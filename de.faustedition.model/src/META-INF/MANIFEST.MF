@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-Name: Faustedition Model Bundle
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: de.faustedition.model
+Bundle-Version: 1.0.0
+Export-Package: de.faustedition.model,
+ de.faustedition.model.metadata,
+ de.faustedition.model.service,
+ de.faustedition.model.xmldb,
+ de.faustedition.util
+Import-Package: javax.sql
+Import-Bundle: com.springsource.org.apache.commons.lang;version="[2.4.0,2.4.0]",
+ com.springsource.org.apache.commons.io;version="[1.4.0,1.4.0]",
+ com.springsource.org.apache.commons.dbcp;version="[1.2.2.osgi,1.2.2.osgi]",
+ com.springsource.org.postgresql.jdbc3;version="[8.3.603,8.3.603]",
+ com.springsource.org.apache.commons.httpclient;version="[3.1.0,3.1.0]"
+Import-Library: org.springframework.spring;version="[2.5.6.A,2.5.6.A]"
+

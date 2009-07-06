@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.springsource.server.ide.par:Par xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:com.springsource.server.ide.par="http:///com/springsource/server/ide/par.ecore">
+  <bundle symbolicName="de.faustedition.model"/>
+  <bundle symbolicName="de.swkk.faustedition"/>
+  <bundle symbolicName="de.faustedition.web"/>
+</com.springsource.server.ide.par:Par>

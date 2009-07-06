@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src">
+		<attributes>
+			<attribute name="com.springsource.server.ide.jdt.core.test.classpathentry" value="false"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="test">
+		<attributes>
+			<attribute name="com.springsource.server.ide.jdt.core.test.classpathentry" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="com.springsource.server.ide.jdt.core.MANIFEST_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

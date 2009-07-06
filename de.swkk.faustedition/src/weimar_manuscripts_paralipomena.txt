@@ -1,0 +1,2361 @@
+#xx01799
+#08a25/XVII,1,12
+#26 ohne Sigle
+#41b264
+#41h252
+#42iNo 8 Chor
+#42jNo: 26. Schlußchor
+
+#xx09880
+#08a25/XVII,2,4
+#21 I 14,288
+#26 H P 5
+#41b218
+#41h8
+#42iNur heute schränckt
+#43 5
+
+#xx09881
+#08a25/XVII,2,2*b
+#21 I 14,288
+#26 H P3
+#41b215
+#41h(7)
+#42iUnd wer euch heut
+#43 4
+
+#xx09882
+#08a25/XVII,2,5
+#21 I 14,289
+#26 H P 8
+#41b132
+#41h33
+#42iUnd schleppe noch bey diesem
+#43 8
+
+#xx09883
+#08a25/XVII,2,8
+#21 I 14,290-291; I 14.2,432
+#26 H P 11
+#41b226
+#41h14
+#42iDisputation. Halbchor
+#43 11
+
+#xx09884
+#08a25/XVII,2,9
+#21 I 14,291-292
+#26 H P 12
+#41b236
+#41h15
+#42iAuditorium. Disputation. Schüler
+#43 12
+
+#xx09885
+#08a25/XVII,2,11*b
+#21 I 14,292
+#26 H P15
+#41b239
+#41h21
+#42iAls Pudel als Gespenst
+#43 16
+
+#xx09886
+#08a25/XVII,2,2*a
+#21 I 14,288
+#26 H P3
+#41b215
+#41h9
+#42iUnd wenn der Narr
+#43 3
+
+#xx09887
+#08a25/XVII,2,7*c
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b121
+#41h20
+#42iDie Wahrheit zu ergründen
+#43 19
+
+#xx09888
+#08a25/XVII,2,13*a
+#21 I 14,294
+#26 H P6
+#41b103
+#41h--
+#42iLand Strase. Ein Kreuz am Weege
+#42jWas giebts Mephisto hast du Eil?
+#43 21
+
+#xx09889
+#08a25/XVII,2,25*g
+#21 I 14,311-312
+#26 H P54
+#41b108
+#41h29
+#42iDenn dein Gespräch gefällt
+#42jGibts ein Gespräch
+#43 60
+
+#xx09890
+#08a25/XVII,2,14*d
+#21 I 14,294-295
+#26 H P22
+#41b175
+#41h48
+#42iNach dem Intermezz
+#43 48
+
+#xx09891
+#08a25/XVII,2,15
+#21 I 14,295
+#26 H P25
+#41b241
+#41h37
+#42iAndreas Nacht. Mondschein
+#43 25
+
+#xx09892
+#08a25/XVII,2,20
+#21 I 14,300-301
+#26 H P30
+#41b171
+#41h--
+#42iFaust Hippomanes
+#43 30
+
+#xx09893
+#08a25/XVII,2,19
+#21 I 14,300
+#26 H P29
+#41b168
+#41h--
+#42iHagestolz Träume
+#43 29
+
+#xx09894
+#08a25/XVII,2,7*d
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b120
+#41h42
+#42iWie man nach Norden
+#43 33
+
+#xx09895
+#08a25/XVII,2,7*e
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b120
+#41h49
+#42iLeuchtende Finger des Meph
+#43 34
+
+#xx09896
+#08a25/XVII,2,7*f
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b120
+#41h58
+#42iIhr Leben ist ein bloser
+#43 35
+
+#xx09897
+#08a25/XVII,1,2*g
+#21 I 14,255
+#26 H P2
+#41b115
+#41h46
+#42iFiel vor mir hin
+#43 46
+
+#xx09898
+#08a25/XVII,2,7*g
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b121
+#41h43
+#42iBestünde nur die Weisheit
+#43 38
+
+#xx09899
+#08a25/XVII,2,21
+#21 I 14,301
+#26 H P32
+#41b180
+#41h41
+#42iwelch hohe Pracht
+#43 32
+
+#xx09900
+#08a25/XVII,2,7*h
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b120
+#41h56
+#42iIch wäre nicht so arm an Witz
+#43 39
+
+#xx09901
+#08a25/XVII,2,25*h
+#21 I 14,311-312
+#26 H P54
+#41b108
+#41h30
+#42iDie bloße Wahrheit
+#43 61
+
+#xx09902
+#08a25/XVII,2,17*d
+#21 I 14,296-297
+#26 H P27
+#41b161
+#41h57
+#42iDer liebe Sänger
+#43 40
+
+#xx09903
+#08a25/XIX,1,3:3
+#26 H P68 Var
+#41b185
+#42iDenn Rath denckt ieglicher genug
+#43 -
+
+#xx09904
+#08a25/XVII,2,7*i
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b120
+#41h63
+#42iMusick nur her
+#43 44
+
+#xx09905
+#08a25/XVII,2,7*j
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b121
+#41h185
+#42iDie spindelförmigen Gestalten
+#43 52
+
+#xx09906
+#08a25/XVII,2,7*k
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b121
+#41h13
+#42iFleisch dorrt wie Heu
+#43 53
+
+#xx09907
+#08a25/XVIII,8:2*e
+#21 I 15.2,246
+#26 V Hc
+#41b799
+#42iIn heiliger Liebes Lu[st]
+#43 208
+
+#xx09908
+#08a25/XVIII,5,9*d
+#21 I 15.2,132: H.8
+#26 IV H8
+#41b725
+#41h110
+#42iErzbischoff (tritt ein)
+#43 184
+
+#xx09909
+#08a25/XVIII,5,6*d
+#21 I 15.2,132: H.5
+#26 IV H5
+#41b693
+#41h213
+#42idas dauert mir zu lange
+#43 187
+
+#xx09910
+#08a25/XVII,2,26
+#21 I 53,367
+#26 H P 62a
+#41b158
+#41h62
+#42iEin Tritt von seinem Fusse
+#43 62.a; 51n
+
+#xx09911
+#08a25/XIX,1,1
+#21 I 15.2,173-177
+#26 H P 63
+#41b266
+#41h70
+#42iZu Beginn des Zweiten Theiles
+#43 63
+
+#xx09912
+#08a25/XIX,1,2*a
+#21 I 15.2,177-179
+#26 H P 65
+#41b186
+#41h114
+#42iBravo alter Fortinbras
+#43 65
+
+#xx09913
+#08a25/XIX,1,2*b
+#21 I 15.2,177-179
+#26 H P 65
+#41b189
+#41h136
+#42iEin Leibarzt muß zu allem
+#43 66
+
+#xx09914
+#08a25/XIX,1,3:1
+#21 I 15.2,179-180
+#26 H P 67
+#41b181
+#41h117
+#42iPfui schäme dich
+#43 67
+
+#xx09915
+#08a25/XIX,1,3:2
+#21 I 15.2,179-180
+#26 H P 68
+#41b183
+#41h118
+#42iGeh' hin versuche nur
+#43 68
+
+#xx09916
+#08a25/XIX,1,4
+#21 I 15.2,181
+#26 H P 69
+#41b192
+#41h115
+#42iHerr Kanzler protestirt nur nicht
+#43 69
+
+#xx09917
+#08a25/XVII,1,2*j
+#21 I 14,255
+#26 H P2
+#41b114
+#41h116
+#42iMeph als Phisicien
+#43 70
+
+#xx09918
+#08a25/XIX,1,5*a
+#21 I 15.2,182
+#26 H P 75
+#41b193
+#41h143
+#42iWenn du was recht verborgen halten
+#43 75
+
+#xx09919
+#08a25/XIX,1,5*b
+#21 I 15.2,182
+#26 H P 75
+#41b193
+#41h144
+#42iEr gefällt mir so besonders nicht
+#43 76
+
+#xx09920
+#08a25/XIX,1,5*c
+#21 I 15.2,182
+#26 H P 75
+#41b193
+#41h145
+#42iEr will nur deine Künste sehn
+#43 77
+
+#xx09921
+#08a25/XIX,1,6*a
+#21 I 15.2,182-183
+#26 H P 78
+#41b131
+#41h--
+#42iIst völlig eins bey Hof
+#42jKennst du das Spiel
+#43 78
+
+#xx09922
+#08a25/XIX,1,6*b
+#21 I 15.2,182-183
+#26 H P 78
+#41b131
+#41h147
+#42iWer den geringsten Vorzug hat
+#43 79
+
+#xx09923
+#08a25/XIX,1,6*c
+#21 I 15.2,182-183
+#26 H P 78
+#41b131
+#41h148
+#42iDas Wissen wächst die Unruh
+#43 80
+
+#xx09924
+#08a25/XIX,1,7
+#21 I 15.2,183
+#26 H P 81
+#41b194
+#41h210
+#42iWorum man sich doch ängstlich
+#43 81
+
+#xx09925
+#08a25/XIX,1,8*a
+#21 I 15.2,183
+#26 H P 82
+#41b201
+#41h209
+#42iDas haben die Propheten schon
+#43 82
+
+#xx09926
+#08a25/XIX,1,8*b
+#21 I 15.2,183
+#26 H P 82
+#41b201
+#41h(198)
+#42iJeder Trost ist niederträchtig
+#43 83
+
+#xx09927
+#08a25/XVII,1,2*e
+#21 I 14,255
+#26 H P2
+#41b113
+#41h59
+#42iUnd selbst die allerkürzten
+#43 37
+
+#xx09928
+#08a25/XIX,2,27*a
+#21 I 15.2,244
+#26 H P196
+#41b794
+#41h113
+#42iChor der Büßerinnen
+#43 196
+
+#xx09929
+#08a25/XIX,1,10
+#21 I 15.2,185-186
+#26 H P 91
+#41b205
+#41h227
+#42iUnd Mitternacht bezeichnet
+#43 91
+
+#xx09930
+#08a25/XIX,1,11:2
+#21 I 15.2,186-187
+#26 H P 92.2
+#41b207
+#41h--
+#42iNun hat das tückische Alter
+#43 92var
+
+#xx09931
+#08a25/XIX,1,12*a
+#21 I 15.2,187
+#26 H P 93
+#41b750
+#41h229
+#42iDas Leben, wie es eilig flieht
+#43 93
+
+#xx09932
+#08a25/XIX,1,12*b
+#21 I 15.2,187
+#26 H P 93
+#41b750
+#41h230
+#42iSo ruhe denn an deiner Stätte
+#43 94
+
+#xx09933
+#08a25/XIX,1,12*c
+#21 I 15.2,187
+#26 H P 93
+#41b750
+#41h232
+#42iNein! diesmal gilt kein Weilen
+#43 95
+
+#xx09934
+#08a25/XIX,1,13
+#21 I 15.2,187-188
+#26 H P 96
+#41b208
+#41h235
+#42iDas zierlich höfische Geschlecht
+#43 96
+
+#xx09935
+#08a25/XVII,2,7*m
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b121
+#41h(2)
+#42iAbkündigung
+#42jDas Leben ist
+#43 97
+
+#xx09936
+#08a25/XIX,1,14:1
+#21 I 15.2,188
+#26 H P 97
+#41b209
+#41h2
+#42iAbkündigung
+#43 97
+
+#xx09937
+#08a25/XIX,1,14:2
+#21 I 15.2,188
+#26 H P 98
+#41b211
+#41h3
+#42iAbschied
+#43 98
+
+#xx09938
+#08a25/XIX,1,15:2
+#21 I 15.2,189-190
+#26 H P 99A
+#41b417
+#41h86
+#42iFaust, niedergelegt
+#43 99 A
+
+#xx09939
+#08a25/XIX,1,15:1
+#21 I 15.2,189-190
+#26 H P 99B
+#41b419
+#41h86
+#42iFaust niedergelegt
+#43 99 B
+
+#xx09940
+#08a25/XVIII,3,7*b
+#21 I 15.2,70: H.58
+#26 III H 58
+#41b291
+#41h76
+#42iF. Schlafend Geister des Ruhms
+#42jF<aust>. Schlafend Geister des Ruhms
+#42kSchlafend Geister des Ruhms
+#43 100
+
+#xx09941
+#08a25/XIX,1,16
+#21 I 15.2,191
+#26 H P101
+#41b294
+#41h77
+#42iAndeutungen auf die verborgenen
+#43 101
+
+#xx09942
+#08a25/XIX,1,17
+#21 I 15.2,191-192
+#26 H P102
+#41b297
+#41h78
+#42iMaskenzüge. <Zur Mummenschanz>
+#43 102
+
+#xx09943
+#08a25/XVII,5,2*b
+#21 I 15.2,11: H.32
+#26 I H 32
+#41b366
+#41h80
+#42iPlutus Ankündigend. Faunenchor
+#43 103
+
+#xx09944
+#08a25/XIX,1,18:2
+#21 I 15.2,192
+#26 H P105
+#41b334
+#41h84
+#42iKnabe Zu Plutus
+#43 105
+
+#xx09945
+#08a25/XIX,1,18:3
+#21 I 15.2,192
+#26 H P106
+#41b343
+#41h81
+#42iDez. 16. Plutus Verabschiedet
+#42jPlutus Verabschiedet (Dez. 16.)
+#43 106
+
+#xx09946
+#08a25/XIX,1,18:4
+#21 I 15.2,192
+#26 H P107
+#41b369
+#41h85
+#42iNoch zum ersten Acte
+#43 107
+
+#xx09947
+#08a25/XIX,1,19
+#21 I 53,367
+#26 H P108c
+#41b305
+#41h122
+#42iNicht so eilig eure Straß
+#43 108.c; 54n
+
+#xx09948
+#08a25/XVII,4,25*b
+#21 I 15.11: H.23
+#26 I H 23
+#41b323
+#41h125
+#42iDich Poesie den Reichthum
+#43 109
+
+#xx09949
+#08a25/XVII,4,25*c
+#21 I 15.11: H.23
+#26 I H 23
+#41b323
+#41h123
+#42iIrrst du nicht hier
+#43 110
+
+#xx09950
+#08a25/XIX,1,20
+#21 I 53,368-369
+#26 H P110a
+#41b306
+#41h124
+#42iNatur und Liebe
+#42jPoeten. Natur und Liebe
+#43 110.a; 55n
+
+#xx09951
+#08a25/XVII,4,30*b
+#21 I 15.2,11: H.28
+#26 I H 28
+#41b338
+#41h126
+#42iIrrthum du bist gar zu schön
+#43 112
+
+#xx09952
+#08a25/XVII,4,31*d
+#21 I 15.2,11: H.29
+#26 I H 29
+#41b339
+#41h127
+#42iEr mag sich wie er will
+#43 113
+
+#xx09953
+#08a25/XVII,4,31*e
+#21 I 15.2,11: H.29
+#26 I H 29
+#41b340
+#41h(128)
+#42iKann ich nie doch
+#43 114
+
+#xx09954
+#08a25/XVII,5,10*b
+#21 I 15.2,11: H.39
+#26 I H 39
+#41b348
+#41h129
+#42iSeht ihr die Quelle da
+#43 115
+
+#xx09955
+#08a25/XVII,5,13*d
+#21 I 15.2,11: H.42
+#26 I H 42
+#41b354
+#41h130
+#42iSoll immerfort das Übermaas
+#43 116
+
+#xx09956
+#08a25/XVII,5,16*b
+#21 I 15.2,12: H.45
+#26 I H 45
+#41b371
+#41h131
+#42iWer schildert solchen Übermuth
+#43 117
+
+#xx09957
+#08a25/XVII,5,16*c
+#21 I 15.2,12: H.45
+#26 I H 45
+#41b372
+#41h132
+#42iUnd wenn du rufst
+#43 118
+
+#xx09958
+#08a25/XVII,5,19*d
+#21 I 15.2,12: H.48
+#26 I H 48
+#41b380
+#41h133
+#42iNicht Nacht nicht Tag
+#43 119
+
+#xx09959
+#08a25/XVII,5,21*e
+#21 I 15.2,12: H.50
+#26 I H 50
+#41b383
+#41h135
+#42iAm glühnden Schlüssel
+#43 120
+
+#xx09960
+#08a25/XVII,5,22*b
+#21 I 15.2,13: H.n
+#26 I H n
+#41b384
+#41h134
+#42iMusst mit Bedacht des Schlüssels
+#43 121
+
+#xx09961
+#08a25/XVII,5,30*b
+#21 I 15.2,12: H.58
+#26 I H 58
+#41b387
+#41h149
+#42iMan kleid' ihn ritterlich
+#43 122
+
+#xx09962
+#08a25/XIX,2,5*g
+#21 I 15.2,219-221
+#26 H P140
+#41b409
+#41h179
+#42iNicht so direkt
+#43 146
+
+#xx09963
+#08a25/XIX,1,21b
+#21 I 15.2,198-215
+#26 H P123B
+#41b424
+#41h(73)
+#42iBey einem großen Feste
+#43 123 B
+
+#xx09964
+#08a25/XIX,1,21c
+#21 I 15.2,198-215
+#26 H P123C
+#41b433
+#41h73
+#42iHelena, Zwischenspiel zu Faust
+#43 123 C
+
+#xx09965
+#08a25/XIX,2,1
+#21 I 15.2,215
+#26 H P124
+#41b490
+#41h87
+#42iPharsalische Ebene Peneus
+#43 124
+
+#xx09966
+#08a25/XIX,2,2
+#21 I 15.2,216
+#26 H P125
+#41b508
+#41h88
+#42iPharsalische Ebene links der Peneus
+#43 125
+
+#xx09967
+#08a25/XIX,2,3
+#21 I 15.2,217
+#26 H P126
+#41b521
+#41h90
+#42iInterloc. Sirenen
+#43 126
+
+#xx09968
+#08a25/XVII,2,13*c
+#21 I 14,294
+#26 H P6
+#41b103
+#41h23
+#42iMein Freund wenn je der Teufel
+#43 7
+
+#xx09969
+#08a25/XVII,7,6*e
+#21 I 15.2,37: H.5
+#26 II H5
+#41b203
+#41h201
+#42iDer leichte hohe Geist
+#43 89
+
+#xx09970
+#08a25/XIX,2,13:1
+#21 I 15.2,228-229
+#26 H P 165
+#41b593
+#42iBurg von außen
+#43 165
+
+#xx09971
+#08a25/XVII,8,14*f
+#21 I 15.2,39: H.49
+#26 II H49
+#41b518
+#41h155
+#42iHier von Scotusa
+#43 153
+
+#xx09972
+#08a25/XVII,7,3*c
+#21 I 15.2,37: H.2
+#26 II H2a
+#41b469
+#41h244
+#42iVon dem was sie verstehn
+#43 128
+
+#xx09973
+#08a25/XVII,7,6*f
+#21 I 15.2,37: H.5
+#26 II H5
+#41b203
+#41h202
+#42iUnd wenn das Leben
+#43 90
+
+#xx09974
+#08a25/XVII,7,6*c
+#21 I 15.2,37: H.5
+#26 II H5
+#41b203
+#41h200
+#42iEin irdischer Verlust
+#43 87
+
+#xx09975
+#08a25/XVII,1,2*d
+#21 I 14,255
+#26 H P2
+#41b113
+#41h60
+#42iVier Beine lieb ich mir
+#43 36
+
+#xx09976
+#08a25/XIX,2,5*a
+#21 I 15.2,219-221
+#26 H P140
+#41b408
+#41h169
+#42iDu schärfe deiner Augen Licht
+#43 140
+
+#xx09977
+#08a25/XVII,1,2*c
+#21 I 14,255
+#26 H P2
+#41b114
+#41h19
+#42iMit pathetischem Dünkel
+#43 18
+
+#xx09978
+#08a25/XIX,2,5*b
+#21 I 15.2,219-221
+#26 H P140
+#41b408
+#41h165
+#42iAn deinem Gürtelkreis Natur
+#43 141
+
+#xx09979
+#08a25/XVII,1,2*b
+#21 I 14,255
+#26 H P2
+#41b115
+#41h11
+#42iTreten des Elements
+#43 2
+
+#xx09980
+#08a25/XVII,2,7*a
+#21 I 14,10
+#26 H P 10
+#41b121
+#42iUnd es verzeihen sogar
+#43 10
+
+#xx09981
+#08a25/XIX,2,15*a
+#21 I 15.2,229
+#26 H P167
+#41b545
+#41h100
+#42iAls Ritterfrau
+#43 167
+
+#xx09982
+#08a25/XIX,2,12
+#21 I 53,369-370
+#26 H P164a
+#41b610
+#41h96
+#42iEinschaltung. Zwergen
+#43 164.a; 57n
+
+#xx09983
+#08a25/XIX,2,6:1
+#21 I 15.2,221
+#26 H P147
+#41b474
+#41h152
+#42iWie wunderbar der Anblick
+#43 147
+
+#xx09984
+#08a25/XIX,2,6:2
+#21 I 15.2,221
+#26 H P148
+#41b648
+#41h245
+#42iAuch die Gesunden
+#43 148
+
+#xx09985
+#08a25/XIX,2,7
+#21 I 15.2,221
+#26 H P149
+#41b472
+#41h177
+#42iWenn du entstehn willst
+#43 149
+
+#xx09986
+#08a25/XVII,8,37*b
+#21 I 15.2,39: H.74
+#26 II H 74
+#41b522
+#41h150
+#42iDas Auge fordert seinen Zoll
+#43 150
+
+#xx09987
+#08a25/XVII,8,13*c
+#21 I 15.2,38-39: H.48
+#26 II H 48
+#41b517
+#41h173
+#42iZum edlen Zweck es abzutreten
+#43 152
+
+#xx09988
+#08a25/XVII,8,20*d
+#21 I 15.2,39: H.55
+#26 II H 55
+#41b512
+#41h176
+#42iKennte der Jüngling
+#43 155
+
+#xx09989
+#08a25/XIX,2,8
+#21 I 15.2,224-225
+#26 H P157
+#41b525
+#41h91
+#42iProlog des dritten Acts
+#43 157
+
+#xx09990
+#08a25/XVIII,2,38*c
+#21 I 15.2,70; I 53,567: H.49
+#26 III H 49
+#41b400
+#41h180
+#42iDas wohlgedachte glaub ich
+#43 158
+
+#xx09991
+#08a25/XIX,2,9:1
+#21 I 15.2,225
+#26 H P159
+#41b529
+#41h181
+#42iNur wandle den Weg
+#43 159
+
+#xx09992
+#08a25/XIX,2,10
+#21 I 15.2,226
+#26 H P161
+#41b531
+#41h183
+#42iWas hüllst du mich
+#43 161
+
+#xx09993
+#08a25/XVIII,1,8*b
+#21 I 15.2,68: H.8
+#26 III H 8
+#41b574
+#41h93
+#42iHelena von den Schiffen
+#43 162
+
+#xx09994
+#08a25/XIX,2,11
+#21 I 15.2,227
+#26 H P163
+#41b578
+#41h94
+#42iHelen<a> Kind Theseus
+#43 163
+
+#xx09995
+#08a25/XVII,8,13*d
+#21 -
+#26 II H48
+#41b517
+#42iEs ist wenn es nur gluckt
+#43 204 Var
+
+#xx09996
+#08a25/XVIII,2,32*b
+#21 I 15.2,69: H.43
+#26 III H 43
+#41b629
+#41h99
+#42iHelena Zu sich einladend
+#43 166
+
+#xx09997
+#08a25/XIX,2,14
+#21 I 53,370-371
+#26 H P166a
+#41b617
+#41h98
+#42iFaust tritt ein
+#43 166.a; 58n
+
+#xx09998
+#08a25/XIX,2,15*c
+#26 H P167
+#41b544
+#42iDie schönen Weiber
+#43 52 Var
+
+#xx09999
+#08a25/XIX,2,16
+#21 I 15.2,230
+#26 H P168
+#41b633
+#41h101
+#42iAbzug der Fürsten
+#43 168
+
+#xx010000
+#08a25/XVIII,3,2*b
+#21 I 15.2,70: H.53
+#26 III H 53
+#41b627
+#41h102
+#42iHohes Gebirg
+#43 169
+
+#xx010001
+#08a25/XVIII,1,9*b
+#21 I 15.2,68: H.9
+#26 III H 9
+#41b552
+#41h188
+#42iO das ist unter allem
+#43 171
+
+#xx010002
+#08a25/XVIII,1,12*b
+#21 I 15.2,68: H.12
+#26 III H 12
+#41b570
+#41h189
+#42iSo wird die Schönheit
+#43 172
+
+#xx010003
+#08a25/XVIII,2,1*b
+#21 I 15.2,68: H.13
+#26 III H 13
+#41b581
+#41h190
+#42iDu schön geborne
+#43 173.1
+
+#xx010004
+#08a25/XVIII,2,2*c
+#21 I 15.2,68: H.14
+#26 III H 14
+#41b582
+#41h191
+#42iDu schön gebohren
+#43 173.2
+
+#xx010005
+#08a25/XVIII,2,2*d
+#21 I 15.2,68: H.14
+#26 III H 14
+#41b583
+#41h192
+#42iWenn Wahres Traum ist
+#43 174
+
+#xx010006
+#08a25/XVIII,2,25*b
+#21 I 15.2,69: H.36
+#26 III H 36
+#41b606
+#41h194
+#42iPeloponnes den ganzen
+#43 175
+
+#xx010007
+#08a25/XVII,2,12*b
+#21 I 14,293
+#26 H P20
+#41b196
+#41h54
+#42iEin Mensch der von sich spricht
+#43 41
+
+#xx010008
+#08a25/XVII,2,7*b
+#21 I 14,289; I 14,275
+#26 H P 10
+#41b122
+#41h6
+#42iSeht mir nur ab
+#43 10
+
+#xx010009
+#08a25/XIX,2,17:2
+#21 I 15.2,233-235
+#26 H P176
+#41b624
+#41h196
+#42iDenn Liebespaaren zeigtet ihr
+#43 176
+
+#xx010010
+#08a25/XIX,2,18
+#21 I 15.2,237-238
+#26 H P179
+#41b673
+#41h106
+#42iParalogus Im Proscenium
+#43 179.1
+
+#xx010011
+#08a25/XVIII,3,18*c
+#21 I 15.2,70: H.66
+#26 III H 66
+#41b647
+#41h197
+#42iSo vertheilen wir uns
+#43 177
+
+#xx010012
+#08a25/XVIII,5,23*b
+#21 I 15.2,133: H.22
+#26 IV H 22
+#41b678
+#41h107
+#42iFaust aus der Wolke
+#43 178
+
+#xx010013
+#08a25/XIX,2,18:2
+#21 I 15.2,237-238
+#26 H P179.2
+#41b674
+#41h106
+#42iDer weise Fürst
+#43 179.2
+
+#xx010014
+#08a25/XIX,2,18:2
+#21 I 15.2,237-238
+#26 H P179.3
+#41b674
+#41h106
+#42iMephistopheles im rauhen Gebirg
+#43 179.3a
+
+#xx010015
+#08a25/XIX,2,18:2
+#21 I 15.2,237-238
+#26 H P179.2
+#41b674
+#41h216
+#42iDie Masken sind von Stahl
+#43 179.3b
+
+#xx010016
+#08a25/XIX,2,19
+#21 I 53,371
+#26 H P179a
+#41b670
+#41h105
+#42iMeph im Gebirg
+#43 179.a; 60n
+
+#xx010017
+#08a25/XIX,2,20
+#21 I 15.2,238
+#26 H P180
+#41b677
+#41h104
+#42iVierter Ackt. Starres Gebirg
+#43 180
+
+#xx010018
+#08a25/XIX,2,21
+#21 I 15.2,238-239
+#26 H P181
+#41b709
+#41h217
+#42iPlateau auf dem Vorgebirge
+#42jDas Größte was man ausgedacht
+#42kUnd ganz natürlich
+#43 181
+
+#xx010019
+#08a25/XVIII,5,13*b
+#21 I 15.2,132: H.12
+#26 IV H 12
+#41b718
+#41h109
+#42iKayser. Obergeneral
+#42jOb G. Legt die Stellung
+#43 183
+
+#xx010020
+#08a25/XVII,2,17*b
+#21 I 14,296-297
+#26 H P27
+#41b161
+#41h43
+#42iBestünde nur die Weisheit
+#43 38
+
+#xx010021
+#08a25/XVII,2,17*a
+#21 I 14,296-297
+#26 H P27
+#41b159
+#41h--
+#42iJuncker der böse Feind
+#43 27
+
+#xx010022
+#08a25/XVIII,5,6*e
+#21 I 15.2,132: H.5
+#26 IV H 5
+#41b694
+#41h(204)
+#42iEs schwillt der Kamm
+#43 188
+
+#xx010023
+#08a25/XIX,2,22
+#21 I 15.2,240-241
+#26 H P188
+#41b701
+#41h204
+#42iVon ferne schwillt der Kamm
+#43 188
+
+#xx010024
+#08a25/XIX,2,23
+#21 I 15.2,241
+#26 H P190
+#41b703
+#41h207
+#42iDoppelt schreckliches
+#43 190
+
+#xx010025
+#08a25/XIX,2,24:1
+#21 I 53,371-372
+#26 H P190a
+#41b702
+#41h206
+#42iEin altes Wrack
+#43 190.a; 61n
+
+#xx010026
+#08a25/XIX,2,24:2
+#21 I 53,371-372
+#26 H P190b
+#41b704
+#41h220
+#42iDas weite Land
+#43 190.b; 62n
+
+#xx010027
+#08a25/XVIII,5,13*c
+#21 I 15.2,132: H.12
+#26 IV H 12
+#41b717
+#41h215
+#42iDie Menge steht dem Kaiser
+#43 191
+
+#xx010028
+#08a25/XVIII,5,13*d
+#21 I 15.2,132: H.12
+#26 IV H 12
+#41b719
+#41h212
+#42iDer Herr ist jung
+#43 192
+
+#xx010029
+#08a25/XIX,2,25
+#21 I 15.2,243
+#26 H P194
+#41b756
+#41h111
+#42iVier graue Weiber
+#43 194
+
+#xx010030
+#08a25/XIX,2,26
+#21 I 15.2,243
+#26 H P195
+#41b752
+#41h112
+#42iLeiche Lemuren legen ihm
+#43 195
+
+#xx010031
+#08a25/XVIII,7,5*c
+#21 I 15.2,147: H.4
+#26 V H 4
+#41b762
+#41h222
+#42iEr hat die Händel angefangen
+#43 198
+
+#xx010032
+#08a25/XVIII,7,24*d
+#21 I 15.2,148: H.23
+#26 V H 23
+#41b758
+#41h237
+#42iWillst du zu deinem Zweck
+#43 199
+
+#xx010033
+#08a25/XVIII,7,24*e
+#21 I 15.2,148: H.23
+#26 V H 23
+#41b758
+#41h228
+#42iWir sind noch keineswegs
+#43 200
+
+#xx010034
+#08a25/XVIII,7,24*f
+#21 I 15.2,148: H.23
+#26 V H 23
+#41b758
+#41h224
+#42iMuß befehlen
+#43 201
+
+#xx010035
+#08a25/XVIII,7,24*g
+#21 I 15.2,148: H.23
+#26 V H 23
+#41b758
+#41h238
+#42iGethan geschehn sogleich
+#43 202
+
+#xx010036
+#08a25/XVIII,7,5*d
+#21 I 15.2,147: H.4
+#26 V H 4
+#41b762
+#41h223
+#42iIhr seyd mir fremd
+#43 202.a; 63n
+
+#xx010037
+#08a25/XVIII,7,32*c
+#21 I 15.2,148: H.31
+#26 V H 31
+#41b778
+#41h239
+#42iLiebe, die gnädige
+#43 203
+
+#xx010038
+#08a25/XIX,2,28
+#21 I 15.2,246
+#26 H P204
+#41b515
+#41h236
+#42iMir grillts im Kopf
+#43 204
+
+#xx010039
+#08a25/XVIII,7,25*d
+#21 I 15.2,148: H.24
+#26 V H 24
+#41b764
+#41h233
+#42iDu kommst mir eben recht
+#43 205
+
+#xx010040
+#08a25/XVIII,7,24*h
+#21 I 15.2,148: H.23
+#26 V H 23
+#41b759
+#41h231
+#42iEs war genau in unserm Packt
+#43 206
+
+#xx010041
+#08a25/XVIII,7,24*i
+#21 I 15.2,148: H.23#26 V H 23
+#41b759
+#41h234
+#42iZart schwebend aufnehmend
+#43 207
+
+#xx010042
+#08a25/XVIII,7,39*d
+#21 I 15.2,149: H.d
+#26 V H d
+#41b793
+#41h(240)
+#42iIn heiligem Liebes brand
+#43 208
+
+#xx010043
+#08a25/XVIII,7,39*e
+#21 I 15.2,149: H.d
+#26 V H d
+#41b793
+#41h241
+#42iIn der allerreinsten Quelle
+#43 209
+
+#xx010044
+#08a25/XVIII,7,40*c
+#21 I 15.2,149: H.e
+#26 V H e
+#41b789
+#41h241
+#42iIn der allerreinsten Quelle
+#43 209
+
+#xx010045
+#08a25/XVII,2,6:2*e
+#21 I 14,289
+#26 H P 9
+#41b128
+#41h75
+#42iAd Partem II
+#43 64
+
+#xx010046
+#08a25/XVII,2,6:2
+#26 H P 9
+#41b129
+#41h34
+#42iWenn du von aussen ausgestattet
+#43 9
+
+#xx010047
+#08a25/XVII,4,21*c
+#21 I 15.2,11: H.19
+#26 I H 19
+#41b317
+#41h119
+#42iGrüßet mich in meiner Laube
+#43 108
+
+#xx010048
+#08a25/XVII,5,1*c
+#26 I H 31
+#41b356
+#42iNur alle hundert jahr
+#43 113 Var
+
+#xx010049
+#08a25/XVII,5,9*g
+#26 I H 38
+#41b358
+#42iNur alle hundert jahr
+#43 113 Var
+
+#xx010050
+#08a25/XVII,5,2*c
+#26 I H 32
+#41b361
+#42iIn hundert Jahren
+#43 113 Var
+
+#xx010051
+#08a25/XVII,5,2*d
+#26 I H 32
+#41b362
+#42iIn hundert Jahren
+#43 113 Var
+
+#xx010052
+#08a25/XVII,7,3:1*b
+#21 I 15.2,37: H.2
+#26 II H 2b
+#41b468
+#41h172
+#42iDas muß dich nicht verdrießen
+#43 127
+
+#xx010053
+#08a25/XVII,7,3*d
+#21 I 15.2,37: H.2
+#26 II H2c
+#41b467
+#41h171
+#42iUnd wenns der Teufel ernstlich
+#43 129
+
+#xx010054
+#08a25/XVII,7,6*b
+#21 I 15.2,37: H.5
+#26 II H5
+#41b203
+#41h199
+#42iSo hab' ich denn auf immerdar
+#43 86
+
+#xx010055
+#08a25/XVII,5,14*b
+#21 I 15.2,193
+#26 I H 43
+#41b345
+#42iPlutus. Verabschiedet den Wagen.
+#43 106
+
+#xx010056
+#08a25/XVIII,6:3*c
+#21 I 15.2,242
+#26 IV Hc
+#41b735
+#42iSodann ist auch vor unserm Thron
+#43 193
+
+#xx010057
+#08a25/XVII,7,16*d
+#21 I 15.2,37: H.15
+#26 II H15
+#41b480
+#41h156
+#42iOhne graßliches Gepolter
+#43 133
+
+#xx010058
+#08a25/XVII,8,7*b
+#21 I 15.2,38 u. 222
+#26 II H 42
+#41b518
+#42iVon Scotusa bis an den Peneus
+#43 153 Var
+
+#xx010059
+#08a25/XVIII,7,3*d
+#21 I 15.2,147: H.2
+#26 V H 2
+#41b784
+#41h3
+#42iAm Ende bin ich nun des Trauerspieles
+#43 98
+
+#xx010060
+#08a25/XVIII,7,3*b
+#21 I 15.2,147: H.2
+#26 V H 2
+#41b783
+#41h239
+#42iLiebe, die gnädige
+#43 203
+
+#xx010061
+#08a25/XVIII,7,3*c
+#21 I 15.2,147: H.2
+#26 V H 2
+#41b783
+#41h2
+#42iDen besten Köpfen sey das Stück empfohlen
+#43 97
+
+#xx010062
+#08a25/XVII,1,2*k
+#21 I 14,255
+#26 H P2
+#41b114
+#41h139
+#42iUnd wenn du ganz was falsches
+#43 71
+
+#xx010063
+#08a25/XVII,1,2*l
+#21 I 14,255
+#26 H P2
+#41b115
+#41h140
+#42iMit diesen Menschen umzugehen
+#43 72
+
+#xx010064
+#08a25/XVII,1,2*m
+#21 I 14,255
+#26 H P2
+#41b115
+#41h141
+#42iWenn du sie nicht zum besten
+#43 73
+
+#xx010065
+#08a25/XVII,1,2*n
+#21 I 14,255
+#26 H P2
+#41b115
+#41h142
+#42iUnd was sie gerne wissen wollen
+#43 74
+
+#xx010066
+#08a25/XVII,2,11*a
+#21 I 14,292
+#26 H P15
+#41b239
+#41h17
+#42iDas was uns trennt
+#42jWas uns zerspaltet
+#43 15
+
+#xx010067
+#08a25/XVII,8,37*c
+#21 I 15.2,58
+#26 II H74
+#41b522
+#42iIch eile nun und such im vollen Lauf
+#43 oS
+
+#xx010068
+#08a25/XVIII,1,6:2*c
+#21 I 15.2,68:H.6
+#26 III H 6
+#41b600
+#41h95
+#42iTadel des Run away
+#43 164
+
+#xx010069
+#08a25/XVIII,1,7:5*a
+#21 I 15.2,68: H.7
+#26 III H 7
+#41b405
+#41h169
+#42iDu schärfe deiner Augen Licht
+#43 140
+
+#xx010070
+#08a25/XVIII,1,7:5*b
+#21 I 15.2,68: H.7
+#26 III H 7
+#41b404
+#41h165
+#42iAn deinem Gürtelkreis Natur
+#43 141
+
+#xx010071
+#08a25/XVIII,1,7:5*c
+#21 I 15.2,68: H.7
+#26 III H 7
+#41b404
+#41h162
+#42iWenn er mit seiner Frau
+#43 142
+
+#xx010072
+#08a25/XVIII,1,12*c
+#21 I, 15,231
+#26 III H12
+#41b570
+#42iDie schönen Frauen jung und alt
+#43 52 Var
+
+#xx010073
+#08a25/XVIII,1,10*b
+#21 I 15.2,68: H.10
+#26 III H 10
+#41b549
+#41h187
+#42iDoch die es einmal verscherzte
+#43 85
+
+#xx010074
+#08a25/XVIII,3,9a*b
+#21 I 15.2,72: H.f
+#26 III Hf
+#41b624
+#41h196
+#42iGenug ihr seht ihn (Denn Liebespaaren)
+#43 176
+
+#xx010075
+#08a25/XVII,1,2*f
+#21 I 14,255
+#26 H P2
+#41b115
+#41h45
+#42iWas für ein hölzern Bild
+#43 45
+
+#xx010076
+#08a25/XVII,1,2*h
+#21 I 14,255
+#26 H P2
+#41b114
+#41h50
+#42iSiehst du er kommt
+#43 49
+
+#xx010077
+#08a25/XVII,1,2*i
+#21 I 14,255
+#26 H P2
+#41b115
+#41h12
+#42iO wo ist der Genuß
+#43 51
+
+#xx010079
+#08a25/XVII,2,1
+#21 I 14,287
+#26 H P1
+#41b221
+#41h5
+#42iIdeales streben nach Einwircken
+#43 1
+
+#xx010080
+#08a25/XVII,2,10
+#21 I 14,292
+#26 H P14
+#41b238
+#41h16
+#42iZu suchen wo auf Erden
+#43 14
+
+#xx010081
+#08a25/XVII,2,11*c
+#21 I 14,292
+#26 H P15
+#41b239
+#41h18
+#42iWer spricht von Zweifeln
+#43 17
+
+#xx010082
+#08a25/XVII,2,12*a
+#21 I 14,293
+#26 H P20
+#41b196
+#41h36
+#42iUnd merk dir ein für allemal
+#42jUnd Freude schwebt
+#42kIn goldnen Frühlings Sonnen
+#43 20
+
+#xx010083
+#08a25/XVII,2,12*c
+#21 I 15.2,183
+#26 H P20
+#41b196
+#42iDas hat schon der Prophet
+#43 82 Var
+
+#xx010084
+#08a25/XVII,2,14*a
+#21 I 14,294-295
+#26 H P22
+#41b174
+#41h35
+#42iFaust Meph F. Umgekehrte Richtung
+#43 22
+
+#xx010085
+#08a25/XVII,2,14*b
+#21 I 14,294-295
+#26 H P22
+#41b174
+#41h38
+#42iKleine Reichsstadt. Das anmuthige
+#43 24
+
+#xx010086
+#08a25/XVII,2,14*c
+#21 I 14,294-295
+#26 H P22
+#41b175
+#41h40
+#42iAufmunterung zu Walp. Nacht
+#43 31
+
+#xx010087
+#08a25/XVII,2,16
+#21 I 14,295-296
+#26 H P26
+#41b133
+#41h39
+#42iDer junge Herr ist freylich
+#43 26
+
+#xx010088
+#08a25/XVIII,5,7:1*f
+#21 I 15.2,132: H.6
+#26 IV H6
+#41b689
+#41h211
+#42iDas Menschengeschlecht es quält
+#43 185
+
+#xx010089
+#08a25/XVIII,5,7:1*g
+#21 I 15.2,132: H.6
+#26 IV H6
+#41b689
+#41h214
+#42iBin ich denn nicht der Kayser
+#43 186
+
+#xx010090
+#08a25/XVII,2,17*c
+#21 I 14,296-297
+#26 H P27
+#41b161
+#41h56
+#42iIch wäre nicht so arm an Witz
+#43 39
+
+#xx010091
+#08a25/XVII,2,18
+#21 I 14,300
+#26 H P28
+#41b166
+#41h--
+#42iJüngster Tag. Praeadamiten
+#43 28
+
+#xx010092
+#08a25/XVII,2,22
+#21 I 14,303
+#26 H P42
+#41b130
+#41h61
+#42iNur Hunger schärft den Geist
+#43 42
+
+#xx010093
+#08a25/XVII,2,23
+#21 I 14,304-305
+#26 H P47
+#41b243
+#41h47
+#42iBlocksbergs-Candidaten
+#43 47
+
+#xx010094
+#08a25/XVII,2,24
+#21 I 14,305-311
+#26 H P50
+#41b139
+#41h69
+#42iGipfel Nacht Feuer Koloss
+#42jDie Böcke zur rechten
+#42kUnd kann ich wie ich bat
+#42lUnd wie wir nun nach Hause ziehn
+#42mDem Ruß den Hexen
+#42nSchöpfung des Menschen
+#42oVerändrung ist schon alles
+#42pWill einige Nacht Mahre zaumen
+#42qWo fließet heißes Menschen Blut
+#43 50
+
+#xx010095
+#08a25/XVII,2,25*a
+#21 I 14,311-312
+#26 H P54
+#41b107
+#41h24
+#42iEy was ich weis das brauch ich
+#43 54
+
+#xx010096
+#08a25/XVII,2,25*b
+#21 I 14,311-312
+#26 H P54
+#41b107
+#41h31
+#42iUnd der zuerst sich wie ein Gott
+#43 55
+
+#xx010097
+#08a25/XVII,2,25*c
+#21 I 14,311-312
+#26 H P54
+#41b107
+#41h32
+#42iAuf diesem Wege rollt es eben
+#43 56
+
+#xx010098
+#08a25/XVII,2,25*d
+#21 I 14,311-312
+#26 H P54
+#41b107
+#41h25
+#42iWenn du nur von den Bissen
+#43 57
+
+#xx010099
+#08a25/XVII,2,25*e
+#21 I 14,311-312
+#26 H P54
+#41b108
+#41h26
+#42iDer ganze Fehler ist daher
+#43 58
+
+#xx010100
+#08a25/XVII,2,25*f
+#21 I 14,311-312
+#26 H P54
+#41b108
+#41h27
+#42iDenn zum erkennen ist der größte
+#43 59
+
+#xx010101
+#08a25/XVIII,5,20*e
+#21 I 15.2,241
+#26 IV H19
+#41b714
+#42iDie Menge steht dem Kayser
+#43 191
+
+#xx010102
+#08a35/N 44
+#21 -
+#26 H P197a
+#41b802
+#43 -
+
+#xx010103
+#08a25/XXVIII,G*a
+#21 I 53,369
+#26 H P121a
+#41b199
+#42iWie man bey Hof sich zwischen
+#43 56n
+
+#xx010104
+#08a25/XIX,1,11:1
+#21 I 15.2,186-187
+#26 H P 92
+#41b206
+#41h--
+#42iWie jung ich war und lebt
+#43 92
+
+#xx010105
+#08a25/XIX,1,18:1*c
+#21 I 15.2,192
+#26 H P104
+#41b331
+#41h83
+#42iKnabe Flämmchen
+#43 104
+
+#xx010106
+#08a25/XIX,1,21d:1
+#21 I 15.2,198-215
+#26 H P123A
+#41b412
+#41h72
+#42iHelena, klassisch-romantische
+#43 123 A
+
+#xx010107
+#08a25/XIX,2,5*d
+#21 I 15.2,219-221
+#26 H P140
+#41b408
+#41h170
+#42iIch kenne dich genau
+#43 143
+
+#xx010108
+#08a25/XIX,2,5*e
+#21 I 15.2,219-221
+#26 H P140
+#41b409
+#41h153
+#42iHascht nach dem nächtgen
+#43 144
+
+#xx010109
+#08a25/XIX,2,5*f
+#21 I 15.2,219-221
+#26 H P140
+#41b409
+#41h163
+#42iDas sind Gewitter
+#42jquid quid non creditur
+#43 145
+
+#xx010110
+#08a25/XIX,2,5*c
+#21 I 15.2,220
+#26 H P140
+#41b408
+#42iWenn er mit seinem Weibe
+#43 142
+
+#xx010111
+#08a25/XIX,2,15*b
+#26 H P167
+#41b544
+#42iO daß die Götter
+#43 172 Var
+
+#xx010112
+#08a25/XIX,2,17:1
+#21 I 15.2,233-235
+#26 H P176 Var
+#41b622
+#41h196
+#42iDenn Liebespaaren zeigtet ihr
+#43 176
+
+#xx010113
+#08a25/XVIII,1,2a*b
+#21 I 15.2,230
+#26 H P170
+#41b641
+#42iWechselrede Faust, Phorkyas
+#43 170
+
+#xx010114
+#08a25/XVII,2,6:1*d
+#21 I 14,313
+#26 H P 9
+#41b128
+#42iC Ad Partem II.
+#43 62
+
+#xx010115
+#08a25/XVII,2,6:1*a
+#21 I 14,289
+#26 H P 9
+#41b128
+#41h34
+#42iWenn du von aussen ausgestattet
+#43 9
+
+#xx010116
+#08a25/XVII,2,6:1*b
+#21 I 14,289
+#26 H P 9
+#41b128
+#41h64
+#42iWas an dem Lumpenpack
+#43 43
+
+#xx010117
+#08a25/XVII,2,6:1*c
+#21 I 14,289
+#26 H P 9
+#41b128
+#41h55
+#42iDie Welt geht auseinander
+#42jer heißt sogar der große
+#43 62
+
+#xx010118
+#08a25/XVIII,5,6*f
+#21 I 15.2,132: H.5
+#26 IV H5
+#41b693
+#41h205
+#42iUnfruchtbar kams
+#43 189
+
+#xx010119
+#08a25/XVII,7,7*f
+#21 I 15.2,37: H.6
+#26 II H6
+#41b484
+#41h160
+#42iSo bin ich der Gott der Winde
+#43 137
+
+#xx010120
+#08a25/XVII,7,7*b
+#21 I 15.2,37: H.6
+#26 II H6
+#41b483
+#41h156
+#42iOhne gräßliches Gepolter
+#43 133
+
+#xx010121
+#08a25/XVII,7,7*c
+#21 I 15.2,37: H.6
+#26 II H6
+#41b483
+#41h157
+#42iAls ich einstmal stark
+#43 134
+
+#xx010122
+#08a25/XVII,7,7*d
+#21 I 15.2,37: H.6
+#26 II H6
+#41b484
+#41h158
+#42iUnd nun sagt man die Tittanen
+#43 135
+
+#xx010123
+#08a25/XVII,7,7*e
+#21 I 15.2,37: H.6
+#26 II H6
+#41b484
+#41h159
+#42iDiese schöne glate Flur
+#42jSemestre
+#43 136
+
+#xx010124
+#08a25/XVII,7,7*g
+#21 I 15.2,37: H.6
+#26 II H6
+#41b484
+#41h154
+#42iReden mag man noch so griechisch
+#43 138
+
+#xx010125
+#08a25/XVII,7,7*h
+#21 I 15.2,37: H.6
+#26 II H6
+#41b484
+#41h164
+#42iWers mit der Welt nicht lustig
+#43 139
+
+#xx010126
+#08a25/XVII,7,3:2
+#21 I 15.2,217
+#26 II H2a
+#41b469
+#41h244
+#42iVon dem was sie verstehn
+#43 128
+
+#xx010127
+#08a25/XVII,7,3:3
+#21 I 15.2,217
+#26 II H2c
+#41b467
+#41h171
+#42iUnd wenns der Teufel ernstlich
+#43 129
+
+#xx010128
+#08a25/XIX,2,4
+#21 I 15.2,217
+#26 II H2d
+#41b467
+#41h171
+#42iUnd wenns der Teufel ernstlich
+#43 129
+
+#xx010129
+#08a25/XVII,7,6*d
+#21 I 15.2,37: H.5
+#26 II H5
+#41b203
+#41h203
+#42iIch lernte diese Welt verachten
+#43 88
+
+#xx010130
+#08a25/XVII,7,5*b
+#21 I 15.2,37: H.4
+#26 II H4
+#41b466
+#41h167
+#42iDas hätt er dencken sollen
+#43 130
+
+#xx010131
+#08a25/XVII,8,11*b
+#21 I 15.2,38: H.46
+#26 II H46
+#41b500
+#41h178
+#42iDir wirds vor unserm Zauber
+#43 151
+
+#xx010132
+#08a25/XVII,8,20*c
+#21 I 15.2,39: H.55
+#26 II H55
+#41b513
+#41h175
+#42iDu bist ein Gast
+#42jIn einem Irrthum
+#43 154
+
+#xx010133
+#08a25/XIX,2,9:2*a
+#21 I 15.2,225
+#26 H P160
+#41b530
+#41h182
+#42iSieh hier die Tiefe dieses Ganges
+#43 160
+
+#xx010134
+#08a27/64*a
+#21 -
+#26 H P101a
+#41b296
+#42iDrey Stände: Heilige
+#43 -
+
+#xx010135
+#08a25/XXVI,F,20 Bl 14
+#21 I 14,292
+#26 H P 13
+#41b112
+#41h-
+#42iSchola Druidica Faustus
+#43 13
+
+#xx010136
+#08a25/XIX,1,9*a
+#21 I 15.2,184
+#26 H P 84
+#41b538
+#41h184
+#42iHelena Egypterin Mägde
+#42jUnd das heilige Menschenrecht
+#43 84
+
+#xx010137
+#08a25/XVII,4,11*d
+#21 I 53,567: H.9a
+#26 I H 9a
+#41b319
+#41h120
+#42iDenn das Falsche wie das Wahre
+#43 108.a; 52n
+
+#xx010138
+#08a25/XVIII,5,21*c
+#21 I 15.2,133: H.20
+#26 IV H 20
+#41b710
+#41h108
+#42iVorstellung derselben
+#43 182
+
+#xx010139
+#08a25/XVIII,6,1e*e
+#14 Sie flieht, da liegt ein weites
+#26 IV Hb (P197)
+#41b804-805
+#42iSie flieht, da liegt ein weites
+#43 197
+
+#xx010140
+#08a25/XVII,1,10a
+#21 I 14,241-245
+#26 ohne Sigle
+#41b250
+#42iZwey Teufelchen
+
+#xx010141
+#08a25/XVIII,8,7
+#26 V Hg 1
+#41b796
+#42iDu schwebst zu Höhen
+
+#xx010142
+#08a25/XVII,2,13*b
+#21 I 14,294
+#26 H P6
+#41b103
+#41h22
+#42iMich darf niemand
+#43 6
+
+#xx010143
+#08a25/XVII,2,3
+#21 I 14,288
+#26 H P 4
+#41b217
+#41h7
+#42iUnd wenn ihr scheltet
+#43 4
