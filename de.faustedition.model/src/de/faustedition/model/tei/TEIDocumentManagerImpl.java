@@ -1,18 +1,15 @@
-package de.faustedition.model.service;
+package de.faustedition.model.tei;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.Map;
 
-import javax.xml.XMLConstants;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -20,9 +17,9 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,60 +28,23 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.SAXException;
 
-import de.faustedition.model.TEIDocument;
 import de.faustedition.model.metadata.ManuscriptIdentifier;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLNamespaceCache;
 import de.faustedition.util.XMLUtil;
 
+@Service("teiDocumentManager")
 public class TEIDocumentManagerImpl implements TEIDocumentManager, InitializingBean {
 	private static final Resource TEI_TEMPLATE_RESOURCE = new ClassPathResource("/tei-document-template.xml");
 	private static final Resource TEI_SERIALIZATION_RESOURCE = new ClassPathResource("/tei-document-serialization.xsl");
 
-	private String cssResourceURL;
 	private String schemaResourceURL;
 
-	private Element headerTemplate;
-	private Element textTemplate;
 	private Templates serializationTemplates;
 	private XMLNamespaceCache namespaceCache;
 
-	@Required
-	public void setSchemaResourceURL(String schemaResourceURL) {
-		this.schemaResourceURL = schemaResourceURL;
-	}
-
-	@Required
-	public void setCssResourceURL(String cssResourceURL) {
-		this.cssResourceURL = cssResourceURL;
-	}
-
 	public TEIDocument createDocument() {
 		return createTemplateDocument();
-	}
-
-	public void configure(TEIDocument teiDocument) throws SAXException, IOException {
-		StringBuilder stylesheetPIdata = new StringBuilder();
-		stylesheetPIdata.append("href=\"" + cssResourceURL + "\"");
-		stylesheetPIdata.append(" type=\"text/css\"");
-		XMLUtil.addProcessingInstruction(teiDocument.getDocument(), "xml-stylesheet", stylesheetPIdata.toString());
-
-		StringBuilder schemaPIdata = new StringBuilder();
-		schemaPIdata.append("RNGSchema=\"" + schemaResourceURL + "\" ");
-		schemaPIdata.append("type=\"compact\"");
-
-		XMLUtil.addProcessingInstruction(teiDocument.getDocument(), "oxygen", schemaPIdata.toString());
-
-		Document document = teiDocument.getDocument();
-		Element teiElement = document.getDocumentElement();
-
-		if (teiDocument.getText() == null) {
-			teiElement.appendChild(document.importNode(textTemplate, true));
-		}
-
-		if (teiDocument.getHeader() == null) {
-			teiElement.insertBefore(document.importNode(headerTemplate, true), teiDocument.getText());
-		}
 	}
 
 	public void serialize(TEIDocument document, OutputStream outStream) throws IOException, TransformerException {
@@ -92,10 +52,6 @@ public class TEIDocumentManagerImpl implements TEIDocumentManager, InitializingB
 	}
 
 	public void setTitle(TEIDocument teiDocument, String title) throws SAXException, IOException {
-		if (teiDocument.getHeader() == null) {
-			configure(teiDocument);
-		}
-
 		try {
 			queryForElement(teiDocument, "/:TEI/:teiHeader/:fileDesc/:titleStmt/:title").setTextContent(title);
 		} catch (XPathExpressionException e) {
@@ -140,11 +96,7 @@ public class TEIDocumentManagerImpl implements TEIDocumentManager, InitializingB
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		TEIDocument template = createTemplateDocument();
-		Assert.notNull(headerTemplate = (Element) template.getHeader().cloneNode(true));
-		Assert.notNull(textTemplate = (Element) template.getText().cloneNode(true));
-		
-		Document document = template.getDocument();
+		Document document = createDocument().getDocument();
 		namespaceCache = new XMLNamespaceCache(document, false);
 		for (Node node = document.getFirstChild(); node != null; node = node.getNextSibling()) {
 			if (node instanceof ProcessingInstruction) {

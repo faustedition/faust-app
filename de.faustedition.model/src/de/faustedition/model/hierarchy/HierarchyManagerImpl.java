@@ -1,4 +1,4 @@
-package de.faustedition.model.service;
+package de.faustedition.model.hierarchy;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,8 +21,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.faustedition.model.HierarchyNode;
-import de.faustedition.model.HierarchyNodeType;
 import de.faustedition.util.DatabaseUtil;
 
 @Service("hierarchyManager")

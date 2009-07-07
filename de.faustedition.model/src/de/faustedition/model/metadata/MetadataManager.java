@@ -1,9 +1,8 @@
-package de.faustedition.model.service;
+package de.faustedition.model.metadata;
 
 import java.util.List;
 
-import de.faustedition.model.HierarchyNode;
-import de.faustedition.model.metadata.MetadataValue;
+import de.faustedition.model.hierarchy.HierarchyNode;
 
 public interface MetadataManager {
 	void init() throws Exception;

@@ -1,4 +1,6 @@
-package de.faustedition.model;
+package de.faustedition.model.transcription;
+
+import de.faustedition.model.Model;
 
 public class Facsimile extends Model {
 	private String path;

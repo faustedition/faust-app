@@ -10,7 +10,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<context:component-scan base-package="de.faustedition.model.service" />
+	<context:component-scan base-package="de.faustedition.model" />
 	<tx:annotation-driven />
 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -24,12 +24,9 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="existXmlStorage" class="de.faustedition.model.xmldb.ExistXmlStorage">
-		<property name="url" value="http://localhost:8088/db/faust" />
-	</bean>
-
-	<bean id="teiDocumentManager" class="de.faustedition.model.service.TEIDocumentManagerImpl">
-		<property name="schemaResourceURL" value="http://www.faustedition.net/schema/v1/faust-tei.rnc" />
-		<property name="cssResourceURL" value="http://www.faustedition.net/schema/v1/faust-tei.css" />
+	<bean id="existDatabase" class="de.faustedition.model.xmldb.ExistDatabase">
+		<property name="url" value="http://localhost:8080/exist/rest/db/faust" />
+		<property name="user" value="faust" />
+		<property name="password" value="faust" />
 	</bean>
 </beans>

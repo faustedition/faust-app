@@ -1,10 +1,9 @@
-package de.faustedition.model.service;
+package de.faustedition.model.metadata;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
 
 import javax.sql.DataSource;
 
@@ -23,12 +22,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.faustedition.model.HierarchyNode;
-import de.faustedition.model.HierarchyNodeType;
-import de.faustedition.model.metadata.MetadataField;
-import de.faustedition.model.metadata.MetadataFieldGroup;
-import de.faustedition.model.metadata.MetadataFieldType;
-import de.faustedition.model.metadata.MetadataValue;
+import de.faustedition.model.hierarchy.HierarchyManager;
+import de.faustedition.model.hierarchy.HierarchyNode;
+import de.faustedition.model.hierarchy.HierarchyNodeType;
 import de.faustedition.util.DatabaseUtil;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
@@ -119,8 +115,8 @@ public class MetadataManagerImpl implements MetadataManager {
 			return;
 		}
 
-		LoggingUtil.log(Level.INFO, String.format("Importing metadata field definitions from %s", METADATA_FIELD_DEFINITIONS
-				.getDescription()));
+		LoggingUtil
+				.info(String.format("Importing metadata field definitions from %s", METADATA_FIELD_DEFINITIONS.getDescription()));
 		try {
 			XMLUtil.parse(METADATA_FIELD_DEFINITIONS.getInputStream(), new DefaultHandler() {
 

@@ -3,8 +3,8 @@ package de.faustedition.model.metadata;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import de.faustedition.model.HierarchyNode;
 import de.faustedition.model.Model;
+import de.faustedition.model.hierarchy.HierarchyNode;
 
 public class MetadataValue extends Model {
 	private HierarchyNode node;

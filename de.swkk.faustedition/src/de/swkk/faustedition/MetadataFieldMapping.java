@@ -2,7 +2,6 @@ package de.swkk.faustedition;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.ClassPathResource;
@@ -23,7 +22,7 @@ public class MetadataFieldMapping extends HashMap<String, String> implements Ini
 	private Resource mappingDefinitionResource = new ClassPathResource("/weimar_metadata_field_mapping.xml");
 
 	public void afterPropertiesSet() throws Exception {
-		LoggingUtil.log(Level.INFO, "Initializing metadata field mapping");
+		LoggingUtil.info("Initializing metadata field mapping");
 		parse(mappingDefinitionResource);
 	}
 

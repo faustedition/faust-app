@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.TreeSet;
-import java.util.logging.Level;
 
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
@@ -22,7 +21,7 @@ public abstract class AllegroRecordSet extends TreeSet<AllegroRecord> {
 		Resource recordSetResource = getRecordSetResource();
 		try {
 			parse();
-			LoggingUtil.log(Level.FINE, String.format("Parsed %d record(s) from %s", size(), recordSetResource.getDescription()));
+			LoggingUtil.debug(String.format("Parsed %d record(s) from %s", size(), recordSetResource.getDescription()));
 		} catch (IOException e) {
 			ErrorUtil.fatal(String.format("I/O error while parsing %s", recordSetResource.getDescription()), e);
 		}

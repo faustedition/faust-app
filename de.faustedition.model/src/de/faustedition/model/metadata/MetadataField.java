@@ -1,7 +1,7 @@
 package de.faustedition.model.metadata;
 
-import de.faustedition.model.HierarchyNodeType;
 import de.faustedition.model.Model;
+import de.faustedition.model.hierarchy.HierarchyNodeType;
 
 public class MetadataField extends Model {
 	private MetadataFieldGroup group;

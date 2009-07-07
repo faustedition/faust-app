@@ -1,4 +1,4 @@
-package de.faustedition.model.service;
+package de.faustedition.model.transcription;
 
 import java.io.IOException;
 
@@ -6,7 +6,6 @@ import javax.xml.transform.TransformerException;
 
 import org.xml.sax.SAXException;
 
-import de.faustedition.model.TranscriptionDocument;
 import de.faustedition.model.metadata.ManuscriptIdentifier;
 import de.faustedition.model.xmldb.Collection;
 import de.faustedition.model.xmldb.ExistException;

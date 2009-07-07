@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javax.xml.transform.TransformerException;
 
@@ -23,7 +22,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.faustedition.model.metadata.ManuscriptIdentifier;
-import de.faustedition.model.service.TranscriptionStore;
+import de.faustedition.model.transcription.TranscriptionStore;
 import de.faustedition.model.xmldb.Collection;
 import de.faustedition.model.xmldb.ExistException;
 import de.faustedition.util.LoggingUtil;
@@ -54,7 +53,7 @@ public class ArchiveDatabase extends LinkedList<ArchiveRecord> implements Initia
 		Resource facsimileDirectoryResource = ResourceUtil.chooseExistingResources(facsimileDirectoryCandidates);
 		if (facsimileDirectoryResource != null) {
 			File facsimileDirectoryFile = facsimileDirectoryResource.getFile();
-			LoggingUtil.log(Level.INFO, "Chose " + facsimileDirectoryResource.getDescription());
+			LoggingUtil.info("Chose " + facsimileDirectoryResource.getDescription());
 			if (facsimileDirectoryFile.isDirectory()) {
 				facsimileDirectory = facsimileDirectoryFile;
 			}
@@ -132,7 +131,8 @@ public class ArchiveDatabase extends LinkedList<ArchiveRecord> implements Initia
 		return true;
 	}
 
-	public void addFacsimiles(GSACallNumber callNumber, Collection folder) throws IOException, SAXException, TransformerException, ExistException {
+	public void addFacsimiles(GSACallNumber callNumber, Collection folder) throws IOException, SAXException, TransformerException,
+			ExistException {
 		if (callNumber.isContent()) {
 			return;
 		}

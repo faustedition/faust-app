@@ -1,10 +1,12 @@
-package de.faustedition.model;
+package de.faustedition.model.hierarchy;
 
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+
+import de.faustedition.model.Model;
 
 public class HierarchyNode extends Model {
 	private static final String PATH_SEPARATOR = "/";

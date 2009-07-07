@@ -11,9 +11,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import de.faustedition.model.HierarchyNode;
-import de.faustedition.model.HierarchyNodeType;
-import de.faustedition.model.service.HierarchyManager;
+import de.faustedition.model.hierarchy.HierarchyManager;
+import de.faustedition.model.hierarchy.HierarchyNode;
+import de.faustedition.model.hierarchy.HierarchyNodeType;
 
 @Component
 public class WeimarerAusgabeFaustRegister extends AllegroRecordSet {

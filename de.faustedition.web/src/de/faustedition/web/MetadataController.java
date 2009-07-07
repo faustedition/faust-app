@@ -19,12 +19,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import de.faustedition.model.HierarchyNode;
+import de.faustedition.model.hierarchy.HierarchyManager;
+import de.faustedition.model.hierarchy.HierarchyNode;
 import de.faustedition.model.metadata.MetadataField;
 import de.faustedition.model.metadata.MetadataFieldGroup;
+import de.faustedition.model.metadata.MetadataManager;
 import de.faustedition.model.metadata.MetadataValue;
-import de.faustedition.model.service.HierarchyManager;
-import de.faustedition.model.service.MetadataManager;
 
 @Controller
 @RequestMapping("/metadata/**")

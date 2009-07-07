@@ -1,6 +1,8 @@
-package de.faustedition.model;
+package de.faustedition.model.transcription;
 
 import org.w3c.dom.Document;
+
+import de.faustedition.model.tei.TEIDocument;
 
 public class TranscriptionDocument extends TEIDocument {
 	private String path;

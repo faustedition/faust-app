@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import javax.xml.transform.TransformerException;
 
@@ -15,10 +14,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
-import de.faustedition.model.HierarchyNode;
-import de.faustedition.model.HierarchyNodeType;
-import de.faustedition.model.service.HierarchyManager;
-import de.faustedition.model.service.MetadataManager;
+import de.faustedition.model.hierarchy.HierarchyManager;
+import de.faustedition.model.hierarchy.HierarchyNode;
+import de.faustedition.model.hierarchy.HierarchyNodeType;
+import de.faustedition.model.metadata.MetadataManager;
 import de.faustedition.model.xmldb.Collection;
 import de.faustedition.model.xmldb.ExistException;
 import de.faustedition.util.LoggingUtil;
@@ -141,7 +140,7 @@ public class InventoryDatabase extends AllegroRecordSet {
 
 				// archiveDatabase.lookup(callNumber);
 			} else {
-				LoggingUtil.log(Level.SEVERE, leafCallNumber);
+				LoggingUtil.fatal(leafCallNumber, null);
 			}
 
 		}

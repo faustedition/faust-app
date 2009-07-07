@@ -1,9 +1,8 @@
-package de.faustedition.model.service;
+package de.faustedition.model.metadata;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.faustedition.model.metadata.MetadataValue;
 
 public class MetadataQuery {
 	public static final int PAGE_SIZE = 25;

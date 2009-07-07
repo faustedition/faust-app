@@ -2,7 +2,7 @@ package de.faustedition.model.metadata;
 
 import org.w3c.dom.Document;
 
-import de.faustedition.model.TEIDocument;
+import de.faustedition.model.tei.TEIDocument;
 import de.faustedition.model.xmldb.Collection;
 
 public class MetadataDocument extends TEIDocument {

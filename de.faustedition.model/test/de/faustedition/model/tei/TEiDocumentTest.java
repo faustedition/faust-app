@@ -1,4 +1,4 @@
-package de.faustedition.model;
+package de.faustedition.model.tei;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.faustedition.model.metadata.ManuscriptIdentifier;
-import de.faustedition.model.service.TEIDocumentManager;
+import de.faustedition.model.tei.TEIDocument;
+import de.faustedition.model.tei.TEIDocumentManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/META-INF/spring/module-context.xml" })

@@ -15,6 +15,8 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
@@ -29,13 +31,23 @@ import org.xml.sax.SAXException;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLUtil;
 
-public class ExistXmlStorage implements InitializingBean {
+public class ExistDatabase implements InitializingBean {
 	private String url;
+	private String user;
+	private String password;
 	private HttpClient httpClient;
 
 	@Required
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public void afterPropertiesSet() throws Exception {
@@ -46,12 +58,17 @@ public class ExistXmlStorage implements InitializingBean {
 		httpConnectionManager.getParams().setMaxTotalConnections(10);
 
 		httpClient = new HttpClient(httpConnectionManager);
+		if (StringUtils.isNotBlank(user)) {
+			httpClient.getParams().setAuthenticationPreemptive(true);
+			httpClient.getState().setCredentials(AuthScope.ANY,
+					new UsernamePasswordCredentials(user, StringUtils.defaultString(password)));
+		}
 	}
 
 	public Document get(String path, ExistQueryParameters parameters) throws ExistException, SAXException, IOException {
 		GetMethod method = new GetMethod(constructURL(path));
 		method.setQueryString(parameters.toNameValuePairs());
-		return XMLUtil.build(new ByteArrayInputStream(retrieve(method)));
+		return XMLUtil.build(new ByteArrayInputStream(execute(method)));
 	}
 
 	public void put(String path, final byte[] content, final String contentType) throws ExistException {
@@ -74,7 +91,7 @@ public class ExistXmlStorage implements InitializingBean {
 				return content.length;
 			}
 		});
-		retrieve(method);
+		execute(method);
 	}
 
 	public void put(String path, final Document document) throws ExistException {
@@ -88,10 +105,10 @@ public class ExistXmlStorage implements InitializingBean {
 	}
 
 	public void delete(String path) throws ExistException {
-		retrieve(new DeleteMethod(constructURL(path)));
+		execute(new DeleteMethod(constructURL(path)));
 	}
 
-	private byte[] retrieve(HttpMethod method) throws ExistException {
+	private byte[] execute(HttpMethod method) throws ExistException {
 		InputStream responseBodyStream = null;
 		try {
 			int httpStatusCode = httpClient.executeMethod(method);
@@ -114,7 +131,7 @@ public class ExistXmlStorage implements InitializingBean {
 	private String constructURL(String collection) {
 		try {
 			collection = (collection == null ? "" : URLEncoder.encode(collection, "UTF-8"));
-			return url + "/" + StringUtils.strip(collection, "/");
+			return url + StringUtils.strip(collection, "/");
 		} catch (UnsupportedEncodingException e) {
 			throw ErrorUtil.fatal("Error encoding URL with UTF-8 charset", e);
 		}

@@ -9,8 +9,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import de.faustedition.model.service.HierarchyManager;
-import de.faustedition.model.service.MetadataManager;
+import de.faustedition.model.hierarchy.HierarchyManager;
+import de.faustedition.model.metadata.MetadataManager;
 import de.faustedition.util.ErrorUtil;
 
 @Service

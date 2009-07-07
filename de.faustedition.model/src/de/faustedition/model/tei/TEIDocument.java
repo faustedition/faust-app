@@ -1,4 +1,4 @@
-package de.faustedition.model;
+package de.faustedition.model.tei;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
