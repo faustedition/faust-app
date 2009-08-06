@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Application-SymbolicName: de.faustedition
-Application-Version: 1.0.0
-Application-Name: Faustedition PAR
-
