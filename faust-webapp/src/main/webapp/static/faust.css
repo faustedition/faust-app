@@ -1,0 +1,38 @@
+/*
+ * Color scheme:
+ * - #193F49 primary
+ * - #1F2850 secondary A
+ * - #1D572E secondary B
+ * - #764F27 complementary
+ */
+
+h1, h2, h3, h4, h5, h6, strong, em {
+    color: #000;
+}
+
+#bd a:hover {
+}
+
+#bd a {
+    color: #1F2850;
+    font-weight: bold;
+}
+
+#hd, #ft {
+    margin: 0em;
+    padding: 0.5em;
+}
+
+#bd {
+    margin: 1em;
+    padding: 1em;    
+}
+
+#hd h1 {
+    text-align: right;
+}
+
+#ft {
+    font-size: 77%;
+    text-align: center;
+}
