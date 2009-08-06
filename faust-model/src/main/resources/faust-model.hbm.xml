@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="de.faustedition.model.HierarchyNode" table="faust_hierarchy_node">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<version name="version" unsaved-value="negative" />
+		<property name="created" type="timestamp" not-null="true" />
+		<property name="lastModified" column="last_modified" type="timestamp" />
+		<property name="treeLeft" column="tree_left" not-null="true" index="hierarchy_node_tree_index" />
+		<property name="treeRight" column="tree_right" not-null="true" index="hierarchy_node_tree_index" />
+		<property name="treeLevel" column="tree_level" not-null="true" index="hierarchy_node_tree_index" />
+		<property name="path" not-null="true" index="hierarchy_node_pathname_index" />
+		<property name="name" not-null="true" index="hierarchy_node_pathname_index" />
+		<property name="nodeType" column="node_type" not-null="true">
+			<type name="de.faustedition.util.EnumUserType">
+				<param name="enumClassName">de.faustedition.model.HierarchyNodeType</param>
+			</type>
+		</property>
+	</class>
+	<class name="de.faustedition.model.metadata.MetadataFieldGroup" table="faust_metadata_field_group">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<version name="version" unsaved-value="negative" />
+		<property name="created" type="timestamp" not-null="true" />
+		<property name="lastModified" column="last_modified" type="timestamp" />
+		<property name="name" not-null="true" unique="true" />
+		<property name="order" column="group_order" not-null="true" />
+	</class>
+	<class name="de.faustedition.model.metadata.MetadataField" table="faust_metadata_field">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<version name="version" unsaved-value="negative" />
+		<property name="created" type="timestamp" not-null="true" />
+		<property name="lastModified" column="last_modified" type="timestamp" />
+		<many-to-one name="group" column="field_group_id" not-null="true" />
+		<property name="name" not-null="true" index="metadata_field_index" />
+		<property name="order" column="field_order" not-null="true" index="metadata_field_index" />
+		<property name="type" column="field_type" not-null="true">
+			<type name="de.faustedition.util.EnumUserType">
+				<param name="enumClassName">de.faustedition.model.metadata.MetadataFieldType</param>
+			</type>
+		</property>
+		<property name="lowestLevel" column="lowest_level" not-null="true">
+			<type name="de.faustedition.util.EnumUserType">
+				<param name="enumClassName">de.faustedition.model.HierarchyNodeType</param>
+			</type>
+		</property>
+	</class>
+	<class name="de.faustedition.model.metadata.MetadataValue" table="faust_metadata_value">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<version name="version" unsaved-value="negative" />
+		<property name="created" type="timestamp" not-null="true" />
+		<property name="lastModified" column="last_modified" type="timestamp" />
+		<many-to-one name="node" column="node_id" not-null="true" index="metadata_value_index" />
+		<many-to-one name="field" column="field_id" not-null="true" index="metadata_value_index" />
+		<property name="value" length="65535" not-null="true" />
+	</class>
+
+	<class name="de.faustedition.model.Facsimile" table="faust_facsimile">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<version name="version" unsaved-value="negative" />
+		<property name="created" type="timestamp" not-null="true" />
+		<property name="lastModified" column="last_modified" type="timestamp" />
+		<many-to-one name="node" column="node_id" not-null="true" />
+		<property name="filePath" column="file_path" not-null="true" />
+	</class>
+</hibernate-mapping>

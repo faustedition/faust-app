@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:lang="http://www.springframework.org/schema/lang" xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:property-placeholder location="faust-model-settings.properties" />
+	
+	<bean id="transcriptionStore" class="de.faustedition.model.transcription.TranscriptionStore">
+		<property name="url" value="${xmldb.url}" />
+		<property name="base" value="${xmldb.base}" />
+		<property name="user" value="${xmldb.user}" />
+		<property name="password" value="${xmldb.password}" />
+	</bean>
+
+	<!-- <context:component-scan base-package="de.faustedition.model.service" />  -->
+
+	<!--
+		<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean"> <property name="mappingResources" value="faust-model.hbm.xml" /> <property name="hibernateProperties">
+		<props> <prop key="hibernate.connection.driver_class">com.mysql.jdbc.Driver</prop> <prop key="hibernate.connection.url">jdbc:mysql://localhost/faustedition</prop> <prop
+		key="hibernate.connection.username">faustedition</prop> <prop key="hibernate.connection.password">faustedition</prop> <prop
+		key="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</prop> <prop key="hibernate.c3p0.min_size">5</prop> <prop key="hibernate.c3p0.max_size">20</prop> <prop
+		key="hibernate.c3p0.timeout">1800</prop> <prop key="hibernate.c3p0.max_statements">50</prop> <prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop> <prop
+		key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop> <prop key="hibernate.hbm2ddl.auto">update</prop> <prop key="hibernate.max_fetch_depth">3</prop> <prop
+		key="hibernate.default_batch_fetch_size">16</prop> <prop key="hibernate.show_sql">false</prop> </props> </property> </bean> <bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager"> <property name="sessionFactory" ref="sessionFactory" /> </bean> <tx:annotation-driven /> <bean id="metadataFieldDefinitions"
+		class="org.springframework.core.io.ClassPathResource"> <constructor-arg value="faust-metadata-field-definition.xml" /> </bean> <bean id="transcriptionManager"
+		class="de.faustedition.model.service.TranscriptionManagerImpl"> <property name="baseDirectoryCandidates"> <list> <value>file:///home/faust/transcriptions</value>
+		<value>file:///Users/gregor/Desktop/Faustedition/data/transcriptions</value> </list> </property> </bean> <bean id="schemaManager" class="de.faustedition.model.service.SchemaManagerImpl"> <property
+		name="schemaResourceURL" value="http://www.faustedition.net/schema/v1/faust-tei.rnc" /> <property name="characterEntities"> <map> <entry key="ndash" value="&#x2013;" /> <entry key="mdash"
+		value="&#x2014;" /> <entry key="ss" value="&#x017f;" /> <entry key="apostr" value="&#x2019;" /> <entry key="mm" value="m&#x0304;" /> <entry key="nn" value="n&#x0304;" /> </map> </property> </bean>
+
+		<bean id="cssManager" class="de.faustedition.model.service.CSSManagerImpl"> <property name="cssResourceURL" value="http://www.faustedition.net/schema/v1/faust-tei.css" /> </bean>
+	-->
+</beans>
