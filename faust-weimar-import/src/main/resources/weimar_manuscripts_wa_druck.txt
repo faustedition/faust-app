@@ -1,0 +1,146 @@
+#xx010203
+#222Faust. Zweiter Theil. Fünfter Act
+#44417
+#445I 15.1
+#55a290
+#55b337
+
+#xx010254
+#222Faust. Erster Theil. Prolog im Himmel
+#44416
+#445I 14
+#55a17
+#55b23
+
+#xx010374
+#222Faust. Erster Theil. Zueignung
+#44416
+#445I 14
+#55a3
+#55b6
+
+#xx010395
+#222Faust. Zweiter Theil. Aus dem Nachlaß. 4. Act. Herausforderung des Gegenkaisers
+#445I 15.1
+#55a341
+
+#xx010403
+#222Faust. Erster Theil. Zu Faust
+#44416
+#445I 14
+#55a239
+#55b245
+
+#xx010404
+#222Faust. Zweiter Theil. Zweiter Act. Laboratorium
+#44417
+#445I 15.1
+#55a101
+#55b109
+
+#xx010405
+#222Faust. Erster Theil. Walpurgisnachtstraum oder Oberons und Titanias goldne Hochzeit. Intermezzo
+#44416
+#445I 14
+#55a213
+#55b223
+
+#xx010408
+#222Faust. Zweiter Theil. Erster Act. Kaiserliche Pfalz
+#44417
+#445I 15.1
+#55a8
+#55b89
+
+#xx010410
+#222Faust. In ursprünglicher Gestalt
+#22aUrfaust
+#44444
+#445I 39
+#55a217
+#55b319
+
+#xx010411
+#222Faust. Erster Theil
+#44416
+#445I 14
+#55a1
+#55b238
+
+#xx010412
+#222Faust. Erster Theil. Vorspiel auf dem Theater
+#44416
+#445I 14
+#55a7
+#55b16
+
+#xx010413
+#222Faust. Zweiter Theil. Zweiter Act. Classische Walpurgisnacht
+#44417
+#445I 15.1
+#55a110
+#55b176
+
+#xx010414
+#222Faust. Zweiter Theil. Zweiter Act. Hochgewölbtes enges gothisches Zimmer
+#44417
+#445I 15.1
+#55a90-100
+
+#xx010415
+#222Faust. Zweiter Theil. Vierter Act
+#44417
+#445I 15.1
+#55a245
+#55b289
+
+#xx010416
+#222Faust. Zweiter Theil. Dritter Act
+#44417
+#445I 15.1
+#55a177
+#55b244
+
+#xx010551
+#222Faust. Zweiter Theil. Erster Act
+#445I 15.1
+#55a2
+#55b89
+
+#xx010768
+#222Faust. Zweiter Theil. Aus dem Nachlaß. 4. Act. Belehnung Fausts
+#445I 15.1
+#55a342
+
+#xx010769
+#222Faust. Zweiter Theil. Aus dem Nachlaß. Epilog um 1800. Abschied
+#445I 15.1
+#55a344-345
+
+#xx010770
+#222Faust. Zweiter Theil. Zweiter Act
+#445I 15.1
+#55a90
+#55b176
+
+#xx010771
+#222Faust. Zweiter Theil
+#445I 15.1
+#55a1
+#55b337
+
+#xx011181
+#222Faust. Zweiter Theil. Erster Act. Anmutige Gegend
+#445I 15.1
+#55a3
+#55b7
+
+#xx011182
+#222Faust. Zweiter Theil. Aus dem Nachlaß. 5. Act. Chor
+#445I 15.1
+#55a343
+
+#xx012749
+#222Faust. Zweiter Theil. Aus dem Nachlaß. Epilog um 1800. Abkündigung
+#445I 15.1
+#55a344

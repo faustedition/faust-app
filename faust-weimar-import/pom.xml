@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>de.faustedition</groupId>
+		<artifactId>faust-parent</artifactId>
+		<version>1</version>
+		<relativePath>../faust-parent</relativePath>
+	</parent>
+	<artifactId>faust-weimar-import</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>Digitale Faustedition :: Weimar metadata import</name>
+	<packaging>jar</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>de.faustedition</groupId>
+			<artifactId>faust-model</artifactId>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>de.swkk.metadata.ImportApplication</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
