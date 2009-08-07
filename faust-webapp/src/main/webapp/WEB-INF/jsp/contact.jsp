@@ -1,14 +1,15 @@
 <%@ page session="false" language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="../../includes/taglibs.jspf" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Kontakt</title>
+<title><fmt:message key="contact.title"/></title>
 </head>
 <body>
 <div class="yui-g">
     <div class="yui-u first">
-        <h2>Projektleitung</h2>
+        <h2><fmt:message key="contact.title.editors"/></h2>
 
         <p><strong>Prof. Dr. Anne Bohnenkamp</strong><br/>
         Direktorin des Freien Deutschen Hochstifts<br/>
@@ -33,7 +34,7 @@
         <a href="mailto:fotis.jannidis@uni-wuerzburg.de" title="E-Mail">fotis.jannidis@uni-wuerzburg.de</a></p>
     </div>
     <div class="yui-u">
-        <h2>Mitarbeiter der Arbeitsstelle in Frankfurt am Main</h2>
+        <h2><fmt:message key="contact.title.team"/></h2>
 
         <p>
             Freies Deutsches Hochstift – Frankfurter Goethe-Museum<br/>

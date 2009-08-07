@@ -1,4 +1,5 @@
 <%@ page session="false" language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="../includes/taglibs.jspf" %>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -11,7 +12,7 @@
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/faust.css" />
         <script type="text/javascript" src="${pageContext.request.contextPath}/static/faust.js"></script>
 	<decorator:head />
-        <link rel="schema.DC"      href="http://purl.org/dc/elements/1.1/" />
+        <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
         <link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
         <meta name="DC.format" scheme="DCTERMS.IMT" content="text/html" />
         <meta name="DC.type" scheme="DCTERMS.DCMIType" content="Text" />
@@ -26,13 +27,13 @@
     <body class="yui-skin-sam">
         <div id="doc2" class="yui-t7">
             <div id="hd">
-                <h1><span style="color: #764F27">faustedition.net&nbsp;::</span>&nbsp;<decorator:title default="Faust-Edition" /></h1>
+                <h1><span style="color: #764F27">faustedition.net&nbsp;::</span>&nbsp;<decorator:title /></h1>
                 <div id="top-navigation" class="yuimenubar yuimenubarnav">
                     <div class="bd">
                         <ul class="first-of-type">
-                            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="${pageContext.request.contextPath}/">Projekt</a></li>
-                            <li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/static/digitale_faustedition_antrag.pdf" class="yuimenubaritemlabel">DFG-Antrag</a></li>
-                            <li class="yuimenubaritem"><span class="yuimenubaritemlabel">Partner</span>
+                            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="${pageContext.request.contextPath}/index.html"><fmt:message key="menu.project" /></a></li>
+                            <li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/static/digitale_faustedition_antrag.pdf" class="yuimenubaritemlabel"><fmt:message key="menu.grant_application" /></a></li>
+                            <li class="yuimenubaritem"><span class="yuimenubaritemlabel"><fmt:message key="menu.partners" /></span>
                                 <div class="yuimenu">
                                     <div class="bd">
                                         <ul>
@@ -43,9 +44,9 @@
                                     </div>
                                 </div>
                             </li>
-                            <li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/contact.jsp" class="yuimenubaritemlabel">Kontakt</a></li>
-                            <li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/imprint.jsp" class="yuimenubaritemlabel">Impressum</a></li>
-                            <li class="yuimenubaritem"><a href="http://wiki.faustedition.net/" class="yuimenubaritemlabel">Intern</a></li>
+                            <li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/contact.html" class="yuimenubaritemlabel"><fmt:message key="menu.contact" /></a></li>
+                            <li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/imprint.html" class="yuimenubaritemlabel"><fmt:message key="menu.imprint" /></a></li>
+                            <li class="yuimenubaritem"><a href="http://wiki.faustedition.net/" class="yuimenubaritemlabel"><fmt:message key="menu.restricted" /></a></li>
                         </ul>
                     </div>
                 </div>    
