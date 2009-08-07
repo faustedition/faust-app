@@ -8,7 +8,10 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<context:property-placeholder location="faust-model-settings.properties" />
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:/faust-model-settings.properties" />
+		<property name="systemPropertiesMode" value="2" />
+	</bean>
 	
 	<bean id="transcriptionStore" class="de.faustedition.model.transcription.TranscriptionStore">
 		<property name="url" value="${xmldb.url}" />

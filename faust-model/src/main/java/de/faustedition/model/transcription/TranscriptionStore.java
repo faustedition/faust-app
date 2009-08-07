@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.xmlrpc.XmlRpcException;
@@ -14,6 +15,8 @@ import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
+
+import de.faustedition.util.LoggingUtil;
 
 public class TranscriptionStore implements InitializingBean {
 	private String url;
@@ -95,8 +98,9 @@ public class TranscriptionStore implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		LoggingUtil.log(Level.INFO, String.format("Transcription store: %s", url));
 		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-		config.setServerURL(new URL(this.url));
+		config.setServerURL(new URL(url));
 		if (StringUtils.isNotBlank(user)) {
 			config.setBasicUserName(user);
 			config.setBasicPassword(StringUtils.defaultString(password));
