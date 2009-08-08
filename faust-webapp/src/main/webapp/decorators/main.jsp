@@ -31,7 +31,7 @@
                 <div id="top-navigation" class="yuimenubar yuimenubarnav">
                     <div class="bd">
                         <ul class="first-of-type">
-                            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="${pageContext.request.contextPath}/index.html"><fmt:message key="menu.project" /></a></li>
+                            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="${pageContext.request.contextPath}/"><fmt:message key="menu.project" /></a></li>
                             <li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/static/digitale_faustedition_antrag.pdf" class="yuimenubaritemlabel"><fmt:message key="menu.grant_application" /></a></li>
                             <li class="yuimenubaritem"><span class="yuimenubaritemlabel"><fmt:message key="menu.partners" /></span>
                                 <div class="yuimenu">
