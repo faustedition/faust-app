@@ -1,32 +1,30 @@
-package de.faustedition.model.transcription;
+package de.faustedition.model;
 
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class TranscriptionStoreContents {
+public class Container {
 
-	protected TranscriptionStore store;
-	protected TranscriptionStoreContents parent;
+	protected Container parent;
 	protected String name;
 
-	protected TranscriptionStoreContents(TranscriptionStore store, TranscriptionStoreContents parent, String name) {
+	protected Container(Container parent, String name) {
 		assert isValidName(name);
-		this.store = store;
 		this.parent = parent;
 		this.name = name;
 	}
 
 	public String getPath() {
-		return (parent == null ? store.getBase() : parent.getPath()) + "/" + name;
+		return (parent == null ? "" : parent.getPath()) + "/" + name;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	protected String normalizeName(String name) {
+	public static String normalizeName(String name) {
 		name = StringUtils.strip(name, "/").replaceAll(Pattern.quote("/"), "_");
 
 		// umlauts

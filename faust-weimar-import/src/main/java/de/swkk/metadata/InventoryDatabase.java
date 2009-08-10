@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.DocumentException;
@@ -118,7 +117,7 @@ public class InventoryDatabase extends AllegroRecordSet {
 
 				// archiveDatabase.lookup(callNumber);
 			} else {
-				LoggingUtil.log(Level.SEVERE, leafCallNumber);
+				LoggingUtil.LOG.warn(leafCallNumber);
 			}
 
 		}

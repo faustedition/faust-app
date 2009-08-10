@@ -7,17 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import de.faustedition.model.service.HierarchyManager;
+import de.faustedition.model.store.ContentStore;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/faust-model-context.xml" })
 public class ModelSetup {
 
 	@Autowired
-	private HierarchyManager hierarchyManager;
+	private ContentStore contentStore;
 
 	@Test
-	public void rootSetup() {
-		Assert.assertNotNull(hierarchyManager.findRoot());
+	public void storageSetup() throws Exception {
+		Assert.assertNotNull(contentStore.getRepository());
 	}
 }

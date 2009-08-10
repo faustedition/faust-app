@@ -16,4 +16,4 @@ done
 
 BASE="`dirname \"$PRG\"`"
 WEBAPP=`echo $BASE/webapps/faust-webapp*`
-exec java -Dfaust.webapp=$WEBAPP -jar $BASE/lib/faust-server*.jar
+exec java -Dfaust.environment=production -Dfaust.webapp=$WEBAPP -jar $BASE/lib/faust-server*.jar

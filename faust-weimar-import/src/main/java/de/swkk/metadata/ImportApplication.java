@@ -1,7 +1,5 @@
 package de.swkk.metadata;
 
-import java.util.logging.Level;
-
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -29,7 +27,7 @@ public class ImportApplication implements Runnable {
 	public static void main(String[] args) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { "/faust-model-context.xml", "/import-application-context.xml" });
 
-		ImportApplication application = BeanFactoryUtils.beanOfType(context, ImportApplication.class);
+		ImportApplication application = (ImportApplication) BeanFactoryUtils.beanOfType(context, ImportApplication.class);
 		application.run();
 
 		context.close();
@@ -41,7 +39,7 @@ public class ImportApplication implements Runnable {
 	}
 
 	public void clearDatastore() {
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Object>() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 
 			public Object doInTransaction(TransactionStatus status) {
 //				try {
@@ -59,7 +57,7 @@ public class ImportApplication implements Runnable {
 	}
 
 	public void fillDatastore() {
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback<Object>() {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 
 			public Object doInTransaction(TransactionStatus status) {
 				try {
@@ -69,7 +67,7 @@ public class ImportApplication implements Runnable {
 					inventoryDatabase.createMetadataStructure();
 				} catch (Exception e) {
 					status.setRollbackOnly();
-					LoggingUtil.log(Level.SEVERE, "Error while filling datastore", e);
+					LoggingUtil.LOG.fatal("Error while filling datastore", e);
 				}
 
 				return null;

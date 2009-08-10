@@ -6,18 +6,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class StaticViewsController {
 
-	@RequestMapping("/index.html")
+	@RequestMapping("/about")
 	public String index() {
-		return "index";
+		return "about";
 	}
 
-	@RequestMapping("/contact.html")
+	@RequestMapping("/contact")
 	public String contact() {
 		return "contact";
 	}
 
-	@RequestMapping("/imprint.html")
+	@RequestMapping("/imprint")
 	public String imprint() {
 		return "imprint";
+	}
+
+	@RequestMapping("/internal")
+	public String internal() {
+		return "internal";
 	}
 }

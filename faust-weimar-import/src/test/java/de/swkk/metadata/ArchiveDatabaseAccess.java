@@ -2,7 +2,6 @@ package de.swkk.metadata;
 
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
@@ -52,7 +51,7 @@ public class ArchiveDatabaseAccess {
 			}
 		}
 
-		LoggingUtil.log(Level.INFO, String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
+		LoggingUtil.LOG.info(String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
 	}
 
 }

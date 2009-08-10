@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.apache.commons.io.FilenameUtils;
 import org.dom4j.DocumentException;
@@ -63,7 +62,7 @@ public class ArchiveDatabase extends LinkedList<ArchiveRecord> implements Initia
 			lookupStr.append(callNumber.getSubFile());
 		}
 
-		LoggingUtil.log(Level.INFO, String.format("Looking up GSA call number [%s]", lookupStr.toString()));
+		LoggingUtil.LOG.info(String.format("Looking up GSA call number [%s]", lookupStr.toString()));
 		return callNumberIndex.get(new GSACallNumber(lookupStr.toString()));
 	}
 
@@ -137,7 +136,7 @@ public class ArchiveDatabase extends LinkedList<ArchiveRecord> implements Initia
 			return;
 		}
 
-		LoggingUtil.log(Level.INFO, String.format("Searching for facsimiles in [%s]", facsimileBase.getAbsolutePath()));
+		LoggingUtil.LOG.info(String.format("Searching for facsimiles in [%s]", facsimileBase.getAbsolutePath()));
 		File[] facsimileFiles = facsimileBase.listFiles(new FilenameFilter() {
 
 			@Override
@@ -148,7 +147,7 @@ public class ArchiveDatabase extends LinkedList<ArchiveRecord> implements Initia
 		});
 
 		for (File facsimileFile : facsimileFiles) {
-			LoggingUtil.log(Level.INFO, String.format("Creating facsimile [%s] in [%s]", facsimileFile.getName(), folder.getFile().getAbsolutePath()));
+			LoggingUtil.LOG.info(String.format("Creating facsimile [%s] in [%s]", facsimileFile.getName(), folder.getFile().getAbsolutePath()));
 			//transcriptionManager.createTranscription(folder, facsimileFile);
 		}
 	}

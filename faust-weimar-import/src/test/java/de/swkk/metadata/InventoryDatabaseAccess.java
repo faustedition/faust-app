@@ -2,7 +2,6 @@ package de.swkk.metadata;
 
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
@@ -57,11 +56,11 @@ public class InventoryDatabaseAccess {
 
 		}
 
-		LoggingUtil.log(Level.INFO, String.format("Portfolios: { %s }", StringUtils.join(portfolioSet, ", ")));
-		LoggingUtil.log(Level.INFO, String.format("Sub-Portfolios: { %s }", StringUtils.join(subPortfolioSet, ", ")));
-		LoggingUtil.log(Level.INFO, String.format("Files: { %s }", StringUtils.join(fileSet, ", ")));
-		LoggingUtil.log(Level.INFO, String.format("Sub-Files: { %s }", StringUtils.join(subFileSet, ", ")));
-		LoggingUtil.log(Level.INFO, String.format("Content: { %s }", StringUtils.join(contentSet, ", ")));
+		LoggingUtil.LOG.info(String.format("Portfolios: { %s }", StringUtils.join(portfolioSet, ", ")));
+		LoggingUtil.LOG.info(String.format("Sub-Portfolios: { %s }", StringUtils.join(subPortfolioSet, ", ")));
+		LoggingUtil.LOG.info(String.format("Files: { %s }", StringUtils.join(fileSet, ", ")));
+		LoggingUtil.LOG.info(String.format("Sub-Files: { %s }", StringUtils.join(subFileSet, ", ")));
+		LoggingUtil.LOG.info(String.format("Content: { %s }", StringUtils.join(contentSet, ", ")));
 	}
 
 	@Test
@@ -74,6 +73,6 @@ public class InventoryDatabaseAccess {
 			}
 		}
 
-		LoggingUtil.log(Level.INFO, String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
+		LoggingUtil.LOG.info(String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
 	}
 }

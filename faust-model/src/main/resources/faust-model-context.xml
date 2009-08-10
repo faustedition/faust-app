@@ -8,11 +8,8 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location" value="classpath:/faust-model-settings.properties" />
-		<property name="systemPropertiesMode" value="2" />
-	</bean>
-	
+	<bean id="modelConfigurer" class="de.faustedition.model.EnvironmentBasedModelConfigurer" />
+
 	<bean id="transcriptionStore" class="de.faustedition.model.transcription.TranscriptionStore">
 		<property name="url" value="${xmldb.url}" />
 		<property name="base" value="${xmldb.base}" />
@@ -20,6 +17,8 @@
 		<property name="password" value="${xmldb.password}" />
 	</bean>
 
+	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory="${data.home}" />
+	
 	<!-- <context:component-scan base-package="de.faustedition.model.service" />  -->
 
 	<!--

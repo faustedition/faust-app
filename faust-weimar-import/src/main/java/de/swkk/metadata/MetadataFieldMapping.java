@@ -2,7 +2,6 @@ package de.swkk.metadata;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -23,7 +22,7 @@ public class MetadataFieldMapping extends HashMap<String, String> implements Ini
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		LoggingUtil.log(Level.INFO, "Initializing metadata field mapping");
+		LoggingUtil.LOG.info("Initializing metadata field mapping");
 		parse(mappingDefinitionResource);
 	}
 

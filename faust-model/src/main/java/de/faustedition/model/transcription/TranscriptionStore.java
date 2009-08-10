@@ -1,5 +1,7 @@
 package de.faustedition.model.transcription;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,7 +9,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.xmlrpc.XmlRpcException;
@@ -15,8 +16,14 @@ import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import de.faustedition.model.Portfolio;
+import de.faustedition.model.Repository;
+import de.faustedition.model.Transcription;
 import de.faustedition.util.LoggingUtil;
+import de.faustedition.util.XMLUtil;
 
 public class TranscriptionStore implements InitializingBean {
 	private String url;
@@ -48,16 +55,39 @@ public class TranscriptionStore implements InitializingBean {
 	}
 
 	public Collection<Repository> findRepositories() throws TranscriptionStoreException {
-		String[] collectionNames = findCollections(this.base);
+		String[] collectionNames = findCollections("/");
 		List<Repository> repositories = new ArrayList<Repository>(collectionNames.length);
 		for (String collection : collectionNames) {
-			repositories.add(new Repository(this, collection));
+			repositories.add(new Repository(collection));
 		}
 		return repositories;
 	}
 
+	public Collection<Portfolio> findPortfolios(Repository repository) throws TranscriptionStoreException {
+		String[] portfolioNames = findCollections(repository.getPath());
+		List<Portfolio> portfolios = new ArrayList<Portfolio>(portfolioNames.length);
+		for (String portfolioName : portfolioNames) {
+			portfolios.add(new Portfolio(repository, portfolioName));
+		}
+		return portfolios;
+	}
+
+	public Collection<Transcription> findTranscriptions(Portfolio portfolio) throws TranscriptionStoreException {
+		String[] documents = findDocuments(portfolio.getPath());
+		List<Transcription> transcriptions = new ArrayList<Transcription>(documents.length);
+		for (String document : documents) {
+			transcriptions.add(new Transcription(portfolio, document));
+		}
+		return transcriptions;
+	}
+
+	public Document retrieve(Transcription transcription) throws TranscriptionStoreException, SAXException, IOException {
+		return XMLUtil.build(new ByteArrayInputStream(retrieve(transcription.getPath())));
+	}
+
 	@SuppressWarnings("unchecked")
-	protected String[] findDocuments(String path) throws TranscriptionStoreException {
+	public String[] findDocuments(String path) throws TranscriptionStoreException {
+		path = this.base + path;
 		List<String> documents = new LinkedList<String>();
 		try {
 			Map<String, Object> collectionDesc = (Map<String, Object>) this.rpcClient.execute("getCollectionDesc", new Object[] { path });
@@ -74,7 +104,8 @@ public class TranscriptionStore implements InitializingBean {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected String[] findCollections(String path) throws TranscriptionStoreException {
+	public String[] findCollections(String path) throws TranscriptionStoreException {
+		path = this.base + path;
 		List<String> collections = new LinkedList<String>();
 		try {
 			Map<String, Object> collectionDesc = (Map<String, Object>) this.rpcClient.execute("getCollectionDesc", new Object[] { path });
@@ -88,7 +119,8 @@ public class TranscriptionStore implements InitializingBean {
 		return collections.toArray(new String[collections.size()]);
 	}
 
-	protected byte[] retrieve(String path) throws TranscriptionStoreException {
+	public byte[] retrieve(String path) throws TranscriptionStoreException {
+		path = this.base + path;
 		try {
 			return (byte[]) rpcClient.execute("getDocument", new Object[] { path, Collections.EMPTY_MAP });
 		} catch (XmlRpcException e) {
@@ -98,7 +130,7 @@ public class TranscriptionStore implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		LoggingUtil.log(Level.INFO, String.format("Transcription store: %s", url));
+		LoggingUtil.LOG.info(String.format("Transcription store: %s", url));
 		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 		config.setServerURL(new URL(url));
 		if (StringUtils.isNotBlank(user)) {
