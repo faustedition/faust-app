@@ -8,6 +8,8 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
+	<context:annotation-config />
+	
 	<bean id="modelConfigurer" class="de.faustedition.model.EnvironmentBasedModelConfigurer" />
 
 	<bean id="transcriptionStore" class="de.faustedition.model.transcription.TranscriptionStore">
@@ -18,7 +20,9 @@
 	</bean>
 
 	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory="${data.home}" />
-	
+
+	<bean id="scheduledExecutor" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean" />
+
 	<!-- <context:component-scan base-package="de.faustedition.model.service" />  -->
 
 	<!--

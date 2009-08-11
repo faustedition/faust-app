@@ -2,21 +2,23 @@ package de.faustedition.model.store;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import javax.jcr.Credentials;
 import javax.jcr.ImportUUIDBehavior;
 import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
+import javax.jcr.NodeIterator;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -24,11 +26,14 @@ import javax.jcr.SimpleCredentials;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.jackrabbit.JcrConstants;
+import org.apache.jackrabbit.api.JackrabbitWorkspace;
 import org.apache.jackrabbit.core.RepositoryImpl;
 import org.apache.jackrabbit.core.config.RepositoryConfig;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.Assert;
@@ -39,14 +44,17 @@ import de.faustedition.util.LoggingUtil;
 
 public class ContentStore implements InitializingBean, DisposableBean {
 	public static final Credentials ADMIN_CREDENTIALS = new SimpleCredentials("admin", "".toCharArray());
+	public static final String WORKSPACE = "store";
 
-	private static final String BACKUP_FILE_NAME_SUFFIX = ".xml.gz";
+	private static final String BACKUP_FILE_NAME_SUFFIX = ".zip";
 	private static final String BACKUP_FILE_NAME_PREFIX = "content-repository-backup-";
 	private static final ClassPathResource STORE_CONFIG = new ClassPathResource("/jackrabbit-repository-config.xml");
-	private static final String ROOT_NODE_NAME = "faust";
 
 	private RepositoryImpl repository;
 	private String dataDirectory;
+
+	@Autowired
+	private ScheduledExecutorService scheduledExecutorService;
 
 	@Required
 	public void setDataDirectory(String dataDirectory) {
@@ -58,7 +66,7 @@ public class ContentStore implements InitializingBean, DisposableBean {
 	}
 
 	public <T> T execute(ContentStoreCallback<T> callback) throws RepositoryException {
-		Session session = getSession();
+		Session session = login();
 		try {
 			return callback.doInSession(session);
 		} finally {
@@ -66,50 +74,46 @@ public class ContentStore implements InitializingBean, DisposableBean {
 		}
 	}
 
-	public Node getRoot() throws RepositoryException {
-		return execute(new ContentStoreCallback<Node>() {
-
-			@Override
-			public Node doInSession(Session session) throws RepositoryException {
-				return getRoot(session);
-			}
-		});
-	}
-
-	public Node getRoot(Session session) throws RepositoryException {
-		Node repositoryRoot = session.getRootNode();
-		try {
-			return repositoryRoot.getNode(ROOT_NODE_NAME);
-		} catch (PathNotFoundException e) {
-			Node rootNode = repositoryRoot.addNode(ROOT_NODE_NAME, JcrConstants.NT_FOLDER);
-			session.save();
-			return rootNode;
-		}
-	}
-
 	public boolean isEmpty() throws RepositoryException {
-		return execute(new ContentStoreCallback<Boolean>() {
+		Session session = repository.login(ADMIN_CREDENTIALS);
 
-			@Override
-			public Boolean doInSession(Session session) throws RepositoryException {
-				return getRoot(session).hasNode(ROOT_NODE_NAME);
+		try {
+			for (String workspaceName : session.getWorkspace().getAccessibleWorkspaceNames()) {
+				if (WORKSPACE.equals(workspaceName)) {
+					return false;
+				}
 			}
-		});
+			return true;
+		} finally {
+			session.logout();
+		}
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		createRepository();
-		if (isEmpty()) {
-			restore();
-		} else {
-			backup();
-		}
+		scheduledExecutorService.execute(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					if (isEmpty()) {
+						restore();
+					}
+				} catch (Exception e) {
+					throw ErrorUtil.fatal("Error while initialising repository", e);
+				}
+			}
+		});
 	}
 
 	@Override
 	public void destroy() throws Exception {
 		repository.shutdown();
+	}
+
+	protected Session login() throws RepositoryException {
+		return repository.login(ADMIN_CREDENTIALS, WORKSPACE);
 	}
 
 	protected void createRepository() throws RepositoryException, IOException {
@@ -120,30 +124,45 @@ public class ContentStore implements InitializingBean, DisposableBean {
 	protected void backup() throws IOException, RepositoryException {
 		final String backupFileName = BACKUP_FILE_NAME_PREFIX + DateFormatUtils.ISO_DATETIME_FORMAT.format(System.currentTimeMillis()) + BACKUP_FILE_NAME_SUFFIX;
 		LoggingUtil.LOG.info(String.format("Backing up content repository to '%s'", backupFileName));
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+
 		execute(new ContentStoreCallback<Object>() {
 
 			@Override
 			public Object doInSession(Session session) throws RepositoryException {
-				GZIPOutputStream outputStream = null;
+				ZipOutputStream zipOutputStream = null;
 				try {
-					outputStream = new GZIPOutputStream(new FileOutputStream(new File(getBackupBase(), backupFileName)));
-					session.exportSystemView(getRoot(session).getPath(), outputStream, false, false);
+					zipOutputStream = new ZipOutputStream(new FileOutputStream(new File(getBackupBase(), backupFileName)));
+					NodeIterator rootNodes = session.getRootNode().getNodes();
+					while (rootNodes.hasNext()) {
+						Node rootNode = rootNodes.nextNode();
+						if (JcrConstants.JCR_SYSTEM.equals(rootNode.getName())) {
+							continue;
+						}
+						zipOutputStream.putNextEntry(new ZipEntry(rootNode.getName()));
+						session.exportSystemView(rootNode.getPath(), zipOutputStream, false, false);
+					}
 				} catch (Exception e) {
 					throw ErrorUtil.fatal("Error backing up repository", e);
 				} finally {
-					IOUtils.closeQuietly(outputStream);
+					IOUtils.closeQuietly(zipOutputStream);
 				}
 				return null;
 			}
 		});
 
-	}
-
-	protected Session getSession() throws RepositoryException {
-		return repository.login(ADMIN_CREDENTIALS);
+		stopWatch.stop();
+		LoggingUtil.LOG.info(String.format("Backup of content repository to '%s' completed in %s", backupFileName, stopWatch));
 	}
 
 	protected void restore() throws RepositoryException, IOException {
+		if (!isEmpty()) {
+			return;
+		}
+
+		createWorkspace();
+
 		List<File> backupFiles = Arrays.asList(getBackupBase().listFiles(new FileFilter() {
 
 			@Override
@@ -166,23 +185,57 @@ public class ContentStore implements InitializingBean, DisposableBean {
 		});
 
 		final File restoreFrom = backupFiles.get(0);
-		LoggingUtil.LOG.info(String.format("Restoring content repository from '%s'", restoreFrom.getAbsolutePath()));
+		LoggingUtil.LOG.info(String.format("Restoring content repository from '%s'", restoreFrom.getName()));
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+
 		execute(new ContentStoreCallback<Object>() {
 
 			@Override
 			public Object doInSession(Session session) throws RepositoryException {
-				InputStream restoreStream = null;
+				ZipFile zipFile = null;
 				try {
-					restoreStream = new GZIPInputStream(new FileInputStream(restoreFrom));
-					getSession().importXML("/", restoreStream, ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW);
+					zipFile = new ZipFile(restoreFrom);
+					for (Enumeration<? extends ZipEntry> zipEntries = zipFile.entries(); zipEntries.hasMoreElements();) {
+						ZipEntry zipEntry = zipEntries.nextElement();
+						InputStream zipInputStream = null;
+						try {
+							zipInputStream = zipFile.getInputStream(zipEntry);
+							session.getWorkspace().importXML("/", zipInputStream, ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW);
+							session.save();
+
+						} finally {
+							IOUtils.closeQuietly(zipInputStream);
+						}
+
+					}
 				} catch (Exception e) {
 					throw ErrorUtil.fatal("Error while restoring repository", e);
 				} finally {
-					IOUtils.closeQuietly(restoreStream);
+					try {
+						if (zipFile != null) {
+							zipFile.close();
+						}
+					} catch (IOException e) {
+					}
 				}
 				return null;
 			}
 		});
+
+		stopWatch.stop();
+		LoggingUtil.LOG.info(String.format("Restoration of content repository from '%s' completed in %s", restoreFrom.getName(), stopWatch));
+	}
+
+	protected void createWorkspace() throws RepositoryException {
+		LoggingUtil.LOG.info("Creating workspace '" + WORKSPACE + "'");
+		Session session = repository.login(ADMIN_CREDENTIALS);
+		try {
+			((JackrabbitWorkspace) session.getWorkspace()).createWorkspace(WORKSPACE);
+		} finally {
+			session.logout();
+		}
+
 	}
 
 	protected File getContentRepositoryBase() {
