@@ -12,15 +12,10 @@
 	
 	<bean id="modelConfigurer" class="de.faustedition.model.EnvironmentBasedModelConfigurer" />
 
-	<bean id="transcriptionStore" class="de.faustedition.model.transcription.TranscriptionStore">
-		<property name="url" value="${xmldb.url}" />
-		<property name="base" value="${xmldb.base}" />
-		<property name="user" value="${xmldb.user}" />
-		<property name="password" value="${xmldb.password}" />
-	</bean>
-
 	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory="${data.home}" />
 
+	<bean id="facsimileStore" class="de.faustedition.model.facsimile.FacsimileStore" p:dataDirectory="${data.home}" />
+	
 	<bean id="scheduledExecutor" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean" />
 
 	<!-- <context:component-scan base-package="de.faustedition.model.service" />  -->
