@@ -33,6 +33,16 @@
 		<url-pattern>/project/*</url-pattern>
 	</servlet-mapping>
 
+	<servlet-mapping>
+		<servlet-name>faust</servlet-name>
+		<url-pattern>/manuscripts/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>faust</servlet-name>
+		<url-pattern>/facsimile/*</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>dav</servlet-name>
 		<servlet-class>de.faustedition.web.DAVServlet</servlet-class>

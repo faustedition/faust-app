@@ -1,22 +1,22 @@
 package de.faustedition.model;
 
-public class Facsimile extends Model {
-	private HierarchyNode node;
-	private String filePath;
+import java.io.File;
 
-	public HierarchyNode getNode() {
-		return node;
+public class Facsimile {
+
+	private Transcription transcription;
+	private File imageFile;
+
+	public Facsimile(Transcription transcription, File imageFile) {
+		this.transcription = transcription;
+		this.imageFile = imageFile;
 	}
 
-	public void setNode(HierarchyNode node) {
-		this.node = node;
+	public Transcription getTranscription() {
+		return transcription;
 	}
 
-	public String getFilePath() {
-		return filePath;
-	}
-
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
+	public File getImageFile() {
+		return imageFile;
 	}
 }

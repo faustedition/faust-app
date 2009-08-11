@@ -31,9 +31,11 @@
 				<div id="top-navigation" class="yuimenubar yuimenubarnav">
 					<div class="bd">
 						<ul class="first-of-type">
-							<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/manuscripts/" class="yuimenubaritemlabel"><fmt:message key="menu.manuscripts" /></a></li>
-							<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/text/" class="yuimenubaritemlabel"><fmt:message key="menu.text" /></a></li>
-							<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/genesis/" class="yuimenubaritemlabel"><fmt:message key="menu.genesis" /></a></li>
+							<security:authorize ifAllGranted="ROLE_EDITOR">
+								<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/manuscripts/" class="yuimenubaritemlabel"><fmt:message key="menu.manuscripts" /></a></li>
+								<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/text/" class="yuimenubaritemlabel"><fmt:message key="menu.text" /></a></li>
+								<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/genesis/" class="yuimenubaritemlabel"><fmt:message key="menu.genesis" /></a></li>
+							</security:authorize>
 							<li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="${pageContext.request.contextPath}/project/about"><fmt:message key="menu.project" /></a>
 								<div class="yuimenu">
 									<div class="bd">
@@ -56,7 +58,7 @@
 							</li>
 							<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/project/contact" class="yuimenubaritemlabel"><fmt:message key="menu.contact" /></a></li>
 							<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/project/imprint" class="yuimenubaritemlabel"><fmt:message key="menu.imprint" /></a></li>
-							<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/project/internal" class="yuimenubaritemlabel"><fmt:message key="menu.restricted" /></a></li>
+							<li class="yuimenubaritem"><a href="http://wiki.faustedition.net/" class="yuimenubaritemlabel"><fmt:message key="menu.restricted" /></a></li>
 						</ul>
 					</div>
 				</div>

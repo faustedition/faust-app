@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class ContentContainer {
+public class ContentContainer implements Comparable<ContentContainer> {
 
 	protected ContentContainer parent;
 	protected String name;
@@ -17,7 +17,7 @@ public class ContentContainer {
 	}
 
 	public String getPath() {
-		return (parent == null ? "" : parent.getPath()) + "/" + name;
+		return (parent == null ? "" : parent.getPath() + "/") + name;
 	}
 
 	public String getName() {
@@ -47,6 +47,11 @@ public class ContentContainer {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		return new ToStringBuilder(this).append("path", getPath()).toString();
+	}
+
+	@Override
+	public int compareTo(ContentContainer o) {
+		return getPath().compareTo(o.getPath());
 	}
 }
