@@ -19,7 +19,7 @@ import de.faustedition.util.XMLUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/faust-model-context.xml" })
-public class TranscriptionStoreTest {
+public class TranscriptionStoreSetup {
 	@Autowired
 	private TranscriptionStore store;
 
