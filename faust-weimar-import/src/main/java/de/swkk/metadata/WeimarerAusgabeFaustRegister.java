@@ -1,28 +1,16 @@
 package de.swkk.metadata;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.DocumentException;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import de.faustedition.model.HierarchyNode;
-import de.faustedition.model.HierarchyNodeType;
-import de.faustedition.model.service.HierarchyManager;
 
 public class WeimarerAusgabeFaustRegister extends AllegroRecordSet {
 	private static final String PAGE_FIELD = "55a";
 	private static final String DESCRIPTION_FIELD = "222";
 	private static final String VOLUME_FIELD = "445";
-	private static final String UNREGISTERED_FILE_NAME = "[nicht zugeordnet]";
-
-	@Autowired
-	private HierarchyManager hierarchyManager;
-
 	private Map<String, Integer> registerToHierarchyMapping = new HashMap<String, Integer>();
 	private Integer unregisteredFile;
 
@@ -61,26 +49,5 @@ public class WeimarerAusgabeFaustRegister extends AllegroRecordSet {
 
 	public Integer resolveMetadataNode(String description) {
 		return (description == null || !registerToHierarchyMapping.containsKey(description) ? unregisteredFile : registerToHierarchyMapping.get(description));
-	}
-
-	public void createTopLevelTranscriptionFolders() throws IOException, DocumentException {
-		for (String description : getDescriptionSet()) {
-			//transcriptionManager.findOrCreateFolder(null, Folder.normalizeName(description));
-		}
-		//transcriptionManager.findOrCreateFolder(null, Folder.normalizeName("nicht zugeordnet"));
-
-	}
-
-	public void createTopLevelMetadataNodes() {
-		HierarchyNode root = hierarchyManager.findRoot();
-		for (String description : getDescriptionSet()) {
-			if (!hierarchyManager.nodeExists(root, description)) {
-				registerToHierarchyMapping.put(description, hierarchyManager.createNode(root, description, HierarchyNodeType.FILE).getId());
-			}
-		}
-
-		if (!hierarchyManager.nodeExists(root, UNREGISTERED_FILE_NAME)) {
-			unregisteredFile = hierarchyManager.createNode(root, UNREGISTERED_FILE_NAME, HierarchyNodeType.FILE).getId();
-		}
 	}
 }

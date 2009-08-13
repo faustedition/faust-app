@@ -6,14 +6,14 @@
 <title>Handschrift „<c:out value="${transcription.name}" />“</title>
 </head>
 <body>
-<c:set var="facsimile" value="${pageContext.request.contextPath}/facsimile/${transcription.path}"/>
+<c:set var="facsimile" value="${pageContext.request.contextPath}/facsimile/${facsimilePath}"/>
 
 <div class="yui-g">
 	<div class="yui-u first">
 		<ul>
 			<li><a href="${facsimile}" title="Facsimile-Link">&raquo; Facsimile-Link</a></li>
 			<li><a href="tei-document/" title="TEI-Dokument">&raquo; TEI-Dokument</a></li>
-			<li><a href="${pageContext.request.contextPath}/dav/store/transcriptions/${transcription.path}.xml" title="WebDAV-Link">&raquo; WebDAV-Link</a></li>
+			<li><a href="${pageContext.request.contextPath}/dav/store/${transcription.path}" title="WebDAV-Link">&raquo; WebDAV-Link</a></li>
 		</ul>
 	</div>
 	<div class="yui-u">

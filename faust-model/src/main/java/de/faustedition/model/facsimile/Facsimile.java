@@ -1,6 +1,8 @@
-package de.faustedition.model;
+package de.faustedition.model.facsimile;
 
 import java.io.File;
+
+import de.faustedition.model.transcription.Transcription;
 
 public class Facsimile {
 

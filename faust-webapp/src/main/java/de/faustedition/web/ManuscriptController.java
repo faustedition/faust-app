@@ -1,7 +1,6 @@
 package de.faustedition.web;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.jcr.RepositoryException;
 import javax.servlet.ServletOutputStream;
@@ -10,25 +9,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import de.faustedition.model.Portfolio;
-import de.faustedition.model.Repository;
-import de.faustedition.model.Transcription;
-import de.faustedition.model.store.ContentContainer;
+import de.faustedition.model.store.ContentObject;
 import de.faustedition.model.store.ObjectNotFoundException;
+import de.faustedition.model.transcription.Portfolio;
+import de.faustedition.model.transcription.Repository;
+import de.faustedition.model.transcription.Transcription;
 import de.faustedition.model.transcription.TranscriptionStore;
+import de.faustedition.util.LoggingUtil;
 
 @Controller
-public class ManuscriptController {
-
-	@Autowired
-	private TranscriptionStore transcriptionStore;
-
+public class ManuscriptController extends AbstractTranscriptionBasedController {
 	@RequestMapping("/manuscripts/**")
 	public ModelAndView browse(HttpServletRequest request, HttpServletResponse response) throws RepositoryException, ObjectNotFoundException, IOException {
 		String requestURL = request.getRequestURL().toString();
@@ -37,41 +32,57 @@ public class ManuscriptController {
 			return null;
 		}
 
-		String path = StringUtils.strip(StringUtils.defaultString(request.getPathInfo()), "/");
-		List<ContentContainer> traversalList = transcriptionStore.traverse(path);
-
-		if (traversalList.size() < 1) {
-			return new ModelAndView("manuscripts/store", new ModelMap(transcriptionStore.findRepositories()));
-		}
-
-		if (traversalList.size() < 2) {
-			Repository repository = (Repository) traversalList.get(0);
-			ModelMap repositoryModel = new ModelMap(repository).addAttribute(transcriptionStore.findPortfolios(repository));
-			return new ModelAndView("manuscripts/repository", repositoryModel);
-		}
-
-		if (traversalList.size() < 3) {
-			Portfolio portfolio = (Portfolio) traversalList.get(1);
-			ModelMap portfolioModel = new ModelMap(portfolio).addAttribute(transcriptionStore.findTranscriptions(portfolio));
-			return new ModelAndView("manuscripts/portfolio", portfolioModel);
-		}
-
-		Transcription transcription = (Transcription) traversalList.get(2);
+		TranscriptionStore transcriptionStore = getTranscriptionStore();
+		ModelMap model = new ModelMap().addAttribute(transcriptionStore);
 		
-		if ("tei-document".equalsIgnoreCase(StringUtils.substringAfterLast(path, "/"))) {
-			byte[] transcriptionData = transcriptionStore.retrieve(transcription);
-			
-			response.setContentType("application/xml");
-			response.setContentLength(transcriptionData.length);
-			
-			ServletOutputStream outputStream = response.getOutputStream();
-			IOUtils.write(transcriptionData, outputStream);
-			outputStream.flush();
-			
-			return null;
+		boolean teiDocumentMode = false;
+		String path = transcriptionStore.buildAbsolutePath(getPath(request));
+		if (path.endsWith("/tei-document")) {
+			path = StringUtils.removeEnd(path, "/tei-document");
+			teiDocumentMode = true;
 		}
-		
-		ModelMap manuscriptModel = new ModelMap(transcription);
-		return new ModelAndView("manuscripts/manuscript", manuscriptModel);
+
+		ContentObject contentObject = contentStore.get(path);
+		if (contentObject == null) {
+			throw new ObjectNotFoundException(path);
+		}
+
+		if (contentObject instanceof TranscriptionStore) {
+			return new ModelAndView("manuscripts/store", model.addAttribute(transcriptionStore.findRepositories(contentStore)));
+		}
+
+		if (contentObject instanceof Repository) {
+			Repository repository = (Repository) contentObject;
+			return new ModelAndView("manuscripts/repository", model.addAttribute(repository).addAttribute(repository.findPortfolios(contentStore)));
+		}
+
+		if (contentObject instanceof Portfolio) {
+			Portfolio portfolio = (Portfolio) contentObject;
+			return new ModelAndView("manuscripts/portfolio", model.addAttribute(portfolio).addAttribute(portfolio.findTranscriptions(contentStore)));
+
+		}
+
+		if (contentObject instanceof Transcription) {
+			Transcription transcription = (Transcription) contentObject;
+
+			if (teiDocumentMode) {
+				byte[] transcriptionData = transcription.retrieve(contentStore);
+
+				response.setContentType("application/xml");
+				response.setContentLength(transcriptionData.length);
+
+				ServletOutputStream outputStream = response.getOutputStream();
+				IOUtils.write(transcriptionData, outputStream);
+				outputStream.flush();
+
+				return null;
+			}
+
+			model.addAttribute(transcription).addAttribute("facsimilePath", transcriptionStore.buildRelativePath(transcription.getPath()));
+			return new ModelAndView("manuscripts/manuscript", model);
+		}
+
+		LoggingUtil.LOG.warn(String.format("Unknown content object addressed in manuscript controller: %s", contentObject));
+		throw new ObjectNotFoundException(path);
 	}
 }

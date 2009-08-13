@@ -12,31 +12,66 @@
 
 	<bean id="modelConfigurer" class="de.faustedition.model.EnvironmentBasedModelConfigurer" />
 
-	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory="${data.home}" />
+	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory="${data.home}">
+		<property name="contentObjectBuilders">
+			<list>
+				<bean class="de.faustedition.model.transcription.TranscriptionStoreBuilder" />
+				<bean class="de.faustedition.model.transcription.RepositoryBuilder" />
+				<bean class="de.faustedition.model.transcription.PortfolioBuilder" />
+				<bean class="de.faustedition.model.transcription.TranscriptionBuilder" />
+			</list>
+		</property>
+	</bean>
 
-	<bean id="facsimileStore" class="de.faustedition.model.facsimile.FacsimileStore" p:dataDirectory="${data.home}" />
+	<bean id="contentStoreBackupManager" class="de.faustedition.model.store.ContentStoreBackupManager" p:dataDirectory="${data.home}" />
 
-	<bean id="transcriptionStore" class="de.faustedition.model.transcription.TranscriptionStore" />
+	<bean id="transformationManager" class="de.faustedition.model.transformation.ContentStoreTransformationManager">
+		<property name="contentTransformers">
+			<list>
+				<bean class="de.faustedition.model.transformation.RemoveXmlEndingTransformation" />
+				<bean class="de.faustedition.model.transformation.TranscriptionMimeTypeTransformer" />
+			</list>
+		</property>
+	</bean>
 
-	<bean id="scheduledExecutor" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean" />
+	<bean id="facsimileStore" class="de.faustedition.model.facsimile.FacsimileStore" p:dataDirectory="${data.home}" p:imageMagickConvertCommand="${imagemagick.convert.cmd}"/>
 
-	<!-- <context:component-scan base-package="de.faustedition.model.service" />  -->
-
-	<!--
-		<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean"> <property name="mappingResources" value="faust-model.hbm.xml" /> <property name="hibernateProperties">
-		<props> <prop key="hibernate.connection.driver_class">com.mysql.jdbc.Driver</prop> <prop key="hibernate.connection.url">jdbc:mysql://localhost/faustedition</prop> <prop
-		key="hibernate.connection.username">faustedition</prop> <prop key="hibernate.connection.password">faustedition</prop> <prop
-		key="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</prop> <prop key="hibernate.c3p0.min_size">5</prop> <prop key="hibernate.c3p0.max_size">20</prop> <prop
-		key="hibernate.c3p0.timeout">1800</prop> <prop key="hibernate.c3p0.max_statements">50</prop> <prop key="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</prop> <prop
-		key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop> <prop key="hibernate.hbm2ddl.auto">update</prop> <prop key="hibernate.max_fetch_depth">3</prop> <prop
-		key="hibernate.default_batch_fetch_size">16</prop> <prop key="hibernate.show_sql">false</prop> </props> </property> </bean> <bean id="transactionManager"
-		class="org.springframework.orm.hibernate3.HibernateTransactionManager"> <property name="sessionFactory" ref="sessionFactory" /> </bean> <tx:annotation-driven /> <bean id="metadataFieldDefinitions"
-		class="org.springframework.core.io.ClassPathResource"> <constructor-arg value="faust-metadata-field-definition.xml" /> </bean> <bean id="transcriptionManager"
-		class="de.faustedition.model.service.TranscriptionManagerImpl"> <property name="baseDirectoryCandidates"> <list> <value>file:///home/faust/transcriptions</value>
-		<value>file:///Users/gregor/Desktop/Faustedition/data/transcriptions</value> </list> </property> </bean> <bean id="schemaManager" class="de.faustedition.model.service.SchemaManagerImpl"> <property
-		name="schemaResourceURL" value="http://www.faustedition.net/schema/v1/faust-tei.rnc" /> <property name="characterEntities"> <map> <entry key="ndash" value="&#x2013;" /> <entry key="mdash"
-		value="&#x2014;" /> <entry key="ss" value="&#x017f;" /> <entry key="apostr" value="&#x2019;" /> <entry key="mm" value="m&#x0304;" /> <entry key="nn" value="n&#x0304;" /> </map> </property> </bean>
-
-		<bean id="cssManager" class="de.faustedition.model.service.CSSManagerImpl"> <property name="cssResourceURL" value="http://www.faustedition.net/schema/v1/faust-tei.css" /> </bean>
-	-->
+	<bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<bean id="initialRestoreTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+					<property name="jobDetail">
+						<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+							<property name="targetObject" ref="contentStoreBackupManager" />
+							<property name="targetMethod" value="restoreIfEmpty" />
+							<property name="concurrent" value="false" />
+						</bean>
+					</property>
+					<property name="startDelay" value="5000" />
+					<property name="repeatCount" value="0" />
+				</bean>
+				<bean id="transformationTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+					<property name="jobDetail">
+						<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+							<property name="targetObject" ref="transformationManager" />
+							<property name="targetMethod" value="transform" />
+							<property name="concurrent" value="false" />
+						</bean>
+					</property>
+					<property name="repeatCount" value="0" />
+					<property name="startDelay" value="300000" />
+				</bean>
+				<bean id="backupTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+					<property name="jobDetail">
+						<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+							<property name="targetObject" ref="contentStoreBackupManager" />
+							<property name="targetMethod" value="backup" />
+							<property name="concurrent" value="false" />
+						</bean>
+					</property>
+					<property name="cronExpression" value="0 0 */6 * * ?" />
+				</bean>
+			</list>
+		</property>
+	</bean>
 </beans>

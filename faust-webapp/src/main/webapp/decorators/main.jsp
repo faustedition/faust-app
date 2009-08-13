@@ -58,7 +58,17 @@
 							</li>
 							<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/project/contact" class="yuimenubaritemlabel"><fmt:message key="menu.contact" /></a></li>
 							<li class="yuimenubaritem"><a href="${pageContext.request.contextPath}/project/imprint" class="yuimenubaritemlabel"><fmt:message key="menu.imprint" /></a></li>
-							<li class="yuimenubaritem"><a href="http://wiki.faustedition.net/" class="yuimenubaritemlabel"><fmt:message key="menu.restricted" /></a></li>
+							<li class="yuimenubaritem"><a href="http://wiki.faustedition.net/" class="yuimenubaritemlabel"><fmt:message key="menu.restricted" /></a>
+								<security:authorize ifNotGranted="ROLE_EDITOR">
+									<div class="yuimenu">
+										<div class="bd">
+											<ul>
+												<li class="yuimenuitem"><a href="${pageContext.request.contextPath}/project/login" class="yuimenuitemlabel">Login</a></li>
+											</ul>
+										</div>
+									</div>
+								</security:authorize>
+							</li>
 						</ul>
 					</div>
 				</div>

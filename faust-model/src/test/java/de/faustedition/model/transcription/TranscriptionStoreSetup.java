@@ -1,22 +1,23 @@
 package de.faustedition.model.transcription;
 
+import javax.jcr.Node;
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.faustedition.model.AbstractModelContextTest;
-import de.faustedition.model.Portfolio;
-import de.faustedition.model.Repository;
-import de.faustedition.model.Transcription;
 import de.faustedition.model.facsimile.FacsimileStore;
+import de.faustedition.model.store.ContentStore;
+import de.faustedition.model.store.ContentStoreCallback;
 import de.faustedition.util.LoggingUtil;
 
 public class TranscriptionStoreSetup extends AbstractModelContextTest {
 
 	@Autowired
-	private TranscriptionStore transcriptionStore;
+	private ContentStore contentStore;
 
 	@Autowired
 	private FacsimileStore facsimileStore;
@@ -24,11 +25,22 @@ public class TranscriptionStoreSetup extends AbstractModelContextTest {
 	@Test
 	public void repositoryListing() throws RepositoryException {
 		int transcriptions = 0;
-		for (Repository repository : transcriptionStore.findRepositories()) {
-			for (Portfolio portfolio : transcriptionStore.findPortfolios(repository)) {
-				for (Transcription transcription : transcriptionStore.findTranscriptions(portfolio)) {
+		TranscriptionStore store = contentStore.findTranscriptionStore();
+		for (Repository repository : store.findRepositories(contentStore)) {
+			for (Portfolio portfolio : repository.findPortfolios(contentStore)) {
+				for (final Transcription transcription : portfolio.findTranscriptions(contentStore)) {
 					Assert.assertNotNull(transcription.getPath());
-					if (!"inventar_db_metadata".equals(transcription.getName())) {
+					contentStore.execute(new ContentStoreCallback<Object>() {
+
+						@Override
+						public Object doInSession(Session session) throws RepositoryException {
+							Node transcriptionNode = session.getRootNode().getNode(transcription.getPath());
+							Assert.assertTrue(transcriptionNode.hasNode("metadata"));
+							Assert.assertTrue(transcriptionNode.getNode("metadata").hasProperty("web-dav-test"));
+							return null;
+						}
+					});
+					if (!transcription.getName().startsWith("inventar_db_metadata")) {
 						transcriptions++;
 						Assert.assertNotNull(facsimileStore.find(transcription));
 					}

@@ -3,7 +3,6 @@ package de.faustedition.web;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import javax.jcr.RepositoryException;
 import javax.servlet.ServletOutputStream;
@@ -17,33 +16,37 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
-import de.faustedition.model.Facsimile;
-import de.faustedition.model.Transcription;
+import de.faustedition.model.facsimile.Facsimile;
 import de.faustedition.model.facsimile.FacsimileStore;
-import de.faustedition.model.store.ContentContainer;
+import de.faustedition.model.facsimile.FacsimileStore.Resolution;
+import de.faustedition.model.store.ContentObject;
 import de.faustedition.model.store.ObjectNotFoundException;
-import de.faustedition.model.transcription.TranscriptionStore;
+import de.faustedition.model.transcription.Transcription;
 
 @Controller
-public class FacsimileController {
-	@Autowired
-	private TranscriptionStore transcriptionStore;
-
+public class FacsimileController extends AbstractTranscriptionBasedController {
 	@Autowired
 	private FacsimileStore facsimileStore;
 
 	@RequestMapping("/facsimile/**")
 	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws RepositoryException, ObjectNotFoundException, IOException {
-		String path = StringUtils.defaultString(request.getPathInfo());
-		List<ContentContainer> traversalList = transcriptionStore.traverse(path);
+		String facsimilePath = getPath(request);
 
-		if (traversalList.size() < 3) {
-			throw new ObjectNotFoundException(path);
+		Resolution facsimileResolution = Resolution.LOW;
+		if (facsimilePath.endsWith("/thumb")) {
+			facsimilePath = StringUtils.removeEndIgnoreCase(facsimilePath, "/thumb");
+			facsimileResolution = Resolution.THUMB;
 		}
 
-		Facsimile facsimile = facsimileStore.find((Transcription) traversalList.get(2));
+		facsimilePath = getTranscriptionStore().buildAbsolutePath(facsimilePath);
+		ContentObject contentObject = contentStore.get(facsimilePath);
+		if (contentObject == null || !(contentObject instanceof Transcription)) {
+			throw new ObjectNotFoundException(facsimilePath);
+		}
+
+		final Facsimile facsimile = facsimileStore.find((Transcription) contentObject, facsimileResolution);
 		if (facsimile == null) {
-			throw new ObjectNotFoundException(path);
+			throw new ObjectNotFoundException(facsimilePath);
 		}
 
 		response.setContentType("image/jpeg");
@@ -53,14 +56,13 @@ public class FacsimileController {
 			return;
 		}
 
-		ServletOutputStream outputStream = response.getOutputStream();
-		InputStream facsimileStream = null;
+		ServletOutputStream responseStream = response.getOutputStream();
+		InputStream imageStream = null;
 		try {
-			facsimileStream = new FileInputStream(facsimile.getImageFile());
-			IOUtils.copy(facsimileStream, outputStream);
-			outputStream.flush();
+			IOUtils.copy(imageStream = new FileInputStream(facsimile.getImageFile()), responseStream);
+			responseStream.flush();
 		} finally {
-			IOUtils.closeQuietly(facsimileStream);
+			IOUtils.closeQuietly(imageStream);
 		}
 	}
 }

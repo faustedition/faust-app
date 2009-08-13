@@ -36,3 +36,15 @@ h1, h2, h3, h4, h5, h6, strong, em {
     font-size: 77%;
     text-align: center;
 }
+
+.no-border {
+	border: 0;
+}
+
+.center {
+	text-align: center;
+}
+
+.small-font {
+	font-size: 85%;
+}

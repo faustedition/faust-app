@@ -10,6 +10,8 @@
 
 	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver" />
 
+	<bean id="handlerExceptionResolver" class="de.faustedition.web.CustomExceptionResolver" />
+	
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="contentType" value="text/html;charset=UTF-8" />
 		<property name="prefix" value="/WEB-INF/jsp/" />

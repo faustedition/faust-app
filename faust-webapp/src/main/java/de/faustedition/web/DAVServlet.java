@@ -33,7 +33,7 @@ public class DAVServlet extends SimpleWebdavServlet {
 	@Override
 	protected CredentialsProvider getCredentialsProvider() {
 		return new CredentialsProvider() {
-			
+
 			@Override
 			public Credentials getCredentials(HttpServletRequest request) throws LoginException, ServletException {
 				return ContentStore.ADMIN_CREDENTIALS;

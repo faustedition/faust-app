@@ -53,5 +53,9 @@
 			<groupId>opensymphony</groupId>
 			<artifactId>sitemesh</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.im4java</groupId>
+			<artifactId>im4java</artifactId>
+		</dependency>
 	</dependencies>
 </project>
