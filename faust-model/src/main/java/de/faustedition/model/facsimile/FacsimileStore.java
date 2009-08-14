@@ -75,7 +75,7 @@ public class FacsimileStore implements InitializingBean {
 				return null;
 			}
 
-			if (!imageFile.getParentFile().isDirectory() && !imageFile.getParentFile().mkdirs()) {
+			if (!imageFile.getParentFile().isDirectory() || !imageFile.getParentFile().mkdirs()) {
 				throw ErrorUtil.fatal("Cannot create directory for thumbnail '" + imageFile.getAbsolutePath() + "'");
 			}
 
