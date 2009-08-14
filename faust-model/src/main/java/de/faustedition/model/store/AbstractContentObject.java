@@ -18,6 +18,10 @@ public class AbstractContentObject implements ContentObject {
 		this.name = name;
 	}
 
+	protected AbstractContentObject(ContentObject parent, String name) {
+		this(parent.getPath() + "/" + name, name);
+	}
+	
 	@Override
 	public String getName() {
 		return name;

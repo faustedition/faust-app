@@ -17,7 +17,7 @@
 		</ul>
 	</div>
 	<div class="yui-u">
-		<iframe src="${facsimile}" height="600" width="400"></iframe>
+		<iframe src="${facsimile}" height="400" width="400"></iframe>
 	</div>
 </div>
 </body>

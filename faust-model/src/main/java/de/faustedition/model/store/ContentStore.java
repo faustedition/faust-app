@@ -3,9 +3,11 @@ package de.faustedition.model.store;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jcr.Credentials;
@@ -35,13 +37,15 @@ import de.faustedition.util.LoggingUtil;
 
 @SuppressWarnings("deprecation")
 public class ContentStore implements InitializingBean, DisposableBean {
-	private static final String FAUST_NS_URI = "http://www.faustedition.net/ns";
+	public static final String FAUST_NS_PREFIX = "faust";
+	public static final String FAUST_NS_URI = "http://www.faustedition.net/ns";
 	public static final String WORKSPACE = "store";
 	private static final ClassPathResource STORE_CONFIG = new ClassPathResource("/jackrabbit-repository-config.xml");
 	private static final ClassPathResource NODE_TYPE_DEFINITION_RESOURCE = new ClassPathResource("/jackrabbit-node-type-definitions.cnd");
 	public static final Credentials ADMIN_CREDENTIALS = new SimpleCredentials("admin", "".toCharArray());
 
-	private Set<ObjectBuilder<? extends ContentObject>> contentObjectBuilders = new HashSet<ObjectBuilder<? extends ContentObject>>();
+	private Set<ContentObjectMapper<? extends ContentObject>> contentObjectMappers = new HashSet<ContentObjectMapper<? extends ContentObject>>();
+	private Map<Class<? extends ContentObject>, ContentObjectMapper<? extends ContentObject>> contentObjectMapperRegistry = new HashMap<Class<? extends ContentObject>, ContentObjectMapper<? extends ContentObject>>();
 	private RepositoryImpl repository;
 	private String dataDirectory;
 
@@ -51,10 +55,13 @@ public class ContentStore implements InitializingBean, DisposableBean {
 	}
 
 	@Required
-	public void setContentObjectBuilders(Set<ObjectBuilder<? extends ContentObject>> objectBuilders) {
-		this.contentObjectBuilders = objectBuilders;
+	public void setContentObjectMappers(Set<ContentObjectMapper<? extends ContentObject>> contentObjectMappers) {
+		this.contentObjectMappers = contentObjectMappers;
+		for (ContentObjectMapper<? extends ContentObject> mapper : contentObjectMappers) {
+			contentObjectMapperRegistry.put(mapper.getMappedType(), mapper);
+		}
 	}
-	
+
 	public TranscriptionStore findTranscriptionStore() throws RepositoryException {
 		List<TranscriptionStore> stores = list(null, TranscriptionStore.class);
 		return (stores.isEmpty() ? null : stores.get(0));
@@ -112,11 +119,28 @@ public class ContentStore implements InitializingBean, DisposableBean {
 		});
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T extends ContentObject> T save(final T contentObject) throws RepositoryException {
+		final ContentObjectMapper<T> contentObjectMapper = (ContentObjectMapper<T>) contentObjectMapperRegistry.get(contentObject.getClass());
+		if (contentObjectMapper == null) {
+			throw new IllegalArgumentException(contentObject.toString());
+		}
+		return execute(new ContentStoreCallback<T>() {
+
+			@Override
+			public T doInSession(Session session) throws RepositoryException {
+				contentObjectMapper.save(contentObject, contentObject.getNode(session));
+				session.save();
+				return contentObject;
+			}
+		});
+	}
+	
 	protected ContentObject build(Session session, String path) throws RepositoryException {
 		Node node = session.getRootNode().getNode(ContentStoreUtil.normalizePath(path));
-		for (ObjectBuilder<? extends ContentObject> builder : contentObjectBuilders) {
-			if (builder.buildsObjectFor(node)) {
-				return builder.build(node);
+		for (ContentObjectMapper<? extends ContentObject> mapper : contentObjectMappers) {
+			if (mapper.mapsObjectFor(node)) {
+				return mapper.map(node);
 			}
 		}
 		return null;
@@ -174,10 +198,10 @@ public class ContentStore implements InitializingBean, DisposableBean {
 			public Object doInSession(Session session) throws RepositoryException {
 				NamespaceRegistry namespaceRegistry = session.getWorkspace().getNamespaceRegistry();
 				try {
-					Assert.isTrue("faust".equals(namespaceRegistry.getPrefix(FAUST_NS_URI)));
+					Assert.isTrue(FAUST_NS_PREFIX.equals(namespaceRegistry.getPrefix(FAUST_NS_URI)));
 				} catch (NamespaceException e) {
 					LoggingUtil.LOG.info("Registering namespace '" + FAUST_NS_URI + "' in content repository");
-					namespaceRegistry.registerNamespace("faust", FAUST_NS_URI);
+					namespaceRegistry.registerNamespace(FAUST_NS_PREFIX, FAUST_NS_URI);
 				}
 
 				JackrabbitNodeTypeManager nodeTypeManager = (JackrabbitNodeTypeManager) session.getWorkspace().getNodeTypeManager();
