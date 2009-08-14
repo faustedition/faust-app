@@ -217,11 +217,6 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>net.sourceforge.im4java</groupId>
-				<artifactId>im4java</artifactId>
-				<version>1.0-20090812</version>
-			</dependency>
-			<dependency>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty</artifactId>
 				<version>${jetty.version}</version>
