@@ -12,4 +12,6 @@ public interface ContentObjectMapper<T extends ContentObject> {
 
 	
 	void save(T contentObject, Node node) throws RepositoryException;
+
+	String getNodeType();
 }

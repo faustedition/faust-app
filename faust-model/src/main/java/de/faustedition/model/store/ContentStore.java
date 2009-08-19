@@ -37,7 +37,6 @@ import de.faustedition.util.LoggingUtil;
 
 @SuppressWarnings("deprecation")
 public class ContentStore implements InitializingBean, DisposableBean {
-	public static final String FAUST_NS_PREFIX = "faust";
 	public static final String FAUST_NS_URI = "http://www.faustedition.net/ns";
 	public static final String WORKSPACE = "store";
 	private static final ClassPathResource STORE_CONFIG = new ClassPathResource("/jackrabbit-repository-config.xml");
@@ -129,9 +128,24 @@ public class ContentStore implements InitializingBean, DisposableBean {
 
 			@Override
 			public T doInSession(Session session) throws RepositoryException {
-				contentObjectMapper.save(contentObject, contentObject.getNode(session));
+				Node rootNode = session.getRootNode();
+				String nodePath = contentObject.getPath();
+				Node node = rootNode.hasNode(nodePath) ? rootNode.getNode(nodePath) : rootNode.addNode(nodePath, contentObjectMapper.getNodeType());
+				contentObjectMapper.save(contentObject, node);
 				session.save();
 				return contentObject;
+			}
+		});
+	}
+
+	public <T extends ContentObject> void delete(final T contentObject) throws RepositoryException {
+		execute(new ContentStoreCallback<T>() {
+
+			@Override
+			public T doInSession(Session session) throws RepositoryException {
+				contentObject.getNode(session).remove();
+				session.save();
+				return null;
 			}
 		});
 	}
@@ -198,10 +212,10 @@ public class ContentStore implements InitializingBean, DisposableBean {
 			public Object doInSession(Session session) throws RepositoryException {
 				NamespaceRegistry namespaceRegistry = session.getWorkspace().getNamespaceRegistry();
 				try {
-					Assert.isTrue(FAUST_NS_PREFIX.equals(namespaceRegistry.getPrefix(FAUST_NS_URI)));
+					Assert.isTrue("faust".equals(namespaceRegistry.getPrefix(FAUST_NS_URI)));
 				} catch (NamespaceException e) {
 					LoggingUtil.LOG.info("Registering namespace '" + FAUST_NS_URI + "' in content repository");
-					namespaceRegistry.registerNamespace(FAUST_NS_PREFIX, FAUST_NS_URI);
+					namespaceRegistry.registerNamespace("faust", FAUST_NS_URI);
 				}
 
 				JackrabbitNodeTypeManager nodeTypeManager = (JackrabbitNodeTypeManager) session.getWorkspace().getNodeTypeManager();

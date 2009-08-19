@@ -1,5 +1,6 @@
 package de.faustedition.model.metadata;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import de.faustedition.model.store.AbstractContentObject;
@@ -8,7 +9,7 @@ import de.faustedition.model.store.ContentObject;
 public class MetadataBundle extends AbstractContentObject {
 	public static final String METADATA_CONTENT_NAME = "metadata";
 	
-	private Map<String, String> values;
+	private Map<String, String> values = new HashMap<String, String>();
 
 	public MetadataBundle(String path, String name) {
 		super(path, name);

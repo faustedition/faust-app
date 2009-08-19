@@ -31,7 +31,7 @@ public class AbstractContentObject implements ContentObject {
 	public String getPath() {
 		return path;
 	}
-
+ 
 	public Node getNode(Session session) throws RepositoryException {
 		return session.getRootNode().getNode(getPath());
 	}

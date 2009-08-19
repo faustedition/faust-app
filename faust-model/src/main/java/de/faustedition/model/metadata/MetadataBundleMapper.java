@@ -10,7 +10,6 @@ import javax.jcr.RepositoryException;
 import org.apache.commons.lang.StringUtils;
 
 import de.faustedition.model.store.ContentObjectMapper;
-import de.faustedition.model.store.ContentStore;
 import de.faustedition.model.store.ContentStoreUtil;
 
 public class MetadataBundleMapper implements ContentObjectMapper<MetadataBundle> {
@@ -22,9 +21,8 @@ public class MetadataBundleMapper implements ContentObjectMapper<MetadataBundle>
 		MetadataBundle metadataBundle = new MetadataBundle(ContentStoreUtil.normalizePath(node.getPath()), node.getName());
 		for (PropertyIterator pi = node.getProperties(); pi.hasNext();) {
 			Property property = pi.nextProperty();
-			String namePrefix = ContentStore.FAUST_NS_PREFIX + ":";
-			if (property.getName().startsWith(namePrefix)) {
-				metadataBundle.getValues().put(StringUtils.removeStart(property.getName(), namePrefix), property.getString());
+			if (property.getName().startsWith("faust:")) {
+				metadataBundle.getValues().put(StringUtils.removeStart(property.getName(), "faust:"), property.getString());
 			}
 		}
 		return metadataBundle;
@@ -39,18 +37,22 @@ public class MetadataBundleMapper implements ContentObjectMapper<MetadataBundle>
 	public void save(MetadataBundle contentObject, Node node) throws RepositoryException {
 		for (PropertyIterator pi = node.getProperties(); pi.hasNext();) {
 			Property property = pi.nextProperty();
-			String namePrefix = ContentStore.FAUST_NS_PREFIX + ":";
-			if (property.getName().startsWith(namePrefix)) {
+			if (property.getName().startsWith("faust:")) {
 				property.remove();
 			}
 		}
 		for (Map.Entry<String, String> metadata : contentObject.getValues().entrySet()) {
-			node.setProperty(ContentStore.FAUST_NS_PREFIX + ":" + metadata.getKey(), metadata.getValue());
+			node.setProperty("faust:" + metadata.getKey(), metadata.getValue());
 		}
 	}
 
 	@Override
 	public Class<? extends MetadataBundle> getMappedType() {
 		return MetadataBundle.class;
+	}
+
+	@Override
+	public String getNodeType() {
+		return "faust:metadata";
 	}
 }

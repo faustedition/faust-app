@@ -30,4 +30,8 @@ public class TranscriptionMapper implements ContentObjectMapper<Transcription> {
 		return Transcription.class;
 	}
 
+	@Override
+	public String getNodeType() {
+		return "nt:file";
+	}
 }

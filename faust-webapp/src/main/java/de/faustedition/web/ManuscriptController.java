@@ -14,6 +14,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import de.faustedition.model.metadata.MetadataBundle;
 import de.faustedition.model.store.ContentObject;
 import de.faustedition.model.store.ObjectNotFoundException;
 import de.faustedition.model.transcription.Portfolio;
@@ -58,7 +59,9 @@ public class ManuscriptController extends AbstractTranscriptionBasedController {
 
 		if (contentObject instanceof Portfolio) {
 			Portfolio portfolio = (Portfolio) contentObject;
-			return new ModelAndView("manuscripts/portfolio", model.addAttribute(portfolio).addAttribute(portfolio.findTranscriptions(contentStore)));
+			model.addAttribute(portfolio).addAttribute(portfolio.findTranscriptions(contentStore));
+			model.addAttribute(contentStore.list(portfolio, MetadataBundle.class));
+			return new ModelAndView("manuscripts/portfolio", model);
 
 		}
 

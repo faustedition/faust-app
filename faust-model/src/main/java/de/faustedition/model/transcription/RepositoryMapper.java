@@ -30,4 +30,8 @@ public class RepositoryMapper implements ContentObjectMapper<Repository> {
 		return Repository.class;
 	}
 
+	@Override
+	public String getNodeType() {
+		return "nt:folder";
+	}
 }

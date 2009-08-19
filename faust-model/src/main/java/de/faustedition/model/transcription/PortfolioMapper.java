@@ -29,4 +29,9 @@ public class PortfolioMapper implements ContentObjectMapper<Portfolio> {
 	public Class<? extends Portfolio> getMappedType() {
 		return Portfolio.class;
 	}
+
+	@Override
+	public String getNodeType() {
+		return "nt:folder";
+	}
 }

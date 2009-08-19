@@ -1,7 +1,9 @@
 <%@ page session="false" language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="java.util.*,de.faustedition.model.transcription.*"%>
 <%@ include file="../../../includes/taglibs.jspf"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+
+<%@page import="de.faustedition.model.metadata.MetadataBundle"%>
+<%@page import="org.springframework.web.util.HtmlUtils"%><html>
 <head>
 	<title>Portfolio „<c:out value="${portfolio.name}" />“</title>
 </head>
@@ -48,6 +50,26 @@
 	</c:when>
 	<c:otherwise>
 		<p class="note">Es sind bislang keine Handschriften in diesem Portfolio verzeichnet.</p>
+	</c:otherwise>
+</c:choose>
+
+<h2>Metadaten</h2>
+
+<c:choose>
+	<c:when test="${fn:length(metadataBundleList) gt 0}">
+		<c:forEach var="bundle" items="${metadataBundleList}" varStatus="bundleLoopStatus">
+			<p><strong>Datenset #<fmt:formatNumber value="${bundleLoopStatus.count}"/></strong></p>
+			
+			<%
+				MetadataBundle bundle = (MetadataBundle) pageContext.findAttribute("bundle");
+				for (Map.Entry<String, String> metadataValue : bundle.getValues().entrySet()) {
+					pageContext.getOut().println("<p>" + HtmlUtils.htmlEscape(metadataValue.getKey()) + ":" + HtmlUtils.htmlEscape(metadataValue.getValue()) + "</p>");
+				}
+			%>
+		</c:forEach>
+	</c:when>
+	<c:otherwise>
+		<p class="note">Es sind bislang keine Metadata für dieses Portfolio verzeichnet.</p>
 	</c:otherwise>
 </c:choose>
 </body>

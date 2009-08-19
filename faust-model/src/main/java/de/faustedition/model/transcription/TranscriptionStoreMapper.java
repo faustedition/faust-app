@@ -36,4 +36,8 @@ public class TranscriptionStoreMapper implements ContentObjectMapper<Transcripti
 		return TranscriptionStore.class;
 	}
 
+	@Override
+	public String getNodeType() {
+		return "nt:folder";
+	}
 }
