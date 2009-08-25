@@ -10,11 +10,18 @@
 
 	<context:annotation-config />
 
-	<bean id="modelConfigurer" class="de.faustedition.model.EnvironmentBasedModelConfigurer" />
+	<bean id="dataDirectory" class="de.faustedition.model.DataDirectoryFactoryBean">
+		<property name="dataDirectoryResources">
+			<list>
+				<value>file:///data/faust</value>
+				<value>file:///Users/gregor/Desktop/Faustedition/data</value>
+			</list>
+		</property>
+	</bean>
 
-	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory="${data.home}" />
+	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory-ref="dataDirectory" />
 
-	<bean id="contentStoreBackupManager" class="de.faustedition.model.store.ContentStoreBackupManager" p:dataDirectory="${data.home}" />
+	<bean id="contentStoreBackupManager" class="de.faustedition.model.store.ContentStoreBackupManager" p:dataDirectory-ref="dataDirectory" />
 
 	<bean id="transformationManager" class="de.faustedition.model.transformation.ContentStoreTransformationManager">
 		<property name="contentTransformers">
@@ -26,7 +33,15 @@
 		</property>
 	</bean>
 
-	<bean id="facsimileStore" class="de.faustedition.model.facsimile.FacsimileStore" p:dataDirectory="${data.home}" p:imageMagickConvertCommand="${imagemagick.convert.cmd}" />
+	<bean id="facsimileStore" class="de.faustedition.model.facsimile.FacsimileStore" p:dataDirectory-ref="dataDirectory">
+		<property name="conversionTools">
+			<list>
+				<value>/usr/bin/convert</value>
+				<value>/usr/local/bin/convert</value>
+				<value>/opt/local/bin/convert</value>
+			</list>
+		</property>
+	</bean>
 
 	<bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">

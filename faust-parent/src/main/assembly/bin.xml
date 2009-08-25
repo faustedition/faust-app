@@ -8,7 +8,6 @@
 	<moduleSets>
 		<moduleSet>
 			<includes>
-				<include>de.faustedition:faust-model</include>
 				<include>de.faustedition:faust-server</include>
 			</includes>
 			<binaries>
@@ -32,6 +31,11 @@
 			<directory>src/main/scripts</directory>
 			<outputDirectory />
 			<fileMode>755</fileMode>
+		</fileSet>
+		<fileSet>
+			<directory>src/main/config</directory>
+			<outputDirectory />
+			<fileMode>644</fileMode>
 		</fileSet>
 	</fileSets>
 </assembly>

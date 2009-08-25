@@ -27,7 +27,7 @@ public class ManuscriptsPage extends AbstractPage {
 
 	@Override
 	public String getPageTitle() {
-		return "Manuskripte/ Best\u00e4nde";
+		return "Manuskripte";
 	}
 
 	private class RepositoryDataView extends DataView<Repository> {

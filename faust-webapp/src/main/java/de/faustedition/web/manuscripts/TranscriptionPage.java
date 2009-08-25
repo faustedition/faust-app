@@ -9,12 +9,14 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.request.InvalidUrlException;
 
+import de.faustedition.model.facsimile.FacsimileResolution;
 import de.faustedition.model.store.ContentStoreCallback;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.model.transcription.Transcription;
 import de.faustedition.web.AbstractPage;
 import de.faustedition.web.FaustApplication;
+import de.faustedition.web.facsimile.FacsimileImage;
 
 public class TranscriptionPage extends AbstractPage {
 
@@ -52,6 +54,7 @@ public class TranscriptionPage extends AbstractPage {
 		});
 
 		add(new Label("transcriptionHeader", new PropertyModel<String>(transcription, "name")));
+		add(new FacsimileImage("facsimile", transcription, FacsimileResolution.LOW));
 	}
 
 	@Override

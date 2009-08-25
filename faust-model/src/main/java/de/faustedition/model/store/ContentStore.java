@@ -38,10 +38,10 @@ public class ContentStore implements InitializingBean, DisposableBean {
 	public static final Credentials ADMIN_CREDENTIALS = new SimpleCredentials("admin", "".toCharArray());
 
 	private RepositoryImpl repository;
-	private String dataDirectory;
+	private File dataDirectory;
 
 	@Required
-	public void setDataDirectory(String dataDirectory) {
+	public void setDataDirectory(File dataDirectory) {
 		this.dataDirectory = dataDirectory;
 	}
 
@@ -77,11 +77,9 @@ public class ContentStore implements InitializingBean, DisposableBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		File contentRepositoryBase = new File(dataDirectory, "content-repository");
-		if (!contentRepositoryBase.exists()) {
+		if (!contentRepositoryBase.isDirectory()) {
 			Assert.isTrue(contentRepositoryBase.mkdirs(), "Cannot create content store directory");
 		}
-		Assert.isTrue(contentRepositoryBase.isDirectory() && contentRepositoryBase.canWrite(), String.format("Cannot access content store directory '%s'", contentRepositoryBase
-				.getAbsolutePath()));
 
 		RepositoryConfig repositoryConfig = RepositoryConfig.create(new InputSource(STORE_CONFIG.getInputStream()), contentRepositoryBase.getAbsolutePath());
 		repository = RepositoryImpl.create(repositoryConfig);
@@ -137,16 +135,16 @@ public class ContentStore implements InitializingBean, DisposableBean {
 
 	public static String normalizeName(String name) {
 		name = StringUtils.strip(name, "/").replaceAll(Pattern.quote("/"), "_");
-	
+
 		// umlauts
 		name = name.replaceAll("\u00c4", "Ae").replaceAll("\u00e4", "ae");
 		name = name.replaceAll("\u00d6", "Oe").replaceAll("\u00f6", "oe");
 		name = name.replaceAll("\u00dc", "Ue").replaceAll("\u00fc", "ue");
 		name = name.replaceAll("\u00df", "ss");
-	
+
 		// non-printable characters
 		name = name.replaceAll("[^\\w\\.\\-]", "_");
-	
+
 		// condense underscores
 		name = name.replaceAll("_+", "_");
 		return name.trim();

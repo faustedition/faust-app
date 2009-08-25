@@ -26,6 +26,7 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.jackrabbit.JcrConstants;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.Assert;
 
 import de.faustedition.util.ErrorUtil;
@@ -35,25 +36,24 @@ public class ContentStoreBackupManager implements InitializingBean {
 	protected static final String BACKUP_FILE_NAME_SUFFIX = ".zip";
 	protected static final String BACKUP_FILE_NAME_PREFIX = "content-repository-backup-";
 
-	private String dataDirectory;
+	private File dataDirectory;
 
 	@Autowired
 	protected ContentStore contentStore;
 
 	protected File backupBaseFile;
 
-	@Autowired
-	public void setDataDirectory(String dataDirectory) {
+	@Required
+	public void setDataDirectory(File dataDirectory) {
 		this.dataDirectory = dataDirectory;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		backupBaseFile = new File(dataDirectory, "backup");
-		if (!backupBaseFile.exists()) {
+		if (!backupBaseFile.isDirectory()) {
 			Assert.isTrue(backupBaseFile.mkdirs(), "Cannot create backup directory");
 		}
-		Assert.isTrue(backupBaseFile.isDirectory() && backupBaseFile.canWrite(), String.format("Cannot access backup directory '%s'", backupBaseFile.getAbsolutePath()));
 	}
 
 	public void backup() {

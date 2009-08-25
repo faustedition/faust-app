@@ -26,7 +26,6 @@ import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.model.transcription.Transcription;
 import de.faustedition.util.ErrorUtil;
-import de.faustedition.util.LoggingUtil;
 import de.faustedition.util.XMLUtil;
 
 public class MetadataCreationTransformer implements ContentTransformer {
@@ -56,7 +55,6 @@ public class MetadataCreationTransformer implements ContentTransformer {
 							for (Transcription transcription : Transcription.find(session, portfolio)) {
 								addFaustMixin(session, transcription);
 								if (transcription.getName().startsWith("inventar_db_metadata")) {
-									LoggingUtil.LOG.info(transcription.getPath());
 									createMetadata(session, portfolio, transcription);
 									// contentStore.delete(transcription);
 								}
@@ -93,7 +91,6 @@ public class MetadataCreationTransformer implements ContentTransformer {
 
 		Document metadataDocument = Transcription.retrieveDocument(metadataTranscription.getNode(session));
 		NodeList valueLists = (NodeList) metadataListXPath.evaluate(metadataDocument, XPathConstants.NODESET);
-		LoggingUtil.LOG.info(String.format("tei:list #: %d", valueLists.getLength()));
 		for (int lc = 0; lc < valueLists.getLength(); lc++) {
 			Element valueList = (Element) valueLists.item(lc);
 

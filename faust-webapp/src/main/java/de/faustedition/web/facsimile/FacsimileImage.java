@@ -20,7 +20,6 @@ public class FacsimileImage extends WebComponent {
 
 	@Override
 	protected void onComponentTag(ComponentTag tag) {
-		checkComponentTag(tag, "img");
 		super.onComponentTag(tag);
 
 		RequestCycle requestCycle = RequestCycle.get();
