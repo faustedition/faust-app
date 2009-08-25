@@ -1,6 +1,5 @@
 package de.swkk.metadata;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -9,22 +8,16 @@ import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
-import org.springframework.util.Assert;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.faustedition.util.LoggingUtil;
-import de.faustedition.util.ResourceUtil;
 import de.faustedition.util.XMLUtil;
 
 public class ArchiveDatabase extends LinkedList<ArchiveRecord> implements InitializingBean {
 
 	private Resource databaseResource;
-
-	private Resource[] facsimileDirectoryCandidates;
-
-	private File facsimileDirectory;
 
 	private Map<GSACallNumber, ArchiveRecord> callNumberIndex = new HashMap<GSACallNumber, ArchiveRecord>();
 
@@ -33,17 +26,8 @@ public class ArchiveDatabase extends LinkedList<ArchiveRecord> implements Initia
 		this.databaseResource = databaseResource;
 	}
 
-	@Required
-	public void setFacsimileDirectoryCandidates(Resource[] facsimileDirectoryCandidates) {
-		this.facsimileDirectoryCandidates = facsimileDirectoryCandidates;
-	}
-
 	public void afterPropertiesSet() throws Exception {
 		parse(this.databaseResource);
-
-		Resource facsimileDirectoryResource = ResourceUtil.chooseExistingResources(facsimileDirectoryCandidates);
-		facsimileDirectory = (facsimileDirectoryResource == null || facsimileDirectoryResource.getFile().isDirectory() ? facsimileDirectoryResource.getFile() : null);
-		Assert.notNull(facsimileDirectory);
 	}
 
 	public ArchiveRecord lookup(GSACallNumber callNumber) {

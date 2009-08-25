@@ -1,20 +1,28 @@
 package de.faustedition.model.transcription;
 
-import java.util.List;
-
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 
 import de.faustedition.model.store.AbstractContentObject;
-import de.faustedition.model.store.ContentStore;
 
 public class TranscriptionStore extends AbstractContentObject {
+	protected static final String NAME = "transcriptions";
 
-	public TranscriptionStore(String path, String name) {
-		super(path, name);
+	protected TranscriptionStore(String path) {
+		super(path);
 	}
 
-	public List<Repository> findRepositories(ContentStore contentStore) throws RepositoryException {
-		return contentStore.list(this, Repository.class);
+	public static TranscriptionStore get(Session session) throws RepositoryException {
+		Node rootNode = session.getRootNode();
+		Node storeNode = null;
+		try {
+			storeNode = rootNode.getNode(NAME);
+		} catch (PathNotFoundException e) {
+			storeNode = rootNode.addNode(NAME, "nt:folder");
+			storeNode.save();
+		}
+		return new TranscriptionStore(storeNode.getPath());
 	}
-
 }

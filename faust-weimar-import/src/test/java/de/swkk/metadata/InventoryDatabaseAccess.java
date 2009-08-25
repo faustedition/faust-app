@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import de.faustedition.util.LoggingUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/faust-model-context.xml", "/import-application-context.xml" })
+@ContextConfiguration(locations = { "/faust-model-context.xml", "/faust-weimar-import-context.xml" })
 public class InventoryDatabaseAccess {
 
 	@Autowired

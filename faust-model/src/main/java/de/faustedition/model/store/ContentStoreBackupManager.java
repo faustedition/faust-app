@@ -66,7 +66,7 @@ public class ContentStoreBackupManager implements InitializingBean {
 			contentStore.execute(new ContentStoreCallback<Object>() {
 
 				@Override
-				public Object doInSession(Session session) throws RepositoryException {
+				public Object inStore(Session session) throws RepositoryException {
 					ZipOutputStream zipOutputStream = null;
 					try {
 						zipOutputStream = new ZipOutputStream(new FileOutputStream(new File(backupBaseFile, backupFileName)));
@@ -136,7 +136,7 @@ public class ContentStoreBackupManager implements InitializingBean {
 			contentStore.execute(new ContentStoreCallback<Object>() {
 
 				@Override
-				public Object doInSession(Session session) throws RepositoryException {
+				public Object inStore(Session session) throws RepositoryException {
 					ZipFile zipFile = null;
 					try {
 						zipFile = new ZipFile(restoreFrom);

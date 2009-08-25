@@ -6,26 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.jcr.RepositoryException;
-
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.Assert;
 
 import de.faustedition.model.store.ContentStore;
-import de.faustedition.model.transcription.Transcription;
-import de.faustedition.model.transcription.TranscriptionStore;
 import de.faustedition.util.ErrorUtil;
 
 public class FacsimileStore implements InitializingBean {
-	public enum Resolution {
-		LOW, HIGH, THUMB
-	};
-
-	private TranscriptionStore transcriptionStore;
 	private String dataDirectory;
 
 	private File lowResolutionImageDirectory;
@@ -34,9 +23,6 @@ public class FacsimileStore implements InitializingBean {
 	private int thumbnailHeight = 150;
 	private int thumbnailWidth = 75;
 	private String imageMagickConvertCommand;
-
-	@Autowired
-	private ContentStore contentStore;
 
 	@Required
 	public void setDataDirectory(String dataDirectory) {
@@ -56,20 +42,19 @@ public class FacsimileStore implements InitializingBean {
 		this.thumbnailWidth = thumbnailWidth;
 	}
 
-	public Facsimile find(Transcription transcription) {
-		return find(transcription, Resolution.LOW);
+	public File find(String path) {
+		return find(path, FacsimileResolution.LOW);
 	}
 
-	public Facsimile find(Transcription transcription, Resolution resolution) {
-		String imagePath = StringUtils.removeEnd(getTranscriptionStore().buildRelativePath(transcription.getPath()), ".xml");
-
-		final File imageFile = new File(getBaseDirectory(resolution), imagePath + getImageSuffix(resolution));
+	public File find(String path, FacsimileResolution resolution) {
+		path = ContentStore.normalizePath(path);
+		final File imageFile = new File(getBaseDirectory(resolution), path + resolution.getSuffix());
 		if (imageFile.isFile() && imageFile.canRead()) {
-			return new Facsimile(transcription, imageFile);
+			return imageFile;
 		}
 
-		if (resolution == Resolution.THUMB) {
-			File thumbnailSourceFile = new File(getBaseDirectory(Resolution.LOW), imagePath + getImageSuffix(Resolution.LOW));
+		if (resolution == FacsimileResolution.THUMB) {
+			File thumbnailSourceFile = new File(getBaseDirectory(FacsimileResolution.LOW), path + FacsimileResolution.LOW.getSuffix());
 
 			if (!thumbnailSourceFile.isFile() || !thumbnailSourceFile.canRead()) {
 				return null;
@@ -119,7 +104,7 @@ public class FacsimileStore implements InitializingBean {
 				}
 
 				if (conversionResult == 0) {
-					return new Facsimile(transcription, imageFile);
+					return imageFile;
 				}
 			} catch (IOException e1) {
 				ErrorUtil.fatal("I/O error while generating thumbnail '" + imageFile.getAbsolutePath() + "'", e1);
@@ -149,7 +134,7 @@ public class FacsimileStore implements InitializingBean {
 		Assert.isTrue(thumbnailDirectory.isDirectory() && thumbnailDirectory.canWrite(), "Cannot write to thumbnail cache directory");
 	}
 
-	protected File getBaseDirectory(Resolution resolution) {
+	protected File getBaseDirectory(FacsimileResolution resolution) {
 		switch (resolution) {
 		case LOW:
 			return lowResolutionImageDirectory;
@@ -160,31 +145,5 @@ public class FacsimileStore implements InitializingBean {
 		}
 
 		throw new IllegalArgumentException(resolution.toString());
-	}
-
-	protected String getImageSuffix(Resolution resolution) {
-		switch (resolution) {
-		case HIGH:
-			return ".tif";
-		case LOW:
-		case THUMB:
-			return ".jpg";
-		}
-
-		throw new IllegalArgumentException(resolution.toString());
-	}
-
-	private TranscriptionStore getTranscriptionStore() {
-		if (transcriptionStore == null) {
-			try {
-				transcriptionStore = contentStore.findTranscriptionStore();
-				Assert.notNull(transcriptionStore, "Cannot find transcription store");
-			} catch (RepositoryException e) {
-				throw ErrorUtil.fatal("Error looking up transcription store", e);
-			}
-
-		}
-
-		return transcriptionStore;
 	}
 }

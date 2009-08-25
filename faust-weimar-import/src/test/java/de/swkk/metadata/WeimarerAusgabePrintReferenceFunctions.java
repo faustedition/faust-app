@@ -7,7 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/faust-model-context.xml", "/import-application-context.xml" })
+@ContextConfiguration(locations = { "/faust-model-context.xml", "/faust-weimar-import-context.xml" })
 public class WeimarerAusgabePrintReferenceFunctions {
 	@Autowired
 	private InventoryDatabase inventoryDatabase;

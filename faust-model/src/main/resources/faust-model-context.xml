@@ -12,17 +12,7 @@
 
 	<bean id="modelConfigurer" class="de.faustedition.model.EnvironmentBasedModelConfigurer" />
 
-	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory="${data.home}">
-		<property name="contentObjectMappers">
-			<list>
-				<bean class="de.faustedition.model.metadata.MetadataBundleMapper" />
-				<bean class="de.faustedition.model.transcription.TranscriptionStoreMapper" />
-				<bean class="de.faustedition.model.transcription.RepositoryMapper" />
-				<bean class="de.faustedition.model.transcription.PortfolioMapper" />
-				<bean class="de.faustedition.model.transcription.TranscriptionMapper" />
-			</list>
-		</property>
-	</bean>
+	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory="${data.home}" />
 
 	<bean id="contentStoreBackupManager" class="de.faustedition.model.store.ContentStoreBackupManager" p:dataDirectory="${data.home}" />
 
