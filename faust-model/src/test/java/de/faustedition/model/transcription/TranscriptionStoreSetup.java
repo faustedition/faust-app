@@ -10,21 +10,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import de.faustedition.model.AbstractModelContextTest;
 import de.faustedition.model.facsimile.FacsimileStore;
-import de.faustedition.model.store.ContentStore;
+import de.faustedition.model.repository.DataRepository;
 import de.faustedition.model.transcription.TranscriptionTraversal.TranscriptionVisitor;
 import de.faustedition.util.LoggingUtil;
 
 public class TranscriptionStoreSetup extends AbstractModelContextTest {
 
 	@Autowired
-	private ContentStore contentStore;
+	private DataRepository dataRepository;
 
 	@Autowired
 	private FacsimileStore facsimileStore;
 
 	@Test
 	public void repositoryListing() throws RepositoryException {
-		int transcriptionCount = TranscriptionTraversal.execute(contentStore, new TranscriptionVisitor<Transcription>() {
+		int transcriptionCount = TranscriptionTraversal.execute(dataRepository, new TranscriptionVisitor<Transcription>() {
 
 			private TranscriptionStore store;
 			

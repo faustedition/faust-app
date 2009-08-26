@@ -19,9 +19,9 @@
 		</property>
 	</bean>
 
-	<bean id="contentStore" class="de.faustedition.model.store.ContentStore" p:dataDirectory-ref="dataDirectory" />
+	<bean id="contentStore" class="de.faustedition.model.repository.DataRepository" p:dataDirectory-ref="dataDirectory" />
 
-	<bean id="contentStoreBackupManager" class="de.faustedition.model.store.ContentStoreBackupManager" p:dataDirectory-ref="dataDirectory" />
+	<bean id="contentStoreBackupManager" class="de.faustedition.model.repository.DataRepositoryBackupManager" p:dataDirectory-ref="dataDirectory" />
 
 	<bean id="transformationManager" class="de.faustedition.model.transformation.ContentStoreTransformationManager">
 		<property name="contentTransformers">

@@ -4,15 +4,15 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.faustedition.model.store.ContentStore;
+import de.faustedition.model.repository.DataRepository;
 
 public class ModelSetup extends AbstractModelContextTest {
 
 	@Autowired
-	private ContentStore contentStore;
+	private DataRepository dataRepository;
 
 	@Test
 	public void storageSetup() throws Exception {
-		Assert.assertNotNull(contentStore.getRepository());
+		Assert.assertNotNull(dataRepository.getRepository());
 	}
 }

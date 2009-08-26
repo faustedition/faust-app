@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import de.faustedition.model.AbstractModelContextTest;
 import de.faustedition.model.metadata.MetadataBundle;
-import de.faustedition.model.store.ContentStore;
-import de.faustedition.model.store.ContentStoreCallback;
+import de.faustedition.model.repository.DataRepository;
+import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.util.LoggingUtil;
@@ -19,19 +19,19 @@ import de.faustedition.util.LoggingUtil;
 public class MetadataTransformerResultTestRun extends AbstractModelContextTest {
 
 	@Autowired
-	private ContentStore contentStore;
+	private DataRepository dataRepository;
 
 	public void metadataTransformation() throws Exception {
-		new MetadataCreationTransformer().transformContent(contentStore);
+		new MetadataCreationTransformer().transformContent(dataRepository);
 
 	}
 
 	@Test
 	public void documentParsing() throws Exception {
-		contentStore.execute(new ContentStoreCallback<Object>() {
+		dataRepository.execute(new DataRepositoryTemplate<Object>() {
 
 			@Override
-			public Object inStore(Session session) throws RepositoryException {
+			public Object doInSession(Session session) throws RepositoryException {
 				for (Repository repository : Repository.find(session)) {
 					for (Portfolio portfolio : Portfolio.find(session, repository)) {
 						Collection<MetadataBundle> metadataList = MetadataBundle.find(session, portfolio);

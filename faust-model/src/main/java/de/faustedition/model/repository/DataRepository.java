@@ -1,4 +1,4 @@
-package de.faustedition.model.store;
+package de.faustedition.model.repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,10 +30,10 @@ import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
 
 @SuppressWarnings("deprecation")
-public class ContentStore implements InitializingBean, DisposableBean {
+public class DataRepository implements InitializingBean, DisposableBean {
 	public static final String FAUST_NS_URI = "http://www.faustedition.net/ns";
 	public static final String WORKSPACE = "store";
-	private static final ClassPathResource STORE_CONFIG = new ClassPathResource("/jackrabbit-repository-config.xml");
+	private static final ClassPathResource REPOSITORY_CONFIG_RESOURCE = new ClassPathResource("/jackrabbit-repository-config.xml");
 	private static final ClassPathResource NODE_TYPE_DEFINITION_RESOURCE = new ClassPathResource("/jackrabbit-node-type-definitions.cnd");
 	public static final Credentials ADMIN_CREDENTIALS = new SimpleCredentials("admin", "".toCharArray());
 
@@ -45,20 +45,20 @@ public class ContentStore implements InitializingBean, DisposableBean {
 		this.dataDirectory = dataDirectory;
 	}
 
-	public <T> T execute(ContentStoreCallback<T> callback) throws RepositoryException {
+	public <T> T execute(DataRepositoryTemplate<T> template) throws RepositoryException {
 		Session session = repository.login(ADMIN_CREDENTIALS, WORKSPACE);
 		try {
-			return callback.inStore(session);
+			return template.doInSession(session);
 		} finally {
 			session.logout();
 		}
 	}
 
 	public boolean isEmpty() throws RepositoryException {
-		return execute(new ContentStoreCallback<Boolean>() {
+		return execute(new DataRepositoryTemplate<Boolean>() {
 
 			@Override
-			public Boolean inStore(Session session) throws RepositoryException {
+			public Boolean doInSession(Session session) throws RepositoryException {
 				for (NodeIterator ni = session.getRootNode().getNodes(); ni.hasNext();) {
 					if (!ni.nextNode().getName().equals(JcrConstants.JCR_SYSTEM)) {
 						return false;
@@ -76,12 +76,12 @@ public class ContentStore implements InitializingBean, DisposableBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		File contentRepositoryBase = new File(dataDirectory, "content-repository");
-		if (!contentRepositoryBase.isDirectory()) {
-			Assert.isTrue(contentRepositoryBase.mkdirs(), "Cannot create content store directory");
+		File repositoryBase = new File(dataDirectory, "repository");
+		if (!repositoryBase.isDirectory()) {
+			Assert.isTrue(repositoryBase.mkdirs(), "Cannot create repository directory");
 		}
 
-		RepositoryConfig repositoryConfig = RepositoryConfig.create(new InputSource(STORE_CONFIG.getInputStream()), contentRepositoryBase.getAbsolutePath());
+		RepositoryConfig repositoryConfig = RepositoryConfig.create(new InputSource(REPOSITORY_CONFIG_RESOURCE.getInputStream()), repositoryBase.getAbsolutePath());
 		repository = RepositoryImpl.create(repositoryConfig);
 
 		Session session = repository.login(ADMIN_CREDENTIALS);
@@ -101,10 +101,10 @@ public class ContentStore implements InitializingBean, DisposableBean {
 			session.logout();
 		}
 
-		execute(new ContentStoreCallback<Object>() {
+		execute(new DataRepositoryTemplate<Object>() {
 
 			@Override
-			public Object inStore(Session session) throws RepositoryException {
+			public Object doInSession(Session session) throws RepositoryException {
 				NamespaceRegistry namespaceRegistry = session.getWorkspace().getNamespaceRegistry();
 				try {
 					Assert.isTrue("faust".equals(namespaceRegistry.getPrefix(FAUST_NS_URI)));
@@ -158,11 +158,11 @@ public class ContentStore implements InitializingBean, DisposableBean {
 		return StringUtils.trimToNull(StringUtils.strip(StringUtils.defaultString(path), "/").replaceAll("/+", "/"));
 	}
 
-	public static String getPath(ContentObject parent, String name) {
+	public static String getPath(RepositoryObject parent, String name) {
 		return (parent == null ? "" : parent.getPath() + "/") + name;
 	}
 
 	public static boolean isValidName(String name) {
-		return ContentStore.normalizeName(name).equals(name);
+		return DataRepository.normalizeName(name).equals(name);
 	}
 }

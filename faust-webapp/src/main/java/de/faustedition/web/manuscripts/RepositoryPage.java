@@ -17,7 +17,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.request.InvalidUrlException;
 
-import de.faustedition.model.store.ContentStoreCallback;
+import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.web.AbstractPage;
@@ -43,10 +43,10 @@ public class RepositoryPage extends AbstractPage {
 			throw new InvalidUrlException("No repository name given");
 		}
 
-		FaustApplication.get().doInContentStore(new ContentStoreCallback<Object>() {
+		FaustApplication.get().accessDataRepository(new DataRepositoryTemplate<Object>() {
 
 			@Override
-			public Object inStore(Session session) throws RepositoryException {
+			public Object doInSession(Session session) throws RepositoryException {
 				repository = Repository.get(session, repositoryName);
 				portfolios = new ArrayList<Portfolio>(Portfolio.find(session, repository));
 				return null;

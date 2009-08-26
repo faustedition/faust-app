@@ -16,8 +16,8 @@ import org.springframework.security.Authentication;
 import org.springframework.security.GrantedAuthority;
 import org.springframework.security.context.SecurityContextHolder;
 
-import de.faustedition.model.store.ContentStore;
-import de.faustedition.model.store.ContentStoreCallback;
+import de.faustedition.model.repository.DataRepository;
+import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.util.LoggingUtil;
 import de.faustedition.web.genesis.GenesisPage;
 import de.faustedition.web.manuscripts.ManuscriptsPage;
@@ -32,7 +32,7 @@ import de.faustedition.web.text.TextPage;
 public class FaustApplication extends WebApplication {
 
 	@SpringBean
-	private ContentStore contentStore;
+	private DataRepository dataRepository;
 
 	@Override
 	protected void init() {
@@ -69,9 +69,9 @@ public class FaustApplication extends WebApplication {
 		return (FaustApplication) WebApplication.get();
 	}
 
-	public <T> T doInContentStore(ContentStoreCallback<T> callback) {
+	public <T> T accessDataRepository(DataRepositoryTemplate<T> callback) {
 		try {
-			return contentStore.execute(callback);
+			return dataRepository.execute(callback);
 		} catch (PathNotFoundException e) {
 			throw new AbortWithWebErrorCodeException(404);
 		} catch (RepositoryException e) {

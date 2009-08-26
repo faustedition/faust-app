@@ -27,4 +27,21 @@
 			<user name="faust" password="ed34f4e7e660d18083745fc0982623eb6e095f5e" authorities="ROLE_EDITOR" />
 		</user-service>
 	</authentication-provider>
+
+	<authentication-manager alias="authenticationManager" />
+
+	<beans:bean id="localNetPreAuthenticationFilter" class="de.faustedition.web.security.LocalNetPreAuthenticatedProcessingFilter">
+		<custom-filter position="PRE_AUTH_FILTER" />
+		<beans:property name="authenticationManager" ref="authenticationManager" />
+		<beans:property name="authenticationDetailsSource">
+			<beans:bean class="de.faustedition.web.security.LocalNetPreAuthenticatedAuthenticationDetailsSource" />
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="preauthenticatedAuthenticationProvider" class="org.springframework.security.providers.preauth.PreAuthenticatedAuthenticationProvider">
+		<beans:property name="preAuthenticatedUserDetailsService">
+			<beans:bean class="org.springframework.security.providers.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService" />
+		</beans:property>
+		<custom-authentication-provider />
+	</beans:bean>
 </beans:beans>

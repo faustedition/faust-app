@@ -6,15 +6,15 @@ import java.util.List;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import de.faustedition.model.store.ContentStore;
-import de.faustedition.model.store.ContentStoreCallback;
+import de.faustedition.model.repository.DataRepository;
+import de.faustedition.model.repository.DataRepositoryTemplate;
 
 public class TranscriptionTraversal {
-	public static <T> List<T> execute(ContentStore store, final TranscriptionVisitor<T> visitor) throws RepositoryException {
-		return store.execute(new ContentStoreCallback<List<T>>() {
+	public static <T> List<T> execute(DataRepository repository, final TranscriptionVisitor<T> visitor) throws RepositoryException {
+		return repository.execute(new DataRepositoryTemplate<List<T>>() {
 
 			@Override
-			public List<T> inStore(Session session) throws RepositoryException {
+			public List<T> doInSession(Session session) throws RepositoryException {
 				List<T> resultList = new LinkedList<T>();
 				for (Repository repository : Repository.find(session)) {
 					for (Portfolio portfolio : Portfolio.find(session, repository)) {

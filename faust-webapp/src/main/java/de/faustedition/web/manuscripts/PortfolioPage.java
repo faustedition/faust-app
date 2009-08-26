@@ -18,7 +18,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.request.InvalidUrlException;
 
 import de.faustedition.model.facsimile.FacsimileResolution;
-import de.faustedition.model.store.ContentStoreCallback;
+import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.model.transcription.Transcription;
@@ -46,10 +46,10 @@ public class PortfolioPage extends AbstractPage {
 			throw new InvalidUrlException();
 		}
 
-		FaustApplication.get().doInContentStore(new ContentStoreCallback<Object>() {
+		FaustApplication.get().accessDataRepository(new DataRepositoryTemplate<Object>() {
 
 			@Override
-			public Object inStore(Session session) throws RepositoryException {
+			public Object doInSession(Session session) throws RepositoryException {
 				repository = Repository.get(session, repositoryName);
 				portfolio = Portfolio.get(session, repository, portfolioName);
 				transcriptions = new ArrayList<Transcription>(Transcription.find(session, portfolio));

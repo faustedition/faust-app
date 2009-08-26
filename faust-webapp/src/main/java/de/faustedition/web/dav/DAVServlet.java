@@ -12,22 +12,22 @@ import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import de.faustedition.model.store.ContentStore;
+import de.faustedition.model.repository.DataRepository;
 
 public class DAVServlet extends SimpleWebdavServlet {
 
-	private ContentStore contentStore;
+	private DataRepository dataRepository;
 
 	@Override
 	public void init() throws ServletException {
 		WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-		contentStore = (ContentStore) BeanFactoryUtils.beanOfType(context, ContentStore.class);
+		dataRepository = (DataRepository) BeanFactoryUtils.beanOfType(context, DataRepository.class);
 		super.init();
 	}
 
 	@Override
 	public Repository getRepository() {
-		return contentStore.getRepository();
+		return dataRepository.getRepository();
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class DAVServlet extends SimpleWebdavServlet {
 
 			@Override
 			public Credentials getCredentials(HttpServletRequest request) throws LoginException, ServletException {
-				return ContentStore.ADMIN_CREDENTIALS;
+				return DataRepository.ADMIN_CREDENTIALS;
 			}
 		};
 	}

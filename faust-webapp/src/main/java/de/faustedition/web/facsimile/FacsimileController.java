@@ -19,8 +19,8 @@ import org.springframework.web.context.request.WebRequest;
 
 import de.faustedition.model.facsimile.FacsimileStore;
 import de.faustedition.model.facsimile.FacsimileResolution;
-import de.faustedition.model.store.ContentStore;
-import de.faustedition.model.store.ObjectNotFoundException;
+import de.faustedition.model.repository.DataRepository;
+import de.faustedition.model.repository.RepositoryObjectNotFoundException;
 import de.faustedition.web.FaustPathUtils;
 
 @Controller
@@ -30,7 +30,7 @@ public class FacsimileController {
 	private FacsimileStore facsimileStore;
 
 	@RequestMapping("/" + URL_PREFIX + "/**")
-	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws RepositoryException, ObjectNotFoundException, IOException {
+	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws RepositoryException, RepositoryObjectNotFoundException, IOException {
 		String path = FaustPathUtils.getPath(request);
 
 		FacsimileResolution facsimileResolution = null;
@@ -42,13 +42,13 @@ public class FacsimileController {
 		}
 
 		if (facsimileResolution == null || facsimileResolution == FacsimileResolution.HIGH) {
-			throw new ObjectNotFoundException();
+			throw new RepositoryObjectNotFoundException();
 		}
 		
-		path = ContentStore.normalizePath(path);
+		path = DataRepository.normalizePath(path);
 		final File facsimile = facsimileStore.find(path, facsimileResolution);
 		if (facsimile == null) {
-			throw new ObjectNotFoundException(path);
+			throw new RepositoryObjectNotFoundException(path);
 		}
 
 		response.setContentType(facsimileResolution.getMimeType());

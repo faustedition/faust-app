@@ -11,13 +11,13 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.AbstractView;
 
-import de.faustedition.model.store.ObjectNotFoundException;
+import de.faustedition.model.repository.RepositoryObjectNotFoundException;
 
 public class CustomExceptionResolver implements HandlerExceptionResolver {
 
 	@Override
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-		if (ex instanceof ObjectNotFoundException || ex instanceof PathNotFoundException) {
+		if (ex instanceof RepositoryObjectNotFoundException || ex instanceof PathNotFoundException) {
 			try {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND, ex.getMessage());
 				return new ModelAndView(new AbstractView() {

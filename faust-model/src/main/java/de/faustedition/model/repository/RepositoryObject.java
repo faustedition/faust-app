@@ -1,4 +1,4 @@
-package de.faustedition.model.store;
+package de.faustedition.model.repository;
 
 import java.io.Serializable;
 
@@ -6,7 +6,7 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-public interface ContentObject extends Comparable<ContentObject>, Serializable {
+public interface RepositoryObject extends Comparable<RepositoryObject>, Serializable {
 
 	String getName();
 

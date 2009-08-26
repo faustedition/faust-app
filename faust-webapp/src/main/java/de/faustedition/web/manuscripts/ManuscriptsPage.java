@@ -13,7 +13,7 @@ import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.PropertyModel;
 
-import de.faustedition.model.store.ContentStoreCallback;
+import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.web.AbstractPage;
 import de.faustedition.web.FaustApplication;
@@ -32,10 +32,10 @@ public class ManuscriptsPage extends AbstractPage {
 
 	private class RepositoryDataView extends DataView<Repository> {
 		public RepositoryDataView(String id) {
-			super(id, new ListDataProvider<Repository>(FaustApplication.get().doInContentStore(new ContentStoreCallback<List<Repository>>() {
+			super(id, new ListDataProvider<Repository>(FaustApplication.get().accessDataRepository(new DataRepositoryTemplate<List<Repository>>() {
 
 				@Override
-				public List<Repository> inStore(Session session) throws RepositoryException {
+				public List<Repository> doInSession(Session session) throws RepositoryException {
 					return new ArrayList<Repository>(Repository.find(session));
 				}
 

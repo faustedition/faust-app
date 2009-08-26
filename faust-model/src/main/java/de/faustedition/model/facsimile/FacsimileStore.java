@@ -11,7 +11,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.Assert;
 
-import de.faustedition.model.store.ContentStore;
+import de.faustedition.model.repository.DataRepository;
 import de.faustedition.util.ErrorUtil;
 
 public class FacsimileStore implements InitializingBean {
@@ -48,7 +48,7 @@ public class FacsimileStore implements InitializingBean {
 	}
 
 	public File find(String path, FacsimileResolution resolution) {
-		path = ContentStore.normalizePath(path);
+		path = DataRepository.normalizePath(path);
 		final File imageFile = new File(getBaseDirectory(resolution), path + resolution.getSuffix());
 
 		if (imageFile.isFile() && imageFile.canRead()) {

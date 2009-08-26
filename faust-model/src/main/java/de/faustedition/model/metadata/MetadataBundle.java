@@ -16,10 +16,10 @@ import javax.jcr.Session;
 
 import org.apache.commons.lang.StringUtils;
 
-import de.faustedition.model.store.AbstractContentObject;
-import de.faustedition.model.store.ContentObject;
+import de.faustedition.model.repository.RepositoryObject;
+import de.faustedition.model.repository.RepositoryObjectBase;
 
-public class MetadataBundle extends AbstractContentObject {
+public class MetadataBundle extends RepositoryObjectBase {
 	public static final String NODE_NAME = "metadata";
 
 	private Map<String, String> values = new HashMap<String, String>();
@@ -28,7 +28,7 @@ public class MetadataBundle extends AbstractContentObject {
 		super(path);
 	}
 
-	protected MetadataBundle(ContentObject annotated) {
+	protected MetadataBundle(RepositoryObject annotated) {
 		super(annotated, NODE_NAME);
 	}
 
@@ -40,7 +40,7 @@ public class MetadataBundle extends AbstractContentObject {
 		this.values = values;
 	}
 
-	public static Collection<MetadataBundle> find(Session session, ContentObject annotated) throws RepositoryException {
+	public static Collection<MetadataBundle> find(Session session, RepositoryObject annotated) throws RepositoryException {
 		Node annotatedNode = annotated.getNode(session);
 		if (!annotatedNode.isNodeType("faust:annotated")) {
 			return Collections.emptySet();
@@ -60,7 +60,7 @@ public class MetadataBundle extends AbstractContentObject {
 		return bundles;
 	}
 
-	public static MetadataBundle create(Session session, ContentObject annotated, Map<String, String> values) throws RepositoryException {
+	public static MetadataBundle create(Session session, RepositoryObject annotated, Map<String, String> values) throws RepositoryException {
 		MetadataBundle bundle = new MetadataBundle(annotated);
 		bundle.setValues(values);
 		bundle.save(annotated.getNode(session).addNode(NODE_NAME, "faust:metadata"));

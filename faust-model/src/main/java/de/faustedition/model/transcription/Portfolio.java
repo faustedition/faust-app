@@ -9,9 +9,9 @@ import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import de.faustedition.model.store.AbstractContentObject;
+import de.faustedition.model.repository.RepositoryObjectBase;
 
-public class Portfolio extends AbstractContentObject {
+public class Portfolio extends RepositoryObjectBase {
 
 	protected Portfolio(String path) {
 		super(path);

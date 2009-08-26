@@ -5,9 +5,9 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import de.faustedition.model.store.AbstractContentObject;
+import de.faustedition.model.repository.RepositoryObjectBase;
 
-public class TranscriptionStore extends AbstractContentObject {
+public class TranscriptionStore extends RepositoryObjectBase {
 	protected static final String NAME = "transcriptions";
 
 	protected TranscriptionStore(String path) {

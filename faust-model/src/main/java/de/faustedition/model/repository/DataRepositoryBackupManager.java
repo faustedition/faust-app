@@ -1,4 +1,4 @@
-package de.faustedition.model.store;
+package de.faustedition.model.repository;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -32,14 +32,14 @@ import org.springframework.util.Assert;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
 
-public class ContentStoreBackupManager implements InitializingBean {
+public class DataRepositoryBackupManager implements InitializingBean {
 	protected static final String BACKUP_FILE_NAME_SUFFIX = ".zip";
-	protected static final String BACKUP_FILE_NAME_PREFIX = "content-repository-backup-";
+	protected static final String BACKUP_FILE_NAME_PREFIX = "repository-backup-";
 
 	private File dataDirectory;
 
 	@Autowired
-	protected ContentStore contentStore;
+	protected DataRepository dataRepository;
 
 	protected File backupBaseFile;
 
@@ -63,10 +63,10 @@ public class ContentStoreBackupManager implements InitializingBean {
 		stopWatch.start();
 
 		try {
-			contentStore.execute(new ContentStoreCallback<Object>() {
+			dataRepository.execute(new DataRepositoryTemplate<Object>() {
 
 				@Override
-				public Object inStore(Session session) throws RepositoryException {
+				public Object doInSession(Session session) throws RepositoryException {
 					ZipOutputStream zipOutputStream = null;
 					try {
 						zipOutputStream = new ZipOutputStream(new FileOutputStream(new File(backupBaseFile, backupFileName)));
@@ -97,7 +97,7 @@ public class ContentStoreBackupManager implements InitializingBean {
 
 	public void restoreIfEmpty() {
 		try {
-			if (contentStore.isEmpty()) {
+			if (dataRepository.isEmpty()) {
 				restore();
 			}
 		} catch (RepositoryException e) {
@@ -133,10 +133,10 @@ public class ContentStoreBackupManager implements InitializingBean {
 		stopWatch.start();
 
 		try {
-			contentStore.execute(new ContentStoreCallback<Object>() {
+			dataRepository.execute(new DataRepositoryTemplate<Object>() {
 
 				@Override
-				public Object inStore(Session session) throws RepositoryException {
+				public Object doInSession(Session session) throws RepositoryException {
 					ZipFile zipFile = null;
 					try {
 						zipFile = new ZipFile(restoreFrom);

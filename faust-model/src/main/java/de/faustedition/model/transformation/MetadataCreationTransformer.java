@@ -19,9 +19,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.faustedition.model.metadata.MetadataBundle;
-import de.faustedition.model.store.ContentObject;
-import de.faustedition.model.store.ContentStore;
-import de.faustedition.model.store.ContentStoreCallback;
+import de.faustedition.model.repository.DataRepository;
+import de.faustedition.model.repository.DataRepositoryTemplate;
+import de.faustedition.model.repository.RepositoryObject;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.model.transcription.Transcription;
@@ -42,11 +42,11 @@ public class MetadataCreationTransformer implements ContentTransformer {
 	}
 
 	@Override
-	public void transformContent(ContentStore contentStore) throws RepositoryException {
-		contentStore.execute(new ContentStoreCallback<Object>() {
+	public void transformContent(DataRepository dataRepository) throws RepositoryException {
+		dataRepository.execute(new DataRepositoryTemplate<Object>() {
 
 			@Override
-			public Object inStore(Session session) throws RepositoryException {
+			public Object doInSession(Session session) throws RepositoryException {
 				try {
 					for (Repository repository : Repository.find(session)) {
 						addFaustMixin(session, repository);
@@ -75,8 +75,8 @@ public class MetadataCreationTransformer implements ContentTransformer {
 		});
 	}
 
-	private void addFaustMixin(Session session, ContentObject contentObject) throws RepositoryException {
-		javax.jcr.Node node = contentObject.getNode(session);
+	private void addFaustMixin(Session session, RepositoryObject repositoryObject) throws RepositoryException {
+		javax.jcr.Node node = repositoryObject.getNode(session);
 		if (!node.isNodeType("faust:annotated")) {
 			node.addMixin("faust:annotated");
 			node.save();

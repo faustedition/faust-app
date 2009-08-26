@@ -19,11 +19,11 @@ import org.apache.jackrabbit.JcrConstants;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import de.faustedition.model.store.AbstractContentObject;
+import de.faustedition.model.repository.RepositoryObjectBase;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLUtil;
 
-public class Transcription extends AbstractContentObject {
+public class Transcription extends RepositoryObjectBase {
 
 	public Transcription(String path) {
 		super(path);

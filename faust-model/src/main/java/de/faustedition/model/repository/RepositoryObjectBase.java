@@ -1,4 +1,4 @@
-package de.faustedition.model.store;
+package de.faustedition.model.repository;
 
 
 import javax.jcr.Node;
@@ -14,17 +14,17 @@ import javax.jcr.ValueFormatException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class AbstractContentObject implements ContentObject {
+public class RepositoryObjectBase implements RepositoryObject {
 
 	protected String path;
 
-	protected AbstractContentObject(String path) {
-		this.path = ContentStore.normalizePath(path);
+	protected RepositoryObjectBase(String path) {
+		this.path = DataRepository.normalizePath(path);
 	}
 
-	protected AbstractContentObject(ContentObject parent, String name) {
+	protected RepositoryObjectBase(RepositoryObject parent, String name) {
 		this(parent.getPath() + "/" + name);
-		assert ContentStore.isValidName(name);
+		assert DataRepository.isValidName(name);
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class AbstractContentObject implements ContentObject {
 	}
 
 	@Override
-	public int compareTo(ContentObject o) {
+	public int compareTo(RepositoryObject o) {
 		return path.compareTo(o.getPath());
 	}
 
