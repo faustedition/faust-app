@@ -19,17 +19,19 @@
 		</property>
 	</bean>
 
-	<bean id="contentStore" class="de.faustedition.model.repository.DataRepository" p:dataDirectory-ref="dataDirectory" />
+	<bean id="dataRepository" class="de.faustedition.model.repository.DataRepository" p:dataDirectory-ref="dataDirectory" />
 
-	<bean id="contentStoreBackupManager" class="de.faustedition.model.repository.DataRepositoryBackupManager" p:dataDirectory-ref="dataDirectory" />
-
-	<bean id="transformationManager" class="de.faustedition.model.transformation.ContentStoreTransformationManager">
-		<property name="contentTransformers">
-			<list>
-				<bean class="de.faustedition.model.transformation.RemoveXmlEndingTransformation" />
-				<bean class="de.faustedition.model.transformation.TranscriptionMimeTypeTransformer" />
-				<bean class="de.faustedition.model.transformation.MetadataCreationTransformer" />
-			</list>
+	<bean id="dataRepositoryBackupManager" class="de.faustedition.model.repository.DataRepositoryBackupManager" p:dataDirectory-ref="dataDirectory">
+		<property name="transformationManager">
+			<bean class="de.faustedition.model.repository.transform.DataRepositoryTransformationManager">
+				<property name="repositoryTransformers">
+					<list>
+						<bean class="de.faustedition.model.repository.transform.RemoveXmlEndingTransformation" />
+						<bean class="de.faustedition.model.repository.transform.TranscriptionMimeTypeTransformer" />
+						<bean class="de.faustedition.model.repository.transform.MetadataCreationTransformer" />
+					</list>
+				</property>
+			</bean>
 		</property>
 	</bean>
 
@@ -43,35 +45,21 @@
 		</property>
 	</bean>
 
-	<bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+	<bean id="compassSearchIndex" class="de.faustedition.model.search.FaustCompassBean" p:dataDirectory-ref="dataDirectory" />
+
+	<bean id="metadataIndexer" class="de.faustedition.model.search.MetadataIndexer" />
+
+	<bean id="asynchronousScheduler" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
+		<property name="poolSize" value="5" />
+	</bean>
+
+	<bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-				<bean id="initialRestoreTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
-					<property name="jobDetail">
-						<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-							<property name="targetObject" ref="contentStoreBackupManager" />
-							<property name="targetMethod" value="restoreIfEmpty" />
-							<property name="concurrent" value="false" />
-						</bean>
-					</property>
-					<property name="startDelay" value="5000" />
-					<property name="repeatCount" value="0" />
-				</bean>
-				<bean id="transformationTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
-					<property name="jobDetail">
-						<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-							<property name="targetObject" ref="transformationManager" />
-							<property name="targetMethod" value="transform" />
-							<property name="concurrent" value="false" />
-						</bean>
-					</property>
-					<property name="repeatCount" value="0" />
-					<property name="startDelay" value="300000" />
-				</bean>
 				<bean id="backupTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 					<property name="jobDetail">
 						<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-							<property name="targetObject" ref="contentStoreBackupManager" />
+							<property name="targetObject" ref="dataRepositoryBackupManager" />
 							<property name="targetMethod" value="backup" />
 							<property name="concurrent" value="false" />
 						</bean>

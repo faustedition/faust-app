@@ -14,6 +14,7 @@ import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.model.transcription.Transcription;
+import de.faustedition.model.transcription.TranscriptionStore;
 import de.faustedition.web.AbstractPage;
 import de.faustedition.web.FaustApplication;
 import de.faustedition.web.facsimile.FacsimileImage;
@@ -46,9 +47,9 @@ public class TranscriptionPage extends AbstractPage {
 
 			@Override
 			public Object doInSession(Session session) throws RepositoryException {
-				repository = Repository.get(session, repositoryName);
-				portfolio = Portfolio.get(session, repository, portfolioName);
-				transcription = Transcription.get(session, portfolio, transcriptionName);
+				repository = TranscriptionStore.get(session).get(session, Repository.class, repositoryName);
+				portfolio = repository.get(session, Portfolio.class, portfolioName);
+				transcription = portfolio.get(session, Transcription.class, transcriptionName);
 				return null;
 			}
 		});

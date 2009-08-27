@@ -10,7 +10,7 @@ import de.faustedition.model.repository.RepositoryObjectBase;
 public class TranscriptionStore extends RepositoryObjectBase {
 	protected static final String NAME = "transcriptions";
 
-	protected TranscriptionStore(String path) {
+	public TranscriptionStore(String path) {
 		super(path);
 	}
 
@@ -23,6 +23,10 @@ public class TranscriptionStore extends RepositoryObjectBase {
 			storeNode = rootNode.addNode(NAME, "nt:folder");
 			storeNode.save();
 		}
-		return new TranscriptionStore(storeNode.getPath());
+		return get(TranscriptionStore.class, storeNode);
+	}
+
+	@Override
+	public void load(Node node) throws RepositoryException {
 	}
 }

@@ -1,4 +1,4 @@
-package de.faustedition.model.transformation;
+package de.faustedition.model.repository.transform;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -8,10 +8,10 @@ import de.faustedition.model.transcription.Transcription;
 import de.faustedition.model.transcription.TranscriptionTraversal;
 import de.faustedition.model.transcription.TranscriptionTraversal.TranscriptionVisitor;
 
-public abstract class AbstractTranscriptionIteratorTransformer implements ContentTransformer {
+public abstract class AbstractTranscriptionIteratorTransformer implements RepositoryTransformer {
 
 	@Override
-	public void transformContent(final DataRepository dataRepository) throws RepositoryException {
+	public void transformData(final DataRepository dataRepository) throws RepositoryException {
 		TranscriptionTraversal.execute(dataRepository, new TranscriptionVisitor<Object>() {
 
 			@Override

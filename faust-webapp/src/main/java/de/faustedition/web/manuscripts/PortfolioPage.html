@@ -7,17 +7,28 @@
 </head>
 <body>
 <wicket:extend>
-	<h2 wicket:id="portfolioHeader">Portfolio</h2>
+	<div class="yui-g">
+	<div class="yui-u first">
+	<h2>Transkriptionen</h2>
 
-	<table class="no-border" style="width: 90%; margin: 0 5%">
+	<table class="no-border" style="margin: 0 5%">
 		<tbody>
 			<tr wicket:id="transcriptions" class="even">
 				<td style="width: 20%" class="center no-border" wicket:id="cols">
-				<div wicket:id="transcriptionPanel" />
+				<div wicket:id="transcription" />
 				</td>
 			</tr>
 		</tbody>
 	</table>
+	</div>
+	<div class="yui-u">
+	<h2>Metadaten</h2>
+	<div wicket:id="metadataView">
+	<p wicket:id="metadataIndex">1.</p>
+	<table wicket:id="metadata" class="data-table" />
+	</div>
+	</div>
+	</div>
 </wicket:extend>
 </body>
 </html>

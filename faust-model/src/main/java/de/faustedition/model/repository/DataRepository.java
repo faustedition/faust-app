@@ -2,16 +2,20 @@ package de.faustedition.model.repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.regex.Pattern;
 
 import javax.jcr.Credentials;
 import javax.jcr.NamespaceException;
 import javax.jcr.NamespaceRegistry;
+import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.Value;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.api.JackrabbitNodeTypeManager;
@@ -133,6 +137,18 @@ public class DataRepository implements InitializingBean, DisposableBean {
 		repository.shutdown();
 	}
 
+	public static byte[] loadFile(Node node) throws RepositoryException {
+		Value transcriptionData = node.getNode(JcrConstants.JCR_CONTENT).getProperty(JcrConstants.JCR_DATA).getValue();
+		InputStream dataStream = null;
+		try {
+			return IOUtils.toByteArray(dataStream = transcriptionData.getStream());
+		} catch (IOException e) {
+			throw ErrorUtil.fatal("Error while reading transcription data", e);
+		} finally {
+			IOUtils.closeQuietly(dataStream);
+		}
+	}
+
 	public static String normalizeName(String name) {
 		name = StringUtils.strip(name, "/").replaceAll(Pattern.quote("/"), "_");
 
@@ -158,7 +174,7 @@ public class DataRepository implements InitializingBean, DisposableBean {
 		return StringUtils.trimToNull(StringUtils.strip(StringUtils.defaultString(path), "/").replaceAll("/+", "/"));
 	}
 
-	public static String getPath(RepositoryObject parent, String name) {
+	public static String concatenatePath(RepositoryObject parent, String name) {
 		return (parent == null ? "" : parent.getPath() + "/") + name;
 	}
 

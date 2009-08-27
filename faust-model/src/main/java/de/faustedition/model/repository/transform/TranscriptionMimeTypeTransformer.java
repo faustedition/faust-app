@@ -1,4 +1,4 @@
-package de.faustedition.model.transformation;
+package de.faustedition.model.repository.transform;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;

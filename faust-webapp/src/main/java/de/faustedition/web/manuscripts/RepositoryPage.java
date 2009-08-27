@@ -20,6 +20,7 @@ import org.apache.wicket.protocol.http.request.InvalidUrlException;
 import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
+import de.faustedition.model.transcription.TranscriptionStore;
 import de.faustedition.web.AbstractPage;
 import de.faustedition.web.FaustApplication;
 
@@ -47,8 +48,8 @@ public class RepositoryPage extends AbstractPage {
 
 			@Override
 			public Object doInSession(Session session) throws RepositoryException {
-				repository = Repository.get(session, repositoryName);
-				portfolios = new ArrayList<Portfolio>(Portfolio.find(session, repository));
+				repository = TranscriptionStore.get(session).get(session, Repository.class, repositoryName);
+				portfolios = new ArrayList<Portfolio>(repository.find(session, Portfolio.class));
 				return null;
 			}
 		});

@@ -1,4 +1,4 @@
-package de.faustedition.model.transformation;
+package de.faustedition.model.repository.transform;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,23 +12,24 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.faustedition.model.metadata.MetadataBundle;
+import de.faustedition.model.metadata.MetadataValue;
 import de.faustedition.model.repository.DataRepository;
 import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.repository.RepositoryObject;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.model.transcription.Transcription;
+import de.faustedition.model.transcription.TranscriptionStore;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLUtil;
 
-public class MetadataCreationTransformer implements ContentTransformer {
+public class MetadataCreationTransformer implements RepositoryTransformer {
 
 	private XPathExpression metadataListXPath;
 
@@ -42,17 +43,17 @@ public class MetadataCreationTransformer implements ContentTransformer {
 	}
 
 	@Override
-	public void transformContent(DataRepository dataRepository) throws RepositoryException {
+	public void transformData(DataRepository dataRepository) throws RepositoryException {
 		dataRepository.execute(new DataRepositoryTemplate<Object>() {
 
 			@Override
 			public Object doInSession(Session session) throws RepositoryException {
 				try {
-					for (Repository repository : Repository.find(session)) {
+					for (Repository repository : TranscriptionStore.get(session).find(session, Repository.class)) {
 						addFaustMixin(session, repository);
-						for (Portfolio portfolio : Portfolio.find(session, repository)) {
+						for (Portfolio portfolio : repository.find(session, Portfolio.class)) {
 							addFaustMixin(session, portfolio);
-							for (Transcription transcription : Transcription.find(session, portfolio)) {
+							for (Transcription transcription : portfolio.find(session, Transcription.class)) {
 								addFaustMixin(session, transcription);
 								if (transcription.getName().startsWith("inventar_db_metadata")) {
 									createMetadata(session, portfolio, transcription);
@@ -89,13 +90,12 @@ public class MetadataCreationTransformer implements ContentTransformer {
 			ni.nextNode().remove();
 		}
 
-		Document metadataDocument = Transcription.retrieveDocument(metadataTranscription.getNode(session));
-		NodeList valueLists = (NodeList) metadataListXPath.evaluate(metadataDocument, XPathConstants.NODESET);
+		NodeList valueLists = (NodeList) metadataListXPath.evaluate(metadataTranscription.getDocument(session), XPathConstants.NODESET);
 		for (int lc = 0; lc < valueLists.getLength(); lc++) {
 			Element valueList = (Element) valueLists.item(lc);
 
-			Map<String, String> metadata = new HashMap<String, String>();
-			String metadataKey = null;
+			Map<String, MetadataValue> metadata = new HashMap<String, MetadataValue>();
+			String metadataField = null;
 			NodeList listContents = valueList.getChildNodes();
 			for (int lcc = 0; lcc < listContents.getLength(); lcc++) {
 				Node listNode = listContents.item(lcc);
@@ -105,14 +105,16 @@ public class MetadataCreationTransformer implements ContentTransformer {
 				Element listElement = (Element) listNode;
 
 				if ("label".equals(listElement.getLocalName())) {
-					metadataKey = StringUtils.trimToNull(listElement.getTextContent());
+					metadataField = StringUtils.trimToNull(listElement.getTextContent());
 				}
-				if ((metadataKey != null) && "item".equals(listElement.getLocalName())) {
-					String newValue = listElement.getTextContent().trim();
-					if (metadata.containsKey(metadataKey)) {
-						newValue += ("\n" + metadata.get(metadataKey));
+				if ((metadataField != null) && "item".equals(listElement.getLocalName())) {
+					String metadataValue = listElement.getTextContent().trim();
+					if (metadata.containsKey(metadataField)) {
+						MetadataValue old = metadata.get(metadataField);
+						metadata.put(metadataField, new MetadataValue(metadataField, old.getValue() + "\n" + metadataValue));
+					} else {
+						metadata.put(metadataField, new MetadataValue(metadataField, metadataValue));
 					}
-					metadata.put(metadataKey, newValue);
 				}
 			}
 

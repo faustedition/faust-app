@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -29,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.Assert;
 
+import de.faustedition.model.repository.transform.DataRepositoryTransformationManager;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
 
@@ -41,6 +45,11 @@ public class DataRepositoryBackupManager implements InitializingBean {
 	@Autowired
 	protected DataRepository dataRepository;
 
+	@Autowired
+	private ScheduledExecutorService scheduledExecutorService;
+
+	private DataRepositoryTransformationManager transformationManager;
+	
 	protected File backupBaseFile;
 
 	@Required
@@ -48,11 +57,32 @@ public class DataRepositoryBackupManager implements InitializingBean {
 		this.dataDirectory = dataDirectory;
 	}
 
+	@Required
+	public void setTransformationManager(DataRepositoryTransformationManager transformationManager) {
+		this.transformationManager = transformationManager;
+	}
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		backupBaseFile = new File(dataDirectory, "backup");
 		if (!backupBaseFile.isDirectory()) {
 			Assert.isTrue(backupBaseFile.mkdirs(), "Cannot create backup directory");
+		}
+		
+		if (dataRepository.isEmpty()) {
+			scheduledExecutorService.schedule(new Callable<Object>() {
+
+				@Override
+				public Object call() throws Exception {
+					LoggingUtil.LOG.info("Restoring empty repository");
+					restore();
+					
+					LoggingUtil.LOG.info("Transforming restored content");
+					transformationManager.runTransformations();
+					
+					return null;
+				}
+			}, 0, TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -93,16 +123,6 @@ public class DataRepositoryBackupManager implements InitializingBean {
 
 		stopWatch.stop();
 		LoggingUtil.LOG.info(String.format("Backup of content repository to '%s' completed in %s", backupFileName, stopWatch));
-	}
-
-	public void restoreIfEmpty() {
-		try {
-			if (dataRepository.isEmpty()) {
-				restore();
-			}
-		} catch (RepositoryException e) {
-			throw ErrorUtil.fatal("Error while restoring content repository", e);
-		}
 	}
 
 	public void restore() {

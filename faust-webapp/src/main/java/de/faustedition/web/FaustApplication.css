@@ -10,6 +10,10 @@ h1, h2, h3, h4, h5, h6, strong, em {
     color: #000;
 }
 
+table, table th, table td, table tr {
+	border: 0;
+}
+
 #bd a:hover {
 }
 
@@ -37,12 +41,49 @@ h1, h2, h3, h4, h5, h6, strong, em {
     text-align: center;
 }
 
+.data-table {
+	width: 90%;
+	margin: 1em 5%;
+}
+
+.secondary-color {
+	color: #764F27;
+}
+
+.small-caps {
+	font-variant:small-caps;
+}
+
 .no-border {
 	border: 0;
 }
 
+.left-border {
+	border-top: 0;
+	border-bottom: 0;
+	border-left: 1px solid #764F27;
+	border-right: 0;
+}
+.horizontal-border {
+	border-top: 1px solid #764F27;
+	border-bottom: 1px solid #764F27;
+	border-left: 0;
+	border-right: 0;
+}
+.float-right {
+	float: right; 
+	margin-left: 1em; 
+}
+
 .center {
 	text-align: center;
+}
+
+.left {
+	text-align: left;
+}
+.right {
+	text-align: right;
 }
 
 .small-font {

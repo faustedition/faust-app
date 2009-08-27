@@ -15,6 +15,7 @@ import org.apache.wicket.model.PropertyModel;
 
 import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.transcription.Repository;
+import de.faustedition.model.transcription.TranscriptionStore;
 import de.faustedition.web.AbstractPage;
 import de.faustedition.web.FaustApplication;
 
@@ -36,7 +37,7 @@ public class ManuscriptsPage extends AbstractPage {
 
 				@Override
 				public List<Repository> doInSession(Session session) throws RepositoryException {
-					return new ArrayList<Repository>(Repository.find(session));
+					return new ArrayList<Repository>(TranscriptionStore.get(session).find(session, Repository.class));
 				}
 
 			})));
