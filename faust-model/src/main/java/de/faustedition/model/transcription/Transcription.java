@@ -33,7 +33,7 @@ public class Transcription extends RepositoryObjectBase {
 	}
 
 	public String getPathInStore() {
-		return StringUtils.removeStart(getPath(), TranscriptionStore.NAME + "/");
+		return StringUtils.removeStart(getPath(), Manuscripts.NAME + "/");
 	}
 
 }

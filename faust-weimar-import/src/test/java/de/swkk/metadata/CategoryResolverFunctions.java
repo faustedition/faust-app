@@ -1,17 +1,18 @@
 package de.swkk.metadata;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/faust-model-context.xml", "/faust-weimar-import-context.xml" })
+import de.swkk.metadata.inventory.CategoryResolver;
+
 public class CategoryResolverFunctions {
-	@Autowired
 	private CategoryResolver categoryResolver;
+
+	@Before
+	public void setUp() throws Exception {
+		categoryResolver = new CategoryResolver();
+	}
 
 	@Test
 	public void resolveExistingCategories() {

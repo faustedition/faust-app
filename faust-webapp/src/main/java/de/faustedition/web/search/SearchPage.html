@@ -7,15 +7,19 @@
 </head>
 <body>
 <wicket:extend>
-	<h2 wicket:id="transcriptionHeader">Transkription</h2>
 
-	<div class="yui-g">
-	<div class="yui-u first">
-	<p>Transkription …</p>
-	<p><a href="#" wicket:id="davLink" title="WebDAV-Link">Bearbeiten …</a></p>
+	<div>
+	<form wicket:id="form">
+	<p><input type="text" wicket:id="query" size="40" /></p>
+	<p><input type="submit" value="Suchen" /></p>
+	</form>
 	</div>
-	<div class="yui-u"><iframe wicket:id="facsimile" src="#" width="300" height="400" /></div>
+
+	<div>
+	<div wicket:id="results"><span wicket:id="resultLabel" /></div>
 	</div>
+
+	<div wicket:id="resultsPager" />
 </wicket:extend>
 </body>
 </html>

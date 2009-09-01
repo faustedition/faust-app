@@ -20,15 +20,4 @@
 			<artifactId>spring-test</artifactId>
 		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<configuration>
-					<mainClass>de.swkk.metadata.ImportApplication</mainClass>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>

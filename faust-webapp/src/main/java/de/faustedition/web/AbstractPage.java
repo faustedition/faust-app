@@ -16,6 +16,7 @@ import de.faustedition.web.manuscripts.ManuscriptsPage;
 import de.faustedition.web.project.AboutPage;
 import de.faustedition.web.project.ContactPage;
 import de.faustedition.web.project.ImprintPage;
+import de.faustedition.web.search.SearchPage;
 import de.faustedition.web.text.TextPage;
 
 @StatelessComponent
@@ -70,6 +71,7 @@ public abstract class AbstractPage extends WebPage {
 			add(new BookmarkablePageLink<ManuscriptsPage>("manuscriptsLink", ManuscriptsPage.class));
 			add(new BookmarkablePageLink<TextPage>("textLink", TextPage.class));
 			add(new BookmarkablePageLink<GenesisPage>("genesisLink", GenesisPage.class));
+			add(new BookmarkablePageLink<SearchPage>("searchLink", SearchPage.class));
 		}
 	}
 }

@@ -7,6 +7,7 @@ import java.util.SortedSet;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import org.apache.wicket.Page;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -18,31 +19,42 @@ import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.request.InvalidUrlException;
+import org.springframework.util.Assert;
 
 import de.faustedition.model.facsimile.FacsimileResolution;
 import de.faustedition.model.metadata.MetadataBundle;
+import de.faustedition.model.repository.DataRepository;
 import de.faustedition.model.repository.DataRepositoryTemplate;
+import de.faustedition.model.repository.RepositoryObject;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.model.transcription.Transcription;
-import de.faustedition.model.transcription.TranscriptionStore;
+import de.faustedition.model.transcription.Manuscripts;
 import de.faustedition.web.AbstractPage;
+import de.faustedition.web.AbstractRepositoryObjectLinkResolver;
 import de.faustedition.web.FaustApplication;
+import de.faustedition.web.RepositoryObjectLinkResolver;
 import de.faustedition.web.facsimile.FacsimileImage;
 import de.faustedition.web.metadata.MetadataTable;
 
 public class PortfolioPage extends AbstractPage {
+	public static final RepositoryObjectLinkResolver LINK_RESOLVER = new AbstractRepositoryObjectLinkResolver() {
+		
+		@Override
+		public BookmarkablePageLink<? extends Page> resolve(String id, Class<? extends RepositoryObject> type, String path) {
+			Assert.isAssignable(Portfolio.class, type);
+			PageParameters parameters = new PageParameters();
+			String[] pathComponents = DataRepository.splitPath(path);
+			parameters.add("0", pathComponents[pathComponents.length - 2]);
+			parameters.add("1", pathComponents[pathComponents.length - 1]);
+			return new BookmarkablePageLink<PortfolioPage>(id, PortfolioPage.class, parameters);
+		}
+	};
+	
 	private Repository repository;
 	private Portfolio portfolio;
 	private SortedSet<MetadataBundle> metadata;
 	private List<Transcription> transcriptions;
-
-	public static BookmarkablePageLink<PortfolioPage> getLink(String id, Repository repository, Portfolio portfolio) {
-		PageParameters parameters = new PageParameters();
-		parameters.add("0", repository.getName());
-		parameters.add("1", portfolio.getName());
-		return new BookmarkablePageLink<PortfolioPage>(id, PortfolioPage.class, parameters);
-	}
 
 	public PortfolioPage(PageParameters parameters) {
 		super();
@@ -56,7 +68,7 @@ public class PortfolioPage extends AbstractPage {
 
 			@Override
 			public Object doInSession(Session session) throws RepositoryException {
-				repository = TranscriptionStore.get(session).get(session, Repository.class, repositoryName);
+				repository = Manuscripts.get(session).get(session, Repository.class, repositoryName);
 				portfolio = repository.get(session, Portfolio.class, portfolioName);
 				metadata = portfolio.find(session, MetadataBundle.class);
 				transcriptions = new ArrayList<Transcription>(portfolio.find(session, Transcription.class));
@@ -105,7 +117,7 @@ public class PortfolioPage extends AbstractPage {
 			super(id, model);
 			Transcription transcription = model.getObject();
 
-			BookmarkablePageLink<TranscriptionPage> link = TranscriptionPage.getLink("transcriptionLink", repository, portfolio, transcription);
+			BookmarkablePageLink<? extends Page> link = FaustApplication.get().getLink("transcriptionLink", transcription);
 			link.add(new FacsimileImage("facsimileThumb", transcription, FacsimileResolution.THUMB));
 			add(link);
 

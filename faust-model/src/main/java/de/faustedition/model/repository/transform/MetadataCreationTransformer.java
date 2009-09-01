@@ -25,7 +25,7 @@ import de.faustedition.model.repository.RepositoryObject;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.model.transcription.Transcription;
-import de.faustedition.model.transcription.TranscriptionStore;
+import de.faustedition.model.transcription.Manuscripts;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLUtil;
 
@@ -49,7 +49,7 @@ public class MetadataCreationTransformer implements RepositoryTransformer {
 			@Override
 			public Object doInSession(Session session) throws RepositoryException {
 				try {
-					for (Repository repository : TranscriptionStore.get(session).find(session, Repository.class)) {
+					for (Repository repository : Manuscripts.get(session).find(session, Repository.class)) {
 						addFaustMixin(session, repository);
 						for (Portfolio portfolio : repository.find(session, Portfolio.class)) {
 							addFaustMixin(session, portfolio);

@@ -1,19 +1,29 @@
-package de.swkk.metadata;
+package de.swkk.metadata.inventory;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
-public class InventoryDatabase extends AllegroRecordSet {
+import de.swkk.metadata.AllegroRecord;
+import de.swkk.metadata.AllegroRecordSet;
+import de.swkk.metadata.GSACallNumber;
+
+public class FaustInventory extends AllegroRecordSet {
+	private static final Resource DATABASE_RESOURCE = new ClassPathResource("/weimar_manuscripts_faust.txt");
 	private static final String FAUST_REFERENCE_FIELD = "11z";
 
-	@Autowired
 	private CategoryResolver categoryResolver;
+	private WeimarerAusgabeFaustRegister waRegister;
 
-	@Autowired
-	private WeimarerAusgabeFaustRegister faustRegister;
+	public FaustInventory() throws IOException {
+		parse(DATABASE_RESOURCE);
+		categoryResolver = new CategoryResolver();
+		waRegister = new WeimarerAusgabeFaustRegister();
+	}
 
 	public GSACallNumber getCallNumber(AllegroRecord record) {
 		for (String candidate : new String[] { "08", "089" }) {
@@ -26,19 +36,9 @@ public class InventoryDatabase extends AllegroRecordSet {
 		return null;
 	}
 
-	public GSACallNumber getCanonicalCallNumber(AllegroRecord record) {
-		GSACallNumber callNumber = getCallNumber(record);
-		if (callNumber.getContent() == null) {
-			return callNumber;
-		}
-
-		String callNumberStr = callNumber.getValue();
-		return new GSACallNumber(callNumberStr.substring(0, callNumberStr.length() - callNumber.getContent().length() - 1));
-	}
-
 	public AllegroRecord lookup(GSACallNumber callNumber) {
 		for (AllegroRecord record : this) {
-			if (getCanonicalCallNumber(record).equals(callNumber)) {
+			if (callNumber.contains(getCallNumber(record))) {
 				return record;
 			}
 		}
@@ -61,6 +61,6 @@ public class InventoryDatabase extends AllegroRecordSet {
 
 	public String getFaustReference(AllegroRecord record) {
 		String referenceField = record.get(FAUST_REFERENCE_FIELD);
-		return (StringUtils.isNotBlank(referenceField) ? faustRegister.resolve(referenceField) : null);
+		return (StringUtils.isNotBlank(referenceField) ? waRegister.resolve(referenceField) : null);
 	}
 }

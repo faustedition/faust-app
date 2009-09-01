@@ -5,41 +5,43 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
+
+import de.swkk.metadata.inventory.CategoryResolver;
+import de.swkk.metadata.inventory.FaustInventory;
+import de.swkk.metadata.inventory.ParalipomenaMetadata;
+import de.swkk.metadata.inventory.WeimarerAusgabeFaustRegister;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/faust-model-context.xml", "/faust-weimar-import-context.xml" })
 public class CategoryResolverCoverage {
 
-	@Autowired
 	private CategoryResolver categoryResolver;
+	private FaustInventory faustInventory;
+	private ParalipomenaMetadata paralipomenaMetadata;
+	private WeimarerAusgabeFaustRegister waRegister;
 
-	@Autowired
-	@Qualifier("faustMetadataRecordSet")
-	private AllegroRecordSet faustMetadata;
-
-	@Autowired
-	@Qualifier("editionMetadataRecordSet")
-	private AllegroRecordSet editionMetadata;
-
-	@Autowired
-	@Qualifier("paralipomenaMetadataRecordSet")
-	private AllegroRecordSet paralipomenaMetadata;
-
+	@Before
+	public void setUp() throws Exception {
+		categoryResolver = new CategoryResolver();
+		faustInventory = new FaustInventory();
+		paralipomenaMetadata = new ParalipomenaMetadata();
+		waRegister = new WeimarerAusgabeFaustRegister();
+	}
+	
 	@Test
 	public void checkFaustMetadata() {
-		checkCoverage(faustMetadata);
+		checkCoverage(faustInventory);
 	}
 
 	@Test
 	public void checkEditionMetadata() {
-		checkCoverage(editionMetadata);
+		checkCoverage(waRegister);
 	}
 
 	@Test

@@ -26,12 +26,12 @@ public class TranscriptionStoreSetup extends AbstractModelContextTest {
 	public void repositoryListing() throws RepositoryException {
 		int transcriptionCount = TranscriptionTraversal.execute(dataRepository, new TranscriptionVisitor<Transcription>() {
 
-			private TranscriptionStore store;
+			private Manuscripts store;
 			
 			@Override
 			public Transcription visit(Session session, Transcription transcription) throws RepositoryException {
 				if (store == null) {
-					store = TranscriptionStore.get(session);
+					store = Manuscripts.get(session);
 				}
 				Assert.assertNotNull(transcription.getPath());
 				Node transcriptionNode = session.getRootNode().getNode(transcription.getPath());

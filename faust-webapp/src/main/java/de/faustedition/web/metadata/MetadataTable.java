@@ -37,10 +37,10 @@ public class MetadataTable extends WebComponent {
 			markup.append(String.format("<tr><th colspan=\"2\" class=\"left small-caps secondary-color\">%s</th></tr>", groupLabel));
 
 			for (MetadataValue value : structuredMetadata.get(fieldGroup)) {
-				markup.append("<tr class=\"horizontal-border\">");
+				markup.append("<tr class=\"border\">");
 				CharSequence fieldLabel = Strings.escapeMarkup(localizer.getString("metadata." + value.getField(), this));
-				markup.append(String.format("<th class=\"right\" style=\"width: 30%%\">%s:</th>", fieldLabel));
-				markup.append(String.format("<td style=\"width: 70%%\">%s</td>", Strings.replaceAll(Strings.escapeMarkup(value.getValue()), "\n", "<br/>")));
+				markup.append(String.format("<th class=\"right\" style=\"width: 40%%\">%s:</th>", fieldLabel));
+				markup.append(String.format("<td style=\"width: 60%%\">%s</td>", Strings.replaceAll(Strings.escapeMarkup(value.getValue()), "\n", "<br/>")));
 
 				markup.append("</tr>");
 			}

@@ -49,7 +49,7 @@ public class DataRepositoryBackupManager implements InitializingBean {
 	private ScheduledExecutorService scheduledExecutorService;
 
 	private DataRepositoryTransformationManager transformationManager;
-	
+
 	protected File backupBaseFile;
 
 	@Required
@@ -61,14 +61,14 @@ public class DataRepositoryBackupManager implements InitializingBean {
 	public void setTransformationManager(DataRepositoryTransformationManager transformationManager) {
 		this.transformationManager = transformationManager;
 	}
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		backupBaseFile = new File(dataDirectory, "backup");
 		if (!backupBaseFile.isDirectory()) {
 			Assert.isTrue(backupBaseFile.mkdirs(), "Cannot create backup directory");
 		}
-		
+
 		if (dataRepository.isEmpty()) {
 			scheduledExecutorService.schedule(new Callable<Object>() {
 
@@ -76,10 +76,10 @@ public class DataRepositoryBackupManager implements InitializingBean {
 				public Object call() throws Exception {
 					LoggingUtil.LOG.info("Restoring empty repository");
 					restore();
-					
+
 					LoggingUtil.LOG.info("Transforming restored content");
 					transformationManager.runTransformations();
-					
+
 					return null;
 				}
 			}, 0, TimeUnit.MILLISECONDS);
@@ -182,6 +182,11 @@ public class DataRepositoryBackupManager implements InitializingBean {
 							}
 						} catch (IOException e) {
 						}
+					}
+
+					if (session.getRootNode().hasNode("transcriptions")) {
+						session.move("/transcriptions", "/manuscripts");
+						session.save();
 					}
 					return null;
 				}

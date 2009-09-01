@@ -7,14 +7,14 @@ import javax.jcr.Session;
 
 import de.faustedition.model.repository.RepositoryObjectBase;
 
-public class TranscriptionStore extends RepositoryObjectBase {
-	protected static final String NAME = "transcriptions";
+public class Manuscripts extends RepositoryObjectBase {
+	protected static final String NAME = "manuscripts";
 
-	public TranscriptionStore(String path) {
+	public Manuscripts(String path) {
 		super(path);
 	}
 
-	public static TranscriptionStore get(Session session) throws RepositoryException {
+	public static Manuscripts get(Session session) throws RepositoryException {
 		Node rootNode = session.getRootNode();
 		Node storeNode = null;
 		try {
@@ -23,7 +23,7 @@ public class TranscriptionStore extends RepositoryObjectBase {
 			storeNode = rootNode.addNode(NAME, "nt:folder");
 			storeNode.save();
 		}
-		return get(TranscriptionStore.class, storeNode);
+		return get(Manuscripts.class, storeNode);
 	}
 
 	@Override

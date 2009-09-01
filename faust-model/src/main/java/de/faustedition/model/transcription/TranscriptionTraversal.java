@@ -16,7 +16,7 @@ public class TranscriptionTraversal {
 			@Override
 			public List<T> doInSession(Session session) throws RepositoryException {
 				List<T> resultList = new LinkedList<T>();
-				for (Repository repository : TranscriptionStore.get(session).find(session, Repository.class)) {
+				for (Repository repository : Manuscripts.get(session).find(session, Repository.class)) {
 					for (Portfolio portfolio : repository.find(session, Portfolio.class)) {
 						for (Transcription transcription : portfolio.find(session, Transcription.class)) {
 							T result = visitor.visit(session, transcription);

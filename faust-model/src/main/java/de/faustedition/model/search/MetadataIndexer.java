@@ -19,7 +19,7 @@ import de.faustedition.model.repository.RepositoryObject;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
 import de.faustedition.model.transcription.Transcription;
-import de.faustedition.model.transcription.TranscriptionStore;
+import de.faustedition.model.transcription.Manuscripts;
 import de.faustedition.util.LoggingUtil;
 
 public class MetadataIndexer {
@@ -47,7 +47,7 @@ public class MetadataIndexer {
 
 						@Override
 						public Object doInSession(Session repositorySession) throws RepositoryException {
-							for (Repository repository : TranscriptionStore.get(repositorySession).find(repositorySession, Repository.class)) {
+							for (Repository repository : Manuscripts.get(repositorySession).find(repositorySession, Repository.class)) {
 								indexMetadata(compassSession, repositorySession, repository);
 								for (Portfolio portfolio : repository.find(repositorySession, Portfolio.class)) {
 									indexMetadata(compassSession, repositorySession, portfolio);

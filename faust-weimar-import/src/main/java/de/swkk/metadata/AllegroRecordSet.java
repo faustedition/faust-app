@@ -4,25 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
-public class AllegroRecordSet extends TreeSet<AllegroRecord> implements InitializingBean {
-
-	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(AllegroRecordSet.class.getName());
-
-	private Resource recordSetResource;
-
-	@Required
-	public void setRecordSetResource(Resource recordSetResource) {
-		this.recordSetResource = recordSetResource;
-	}
+public class AllegroRecordSet extends TreeSet<AllegroRecord> {
 
 	public void parse(Resource recordSetResource) throws IOException {
 		clear();
@@ -69,12 +55,5 @@ public class AllegroRecordSet extends TreeSet<AllegroRecord> implements Initiali
 				lastEntry = recordIdentifier;
 			}
 		} while (true);
-	}
-
-	public void afterPropertiesSet() throws Exception {
-		parse(this.recordSetResource);
-		if (logger.isLoggable(Level.FINE)) {
-			logger.fine(String.format("Parsed %d record(s) from %s", size(), this.recordSetResource.getDescription()));
-		}
 	}
 }

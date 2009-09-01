@@ -12,7 +12,7 @@ public class Repository extends RepositoryObjectBase {
 	}
 
 	protected static Node getTranscriptionStoreNode(Session session) throws RepositoryException {
-		return TranscriptionStore.get(session).getNode(session);
+		return Manuscripts.get(session).getNode(session);
 	}
 
 	@Override

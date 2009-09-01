@@ -1,63 +1,37 @@
-package de.swkk.metadata;
+package de.swkk.metadata.archivedb;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.faustedition.util.LoggingUtil;
 import de.faustedition.util.XMLUtil;
+import de.swkk.metadata.GSACallNumber;
 
-public class ArchiveDatabase extends LinkedList<ArchiveRecord> implements InitializingBean {
+public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
+	private static final Resource DATABASE_RESOURCE = new ClassPathResource("/weimar_manuscripts_archive_db.xml");
 
-	private Resource databaseResource;
+	private Map<GSACallNumber, ArchiveDatabaseRecord> callNumberIndex = new HashMap<GSACallNumber, ArchiveDatabaseRecord>();
 
-	private Map<GSACallNumber, ArchiveRecord> callNumberIndex = new HashMap<GSACallNumber, ArchiveRecord>();
+	public ArchiveDatabase() throws SAXException, IOException {
+		XMLUtil.parse(DATABASE_RESOURCE.getInputStream(), new DefaultHandler() {
 
-	@Required
-	public void setDatabaseResource(Resource databaseResource) {
-		this.databaseResource = databaseResource;
-	}
-
-	public void afterPropertiesSet() throws Exception {
-		parse(this.databaseResource);
-	}
-
-	public ArchiveRecord lookup(GSACallNumber callNumber) {
-		StringBuilder lookupStr = new StringBuilder();
-		lookupStr.append(callNumber.getPortfolio() == null ? "25" : callNumber.getPortfolio().toString());
-		lookupStr.append("/");
-		lookupStr.append(callNumber.getSubPortfolio());
-		lookupStr.append(",");
-		lookupStr.append(callNumber.getFile());
-		if (callNumber.getSubFile() != null) {
-			lookupStr.append(",");
-			lookupStr.append(callNumber.getSubFile());
-		}
-
-		LoggingUtil.LOG.info(String.format("Looking up GSA call number [%s]", lookupStr.toString()));
-		return callNumberIndex.get(new GSACallNumber(lookupStr.toString()));
-	}
-
-	protected void parse(Resource resource) throws SAXException, IOException {
-		clear();
-		XMLUtil.parse(resource.getInputStream(), new DefaultHandler() {
-
-			private ArchiveRecord record;
+			private ArchiveDatabaseRecord record;
 			private String currentProperty;
 			private StringBuilder currentValue;
 
 			@Override
 			public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 				if ("ITEM".equals(qName)) {
-					record = new ArchiveRecord();
+					record = new ArchiveDatabaseRecord();
 
 					int numAttrIndex = attributes.getIndex("num");
 					if (numAttrIndex >= 0) {
@@ -91,8 +65,28 @@ public class ArchiveDatabase extends LinkedList<ArchiveRecord> implements Initia
 		});
 	}
 
+	public SortedSet<ArchiveDatabaseRecord> collect(GSACallNumber callNumber) {
+		SortedSet<ArchiveDatabaseRecord> records = new TreeSet<ArchiveDatabaseRecord>();
+		for (GSACallNumber dbCallNumber : callNumberIndex.keySet()) {
+			if (callNumber.contains(dbCallNumber)) {
+				records.add(callNumberIndex.get(dbCallNumber));
+			}
+		}
+		return records;
+	}
+
+	public SortedSet<ArchiveDatabaseRecord> filter(GSACallNumber callNumber) {
+		SortedSet<ArchiveDatabaseRecord> records = new TreeSet<ArchiveDatabaseRecord>();
+		for (GSACallNumber dbCallNumber : callNumberIndex.keySet()) {
+			if (dbCallNumber.contains(callNumber)) {
+				records.add(callNumberIndex.get(dbCallNumber));
+			}
+		}
+		return records;
+	}
+
 	@Override
-	public boolean add(ArchiveRecord o) {
+	public boolean add(ArchiveDatabaseRecord o) {
 		if (callNumberIndex.containsKey(o.getCallNumber())) {
 			throw new IllegalStateException(o.getCallNumber().toString());
 		}

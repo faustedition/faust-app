@@ -6,6 +6,7 @@ import java.util.List;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import org.apache.wicket.Page;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
@@ -15,7 +16,7 @@ import org.apache.wicket.model.PropertyModel;
 
 import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.transcription.Repository;
-import de.faustedition.model.transcription.TranscriptionStore;
+import de.faustedition.model.transcription.Manuscripts;
 import de.faustedition.web.AbstractPage;
 import de.faustedition.web.FaustApplication;
 
@@ -37,7 +38,7 @@ public class ManuscriptsPage extends AbstractPage {
 
 				@Override
 				public List<Repository> doInSession(Session session) throws RepositoryException {
-					return new ArrayList<Repository>(TranscriptionStore.get(session).find(session, Repository.class));
+					return new ArrayList<Repository>(Manuscripts.get(session).find(session, Repository.class));
 				}
 
 			})));
@@ -46,7 +47,8 @@ public class ManuscriptsPage extends AbstractPage {
 		@Override
 		protected void populateItem(final Item<Repository> item) {
 			Repository repository = item.getModel().getObject();
-			BookmarkablePageLink<RepositoryPage> link = RepositoryPage.getLink("repositoryLink", repository);
+			FaustApplication.get().getLink("repositoryLink", repository);
+			BookmarkablePageLink<? extends Page> link = FaustApplication.get().getLink("repositoryLink", repository);
 			link.add(new Label("repositoryName", new PropertyModel<String>(repository, "name")));
 			item.add(link);
 		}

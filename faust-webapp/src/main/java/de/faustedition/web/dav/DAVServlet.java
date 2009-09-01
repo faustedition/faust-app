@@ -15,7 +15,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import de.faustedition.model.repository.DataRepository;
 
 public class DAVServlet extends SimpleWebdavServlet {
-
+	public static final String URL_PREFIX = "/dav";
+	
 	private DataRepository dataRepository;
 
 	@Override

@@ -3,34 +3,16 @@
 	<iomanager>
 		<class name="org.apache.jackrabbit.server.io.IOManagerImpl" />
 		<iohandler>
-			<class name="org.apache.jackrabbit.server.io.VersionHandler" />
-		</iohandler>
-		<iohandler>
-			<class name="org.apache.jackrabbit.server.io.VersionHistoryHandler" />
-		</iohandler>
-		<iohandler>
-			<class name="org.apache.jackrabbit.server.io.ZipHandler" />
-		</iohandler>
-		<iohandler>
 			<class name="org.apache.jackrabbit.server.io.DirListingExportHandler" />
 		</iohandler>
 		<iohandler>
-			<class name="org.apache.jackrabbit.server.io.DefaultHandler" />
+			<class name="de.faustedition.web.dav.XMLTransformingDefaultHandler" />
 		</iohandler>
 	</iomanager>
 	<propertymanager>
 		<class name="org.apache.jackrabbit.server.io.PropertyManagerImpl" />
 		<propertyhandler>
-			<class name="org.apache.jackrabbit.server.io.VersionHandler" />
-		</propertyhandler>
-		<propertyhandler>
-			<class name="org.apache.jackrabbit.server.io.VersionHistoryHandler" />
-		</propertyhandler>
-		<propertyhandler>
-			<class name="org.apache.jackrabbit.server.io.ZipHandler" />
-		</propertyhandler>
-		<propertyhandler>
-			<class name="org.apache.jackrabbit.server.io.DefaultHandler" />
+			<class name="de.faustedition.web.dav.XMLTransformingDefaultHandler" />
 		</propertyhandler>
 	</propertymanager>
 	<noncollection>

@@ -15,7 +15,7 @@ import de.faustedition.model.repository.DataRepositoryTemplate;
 import de.faustedition.model.repository.transform.MetadataCreationTransformer;
 import de.faustedition.model.transcription.Portfolio;
 import de.faustedition.model.transcription.Repository;
-import de.faustedition.model.transcription.TranscriptionStore;
+import de.faustedition.model.transcription.Manuscripts;
 import de.faustedition.util.LoggingUtil;
 
 public class MetadataTransformerResultTestRun extends AbstractModelContextTest {
@@ -34,7 +34,7 @@ public class MetadataTransformerResultTestRun extends AbstractModelContextTest {
 
 			@Override
 			public Object doInSession(Session session) throws RepositoryException {
-				for (Repository repository : TranscriptionStore.get(session).find(session, Repository.class)) {
+				for (Repository repository : Manuscripts.get(session).find(session, Repository.class)) {
 					for (Portfolio portfolio : repository.find(session, Portfolio.class)) {
 						Collection<MetadataBundle> metadataList = portfolio.find(session, MetadataBundle.class);
 						LoggingUtil.LOG.info(String.format("%s ==> %d", portfolio.getPath(), metadataList.size()));

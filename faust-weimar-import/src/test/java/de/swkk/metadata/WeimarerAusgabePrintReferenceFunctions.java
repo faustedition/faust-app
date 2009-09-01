@@ -1,23 +1,24 @@
 package de.swkk.metadata;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/faust-model-context.xml", "/faust-weimar-import-context.xml" })
+import de.swkk.metadata.inventory.FaustInventory;
+import de.swkk.metadata.inventory.WeimarerAusgabeFaustRegister;
+
 public class WeimarerAusgabePrintReferenceFunctions {
-	@Autowired
-	private InventoryDatabase inventoryDatabase;
+	private FaustInventory inventoryDatabase;
+	private WeimarerAusgabeFaustRegister waRegister;
 
-	@Autowired
-	private WeimarerAusgabeFaustRegister faustRegister;
-
+	@Before
+	public void setUp() throws Exception {
+		inventoryDatabase = new FaustInventory();
+		waRegister = new WeimarerAusgabeFaustRegister();
+	}
+	
 	@Test
 	public void listRegister() {
-		for (String description : faustRegister.getDescriptionSet()) {
+		for (String description : waRegister.getDescriptionSet()) {
 			System.out.println(description);
 		}
 	}
