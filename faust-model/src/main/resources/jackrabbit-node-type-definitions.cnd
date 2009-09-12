@@ -3,6 +3,11 @@
 [faust:annotated]
 	mixin
 	+ 'metadata' (faust:metadata) = faust:metadata multiple
+
+[faust:object]
+	mixin
+	- 'type' (string) mandatory
+	+ 'metadata' (faust:metadata) = faust:metadata multiple
 	
 [faust:metadata]
 	- *

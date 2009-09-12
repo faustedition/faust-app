@@ -8,6 +8,11 @@
 	<packaging>pom</packaging>
 	<dependencies>
 		<dependency>
+			<groupId>com.google.collections</groupId>
+			<artifactId>google-collections</artifactId>
+			<version>1.0-rc2</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.4</version>
@@ -25,11 +30,6 @@
 				<groupId>de.faustedition</groupId>
 				<artifactId>faust-weimar-import</artifactId>
 				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.jcr</groupId>
-				<artifactId>jcr</artifactId>
-				<version>1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -72,14 +72,52 @@
 				<version>1.1.1</version>
 			</dependency>
 			<dependency>
+				<groupId>xom</groupId>
+				<artifactId>xom</artifactId>
+				<version>1.1</version>
+				<exclusions>
+					<exclusion>
+						<groupId>jaxen</groupId>
+						<artifactId>jaxen</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xerces</groupId>
+						<artifactId>xmlParserAPIs</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>jdom</groupId>
+						<artifactId>jdom</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>cglib</groupId>
+				<artifactId>cglib</artifactId>
+				<version>2.2</version>
+			</dependency>
+			<dependency>
+				<groupId>javassist</groupId>
+				<artifactId>javassist</artifactId>
+				<version>3.8.0.GA</version>
+			</dependency>
+			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.5.8</version>
+				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
-				<version>1.5.8</version>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>log4j</groupId>
@@ -152,38 +190,25 @@
 				<version>${spring.security.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.jackrabbit</groupId>
-				<artifactId>jackrabbit-core</artifactId>
-				<version>1.6.0</version>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>3.3.2.GA</version>
 				<exclusions>
 					<exclusion>
-						<groupId>org.apache.poi</groupId>
-						<artifactId>poi</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.apache.poi</groupId>
-						<artifactId>poi-scratchpad</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>pdfbox</groupId>
-						<artifactId>pdfbox</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>net.sourceforge.nekohtml</groupId>
-						<artifactId>nekohtml</artifactId>
+						<groupId>xml-apis</groupId>
+						<artifactId>xml-apis</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.jackrabbit</groupId>
-				<artifactId>jackrabbit-jcr-server</artifactId>
-				<version>1.6.0</version>
-				<exclusions>
-					<exclusion>
-						<groupId>xerces</groupId>
-						<artifactId>xercesImpl</artifactId>
-					</exclusion>
-				</exclusions>
+				<groupId>postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>8.3-603.jdbc4</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-dbcp</groupId>
+				<artifactId>commons-dbcp</artifactId>
+				<version>1.2.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.opensymphony.quartz</groupId>
@@ -202,6 +227,17 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.wicket</groupId>
+				<artifactId>wicket-ioc</artifactId>
+				<version>${wicket.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>cglib</groupId>
+						<artifactId>cglib-nodep</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.wicket</groupId>
 				<artifactId>wicket-spring</artifactId>
 				<version>${wicket.version}</version>
 			</dependency>
@@ -214,6 +250,16 @@
 				<groupId>org.apache.wicket</groupId>
 				<artifactId>wicket-devutils</artifactId>
 				<version>${wicket.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.ettrema</groupId>
+				<artifactId>milton-api</artifactId>
+				<version>${milton.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.ettrema</groupId>
+				<artifactId>milton-servlet</artifactId>
+				<version>${milton.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mortbay.jetty</groupId>
@@ -276,9 +322,11 @@
 		<module>../faust-server</module>
 	</modules>
 	<properties>
+		<slf4j.version>1.5.8</slf4j.version>
 		<spring.version>2.5.6.SEC01</spring.version>
 		<spring.security.version>2.0.5.RELEASE</spring.security.version>
 		<wicket.version>1.4.1</wicket.version>
+		<milton.version>1.4.2</milton.version>
 		<jetty.version>6.1.19</jetty.version>
 	</properties>
 </project>

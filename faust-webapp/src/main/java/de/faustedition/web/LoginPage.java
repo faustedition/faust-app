@@ -4,7 +4,7 @@ import org.apache.wicket.RequestCycle;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.WebPage;
 
-import de.faustedition.web.manuscripts.ManuscriptsPage;
+import de.faustedition.web.manuscript.ManuscriptsPage;
 
 
 public class LoginPage extends WebPage {

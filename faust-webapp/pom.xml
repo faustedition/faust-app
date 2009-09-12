@@ -16,6 +16,10 @@
 			<artifactId>faust-model</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>de.faustedition</groupId>
+			<artifactId>faust-weimar-import</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<scope>provided</scope>
@@ -33,12 +37,12 @@
 			<artifactId>spring-security-core-tiger</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>jackrabbit-jcr-server</artifactId>
+			<groupId>org.apache.wicket</groupId>
+			<artifactId>wicket</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.wicket</groupId>
-			<artifactId>wicket</artifactId>
+			<artifactId>wicket-ioc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.wicket</groupId>
@@ -52,9 +56,16 @@
 			<groupId>org.apache.wicket</groupId>
 			<artifactId>wicket-auth-roles</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.ettrema</groupId>
+			<artifactId>milton-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ettrema</groupId>
+			<artifactId>milton-servlet</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
-
 		<resources>
 			<resource>
 				<filtering>false</filtering>

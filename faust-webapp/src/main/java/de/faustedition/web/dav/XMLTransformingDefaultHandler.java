@@ -5,80 +5,31 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-import javax.jcr.Node;
-import javax.jcr.Property;
-import javax.jcr.RepositoryException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.jackrabbit.JcrConstants;
-import org.apache.jackrabbit.server.io.DefaultHandler;
-import org.apache.jackrabbit.server.io.ExportContext;
-import org.apache.jackrabbit.server.io.IOManager;
-import org.apache.jackrabbit.server.io.IOUtil;
-import org.apache.jackrabbit.server.io.ImportContext;
 
 import de.faustedition.util.XMLUtil;
 
-public class XMLTransformingDefaultHandler extends DefaultHandler {
+public class XMLTransformingDefaultHandler {
 
-	public XMLTransformingDefaultHandler() {
-		super();
-	}
-
-	public XMLTransformingDefaultHandler(IOManager ioManager, String collectionNodetype, String defaultNodetype, String contentNodetype) {
-		super(ioManager, collectionNodetype, defaultNodetype, contentNodetype);
-	}
-
-	public XMLTransformingDefaultHandler(IOManager ioManager) {
-		super(ioManager);
-	}
-
-	@Override
-	protected boolean importData(ImportContext context, boolean isCollection, Node contentNode) throws IOException, RepositoryException {
-		InputStream in = context.getInputStream();
-		if (in != null) {
-			// NOTE: with the default folder-nodetype (nt:folder) no
-			// inputstream
-			// is allowed. setting the property would therefore
-			// fail.
-			if (isCollection) {
-				return false;
-			}
-
-			File dataFile = transform(contentNode.getPath(), in);
-			FileInputStream dataFileStream = null;
-			try {
-				contentNode.setProperty(JcrConstants.JCR_DATA, (dataFileStream = new FileInputStream(dataFile)));
-			} finally {
-				IOUtils.closeQuietly(dataFileStream);
-				dataFile.delete();
-			}
+	public void transform(File dataFile, OutputStream stream) throws IOException {
+		FileInputStream dataFileStream = null;
+		try {
+			IOUtils.copy((dataFileStream = new FileInputStream(dataFile)), stream);
+		} finally {
+			IOUtils.closeQuietly(dataFileStream);
+			dataFile.delete();
 		}
-		// success if no data to import.
-		return true;
+
 	}
 
-	@Override
-	protected void exportData(ExportContext context, boolean isCollection, Node contentNode) throws IOException, RepositoryException {
-		if (contentNode.hasProperty(JcrConstants.JCR_DATA)) {
-			Property p = contentNode.getProperty(JcrConstants.JCR_DATA);
-			File dataFile = transform(contentNode.getPath(), p.getStream());
-			FileInputStream dataFileStream = null;
-			try {
-				IOUtil.spool((dataFileStream = new FileInputStream(dataFile)), context.getOutputStream());
-			} finally {
-				IOUtils.closeQuietly(dataFileStream);
-				dataFile.delete();
-			}
-		}
-	}
-
-	private File transform(String path, InputStream inputStream) throws IOException {
+	public File transform(String path, InputStream inputStream) throws IOException {
 		File bufferFile = createBufferFile(inputStream);
 		try {
 			return transform(bufferFile);

@@ -8,6 +8,8 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			classpath:/faust-model-context.xml
+			classpath:/faust-weimar-import-context.xml
+			classpath:/faust-webapp-context.xml
 			classpath:/faust-security-context.xml
 		</param-value>
 	</context-param>
@@ -25,7 +27,7 @@
 		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
+
 	<filter>
 		<filter-name>wicket</filter-name>
 		<filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
@@ -57,16 +59,7 @@
 
 	<servlet>
 		<servlet-name>dav</servlet-name>
-		<servlet-class>de.faustedition.web.dav.DAVServlet</servlet-class>
-		<init-param>
-			<param-name>resource-path-prefix</param-name>
-			<param-value>/dav</param-value>
-		</init-param>
-		<init-param>
-			<param-name>resource-config</param-name>
-			<param-value>/WEB-INF/dav-config.xml</param-value>
-		</init-param>
-
+		<servlet-class>de.faustedition.web.dav.DavServlet</servlet-class>
 		<load-on-startup>3</load-on-startup>
 	</servlet>
 

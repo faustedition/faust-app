@@ -12,7 +12,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.PropertyModel;
 
 import de.faustedition.web.genesis.GenesisPage;
-import de.faustedition.web.manuscripts.ManuscriptsPage;
+import de.faustedition.web.manuscript.ManuscriptsPage;
 import de.faustedition.web.project.AboutPage;
 import de.faustedition.web.project.ContactPage;
 import de.faustedition.web.project.ImprintPage;

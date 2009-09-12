@@ -1,17 +1,20 @@
 package de.faustedition.web;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.wicket.Page;
+import org.apache.wicket.Request;
+import org.apache.wicket.RequestCycle;
+import org.apache.wicket.Response;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.devutils.stateless.StatelessChecker;
 import org.apache.wicket.injection.web.InjectorHolder;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.protocol.http.WebRequest;
+import org.apache.wicket.protocol.http.WebRequestCycle;
+import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.protocol.http.servlet.AbortWithWebErrorCodeException;
 import org.apache.wicket.request.target.coding.IndexedParamUrlCodingStrategy;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -19,19 +22,16 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.springframework.security.Authentication;
 import org.springframework.security.GrantedAuthority;
 import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import de.faustedition.model.repository.DataRepository;
-import de.faustedition.model.repository.DataRepositoryTemplate;
-import de.faustedition.model.repository.RepositoryObject;
-import de.faustedition.model.transcription.Portfolio;
-import de.faustedition.model.transcription.Repository;
-import de.faustedition.model.transcription.Transcription;
 import de.faustedition.util.LoggingUtil;
 import de.faustedition.web.genesis.GenesisPage;
-import de.faustedition.web.manuscripts.ManuscriptsPage;
-import de.faustedition.web.manuscripts.PortfolioPage;
-import de.faustedition.web.manuscripts.RepositoryPage;
-import de.faustedition.web.manuscripts.TranscriptionPage;
+import de.faustedition.web.manuscript.ManuscriptPage;
+import de.faustedition.web.manuscript.ManuscriptsPage;
+import de.faustedition.web.manuscript.PortfolioPage;
+import de.faustedition.web.manuscript.RepositoryPage;
 import de.faustedition.web.project.AboutPage;
 import de.faustedition.web.project.ContactPage;
 import de.faustedition.web.project.ImprintPage;
@@ -39,11 +39,6 @@ import de.faustedition.web.search.SearchPage;
 import de.faustedition.web.text.TextPage;
 
 public class FaustApplication extends WebApplication {
-	private Map<Class<? extends RepositoryObject>, RepositoryObjectLinkResolver> linkResolverMap = new HashMap<Class<? extends RepositoryObject>, RepositoryObjectLinkResolver>();
-
-	@SpringBean
-	private DataRepository dataRepository;
-
 	@Override
 	protected void init() {
 		super.init();
@@ -64,13 +59,13 @@ public class FaustApplication extends WebApplication {
 		mount(new IndexedParamUrlCodingStrategy("/search", SearchPage.class));
 
 		mount(new IndexedParamUrlCodingStrategy("/manuscripts/repository", RepositoryPage.class));
-		linkResolverMap.put(Repository.class, RepositoryPage.LINK_RESOLVER);
-
 		mount(new IndexedParamUrlCodingStrategy("/manuscripts/portfolio", PortfolioPage.class));
-		linkResolverMap.put(Portfolio.class, PortfolioPage.LINK_RESOLVER);
+		mount(new IndexedParamUrlCodingStrategy("/manuscripts/transcription", ManuscriptPage.class));
+	}
 
-		mount(new IndexedParamUrlCodingStrategy("/manuscripts/transcription", TranscriptionPage.class));
-		linkResolverMap.put(Transcription.class, TranscriptionPage.LINK_RESOLVER);
+	@Override
+	public RequestCycle newRequestCycle(Request request, Response response) {
+		return new TransactionalRequestCycle(this, (WebRequest) request, (WebResponse) response);
 	}
 
 	@Override
@@ -78,23 +73,13 @@ public class FaustApplication extends WebApplication {
 		return AboutPage.class;
 	}
 
-	public static WicketRuntimeException fatalError(String message, RepositoryException e) {
+	public static WicketRuntimeException fatalError(String message, RuntimeException e) {
 		LoggingUtil.LOG.fatal(message, e);
 		return new WicketRuntimeException(message, e);
 	}
 
 	public static FaustApplication get() {
 		return (FaustApplication) WebApplication.get();
-	}
-
-	public <T> T accessDataRepository(DataRepositoryTemplate<T> callback) {
-		try {
-			return dataRepository.execute(callback);
-		} catch (PathNotFoundException e) {
-			throw new AbortWithWebErrorCodeException(404);
-		} catch (RepositoryException e) {
-			throw fatalError("Error accessing content repository", e);
-		}
 	}
 
 	public boolean hasRole(String role) {
@@ -109,11 +94,47 @@ public class FaustApplication extends WebApplication {
 		return false;
 	}
 
-	public BookmarkablePageLink<? extends Page> getLink(String id, RepositoryObject repositoryObject) {
-		return linkResolverMap.get(repositoryObject.getClass()).resolve(id, repositoryObject);
+	public static void assertFound(Object foundObject) {
+		if (foundObject == null) {
+			throw new AbortWithWebErrorCodeException(404);
+		}
 	}
 
-	public BookmarkablePageLink<? extends Page> getLink(String id, Class<? extends RepositoryObject> type, String path) {
-		return linkResolverMap.get(type).resolve(id, type, path);
+	public static class TransactionalRequestCycle extends WebRequestCycle {
+		private static final Set<String> READ_ONLY_METHODS = new HashSet<String>(Arrays.asList(new String[] { "GET", "HEAD"} ));
+		
+		@SpringBean
+		private PlatformTransactionManager transactionManager;
+		private TransactionStatus transactionStatus;
+		private DefaultTransactionDefinition transactionDefinition;
+
+		public TransactionalRequestCycle(WebApplication application, WebRequest request, Response response) {
+			super(application, request, response);
+			InjectorHolder.getInjector().inject(this);
+			
+			transactionDefinition = new DefaultTransactionDefinition();
+			transactionDefinition.setReadOnly(READ_ONLY_METHODS.contains(request.getHttpServletRequest().getMethod()));
+		}
+
+		@Override
+		protected void onBeginRequest() {
+			transactionStatus = transactionManager.getTransaction(transactionDefinition);
+			super.onBeginRequest();
+		}
+
+		@Override
+		protected void onEndRequest() {
+			super.onEndRequest();
+			transactionManager.commit(transactionStatus);
+		}
+
+		@Override
+		public Page onRuntimeException(Page page, RuntimeException e) {
+			if (transactionStatus != null) {
+				transactionManager.rollback(transactionStatus);
+			}
+
+			return super.onRuntimeException(page, e);
+		}
 	}
 }

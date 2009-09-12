@@ -4,17 +4,17 @@ import org.apache.wicket.RequestCycle;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebComponent;
 
-import de.faustedition.model.facsimile.FacsimileResolution;
-import de.faustedition.model.transcription.Transcription;
+import de.faustedition.model.manuscript.Facsimile;
+import de.faustedition.model.manuscript.FacsimileImageResolution;
 
 public class FacsimileImage extends WebComponent {
 
 	private final String path;
-	private final FacsimileResolution resolution;
+	private final FacsimileImageResolution resolution;
 
-	public FacsimileImage(String id, Transcription transcription, FacsimileResolution resolution) {
+	public FacsimileImage(String id, Facsimile facsimile, FacsimileImageResolution resolution) {
 		super(id);
-		this.path = transcription.getPathInStore();
+		this.path = facsimile.getImagePath();
 		this.resolution = resolution;
 	}
 

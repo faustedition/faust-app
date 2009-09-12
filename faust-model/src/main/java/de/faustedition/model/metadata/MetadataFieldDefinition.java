@@ -1,10 +1,16 @@
 package de.faustedition.model.metadata;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class MetadataFieldDefinition implements Comparable<MetadataFieldDefinition> {
 	public static Map<MetadataFieldGroup, List<MetadataFieldDefinition>> REGISTRY;
@@ -49,6 +55,26 @@ public class MetadataFieldDefinition implements Comparable<MetadataFieldDefiniti
 		return (group.equals(o.group) ? (order - o.order) : (group.ordinal() - o.group.ordinal()));
 	}
 
+	public static SortedMap<MetadataFieldGroup, SortedSet<MetadataAssignment>> createStructuredMetadata(Collection<MetadataAssignment> metadata) {
+		SortedMap<MetadataFieldGroup, SortedSet<MetadataAssignment>> metadataStructure = new TreeMap<MetadataFieldGroup, SortedSet<MetadataAssignment>>();
+		for (MetadataAssignment assignment : metadata) {
+			MetadataFieldGroup fieldGroup = assignment.getDefinition().getGroup();
+			if (metadataStructure.containsKey(fieldGroup)) {
+				metadataStructure.get(fieldGroup).add(assignment);
+			} else {
+				SortedSet<MetadataAssignment> assignmentSet = new TreeSet<MetadataAssignment>(new Comparator<MetadataAssignment>() {
+
+					@Override
+					public int compare(MetadataAssignment o1, MetadataAssignment o2) {
+						return o1.getDefinition().compareTo(o2.getDefinition());
+					}
+				});
+				assignmentSet.add(assignment);
+				metadataStructure.put(fieldGroup, assignmentSet);
+			}
+		}
+		return metadataStructure;
+	}
 	static {
 		REGISTRY = new HashMap<MetadataFieldGroup, List<MetadataFieldDefinition>>();
 		REGISTRY_LOOKUP_TABLE = new HashMap<String, MetadataFieldDefinition>();

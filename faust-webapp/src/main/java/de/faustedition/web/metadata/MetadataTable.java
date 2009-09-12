@@ -1,5 +1,6 @@
 package de.faustedition.web.metadata;
 
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -12,17 +13,17 @@ import org.apache.wicket.markup.parser.XmlTag;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.string.Strings;
 
-import de.faustedition.model.metadata.MetadataBundle;
+import de.faustedition.model.metadata.MetadataAssignment;
+import de.faustedition.model.metadata.MetadataFieldDefinition;
 import de.faustedition.model.metadata.MetadataFieldGroup;
-import de.faustedition.model.metadata.MetadataValue;
 
 public class MetadataTable extends WebComponent {
-	private MetadataBundle metadata;
+	private transient Collection<MetadataAssignment> metadata;
 
-	public MetadataTable(String id, MetadataBundle metadata) {
-		super(id, new Model<MetadataBundle>(metadata));
+	public MetadataTable(String id, Collection<MetadataAssignment> metadata) {
+		super(id, Model.of(metadata));
 		this.metadata = metadata;
-		setVisible(!metadata.getValues().isEmpty());
+		setVisible(!metadata.isEmpty());
 	}
 
 	@Override
@@ -30,13 +31,13 @@ public class MetadataTable extends WebComponent {
 		StringBuilder markup = new StringBuilder();
 		Localizer localizer = Application.get().getResourceSettings().getLocalizer();
 		
-		SortedMap<MetadataFieldGroup, SortedSet<MetadataValue>> structuredMetadata = metadata.getStructuredMetadata();
+		SortedMap<MetadataFieldGroup, SortedSet<MetadataAssignment>> structuredMetadata = MetadataFieldDefinition.createStructuredMetadata(metadata);
 		for (MetadataFieldGroup fieldGroup : structuredMetadata.keySet()) {
 
 			CharSequence groupLabel = Strings.escapeMarkup(localizer.getString("metadata_group." + fieldGroup.toString(), this));
 			markup.append(String.format("<tr><th colspan=\"2\" class=\"left small-caps secondary-color\">%s</th></tr>", groupLabel));
 
-			for (MetadataValue value : structuredMetadata.get(fieldGroup)) {
+			for (MetadataAssignment value : structuredMetadata.get(fieldGroup)) {
 				markup.append("<tr class=\"border\">");
 				CharSequence fieldLabel = Strings.escapeMarkup(localizer.getString("metadata." + value.getField(), this));
 				markup.append(String.format("<th class=\"right\" style=\"width: 40%%\">%s:</th>", fieldLabel));
