@@ -9,4 +9,5 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
 	<bean id="dissertationText" class="de.abohnenkamp.paralipomena.DissertationText" />
+	<bean id="paralipomenonBootstrapper" class="de.abohnenkamp.paralipomena.ParalipomenaBootstrapPostProcessor" />
 </beans>

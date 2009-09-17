@@ -10,9 +10,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.security.Authentication;
+import org.springframework.security.context.SecurityContext;
+import org.springframework.security.context.SecurityContextHolder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -20,9 +24,12 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.DefaultResponseHandler;
 import com.bradmcevoy.http.MiltonServlet;
+import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.ResourceFactory;
+import com.bradmcevoy.http.Response;
 
 import de.faustedition.util.ErrorUtil;
 
@@ -34,7 +41,7 @@ public class DavServlet extends MiltonServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
-		init((ResourceFactory) BeanFactoryUtils.beanOfTypeIncludingAncestors(context, ResourceFactory.class), new DefaultResponseHandler(), null);
+		init((ResourceFactory) BeanFactoryUtils.beanOfTypeIncludingAncestors(context, ResourceFactory.class), new DefaultResponseHandler("1,2"), null);
 		transactionManager = (PlatformTransactionManager) BeanFactoryUtils.beanOfTypeIncludingAncestors(context, PlatformTransactionManager.class);
 	}
 
@@ -48,7 +55,30 @@ public class DavServlet extends MiltonServlet {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					try {
-						DavServlet.super.service(servletRequest, servletResponse);
+						HttpServletRequest req = (HttpServletRequest) servletRequest;
+						HttpServletResponse resp = (HttpServletResponse) servletResponse;
+						try {
+							Request request = new com.bradmcevoy.http.ServletRequest(req) {
+								public com.bradmcevoy.http.Auth getAuthorization() {
+									SecurityContext securityContext = SecurityContextHolder.getContext();
+									if (securityContext == null) {
+										return null;
+									}
+
+									Authentication authentication = securityContext.getAuthentication();
+									if (authentication == null) {
+										return null;
+									}
+
+									return new Auth(authentication.getName(), null);
+								};
+							};
+							Response response = new com.bradmcevoy.http.ServletResponse(resp);
+							httpManager.process(request, response);
+						} finally {
+							servletResponse.getOutputStream().flush();
+							servletResponse.flushBuffer();
+						}
 					} catch (Exception e) {
 						status.setRollbackOnly();
 					}
@@ -61,7 +91,7 @@ public class DavServlet extends MiltonServlet {
 			} else if (rootCause instanceof IOException) {
 				throw (IOException) rootCause;
 			}
-			
+
 			throw ErrorUtil.fatal("Error in WebDAV transaction", e);
 		}
 	}

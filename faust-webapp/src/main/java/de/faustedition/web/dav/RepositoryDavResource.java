@@ -32,4 +32,9 @@ public class RepositoryDavResource extends CollectionDavResourceBase {
 	public List<? extends Resource> getChildren() {
 		return Lists.transform(Portfolio.find(factory.getDbSessionFactory().getCurrentSession(), repository), factory.portfolioResourceCreator);
 	}
+
+	@Override
+	public Object getLockResource() {
+		return repository;
+	}
 }

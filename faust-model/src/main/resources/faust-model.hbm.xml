@@ -38,12 +38,8 @@
 			<generator class="native" />
 		</id>
 		<many-to-one name="facsimile" not-null="true" index="transcription_index" />
-		<property name="transcriptionType" not-null="true" index="transcription_index">
-			<type name="de.faustedition.util.EnumUserType">
-				<param name="enumClassName">de.faustedition.model.manuscript.TranscriptionType</param>
-			</type>
-		</property>
-		<property name="data" />
+		<property name="textData" not-null="true" />
+		<property name="revisionData" not-null="true" />
 	</class>
 
 	<class name="de.faustedition.model.metadata.MetadataAssignment">

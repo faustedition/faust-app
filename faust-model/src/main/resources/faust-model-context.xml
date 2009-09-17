@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:lang="http://www.springframework.org/schema/lang" xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:compass="http://www.compass-project.org/schema/spring-core-config"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.compass-project.org/schema/spring-core-config http://www.compass-project.org/schema/spring-compass-core-config-2.2.xsd">
 
 	<context:annotation-config />
 
@@ -33,7 +35,7 @@
 			<props>
 				<prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
 				<prop key="hibernate.show_sql">false</prop>
-				<!-- <prop key="hibernate.hbm2ddl.auto">create</prop>  -->
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
 			</props>
 		</property>
 	</bean>
@@ -41,6 +43,8 @@
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" p:sessionFactory-ref="dbSessionFactory" />
 
 	<bean id="bootstrapper" class="de.faustedition.model.init.Bootstrapper" />
+	<bean id="existImportBootstrapper" class="de.faustedition.model.init.ExistImportBootstrapPostProcessor" />
+
 	<bean id="facsimileImageDao" class="de.faustedition.model.manuscript.FacsimileImageDao">
 		<property name="conversionTools">
 			<list>
@@ -51,9 +55,11 @@
 		</property>
 	</bean>
 
-	<bean id="transcriptionDocumentFactory" class="de.faustedition.model.manuscript.TranscriptionDocumentFactory" />
-	
-	<bean id="compassSearchIndex" class="de.faustedition.model.search.FaustCompassBean" />
+	<compass:compass name="compassSearchIndex">
+		<compass:connection>
+			<compass:ram path="/index" />
+		</compass:connection>
+	</compass:compass>
 
 	<bean id="asynchronousScheduler" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
 		<property name="poolSize" value="5" />

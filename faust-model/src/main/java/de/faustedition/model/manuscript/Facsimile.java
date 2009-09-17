@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;

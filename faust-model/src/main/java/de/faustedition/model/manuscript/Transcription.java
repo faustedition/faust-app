@@ -3,7 +3,7 @@ package de.faustedition.model.manuscript;
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
 
@@ -11,8 +11,8 @@ public class Transcription implements Serializable {
 
 	private long id;
 	private Facsimile facsimile;
-	private TranscriptionType transcriptionType;
-	private byte[] data;
+	private byte[] textData;
+	private byte[] revisionData;
 
 	public long getId() {
 		return id;
@@ -30,28 +30,28 @@ public class Transcription implements Serializable {
 		this.facsimile = facsimile;
 	}
 
-	public TranscriptionType getTranscriptionType() {
-		return transcriptionType;
+	public byte[] getTextData() {
+		return textData;
 	}
 
-	public void setTranscriptionType(TranscriptionType transcriptionType) {
-		this.transcriptionType = transcriptionType;
+	public void setTextData(byte[] data) {
+		this.textData = data;
 	}
 
-	public byte[] getData() {
-		return data;
+	public byte[] getRevisionData() {
+		return revisionData;
 	}
 
-	public void setData(byte[] data) {
-		this.data = data;
+	public void setRevisionData(byte[] revisionData) {
+		this.revisionData = revisionData;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && (obj instanceof Transcription) && (transcriptionType != null) && (facsimile != null)) {
+		if (obj != null && (obj instanceof Transcription) && (facsimile != null)) {
 			Transcription other = (Transcription) obj;
-			if ((other.transcriptionType != null) && (other.facsimile != null)) {
-				return transcriptionType.equals(other.transcriptionType) && (facsimile.getId() == other.facsimile.getId());
+			if (other.facsimile != null) {
+				return (facsimile.getId() == other.facsimile.getId());
 			}
 		}
 		return super.equals(obj);
@@ -59,24 +59,10 @@ public class Transcription implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return (transcriptionType == null || facsimile == null) ? super.hashCode() : new HashCodeBuilder().append(transcriptionType).append(facsimile.getId()).toHashCode();
+		return (facsimile == null ? super.hashCode() : new HashCodeBuilder().append(facsimile.getId()).toHashCode());
 	}
 
-	public static Transcription find(Session session, Facsimile facsimile, TranscriptionType type) {
-		return (Transcription) DataAccessUtils.uniqueResult(session.createCriteria(Transcription.class).add(Restrictions.eq("transcriptionType", type)).createCriteria("facsimile").add(
-				Restrictions.idEq(facsimile.getId())).list());
+	public static Transcription find(Session session, Facsimile facsimile) {
+		return (Transcription) DataAccessUtils.uniqueResult(session.createCriteria(Transcription.class).createCriteria("facsimile").add(Restrictions.idEq(facsimile.getId())).list());
 	}
-
-	public static Transcription findOrCreate(Session session, Facsimile facsimile, TranscriptionType type) {
-		Transcription transcription = find(session, facsimile, type);
-		if (transcription == null) {
-			transcription = new Transcription();
-			transcription.setFacsimile(facsimile);
-			transcription.setTranscriptionType(type);
-			session.save(transcription);
-		}
-
-		return transcription;
-	}
-
 }

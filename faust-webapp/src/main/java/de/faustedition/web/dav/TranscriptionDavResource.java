@@ -1,6 +1,8 @@
 package de.faustedition.web.dav;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
@@ -8,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.GetableResource;
+import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.google.common.base.Preconditions;
@@ -15,13 +18,13 @@ import com.google.common.base.Preconditions;
 import de.faustedition.model.manuscript.Facsimile;
 import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Transcription;
-import de.faustedition.model.manuscript.TranscriptionType;
-import de.faustedition.util.ErrorUtil;
+import de.faustedition.model.manuscript.TranscriptionDocument;
 
-public class TranscriptionDavResource extends DavResourceBase implements GetableResource {
+public class TranscriptionDavResource extends DavResourceBase implements GetableResource, PropFindableResource {
 
 	private final Manuscript manuscript;
-	private byte[] transcriptionData;
+	private TranscriptionDocument transcriptionDocument;
+	private byte[] transcriptionDocumentData;
 
 	protected TranscriptionDavResource(DavResourceFactory factory, Manuscript manuscript) {
 		super(factory);
@@ -30,33 +33,38 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 
 	@Override
 	public String getName() {
-		return manuscript.getPortfolio().getName() + "_" + manuscript.getName();
+		return manuscript.getPortfolio().getName() + "_" + manuscript.getName() + ".xml";
 	}
 
-	protected byte[] getTranscriptionData() {
-		if (transcriptionData == null) {
-			for (Facsimile f : Facsimile.find(factory.getDbSessionFactory().getCurrentSession(), manuscript)) {
-				if (!f.getName().equals(manuscript.getName())) {
-					continue;
-				}
-				Transcription transcription = Transcription.find(factory.getDbSessionFactory().getCurrentSession(), f, TranscriptionType.DOCUMENT_AND_TEXT);
-				if (transcription == null) {
-					break;
-				}
-				try {
-					transcriptionData = factory.getTranscriptionDocumentFactory().build(transcription).serialize();
-				} catch (IOException e) {
-					throw ErrorUtil.fatal("I/O error while generating transcription document", e);
-				}
-			}
+	protected TranscriptionDocument getTranscriptionDocument() {
+		if (transcriptionDocument == null) {
+			transcriptionDocument = factory.getTranscriptionDocumentFactory().build(findTranscription());
 		}
-		Preconditions.checkNotNull(transcriptionData);
-		return transcriptionData;
+		return transcriptionDocument;
+
+	}
+
+	protected Transcription findTranscription() {
+		Facsimile facsimile = Facsimile.find(factory.getDbSessionFactory().getCurrentSession(), manuscript, manuscript.getName());
+		Preconditions.checkNotNull(facsimile);
+		Transcription transcription = Transcription.find(factory.getDbSessionFactory().getCurrentSession(), facsimile);
+		Preconditions.checkNotNull(transcription);
+		return transcription;
+	}
+
+	public byte[] getTranscriptionDocumentData() {
+		if (transcriptionDocumentData == null) {
+			ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
+			getTranscriptionDocument().serialize(dataStream, true);
+			transcriptionDocumentData = dataStream.toByteArray();
+		}
+
+		return transcriptionDocumentData;
 	}
 
 	@Override
 	public Long getContentLength() {
-		return Long.valueOf(getTranscriptionData().length);
+		return Long.valueOf(getTranscriptionDocumentData().length);
 	}
 
 	@Override
@@ -71,6 +79,20 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 
 	@Override
 	public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException {
-		IOUtils.write(getTranscriptionData(), out);
+		if (transcriptionDocumentData == null) {
+			getTranscriptionDocument().serialize(out, true);
+		} else {
+			IOUtils.write(getTranscriptionDocumentData(), out);
+		}
+		out.flush();
+	}
+
+	@Override
+	public Object getLockResource() {
+		return manuscript;
+	}
+
+	public void update(InputStream inputStream) throws IOException {
+		factory.getTranscriptionDocumentFactory().parse(inputStream).update(findTranscription());
 	}
 }

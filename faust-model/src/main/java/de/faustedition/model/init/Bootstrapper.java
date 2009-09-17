@@ -1,8 +1,13 @@
 package de.faustedition.model.init;
 
+import static de.faustedition.model.TEIDocument.teiElementNode;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
+
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.SessionFactory;
@@ -25,12 +30,12 @@ import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
 import de.faustedition.model.manuscript.Transcription;
-import de.faustedition.model.manuscript.TranscriptionType;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
+import de.faustedition.util.XMLUtil;
 
 public class Bootstrapper implements InitializingBean, ApplicationContextAware {
-	private static final FacsimileImageResolution BOOTSTRAP_RESOLUTION = FacsimileImageResolution.LOW;
+	private static final FacsimileImageResolution BOOTSTRAP_RESOLUTION = FacsimileImageResolution.HIGH;
 
 	@Autowired
 	private SessionFactory dbSessionFactory;
@@ -91,23 +96,36 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware {
 
 					String portfolioName = imageFilePath[imageFilePath.length - 2];
 					if (portfolio == null || !portfolio.getName().equals(portfolioName) || !portfolio.getRepository().equals(repository)) {
-						LoggingUtil.LOG.info("Portfolio " + portfolioName);
 						portfolio = Portfolio.findOrCreate(session, repository, portfolioName);
 					}
 
 					String manuscriptFullName = StringUtils.removeEnd(imageFilePath[imageFilePath.length - 1], BOOTSTRAP_RESOLUTION.getSuffix());
 					String manuscriptShortName = StringUtils.strip(StringUtils.removeStart(manuscriptFullName, portfolioName), "_-:");
-					LoggingUtil.LOG.info("Manuscript " + manuscriptShortName);
+					LoggingUtil.LOG.info("Manuscript " + portfolio.getName() + "_" + manuscriptShortName);
 
 					Manuscript manuscript = Manuscript.findOrCreate(session, portfolio, manuscriptShortName);
 					Facsimile facsimile = Facsimile.findOrCreate(session, manuscript, manuscriptShortName, StringUtils.join(new String[] { repositoryName, portfolioName,
 							manuscriptFullName }, "/"));
-					Transcription.findOrCreate(session, facsimile, TranscriptionType.DOCUMENT_AND_TEXT);
+					Transcription transcription = Transcription.find(session, facsimile);
+					if (transcription == null) {
+						try {
+							transcription = new Transcription();
+							transcription.setFacsimile(facsimile);
+							transcription.setTextData(XMLUtil.serialize(teiElementNode("text", teiElementNode("body", teiElementNode("p"))).toDOM(), false));
+							transcription.setRevisionData(XMLUtil.serialize(teiElementNode("revisionDesc").toDOM(), false));
+							session.save(transcription);
+						} catch (TransformerException e) {
+							throw ErrorUtil.fatal("Error creating template transcription", e);
+						} catch (IOException e) {
+							throw ErrorUtil.fatal("Error creating template transcription", e);
+						}
+					}
 				}
 
 				try {
 					Map<String, BootstrapPostProcessor> postProcessors = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, BootstrapPostProcessor.class);
 					for (BootstrapPostProcessor postProcessor : postProcessors.values()) {
+						LoggingUtil.LOG.info("Running boostrap post-processor " + postProcessor);
 						postProcessor.afterBootstrapping();
 					}
 				} catch (Exception e) {

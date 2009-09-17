@@ -21,10 +21,18 @@ import de.faustedition.web.text.TextPage;
 
 @StatelessComponent
 public abstract class AbstractPage extends WebPage {
-
+	private static final String YUI_BASE ="yui-2.7.0b/build/";
+	
 	public AbstractPage() {
 		setStatelessHint(true);
+		add(CSSPackageResource.getHeaderContribution(YUI_BASE + "reset-fonts-grids/reset-fonts-grids.css"));
+		add(CSSPackageResource.getHeaderContribution(YUI_BASE + "base/base-min.css"));
+		add(CSSPackageResource.getHeaderContribution(YUI_BASE + "menu/assets/skins/sam/menu.css"));
 		add(CSSPackageResource.getHeaderContribution(AbstractPage.class, "FaustApplication.css", "screen"));
+		
+		add(JavascriptPackageResource.getHeaderContribution(YUI_BASE + "yahoo-dom-event/yahoo-dom-event.js"));
+		add(JavascriptPackageResource.getHeaderContribution(YUI_BASE + "container/container_core-min.js"));
+		add(JavascriptPackageResource.getHeaderContribution(YUI_BASE + "menu/menu-min.js"));
 		add(JavascriptPackageResource.getHeaderContribution(AbstractPage.class, "FaustApplication.js"));
 
 		add(new Label("headTitle", new PropertyModel<String>(this, "prefixedPageTitle")));

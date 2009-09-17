@@ -13,6 +13,11 @@
 			<version>1.0-rc2</version>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.practicalxml</groupId>
+			<artifactId>practicalxml</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.4</version>
@@ -24,6 +29,11 @@
 			<dependency>
 				<groupId>de.faustedition</groupId>
 				<artifactId>faust-model</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.faustedition</groupId>
+				<artifactId>faust-paralipomena-import</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -70,29 +80,6 @@
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
 				<version>1.1.1</version>
-			</dependency>
-			<dependency>
-				<groupId>xom</groupId>
-				<artifactId>xom</artifactId>
-				<version>1.1</version>
-				<exclusions>
-					<exclusion>
-						<groupId>jaxen</groupId>
-						<artifactId>jaxen</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>xerces</groupId>
-						<artifactId>xmlParserAPIs</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>xml-apis</groupId>
-						<artifactId>xml-apis</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>jdom</groupId>
-						<artifactId>jdom</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>cglib</groupId>

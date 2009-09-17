@@ -63,7 +63,7 @@ public class XMLTransformingDefaultHandler {
 			resultFile.deleteOnExit();
 			fileInputStream = new FileInputStream(file);
 			tempWriter = new OutputStreamWriter(new FileOutputStream(resultFile), "utf-8");
-			XMLUtil.serializingTransformer(true).transform(new StreamSource(fileInputStream), new StreamResult(tempWriter));
+			XMLUtil.nullTransformer(true).transform(new StreamSource(fileInputStream), new StreamResult(tempWriter));
 			IOUtils.closeQuietly(tempWriter);
 			IOUtils.closeQuietly(fileInputStream);
 		} catch (TransformerException e) {

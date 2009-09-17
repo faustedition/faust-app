@@ -29,4 +29,8 @@ public class RootDavResource extends CollectionDavResourceBase {
 		return Lists.transform(Repository.find(factory.getDbSessionFactory().getCurrentSession()), factory.repositoryResourceCreator);
 	}
 
+	@Override
+	public Object getLockResource() {
+		return this.getClass();
+	}
 }

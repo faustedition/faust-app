@@ -3,11 +3,18 @@ package de.faustedition.web.dav;
 import java.util.Date;
 
 import com.bradmcevoy.http.Auth;
+import com.bradmcevoy.http.GetableResource;
+import com.bradmcevoy.http.LockInfo;
+import com.bradmcevoy.http.LockResult;
+import com.bradmcevoy.http.LockTimeout;
+import com.bradmcevoy.http.LockToken;
+import com.bradmcevoy.http.LockableResource;
+import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.Request.Method;
 
-public abstract class DavResourceBase implements Resource {
+public abstract class DavResourceBase implements Resource, GetableResource, PropFindableResource, LockableResource {
 
 	protected final DavResourceFactory factory;
 
@@ -17,7 +24,7 @@ public abstract class DavResourceBase implements Resource {
 
 	@Override
 	public Object authenticate(String user, String password) {
-		return null;
+		return "";
 	}
 
 	@Override
@@ -28,6 +35,11 @@ public abstract class DavResourceBase implements Resource {
 	@Override
 	public String checkRedirect(Request request) {
 		return null;
+	}
+
+	@Override
+	public Date getCreateDate() {
+		return new Date();
 	}
 
 	@Override
@@ -43,5 +55,28 @@ public abstract class DavResourceBase implements Resource {
 	@Override
 	public String getUniqueId() {
 		return null;
+	}
+	
+	public abstract Object getLockResource();
+	
+	
+	@Override
+	public LockResult lock(LockTimeout timeout, LockInfo lockInfo) {
+		return factory.lock(timeout, lockInfo, getLockResource());
+	}
+	
+	@Override
+	public LockResult refreshLock(String token) {
+		return factory.refresh(token, getLockResource());
+	}
+	
+	@Override
+	public void unlock(String tokenId) {
+		factory.unlock(tokenId, getLockResource());
+	}
+	
+	@Override
+	public LockToken getCurrentLock() {
+		return factory.getCurrentToken(getLockResource());
 	}
 }

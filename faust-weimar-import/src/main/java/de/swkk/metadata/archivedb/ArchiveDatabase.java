@@ -7,13 +7,17 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.faustedition.util.XMLUtil;
+import de.faustedition.util.ErrorUtil;
 import de.swkk.metadata.GSACallNumber;
 
 public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
@@ -22,7 +26,14 @@ public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
 	private Map<GSACallNumber, ArchiveDatabaseRecord> callNumberIndex = new HashMap<GSACallNumber, ArchiveDatabaseRecord>();
 
 	public ArchiveDatabase() throws SAXException, IOException {
-		XMLUtil.parse(DATABASE_RESOURCE.getInputStream(), new DefaultHandler() {
+		SAXParser parser = null;
+		try {
+			parser = SAXParserFactory.newInstance().newSAXParser();
+		} catch (ParserConfigurationException e) {
+			throw ErrorUtil.fatal("Error configuring SAX parser", e);
+		}
+		
+		parser.parse(DATABASE_RESOURCE.getInputStream(), new DefaultHandler() {
 
 			private ArchiveDatabaseRecord record;
 			private String currentProperty;

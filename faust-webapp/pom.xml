@@ -17,6 +17,10 @@
 		</dependency>
 		<dependency>
 			<groupId>de.faustedition</groupId>
+			<artifactId>faust-paralipomena-import</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.faustedition</groupId>
 			<artifactId>faust-weimar-import</artifactId>
 		</dependency>
 		<dependency>

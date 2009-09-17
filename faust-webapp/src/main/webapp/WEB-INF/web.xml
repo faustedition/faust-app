@@ -8,6 +8,7 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			classpath:/faust-model-context.xml
+			classpath:/faust-paralipomena-import-context.xml
 			classpath:/faust-weimar-import-context.xml
 			classpath:/faust-webapp-context.xml
 			classpath:/faust-security-context.xml
@@ -66,11 +67,6 @@
 	<servlet-mapping>
 		<servlet-name>dav</servlet-name>
 		<url-pattern>/dav/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>/schema/*</url-pattern>
 	</servlet-mapping>
 
 	<mime-mapping>

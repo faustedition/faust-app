@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:svg="http://www.w3.org/2000/svg">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.tei-c.org/ns/1.0" xmlns:svg="http://www.w3.org/2000/svg">
 	<xsl:output indent="yes" method="xml" />
 
 	<xsl:template match="/">
@@ -8,78 +8,78 @@
 		</TEI>
 	</xsl:template>
 
-	<xsl:template match="metadaten" />
-	<xsl:template match="kommentar" />
+	<xsl:template match="*[local-name() = 'metadaten']" />
+	<xsl:template match="*[local-name() = 'kommentar']" />
 
-	<xsl:template match="paralipomenon">
-		<tei:text>
+	<xsl:template match="*[local-name() = 'paralipomenon']">
+		<text>
 			<xsl:apply-templates />
-		</tei:text>
+		</text>
 	</xsl:template>
 
-	<xsl:template match="b">
-		<tei:hi rend="bold">
+	<xsl:template match="*[local-name() = 'b']">
+		<hi rend="bold">
 			<xsl:apply-templates />
-		</tei:hi>
+		</hi>
 	</xsl:template>
 
-	<xsl:template match="br">
-		<tei:lb />
+	<xsl:template match="*[local-name() = 'br']">
+		<lb />
 	</xsl:template>
 
-	<xsl:template match="div">
-		<xsl:element name="tei:div">
+	<xsl:template match="*[local-name() = 'div']">
+		<xsl:element name="div">
 			<xsl:attribute name="type">
 				<xsl:value-of select="@type" />
 			</xsl:attribute>
 			<xsl:attribute name="n">
-				<xsl:value-of select="@type" />
+				<xsl:value-of select="@n" />
 			</xsl:attribute>
 			<xsl:apply-templates />
 		</xsl:element>
 	</xsl:template>
 
-	<xsl:template match="hr">
+	<xsl:template match="*[local-name() = 'hr']">
 		<svg:line />
 	</xsl:template>
 
-	<xsl:template match="i">
-		<tei:hi rend="italic">
+	<xsl:template match="*[local-name() = 'i']">
+		<hi rend="italic">
 			<xsl:apply-templates />
-		</tei:hi>
+		</hi>
 	</xsl:template>
 
-	<xsl:template match="img">
+	<xsl:template match="*[local-name() = 'img']">
 		<xsl:apply-templates />
 	</xsl:template>
 
-	<xsl:template match="p">
-		<tei:p>
+	<xsl:template match="*[local-name() = 'p']">
+		<p>
 			<xsl:apply-templates />
-		</tei:p>
+		</p>
 	</xsl:template>
 
-	<xsl:template match="strike">
-		<tei:hi rend="strikethrough">
+	<xsl:template match="*[local-name() = 'strike']">
+		<hi rend="strikethrough">
 			<xsl:apply-templates />
-		</tei:hi>
+		</hi>
 	</xsl:template>
 
-	<xsl:template match="sub">
-		<tei:hi rend="sub">
+	<xsl:template match="*[local-name() = 'sub']">
+		<hi rend="sub">
 			<xsl:apply-templates />
-		</tei:hi>
+		</hi>
 	</xsl:template>
 
-	<xsl:template match="sup">
-		<tei:hi rend="sup">
+	<xsl:template match="*[local-name() = 'sup']">
+		<hi rend="sup">
 			<xsl:apply-templates />
-		</tei:hi>
+		</hi>
 	</xsl:template>
 
-	<xsl:template match="u">
-		<tei:hi rend="underline">
+	<xsl:template match="*[local-name() = 'u']">
+		<hi rend="underline">
 			<xsl:apply-templates />
-		</tei:hi>
+		</hi>
 	</xsl:template>
 </xsl:stylesheet>

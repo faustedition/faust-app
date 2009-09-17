@@ -2,18 +2,20 @@ package de.abohnenkamp.paralipomena;
 
 import org.w3c.dom.Element;
 
+import de.swkk.metadata.GSACallNumber;
+
 public class ParalipomenonTranscription {
-	private String callNumber;
+	private GSACallNumber callNumber;
 	private Element text;
 	private Element commentary;
 
-	public ParalipomenonTranscription(String callNumber, Element text, Element commentary) {
+	public ParalipomenonTranscription(GSACallNumber callNumber, Element text, Element commentary) {
 		this.callNumber = callNumber;
 		this.text = text;
 		this.commentary = commentary;
 	}
 
-	public String getCallNumber() {
+	public GSACallNumber getCallNumber() {
 		return callNumber;
 	}
 
