@@ -3,11 +3,8 @@ package de.faustedition.model.init;
 import static de.faustedition.model.TEIDocument.teiElementNode;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
-
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.SessionFactory;
@@ -108,17 +105,11 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware {
 							manuscriptFullName }, "/"));
 					Transcription transcription = Transcription.find(session, facsimile);
 					if (transcription == null) {
-						try {
-							transcription = new Transcription();
-							transcription.setFacsimile(facsimile);
-							transcription.setTextData(XMLUtil.serialize(teiElementNode("text", teiElementNode("body", teiElementNode("p"))).toDOM(), false));
-							transcription.setRevisionData(XMLUtil.serialize(teiElementNode("revisionDesc").toDOM(), false));
-							session.save(transcription);
-						} catch (TransformerException e) {
-							throw ErrorUtil.fatal("Error creating template transcription", e);
-						} catch (IOException e) {
-							throw ErrorUtil.fatal("Error creating template transcription", e);
-						}
+						transcription = new Transcription();
+						transcription.setFacsimile(facsimile);
+						transcription.setTextData(XMLUtil.serialize(teiElementNode("text", teiElementNode("body", teiElementNode("p"))).toDOM(), false));
+						transcription.setRevisionData(XMLUtil.serialize(teiElementNode("revisionDesc").toDOM(), false));
+						session.save(transcription);
 					}
 				}
 

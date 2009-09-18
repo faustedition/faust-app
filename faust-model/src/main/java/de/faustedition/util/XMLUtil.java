@@ -14,6 +14,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.practicalxml.XmlException;
+
 import org.w3c.dom.Document;
 
 public class XMLUtil {
@@ -35,18 +37,30 @@ public class XMLUtil {
 		return transformer;
 	}
 
-	public static byte[] serialize(Document document, boolean indent) throws TransformerException, IOException {
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		serialize(document, new OutputStreamWriter(byteStream, "UTF-8"), indent);
-		return byteStream.toByteArray();
+	public static byte[] serialize(Document document, boolean indent) {
+		try {
+			ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+			serialize(document, new OutputStreamWriter(byteStream, "UTF-8"), indent);
+			return byteStream.toByteArray();
+		} catch (IOException e) {
+			throw new XmlException("I/O error while serializing document", e);
+		}
 	}
 
-	public static void serialize(Document document, OutputStream stream, boolean indent) throws TransformerException, IOException {
-		serialize(document, new OutputStreamWriter(stream, "UTF-8"), indent);
+	public static void serialize(Document document, OutputStream stream, boolean indent) {
+		try {
+			serialize(document, new OutputStreamWriter(stream, "UTF-8"), indent);
+		} catch (IOException e) {
+			throw new XmlException("I/O error while serializing document", e);
+		}
 	}
 
-	public static void serialize(Document document, Writer writer, boolean indent) throws TransformerException {
-		nullTransformer(indent).transform(new DOMSource(document), new StreamResult(writer));
+	public static void serialize(Document document, Writer writer, boolean indent) {
+		try {
+			nullTransformer(indent).transform(new DOMSource(document), new StreamResult(writer));
+		} catch (TransformerException e) {
+			throw new XmlException("XSLT error while serializing document", e);
+		}
 	}
 
 	private static class StrictNoOutputErrorListener implements ErrorListener {

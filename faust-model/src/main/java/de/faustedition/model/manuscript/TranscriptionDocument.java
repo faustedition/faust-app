@@ -1,9 +1,6 @@
 package de.faustedition.model.manuscript;
 
-import java.io.IOException;
 import java.io.OutputStream;
-
-import javax.xml.transform.TransformerException;
 
 import net.sf.practicalxml.DomUtil;
 
@@ -15,7 +12,6 @@ import org.w3c.dom.Node;
 import com.google.common.base.Preconditions;
 
 import de.faustedition.model.TEIDocument;
-import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLUtil;
 
 public class TranscriptionDocument {
@@ -47,15 +43,9 @@ public class TranscriptionDocument {
 	}
 
 	private byte[] serializeFragment(Element fragmentElement) {
-		try {
-			Document fragmentDataDocument = DomUtil.newDocument();
-			fragmentDataDocument.appendChild(fragmentDataDocument.importNode(fragmentElement, true));
-			return XMLUtil.serialize(fragmentDataDocument, false);
-		} catch (TransformerException e) {
-			throw ErrorUtil.fatal("XSLT error while serializing transcription document fragment", e);
-		} catch (IOException e) {
-			throw ErrorUtil.fatal("I/O error while serializing transcription document fragment", e);
-		}
+		Document fragmentDataDocument = DomUtil.newDocument();
+		fragmentDataDocument.appendChild(fragmentDataDocument.importNode(fragmentElement, true));
+		return XMLUtil.serialize(fragmentDataDocument, false);
 
 	}
 
@@ -69,12 +59,6 @@ public class TranscriptionDocument {
 	}
 
 	public void serialize(OutputStream stream, boolean indent) {
-		try {
-			XMLUtil.serialize(document, stream, indent);
-		} catch (TransformerException e) {
-			throw ErrorUtil.fatal("XSLT error while serializing transcription document", e);
-		} catch (IOException e) {
-			throw ErrorUtil.fatal("I/O error while serializing transcription document", e);
-		}
+		XMLUtil.serialize(document, stream, indent);
 	}
 }

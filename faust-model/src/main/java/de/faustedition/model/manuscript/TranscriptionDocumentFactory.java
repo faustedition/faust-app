@@ -7,6 +7,7 @@ import static net.sf.practicalxml.builder.XmlBuilder.text;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,9 +20,12 @@ import net.sf.practicalxml.ParseUtil;
 import net.sf.practicalxml.XmlUtil;
 import net.sf.practicalxml.builder.ElementNode;
 import net.sf.practicalxml.builder.Node;
+import net.sf.practicalxml.builder.XmlBuilder;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import de.faustedition.model.TEIDocument;
@@ -54,16 +58,52 @@ public class TranscriptionDocumentFactory {
 		Document transcriptionDataDocument = ParseUtil.parse(new InputSource(new ByteArrayInputStream(transcription.getTextData())));
 		document.getDocumentElement().appendChild(document.importNode(transcriptionDataDocument.getDocumentElement(), true));
 
-		Document revisionDataDocument = ParseUtil.parse(new InputSource(new ByteArrayInputStream(transcription.getRevisionData())));
-		DomUtil.getChild(document.getDocumentElement(), "teiHeader").appendChild(document.importNode(revisionDataDocument.getDocumentElement(), true));
-		
+		List<TranscriptionRevision> revisionHistory = getRevisionHistory(transcription);
+		if (revisionHistory.isEmpty()) {
+			revisionHistory.add(new TranscriptionRevision(null, DateFormatUtils.ISO_DATE_FORMAT.format(new Date()), null));
+		}
+		DomUtil.getChild(document.getDocumentElement(), "teiHeader").appendChild(document.importNode(serialize(revisionHistory), true));
+
 		return new TranscriptionDocument(document);
+	}
+
+	public List<TranscriptionRevision> getRevisionHistory(Transcription transcription) {
+		Document revisionDocument = ParseUtil.parse(new InputSource(new ByteArrayInputStream(transcription.getRevisionData())));
+		List<Element> changeElements = DomUtil.getChildren(revisionDocument.getDocumentElement(), "change");
+		List<TranscriptionRevision> revisions = new ArrayList<TranscriptionRevision>(changeElements.size());
+		for (Element changeElement : changeElements) {
+			TranscriptionRevision revision = new TranscriptionRevision();
+			revision.setAuthor(StringUtils.trimToNull(changeElement.getAttribute("who")));
+			revision.setDate(StringUtils.trimToNull(changeElement.getAttribute("when")));
+			revision.setDescription(StringUtils.trimToNull(DomUtil.getText(changeElement)));
+		}
+		return revisions;
+	}
+
+	public Element serialize(List<TranscriptionRevision> revisions) {
+		ElementNode[] changeElements = new ElementNode[revisions.size()];
+		for (int rc = 0; rc < revisions.size(); rc++) {
+			TranscriptionRevision revision = revisions.get(rc);
+			changeElements[rc] = TEIDocument.teiElementNode("change");
+			if (revision.getAuthor() != null) {
+				changeElements[rc].addChild(XmlBuilder.attribute("who", revision.getAuthor()));
+			}
+			if (revision.getDate() != null) {
+				changeElements[rc].addChild(XmlBuilder.attribute("when", revision.getDate()));
+			}
+			if (revision.getDescription() != null) {
+				changeElements[rc].addChild(XmlBuilder.text(revision.getDescription()));
+			}
+		}
+
+		return TEIDocument.teiElementNode("revisionDesc", changeElements).toDOM().getDocumentElement();
 	}
 
 	protected Document buildTemplate(Transcription transcription) {
 		Manuscript manuscript = transcription.getFacsimile().getManuscript();
 		ElementNode titleNode = teiElementNode("title", text(manuscript.getPortfolio().getName() + "-" + manuscript.getName()));
-		ElementNode fileDesc = teiElementNode("fileDesc", teiElementNode("titleStmt", titleNode), teiElementNode("sourceDesc", teiElementNode("p")));
+		ElementNode fileDesc = teiElementNode("fileDesc", teiElementNode("titleStmt", titleNode), teiElementNode("publicationStmt", teiElementNode("p")), teiElementNode("sourceDesc",
+				teiElementNode("p")));
 		ElementNode encodingDesc = teiElementNode("encodingDesc", characterDeclarations());
 		ElementNode profileDesc = teiElementNode("profileDesc", handDeclarations());
 
