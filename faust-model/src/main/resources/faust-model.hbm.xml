@@ -38,6 +38,8 @@
 			<generator class="native" />
 		</id>
 		<many-to-one name="facsimile" not-null="true" index="transcription_index" />
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastModified" not-null="true" type="timestamp" />
 		<property name="textData" not-null="true" />
 		<property name="revisionData" not-null="true" />
 	</class>

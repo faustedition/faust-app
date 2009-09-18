@@ -16,7 +16,7 @@
 		<property name="dataDirectoryResources">
 			<list>
 				<value>file:///data/faust</value>
-				<value>file:///Users/gregor/Desktop/Faustedition/data</value>
+				<value>file:///Users/gregor/Documents/Faustedition/data</value>
 			</list>
 		</property>
 	</bean>

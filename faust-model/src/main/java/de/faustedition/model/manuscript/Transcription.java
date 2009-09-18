@@ -1,6 +1,7 @@
 package de.faustedition.model.manuscript;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.Session;
@@ -11,6 +12,8 @@ public class Transcription implements Serializable {
 
 	private long id;
 	private Facsimile facsimile;
+	private Date created = new Date();
+	private Date lastModified = new Date();
 	private byte[] textData;
 	private byte[] revisionData;
 
@@ -28,6 +31,26 @@ public class Transcription implements Serializable {
 
 	public void setFacsimile(Facsimile facsimile) {
 		this.facsimile = facsimile;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public Date getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(Date lastModified) {
+		this.lastModified = lastModified;
+	}
+
+	public void modified() {
+		setLastModified(new Date());
 	}
 
 	public byte[] getTextData() {

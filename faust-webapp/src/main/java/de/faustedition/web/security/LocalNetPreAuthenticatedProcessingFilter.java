@@ -7,7 +7,7 @@ import org.springframework.security.ui.preauth.AbstractPreAuthenticatedProcessin
 
 public class LocalNetPreAuthenticatedProcessingFilter extends AbstractPreAuthenticatedProcessingFilter {
 	private static final String LOCAL_NET_TOKEN = "localnet";
-	private static final String[] LOCAL_NET_ADDRESS_PREFIXES = new String[] { "127.0.0.1", "0:0:0:0:0:0:0:1", "192.168.1.", "192.168.2." };
+	private static final String[] LOCAL_NET_ADDRESS_PREFIXES = new String[] { "127.0.0.1", "0:0:0:0:0:0:0:1" };
 
 	@Override
 	protected Object getPreAuthenticatedCredentials(HttpServletRequest request) {

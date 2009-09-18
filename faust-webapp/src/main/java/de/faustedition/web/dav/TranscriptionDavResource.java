@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -23,6 +24,7 @@ import de.faustedition.model.manuscript.TranscriptionDocument;
 public class TranscriptionDavResource extends DavResourceBase implements GetableResource, PropFindableResource {
 
 	private final Manuscript manuscript;
+	private Transcription transcription;
 	private TranscriptionDocument transcriptionDocument;
 	private byte[] transcriptionDocumentData;
 
@@ -36,19 +38,31 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 		return manuscript.getPortfolio().getName() + "_" + manuscript.getName() + ".xml";
 	}
 
+	@Override
+	public Date getCreateDate() {
+		return getTranscription().getCreated();
+	}
+
+	@Override
+	public Date getModifiedDate() {
+		return getTranscription().getLastModified();
+	}
+
 	protected TranscriptionDocument getTranscriptionDocument() {
 		if (transcriptionDocument == null) {
-			transcriptionDocument = factory.getTranscriptionDocumentFactory().build(findTranscription());
+			transcriptionDocument = factory.getTranscriptionDocumentFactory().build(getTranscription());
 		}
 		return transcriptionDocument;
 
 	}
 
-	protected Transcription findTranscription() {
-		Facsimile facsimile = Facsimile.find(factory.getDbSessionFactory().getCurrentSession(), manuscript, manuscript.getName());
-		Preconditions.checkNotNull(facsimile);
-		Transcription transcription = Transcription.find(factory.getDbSessionFactory().getCurrentSession(), facsimile);
-		Preconditions.checkNotNull(transcription);
+	protected Transcription getTranscription() {
+		if (transcription == null) {
+			Facsimile facsimile = Facsimile.find(factory.getDbSessionFactory().getCurrentSession(), manuscript, manuscript.getName());
+			Preconditions.checkNotNull(facsimile);
+			transcription = Transcription.find(factory.getDbSessionFactory().getCurrentSession(), facsimile);
+			Preconditions.checkNotNull(transcription);
+		}
 		return transcription;
 	}
 
@@ -93,6 +107,6 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 	}
 
 	public void update(InputStream inputStream) throws IOException {
-		factory.getTranscriptionDocumentFactory().parse(inputStream).update(findTranscription());
+		factory.getTranscriptionDocumentFactory().parse(inputStream).update(getTranscription());
 	}
 }
