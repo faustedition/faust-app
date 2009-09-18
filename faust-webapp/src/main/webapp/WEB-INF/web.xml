@@ -60,7 +60,7 @@
 
 	<servlet>
 		<servlet-name>dav</servlet-name>
-		<servlet-class>de.faustedition.web.dav.DavServlet</servlet-class>
+		<servlet-class>de.faustedition.web.dav.FaustDavServlet</servlet-class>
 		<load-on-startup>3</load-on-startup>
 	</servlet>
 
