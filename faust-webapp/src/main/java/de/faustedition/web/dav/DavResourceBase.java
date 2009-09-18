@@ -39,12 +39,12 @@ public abstract class DavResourceBase implements Resource, GetableResource, Prop
 
 	@Override
 	public Date getCreateDate() {
-		return new Date();
+		return new Date(0);
 	}
 
 	@Override
 	public Date getModifiedDate() {
-		return new Date();
+		return new Date(0);
 	}
 
 	@Override

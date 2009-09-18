@@ -63,15 +63,14 @@ public class TranscriptionDocumentFactory {
 	protected Document buildTemplate(Transcription transcription) {
 		Manuscript manuscript = transcription.getFacsimile().getManuscript();
 		ElementNode titleNode = teiElementNode("title", text(manuscript.getPortfolio().getName() + "-" + manuscript.getName()));
-		ElementNode fileDesc = teiElementNode("fileDesc", teiElementNode("titleStmt", titleNode));
+		ElementNode fileDesc = teiElementNode("fileDesc", teiElementNode("titleStmt", titleNode), teiElementNode("sourceDesc", teiElementNode("p")));
 		ElementNode encodingDesc = teiElementNode("encodingDesc", characterDeclarations());
 		ElementNode profileDesc = teiElementNode("profileDesc", handDeclarations());
-		ElementNode sourceDesc = teiElementNode("sourceDesc", teiElementNode("p"));
 
 		Document document = DomUtil.newDocument();
 		document.appendChild(document.createProcessingInstruction("xml-stylesheet", String.format("href=\"%s\" type=\"text/css\"", XmlUtil.escape(stylesheetUri))));
 		document.appendChild(document.createProcessingInstruction("oxygen", String.format("RNGSchema=\"%s\" type=\"compact\"", XmlUtil.escape(schemaUri))));
-		document.appendChild(document.importNode(TEIDocument.teiRoot(teiElementNode("teiHeader", fileDesc, encodingDesc, profileDesc, sourceDesc)).toDOM().getDocumentElement(), true));
+		document.appendChild(document.importNode(TEIDocument.teiRoot(teiElementNode("teiHeader", fileDesc, encodingDesc, profileDesc)).toDOM().getDocumentElement(), true));
 		return document;
 	}
 
@@ -84,10 +83,10 @@ public class TranscriptionDocumentFactory {
 			ElementNode descNode = teiElementNode("desc", text(declaration.description));
 			ElementNode mappingNode = teiElementNode("mapping", attribute("type", "Unicode"), text(declaration.unicodeMapping));
 
-			declarations.add(teiElementNode("charDecl", attribute(XMLConstants.XML_NS_URI, "xml:id", id), charNameNode, descNode, mappingNode));
+			declarations.add(teiElementNode("char", attribute(XMLConstants.XML_NS_URI, "xml:id", id), charNameNode, descNode, mappingNode));
 		}
 
-		return teiElementNode("charDecls", declarations.toArray(new Node[declarations.size()]));
+		return teiElementNode("charDecl", declarations.toArray(new Node[declarations.size()]));
 	}
 
 	private Node handDeclarations() {
@@ -157,6 +156,7 @@ public class TranscriptionDocumentFactory {
 				String materialDesc = materials.get(material);
 				for (String typeface : typefaces.keySet()) {
 					String typefaceDesc = typefaces.get(typeface);
+					HAND_DECLARATIONS.put(String.format("%s_%s", writer, material, typeface), String.format("%s (%s)", writerName, materialDesc));
 					HAND_DECLARATIONS.put(String.format("%s_%s_%s", writer, material, typeface), String.format("%s (%s - %s)", writerName, materialDesc, typefaceDesc));
 				}
 			}
