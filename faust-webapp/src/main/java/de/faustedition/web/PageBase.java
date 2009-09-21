@@ -20,40 +20,47 @@ import de.faustedition.web.search.SearchPage;
 import de.faustedition.web.text.TextPage;
 
 @StatelessComponent
-public abstract class AbstractPage extends WebPage {
-	private static final String YUI_BASE ="yui-2.7.0b/build/";
-	
-	public AbstractPage() {
+public abstract class PageBase extends WebPage
+{
+	private static final String YUI_BASE = "yui-2.7.0b/build/";
+
+	public PageBase()
+	{
 		setStatelessHint(true);
 		add(CSSPackageResource.getHeaderContribution(YUI_BASE + "reset-fonts-grids/reset-fonts-grids.css"));
 		add(CSSPackageResource.getHeaderContribution(YUI_BASE + "base/base-min.css"));
 		add(CSSPackageResource.getHeaderContribution(YUI_BASE + "menu/assets/skins/sam/menu.css"));
-		add(CSSPackageResource.getHeaderContribution(AbstractPage.class, "FaustApplication.css", "screen"));
-		
+		add(CSSPackageResource.getHeaderContribution(PageBase.class, "FaustApplication.css", "screen"));
+
 		add(JavascriptPackageResource.getHeaderContribution(YUI_BASE + "yahoo-dom-event/yahoo-dom-event.js"));
 		add(JavascriptPackageResource.getHeaderContribution(YUI_BASE + "container/container_core-min.js"));
 		add(JavascriptPackageResource.getHeaderContribution(YUI_BASE + "menu/menu-min.js"));
-		add(JavascriptPackageResource.getHeaderContribution(AbstractPage.class, "FaustApplication.js"));
+		add(JavascriptPackageResource.getHeaderContribution(PageBase.class, "FaustApplication.js"));
 
 		add(new Label("headTitle", new PropertyModel<String>(this, "prefixedPageTitle")));
 		add(new Label("headerTitle", new PropertyModel<String>(this, "pageTitle")));
-		
+
 		add(FaustApplication.get().hasRole("ROLE_EDITOR") ? new PrivateMainMenu("mainMenu") : new PublicMainMenu("mainMenu"));
 	}
 
-	public String getPrefixedPageTitle() {
+	public String getPrefixedPageTitle()
+	{
 		return "faustedition.net :: " + getPageTitle();
 	}
-	
+
 	public abstract String getPageTitle();
 
-	private abstract class MainMenu extends Panel {
+	private abstract class MainMenu extends Panel
+	{
 
-		public MainMenu(String id) {
+		public MainMenu(String id)
+		{
 			super(id);
-			add(new ResourceLink<ResourceReference>("grantApplicationLink", new ResourceReference(AboutPage.class, "FaustGrantApplication.pdf")) {
+			add(new ResourceLink<ResourceReference>("grantApplicationLink", new ResourceReference(AboutPage.class, "FaustGrantApplication.pdf"))
+			{
 				@Override
-				protected boolean getStatelessHint() {
+				protected boolean getStatelessHint()
+				{
 					return true;
 				}
 			});
@@ -63,18 +70,22 @@ public abstract class AbstractPage extends WebPage {
 		}
 	}
 
-	private class PublicMainMenu extends MainMenu {
+	private class PublicMainMenu extends MainMenu
+	{
 
-		public PublicMainMenu(String id) {
+		public PublicMainMenu(String id)
+		{
 			super(id);
 			add(new BookmarkablePageLink<LoginPage>("loginLink", LoginPage.class));
 		}
 
 	}
 
-	private class PrivateMainMenu extends MainMenu {
+	private class PrivateMainMenu extends MainMenu
+	{
 
-		public PrivateMainMenu(String id) {
+		public PrivateMainMenu(String id)
+		{
 			super(id);
 			add(new BookmarkablePageLink<ManuscriptsPage>("manuscriptsLink", ManuscriptsPage.class));
 			add(new BookmarkablePageLink<TextPage>("textLink", TextPage.class));

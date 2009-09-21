@@ -208,6 +208,16 @@
 				<version>2.2.0</version>
 			</dependency>
 			<dependency>
+				<groupId>org.apache.lucene</groupId>
+				<artifactId>lucene-core</artifactId>
+				<version>${lucene.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.lucene</groupId>
+				<artifactId>lucene-highlighter</artifactId>
+				<version>${lucene.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.wicket</groupId>
 				<artifactId>wicket</artifactId>
 				<version>${wicket.version}</version>
@@ -314,6 +324,7 @@
 		<spring.security.version>2.0.5.RELEASE</spring.security.version>
 		<wicket.version>1.4.1</wicket.version>
 		<milton.version>1.4.2</milton.version>
+		<lucene.version>2.4.1</lucene.version>
 		<jetty.version>6.1.19</jetty.version>
 	</properties>
 </project>

@@ -27,9 +27,12 @@ import org.compass.core.support.search.CompassSearchCommand;
 import org.compass.core.support.search.CompassSearchHelper;
 import org.compass.core.support.search.CompassSearchResults;
 
-import de.faustedition.web.AbstractPage;
+import de.faustedition.model.manuscript.Transcription;
+import de.faustedition.model.metadata.MetadataAssignment;
+import de.faustedition.web.PageBase;
 
-public class SearchPage extends AbstractPage {
+public class SearchPage extends PageBase
+{
 	private static final int RESULTS_PAGE_SIZE = 20;
 
 	@SpringBean
@@ -39,22 +42,27 @@ public class SearchPage extends AbstractPage {
 
 	private int pageNumber;
 
-	private static PageParameters getPageParameters(String query, int pageNumber) {
+	private static PageParameters getPageParameters(String query, int pageNumber)
+	{
 		PageParameters parameters = new PageParameters();
-		if (StringUtils.isNotBlank(query)) {
+		if (StringUtils.isNotBlank(query))
+		{
 			parameters.add("0", query);
-			if (pageNumber > 0) {
+			if (pageNumber > 0)
+			{
 				parameters.add("1", Integer.toString(pageNumber));
 			}
 		}
 		return parameters;
 	}
 
-	private static BookmarkablePageLink<SearchPage> getLink(String id, String query, int pageNumber) {
+	private static BookmarkablePageLink<SearchPage> getLink(String id, String query, int pageNumber)
+	{
 		return new BookmarkablePageLink<SearchPage>(id, SearchPage.class, getPageParameters(query, pageNumber));
 	}
 
-	public SearchPage(PageParameters parameters) {
+	public SearchPage(PageParameters parameters)
+	{
 		this.query = parameters.getString("0");
 		this.pageNumber = parameters.getAsInteger("1", 0);
 
@@ -69,111 +77,154 @@ public class SearchPage extends AbstractPage {
 
 	}
 
-	public String getQuery() {
+	public String getQuery()
+	{
 		return query;
 	}
 
-	public void setQuery(String query) {
+	public void setQuery(String query)
+	{
 		this.query = query;
 	}
 
-	public int getPageNumber() {
+	public int getPageNumber()
+	{
 		return pageNumber;
 	}
 
-	public void setPageNumber(int pageNumber) {
+	public void setPageNumber(int pageNumber)
+	{
 		this.pageNumber = pageNumber;
 	}
 
 	@Override
-	public String getPageTitle() {
+	public String getPageTitle()
+	{
 		return "Suche";
 	}
 
-	private class SearchResultsDataView extends DataView<CompassHit> {
+	private class SearchResultsDataView extends DataView<CompassHit>
+	{
 
-		protected SearchResultsDataView(String id) {
+		protected SearchResultsDataView(String id)
+		{
 			super(id, new SearchResultsDataProvider());
 		}
 
 		@Override
-		protected void populateItem(Item<CompassHit> item) {
+		protected void populateItem(Item<CompassHit> item)
+		{
 			CompassHit hit = item.getModelObject();
-			item.add(new Label("resultLabel", String.format("%d. %s (%d %%)", item.getIndex() + 1, hit.resource().getValue("path"), Math.round(hit.getScore() * 100))));
+			Object hitObject = hit.data();
+			if (hitObject instanceof MetadataAssignment)
+			{
+				MetadataAssignment assignment = (MetadataAssignment) hitObject;
+				item.add(new Label("hit", assignment.getField() + " ==> " + assignment.getValue()));
+			} else if (hitObject instanceof Transcription)
+			{
+				Transcription transcription = (Transcription) hitObject;
+				item.add(new Label("hit", "Transcription #" + transcription.getId()));
+			} else
+			{
+				item.add(new Label("hit", "\u00a0"));
+			}
+			// item.add(new Label("resultLabel",
+			// String.format("%d. %s (%d %%)", item.getIndex() + 1,
+			// hit.data().getClass(), Math.round(hit.getScore() *
+			// 100))));
 		}
 
 		@Override
-		public boolean isVisible() {
+		public boolean isVisible()
+		{
 			return StringUtils.isNotBlank(getQuery());
 		}
 	}
 
-	private class SearchResultsDataProvider implements IDataProvider<CompassHit> {
+	private class SearchResultsDataProvider implements IDataProvider<CompassHit>
+	{
 
-		public SearchResultsDataProvider() {
+		public SearchResultsDataProvider()
+		{
 		}
 
 		@Override
-		public Iterator<? extends CompassHit> iterator(int first, int count) {
+		public Iterator<? extends CompassHit> iterator(int first, int count)
+		{
 			CompassSearchResults searchResults = new CompassSearchHelper(compass, count).search(new CompassSearchCommand(query, first / RESULTS_PAGE_SIZE));
 			return Arrays.asList(searchResults.getHits()).iterator();
 		}
 
 		@Override
-		public IModel<CompassHit> model(CompassHit object) {
+		public IModel<CompassHit> model(CompassHit object)
+		{
 			return Model.of(object);
 		}
 
 		@Override
-		public int size() {
+		public int size()
+		{
 			return new CompassSearchHelper(compass).search(new CompassSearchCommand(query)).getTotalHits();
 		}
 
 		@Override
-		public void detach() {
+		public void detach()
+		{
 		}
 
 	}
 
-	private class SearchForm extends StatelessForm<Void> {
-		public SearchForm(String id) {
+	private class SearchForm extends StatelessForm<Void>
+	{
+		public SearchForm(String id)
+		{
 			super(id);
 			add(new TextField<String>("query", new PropertyModel<String>(SearchPage.this, "query")));
 		}
 
 		@Override
-		protected void onSubmit() {
+		protected void onSubmit()
+		{
 			setResponsePage(SearchPage.class, getPageParameters(query, 0));
 		}
 	}
 
-	private class SearchResultsPagingNavigator extends PagingNavigator {
+	private class SearchResultsPagingNavigator extends PagingNavigator
+	{
 
-		public SearchResultsPagingNavigator(String id, SearchResultsDataView resultsView) {
+		public SearchResultsPagingNavigator(String id, SearchResultsDataView resultsView)
+		{
 			super(id, resultsView);
 		}
 
 		@Override
-		protected AbstractLink newPagingNavigationIncrementLink(String id, IPageable pageable, int increment) {
+		protected AbstractLink newPagingNavigationIncrementLink(String id, IPageable pageable, int increment)
+		{
 			return newPagingNavigationLink(id, pageable, pageNumber + increment);
 		}
 
 		@Override
-		protected AbstractLink newPagingNavigationLink(String id, IPageable pageable, int pageNumber) {
+		protected AbstractLink newPagingNavigationLink(String id, IPageable pageable, int pageNumber)
+		{
 			return getLink(id, query, Math.max(0, Math.min(pageable.getPageCount() - 1, pageNumber)));
 		}
 
 		@Override
-		protected PagingNavigation newNavigation(IPageable pageable, IPagingLabelProvider labelProvider) {
-			return new PagingNavigation("navigation", pageable, labelProvider) {
+		protected PagingNavigation newNavigation(IPageable pageable, IPagingLabelProvider labelProvider)
+		{
+			return new PagingNavigation("navigation", pageable, labelProvider)
+			{
 				@Override
-				protected AbstractLink newPagingNavigationLink(String id, IPageable pageable, int pageIndex) {
+				protected AbstractLink newPagingNavigationLink(String id, IPageable pageable, int pageIndex)
+				{
 					return getLink(id, query, Math.max(0, Math.min(pageable.getPageCount() - 1, pageIndex)));
 				}
 			};
 		}
+
 		@Override
-		public boolean isVisible() {
+		public boolean isVisible()
+		{
 			return StringUtils.isNotBlank(getQuery()) && (getPageable().getPageCount() > 1);
 		}
 	}

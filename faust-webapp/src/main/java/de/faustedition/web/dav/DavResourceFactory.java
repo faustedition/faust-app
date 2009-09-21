@@ -26,7 +26,8 @@ import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
 import de.faustedition.model.manuscript.TranscriptionDocumentFactory;
 
-public class DavResourceFactory implements ResourceFactory {
+public class DavResourceFactory implements ResourceFactory
+{
 	private static final String DAV_SERVLET_PATH = "/dav";
 	private static final LockTimeout DEFAULT_LOCK_TIMEOUT = new LockTimeout(1800L);
 
@@ -36,15 +37,19 @@ public class DavResourceFactory implements ResourceFactory {
 	@Autowired
 	private SessionFactory dbSessionFactory;
 
-	public SessionFactory getDbSessionFactory() {
+	public SessionFactory getDbSessionFactory()
+	{
 		return dbSessionFactory;
 	}
 
 	@Override
-	public Resource getResource(String host, String path) {
+	public Resource getResource(String host, String path)
+	{
 		Resource resource = new RootDavResource(this);
-		for (String part : Path.path(StringUtils.strip(StringUtils.substringAfterLast(path, DAV_SERVLET_PATH), "/")).getParts()) {
-			if ((resource == null) || !(resource instanceof CollectionResource)) {
+		for (String part : Path.path(StringUtils.strip(StringUtils.substringAfterLast(path, DAV_SERVLET_PATH), "/")).getParts())
+		{
+			if ((resource == null) || !(resource instanceof CollectionResource))
+			{
 				return null;
 			}
 			resource = ((CollectionResource) resource).child(part);
@@ -52,19 +57,23 @@ public class DavResourceFactory implements ResourceFactory {
 		return resource;
 	}
 
-	public TranscriptionDocumentFactory getTranscriptionDocumentFactory() {
+	public TranscriptionDocumentFactory getTranscriptionDocumentFactory()
+	{
 		String baseUri = StringUtils.strip(StringUtils.substringBeforeLast(HttpManager.request().getAbsoluteUrl(), DAV_SERVLET_PATH), "/");
 		return new TranscriptionDocumentFactory(baseUri + "/schema/v1/faust-tei.rnc", baseUri + "/schema/v1/faust-tei.css");
 	}
 
 	@Override
-	public String getSupportedLevels() {
+	public String getSupportedLevels()
+	{
 		return "1,2";
 	}
 
-	public synchronized LockResult lock(LockTimeout timeout, LockInfo lockInfo, Object resource) {
+	public synchronized LockResult lock(LockTimeout timeout, LockInfo lockInfo, Object resource)
+	{
 		LockToken currentLock = currentLock(resource);
-		if (currentLock != null) {
+		if (currentLock != null)
+		{
 			return LockResult.failed(LockResult.FailureReason.ALREADY_LOCKED);
 		}
 		lockInfo.owner = ((ServletRequest) HttpManager.request()).getAuthorization().getUser();
@@ -75,39 +84,47 @@ public class DavResourceFactory implements ResourceFactory {
 		return LockResult.success(newToken);
 	}
 
-	public synchronized LockResult refresh(String tokenId, Object resource) {
+	public synchronized LockResult refresh(String tokenId, Object resource)
+	{
 		CurrentLock curLock = locksByResource.get(resource);
 		curLock.token.setFrom(new Date());
 		return LockResult.success(curLock.token);
 	}
 
-	public synchronized void unlock(String tokenId, Object resource) {
+	public synchronized void unlock(String tokenId, Object resource)
+	{
 		LockToken lockToken = currentLock(resource);
-		if (lockToken != null) {
+		if (lockToken != null)
+		{
 			removeLock(lockToken);
 		}
 	}
 
-	private LockToken currentLock(Object resource) {
+	private LockToken currentLock(Object resource)
+	{
 		CurrentLock curLock = locksByResource.get(resource);
 		if (curLock == null)
 			return null;
 		LockToken token = curLock.token;
-		if (token.isExpired()) {
+		if (token.isExpired())
+		{
 			removeLock(token);
 			return null;
-		} else {
+		} else
+		{
 			return token;
 		}
 	}
 
-	private void removeLock(LockToken token) {
+	private void removeLock(LockToken token)
+	{
 		CurrentLock currentLock = locksByToken.get(token.tokenId);
 		locksByResource.remove(currentLock.resource);
 		locksByToken.remove(currentLock.token.tokenId);
 	}
 
-	public LockToken getCurrentToken(Object resource) {
+	public LockToken getCurrentToken(Object resource)
+	{
 		CurrentLock lock = locksByResource.get(resource);
 		if (lock == null)
 			return null;
@@ -118,36 +135,44 @@ public class DavResourceFactory implements ResourceFactory {
 		return token;
 	}
 
-	private static class CurrentLock {
+	private static class CurrentLock
+	{
 		final Object resource;
 		final LockToken token;
 		final String owner;
 
-		private CurrentLock(Object resource, LockToken token, String owner) {
+		private CurrentLock(Object resource, LockToken token, String owner)
+		{
 			this.resource = resource;
 			this.token = token;
 			this.owner = owner;
 		}
 	}
 
-	protected final Function<Manuscript, TranscriptionDavResource> transcriptionResourceCreator = new Function<Manuscript, TranscriptionDavResource>() {
+	protected final Function<Manuscript, TranscriptionDavResource> transcriptionResourceCreator = new Function<Manuscript, TranscriptionDavResource>()
+	{
 
 		@Override
-		public TranscriptionDavResource apply(Manuscript from) {
+		public TranscriptionDavResource apply(Manuscript from)
+		{
 			return new TranscriptionDavResource(DavResourceFactory.this, from);
 		}
 	};
-	protected Function<Portfolio, PortfolioDavResource> portfolioResourceCreator = new Function<Portfolio, PortfolioDavResource>() {
+	protected Function<Portfolio, PortfolioDavResource> portfolioResourceCreator = new Function<Portfolio, PortfolioDavResource>()
+	{
 
 		@Override
-		public PortfolioDavResource apply(Portfolio from) {
+		public PortfolioDavResource apply(Portfolio from)
+		{
 			return new PortfolioDavResource(DavResourceFactory.this, from);
 		}
 	};
-	protected Function<Repository, RepositoryDavResource> repositoryResourceCreator = new Function<Repository, RepositoryDavResource>() {
+	protected Function<Repository, RepositoryDavResource> repositoryResourceCreator = new Function<Repository, RepositoryDavResource>()
+	{
 
 		@Override
-		public RepositoryDavResource apply(Repository from) {
+		public RepositoryDavResource apply(Repository from)
+		{
 			return new RepositoryDavResource(DavResourceFactory.this, from);
 		}
 	};

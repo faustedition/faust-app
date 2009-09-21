@@ -1,11 +1,13 @@
 package de.faustedition.web.text;
 
-import de.faustedition.web.AbstractPage;
+import de.faustedition.web.PageBase;
 
-public class TextPage extends AbstractPage {
+public class TextPage extends PageBase
+{
 
 	@Override
-	public String getPageTitle() {
+	public String getPageTitle()
+	{
 		return "Text";
 	}
 

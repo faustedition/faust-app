@@ -1,11 +1,13 @@
 package de.faustedition.web.project;
 
-import de.faustedition.web.AbstractPage;
+import de.faustedition.web.PageBase;
 
-public class ContactPage extends AbstractPage {
+public class ContactPage extends PageBase
+{
 
 	@Override
-	public String getPageTitle() {
+	public String getPageTitle()
+	{
 		return "Kontakt";
 	}
 

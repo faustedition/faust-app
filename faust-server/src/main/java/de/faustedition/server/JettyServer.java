@@ -8,23 +8,28 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
-public class JettyServer {
+public class JettyServer
+{
 	private static final Logger logger = Logger.getLogger("de.faustedition");
 
-	public static void main(String[] args) {
-		try {
+	public static void main(String[] args)
+	{
+		try
+		{
 			String faustWebapp = System.getProperty("faust.webapp");
-			if (faustWebapp == null) {
+			if (faustWebapp == null)
+			{
 				logger.severe("No system property 'faust.webapp' given");
 				System.exit(-1);
 			}
-			
+
 			File faustWebappFile = new File(faustWebapp);
-			if (!faustWebappFile.canRead()) {
+			if (!faustWebappFile.canRead())
+			{
 				logger.severe(String.format("Cannot read webapp source '%s'", faustWebappFile.getAbsolutePath()));
 				System.exit(-2);
 			}
-			
+
 			SelectChannelConnector connector = new SelectChannelConnector();
 			connector.setPort(9999);
 			connector.setForwarded(true);
@@ -35,7 +40,8 @@ public class JettyServer {
 			server.setStopAtShutdown(true);
 			server.start();
 			server.join();
-		} catch (Exception e) {
+		} catch (Exception e)
+		{
 			logger.log(Level.SEVERE, "Error starting Jetty server", e);
 			System.exit(-3);
 		}

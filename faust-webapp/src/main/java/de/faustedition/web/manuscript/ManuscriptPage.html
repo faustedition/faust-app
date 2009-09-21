@@ -7,14 +7,16 @@
 </head>
 <body>
 <wicket:extend>
-	<h2 wicket:id="manuscriptHeader">Manuskript</h2>
+	<h2><span wicket:id="manuscriptHeader">Manuskript</span> <span wicket:id="portfolioLink" /></h2>
 
 	<div class="yui-g">
-	<div class="yui-u first">
-	<p>Transcription …</p>
-	<!-- <p><a href="#" wicket:id="davLink" title="WebDAV-Link">Bearbeiten …</a></p> --></div>
-	<div class="yui-u"><iframe wicket:id="facsimile" src="#" width="300" height="400" /></div>
+	<div class="yui-u first"><img wicket:id="facsimile" src="#" width="400" height="600" /></div>
+	<div class="yui-u">
+	<div style="font-family: tahoma; padding: 0.5em; margin: 0.5em" wicket:id="transcription">HTML</div>
 	</div>
+	</div>
+
+	<div class="border small-font" style="color: #666; padding: 0.5em; margin: 0.5em" wicket:id="transcriptionSource">TEI Source</div>
 </wicket:extend>
 </body>
 </html>

@@ -19,10 +19,12 @@ import org.hibernate.SessionFactory;
 
 import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
-import de.faustedition.web.AbstractPage;
+import de.faustedition.web.PageBase;
 import de.faustedition.web.FaustApplication;
+import de.faustedition.web.util.UpLink;
 
-public class RepositoryPage extends AbstractPage {
+public class RepositoryPage extends PageBase
+{
 
 	@SpringBean
 	private SessionFactory dbSessionFactory;
@@ -30,11 +32,13 @@ public class RepositoryPage extends AbstractPage {
 	private Repository repository;
 	private List<Portfolio> portfolios;
 
-	public RepositoryPage(PageParameters parameters) {
+	public RepositoryPage(PageParameters parameters)
+	{
 		super();
 
 		final String repositoryName = parameters.getString("0");
-		if (repositoryName == null) {
+		if (repositoryName == null)
+		{
 			throw new InvalidUrlException("No repository name given");
 		}
 
@@ -43,35 +47,43 @@ public class RepositoryPage extends AbstractPage {
 		portfolios = Portfolio.find(session, repository);
 
 		add(new Label("repositoryHeader", new PropertyModel<String>(repository, "name")));
+		add(new UpLink("manuscriptsLink", new BookmarkablePageLink<Page>("upLink", ManuscriptsPage.class)));
 		add(new PortfolioDataView("portfolios"));
 	}
 
 	@Override
-	public String getPageTitle() {
+	public String getPageTitle()
+	{
 		return (repository == null ? "" : repository.getName());
 	}
 
-	private class PortfolioDataView extends GridView<Portfolio> {
+	private class PortfolioDataView extends GridView<Portfolio>
+	{
 
-		public PortfolioDataView(String id) {
+		public PortfolioDataView(String id)
+		{
 			super(id, new ListDataProvider<Portfolio>(portfolios));
 			setColumns(5);
 		}
 
 		@Override
-		protected void populateItem(Item<Portfolio> item) {
+		protected void populateItem(Item<Portfolio> item)
+		{
 			item.add(new PortfolioPanel("portfolioPanel", item.getModel()));
 		}
 
 		@Override
-		protected void populateEmptyItem(Item<Portfolio> item) {
+		protected void populateEmptyItem(Item<Portfolio> item)
+		{
 			item.add(new Label("portfolioPanel"));
 		}
 	}
 
-	private class PortfolioPanel extends Panel {
+	private class PortfolioPanel extends Panel
+	{
 
-		public PortfolioPanel(String id, IModel<Portfolio> model) {
+		public PortfolioPanel(String id, IModel<Portfolio> model)
+		{
 			super(id, model);
 			Portfolio portfolio = model.getObject();
 			BookmarkablePageLink<? extends Page> link = PortfolioPage.getLink("portfolioLink", portfolio);
@@ -81,7 +93,8 @@ public class RepositoryPage extends AbstractPage {
 
 	}
 
-	public static BookmarkablePageLink<? extends Page> getLink(String id, Repository repository) {
+	public static BookmarkablePageLink<? extends Page> getLink(String id, Repository repository)
+	{
 		PageParameters parameters = new PageParameters();
 		parameters.put("0", repository.getName());
 		return new BookmarkablePageLink<Page>(id, RepositoryPage.class, parameters);

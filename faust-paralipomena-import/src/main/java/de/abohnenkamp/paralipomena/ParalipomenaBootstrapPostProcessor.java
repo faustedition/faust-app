@@ -24,7 +24,8 @@ import de.faustedition.util.LoggingUtil;
 import de.swkk.metadata.archivedb.ArchiveDatabase;
 import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
 
-public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcessor, InitializingBean {
+public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcessor, InitializingBean
+{
 	@Autowired
 	private DissertationText dissertationText;
 
@@ -34,43 +35,54 @@ public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcesso
 	private ArchiveDatabase archiveDatabase;
 
 	@Override
-	public void afterBootstrapping() {
+	public void afterBootstrapping()
+	{
 		Session session = dbSessionFactory.getCurrentSession();
 		Repository repository = Repository.find(session, "GSA");
-		if (repository == null) {
+		if (repository == null)
+		{
 			return;
 		}
 
 		TranscriptionDocumentFactory transcriptionDocumentFactory = new TranscriptionDocumentFactory();
 		List<ParalipomenonTranscription> paralipomena = dissertationText.extractParalipomena();
-		for (ParalipomenonTranscription paralipomenon : paralipomena) {
-			for (ArchiveDatabaseRecord record : archiveDatabase.collect(paralipomenon.getCallNumber())) {
+		for (ParalipomenonTranscription paralipomenon : paralipomena)
+		{
+			for (ArchiveDatabaseRecord record : archiveDatabase.collect(paralipomenon.getCallNumber()))
+			{
 				String portfolioNum = Integer.toString(record.getIdentNum());
 				Portfolio portfolio = Portfolio.find(session, repository, portfolioNum);
-				if (portfolio == null) {
+				if (portfolio == null)
+				{
 					LoggingUtil.LOG.warn(String.format("Cannot find portfolio %s for paralipomenon %s", portfolioNum, paralipomenon.getCallNumber()));
 					continue;
 				}
-				for (Manuscript manuscript : Manuscript.find(session, portfolio)) {
+				for (Manuscript manuscript : Manuscript.find(session, portfolio))
+				{
 					Facsimile facsimile = Facsimile.find(session, manuscript, manuscript.getName());
-					if (facsimile == null) {
+					if (facsimile == null)
+					{
 						continue;
 					}
 					Transcription transcription = Transcription.find(session, facsimile);
-					if (transcription == null) {
+					if (transcription == null)
+					{
 						continue;
 					}
 
 					LoggingUtil.LOG.info(paralipomenon.getCallNumber() + " ===> " + portfolio.getName() + "/" + manuscript.getName());
 					TranscriptionDocument transcriptionDocument = transcriptionDocumentFactory.build(transcription);
 					Element textBodyElement = DomUtil.getChild(transcriptionDocument.getTextElement(), "body");
-					if (!transcriptionDocument.hasText()) {
-						for (Node node : DomUtil.getChildren(textBodyElement)) {
+					if (!transcriptionDocument.hasText())
+					{
+						for (Node node : DomUtil.getChildren(textBodyElement))
+						{
 							textBodyElement.removeChild(node);
 						}
 					}
 
-					for (Node node : new NodeListIterable(DomUtil.getChild(paralipomenon.getText(), "text").getChildNodes())) {
+					for (Node node : new NodeListIterable(DomUtil.getChild(paralipomenon.getText(), "text").getChildNodes()))
+					{
 						textBodyElement.appendChild(textBodyElement.getOwnerDocument().importNode(node, true));
 					}
 
@@ -82,7 +94,8 @@ public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcesso
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() throws Exception
+	{
 		archiveDatabase = new ArchiveDatabase();
 	}
 }

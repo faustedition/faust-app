@@ -31,7 +31,8 @@ import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
 import de.faustedition.util.XMLUtil;
 
-public class Bootstrapper implements InitializingBean, ApplicationContextAware {
+public class Bootstrapper implements InitializingBean, ApplicationContextAware
+{
 	private static final FacsimileImageResolution BOOTSTRAP_RESOLUTION = FacsimileImageResolution.HIGH;
 
 	@Autowired
@@ -49,29 +50,37 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware {
 	private ApplicationContext applicationContext;
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+	{
 		this.applicationContext = applicationContext;
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		scheduledExecutorService.execute(new Runnable() {
+	public void afterPropertiesSet() throws Exception
+	{
+		scheduledExecutorService.execute(new Runnable()
+		{
 
 			@Override
-			public void run() {
+			public void run()
+			{
 				bootstrap();
 			}
 		});
 	}
 
-	private void bootstrap() {
-		new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult() {
+	private void bootstrap()
+	{
+		new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult()
+		{
 
 			@SuppressWarnings("unchecked")
 			@Override
-			protected void doInTransactionWithoutResult(TransactionStatus status) {
+			protected void doInTransactionWithoutResult(TransactionStatus status)
+			{
 				Session session = dbSessionFactory.getCurrentSession();
-				if (!Repository.find(session).isEmpty()) {
+				if (!Repository.find(session).isEmpty())
+				{
 					LoggingUtil.LOG.info("Database contains repositories; skip bootstrapping");
 					return;
 				}
@@ -79,20 +88,24 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware {
 				Repository repository = null;
 				Portfolio portfolio = null;
 				LoggingUtil.LOG.info("Bootstrapping database");
-				for (File facsimileImageFile : facsimileImageDao.findImageFiles(BOOTSTRAP_RESOLUTION)) {
+				for (File facsimileImageFile : facsimileImageDao.findImageFiles(BOOTSTRAP_RESOLUTION))
+				{
 					String[] imageFilePath = StringUtils.split(facsimileImageFile.getAbsolutePath(), File.separator);
-					if (imageFilePath.length < 3) {
+					if (imageFilePath.length < 3)
+					{
 						continue;
 					}
 
 					String repositoryName = imageFilePath[imageFilePath.length - 3];
-					if (repository == null || !repository.getName().equals(repositoryName)) {
+					if (repository == null || !repository.getName().equals(repositoryName))
+					{
 						LoggingUtil.LOG.info("Repository " + repositoryName);
 						repository = Repository.findOrCreate(session, repositoryName);
 					}
 
 					String portfolioName = imageFilePath[imageFilePath.length - 2];
-					if (portfolio == null || !portfolio.getName().equals(portfolioName) || !portfolio.getRepository().equals(repository)) {
+					if (portfolio == null || !portfolio.getName().equals(portfolioName) || !portfolio.getRepository().equals(repository))
+					{
 						portfolio = Portfolio.findOrCreate(session, repository, portfolioName);
 					}
 
@@ -104,7 +117,8 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware {
 					Facsimile facsimile = Facsimile.findOrCreate(session, manuscript, manuscriptShortName, StringUtils.join(new String[] { repositoryName, portfolioName,
 							manuscriptFullName }, "/"));
 					Transcription transcription = Transcription.find(session, facsimile);
-					if (transcription == null) {
+					if (transcription == null)
+					{
 						transcription = new Transcription();
 						transcription.setFacsimile(facsimile);
 						transcription.setTextData(XMLUtil.serialize(teiElementNode("text", teiElementNode("body", teiElementNode("p"))).toDOM(), false));
@@ -113,13 +127,16 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware {
 					}
 				}
 
-				try {
+				try
+				{
 					Map<String, BootstrapPostProcessor> postProcessors = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, BootstrapPostProcessor.class);
-					for (BootstrapPostProcessor postProcessor : postProcessors.values()) {
+					for (BootstrapPostProcessor postProcessor : postProcessors.values())
+					{
 						LoggingUtil.LOG.info("Running boostrap post-processor " + postProcessor);
 						postProcessor.afterBootstrapping();
 					}
-				} catch (Exception e) {
+				} catch (Exception e)
+				{
 					throw ErrorUtil.fatal("Fatal error bootstrapping database", e);
 				}
 			}

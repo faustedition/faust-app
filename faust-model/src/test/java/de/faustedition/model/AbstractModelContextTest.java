@@ -6,6 +6,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/faust-model-context.xml" })
-public abstract class AbstractModelContextTest {
+public abstract class AbstractModelContextTest
+{
 
 }

@@ -79,5 +79,13 @@
 			<groupId>org.compass-project</groupId>
 			<artifactId>compass</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-highlighter</artifactId>
+		</dependency>
 	</dependencies>
 </project>

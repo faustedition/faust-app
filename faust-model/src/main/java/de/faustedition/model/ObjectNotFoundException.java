@@ -1,20 +1,25 @@
 package de.faustedition.model;
 
-public class ObjectNotFoundException extends Exception {
+public class ObjectNotFoundException extends Exception
+{
 
-	public ObjectNotFoundException() {
+	public ObjectNotFoundException()
+	{
 		super();
 	}
 
-	public ObjectNotFoundException(String message, Throwable cause) {
+	public ObjectNotFoundException(String message, Throwable cause)
+	{
 		super(message, cause);
 	}
 
-	public ObjectNotFoundException(String message) {
+	public ObjectNotFoundException(String message)
+	{
 		super(message);
 	}
 
-	public ObjectNotFoundException(Throwable cause) {
+	public ObjectNotFoundException(Throwable cause)
+	{
 		super(cause);
 	}
 

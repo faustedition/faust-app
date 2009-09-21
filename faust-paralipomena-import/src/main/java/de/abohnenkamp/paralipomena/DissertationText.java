@@ -27,23 +27,28 @@ import org.xml.sax.InputSource;
 import de.faustedition.util.ErrorUtil;
 import de.swkk.metadata.GSACallNumber;
 
-public class DissertationText implements InitializingBean {
+public class DissertationText implements InitializingBean
+{
 	private static final Resource XML_RESOURCE = new ClassPathResource("/abr-dissertation-text.xml");
 	private static final Resource TEI_TRANSFORMATION_RESOURCE = new ClassPathResource("/tei-transformation.xsl");
 	private static final Pattern GSA_CALL_NUMBER_PATTERN = Pattern.compile("^GSA ([XVI]+) \\(([0-9]+),([0-9]+)");
 	private Document document;
 	private Transformer teiTransformer;
 
-	public Document getDocument() {
+	public Document getDocument()
+	{
 		return document;
 	}
 
-	public List<ParalipomenonTranscription> extractParalipomena() {
+	public List<ParalipomenonTranscription> extractParalipomena()
+	{
 		List<ParalipomenonTranscription> result = new LinkedList<ParalipomenonTranscription>();
-		for (Node paralipomenonRoot : new XPathWrapper("/texte/text").evaluate(document)) {
+		for (Node paralipomenonRoot : new XPathWrapper("/texte/text").evaluate(document))
+		{
 			Element textElement = DomUtil.getChild((Element) paralipomenonRoot, "paralipomenon");
 			Matcher callNumberMatcher = GSA_CALL_NUMBER_PATTERN.matcher(textElement.getAttribute("n"));
-			if (callNumberMatcher.find()) {
+			if (callNumberMatcher.find())
+			{
 				GSACallNumber gsaCallNumber = new GSACallNumber("25/" + callNumberMatcher.group(1) + "," + callNumberMatcher.group(2) + "," + callNumberMatcher.group(3));
 				result.add(new ParalipomenonTranscription(gsaCallNumber, toTei(textElement), toTei(DomUtil.getChild((Element) paralipomenonRoot, "kommentar"))));
 			}
@@ -51,18 +56,22 @@ public class DissertationText implements InitializingBean {
 		return result;
 	}
 
-	private Element toTei(Element element) {
-		try {
+	private Element toTei(Element element)
+	{
+		try
+		{
 			DOMResult result = new DOMResult();
 			teiTransformer.transform(new DOMSource(element), result);
 			return ((Document) result.getNode()).getDocumentElement();
-		} catch (TransformerException e) {
+		} catch (TransformerException e)
+		{
 			throw ErrorUtil.fatal("Error transforming paralipomenon snippet to TEI", e);
 		}
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() throws Exception
+	{
 		document = ParseUtil.parse(new InputSource(XML_RESOURCE.getInputStream()));
 		teiTransformer = TransformerFactory.newInstance().newTransformer(new StreamSource(TEI_TRANSFORMATION_RESOURCE.getInputStream()));
 	}

@@ -23,7 +23,8 @@ import org.springframework.util.Assert;
 
 import de.faustedition.util.ErrorUtil;
 
-public class FacsimileImageDao implements InitializingBean {
+public class FacsimileImageDao implements InitializingBean
+{
 	@Autowired
 	@Qualifier("dataDirectory")
 	private File dataDirectory;
@@ -38,31 +39,39 @@ public class FacsimileImageDao implements InitializingBean {
 	private File thumbnailDirectory;
 
 	@Required
-	public void setConversionTools(String[] conversionTools) {
+	public void setConversionTools(String[] conversionTools)
+	{
 		this.conversionTools = conversionTools;
 	}
 
-	public void setThumbnailHeight(int thumbnailHeight) {
+	public void setThumbnailHeight(int thumbnailHeight)
+	{
 		this.thumbnailHeight = thumbnailHeight;
 	}
 
-	public void setThumbnailWidth(int thumbnailWidth) {
+	public void setThumbnailWidth(int thumbnailWidth)
+	{
 		this.thumbnailWidth = thumbnailWidth;
 	}
 
 	@SuppressWarnings("unchecked")
-	public SortedSet<File> findImageFiles(final FacsimileImageResolution resolution) {
-		SortedSet<File> imageFileSet = new TreeSet<File>(new Comparator<File>() {
+	public SortedSet<File> findImageFiles(final FacsimileImageResolution resolution)
+	{
+		SortedSet<File> imageFileSet = new TreeSet<File>(new Comparator<File>()
+		{
 
 			@Override
-			public int compare(File o1, File o2) {
+			public int compare(File o1, File o2)
+			{
 				return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
 			}
 		});
-		imageFileSet.addAll(FileUtils.listFiles(getBaseDirectory(resolution), new AbstractFileFilter() {
+		imageFileSet.addAll(FileUtils.listFiles(getBaseDirectory(resolution), new AbstractFileFilter()
+		{
 
 			@Override
-			public boolean accept(File dir, String name) {
+			public boolean accept(File dir, String name)
+			{
 				return name.endsWith(resolution.getSuffix());
 			}
 
@@ -70,21 +79,26 @@ public class FacsimileImageDao implements InitializingBean {
 		return imageFileSet;
 	}
 
-	public File findImageFile(Facsimile facsimile) {
+	public File findImageFile(Facsimile facsimile)
+	{
 		return findImageFile(facsimile, FacsimileImageResolution.LOW);
 	}
 
-	public File findImageFile(Facsimile facsimile, FacsimileImageResolution resolution) {
+	public File findImageFile(Facsimile facsimile, FacsimileImageResolution resolution)
+	{
 		final File imageFile = new File(getBaseDirectory(resolution), facsimile.getImagePath() + resolution.getSuffix());
 
-		if (imageFile.isFile() && imageFile.canRead()) {
+		if (imageFile.isFile() && imageFile.canRead())
+		{
 			return imageFile;
 		}
 
-		if (resolution == FacsimileImageResolution.THUMB) {
+		if (resolution == FacsimileImageResolution.THUMB)
+		{
 			File sourceFile = new File(getBaseDirectory(FacsimileImageResolution.LOW), facsimile.getImagePath() + FacsimileImageResolution.LOW.getSuffix());
 
-			if (!sourceFile.isFile() || !sourceFile.canRead()) {
+			if (!sourceFile.isFile() || !sourceFile.canRead())
+			{
 				return null;
 			}
 
@@ -94,30 +108,39 @@ public class FacsimileImageDao implements InitializingBean {
 		return null;
 	}
 
-	private File createThumbnailImage(File source, final File thumbnailFile) {
-		if (!thumbnailFile.getParentFile().isDirectory()) {
+	private File createThumbnailImage(File source, final File thumbnailFile)
+	{
+		if (!thumbnailFile.getParentFile().isDirectory())
+		{
 			thumbnailFile.getParentFile().mkdirs();
-			if (!thumbnailFile.getParentFile().isDirectory()) {
+			if (!thumbnailFile.getParentFile().isDirectory())
+			{
 				throw ErrorUtil.fatal("Cannot create directory for thumbnail '" + thumbnailFile.getAbsolutePath() + "'");
 			}
 		}
 
-		try {
+		try
+		{
 			final Process convertProcess = new ProcessBuilder(imageMagickConvertCommand, source.getAbsolutePath(), "-resize", thumbnailWidth + "x" + thumbnailHeight, "-").start();
-			Thread conversionResultReaderThread = new Thread(new Runnable() {
+			Thread conversionResultReaderThread = new Thread(new Runnable()
+			{
 
 				@Override
-				public void run() {
+				public void run()
+				{
 					InputStream convertOutput = null;
 					OutputStream thumbnailStream = null;
-					try {
+					try
+					{
 						convertOutput = convertProcess.getInputStream();
 						thumbnailStream = new FileOutputStream(thumbnailFile);
 						IOUtils.copy(convertOutput, thumbnailStream);
-					} catch (IOException e) {
+					} catch (IOException e)
+					{
 						IOUtils.closeQuietly(thumbnailStream);
 						thumbnailFile.delete();
-					} finally {
+					} finally
+					{
 						IOUtils.closeQuietly(thumbnailStream);
 						IOUtils.closeQuietly(convertOutput);
 					}
@@ -127,20 +150,26 @@ public class FacsimileImageDao implements InitializingBean {
 			conversionResultReaderThread.start();
 
 			int conversionResult = -1;
-			try {
+			try
+			{
 				conversionResult = convertProcess.waitFor();
-			} catch (InterruptedException e) {
+			} catch (InterruptedException e)
+			{
 			}
 
-			try {
+			try
+			{
 				conversionResultReaderThread.join();
-			} catch (InterruptedException ie) {
+			} catch (InterruptedException ie)
+			{
 			}
 
-			if (conversionResult == 0) {
+			if (conversionResult == 0)
+			{
 				return thumbnailFile;
 			}
-		} catch (IOException ioe) {
+		} catch (IOException ioe)
+		{
 			ErrorUtil.fatal("I/O error while generating thumbnail '" + thumbnailFile.getAbsolutePath() + "'", ioe);
 		}
 		thumbnailFile.delete();
@@ -148,7 +177,8 @@ public class FacsimileImageDao implements InitializingBean {
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() throws Exception
+	{
 		File imageDirectory = new File(dataDirectory, "images");
 		Assert.isTrue(imageDirectory.isDirectory() && imageDirectory.canRead(), "Cannot access image directory");
 
@@ -166,17 +196,21 @@ public class FacsimileImageDao implements InitializingBean {
 		thumbnailDirectory.mkdirs();
 		Assert.isTrue(thumbnailDirectory.isDirectory() && thumbnailDirectory.canWrite(), "Cannot write to thumbnail cache directory");
 
-		for (String conversionTool : conversionTools) {
+		for (String conversionTool : conversionTools)
+		{
 			File conversionToolFile = new File(conversionTool);
-			if (conversionToolFile.isFile()) {
+			if (conversionToolFile.isFile())
+			{
 				imageMagickConvertCommand = conversionToolFile.getAbsolutePath();
 			}
 		}
 		Assert.notNull(imageMagickConvertCommand, "No ImageMagick 'convert' command could by found on this system");
 	}
 
-	protected File getBaseDirectory(FacsimileImageResolution resolution) {
-		switch (resolution) {
+	protected File getBaseDirectory(FacsimileImageResolution resolution)
+	{
+		switch (resolution)
+		{
 		case LOW:
 			return lowResolutionImageDirectory;
 		case HIGH:
@@ -188,7 +222,8 @@ public class FacsimileImageDao implements InitializingBean {
 		throw new IllegalArgumentException(resolution.toString());
 	}
 
-	public String getRelativePath(File imageFile, FacsimileImageResolution resolution) {
+	public String getRelativePath(File imageFile, FacsimileImageResolution resolution)
+	{
 		String imageFilePath = FilenameUtils.separatorsToUnix(imageFile.getAbsolutePath());
 		String basePath = getBaseDirectory(resolution).getAbsolutePath();
 		Assert.isTrue(imageFilePath.startsWith(basePath));

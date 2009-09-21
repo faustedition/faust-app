@@ -9,52 +9,65 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
 
-public class Facsimile implements Serializable {
+public class Facsimile implements Serializable
+{
 	private long id;
 	private Manuscript manuscript;
 	private String name;
 	private String imagePath;
 
-	public Facsimile() {
+	public Facsimile()
+	{
 	}
 
-	public long getId() {
+	public long getId()
+	{
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(long id)
+	{
 		this.id = id;
 	}
 
-	public Manuscript getManuscript() {
+	public Manuscript getManuscript()
+	{
 		return manuscript;
 	}
 
-	public void setManuscript(Manuscript manuscript) {
+	public void setManuscript(Manuscript manuscript)
+	{
 		this.manuscript = manuscript;
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(String name)
+	{
 		this.name = name;
 	}
 
-	public String getImagePath() {
+	public String getImagePath()
+	{
 		return imagePath;
 	}
 
-	public void setImagePath(String imagePath) {
+	public void setImagePath(String imagePath)
+	{
 		this.imagePath = imagePath;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj != null && (obj instanceof Facsimile) && (name != null) && (manuscript != null)) {
+	public boolean equals(Object obj)
+	{
+		if (obj != null && (obj instanceof Facsimile) && (name != null) && (manuscript != null))
+		{
 			Facsimile other = (Facsimile) obj;
-			if ((other.name != null) && (other.manuscript != null)) {
+			if ((other.name != null) && (other.manuscript != null))
+			{
 				return name.equals(other.name) && (manuscript.getId() == other.manuscript.getId());
 			}
 		}
@@ -62,23 +75,28 @@ public class Facsimile implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		return (name == null || manuscript == null) ? super.hashCode() : new HashCodeBuilder().append(name).append(manuscript.getId()).toHashCode();
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<Facsimile> find(Session session, Manuscript manuscript) {
+	public static List<Facsimile> find(Session session, Manuscript manuscript)
+	{
 		return session.createCriteria(Facsimile.class).addOrder(Order.asc("name")).createCriteria("manuscript").add(Restrictions.idEq(manuscript.getId())).list();
 	}
 
-	public static Facsimile find(Session session, Manuscript manuscript, String name) {
+	public static Facsimile find(Session session, Manuscript manuscript, String name)
+	{
 		return (Facsimile) DataAccessUtils.uniqueResult(session.createCriteria(Facsimile.class).add(Restrictions.eq("name", name)).createCriteria("manuscript").add(
 				Restrictions.idEq(manuscript.getId())).list());
 	}
 
-	public static Facsimile findOrCreate(Session session, Manuscript manuscript, String name, String imagePath) {
+	public static Facsimile findOrCreate(Session session, Manuscript manuscript, String name, String imagePath)
+	{
 		Facsimile facsimile = find(session, manuscript, name);
-		if (facsimile == null) {
+		if (facsimile == null)
+		{
 			facsimile = new Facsimile();
 			facsimile.setManuscript(manuscript);
 			facsimile.setName(name);
@@ -89,7 +107,8 @@ public class Facsimile implements Serializable {
 		return facsimile;
 	}
 
-	public static Facsimile findByImagePath(Session session, String imagePath) {
+	public static Facsimile findByImagePath(Session session, String imagePath)
+	{
 		return (Facsimile) DataAccessUtils.singleResult(session.createCriteria(Facsimile.class).add(Restrictions.eq("imagePath", imagePath)).list());
 	}
 

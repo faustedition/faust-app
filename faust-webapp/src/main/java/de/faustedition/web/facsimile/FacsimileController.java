@@ -28,7 +28,8 @@ import de.faustedition.util.ReadOnlyTransactionTemplate;
 import de.faustedition.web.FaustPathUtils;
 
 @Controller
-public class FacsimileController {
+public class FacsimileController
+{
 	public static final String URL_PREFIX = "facsimile";
 	@Autowired
 	private FacsimileImageDao facsimileStore;
@@ -40,47 +41,57 @@ public class FacsimileController {
 	private SessionFactory dbSessionFactory;
 
 	@RequestMapping("/" + URL_PREFIX + "/**")
-	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws ObjectNotFoundException, IOException {
+	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws ObjectNotFoundException, IOException
+	{
 		String path = FaustPathUtils.getPath(request);
 
 		FacsimileImageResolution facsimileResolution = null;
-		for (FacsimileImageResolution resolution : FacsimileImageResolution.values()) {
-			if (resolution.matches(path)) {
+		for (FacsimileImageResolution resolution : FacsimileImageResolution.values())
+		{
+			if (resolution.matches(path))
+			{
 				facsimileResolution = resolution;
 				path = StringUtils.removeEnd(path, resolution.getSuffix());
 			}
 		}
 
-		if (facsimileResolution == null || facsimileResolution == FacsimileImageResolution.HIGH) {
+		if (facsimileResolution == null || facsimileResolution == FacsimileImageResolution.HIGH)
+		{
 			throw new ObjectNotFoundException();
 		}
 
 		final String imagePath = path;
-		Facsimile facsimile = (Facsimile) new ReadOnlyTransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		Facsimile facsimile = (Facsimile) new ReadOnlyTransactionTemplate(transactionManager).execute(new TransactionCallback()
+		{
 
 			@Override
-			public Object doInTransaction(TransactionStatus status) {
+			public Object doInTransaction(TransactionStatus status)
+			{
 				return Facsimile.findByImagePath(dbSessionFactory.getCurrentSession(), imagePath);
 			}
 		});
 		final File facsimileImageFile = facsimileStore.findImageFile(facsimile, facsimileResolution);
-		if (facsimile == null) {
+		if (facsimile == null)
+		{
 			throw new ObjectNotFoundException(path);
 		}
 
 		response.setContentType(facsimileResolution.getMimeType());
 		response.setContentLength((int) facsimileImageFile.length());
 
-		if (webRequest.checkNotModified(facsimileImageFile.lastModified())) {
+		if (webRequest.checkNotModified(facsimileImageFile.lastModified()))
+		{
 			return;
 		}
 
 		ServletOutputStream responseStream = response.getOutputStream();
 		InputStream imageStream = null;
-		try {
+		try
+		{
 			IOUtils.copy(imageStream = new FileInputStream(facsimileImageFile), responseStream);
 			responseStream.flush();
-		} finally {
+		} finally
+		{
 			IOUtils.closeQuietly(imageStream);
 		}
 	}

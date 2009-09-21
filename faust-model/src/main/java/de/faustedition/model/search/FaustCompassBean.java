@@ -16,15 +16,18 @@ import org.springframework.util.Assert;
 
 import de.faustedition.model.metadata.MetadataFieldDefinition;
 
-public class FaustCompassBean extends LocalCompassBean {
+public class FaustCompassBean extends LocalCompassBean
+{
 	@Autowired
 	@Qualifier("dataDirectory")
 	private File dataDirectory;
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() throws Exception
+	{
 		File searchIndexDirectory = new File(dataDirectory, "search-index");
-		if (!searchIndexDirectory.isDirectory()) {
+		if (!searchIndexDirectory.isDirectory())
+		{
 			Assert.isTrue(searchIndexDirectory.mkdirs(), "Cannot create search index directory");
 		}
 
@@ -34,14 +37,17 @@ public class FaustCompassBean extends LocalCompassBean {
 		super.afterPropertiesSet();
 	}
 
-	private class CompassConfigurationPostProcessor implements LocalCompassBeanPostProcessor {
+	private class CompassConfigurationPostProcessor implements LocalCompassBeanPostProcessor
+	{
 
 		@Override
-		public void process(CompassConfiguration config) throws ConfigurationException {
+		public void process(CompassConfiguration config) throws ConfigurationException
+		{
 			ResourceMappingBuilder metadataResourceMapping = RSEM.resource("metadata");
 			metadataResourceMapping.add(RSEM.id("path"));
 			metadataResourceMapping.add(RSEM.property("repositoryType"));
-			for (String metadataFieldName : MetadataFieldDefinition.REGISTRY_LOOKUP_TABLE.keySet()) {
+			for (String metadataFieldName : MetadataFieldDefinition.REGISTRY_LOOKUP_TABLE.keySet())
+			{
 				metadataResourceMapping.add(RSEM.property(metadataFieldName).store(Property.Store.NO));
 			}
 			config.addMapping(metadataResourceMapping);

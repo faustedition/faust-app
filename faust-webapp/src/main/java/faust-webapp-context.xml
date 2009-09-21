@@ -9,6 +9,6 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<context:annotation-config />
-	
+
 	<bean id="davResourceFactory" class="de.faustedition.web.dav.DavResourceFactory" />
 </beans>

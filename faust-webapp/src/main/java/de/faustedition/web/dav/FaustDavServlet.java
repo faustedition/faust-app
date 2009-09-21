@@ -31,39 +31,51 @@ import com.bradmcevoy.http.Response;
 
 import de.faustedition.util.ErrorUtil;
 
-public class FaustDavServlet extends MiltonServlet {
+public class FaustDavServlet extends MiltonServlet
+{
 
 	private static final Set<String> READ_ONLY_METHODS = new HashSet<String>(Arrays.asList(new String[] { "GET", "HEAD", "OPTION", "PROPFIND" }));
 	private PlatformTransactionManager transactionManager;
 
 	@Override
-	public void init(ServletConfig config) throws ServletException {
+	public void init(ServletConfig config) throws ServletException
+	{
 		WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
 		init((ResourceFactory) BeanFactoryUtils.beanOfTypeIncludingAncestors(context, ResourceFactory.class), new DefaultResponseHandler("1,2"), null);
 		transactionManager = (PlatformTransactionManager) BeanFactoryUtils.beanOfTypeIncludingAncestors(context, PlatformTransactionManager.class);
 	}
 
 	@Override
-	public void service(final javax.servlet.ServletRequest servletRequest, final javax.servlet.ServletResponse servletResponse) throws ServletException, IOException {
-		try {
+	public void service(final javax.servlet.ServletRequest servletRequest, final javax.servlet.ServletResponse servletResponse) throws ServletException, IOException
+	{
+		try
+		{
 			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 			transactionTemplate.setReadOnly(READ_ONLY_METHODS.contains(((HttpServletRequest) servletRequest).getMethod()));
-			transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+			transactionTemplate.execute(new TransactionCallbackWithoutResult()
+			{
 
 				@Override
-				protected void doInTransactionWithoutResult(TransactionStatus status) {
-					try {
+				protected void doInTransactionWithoutResult(TransactionStatus status)
+				{
+					try
+					{
 						HttpServletRequest req = (HttpServletRequest) servletRequest;
 						HttpServletResponse resp = (HttpServletResponse) servletResponse;
-						try {
-							Request request = new com.bradmcevoy.http.ServletRequest(req) {
-								public com.bradmcevoy.http.Auth getAuthorization() {
+						try
+						{
+							Request request = new com.bradmcevoy.http.ServletRequest(req)
+							{
+								public com.bradmcevoy.http.Auth getAuthorization()
+								{
 									SecurityContext securityContext = SecurityContextHolder.getContext();
-									if (securityContext == null) {
+									if (securityContext == null)
+									{
 										return null;
 									}
 									Authentication authentication = securityContext.getAuthentication();
-									if (authentication == null) {
+									if (authentication == null)
+									{
 										return null;
 									}
 
@@ -72,20 +84,25 @@ public class FaustDavServlet extends MiltonServlet {
 							};
 							Response response = new com.bradmcevoy.http.ServletResponse(resp);
 							httpManager.process(request, response);
-						} finally {
+						} finally
+						{
 							servletResponse.getOutputStream().flush();
 							servletResponse.flushBuffer();
 						}
-					} catch (Exception e) {
+					} catch (Exception e)
+					{
 						status.setRollbackOnly();
 					}
 				}
 			});
-		} catch (Exception e) {
+		} catch (Exception e)
+		{
 			Throwable rootCause = ExceptionUtils.getRootCause(e);
-			if (rootCause instanceof ServletException) {
+			if (rootCause instanceof ServletException)
+			{
 				throw (ServletException) rootCause;
-			} else if (rootCause instanceof IOException) {
+			} else if (rootCause instanceof IOException)
+			{
 				throw (IOException) rootCause;
 			}
 

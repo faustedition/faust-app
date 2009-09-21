@@ -4,76 +4,113 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.compass.annotations.Searchable;
+import org.compass.annotations.SearchableId;
+import org.compass.annotations.SearchableMetaData;
+import org.compass.annotations.SearchableProperty;
+import org.compass.annotations.Store;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
 
-public class Transcription implements Serializable {
+import de.faustedition.util.XMLUtil;
 
+@Searchable
+public class Transcription implements Serializable
+{
+
+	@SearchableId
 	private long id;
 	private Facsimile facsimile;
 	private Date created = new Date();
 	private Date lastModified = new Date();
+
+	@SearchableProperty
+	@SearchableMetaData(name = "textData", converter = "xmlfragment", store = Store.NO)
 	private byte[] textData;
+
+	@SearchableProperty
+	@SearchableMetaData(name = "revisionData", converter = "xmlfragment", store = Store.NO)
 	private byte[] revisionData;
 
-	public long getId() {
+	public long getId()
+	{
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(long id)
+	{
 		this.id = id;
 	}
 
-	public Facsimile getFacsimile() {
+	public Facsimile getFacsimile()
+	{
 		return facsimile;
 	}
 
-	public void setFacsimile(Facsimile facsimile) {
+	public void setFacsimile(Facsimile facsimile)
+	{
 		this.facsimile = facsimile;
 	}
 
-	public Date getCreated() {
+	public Date getCreated()
+	{
 		return created;
 	}
 
-	public void setCreated(Date created) {
+	public void setCreated(Date created)
+	{
 		this.created = created;
 	}
 
-	public Date getLastModified() {
+	public Date getLastModified()
+	{
 		return lastModified;
 	}
 
-	public void setLastModified(Date lastModified) {
+	public void setLastModified(Date lastModified)
+	{
 		this.lastModified = lastModified;
 	}
 
-	public void modified() {
+	public void modified()
+	{
 		setLastModified(new Date());
 	}
 
-	public byte[] getTextData() {
+	public byte[] getTextData()
+	{
 		return textData;
 	}
 
-	public void setTextData(byte[] data) {
+	public void setTextData(byte[] data)
+	{
 		this.textData = data;
 	}
 
-	public byte[] getRevisionData() {
+	public boolean hasText()
+	{
+		return XMLUtil.hasText(XMLUtil.parse(getTextData()).getDocumentElement());
+	}
+
+	public byte[] getRevisionData()
+	{
 		return revisionData;
 	}
 
-	public void setRevisionData(byte[] revisionData) {
+	public void setRevisionData(byte[] revisionData)
+	{
 		this.revisionData = revisionData;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj != null && (obj instanceof Transcription) && (facsimile != null)) {
+	public boolean equals(Object obj)
+	{
+		if (obj != null && (obj instanceof Transcription) && (facsimile != null))
+		{
 			Transcription other = (Transcription) obj;
-			if (other.facsimile != null) {
+			if (other.facsimile != null)
+			{
 				return (facsimile.getId() == other.facsimile.getId());
 			}
 		}
@@ -81,11 +118,13 @@ public class Transcription implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		return (facsimile == null ? super.hashCode() : new HashCodeBuilder().append(facsimile.getId()).toHashCode());
 	}
 
-	public static Transcription find(Session session, Facsimile facsimile) {
+	public static Transcription find(Session session, Facsimile facsimile)
+	{
 		return (Transcription) DataAccessUtils.uniqueResult(session.createCriteria(Transcription.class).createCriteria("facsimile").add(Restrictions.idEq(facsimile.getId())).list());
 	}
 }

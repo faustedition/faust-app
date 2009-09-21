@@ -9,7 +9,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import de.faustedition.model.AbstractModelContextTest;
 
-public class ExistImportBoostrapRun extends AbstractModelContextTest {
+public class ExistImportBoostrapRun extends AbstractModelContextTest
+{
 
 	@Autowired
 	private ExistImportBootstrapPostProcessor bootstrapPostProcessor;
@@ -18,11 +19,14 @@ public class ExistImportBoostrapRun extends AbstractModelContextTest {
 	private PlatformTransactionManager transactionManager;
 
 	@Test
-	public void runBootstrapPostProcessor() {
-		new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult() {
+	public void runBootstrapPostProcessor()
+	{
+		new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult()
+		{
 
 			@Override
-			protected void doInTransactionWithoutResult(TransactionStatus status) {
+			protected void doInTransactionWithoutResult(TransactionStatus status)
+			{
 				bootstrapPostProcessor.afterBootstrapping();
 				status.setRollbackOnly();
 			}

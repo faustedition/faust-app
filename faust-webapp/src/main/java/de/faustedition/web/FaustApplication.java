@@ -38,9 +38,11 @@ import de.faustedition.web.project.ImprintPage;
 import de.faustedition.web.search.SearchPage;
 import de.faustedition.web.text.TextPage;
 
-public class FaustApplication extends WebApplication {
+public class FaustApplication extends WebApplication
+{
 	@Override
-	protected void init() {
+	protected void init()
+	{
 		super.init();
 
 		addComponentInstantiationListener(new SpringComponentInjector(this));
@@ -64,29 +66,37 @@ public class FaustApplication extends WebApplication {
 	}
 
 	@Override
-	public RequestCycle newRequestCycle(Request request, Response response) {
+	public RequestCycle newRequestCycle(Request request, Response response)
+	{
 		return new TransactionalRequestCycle(this, (WebRequest) request, (WebResponse) response);
 	}
 
 	@Override
-	public Class<? extends Page> getHomePage() {
+	public Class<? extends Page> getHomePage()
+	{
 		return AboutPage.class;
 	}
 
-	public static WicketRuntimeException fatalError(String message, RuntimeException e) {
+	public static WicketRuntimeException fatalError(String message, RuntimeException e)
+	{
 		LoggingUtil.LOG.fatal(message, e);
 		return new WicketRuntimeException(message, e);
 	}
 
-	public static FaustApplication get() {
+	public static FaustApplication get()
+	{
 		return (FaustApplication) WebApplication.get();
 	}
 
-	public boolean hasRole(String role) {
+	public boolean hasRole(String role)
+	{
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication != null && authentication.isAuthenticated()) {
-			for (GrantedAuthority authority : authentication.getAuthorities()) {
-				if (role.equals(authority.getAuthority())) {
+		if (authentication != null && authentication.isAuthenticated())
+		{
+			for (GrantedAuthority authority : authentication.getAuthorities())
+			{
+				if (role.equals(authority.getAuthority()))
+				{
 					return true;
 				}
 			}
@@ -94,43 +104,51 @@ public class FaustApplication extends WebApplication {
 		return false;
 	}
 
-	public static void assertFound(Object foundObject) {
-		if (foundObject == null) {
+	public static void assertFound(Object foundObject)
+	{
+		if (foundObject == null)
+		{
 			throw new AbortWithWebErrorCodeException(404);
 		}
 	}
 
-	public static class TransactionalRequestCycle extends WebRequestCycle {
-		private static final Set<String> READ_ONLY_METHODS = new HashSet<String>(Arrays.asList(new String[] { "GET", "HEAD"} ));
-		
+	public static class TransactionalRequestCycle extends WebRequestCycle
+	{
+		private static final Set<String> READ_ONLY_METHODS = new HashSet<String>(Arrays.asList(new String[] { "GET", "HEAD" }));
+
 		@SpringBean
 		private PlatformTransactionManager transactionManager;
 		private TransactionStatus transactionStatus;
 		private DefaultTransactionDefinition transactionDefinition;
 
-		public TransactionalRequestCycle(WebApplication application, WebRequest request, Response response) {
+		public TransactionalRequestCycle(WebApplication application, WebRequest request, Response response)
+		{
 			super(application, request, response);
 			InjectorHolder.getInjector().inject(this);
-			
+
 			transactionDefinition = new DefaultTransactionDefinition();
 			transactionDefinition.setReadOnly(READ_ONLY_METHODS.contains(request.getHttpServletRequest().getMethod()));
 		}
 
 		@Override
-		protected void onBeginRequest() {
+		protected void onBeginRequest()
+		{
 			transactionStatus = transactionManager.getTransaction(transactionDefinition);
 			super.onBeginRequest();
 		}
 
 		@Override
-		protected void onEndRequest() {
+		protected void onEndRequest()
+		{
 			super.onEndRequest();
 			transactionManager.commit(transactionStatus);
 		}
 
 		@Override
-		public Page onRuntimeException(Page page, RuntimeException e) {
-			if (transactionStatus != null) {
+		public Page onRuntimeException(Page page, RuntimeException e)
+		{
+			if (transactionStatus != null)
+			{
 				transactionManager.rollback(transactionStatus);
 			}
 

@@ -12,7 +12,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class MetadataFieldDefinition implements Comparable<MetadataFieldDefinition> {
+public class MetadataFieldDefinition implements Comparable<MetadataFieldDefinition>
+{
 	public static Map<MetadataFieldGroup, List<MetadataFieldDefinition>> REGISTRY;
 	public static Map<String, MetadataFieldDefinition> REGISTRY_LOOKUP_TABLE;
 
@@ -22,7 +23,8 @@ public class MetadataFieldDefinition implements Comparable<MetadataFieldDefiniti
 	private Class<?> type;
 	private MetadataAnnotationLevel lowestLevel;
 
-	private MetadataFieldDefinition(MetadataFieldGroup group, int order, String name, Class<?> type, MetadataAnnotationLevel lowestLevel) {
+	private MetadataFieldDefinition(MetadataFieldGroup group, int order, String name, Class<?> type, MetadataAnnotationLevel lowestLevel)
+	{
 		this.group = group;
 		this.order = order;
 		this.name = name;
@@ -30,42 +32,54 @@ public class MetadataFieldDefinition implements Comparable<MetadataFieldDefiniti
 		this.lowestLevel = lowestLevel;
 	}
 
-	public MetadataFieldGroup getGroup() {
+	public MetadataFieldGroup getGroup()
+	{
 		return group;
 	}
 
-	public int getOrder() {
+	public int getOrder()
+	{
 		return order;
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
-	public Class<?> getType() {
+	public Class<?> getType()
+	{
 		return type;
 	}
 
-	public MetadataAnnotationLevel getLowestLevel() {
+	public MetadataAnnotationLevel getLowestLevel()
+	{
 		return lowestLevel;
 	}
 
 	@Override
-	public int compareTo(MetadataFieldDefinition o) {
+	public int compareTo(MetadataFieldDefinition o)
+	{
 		return (group.equals(o.group) ? (order - o.order) : (group.ordinal() - o.group.ordinal()));
 	}
 
-	public static SortedMap<MetadataFieldGroup, SortedSet<MetadataAssignment>> createStructuredMetadata(Collection<MetadataAssignment> metadata) {
+	public static SortedMap<MetadataFieldGroup, SortedSet<MetadataAssignment>> createStructuredMetadata(Collection<MetadataAssignment> metadata)
+	{
 		SortedMap<MetadataFieldGroup, SortedSet<MetadataAssignment>> metadataStructure = new TreeMap<MetadataFieldGroup, SortedSet<MetadataAssignment>>();
-		for (MetadataAssignment assignment : metadata) {
+		for (MetadataAssignment assignment : metadata)
+		{
 			MetadataFieldGroup fieldGroup = assignment.getDefinition().getGroup();
-			if (metadataStructure.containsKey(fieldGroup)) {
+			if (metadataStructure.containsKey(fieldGroup))
+			{
 				metadataStructure.get(fieldGroup).add(assignment);
-			} else {
-				SortedSet<MetadataAssignment> assignmentSet = new TreeSet<MetadataAssignment>(new Comparator<MetadataAssignment>() {
+			} else
+			{
+				SortedSet<MetadataAssignment> assignmentSet = new TreeSet<MetadataAssignment>(new Comparator<MetadataAssignment>()
+				{
 
 					@Override
-					public int compare(MetadataAssignment o1, MetadataAssignment o2) {
+					public int compare(MetadataAssignment o1, MetadataAssignment o2)
+					{
 						return o1.getDefinition().compareTo(o2.getDefinition());
 					}
 				});
@@ -75,7 +89,9 @@ public class MetadataFieldDefinition implements Comparable<MetadataFieldDefiniti
 		}
 		return metadataStructure;
 	}
-	static {
+
+	static
+	{
 		REGISTRY = new HashMap<MetadataFieldGroup, List<MetadataFieldDefinition>>();
 		REGISTRY_LOOKUP_TABLE = new HashMap<String, MetadataFieldDefinition>();
 
@@ -170,8 +186,10 @@ public class MetadataFieldDefinition implements Comparable<MetadataFieldDefiniti
 		REGISTRY_LOOKUP_TABLE = Collections.unmodifiableMap(REGISTRY_LOOKUP_TABLE);
 	}
 
-	private static void register(MetadataFieldDefinition definition) {
-		if (!REGISTRY.containsKey(definition.getGroup())) {
+	private static void register(MetadataFieldDefinition definition)
+	{
+		if (!REGISTRY.containsKey(definition.getGroup()))
+		{
 			REGISTRY.put(definition.getGroup(), new LinkedList<MetadataFieldDefinition>());
 		}
 		REGISTRY.get(definition.getGroup()).add(definition);

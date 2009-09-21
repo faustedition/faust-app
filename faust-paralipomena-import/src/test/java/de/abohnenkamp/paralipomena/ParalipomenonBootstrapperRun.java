@@ -12,7 +12,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/faust-model-context.xml", "/faust-paralipomena-import-context.xml" })
-public class ParalipomenonBootstrapperRun {
+public class ParalipomenonBootstrapperRun
+{
 	@Autowired
 	private ParalipomenaBootstrapPostProcessor postProcessor;
 
@@ -20,11 +21,14 @@ public class ParalipomenonBootstrapperRun {
 	private PlatformTransactionManager transactionManager;
 
 	@Test
-	public void runPostProcessor() throws Exception {
-		new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult() {
+	public void runPostProcessor() throws Exception
+	{
+		new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult()
+		{
 
 			@Override
-			protected void doInTransactionWithoutResult(TransactionStatus status) {
+			protected void doInTransactionWithoutResult(TransactionStatus status)
+			{
 				postProcessor.afterBootstrapping();
 				status.setRollbackOnly();
 			}

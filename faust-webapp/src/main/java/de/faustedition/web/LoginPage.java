@@ -6,15 +6,17 @@ import org.apache.wicket.markup.html.WebPage;
 
 import de.faustedition.web.manuscript.ManuscriptsPage;
 
+public class LoginPage extends WebPage
+{
 
-public class LoginPage extends WebPage {
-
-	public LoginPage() {
+	public LoginPage()
+	{
 		super();
 	}
 
 	@Override
-	protected void onBeforeRender() {
+	protected void onBeforeRender()
+	{
 		RequestCycle.get().setRedirect(true);
 		throw new RestartResponseException(ManuscriptsPage.class);
 	}

@@ -30,7 +30,8 @@ import org.xml.sax.InputSource;
 
 import de.faustedition.model.TEIDocument;
 
-public class TranscriptionDocumentFactory {
+public class TranscriptionDocumentFactory
+{
 	private static final String SCHEMA_URI_DEFAULT = "http://www.faustedition.net/schema/v1/faust-tei.rnc";
 	private static final String STYLESHEET_URI_DEFAULT = "http://www.faustedition.net/schema/v1/faust-tei.css";
 	private static final Map<String, String> HAND_DECLARATIONS = new LinkedHashMap<String, String>();
@@ -38,28 +39,33 @@ public class TranscriptionDocumentFactory {
 	private String schemaUri;
 	private String stylesheetUri;
 
-	public TranscriptionDocumentFactory(String schemaUri, String stylesheetUri) {
+	public TranscriptionDocumentFactory(String schemaUri, String stylesheetUri)
+	{
 		this.schemaUri = schemaUri;
 		this.stylesheetUri = stylesheetUri;
 	}
 
-	public TranscriptionDocumentFactory() {
+	public TranscriptionDocumentFactory()
+	{
 		this.schemaUri = SCHEMA_URI_DEFAULT;
 		this.stylesheetUri = STYLESHEET_URI_DEFAULT;
 	}
 
-	public TranscriptionDocument parse(InputStream stream) {
+	public TranscriptionDocument parse(InputStream stream)
+	{
 		return new TranscriptionDocument(ParseUtil.parse(new InputSource(stream)));
 	}
 
-	public TranscriptionDocument build(Transcription transcription) {
+	public TranscriptionDocument build(Transcription transcription)
+	{
 		Document document = buildTemplate(transcription);
 
 		Document transcriptionDataDocument = ParseUtil.parse(new InputSource(new ByteArrayInputStream(transcription.getTextData())));
 		document.getDocumentElement().appendChild(document.importNode(transcriptionDataDocument.getDocumentElement(), true));
 
 		List<TranscriptionRevision> revisionHistory = getRevisionHistory(transcription);
-		if (revisionHistory.isEmpty()) {
+		if (revisionHistory.isEmpty())
+		{
 			revisionHistory.add(new TranscriptionRevision(null, DateFormatUtils.ISO_DATE_FORMAT.format(new Date()), null));
 		}
 		DomUtil.getChild(document.getDocumentElement(), "teiHeader").appendChild(document.importNode(serialize(revisionHistory), true));
@@ -67,11 +73,13 @@ public class TranscriptionDocumentFactory {
 		return new TranscriptionDocument(document);
 	}
 
-	public List<TranscriptionRevision> getRevisionHistory(Transcription transcription) {
+	public List<TranscriptionRevision> getRevisionHistory(Transcription transcription)
+	{
 		Document revisionDocument = ParseUtil.parse(new InputSource(new ByteArrayInputStream(transcription.getRevisionData())));
 		List<Element> changeElements = DomUtil.getChildren(revisionDocument.getDocumentElement(), "change");
 		List<TranscriptionRevision> revisions = new ArrayList<TranscriptionRevision>(changeElements.size());
-		for (Element changeElement : changeElements) {
+		for (Element changeElement : changeElements)
+		{
 			TranscriptionRevision revision = new TranscriptionRevision();
 			revision.setAuthor(StringUtils.trimToNull(changeElement.getAttribute("who")));
 			revision.setDate(StringUtils.trimToNull(changeElement.getAttribute("when")));
@@ -80,18 +88,23 @@ public class TranscriptionDocumentFactory {
 		return revisions;
 	}
 
-	public Element serialize(List<TranscriptionRevision> revisions) {
+	public Element serialize(List<TranscriptionRevision> revisions)
+	{
 		ElementNode[] changeElements = new ElementNode[revisions.size()];
-		for (int rc = 0; rc < revisions.size(); rc++) {
+		for (int rc = 0; rc < revisions.size(); rc++)
+		{
 			TranscriptionRevision revision = revisions.get(rc);
 			changeElements[rc] = TEIDocument.teiElementNode("change");
-			if (revision.getAuthor() != null) {
+			if (revision.getAuthor() != null)
+			{
 				changeElements[rc].addChild(XmlBuilder.attribute("who", revision.getAuthor()));
 			}
-			if (revision.getDate() != null) {
+			if (revision.getDate() != null)
+			{
 				changeElements[rc].addChild(XmlBuilder.attribute("when", revision.getDate()));
 			}
-			if (revision.getDescription() != null) {
+			if (revision.getDescription() != null)
+			{
 				changeElements[rc].addChild(XmlBuilder.text(revision.getDescription()));
 			}
 		}
@@ -99,7 +112,8 @@ public class TranscriptionDocumentFactory {
 		return TEIDocument.teiElementNode("revisionDesc", changeElements).toDOM().getDocumentElement();
 	}
 
-	protected Document buildTemplate(Transcription transcription) {
+	protected Document buildTemplate(Transcription transcription)
+	{
 		Manuscript manuscript = transcription.getFacsimile().getManuscript();
 		ElementNode titleNode = teiElementNode("title", text(manuscript.getPortfolio().getName() + "-" + manuscript.getName()));
 		ElementNode fileDesc = teiElementNode("fileDesc", teiElementNode("titleStmt", titleNode), teiElementNode("publicationStmt", teiElementNode("p")), teiElementNode("sourceDesc",
@@ -114,9 +128,11 @@ public class TranscriptionDocumentFactory {
 		return document;
 	}
 
-	private Node characterDeclarations() {
+	private Node characterDeclarations()
+	{
 		List<Node> declarations = new ArrayList<Node>(CHAR_DECLARATIONS.size());
-		for (String id : CHAR_DECLARATIONS.keySet()) {
+		for (String id : CHAR_DECLARATIONS.keySet())
+		{
 			CharacterDeclaration declaration = CHAR_DECLARATIONS.get(id);
 
 			ElementNode charNameNode = teiElementNode("charName", text(declaration.name));
@@ -129,15 +145,18 @@ public class TranscriptionDocumentFactory {
 		return teiElementNode("charDecl", declarations.toArray(new Node[declarations.size()]));
 	}
 
-	private Node handDeclarations() {
+	private Node handDeclarations()
+	{
 		List<Node> declarations = new ArrayList<Node>(HAND_DECLARATIONS.size());
-		for (String id : HAND_DECLARATIONS.keySet()) {
+		for (String id : HAND_DECLARATIONS.keySet())
+		{
 			declarations.add(teiElementNode("handNote", attribute(XMLConstants.XML_NS_URI, "xml:id", id), text(HAND_DECLARATIONS.get(id))));
 		}
 		return teiElementNode("handNotes", declarations.toArray(new Node[declarations.size()]));
 	}
 
-	static {
+	static
+	{
 		final Map<String, String> typefaces = new LinkedHashMap<String, String>();
 		typefaces.put("lat", "latin");
 		typefaces.put("gr", "greek");
@@ -190,11 +209,14 @@ public class TranscriptionDocumentFactory {
 		writerMaterials.put("xy", "t, tr, bl, blau");
 		writerMaterials.put("xz", "t, tr, bl, blau");
 
-		for (String writer : writerMaterials.keySet()) {
+		for (String writer : writerMaterials.keySet())
+		{
 			String writerName = writers.get(writer);
-			for (String material : StringUtils.stripAll(StringUtils.split(writerMaterials.get(writer), ","))) {
+			for (String material : StringUtils.stripAll(StringUtils.split(writerMaterials.get(writer), ",")))
+			{
 				String materialDesc = materials.get(material);
-				for (String typeface : typefaces.keySet()) {
+				for (String typeface : typefaces.keySet())
+				{
 					String typefaceDesc = typefaces.get(typeface);
 					HAND_DECLARATIONS.put(String.format("%s_%s", writer, material, typeface), String.format("%s (%s)", writerName, materialDesc));
 					HAND_DECLARATIONS.put(String.format("%s_%s_%s", writer, material, typeface), String.format("%s (%s - %s)", writerName, materialDesc, typefaceDesc));
@@ -217,12 +239,14 @@ public class TranscriptionDocumentFactory {
 
 	}
 
-	private static class CharacterDeclaration {
+	private static class CharacterDeclaration
+	{
 		private String name;
 		private String description;
 		private String unicodeMapping;
 
-		private CharacterDeclaration(String name, String description, String unicodeMapping) {
+		private CharacterDeclaration(String name, String description, String unicodeMapping)
+		{
 			this.name = name;
 			this.description = description;
 			this.unicodeMapping = unicodeMapping;
