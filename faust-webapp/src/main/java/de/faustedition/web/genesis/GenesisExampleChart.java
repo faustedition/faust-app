@@ -35,19 +35,22 @@ public class GenesisExampleChart extends AbstractXYDataset implements IntervalXY
 
 	static
 	{
-		GENESIS_DATASET.put("V.H15", new LineInterval[] { new LineInterval(11519, 11526) });
-		GENESIS_DATASET.put("V.H13v", new LineInterval[] { new LineInterval(11511, 11529) });
-		GENESIS_DATASET.put("V.H14", new LineInterval[] { new LineInterval(11511, 11530) });
-		GENESIS_DATASET.put("V.H18", new LineInterval[] { new LineInterval(11595, 11603) });
-		GENESIS_DATASET.put("V.H17r", new LineInterval[] { new LineInterval(11593, 11595) });
-		GENESIS_DATASET.put("V.H2", new LineInterval[] { new LineInterval(11511, 11603) });
-		GENESIS_DATASET.put("V.H16", new LineInterval[] { new LineInterval(11573, 11576) });
-		GENESIS_DATASET.put("V.H", new LineInterval[] { new LineInterval(11511, 11603) });
+		GENESIS_DATASET.put("V.H15", new LineInterval[] { new LineInterval("391506", "0002", 11519, 11526) });
+		GENESIS_DATASET.put("V.H13v", new LineInterval[] { new LineInterval("391027", "0004", 11511, 11530) });
+		GENESIS_DATASET.put("V.H14", new LineInterval[] { new LineInterval("391505", "0002", 11511, 11530) });
+		GENESIS_DATASET.put("V.H18", new LineInterval[] { new LineInterval("390757", "0002", 11595, 11603) });
+		GENESIS_DATASET.put("V.H17r", new LineInterval[] { new LineInterval("391510", "0002", 11593, 11595) });
+		GENESIS_DATASET.put("V.H2", new LineInterval[] { new LineInterval("390883", "0013", 11511, 11530), new LineInterval("390883", "0014", 11539, 11590),
+				new LineInterval("390883", "0015", 11593, 11603) });
+		GENESIS_DATASET.put("V.H16", new LineInterval[] { new LineInterval("391507", "0002", 11573, 11576) });
+		GENESIS_DATASET.put("V.H", new LineInterval[] { new LineInterval("391098", "0360", 11511, 11522), new LineInterval("391098", "0361", 11523, 11543),
+				new LineInterval("391098", "0362", 11544, 11562), new LineInterval("391098", "0363", 11563, 11586), new LineInterval("391098", "0364", 11587, 11593),
+				new LineInterval("391098", "0365", 11594, 11619) });
 	}
 
 	private boolean transposed;
 
-	public void render(OutputStream imageStream, PrintWriter imageMapWriter, String mapId) throws IOException
+	public void render(OutputStream imageStream, PrintWriter imageMapWriter, final String manuscriptBaseUrl, String mapId) throws IOException
 	{
 		JFreeChart chart = ChartFactory.createXYBarChart(null, "Handschrift", false, "Vers", this, PlotOrientation.HORIZONTAL, false, false, false);
 		chart.setBackgroundPaint(Color.white);
@@ -65,7 +68,8 @@ public class GenesisExampleChart extends AbstractXYDataset implements IntervalXY
 			@Override
 			public String generateURL(XYDataset dataset, int series, int item)
 			{
-				return "http://www.google.de/";
+				LineInterval interval = GENESIS_DATASET.get(WITNESSES.get(series))[item];
+				return manuscriptBaseUrl + String.format("GSA/%s/%s", interval.portfolio, interval.manuscript);
 			}
 		});
 
@@ -293,9 +297,13 @@ public class GenesisExampleChart extends AbstractXYDataset implements IntervalXY
 	{
 		private int start;
 		private int end;
+		private String portfolio;
+		private String manuscript;
 
-		private LineInterval(int start, int end)
+		private LineInterval(String portfolio, String manuscript, int start, int end)
 		{
+			this.portfolio = portfolio;
+			this.manuscript = manuscript;
 			this.start = start;
 			this.end = end;
 		}

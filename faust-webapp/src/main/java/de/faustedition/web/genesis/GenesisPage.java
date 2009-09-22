@@ -54,7 +54,8 @@ public class GenesisPage extends PageBase
 				try
 				{
 					StringWriter imageMap = new StringWriter();
-					new GenesisExampleChart().render(new ByteArrayOutputStream(), new PrintWriter(imageMap), "genesisChart");
+					new GenesisExampleChart().render(new ByteArrayOutputStream(), new PrintWriter(imageMap), RequestCycle.get().getRequest().getRelativePathPrefixToContextRoot()
+							+ "manuscripts/transcription/", "genesisChart");
 					replaceComponentTagBody(markupStream, openTag, imageMap.toString());
 				}
 				catch (IOException e)

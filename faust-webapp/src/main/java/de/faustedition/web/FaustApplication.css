@@ -46,6 +46,10 @@ table,table th,table td,table tr {
 	margin: 1em 5%;
 }
 
+.primary-color {
+	color: #000;
+}
+
 .secondary-color {
 	color: #764F27;
 }
@@ -87,8 +91,16 @@ table,table th,table td,table tr {
 	font-size: 85%;
 }
 
+.normal-variant {
+	font-variant: normal;
+}
+
 .small-caps {
 	font-variant: small-caps;
+}
+
+.normal-style {
+	font-style: normal;
 }
 
 .italic {

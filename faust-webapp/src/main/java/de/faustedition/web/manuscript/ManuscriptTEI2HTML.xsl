@@ -6,11 +6,9 @@
 		</div>
 	</xsl:template>
 
-	<!-- 
-	<xsl:template match="tei:lb">
+	<xsl:template match="tei:lb[ancestor::tei:stage|ancestor::tei:l|ancestor::tei:p]">
 		<br />
 	</xsl:template>
- 	-->
 
 	<xsl:template match="tei:sp|tei:head">
 		<div style="margin: 2em 0">
@@ -74,4 +72,5 @@
 
 	<xsl:template match="tei:expan" />
 	<xsl:template match="tei:corr" />
+	<xsl:template match="tei:reg" />
 </xsl:stylesheet>

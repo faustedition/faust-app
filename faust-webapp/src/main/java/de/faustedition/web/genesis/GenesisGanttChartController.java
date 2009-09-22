@@ -17,7 +17,7 @@ public class GenesisGanttChartController
 	{
 		response.setContentType("image/png");
 		ServletOutputStream responseStream = response.getOutputStream();
-		new GenesisExampleChart().render(responseStream, new PrintWriter(new StringWriter()), "genesisChart");
+		new GenesisExampleChart().render(responseStream, new PrintWriter(new StringWriter()), "genesisChart", "");
 		responseStream.flush();
 	}
 }
