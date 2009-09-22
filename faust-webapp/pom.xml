@@ -68,6 +68,10 @@
 			<groupId>com.ettrema</groupId>
 			<artifactId>milton-servlet</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>

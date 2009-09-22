@@ -23,6 +23,7 @@ cd $BASE
 
 WEBAPP=`echo $BASE/webapps/faust-webapp*`
 exec java -Xmx1024m\
+    -Djava.awt.headless=true\
 	-Dlog4j.configuration=file://$BASE/log4j.properties\
 	-Dfaust.webapp=$WEBAPP\
 	-Dwicket.configuration=deployment\

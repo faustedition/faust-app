@@ -10,13 +10,13 @@ import de.faustedition.model.manuscript.FacsimileImageResolution;
 public class FacsimileImage extends WebComponent
 {
 
-	private final String path;
+	private final Facsimile facsimile;
 	private final FacsimileImageResolution resolution;
 
 	public FacsimileImage(String id, Facsimile facsimile, FacsimileImageResolution resolution)
 	{
 		super(id);
-		this.path = facsimile.getImagePath();
+		this.facsimile = facsimile;
 		this.resolution = resolution;
 	}
 
@@ -24,11 +24,14 @@ public class FacsimileImage extends WebComponent
 	protected void onComponentTag(ComponentTag tag)
 	{
 		super.onComponentTag(tag);
+		tag.put("src", getURL(facsimile, resolution));
+	}
 
+	protected static CharSequence getURL(Facsimile facsimile, FacsimileImageResolution resolution)
+	{
 		RequestCycle requestCycle = RequestCycle.get();
-		CharSequence facsimileUrl = FacsimileController.URL_PREFIX + "/" + path + resolution.getSuffix();
+		CharSequence facsimileUrl = FacsimileController.URL_PREFIX + "/" + facsimile.getImagePath() + resolution.getSuffix();
 		facsimileUrl = requestCycle.getOriginalResponse().encodeURL(facsimileUrl);
-		facsimileUrl = requestCycle.getRequest().getRelativePathPrefixToContextRoot() + facsimileUrl;
-		tag.put("src", facsimileUrl);
+		return requestCycle.getRequest().getRelativePathPrefixToContextRoot() + facsimileUrl;
 	}
 }

@@ -58,6 +58,11 @@
 		<url-pattern>/facsimile/*</url-pattern>
 	</servlet-mapping>
 
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>/chart/*</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>dav</servlet-name>
 		<servlet-class>de.faustedition.web.dav.FaustDavServlet</servlet-class>

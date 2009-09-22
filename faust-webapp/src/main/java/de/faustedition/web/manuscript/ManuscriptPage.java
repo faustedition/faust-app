@@ -34,6 +34,7 @@ import de.faustedition.util.ErrorUtil;
 import de.faustedition.web.FaustApplication;
 import de.faustedition.web.PageBase;
 import de.faustedition.web.facsimile.FacsimileImage;
+import de.faustedition.web.facsimile.FacsimileLink;
 import de.faustedition.web.util.UpLink;
 import de.faustedition.web.util.XMLSourcePanel;
 
@@ -72,7 +73,11 @@ public class ManuscriptPage extends PageBase
 
 		add(new Label("manuscriptHeader", new PropertyModel<String>(this, "manuscriptTitle")));
 		add(new UpLink("portfolioLink", PortfolioPage.getLink("upLink", manuscript.getPortfolio())));
-		add(new FacsimileImage("facsimile", facsimile, FacsimileImageResolution.LOW));
+
+		FacsimileLink facsimileLink = new FacsimileLink("facsimileLink", facsimile, FacsimileImageResolution.LOW);
+		facsimileLink.add(new FacsimileImage("facsimile", facsimile, FacsimileImageResolution.LOW));
+		add(facsimileLink);
+		
 		add(new WebComponent("transcription")
 		{
 			@Override

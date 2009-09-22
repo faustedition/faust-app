@@ -17,4 +17,6 @@
 	</bean>
 
 	<bean id="facsimileController" class="de.faustedition.web.facsimile.FacsimileController" />
+
+	<bean id="genesisGanttChartController" class="de.faustedition.web.genesis.GenesisGanttChartController" />
 </beans>

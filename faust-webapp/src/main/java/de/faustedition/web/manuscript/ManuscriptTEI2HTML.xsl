@@ -48,6 +48,18 @@
 		</span>
 	</xsl:template>
 
+	<xsl:template match="tei:hi[@rend='sub']">
+		<sub>
+			<xsl:apply-templates />
+		</sub>
+	</xsl:template>
+
+	<xsl:template match="tei:hi[@rend='sup']">
+		<sup>
+			<xsl:apply-templates />
+		</sup>
+	</xsl:template>
+
 	<xsl:template match="tei:add">
 		<span style="color: #6f6">
 			<xsl:apply-templates />

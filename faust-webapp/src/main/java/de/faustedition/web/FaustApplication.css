@@ -58,10 +58,6 @@ table,table th,table td,table tr {
 	color: #1D572E;
 }
 
-.small-caps {
-	font-variant: small-caps;
-}
-
 .no-border {
 	border: 0;
 }
@@ -89,4 +85,12 @@ table,table th,table td,table tr {
 
 .small-font {
 	font-size: 85%;
+}
+
+.small-caps {
+	font-variant: small-caps;
+}
+
+.italic {
+	font-style: italic;
 }

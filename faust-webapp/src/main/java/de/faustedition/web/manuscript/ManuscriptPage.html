@@ -10,13 +10,16 @@
 	<h2><span wicket:id="manuscriptHeader">Manuskript</span> <span wicket:id="portfolioLink" /></h2>
 
 	<div class="yui-g">
-	<div class="yui-u first"><img wicket:id="facsimile" src="#" width="400" height="600" /></div>
+	<div class="yui-u first">
+	<p class="small-font italic" ><strong>Tipp:</strong> Zum Vergrößern klicken Sie bitte auf das Faksimile.</p>
+	<p><a href="#" wicket:id="facsimileLink" title="Vergrößern"><img wicket:id="facsimile" src="#" width="400" /></a></p>
+	</div>
 	<div class="yui-u">
 	<div style="font-family: tahoma; padding: 0.5em; margin: 0.5em" wicket:id="transcription">HTML</div>
 	</div>
 	</div>
 
-	<div class="border small-font" style="color: #666; padding: 0.5em; margin: 0.5em" wicket:id="transcriptionSource">TEI Source</div>
+	<div class="border small-font" style="color: #999; padding: 0.5em; margin: 0.5em" wicket:id="transcriptionSource">TEI Source</div>
 </wicket:extend>
 </body>
 </html>
