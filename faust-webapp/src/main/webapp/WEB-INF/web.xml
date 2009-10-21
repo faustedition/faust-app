@@ -7,11 +7,8 @@
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
-			classpath:/faust-model-context.xml
-			classpath:/faust-paralipomena-import-context.xml
-			classpath:/faust-weimar-import-context.xml
-			classpath:/faust-webapp-context.xml
-			classpath:/faust-security-context.xml
+			classpath:/application-context.xml
+			classpath:/security-context.xml
 		</param-value>
 	</context-param>
 
@@ -29,64 +26,53 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<filter>
-		<filter-name>wicket</filter-name>
-		<filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
-		<init-param>
-			<param-name>applicationClassName</param-name>
-			<param-value>de.faustedition.web.FaustApplication</param-value>
-		</init-param>
-		<init-param>
-			<param-name>filterMappingUrlPattern</param-name>
-			<param-value>/*</param-value>
-		</init-param>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>wicket</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
 	<servlet>
 		<servlet-name>springmvc</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>springmvc</servlet-name>
-		<url-pattern>/facsimile/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>springmvc</servlet-name>
-		<url-pattern>/chart/*</url-pattern>
-	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>dav</servlet-name>
 		<servlet-class>de.faustedition.web.dav.FaustDavServlet</servlet-class>
-		<load-on-startup>3</load-on-startup>
+		<load-on-startup>2</load-on-startup>
 	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>/static/*</url-pattern>
+	</servlet-mapping>
 
 	<servlet-mapping>
 		<servlet-name>dav</servlet-name>
 		<url-pattern>/dav/*</url-pattern>
 	</servlet-mapping>
 
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>character-encoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>character-encoding</filter-name>
+		<servlet-name>springmvc</servlet-name>
+	</filter-mapping>
+
 	<mime-mapping>
 		<extension>rnc</extension>
 		<mime-type>application/relax-ng-compact-syntax</mime-type>
 	</mime-mapping>
-
-	<locale-encoding-mapping-list>
-		<locale-encoding-mapping>
-			<locale>de</locale>
-			<encoding>UTF-8</encoding>
-		</locale-encoding-mapping>
-		<locale-encoding-mapping>
-			<locale>en</locale>
-			<encoding>UTF-8</encoding>
-		</locale-encoding-mapping>
-	</locale-encoding-mapping-list>
 </web-app>

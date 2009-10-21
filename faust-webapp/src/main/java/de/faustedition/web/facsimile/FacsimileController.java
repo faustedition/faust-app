@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Deque;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -14,9 +15,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
@@ -24,8 +22,7 @@ import de.faustedition.model.ObjectNotFoundException;
 import de.faustedition.model.manuscript.Facsimile;
 import de.faustedition.model.manuscript.FacsimileImageDao;
 import de.faustedition.model.manuscript.FacsimileImageResolution;
-import de.faustedition.util.ReadOnlyTransactionTemplate;
-import de.faustedition.web.FaustPathUtils;
+import de.faustedition.web.ControllerUtil;
 
 @Controller
 public class FacsimileController
@@ -35,47 +32,39 @@ public class FacsimileController
 	private FacsimileImageDao facsimileStore;
 
 	@Autowired
-	private PlatformTransactionManager transactionManager;
-
-	@Autowired
 	private SessionFactory dbSessionFactory;
 
-	@RequestMapping("/" + URL_PREFIX + "/**")
+	@RequestMapping("/facsimile/**")
 	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws ObjectNotFoundException, IOException
 	{
-		String path = FaustPathUtils.getPath(request);
-
-		FacsimileImageResolution facsimileResolution = null;
-		for (FacsimileImageResolution resolution : FacsimileImageResolution.values())
+		Deque<String> pathComponents = ControllerUtil.getPathComponents(request);
+		if (!pathComponents.isEmpty() && "facsimile".equals(pathComponents.getFirst()))
 		{
-			if (resolution.matches(path))
-			{
-				facsimileResolution = resolution;
-				path = StringUtils.removeEnd(path, resolution.getSuffix());
-			}
+			pathComponents.removeFirst();
 		}
-
-		if (facsimileResolution == null || facsimileResolution == FacsimileImageResolution.HIGH)
+		if (pathComponents.isEmpty())
 		{
 			throw new ObjectNotFoundException();
 		}
 
-		final String imagePath = path;
-		Facsimile facsimile = (Facsimile) new ReadOnlyTransactionTemplate(transactionManager).execute(new TransactionCallback()
+		String filename = pathComponents.removeLast();
+		FacsimileImageResolution facsimileResolution = null;
+		for (FacsimileImageResolution resolution : FacsimileImageResolution.values())
 		{
-
-			@Override
-			public Object doInTransaction(TransactionStatus status)
+			if (resolution.matches(filename))
 			{
-				return Facsimile.findByImagePath(dbSessionFactory.getCurrentSession(), imagePath);
+				facsimileResolution = resolution;
+				filename = StringUtils.removeEnd(filename, resolution.getSuffix());
 			}
-		});
-		final File facsimileImageFile = facsimileStore.findImageFile(facsimile, facsimileResolution);
-		if (facsimile == null)
-		{
-			throw new ObjectNotFoundException(path);
 		}
+		if (facsimileResolution == null || facsimileResolution == FacsimileImageResolution.HIGH)
+		{
+			throw new ObjectNotFoundException();
+		}
+		pathComponents.addLast(filename);
 
+		Facsimile facsimile = ControllerUtil.foundObject(Facsimile.findByImagePath(dbSessionFactory.getCurrentSession(), StringUtils.join(pathComponents, "/")));
+		File facsimileImageFile = ControllerUtil.foundObject(facsimileStore.findImageFile(facsimile, facsimileResolution));
 		response.setContentType(facsimileResolution.getMimeType());
 		response.setContentLength((int) facsimileImageFile.length());
 
@@ -90,7 +79,8 @@ public class FacsimileController
 		{
 			IOUtils.copy(imageStream = new FileInputStream(facsimileImageFile), responseStream);
 			responseStream.flush();
-		} finally
+		}
+		finally
 		{
 			IOUtils.closeQuietly(imageStream);
 		}
