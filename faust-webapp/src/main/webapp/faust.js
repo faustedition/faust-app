@@ -1,18 +1,6 @@
 function yuiInit() {
-	var loader = new YAHOO.util.YUILoader( {
-		base : "http://ajax.googleapis.com/ajax/libs/yui/2.8.0r4/build/",
-		require : [ "base", "fonts", "grids", "menu", "paginator", "reset" ],
-		loadOptional : true,
-		combine : false,
-		filter : "MIN",
-		allowRollup : true,
-		insertBefore : "faust-css",
-		onSuccess : function() {
-			onContent("top-navigation", initTopNav);
-			onDOM(initPage);
-		}
-	});
-	loader.insert();
+	onContent("top-navigation", initTopNav);
+	onDOM(initPage);
 }
 
 function initTopNav() {

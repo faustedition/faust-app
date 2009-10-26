@@ -8,6 +8,5 @@
 				<li><a href="${ctx}/manuscripts/${r.name?url}">${r.name?html}</a></li>
 			[/#list]
 		</ul>
-	[#else]
 	[/#if]
 [/@faust.page]

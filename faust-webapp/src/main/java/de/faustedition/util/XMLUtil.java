@@ -32,10 +32,6 @@ public class XMLUtil
 	{
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		transformerFactory.setErrorListener(new StrictNoOutputErrorListener());
-		if (indent)
-		{
-			transformerFactory.setAttribute("indent-number", 4);
-		}
 
 		Transformer transformer = transformerFactory.newTransformer();
 		transformer.setErrorListener(new StrictNoOutputErrorListener());

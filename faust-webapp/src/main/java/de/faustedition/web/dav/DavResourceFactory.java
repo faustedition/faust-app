@@ -60,7 +60,7 @@ public class DavResourceFactory implements ResourceFactory
 	public TranscriptionDocumentFactory getTranscriptionDocumentFactory()
 	{
 		String baseUri = StringUtils.strip(StringUtils.substringBeforeLast(HttpManager.request().getAbsoluteUrl(), DAV_SERVLET_PATH), "/");
-		return new TranscriptionDocumentFactory(baseUri + "/schema/v1/faust-tei.rnc", baseUri + "/schema/v1/faust-tei.css");
+		return new TranscriptionDocumentFactory(baseUri + "/static/schema/v1/faust-tei.rnc", baseUri + "/static/schema/v1/faust-tei.css");
 	}
 
 	@Override

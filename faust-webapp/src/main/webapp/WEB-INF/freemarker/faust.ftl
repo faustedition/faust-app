@@ -10,10 +10,10 @@
 <head profile="http://dublincore.org/documents/dcq-html/">
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>${title} :: Digitale Faust-Edition</title>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/yui/2.8.0r4/build/yuiloader/yuiloader-min.js"></script>
+	[@yuiHeader/]
     <script type="text/javascript" src="${ctx}/static/faust.js"></script>
+    <link rel="stylesheet" type="text/css" href="${ctx}/static/faust.css" />
     <script type="text/javascript">var ctx = "${ctx}"; yuiInit();</script>
-    <link id="faust-css" rel="stylesheet" type="text/css" href="${ctx}/static/faust.css" />
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
 	<meta name="DC.format" scheme="DCTERMS.IMT" content="text/html" />
@@ -102,4 +102,18 @@
 	[#if (contents?size % rows) > 0][#list (rows - 1)..(contents?size % rows) as remainder]<td>&nbsp;</td>[/#list][/#if]
 	</tr>
 [/#if]
+[/#macro]
+
+[#macro yuiHeader]
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css"/>
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/base/base-min.css"/>
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/menu/assets/skins/sam/menu.css"/>
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/paginator/assets/skins/sam/paginator.css"/>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/utilities/utilities.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/container/container_core-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/menu/menu-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/event-mouseenter/event-mouseenter-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/selector/selector-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/event-delegate/event-delegate-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/paginator/paginator-min.js"></script>
 [/#macro]
