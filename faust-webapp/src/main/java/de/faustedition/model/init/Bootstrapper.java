@@ -137,7 +137,7 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware
 					}
 				} catch (Exception e)
 				{
-					throw ErrorUtil.fatal("Fatal error bootstrapping database", e);
+					throw ErrorUtil.fatal(e, "Fatal error bootstrapping database");
 				}
 			}
 		});

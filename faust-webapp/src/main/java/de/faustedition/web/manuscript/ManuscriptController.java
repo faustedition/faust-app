@@ -208,11 +208,11 @@ public class ManuscriptController implements MessageSourceAware
 		}
 		catch (TransformerException e)
 		{
-			throw ErrorUtil.fatal("XSL error while compiling TEI conversion templates", e);
+			throw ErrorUtil.fatal(e, "XSL error while compiling TEI conversion templates");
 		}
 		catch (IOException e)
 		{
-			throw ErrorUtil.fatal("I/O error while compiling TEI conversion templates", e);
+			throw ErrorUtil.fatal(e, "I/O error while compiling TEI conversion templates");
 		}
 	}
 

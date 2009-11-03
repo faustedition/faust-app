@@ -30,7 +30,7 @@ import de.swkk.metadata.GSACallNumber;
 public class DissertationText implements InitializingBean
 {
 	private static final Resource XML_RESOURCE = new ClassPathResource("/abr-dissertation-text.xml");
-	private static final Resource TEI_TRANSFORMATION_RESOURCE = new ClassPathResource("/tei-transformation.xsl");
+	private static final Resource TEI_TRANSFORMATION_RESOURCE = new ClassPathResource("/abr-dissertation-tei-transformation.xsl");
 	private static final Pattern GSA_CALL_NUMBER_PATTERN = Pattern.compile("^GSA ([XVI]+) \\(([0-9]+),([0-9]+)");
 	private Document document;
 	private Transformer teiTransformer;
@@ -65,7 +65,7 @@ public class DissertationText implements InitializingBean
 			return ((Document) result.getNode()).getDocumentElement();
 		} catch (TransformerException e)
 		{
-			throw ErrorUtil.fatal("Error transforming paralipomenon snippet to TEI", e);
+			throw ErrorUtil.fatal(e, "Error transforming paralipomenon snippet to TEI");
 		}
 	}
 

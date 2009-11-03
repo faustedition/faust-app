@@ -135,11 +135,13 @@ public class FacsimileImageDao implements InitializingBean
 						convertOutput = convertProcess.getInputStream();
 						thumbnailStream = new FileOutputStream(thumbnailFile);
 						IOUtils.copy(convertOutput, thumbnailStream);
-					} catch (IOException e)
+					}
+					catch (IOException e)
 					{
 						IOUtils.closeQuietly(thumbnailStream);
 						thumbnailFile.delete();
-					} finally
+					}
+					finally
 					{
 						IOUtils.closeQuietly(thumbnailStream);
 						IOUtils.closeQuietly(convertOutput);
@@ -153,14 +155,16 @@ public class FacsimileImageDao implements InitializingBean
 			try
 			{
 				conversionResult = convertProcess.waitFor();
-			} catch (InterruptedException e)
+			}
+			catch (InterruptedException e)
 			{
 			}
 
 			try
 			{
 				conversionResultReaderThread.join();
-			} catch (InterruptedException ie)
+			}
+			catch (InterruptedException ie)
 			{
 			}
 
@@ -168,9 +172,10 @@ public class FacsimileImageDao implements InitializingBean
 			{
 				return thumbnailFile;
 			}
-		} catch (IOException ioe)
+		}
+		catch (IOException ioe)
 		{
-			ErrorUtil.fatal("I/O error while generating thumbnail '" + thumbnailFile.getAbsolutePath() + "'", ioe);
+			ErrorUtil.fatal(ioe, "I/O error while generating thumbnail '%s'", thumbnailFile.getAbsolutePath());
 		}
 		thumbnailFile.delete();
 		return null;

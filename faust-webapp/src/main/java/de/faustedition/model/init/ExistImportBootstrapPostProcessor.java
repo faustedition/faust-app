@@ -96,7 +96,7 @@ public class ExistImportBootstrapPostProcessor implements BootstrapPostProcessor
 						}
 					} catch (IOException e)
 					{
-						throw ErrorUtil.fatal("I/O error while reading transcription from " + transcriptionFile.getAbsolutePath(), e);
+						throw ErrorUtil.fatal(e, "I/O error while reading transcription from '%s'", transcriptionFile.getAbsolutePath());
 					} finally
 					{
 						IOUtils.closeQuietly(transcriptionStream);

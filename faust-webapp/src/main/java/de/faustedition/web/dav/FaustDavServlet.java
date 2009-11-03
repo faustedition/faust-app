@@ -106,7 +106,7 @@ public class FaustDavServlet extends MiltonServlet
 				throw (IOException) rootCause;
 			}
 
-			throw ErrorUtil.fatal("Error in WebDAV transaction", e);
+			throw ErrorUtil.fatal(e, "Error in WebDAV transaction");
 		}
 	}
 }

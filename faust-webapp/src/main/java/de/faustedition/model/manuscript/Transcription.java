@@ -4,33 +4,23 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.compass.annotations.Searchable;
-import org.compass.annotations.SearchableId;
-import org.compass.annotations.SearchableMetaData;
-import org.compass.annotations.SearchableProperty;
-import org.compass.annotations.Store;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
 
+import de.faustedition.model.search.SearchIndex;
 import de.faustedition.util.XMLUtil;
 
-@Searchable
 public class Transcription implements Serializable
 {
 
-	@SearchableId
 	private long id;
 	private Facsimile facsimile;
 	private Date created = new Date();
 	private Date lastModified = new Date();
-
-	@SearchableProperty
-	@SearchableMetaData(name = "textData", converter = "xmlfragment", store = Store.NO)
 	private byte[] textData;
-
-	@SearchableProperty
-	@SearchableMetaData(name = "revisionData", converter = "xmlfragment", store = Store.NO)
 	private byte[] revisionData;
 
 	public long getId()
@@ -101,6 +91,29 @@ public class Transcription implements Serializable
 	public void setRevisionData(byte[] revisionData)
 	{
 		this.revisionData = revisionData;
+	}
+
+	public Document getLuceneDocument()
+	{
+		StringBuilder defaultFieldValue = new StringBuilder();
+		Document document = new Document();
+		document.add(new Field("class", getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+		document.add(new Field("id", Long.toString(getId()), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+		if (textData != null)
+		{
+			String textData = XMLUtil.parse(this.textData).getDocumentElement().getTextContent();
+			document.add(new Field("textData", textData, Field.Store.NO, Field.Index.ANALYZED));
+			defaultFieldValue.append("\n" + textData);
+		}
+		if (revisionData != null)
+		{
+			String revisionData = XMLUtil.parse(this.revisionData).getDocumentElement().getTextContent();
+			document.add(new Field("revisionData", revisionData, Field.Store.NO, Field.Index.ANALYZED));
+			defaultFieldValue.append("\n" + revisionData);
+		}
+		document.add(new Field(SearchIndex.DEFAULT_FIELD, defaultFieldValue.toString(), Field.Store.NO, Field.Index.ANALYZED));
+
+		return document;
 	}
 
 	@Override

@@ -13,7 +13,7 @@
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename" value="messages" />
 	</bean>
-	
+
 	<bean id="dataDirectory" class="de.faustedition.model.DataDirectoryFactoryBean">
 		<property name="dataDirectoryResources">
 			<list>
@@ -21,6 +21,10 @@
 				<value>file:///Users/gregor/Documents/Faustedition/data</value>
 			</list>
 		</property>
+	</bean>
+
+	<bean id="searchIndex" class="de.faustedition.model.search.SearchIndex">
+		<property name="indexName" value="faust" />
 	</bean>
 
 	<bean id="dbDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -57,40 +61,7 @@
 		</property>
 	</bean>
 
-	<bean id="compass" class="org.compass.spring.LocalCompassBean">
-		<property name="mappingScan" value="de.faustedition.model" />
-		<property name="compassSettings">
-			<props>
-				<prop key="compass.engine.connection">ram://index</prop>
-				<prop key="compass.transaction.factory">org.compass.spring.transaction.SpringSyncTransactionFactory</prop>
-			</props>
-		</property>
-		<property name="convertersByName">
-			<map>
-				<entry key="xmlfragment">
-					<bean class="de.faustedition.model.search.XmlFragmentConverter" />
-				</entry>
-			</map>
-		</property>
-		<property name="transactionManager" ref="transactionManager" />
-	</bean>
-
-	<bean id="compassGps" class="org.compass.gps.impl.SingleCompassGps" init-method="start" destroy-method="stop">
-		<property name="compass" ref="compass" />
-		<property name="gpsDevices">
-			<list>
-				<bean id="hibernateGpsDevice" class="org.compass.gps.device.hibernate.HibernateGpsDevice">
-					<property name="name" value="hibernateGpsDevice" />
-					<property name="sessionFactory" ref="dbSessionFactory" />
-					<property name="nativeExtractor">
-						<bean class="org.compass.spring.device.hibernate.SpringNativeHibernateExtractor" />
-					</property>
-				</bean>
-			</list>
-		</property>
-	</bean>
-
-	<bean id="indexBuildingBootTask" class="de.faustedition.model.search.IndexBuildingBootTask" />
+	<bean id="indexBuildingBootTask" class="de.faustedition.model.search.SearchIndexBuildTask" />
 
 	<bean id="asynchronousScheduler" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
 		<property name="poolSize" value="5" />

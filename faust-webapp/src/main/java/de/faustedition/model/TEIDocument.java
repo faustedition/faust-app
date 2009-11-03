@@ -1,11 +1,19 @@
 package de.faustedition.model;
 
-import javax.xml.XMLConstants;
+import java.io.ByteArrayInputStream;
 
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+
+import net.sf.practicalxml.ParseUtil;
 import net.sf.practicalxml.builder.ElementNode;
 import net.sf.practicalxml.builder.Node;
 import net.sf.practicalxml.builder.XmlBuilder;
 import net.sf.practicalxml.xpath.XPathWrapper;
+
+import org.xml.sax.InputSource;
+
+import de.faustedition.util.XMLUtil;
 
 public class TEIDocument
 {
@@ -30,5 +38,11 @@ public class TEIDocument
 		xPathWrapper.bindDefaultNamespace(TEI_NS_URI);
 		xPathWrapper.bindNamespace("svg", SVG_NS_URI);
 		return xPathWrapper;
+	}
+
+	public static void parse(byte[] data)
+	{
+		Schema schema = null; // TODO
+		ParseUtil.validatingParse(new InputSource(new ByteArrayInputStream(data)), schema, new XMLUtil.StrictNoOutputErrorCallback());
 	}
 }

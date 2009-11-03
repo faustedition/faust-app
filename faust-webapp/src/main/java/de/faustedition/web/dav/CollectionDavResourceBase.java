@@ -72,7 +72,7 @@ public abstract class CollectionDavResourceBase extends DavResourceBase implemen
 			transformer.transform(new DOMSource(document), new StreamResult(out));
 		} catch (TransformerException e)
 		{
-			throw ErrorUtil.fatal("Error serializing XHTML view", e);
+			throw ErrorUtil.fatal(e, "Error serializing XHTML view");
 		}
 	}
 

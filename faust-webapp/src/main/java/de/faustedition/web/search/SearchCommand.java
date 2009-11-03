@@ -1,16 +1,22 @@
 package de.faustedition.web.search;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
-import org.compass.core.Compass;
-import org.compass.core.CompassHit;
-import org.compass.core.support.search.CompassSearchCommand;
-import org.compass.core.support.search.CompassSearchHelper;
+import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 
 import com.google.common.collect.Lists;
 
 import de.faustedition.model.manuscript.Transcription;
 import de.faustedition.model.metadata.MetadataAssignment;
+import de.faustedition.model.search.SearchException;
+import de.faustedition.model.search.SearchIndex;
+import de.faustedition.model.search.SearchIndexAdapter;
 
 public class SearchCommand
 {
@@ -26,27 +32,33 @@ public class SearchCommand
 		this.query = query;
 	}
 
-	public List<SearchResult> execute(Compass compass)
+	public List<SearchResult> execute(SearchIndex searchIndex) throws SearchException
 	{
-		List<SearchResult> resultList = Lists.newArrayList();
-		for (CompassHit hit : new CompassSearchHelper(compass).search(new CompassSearchCommand(query)).getHits())
+		if (StringUtils.isBlank(query))
 		{
-			Object hitObject = hit.data();
-			if (hitObject instanceof MetadataAssignment)
-			{
-				MetadataAssignment assignment = (MetadataAssignment) hitObject;
-				resultList.add(new SearchResult(assignment.getField() + " ==> " + assignment.getValue()));
-			}
-			else if (hitObject instanceof Transcription)
-			{
-				resultList.add(new SearchResult("Transcription #" + ((Transcription) hitObject).getId()));
-			}
-			else
-			{
-				resultList.add(new SearchResult("\u00a0"));
-			}
-
+			return Collections.emptyList();
 		}
+		final List<SearchResult> resultList = Lists.newArrayList();
+		searchIndex.query(query, new SearchIndexAdapter()
+		{
+			@Override
+			public void queryResult(IndexSearcher searcher, TopDocs documents) throws IOException
+			{
+				for (ScoreDoc document : documents.scoreDocs)
+				{
+					Document luceneDocument = searcher.doc(document.doc);
+					String clazzName = luceneDocument.get("class");
+					if (MetadataAssignment.class.getName().equals(clazzName))
+					{
+						resultList.add(new SearchResult(String.format("%s ==> %s", luceneDocument.get("field"), luceneDocument.get("value"))));
+					}
+					else if (Transcription.class.getName().equals(clazzName))
+					{
+						resultList.add(new SearchResult(String.format("Transcription #%s", luceneDocument.get("id"))));
+					}
+				}
+			}
+		});
 		return resultList;
 	}
 }

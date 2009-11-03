@@ -22,26 +22,30 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import de.faustedition.model.TEIDocument;
 
 public class XMLUtil
 {
+	public static TransformerFactory saxonTransformerFactory()
+	{
+		return TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", XMLUtil.class.getClassLoader());
+	}
+
 	public static Transformer nullTransformer(boolean indent) throws TransformerException
 	{
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		transformerFactory.setErrorListener(new StrictNoOutputErrorListener());
+		TransformerFactory transformerFactory = saxonTransformerFactory();
+		transformerFactory.setErrorListener(new StrictNoOutputErrorCallback());
 
 		Transformer transformer = transformerFactory.newTransformer();
-		transformer.setErrorListener(new StrictNoOutputErrorListener());
+		transformer.setErrorListener(new StrictNoOutputErrorCallback());
 		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 		transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-		if (indent)
-		{
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-		}
+		transformer.setOutputProperty(OutputKeys.INDENT, (indent ? "yes" : "no"));
 		return transformer;
 	}
 
@@ -83,7 +87,24 @@ public class XMLUtil
 		}
 	}
 
-	private static class StrictNoOutputErrorListener implements ErrorListener
+	public static Document parse(byte[] data)
+	{
+		return ParseUtil.parse(new InputSource(new ByteArrayInputStream(data)));
+	}
+
+	public static boolean hasText(Element element)
+	{
+		for (Node textNode : TEIDocument.xpath(".//text()").evaluate(element))
+		{
+			if (StringUtils.isNotBlank(textNode.getTextContent()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static class StrictNoOutputErrorCallback implements ErrorListener, ErrorHandler
 	{
 
 		@Override
@@ -104,23 +125,24 @@ public class XMLUtil
 			throw exception;
 		}
 
-	}
-
-	public static Document parse(byte[] data)
-	{
-		return ParseUtil.parse(new InputSource(new ByteArrayInputStream(data)));
-	}
-
-	public static boolean hasText(Element element)
-	{
-		for (Node textNode : TEIDocument.xpath(".//text()").evaluate(element))
+		@Override
+		public void error(SAXParseException exception) throws SAXException
 		{
-			if (StringUtils.isNotBlank(textNode.getTextContent()))
-			{
-				return true;
-			}
+			throw exception;
+			
 		}
-		return false;
-	}
 
+		@Override
+		public void fatalError(SAXParseException exception) throws SAXException
+		{
+			throw exception;
+		}
+
+		@Override
+		public void warning(SAXParseException exception) throws SAXException
+		{
+			throw exception;			
+		}
+
+	}
 }

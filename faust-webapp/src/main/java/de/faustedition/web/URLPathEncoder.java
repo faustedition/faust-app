@@ -35,7 +35,7 @@ public class URLPathEncoder implements TemplateMethodModel
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			throw ErrorUtil.fatal("UTF-8 encoding unsupported", e);
+			throw ErrorUtil.fatal(e, "UTF-8 encoding unsupported");
 		}
 	}
 

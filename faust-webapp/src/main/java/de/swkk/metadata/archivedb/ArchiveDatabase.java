@@ -30,7 +30,7 @@ public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
 		try {
 			parser = SAXParserFactory.newInstance().newSAXParser();
 		} catch (ParserConfigurationException e) {
-			throw ErrorUtil.fatal("Error configuring SAX parser", e);
+			throw ErrorUtil.fatal(e, "Error configuring SAX parser");
 		}
 		
 		parser.parse(DATABASE_RESOURCE.getInputStream(), new DefaultHandler() {
