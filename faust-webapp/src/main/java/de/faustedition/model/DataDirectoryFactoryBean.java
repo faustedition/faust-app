@@ -8,7 +8,7 @@ import org.springframework.core.io.Resource;
 
 import de.faustedition.util.ResourceUtil;
 
-public class DataDirectoryFactoryBean implements FactoryBean
+public class DataDirectoryFactoryBean implements FactoryBean<File>
 {
 
 	private Resource[] dataDirectoryResources;
@@ -21,7 +21,7 @@ public class DataDirectoryFactoryBean implements FactoryBean
 	}
 
 	@Override
-	public Object getObject() throws Exception
+	public File getObject() throws Exception
 	{
 		if (dataDirectory == null)
 		{

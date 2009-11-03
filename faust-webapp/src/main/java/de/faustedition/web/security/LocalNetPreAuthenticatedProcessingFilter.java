@@ -2,8 +2,7 @@ package de.faustedition.web.security;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.security.ui.FilterChainOrder;
-import org.springframework.security.ui.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
 public class LocalNetPreAuthenticatedProcessingFilter extends AbstractPreAuthenticatedProcessingFilter
 {
@@ -34,11 +33,4 @@ public class LocalNetPreAuthenticatedProcessingFilter extends AbstractPreAuthent
 
 		return false;
 	}
-
-	@Override
-	public int getOrder()
-	{
-		return FilterChainOrder.PRE_AUTH_FILTER;
-	}
-
 }

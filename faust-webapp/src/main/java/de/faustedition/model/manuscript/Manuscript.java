@@ -55,9 +55,10 @@ public class Manuscript implements Serializable
 		return session.createCriteria(Manuscript.class).addOrder(Order.asc("name")).createCriteria("portfolio").add(Restrictions.idEq(portfolio.getId())).list();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Manuscript find(Session session, Portfolio portfolio, String name)
 	{
-		return (Manuscript) DataAccessUtils.uniqueResult(session.createCriteria(Manuscript.class).add(Restrictions.eq("name", name)).createCriteria("portfolio").add(
+		return DataAccessUtils.uniqueResult((List<Manuscript>) session.createCriteria(Manuscript.class).add(Restrictions.eq("name", name)).createCriteria("portfolio").add(
 				Restrictions.idEq(portfolio.getId())).list());
 	}
 

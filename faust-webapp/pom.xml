@@ -136,28 +136,15 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 			<version>${spring.security.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-aop</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-context</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-support</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-core-tiger</artifactId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
 			<version>${spring.security.version}</version>
 		</dependency>
 		<dependency>
@@ -181,18 +168,6 @@
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.2.2</version>
 		</dependency>
-		<dependency>
-			<groupId>org.opensymphony.quartz</groupId>
-			<artifactId>quartz</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.compass-project</groupId>
-			<artifactId>compass</artifactId>
-			<version>2.2.0</version>
-		</dependency>
-		 -->
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
@@ -271,8 +246,8 @@
 	</build>
 	<properties>
 		<slf4j.version>1.5.8</slf4j.version>
-		<spring.version>2.5.6.SEC01</spring.version>
-		<spring.security.version>2.0.5.RELEASE</spring.security.version>
+		<spring.version>3.0.0.RC1</spring.version>
+		<spring.security.version>3.0.0.RC1</spring.security.version>
 		<milton.version>1.4.2</milton.version>
 		<lucene.version>2.9.0</lucene.version>
 	</properties>

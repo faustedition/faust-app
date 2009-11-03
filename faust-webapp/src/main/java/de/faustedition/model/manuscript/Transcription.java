@@ -2,6 +2,7 @@ package de.faustedition.model.manuscript;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.lucene.document.Document;
@@ -136,8 +137,9 @@ public class Transcription implements Serializable
 		return (facsimile == null ? super.hashCode() : new HashCodeBuilder().append(facsimile.getId()).toHashCode());
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Transcription find(Session session, Facsimile facsimile)
 	{
-		return (Transcription) DataAccessUtils.uniqueResult(session.createCriteria(Transcription.class).createCriteria("facsimile").add(Restrictions.idEq(facsimile.getId())).list());
+		return DataAccessUtils.uniqueResult((List<Transcription>) session.createCriteria(Transcription.class).createCriteria("facsimile").add(Restrictions.idEq(facsimile.getId())).list());
 	}
 }

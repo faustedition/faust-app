@@ -86,9 +86,10 @@ public class Facsimile implements Serializable
 		return session.createCriteria(Facsimile.class).addOrder(Order.asc("name")).createCriteria("manuscript").add(Restrictions.idEq(manuscript.getId())).list();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Facsimile find(Session session, Manuscript manuscript, String name)
 	{
-		return (Facsimile) DataAccessUtils.uniqueResult(session.createCriteria(Facsimile.class).add(Restrictions.eq("name", name)).createCriteria("manuscript").add(
+		return DataAccessUtils.uniqueResult((List<Facsimile>) session.createCriteria(Facsimile.class).add(Restrictions.eq("name", name)).createCriteria("manuscript").add(
 				Restrictions.idEq(manuscript.getId())).list());
 	}
 
@@ -107,9 +108,10 @@ public class Facsimile implements Serializable
 		return facsimile;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Facsimile findByImagePath(Session session, String imagePath)
 	{
-		return (Facsimile) DataAccessUtils.singleResult(session.createCriteria(Facsimile.class).add(Restrictions.eq("imagePath", imagePath)).list());
+		return DataAccessUtils.singleResult((List<Facsimile>) session.createCriteria(Facsimile.class).add(Restrictions.eq("imagePath", imagePath)).list());
 	}
 
 }

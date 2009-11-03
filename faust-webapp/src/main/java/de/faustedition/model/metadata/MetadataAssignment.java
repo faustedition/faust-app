@@ -80,10 +80,11 @@ public class MetadataAssignment implements Serializable
 				.executeUpdate();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static MetadataAssignment find(Session session, MetadataAssignment assignment)
 	{
-		return (MetadataAssignment) DataAccessUtils.uniqueResult(session.createCriteria(MetadataAssignment.class).add(Restrictions.eq("associatedType", assignment.getAssociatedType())).add(
-				Restrictions.eq("associatedId", assignment.getAssociatedId())).add(Restrictions.eq("field", assignment.getField())).list());
+		return DataAccessUtils.uniqueResult((List<MetadataAssignment>) session.createCriteria(MetadataAssignment.class).add(Restrictions.eq("associatedType", assignment.getAssociatedType()))
+				.add(Restrictions.eq("associatedId", assignment.getAssociatedId())).add(Restrictions.eq("field", assignment.getField())).list());
 	}
 
 	public void create(Session session)

@@ -1,9 +1,11 @@
 package de.faustedition.web.security;
 
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.ui.AuthenticationDetailsSourceImpl;
-import org.springframework.security.ui.preauth.PreAuthenticatedGrantedAuthoritiesAuthenticationDetails;
+import java.util.Arrays;
+
+import org.springframework.security.authentication.AuthenticationDetailsSourceImpl;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesAuthenticationDetails;
 
 public class LocalNetPreAuthenticatedAuthenticationDetailsSource extends AuthenticationDetailsSourceImpl
 {
@@ -18,7 +20,7 @@ public class LocalNetPreAuthenticatedAuthenticationDetailsSource extends Authent
 	public Object buildDetails(Object context)
 	{
 		PreAuthenticatedGrantedAuthoritiesAuthenticationDetails details = (PreAuthenticatedGrantedAuthoritiesAuthenticationDetails) super.buildDetails(context);
-		details.setGrantedAuthorities(new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_EDITOR") });
+		details.setGrantedAuthorities(Arrays.asList(new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_EDITOR") }));
 		return details;
 	}
 }

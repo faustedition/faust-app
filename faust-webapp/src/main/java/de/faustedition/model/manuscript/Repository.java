@@ -37,9 +37,10 @@ public class Repository implements Serializable
 		this.name = name;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Repository find(Session session, String name)
 	{
-		return (Repository) DataAccessUtils.uniqueResult(session.createCriteria(Repository.class).add(Restrictions.eq("name", name)).list());
+		return DataAccessUtils.uniqueResult((List<Repository>) session.createCriteria(Repository.class).add(Restrictions.eq("name", name)).list());
 	}
 
 	public static Repository findOrCreate(Session session, String name)

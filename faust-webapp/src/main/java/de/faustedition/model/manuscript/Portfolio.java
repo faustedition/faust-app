@@ -50,9 +50,10 @@ public class Portfolio implements Serializable
 		this.name = name;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Portfolio find(Session session, Repository repository, String name)
 	{
-		return (Portfolio) DataAccessUtils.uniqueResult(session.createCriteria(Portfolio.class).add(Restrictions.eq("name", name)).createCriteria("repository").add(
+		return DataAccessUtils.uniqueResult((List<Portfolio>) session.createCriteria(Portfolio.class).add(Restrictions.eq("name", name)).createCriteria("repository").add(
 				Restrictions.idEq(repository.getId())).list());
 	}
 

@@ -74,7 +74,6 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware
 		new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult()
 		{
 
-			@SuppressWarnings("unchecked")
 			@Override
 			protected void doInTransactionWithoutResult(TransactionStatus status)
 			{

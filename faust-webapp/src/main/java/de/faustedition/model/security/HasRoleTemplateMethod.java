@@ -1,10 +1,11 @@
 package de.faustedition.model.security;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import freemarker.template.TemplateMethodModel;
 import freemarker.template.TemplateModelException;
@@ -24,7 +25,7 @@ public class HasRoleTemplateMethod implements TemplateMethodModel
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null)
 		{
-			GrantedAuthority[] authorities = authentication.getAuthorities();
+			Collection<GrantedAuthority> authorities = authentication.getAuthorities();
 			if (authorities != null)
 			{
 				for (GrantedAuthority authority : authorities)
