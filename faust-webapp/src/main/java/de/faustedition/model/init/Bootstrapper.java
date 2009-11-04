@@ -3,18 +3,16 @@ package de.faustedition.model.init;
 import static de.faustedition.model.TEIDocument.teiElementNode;
 
 import java.io.File;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -31,7 +29,7 @@ import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
 import de.faustedition.util.XMLUtil;
 
-public class Bootstrapper implements InitializingBean, ApplicationContextAware
+public class Bootstrapper
 {
 	private static final FacsimileImageResolution BOOTSTRAP_RESOLUTION = FacsimileImageResolution.HIGH;
 
@@ -47,16 +45,20 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware
 	@Autowired
 	private ScheduledExecutorService scheduledExecutorService;
 
-	private ApplicationContext applicationContext;
+	private final List<BootstrapPostProcessor> postProcessors;
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+	public Bootstrapper()
 	{
-		this.applicationContext = applicationContext;
+		this(new ArrayList<BootstrapPostProcessor>());
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception
+	public Bootstrapper(List<BootstrapPostProcessor> postProcessors)
+	{
+		this.postProcessors = postProcessors;
+	}
+
+	@PostConstruct
+	public void init() throws Exception
 	{
 		scheduledExecutorService.execute(new Runnable()
 		{
@@ -128,13 +130,13 @@ public class Bootstrapper implements InitializingBean, ApplicationContextAware
 
 				try
 				{
-					Map<String, BootstrapPostProcessor> postProcessors = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, BootstrapPostProcessor.class);
-					for (BootstrapPostProcessor postProcessor : postProcessors.values())
+					for (BootstrapPostProcessor postProcessor : postProcessors)
 					{
 						LoggingUtil.LOG.info("Running boostrap post-processor " + postProcessor);
 						postProcessor.afterBootstrapping();
 					}
-				} catch (Exception e)
+				}
+				catch (Exception e)
 				{
 					throw ErrorUtil.fatal(e, "Fatal error bootstrapping database");
 				}

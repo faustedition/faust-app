@@ -48,9 +48,9 @@ import de.faustedition.web.metadata.MetadataTable;
 @Controller
 public class ManuscriptController implements MessageSourceAware
 {
-	private static final ClassPathResource TEI_2_HTML_XSL_RESOURCE = new ClassPathResource("/manuscript-tei-2-xhtml.xsl");
-	private static final ClassPathResource TEI_2_XSLFO_XSL_RESOURCE = new ClassPathResource("/manuscript-tei-2-xsl-fo.xsl");
-	private static final ClassPathResource TEI_2_SVG_XSL_RESOURCE = new ClassPathResource("/manuscript-tei-2-svg.xsl");
+	private static final ClassPathResource TEI_2_HTML_XSL_RESOURCE = new ClassPathResource("/xsl/manuscript-tei-2-xhtml.xsl");
+	private static final ClassPathResource TEI_2_XSLFO_XSL_RESOURCE = new ClassPathResource("/xsl/manuscript-tei-2-xsl-fo.xsl");
+	private static final ClassPathResource TEI_2_SVG_XSL_RESOURCE = new ClassPathResource("/xsl/manuscript-tei-2-svg.xsl");
 	private static final FopFactory FOP_FACTORY = FopFactory.newInstance();
 	private static Templates tei2htmlTemplates;
 	private static Templates tei2xslFoTemplates;

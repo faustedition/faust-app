@@ -13,7 +13,7 @@ import de.swkk.metadata.AllegroRecordSet;
 import de.swkk.metadata.GSACallNumber;
 
 public class FaustInventory extends AllegroRecordSet {
-	private static final Resource DATABASE_RESOURCE = new ClassPathResource("/weimar_manuscripts_faust.txt");
+	private static final Resource DATABASE_RESOURCE = new ClassPathResource("/data/weimar_manuscripts_faust.txt");
 	private static final String FAUST_REFERENCE_FIELD = "11z";
 
 	private CategoryResolver categoryResolver;

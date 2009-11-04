@@ -3,42 +3,4 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<context:component-scan base-package="de.faustedition.web" />
-
-	<bean id="handlerAdapter" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-		<!--
-			<property name="webBindingInitializer"> <bean class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer"> <property name="formatterRegistry" ref="formatterRegistry" /> <property
-			name="propertyEditorRegistrar"> <bean class="de.elumbusreisen.util.WebPropertyEditorRegistrar" /> </property> </bean> </property>
-		-->
-	</bean>
-
-	<bean id="handlerMapping" class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-		<property name="interceptors">
-			<list>
-				<bean class="de.faustedition.web.TransactionContextHandlerInterceptor" />
-			</list>
-		</property>
-	</bean>
-
-	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver" />
-
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
-		<property name="viewClass" value="de.faustedition.web.FaustFreemarkerView" />
-		<property name="contentType" value="application/xhtml+xml" />
-		<property name="prefix" value="" />
-		<property name="suffix" value=".ftl" />
-	</bean>
-
-	<bean id="freemarkerConfiguration" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
-		<property name="templateLoaderPath" value="/WEB-INF/freemarker/" />
-		<property name="freemarkerSettings">
-			<props>
-				<prop key="auto_include">/header.ftl</prop>
-				<prop key="default_encoding">UTF-8</prop>
-				<prop key="output_encoding">UTF-8</prop>
-				<prop key="url_escaping_charset">UTF-8</prop>
-				<prop key="strict_syntax">true</prop>
-				<prop key="whitespace_stripping">true</prop>
-			</props>
-		</property>
-	</bean>
 </beans>

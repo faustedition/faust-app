@@ -21,7 +21,7 @@ import de.faustedition.util.ErrorUtil;
 import de.swkk.metadata.GSACallNumber;
 
 public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
-	private static final Resource DATABASE_RESOURCE = new ClassPathResource("/weimar_manuscripts_archive_db.xml");
+	private static final Resource DATABASE_RESOURCE = new ClassPathResource("/data/weimar_manuscripts_archive_db.xml");
 
 	private Map<GSACallNumber, ArchiveDatabaseRecord> callNumberIndex = new HashMap<GSACallNumber, ArchiveDatabaseRecord>();
 

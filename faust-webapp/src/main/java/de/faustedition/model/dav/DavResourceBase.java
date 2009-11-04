@@ -1,4 +1,4 @@
-package de.faustedition.web.dav;
+package de.faustedition.model.dav;
 
 import java.util.Date;
 

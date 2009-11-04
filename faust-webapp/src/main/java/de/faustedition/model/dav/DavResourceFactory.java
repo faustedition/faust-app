@@ -1,4 +1,4 @@
-package de.faustedition.web.dav;
+package de.faustedition.model.dav;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.CollectionResource;
@@ -26,6 +27,7 @@ import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
 import de.faustedition.model.manuscript.TranscriptionDocumentFactory;
 
+@Service
 public class DavResourceFactory implements ResourceFactory
 {
 	private static final String DAV_SERVLET_PATH = "/dav";

@@ -3,6 +3,8 @@ package de.faustedition.model.search;
 import java.io.File;
 import java.io.IOException;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
@@ -12,14 +14,13 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Required;
 
 import de.faustedition.util.ErrorUtil;
 
-public class SearchIndex implements InitializingBean
+public class SearchIndex
 {
 	private static final String SEARCH_INDEX_DIRECTORY = "search-index";
 
@@ -33,6 +34,15 @@ public class SearchIndex implements InitializingBean
 
 	private File indexDirectory;
 	private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_CURRENT);
+
+	public SearchIndex()
+	{
+	}
+
+	public SearchIndex(String indexName)
+	{
+		setIndexName(indexName);
+	}
 
 	@Required
 	public void setIndexName(String indexName)
@@ -105,8 +115,8 @@ public class SearchIndex implements InitializingBean
 		}
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception
+	@PostConstruct
+	public void init() throws Exception
 	{
 		indexDirectory = new File(new File(dataDirectory, SEARCH_INDEX_DIRECTORY), indexName);
 		indexDirectory.mkdirs();

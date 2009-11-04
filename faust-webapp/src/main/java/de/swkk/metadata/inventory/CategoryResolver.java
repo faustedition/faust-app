@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 import de.swkk.metadata.AllegroRecordSet;
 
 public class CategoryResolver extends AllegroRecordSet {
-	private static final Resource RESOLVER_RESOURCE = new ClassPathResource("/weimar_manuscripts_category_desc.txt");
+	private static final Resource RESOLVER_RESOURCE = new ClassPathResource("/data/weimar_manuscripts_category_desc.txt");
 
 	public CategoryResolver() throws IOException {
 		parse(RESOLVER_RESOURCE);

@@ -8,7 +8,7 @@ public class ResourceUtil
 	{
 		for (Resource candidate : candidates)
 		{
-			if (candidate.exists() && candidate.isReadable())
+			if (candidate.exists())
 			{
 				return candidate;
 			}

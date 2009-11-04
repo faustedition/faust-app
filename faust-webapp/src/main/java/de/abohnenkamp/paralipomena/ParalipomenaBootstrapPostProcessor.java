@@ -26,8 +26,7 @@ import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
 
 public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcessor, InitializingBean
 {
-	@Autowired
-	private DissertationText dissertationText;
+	private DissertationText dissertationText = new DissertationText();
 
 	@Autowired
 	private SessionFactory dbSessionFactory;

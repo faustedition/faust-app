@@ -6,10 +6,7 @@
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>
-			classpath:/application-context.xml
-			classpath:/security-context.xml
-		</param-value>
+		<param-value>classpath:/application-context.xml classpath:/security-context.xml</param-value>
 	</context-param>
 
 	<listener>
@@ -34,7 +31,7 @@
 
 	<servlet>
 		<servlet-name>dav</servlet-name>
-		<servlet-class>de.faustedition.web.dav.FaustDavServlet</servlet-class>
+		<servlet-class>de.faustedition.model.dav.FaustDavServlet</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 

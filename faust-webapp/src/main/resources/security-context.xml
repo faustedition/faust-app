@@ -11,11 +11,11 @@
 		<intercept-url pattern="/login" access="ROLE_EDITOR" />
 		<intercept-url pattern="/**" filters="none" />
 		<http-basic />
-		<custom-filter ref="localNetPreAuthenticationFilter" before="PRE_AUTH_FILTER" />
+		<custom-filter ref="localNetPreAuthenticatedProcessingFilter" before="PRE_AUTH_FILTER" />
 	</http>
 
 	<authentication-manager alias="authenticationManager">
-		<authentication-provider ref="preauthenticatedAuthenticationProvider" />
+		<authentication-provider ref="preAuthenticatedAuthenticationProvider" />
 		<authentication-provider>
 			<password-encoder hash="sha" />
 			<user-service>
@@ -31,17 +31,4 @@
 			</user-service>
 		</authentication-provider>
 	</authentication-manager>
-
-	<beans:bean id="localNetPreAuthenticationFilter" class="de.faustedition.web.security.LocalNetPreAuthenticatedProcessingFilter">
-		<beans:property name="authenticationManager" ref="authenticationManager" />
-		<beans:property name="authenticationDetailsSource">
-			<beans:bean class="de.faustedition.web.security.LocalNetPreAuthenticatedAuthenticationDetailsSource" />
-		</beans:property>
-	</beans:bean>
-
-	<beans:bean id="preauthenticatedAuthenticationProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-		<beans:property name="preAuthenticatedUserDetailsService">
-			<beans:bean class="org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService" />
-		</beans:property>
-	</beans:bean>
 </beans:beans>

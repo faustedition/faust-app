@@ -3,9 +3,10 @@ package de.swkk.metadata;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.faustedition.model.init.BootstrapPostProcessor;
@@ -18,7 +19,7 @@ import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
 import de.swkk.metadata.inventory.FaustInventory;
 import de.swkk.metadata.inventory.MetadataFieldMapping;
 
-public class MetadataBootstrapPostProcessor implements BootstrapPostProcessor, InitializingBean {
+public class MetadataBootstrapPostProcessor implements BootstrapPostProcessor {
 
 	@Autowired
 	private SessionFactory dbSessionFactory;
@@ -66,8 +67,8 @@ public class MetadataBootstrapPostProcessor implements BootstrapPostProcessor, I
 
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void init() throws Exception {
 		faustInventory = new FaustInventory();
 		archiveDatabase = new ArchiveDatabase();
 	}

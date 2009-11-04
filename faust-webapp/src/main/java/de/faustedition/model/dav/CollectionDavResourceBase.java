@@ -1,4 +1,4 @@
-package de.faustedition.web.dav;
+package de.faustedition.model.dav;
 
 import static net.sf.practicalxml.builder.XmlBuilder.attribute;
 import static net.sf.practicalxml.builder.XmlBuilder.element;

@@ -1,4 +1,4 @@
-package de.faustedition.web.security;
+package de.faustedition.model.security;
 
 import java.util.Arrays;
 

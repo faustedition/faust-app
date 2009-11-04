@@ -17,7 +17,7 @@ public class WeimarerAusgabeFaustRegister extends AllegroRecordSet {
 	private static final String PAGE_FIELD = "55a";
 	private static final String DESCRIPTION_FIELD = "222";
 	private static final String VOLUME_FIELD = "445";
-	private static final Resource FAUST_REGISTER_RESOURCE = new ClassPathResource("/weimar_manuscripts_wa_druck.txt");
+	private static final Resource FAUST_REGISTER_RESOURCE = new ClassPathResource("/data/weimar_manuscripts_wa_druck.txt");
 	private Map<String, Integer> registerToHierarchyMapping = new HashMap<String, Integer>();
 	private Integer unregisteredFile;
 

@@ -1,15 +1,17 @@
 package de.faustedition.model.search;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
@@ -22,7 +24,8 @@ import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.HibernateUtil;
 import de.faustedition.util.LoggingUtil;
 
-public class SearchIndexBuildTask implements Runnable, InitializingBean
+@Service
+public class SearchIndexBuildTask implements Runnable
 {
 	@Autowired
 	private SearchIndex searchIndex;
@@ -33,6 +36,9 @@ public class SearchIndexBuildTask implements Runnable, InitializingBean
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	@Autowired
+	private ScheduledExecutorService scheduledExecutorService;
+	
 	@Override
 	public void run()
 	{
@@ -103,10 +109,9 @@ public class SearchIndexBuildTask implements Runnable, InitializingBean
 		}
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception
+	@PostConstruct
+	public void init() throws Exception
 	{
-		Executors.newSingleThreadExecutor().execute(this);
+		scheduledExecutorService.execute(this);
 	}
-
 }
