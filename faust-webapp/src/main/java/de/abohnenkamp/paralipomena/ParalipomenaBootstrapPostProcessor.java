@@ -2,9 +2,6 @@ package de.abohnenkamp.paralipomena;
 
 import java.util.List;
 
-import net.sf.practicalxml.DomUtil;
-import net.sf.practicalxml.util.NodeListIterable;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -18,9 +15,10 @@ import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
 import de.faustedition.model.manuscript.Transcription;
-import de.faustedition.model.manuscript.TranscriptionDocument;
-import de.faustedition.model.manuscript.TranscriptionDocumentFactory;
+import de.faustedition.model.tei.TEIDocument;
+import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
+import de.faustedition.util.XMLUtil;
 import de.swkk.metadata.archivedb.ArchiveDatabase;
 import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
 
@@ -43,7 +41,6 @@ public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcesso
 			return;
 		}
 
-		TranscriptionDocumentFactory transcriptionDocumentFactory = new TranscriptionDocumentFactory();
 		List<ParalipomenonTranscription> paralipomena = dissertationText.extractParalipomena();
 		for (ParalipomenonTranscription paralipomenon : paralipomena)
 		{
@@ -70,22 +67,29 @@ public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcesso
 					}
 
 					LoggingUtil.LOG.info(paralipomenon.getCallNumber() + " ===> " + portfolio.getName() + "/" + manuscript.getName());
-					TranscriptionDocument transcriptionDocument = transcriptionDocumentFactory.build(transcription);
-					Element textBodyElement = DomUtil.getChild(transcriptionDocument.getTextElement(), "body");
-					if (!transcriptionDocument.hasText())
+					try
 					{
-						for (Node node : DomUtil.getChildren(textBodyElement))
+						TEIDocument transcriptionDocument = transcription.buildTEIDocument();
+						Element textBodyElement = XMLUtil.getChild(transcriptionDocument.getTextElement(), "body");
+						if (!transcriptionDocument.hasText())
 						{
-							textBodyElement.removeChild(node);
+							for (Node node : XMLUtil.iterableNodeList(textBodyElement.getChildNodes()))
+							{
+								textBodyElement.removeChild(node);
+							}
 						}
-					}
 
-					for (Node node : new NodeListIterable(DomUtil.getChild(paralipomenon.getText(), "text").getChildNodes()))
+						for (Node node : XMLUtil.iterableNodeList(XMLUtil.getChild(paralipomenon.getText(), "text").getChildNodes()))
+						{
+							textBodyElement.appendChild(textBodyElement.getOwnerDocument().importNode(node, true));
+						}
+
+						transcription.update(transcriptionDocument);
+					}
+					catch (Exception e)
 					{
-						textBodyElement.appendChild(textBodyElement.getOwnerDocument().importNode(node, true));
+						throw ErrorUtil.fatal(e, "Error while bootstrapping paralipomena data");
 					}
-
-					transcriptionDocument.update(transcription);
 					break;
 				}
 			}

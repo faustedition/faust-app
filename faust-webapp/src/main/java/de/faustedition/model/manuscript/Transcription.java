@@ -1,17 +1,28 @@
 package de.faustedition.model.manuscript;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.sf.practicalxml.DomUtil;
+import net.sf.practicalxml.builder.ElementNode;
+import net.sf.practicalxml.builder.XmlBuilder;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import de.faustedition.model.search.SearchIndex;
+import de.faustedition.model.tei.TEIDocument;
 import de.faustedition.util.XMLUtil;
 
 public class Transcription implements Serializable
@@ -79,7 +90,7 @@ public class Transcription implements Serializable
 		this.textData = data;
 	}
 
-	public boolean hasText()
+	public boolean hasText() throws SAXException, IOException
 	{
 		return XMLUtil.hasText(XMLUtil.parse(getTextData()).getDocumentElement());
 	}
@@ -92,6 +103,70 @@ public class Transcription implements Serializable
 	public void setRevisionData(byte[] revisionData)
 	{
 		this.revisionData = revisionData;
+	}
+
+	public List<TranscriptionRevision> getRevisionHistory()
+	{
+		org.w3c.dom.Document revisionDocument = XMLUtil.parse(getRevisionData());
+		List<Element> changeElements = DomUtil.getChildren(revisionDocument.getDocumentElement(), "change");
+		List<TranscriptionRevision> revisions = new ArrayList<TranscriptionRevision>(changeElements.size());
+		for (Element changeElement : changeElements)
+		{
+			TranscriptionRevision revision = new TranscriptionRevision();
+			revision.setAuthor(StringUtils.trimToNull(changeElement.getAttribute("who")));
+			revision.setDate(StringUtils.trimToNull(changeElement.getAttribute("when")));
+			revision.setDescription(StringUtils.trimToNull(DomUtil.getText(changeElement)));
+		}
+		return revisions;
+	}
+
+	public Element serialize(List<TranscriptionRevision> revisions)
+	{
+		ElementNode[] changeElements = new ElementNode[revisions.size()];
+		for (int rc = 0; rc < revisions.size(); rc++)
+		{
+			TranscriptionRevision revision = revisions.get(rc);
+			changeElements[rc] = TEIDocument.teiElementNode("change");
+			if (revision.getAuthor() != null)
+			{
+				changeElements[rc].addChild(XmlBuilder.attribute("who", revision.getAuthor()));
+			}
+			if (revision.getDate() != null)
+			{
+				changeElements[rc].addChild(XmlBuilder.attribute("when", revision.getDate()));
+			}
+			if (revision.getDescription() != null)
+			{
+				changeElements[rc].addChild(XmlBuilder.text(revision.getDescription()));
+			}
+		}
+
+		return TEIDocument.teiElementNode("revisionDesc", changeElements).toDOM().getDocumentElement();
+	}
+	
+	public void update(TEIDocument document)
+	{
+		setTextData(XMLUtil.serializeFragment(document.getTextElement()));
+		setRevisionData(XMLUtil.serializeFragment(document.getRevisionElement()));
+	}
+
+
+	public TEIDocument buildTEIDocument()
+	{
+		Manuscript manuscript = getFacsimile().getManuscript();
+		TEIDocument teiDocument = TEIDocument.buildTemplate(manuscript.getPortfolio().getName() + "-" + manuscript.getName());
+		Element teiRootElement = teiDocument.getDocument().getDocumentElement();
+		
+		teiRootElement.appendChild(teiDocument.getDocument().importNode(XMLUtil.parse(getTextData()).getDocumentElement(), true));
+
+		List<TranscriptionRevision> revisionHistory = getRevisionHistory();
+		if (revisionHistory.isEmpty())
+		{
+			revisionHistory.add(new TranscriptionRevision(null, DateFormatUtils.ISO_DATE_FORMAT.format(new Date()), null));
+		}
+		DomUtil.getChild(teiRootElement, "teiHeader").appendChild(teiDocument.getDocument().importNode(serialize(revisionHistory), true));
+
+		return teiDocument;
 	}
 
 	public Document getLuceneDocument()
@@ -112,7 +187,7 @@ public class Transcription implements Serializable
 			document.add(new Field("revisionData", revisionData, Field.Store.NO, Field.Index.ANALYZED));
 			defaultFieldValue.append("\n" + revisionData);
 		}
-		document.add(new Field(SearchIndex.DEFAULT_FIELD, defaultFieldValue.toString(), Field.Store.NO, Field.Index.ANALYZED));
+		document.add(new Field(SearchIndex.DEFAULT_FIELD, defaultFieldValue.toString(), Field.Store.YES, Field.Index.ANALYZED));
 
 		return document;
 	}

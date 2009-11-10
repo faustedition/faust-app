@@ -7,13 +7,10 @@ import java.util.regex.Pattern;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 
-import net.sf.practicalxml.DomUtil;
-import net.sf.practicalxml.ParseUtil;
 import net.sf.practicalxml.xpath.XPathWrapper;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -22,9 +19,9 @@ import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 
 import de.faustedition.util.ErrorUtil;
+import de.faustedition.util.XMLUtil;
 import de.swkk.metadata.GSACallNumber;
 
 public class DissertationText implements InitializingBean
@@ -45,12 +42,12 @@ public class DissertationText implements InitializingBean
 		List<ParalipomenonTranscription> result = new LinkedList<ParalipomenonTranscription>();
 		for (Node paralipomenonRoot : new XPathWrapper("/texte/text").evaluate(document))
 		{
-			Element textElement = DomUtil.getChild((Element) paralipomenonRoot, "paralipomenon");
+			Element textElement = XMLUtil.getChild((Element) paralipomenonRoot, "paralipomenon");
 			Matcher callNumberMatcher = GSA_CALL_NUMBER_PATTERN.matcher(textElement.getAttribute("n"));
 			if (callNumberMatcher.find())
 			{
 				GSACallNumber gsaCallNumber = new GSACallNumber("25/" + callNumberMatcher.group(1) + "," + callNumberMatcher.group(2) + "," + callNumberMatcher.group(3));
-				result.add(new ParalipomenonTranscription(gsaCallNumber, toTei(textElement), toTei(DomUtil.getChild((Element) paralipomenonRoot, "kommentar"))));
+				result.add(new ParalipomenonTranscription(gsaCallNumber, toTei(textElement), toTei(XMLUtil.getChild((Element) paralipomenonRoot, "kommentar"))));
 			}
 		}
 		return result;
@@ -72,7 +69,7 @@ public class DissertationText implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		document = ParseUtil.parse(new InputSource(XML_RESOURCE.getInputStream()));
-		teiTransformer = TransformerFactory.newInstance().newTransformer(new StreamSource(TEI_TRANSFORMATION_RESOURCE.getInputStream()));
+		document = XMLUtil.parse(XML_RESOURCE.getInputStream());
+		teiTransformer = XMLUtil.newTransformer(new StreamSource(TEI_TRANSFORMATION_RESOURCE.getInputStream()));
 	}
 }

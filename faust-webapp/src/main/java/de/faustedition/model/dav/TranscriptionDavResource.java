@@ -7,7 +7,12 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
 
+import net.sf.practicalxml.ParseUtil;
+import net.sf.practicalxml.XmlUtil;
+
 import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.GetableResource;
@@ -19,14 +24,16 @@ import com.google.common.base.Preconditions;
 import de.faustedition.model.manuscript.Facsimile;
 import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Transcription;
-import de.faustedition.model.manuscript.TranscriptionDocument;
+import de.faustedition.model.tei.TEIDocument;
 
 public class TranscriptionDavResource extends DavResourceBase implements GetableResource, PropFindableResource
 {
+	private static final String CSS_STYLE_SHEET_PATH = "/schema/faust.css";
+	private static final String RNG_SCHEMA_PATH = "/schema/faust.rnc";
 
 	private final Manuscript manuscript;
 	private Transcription transcription;
-	private TranscriptionDocument transcriptionDocument;
+	private TEIDocument transcriptionDocument;
 	private byte[] transcriptionDocumentData;
 
 	protected TranscriptionDavResource(DavResourceFactory factory, Manuscript manuscript)
@@ -53,12 +60,19 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 		return getTranscription().getLastModified();
 	}
 
-	protected TranscriptionDocument getTranscriptionDocument()
+	protected TEIDocument getTranscriptionDocument()
 	{
 		if (transcriptionDocument == null)
 		{
-			transcriptionDocument = factory.getTranscriptionDocumentFactory().build(getTranscription());
+			transcriptionDocument = getTranscription().buildTEIDocument();
+
+			Document document = transcriptionDocument.getDocument();
+			String cssStylesheetUri = XmlUtil.escape(factory.getBaseURI() + CSS_STYLE_SHEET_PATH);
+			String rngSchemaUri = XmlUtil.escape(factory.getBaseURI() + RNG_SCHEMA_PATH);
+			document.insertBefore(document.createProcessingInstruction("xml-stylesheet", String.format("href=\"%s\" type=\"text/css\"", cssStylesheetUri)), document.getDocumentElement());
+			document.insertBefore(document.createProcessingInstruction("oxygen", String.format("RNGSchema=\"%s\" type=\"compact\"", rngSchemaUri)), document.getDocumentElement());
 		}
+
 		return transcriptionDocument;
 
 	}
@@ -111,7 +125,8 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 		if (transcriptionDocumentData == null)
 		{
 			getTranscriptionDocument().serialize(out, true);
-		} else
+		}
+		else
 		{
 			IOUtils.write(getTranscriptionDocumentData(), out);
 		}
@@ -126,6 +141,6 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 
 	public void update(InputStream inputStream) throws IOException
 	{
-		factory.getTranscriptionDocumentFactory().parse(inputStream).update(getTranscription());
+		getTranscription().update(new TEIDocument(ParseUtil.parse(new InputSource(inputStream))));
 	}
 }

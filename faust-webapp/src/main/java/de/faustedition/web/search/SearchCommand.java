@@ -54,7 +54,7 @@ public class SearchCommand
 					}
 					else if (Transcription.class.getName().equals(clazzName))
 					{
-						resultList.add(new SearchResult(String.format("Transcription #%s", luceneDocument.get("id"))));
+						resultList.add(new SearchResult(String.format("Transcription #%s ==> %s", luceneDocument.get("id"), luceneDocument.get(SearchIndex.DEFAULT_FIELD))));
 					}
 				}
 			}

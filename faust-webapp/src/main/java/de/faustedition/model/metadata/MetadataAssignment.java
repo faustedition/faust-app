@@ -106,7 +106,7 @@ public class MetadataAssignment implements Serializable
 		document.add(new Field("associatedType", getAssociatedType(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
 		document.add(new Field("associatedId", Long.toString(getAssociatedId()), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
 		document.add(new Field("field", getField(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-		document.add(new Field("value", getValue(), Field.Store.NO, Field.Index.ANALYZED));
+		document.add(new Field("value", getValue(), Field.Store.YES, Field.Index.ANALYZED));
 		document.add(new Field(SearchIndex.DEFAULT_FIELD, getValue(), Field.Store.NO, Field.Index.ANALYZED));
 		return document;
 	}

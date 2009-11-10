@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>391098-0349</title>
+            </titleStmt>
+            <publicationStmt>
+                <p/>
+            </publicationStmt>
+            <sourceDesc>
+                <p/>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <charDecl>
+                <char xml:id="parenthesis_left">
+                    <charName>LEFT PARENTHESIS</charName>
+                    <desc>In 18th century there were different ways to represent parentheses in handwritten documents. Then the token most often used (default) symbol was a vertical stroke combined with a colon. We want to be able to differentiate between this default representation, which we encode as normal parenthesis characters, and the very (same) characters, that are used today, and that also appear in documents of that time. Therefore we encode the  contemporary representation of parantheses, if encountered in handwritten documents, as glyphs.</desc>
+                    <mapping type="Unicode">(</mapping>
+                </char>
+                <char xml:id="parenthesis_right">
+                    <charName>RIGHT PARENTHESIS</charName>
+                    <desc>See the description of LEFT PARANTHESIS.</desc>
+                    <mapping type="Unicode">)</mapping>
+                </char>
+                <char xml:id="truncation">
+                    <charName>TRUNCATION SIGN</charName>
+                    <desc>The suspension/truncation sign, in German known as “Abbrechungszeichen”.</desc>
+                    <mapping type="Unicode">.</mapping>
+                </char>
+            </charDecl>
+        </encodingDesc>
+        <profileDesc>
+            <handNotes>
+                <handNote xml:id="g_t">Goethe (ink)</handNote>
+                <handNote xml:id="g_t_lat">Goethe (ink - latin)</handNote>
+                <handNote xml:id="g_t_gr">Goethe (ink - greek)</handNote>
+                <handNote xml:id="g_tr">Goethe (ink red/brown)</handNote>
+                <handNote xml:id="g_tr_lat">Goethe (ink red/brown - latin)</handNote>
+                <handNote xml:id="g_tr_gr">Goethe (ink red/brown - greek)</handNote>
+                <handNote xml:id="g_bl">Goethe (pencil)</handNote>
+                <handNote xml:id="g_bl_lat">Goethe (pencil - latin)</handNote>
+                <handNote xml:id="g_bl_gr">Goethe (pencil - greek)</handNote>
+                <handNote xml:id="g_ro">Goethe (ruddle)</handNote>
+                <handNote xml:id="g_ro_lat">Goethe (ruddle - latin)</handNote>
+                <handNote xml:id="g_ro_gr">Goethe (ruddle - greek)</handNote>
+                <handNote xml:id="g_ko">Goethe (charcoal)</handNote>
+                <handNote xml:id="g_ko_lat">Goethe (charcoal - latin)</handNote>
+                <handNote xml:id="g_ko_gr">Goethe (charcoal - greek)</handNote>
+                <handNote xml:id="ec_t">Eckermann (ink)</handNote>
+                <handNote xml:id="ec_t_lat">Eckermann (ink - latin)</handNote>
+                <handNote xml:id="ec_t_gr">Eckermann (ink - greek)</handNote>
+                <handNote xml:id="ec_bl">Eckermann (pencil)</handNote>
+                <handNote xml:id="ec_bl_lat">Eckermann (pencil - latin)</handNote>
+                <handNote xml:id="ec_bl_gr">Eckermann (pencil - greek)</handNote>
+                <handNote xml:id="gt_t">Geist (ink)</handNote>
+                <handNote xml:id="gt_t_lat">Geist (ink - latin)</handNote>
+                <handNote xml:id="gt_t_gr">Geist (ink - greek)</handNote>
+                <handNote xml:id="gh_t">Göchhausen (ink)</handNote>
+                <handNote xml:id="gh_t_lat">Göchhausen (ink - latin)</handNote>
+                <handNote xml:id="gh_t_gr">Göchhausen (ink - greek)</handNote>
+                <handNote xml:id="go_t">Göttling (ink)</handNote>
+                <handNote xml:id="go_t_lat">Göttling (ink - latin)</handNote>
+                <handNote xml:id="go_t_gr">Göttling (ink - greek)</handNote>
+                <handNote xml:id="jo_t">John (ink)</handNote>
+                <handNote xml:id="jo_t_lat">John (ink - latin)</handNote>
+                <handNote xml:id="jo_t_gr">John (ink - greek)</handNote>
+                <handNote xml:id="kr_t">Kräuter (ink)</handNote>
+                <handNote xml:id="kr_t_lat">Kräuter (ink - latin)</handNote>
+                <handNote xml:id="kr_t_gr">Kräuter (ink - greek)</handNote>
+                <handNote xml:id="m_t">Müller (ink)</handNote>
+                <handNote xml:id="m_t_lat">Müller (ink - latin)</handNote>
+                <handNote xml:id="m_t_gr">Müller (ink - greek)</handNote>
+                <handNote xml:id="ri_t">Riemer (ink)</handNote>
+                <handNote xml:id="ri_t_lat">Riemer (ink - latin)</handNote>
+                <handNote xml:id="ri_t_gr">Riemer (ink - greek)</handNote>
+                <handNote xml:id="ri_bl">Riemer (pencil)</handNote>
+                <handNote xml:id="ri_bl_lat">Riemer (pencil - latin)</handNote>
+                <handNote xml:id="ri_bl_gr">Riemer (pencil - greek)</handNote>
+                <handNote xml:id="st_t">Schuchardt (ink)</handNote>
+                <handNote xml:id="st_t_lat">Schuchardt (ink - latin)</handNote>
+                <handNote xml:id="st_t_gr">Schuchardt (ink - greek)</handNote>
+                <handNote xml:id="st_bl">Schuchardt (pencil)</handNote>
+                <handNote xml:id="st_bl_lat">Schuchardt (pencil - latin)</handNote>
+                <handNote xml:id="st_bl_gr">Schuchardt (pencil - greek)</handNote>
+                <handNote xml:id="sta_t">Stadelmann (ink)</handNote>
+                <handNote xml:id="sta_t_lat">Stadelmann (ink - latin)</handNote>
+                <handNote xml:id="sta_t_gr">Stadelmann (ink - greek)</handNote>
+                <handNote xml:id="v_t">Helene Vulpius (ink)</handNote>
+                <handNote xml:id="v_t_lat">Helene Vulpius (ink - latin)</handNote>
+                <handNote xml:id="v_t_gr">Helene Vulpius (ink - greek)</handNote>
+                <handNote xml:id="wejo_t">Weller und John (ink)</handNote>
+                <handNote xml:id="wejo_t_lat">Weller und John (ink - latin)</handNote>
+                <handNote xml:id="wejo_t_gr">Weller und John (ink - greek)</handNote>
+                <handNote xml:id="zs_t">Zeitgenössische Schrift (ink)</handNote>
+                <handNote xml:id="zs_t_lat">Zeitgenössische Schrift (ink - latin)</handNote>
+                <handNote xml:id="zs_t_gr">Zeitgenössische Schrift (ink - greek)</handNote>
+                <handNote xml:id="sc_t">Schreiberhand (ink)</handNote>
+                <handNote xml:id="sc_t_lat">Schreiberhand (ink - latin)</handNote>
+                <handNote xml:id="sc_t_gr">Schreiberhand (ink - greek)</handNote>
+                <handNote xml:id="sc_tr">Schreiberhand (ink red/brown)</handNote>
+                <handNote xml:id="sc_tr_lat">Schreiberhand (ink red/brown - latin)</handNote>
+                <handNote xml:id="sc_tr_gr">Schreiberhand (ink red/brown - greek)</handNote>
+                <handNote xml:id="sc_bl">Schreiberhand (pencil)</handNote>
+                <handNote xml:id="sc_bl_lat">Schreiberhand (pencil - latin)</handNote>
+                <handNote xml:id="sc_bl_gr">Schreiberhand (pencil - greek)</handNote>
+                <handNote xml:id="xx_t">Fremde Hand #1 (ink)</handNote>
+                <handNote xml:id="xx_t_lat">Fremde Hand #1 (ink - latin)</handNote>
+                <handNote xml:id="xx_t_gr">Fremde Hand #1 (ink - greek)</handNote>
+                <handNote xml:id="xx_tr">Fremde Hand #1 (ink red/brown)</handNote>
+                <handNote xml:id="xx_tr_lat">Fremde Hand #1 (ink red/brown - latin)</handNote>
+                <handNote xml:id="xx_tr_gr">Fremde Hand #1 (ink red/brown - greek)</handNote>
+                <handNote xml:id="xx_bl">Fremde Hand #1 (pencil)</handNote>
+                <handNote xml:id="xx_bl_lat">Fremde Hand #1 (pencil - latin)</handNote>
+                <handNote xml:id="xx_bl_gr">Fremde Hand #1 (pencil - greek)</handNote>
+                <handNote xml:id="xx_blau">Fremde Hand #1 (blue pencil)</handNote>
+                <handNote xml:id="xx_blau_lat">Fremde Hand #1 (blue pencil - latin)</handNote>
+                <handNote xml:id="xx_blau_gr">Fremde Hand #1 (blue pencil - greek)</handNote>
+                <handNote xml:id="xy_t">Fremde Hand #2 (ink)</handNote>
+                <handNote xml:id="xy_t_lat">Fremde Hand #2 (ink - latin)</handNote>
+                <handNote xml:id="xy_t_gr">Fremde Hand #2 (ink - greek)</handNote>
+                <handNote xml:id="xy_tr">Fremde Hand #2 (ink red/brown)</handNote>
+                <handNote xml:id="xy_tr_lat">Fremde Hand #2 (ink red/brown - latin)</handNote>
+                <handNote xml:id="xy_tr_gr">Fremde Hand #2 (ink red/brown - greek)</handNote>
+                <handNote xml:id="xy_bl">Fremde Hand #2 (pencil)</handNote>
+                <handNote xml:id="xy_bl_lat">Fremde Hand #2 (pencil - latin)</handNote>
+                <handNote xml:id="xy_bl_gr">Fremde Hand #2 (pencil - greek)</handNote>
+                <handNote xml:id="xy_blau">Fremde Hand #2 (blue pencil)</handNote>
+                <handNote xml:id="xy_blau_lat">Fremde Hand #2 (blue pencil - latin)</handNote>
+                <handNote xml:id="xy_blau_gr">Fremde Hand #2 (blue pencil - greek)</handNote>
+                <handNote xml:id="xz_t">Fremde Hand #3 (ink)</handNote>
+                <handNote xml:id="xz_t_lat">Fremde Hand #3 (ink - latin)</handNote>
+                <handNote xml:id="xz_t_gr">Fremde Hand #3 (ink - greek)</handNote>
+                <handNote xml:id="xz_tr">Fremde Hand #3 (ink red/brown)</handNote>
+                <handNote xml:id="xz_tr_lat">Fremde Hand #3 (ink red/brown - latin)</handNote>
+                <handNote xml:id="xz_tr_gr">Fremde Hand #3 (ink red/brown - greek)</handNote>
+                <handNote xml:id="xz_bl">Fremde Hand #3 (pencil)</handNote>
+                <handNote xml:id="xz_bl_lat">Fremde Hand #3 (pencil - latin)</handNote>
+                <handNote xml:id="xz_bl_gr">Fremde Hand #3 (pencil - greek)</handNote>
+                <handNote xml:id="xz_blau">Fremde Hand #3 (blue pencil)</handNote>
+                <handNote xml:id="xz_blau_lat">Fremde Hand #3 (blue pencil - latin)</handNote>
+                <handNote xml:id="xz_blau_gr">Fremde Hand #3 (blue pencil - greek)</handNote>
+            </handNotes>
+        </profileDesc>
+        <revisionDesc>
+            <change when="2009-11-08"/>
+        </revisionDesc>
+    </teiHeader>
+    <text>
+        <body>
+            <fw hand="#xx_blau" place="margin" type="folioNum">169</fw>
+            <div n="2.5.2" type="scene">
+                <sp>
+                    <!-- speaker=Faust -->
+                    <lg>
+                        <l n="11247">Zu überſchaun mit einem Blick<add hand="#_bl">,</add>
+                        </l>
+                        <l n="11248">Des Menſchengeiſtes Meiſterſtück<add hand="#_bl">,</add>
+                        </l>
+                        <l n="11249">Bethätigend, mit klugem Sinn,</l>
+                        <l n="11250">Der Völker breiten Wohngewinn.</l>
+                        <!-- es folgt neuer Absatz -->
+                    </lg>
+                    <lg>
+                        <l n="11251">So ſind am härtſten wir gequält</l>
+                        <l n="11252">Im Reichthum fühlend was uns fehlt.</l>
+                        <l n="11253">Des Glöckchens Klang, der Linden Duft</l>
+                        <l n="11254">Umfängt mich wie in Kirch und Gruft.</l>
+                        <l n="11255">Des allgewaltigen Wille<add hand="#g_t" place="above">n</add>s Kühr</l>
+                        <!-- Hand Goethe? -->
+                        <l n="11256">Bricht ſich an dieſem Sande hier.</l>
+                        <l n="11257">Wie ſchaff ich mir es vom Gemüthe<subst hand="#_t">
+                                <del>?</del>
+                                <add place="inline">!</add>
+                            </subst>
+                        </l>
+                        <!-- hand? -->
+                        <l n="11258">Das Glöcklein läutet und ich wüthe.</l>
+                    </lg>
+                </sp>
+                <sp>
+                    <speaker rend="centered">
+                        <hi rend="underline">
+                            <name>Mephiſt<am>.</am>
+                            </name>
+                        </hi>
+                    </speaker>
+                    <l n="11259">Natürlich! daß ein Hauptverdruß</l>
+                    <l n="11260">Das Leben Dir vergällen muß.</l>
+                    <l n="11261">Wer läugnets! Jedem edlen Ohr</l>
+                    <l n="11262">Kommt das Geklingel widrig vor.</l>
+                    <l n="11263">Und das verfluchte Bim-Baum-Bimmel</l>
+                    <l n="11264">Umnebel<subst hand="#g_t">
+                            <del>t</del>
+                            <add place="above">nd</add>
+                        </subst> heitern Abendhimmel,</l>
+                    <l n="11265">Miſcht ſich in jegliches Begebniß,</l>
+                    <l n="11266">Vom erſten Bad bis zum Begräbniß,</l>
+                    <l n="11267">Als wäre, zwiſchen Bimm und Baum,</l>
+                    <l n="11268">Das Leben ein verſchollner Traum.</l>
+                </sp>
+                <sp>
+                    <speaker rend="centered">
+                        <hi rend="underline">
+                            <name>Fauſt</name>.</hi>
+                    </speaker>
+                    <l n="11269">Das Widerſtehn, der Eigenſinn</l>
+                    <l n="11270">Verküm̄ern herrlichſten Gewinn,</l>
+                    <l n="11271">Daß man, zu tiefer grimmiger Pein<!-- überschrieben, was stand drunter? -->,</l>
+                    <l n="11272">Ermüden muß gerecht zu ſeyn.</l>
+                </sp>
+            </div>
+        </body>
+    </text>
+</TEI>

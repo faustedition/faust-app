@@ -4,6 +4,7 @@
 		${(portfolio.name + '//' + manuscript.name)?html} 
 		[@faust.uplink url=(ctx + "/manuscripts/" + encodePath(repository.name + "/" + portfolio.name) + "/") title="Portfolioübersicht" /]
 		<a href="${manuscript.name}.pdf" title="PDF-Download"><img src="${ctx}/static/printer.png" alt="PDF-Download" /></a>
+		<a href="${ctx}/dav/${repository.name}/${portfolio.name}/${manuscript.name}" title="Transkription bearbeiten"><img src="${ctx}/static/edit.png" alt="Transkription bearbeiten" /></a>
 	</h2>
 
 	<div class="yui-g">
@@ -16,14 +17,11 @@
 	</div>
 	</div>
 
+	[#--
 	<div>
 		<applet code="de.faustedition.documentview.DocumentViewer" archive="${ctx}/static/applets/faust-documentview.jar" width="600" height="600">
 			<param name="svgSrc" value="${manuscript.name}.svg" />
 		</applet>
 	</div>
-
-	<div class="border small-font" style="color: #999; padding: 0.5em; margin: 0.5em">
-		<pre>${transcriptionSource?html}</pre>
-	</div>
-	
+	--]
 [/@faust.page]

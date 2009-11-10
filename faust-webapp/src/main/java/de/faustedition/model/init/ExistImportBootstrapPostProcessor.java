@@ -26,7 +26,7 @@ import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
 import de.faustedition.model.manuscript.Transcription;
-import de.faustedition.model.manuscript.TranscriptionDocument;
+import de.faustedition.model.tei.TEIDocument;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
 
@@ -81,8 +81,7 @@ public class ExistImportBootstrapPostProcessor implements BootstrapPostProcessor
 					FileInputStream transcriptionStream = null;
 					try
 					{
-						TranscriptionDocument transcriptionDocument = new TranscriptionDocument(ParseUtil.parse(new InputSource(transcriptionStream = new FileInputStream(
-								transcriptionFile))));
+						TEIDocument transcriptionDocument = new TEIDocument(ParseUtil.parse(new InputSource(transcriptionStream = new FileInputStream(transcriptionFile))));
 						if (transcriptionDocument.hasText())
 						{
 							LoggingUtil.LOG.info("eXist ==> " + portfolio.getName() + "_" + manuscript.getName());
@@ -91,13 +90,14 @@ public class ExistImportBootstrapPostProcessor implements BootstrapPostProcessor
 
 							Transcription transcription = Transcription.find(session, facsimile);
 							Preconditions.checkNotNull(transcription);
-
-							transcriptionDocument.update(transcription);
+							transcription.update(transcriptionDocument);
 						}
-					} catch (IOException e)
+					}
+					catch (IOException e)
 					{
 						throw ErrorUtil.fatal(e, "I/O error while reading transcription from '%s'", transcriptionFile.getAbsolutePath());
-					} finally
+					}
+					finally
 					{
 						IOUtils.closeQuietly(transcriptionStream);
 					}

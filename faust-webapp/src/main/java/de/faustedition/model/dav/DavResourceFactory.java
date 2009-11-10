@@ -25,7 +25,6 @@ import com.google.common.base.Function;
 import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
-import de.faustedition.model.manuscript.TranscriptionDocumentFactory;
 
 @Service
 public class DavResourceFactory implements ResourceFactory
@@ -59,10 +58,9 @@ public class DavResourceFactory implements ResourceFactory
 		return resource;
 	}
 
-	public TranscriptionDocumentFactory getTranscriptionDocumentFactory()
+	public String getBaseURI()
 	{
-		String baseUri = StringUtils.strip(StringUtils.substringBeforeLast(HttpManager.request().getAbsoluteUrl(), DAV_SERVLET_PATH), "/");
-		return new TranscriptionDocumentFactory(baseUri + "/static/schema/v1/faust-tei.rnc", baseUri + "/static/schema/v1/faust-tei.css");
+		return StringUtils.strip(StringUtils.substringBeforeLast(HttpManager.request().getAbsoluteUrl(), DAV_SERVLET_PATH), "/");
 	}
 
 	@Override
