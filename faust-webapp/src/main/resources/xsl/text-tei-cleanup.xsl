@@ -2,6 +2,10 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0">
 	<xsl:output indent="no" />
 
+	<xsl:template match="//tei:text">
+		<xsl:apply-templates />
+	</xsl:template>
+
 	<xsl:template match="tei:stage">
 		<xsl:element name="{name(.)}" namespace="{namespace-uri(.)}">
 			<xsl:copy-of select="@*" />

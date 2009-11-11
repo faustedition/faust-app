@@ -7,8 +7,6 @@ import java.util.Map;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 
-import de.faustedition.util.LoggingUtil;
-
 public abstract class AnnotationNode
 {
 	protected CorpusData corpusData;
@@ -99,12 +97,11 @@ public abstract class AnnotationNode
 
 	public AnnotationSegment remove(AnnotationNode node)
 	{
-		if (!children.contains(node))
+		boolean removed = children.remove(node);
+		if (!removed)
 		{
-			LoggingUtil.LOG.error(String.format("%s:%s ==> %s:%s", getNamespace(), getLocalName(), node.getNamespace(), node.getLocalName()));
 			throw new IllegalArgumentException();
 		}
-		children.remove(node);
 		for (AnnotationNode child : node.getChildren())
 		{
 			add(child);

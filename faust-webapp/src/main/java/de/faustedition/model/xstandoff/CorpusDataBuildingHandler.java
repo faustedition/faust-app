@@ -1,49 +1,31 @@
 package de.faustedition.model.xstandoff;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Stack;
 
-import javax.xml.transform.TransformerException;
-
-import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.faustedition.util.XMLUtil;
-
-public class CorpusDataBuilder extends DefaultHandler
+public class CorpusDataBuildingHandler extends DefaultHandler
 {
 	private CorpusData corpusData;
 	private StringBuilder primaryDataBuilder;
 	private Stack<AnnotationNode> parents;
 	private Stack<Integer> segmentStarts;
 
-	public CorpusData build(Node node) throws SAXException, IOException, TransformerException
+	public CorpusData getCorpusData()
 	{
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		XMLUtil.serialize(node, stream, false);
-		return build(new ByteArrayInputStream(stream.toByteArray()));
-	}
-
-	public CorpusData build(InputStream inputStream) throws SAXException, IOException
-	{
-		corpusData = new CorpusData();
-		primaryDataBuilder = new StringBuilder();
-		parents = new Stack<AnnotationNode>();
-		segmentStarts = new Stack<Integer>();
-
-		XMLUtil.saxParser().parse(inputStream, this);
-
 		return corpusData;
 	}
 
 	@Override
 	public void startDocument() throws SAXException
 	{
+		primaryDataBuilder = new StringBuilder();
+		parents = new Stack<AnnotationNode>();
+		segmentStarts = new Stack<Integer>();
+
+		corpusData = new CorpusData();
 		AnnotationLevel level = new AnnotationLevel(corpusData, null);
 		corpusData.getAnnotationLevels().add(level);
 
