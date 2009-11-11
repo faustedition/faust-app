@@ -39,7 +39,7 @@ public class ModelConfiguration
 	@Bean
 	public File dataDirectory() throws IOException
 	{
-		Resource resource = ResourceUtil.chooseExistingResource(new Resource[] { new FileSystemResource("/data/faust"), new FileSystemResource("/Users/gregor/Documents/Faustedition/data") });
+		Resource resource = ResourceUtil.chooseExistingResource(new Resource[] { new FileSystemResource("/data/faust"), new FileSystemResource("/Users/gregor/Documents/Faustedition/data"), new FileSystemResource("/home/moz/faust-data") });
 		if (resource != null && resource.getFile() != null && resource.getFile().isDirectory())
 		{
 			return resource.getFile();
