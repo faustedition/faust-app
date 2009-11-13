@@ -8,6 +8,14 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import net.xstandoff.AnnotationAttribute;
+import net.xstandoff.AnnotationElement;
+import net.xstandoff.AnnotationLayer;
+import net.xstandoff.AnnotationLayerExtractor;
+import net.xstandoff.AnnotationLevel;
+import net.xstandoff.CorpusData;
+import net.xstandoff.CorpusDataBuildingHandler;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;

@@ -1,4 +1,4 @@
-package de.faustedition.model.xstandoff;
+package net.xstandoff;
 
 import java.util.ArrayList;
 import java.util.List;
