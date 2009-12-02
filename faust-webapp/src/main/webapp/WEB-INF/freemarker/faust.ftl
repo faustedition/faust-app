@@ -67,7 +67,7 @@
 				<div class="yuimenu">
 					<div class="bd">
 						<ul>
-							<li class="yuimenuitem"><a href="#" wicket:id="loginLink" class="yuimenuitemlabel">Login</a></li>
+							<li class="yuimenuitem"><a href="${ctx}/login" class="yuimenuitemlabel">Login</a></li>
 						</ul>
 					</div>
 				</div>
