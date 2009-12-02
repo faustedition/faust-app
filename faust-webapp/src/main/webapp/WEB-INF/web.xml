@@ -35,8 +35,14 @@
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 
+	<servlet>
+		<servlet-name>static</servlet-name>
+		<servlet-class>de.faustedition.web.StaticWrapperServlet</servlet-class>
+		<load-on-startup>3</load-on-startup>
+	</servlet>
+	
 	<servlet-mapping>
-		<servlet-name>default</servlet-name>
+		<servlet-name>static</servlet-name>
 		<url-pattern>/static/*</url-pattern>
 	</servlet-mapping>
 

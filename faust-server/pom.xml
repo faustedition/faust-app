@@ -12,13 +12,8 @@
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jetty</artifactId>
-			<version>${jetty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jsp-2.1-jetty</artifactId>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
 	</dependencies>
@@ -38,6 +33,6 @@
 		</plugins>
 	</build>
 	<properties>
-		<jetty.version>6.1.19</jetty.version>
+		<jetty.version>7.0.0.RC6</jetty.version>
 	</properties>
 </project>
