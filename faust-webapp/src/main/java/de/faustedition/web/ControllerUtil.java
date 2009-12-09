@@ -20,7 +20,13 @@ public class ControllerUtil
 
 	public static Deque<String> getPathComponents(HttpServletRequest request)
 	{
-		return new ArrayDeque<String>(Arrays.asList(StringUtils.split(ControllerUtil.getPath(request), "/")));
+		return getPathComponents(getPath(request));
+	}
+
+	public static Deque<String> getPathComponents(String path)
+	{
+		return new ArrayDeque<String>(Arrays.asList(StringUtils.split(path, "/")));
+
 	}
 
 	public static <T> T foundObject(T object) throws ObjectNotFoundException

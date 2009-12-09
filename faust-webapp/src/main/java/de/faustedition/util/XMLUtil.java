@@ -25,6 +25,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,8 +37,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-
-import de.faustedition.model.tei.TEIDocument;
 
 public class XMLUtil
 {
@@ -72,6 +74,11 @@ public class XMLUtil
 		{
 			throw ErrorUtil.fatal(e, "Error configuring DOM builder");
 		}
+	}
+
+	public static XPath xpath()
+	{
+		return XPathFactory.newInstance().newXPath();
 	}
 
 	public static Transformer newTransformer(Source source)
@@ -180,15 +187,22 @@ public class XMLUtil
 
 	public static boolean hasText(Element element)
 	{
-		for (Node textNode : TEIDocument.xpath(".//text()").evaluate(element))
+		try
 		{
-			String textContent = textNode.getTextContent();
-			if (textContent != null && textContent.trim().length() > 0)
+			for (Node textNode : iterableNodeList((NodeList) xpath().evaluate(".//text()", element, XPathConstants.NODESET)))
 			{
-				return true;
+				String textContent = textNode.getTextContent();
+				if (textContent != null && textContent.trim().length() > 0)
+				{
+					return true;
+				}
 			}
+			return false;
 		}
-		return false;
+		catch (XPathExpressionException e)
+		{
+			throw ErrorUtil.fatal(e, "XPath error while checking for text nodes on %s", element.toString());
+		}
 	}
 
 	public static class StrictNoOutputErrorCallback implements ErrorListener, ErrorHandler
@@ -296,5 +310,13 @@ public class XMLUtil
 	public static Document getDocument(Node node)
 	{
 		return (Document) (node instanceof Document ? node : node.getOwnerDocument());
+	}
+
+	public static void removeChildren(Node node)
+	{
+		for (Node childNode : iterableNodeList(node.getChildNodes()))
+		{
+			node.removeChild(childNode);
+		}
 	}
 }

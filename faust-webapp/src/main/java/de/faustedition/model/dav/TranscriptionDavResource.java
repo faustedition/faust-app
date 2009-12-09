@@ -25,6 +25,7 @@ import de.faustedition.model.manuscript.Facsimile;
 import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Transcription;
 import de.faustedition.model.tei.TEIDocument;
+import de.faustedition.util.XMLUtil;
 
 public class TranscriptionDavResource extends DavResourceBase implements GetableResource, PropFindableResource
 {
@@ -64,7 +65,7 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 	{
 		if (transcriptionDocument == null)
 		{
-			transcriptionDocument = getTranscription().buildTEIDocument();
+			transcriptionDocument = getTranscription().buildTEIDocument(factory.getTeiDocumentManager());
 
 			Document document = transcriptionDocument.getDocument();
 			String cssStylesheetUri = XmlUtil.escape(factory.getBaseURI() + CSS_STYLE_SHEET_PATH);
@@ -94,7 +95,7 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 		if (transcriptionDocumentData == null)
 		{
 			ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
-			getTranscriptionDocument().serialize(dataStream, true);
+			XMLUtil.serialize(getTranscriptionDocument().getDocument(), dataStream, true);
 			transcriptionDocumentData = dataStream.toByteArray();
 		}
 
@@ -124,7 +125,7 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 	{
 		if (transcriptionDocumentData == null)
 		{
-			getTranscriptionDocument().serialize(out, true);
+			XMLUtil.serialize(getTranscriptionDocument().getDocument(), out, true);
 		}
 		else
 		{

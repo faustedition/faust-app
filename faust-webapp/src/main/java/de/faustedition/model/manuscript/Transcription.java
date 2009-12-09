@@ -7,12 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 import net.sf.practicalxml.DomUtil;
-import net.sf.practicalxml.builder.ElementNode;
-import net.sf.practicalxml.builder.XmlBuilder;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.Session;
@@ -23,6 +20,7 @@ import org.xml.sax.SAXException;
 
 import de.faustedition.model.search.SearchIndex;
 import de.faustedition.model.tei.TEIDocument;
+import de.faustedition.model.tei.TEIDocumentManager;
 import de.faustedition.util.XMLUtil;
 
 public class Transcription implements Serializable
@@ -120,30 +118,6 @@ public class Transcription implements Serializable
 		return revisions;
 	}
 
-	public Element serialize(List<TranscriptionRevision> revisions)
-	{
-		ElementNode[] changeElements = new ElementNode[revisions.size()];
-		for (int rc = 0; rc < revisions.size(); rc++)
-		{
-			TranscriptionRevision revision = revisions.get(rc);
-			changeElements[rc] = TEIDocument.teiElementNode("change");
-			if (revision.getAuthor() != null)
-			{
-				changeElements[rc].addChild(XmlBuilder.attribute("who", revision.getAuthor()));
-			}
-			if (revision.getDate() != null)
-			{
-				changeElements[rc].addChild(XmlBuilder.attribute("when", revision.getDate()));
-			}
-			if (revision.getDescription() != null)
-			{
-				changeElements[rc].addChild(XmlBuilder.text(revision.getDescription()));
-			}
-		}
-
-		return TEIDocument.teiElementNode("revisionDesc", changeElements).toDOM().getDocumentElement();
-	}
-	
 	public void update(TEIDocument document)
 	{
 		setTextData(XMLUtil.serializeFragment(document.getTextElement()));
@@ -151,20 +125,12 @@ public class Transcription implements Serializable
 	}
 
 
-	public TEIDocument buildTEIDocument()
+	public TEIDocument buildTEIDocument(TEIDocumentManager manager)
 	{
-		Manuscript manuscript = getFacsimile().getManuscript();
-		TEIDocument teiDocument = TEIDocument.buildTemplate(manuscript.getPortfolio().getName() + "-" + manuscript.getName());
-		Element teiRootElement = teiDocument.getDocument().getDocumentElement();
-		
-		teiRootElement.appendChild(teiDocument.getDocument().importNode(XMLUtil.parse(getTextData()).getDocumentElement(), true));
+		TEIDocument teiDocument = manager.create();
 
-		List<TranscriptionRevision> revisionHistory = getRevisionHistory();
-		if (revisionHistory.isEmpty())
-		{
-			revisionHistory.add(new TranscriptionRevision(null, DateFormatUtils.ISO_DATE_FORMAT.format(new Date()), null));
-		}
-		DomUtil.getChild(teiRootElement, "teiHeader").appendChild(teiDocument.getDocument().importNode(serialize(revisionHistory), true));
+		org.w3c.dom.Document domDocument = teiDocument.getDocument();
+		domDocument.getDocumentElement().appendChild(domDocument.importNode(XMLUtil.parse(getTextData()).getDocumentElement(), true));
 
 		return teiDocument;
 	}

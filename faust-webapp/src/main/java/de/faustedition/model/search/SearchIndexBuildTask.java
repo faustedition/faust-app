@@ -1,7 +1,6 @@
 package de.faustedition.model.search;
 
 import java.io.IOException;
-import java.util.concurrent.ScheduledExecutorService;
 
 import javax.annotation.PostConstruct;
 
@@ -11,6 +10,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionException;
@@ -37,7 +37,7 @@ public class SearchIndexBuildTask implements Runnable
 	private SessionFactory sessionFactory;
 
 	@Autowired
-	private ScheduledExecutorService scheduledExecutorService;
+	private TaskExecutor taskExecutor;
 	
 	@Override
 	public void run()
@@ -112,6 +112,6 @@ public class SearchIndexBuildTask implements Runnable
 	@PostConstruct
 	public void init() throws Exception
 	{
-		scheduledExecutorService.execute(this);
+		taskExecutor.execute(this);
 	}
 }

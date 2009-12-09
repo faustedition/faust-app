@@ -16,6 +16,7 @@ import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
 import de.faustedition.model.manuscript.Transcription;
 import de.faustedition.model.tei.TEIDocument;
+import de.faustedition.model.tei.TEIDocumentManager;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
 import de.faustedition.util.XMLUtil;
@@ -30,6 +31,9 @@ public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcesso
 	private SessionFactory dbSessionFactory;
 
 	private ArchiveDatabase archiveDatabase;
+
+	@Autowired
+	private TEIDocumentManager teiDocumentManager;
 
 	@Override
 	public void afterBootstrapping()
@@ -69,14 +73,11 @@ public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcesso
 					LoggingUtil.LOG.info(paralipomenon.getCallNumber() + " ===> " + portfolio.getName() + "/" + manuscript.getName());
 					try
 					{
-						TEIDocument transcriptionDocument = transcription.buildTEIDocument();
+						TEIDocument transcriptionDocument = transcription.buildTEIDocument(teiDocumentManager);
 						Element textBodyElement = XMLUtil.getChild(transcriptionDocument.getTextElement(), "body");
-						if (!transcriptionDocument.hasText())
+						if (!XMLUtil.hasText(textBodyElement))
 						{
-							for (Node node : XMLUtil.iterableNodeList(textBodyElement.getChildNodes()))
-							{
-								textBodyElement.removeChild(node);
-							}
+							XMLUtil.removeChildren(textBodyElement);
 						}
 
 						for (Node node : XMLUtil.iterableNodeList(XMLUtil.getChild(paralipomenon.getText(), "text").getChildNodes()))

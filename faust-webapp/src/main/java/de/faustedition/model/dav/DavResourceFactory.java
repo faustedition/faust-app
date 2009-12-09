@@ -25,6 +25,7 @@ import com.google.common.base.Function;
 import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
+import de.faustedition.model.tei.TEIDocumentManager;
 
 @Service
 public class DavResourceFactory implements ResourceFactory
@@ -38,11 +39,19 @@ public class DavResourceFactory implements ResourceFactory
 	@Autowired
 	private SessionFactory dbSessionFactory;
 
+	@Autowired
+	private TEIDocumentManager teiDocumentManager;
+	
 	public SessionFactory getDbSessionFactory()
 	{
 		return dbSessionFactory;
 	}
 
+	public TEIDocumentManager getTeiDocumentManager()
+	{
+		return teiDocumentManager;
+	}
+	
 	@Override
 	public Resource getResource(String host, String path)
 	{

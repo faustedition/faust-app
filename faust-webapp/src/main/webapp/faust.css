@@ -22,6 +22,10 @@ table,table th,table td,table tr {
 	font-weight: bold;
 }
 
+a.img {
+	text-decoration: none;
+}
+
 #hd,#ft {
 	margin: 0em;
 	padding: 0.5em;

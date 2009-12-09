@@ -25,7 +25,8 @@ public class XMLTransformingDefaultHandler
 		try
 		{
 			IOUtils.copy((dataFileStream = new FileInputStream(dataFile)), stream);
-		} finally
+		}
+		finally
 		{
 			IOUtils.closeQuietly(dataFileStream);
 			dataFile.delete();
@@ -39,7 +40,8 @@ public class XMLTransformingDefaultHandler
 		try
 		{
 			return transform(bufferFile);
-		} catch (TransformerException e)
+		}
+		catch (TransformerException e)
 		{
 			return bufferFile;
 		}
@@ -54,7 +56,8 @@ public class XMLTransformingDefaultHandler
 		{
 			bufferFile.deleteOnExit();
 			IOUtils.copy(inputStream, (bufferFileStream = new FileOutputStream(bufferFile)));
-		} finally
+		}
+		finally
 		{
 			IOUtils.closeQuietly(bufferFileStream);
 			IOUtils.closeQuietly(inputStream);
@@ -78,10 +81,12 @@ public class XMLTransformingDefaultHandler
 			XMLUtil.nullTransformer(true).transform(new StreamSource(fileInputStream), new StreamResult(tempWriter));
 			IOUtils.closeQuietly(tempWriter);
 			IOUtils.closeQuietly(fileInputStream);
-		} catch (TransformerException e)
+		}
+		catch (TransformerException e)
 		{
 			transformerException = e;
-		} finally
+		}
+		finally
 		{
 			IOUtils.closeQuietly(tempWriter);
 			IOUtils.closeQuietly(fileInputStream);
@@ -92,7 +97,8 @@ public class XMLTransformingDefaultHandler
 		{
 			file.delete();
 			return resultFile;
-		} else
+		}
+		else
 		{
 			resultFile.delete();
 			throw transformerException;
