@@ -34,9 +34,10 @@
 	<div class="bd">
 	<ul class="first-of-type">
 		[#if hasRole("ROLE_EDITOR")]
-			<li class="yuimenubaritem"><a href="${ctx}/manuscripts/" class="yuimenubaritemlabel">Manuskripte</a></li>
+			<li class="yuimenubaritem"><a href="${ctx}/document/" class="yuimenubaritemlabel">Dokumente</a></li>
 			<li class="yuimenubaritem"><a href="${ctx}/text/" class="yuimenubaritemlabel">Text</a></li>
 			<li class="yuimenubaritem"><a href="${ctx}/genesis/" class="yuimenubaritemlabel">Genese</a></li>
+			<li class="yuimenubaritem"><a href="${ctx}/manuscripts/" class="yuimenubaritemlabel">Manuskripte</a></li>
 			<li class="yuimenubaritem"><a href="${ctx}/search" class="yuimenubaritemlabel">Suche</a></li>
 		[/#if]
 		<li class="yuimenubaritem"><a href="${ctx}/project/about" class="yuimenubaritemlabel">Projekt</a>

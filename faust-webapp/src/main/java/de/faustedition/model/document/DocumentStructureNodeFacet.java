@@ -1,6 +1,14 @@
 package de.faustedition.model.document;
 
+import java.util.Map;
+
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+
+import com.google.common.collect.Maps;
+
+import de.faustedition.util.HibernateUtil;
 
 public abstract class DocumentStructureNodeFacet
 {
@@ -47,5 +55,16 @@ public abstract class DocumentStructureNodeFacet
 	public void save(Session session)
 	{
 		session.saveOrUpdate(this);
+	}
+
+	public static Map<Class<? extends DocumentStructureNodeFacet>, DocumentStructureNodeFacet> findByNode(Session session, DocumentStructureNode node)
+	{
+		Map<Class<? extends DocumentStructureNodeFacet>, DocumentStructureNodeFacet> facets = Maps.newHashMap();
+		Criteria facetCriteria = session.createCriteria(DocumentStructureNodeFacet.class).createCriteria("facettedNode").add(Restrictions.idEq(node.getId()));
+		for (DocumentStructureNodeFacet facet : HibernateUtil.scroll(facetCriteria, DocumentStructureNodeFacet.class))
+		{
+			facets.put(facet.getClass(), facet);
+		}
+		return facets;
 	}
 }

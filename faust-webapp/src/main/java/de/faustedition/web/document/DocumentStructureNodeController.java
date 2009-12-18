@@ -1,6 +1,7 @@
 package de.faustedition.web.document;
 
 import java.util.Deque;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import de.faustedition.model.ObjectNotFoundException;
 import de.faustedition.model.document.DocumentStructureNode;
+import de.faustedition.model.document.DocumentStructureNodeFacet;
 import de.faustedition.web.ControllerUtil;
 
 @Controller
@@ -43,6 +45,9 @@ public class DocumentStructureNodeController
 		{
 			model.addAttribute("node", node);
 			model.addAttribute("parentPath", DocumentStructureNode.findParents(session, pathComponents));
+			
+			Map<Class<? extends DocumentStructureNodeFacet>, DocumentStructureNodeFacet> facets = DocumentStructureNodeFacet.findByNode(session, node);
+			model.addAttribute("facets", facets.values());
 		}
 
 		model.addAttribute("children", node == null ? DocumentStructureNode.findRootChildren(session) : node.findChildren(session));

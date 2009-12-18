@@ -11,7 +11,7 @@
 	<div class="yui-g">
 	<div class="yui-u first">
 		<h3>Urfaust</h3>
-	
+
 		<ol>
 			<li><a href="${ctx}/manuscripts/GSA/${urfaust.portfolio?url}/${urfaust.manuscript}" title="Zum Manuskript">${urfaust.name?html}</a></li>
 		</ol>
