@@ -4,7 +4,8 @@ import os
 import os.path
 import sys
 
-def print_stage(stage): print "\n" + (70 * "=") + "\n" + stage + "\n" + (70 * "=") + "\n"
+def print_stage(stage):
+	print "\n" + (70 * "=") + "\n" + stage + "\n" + (70 * "=") + "\n"
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 args = sys.argv[1:]
@@ -24,13 +25,16 @@ if 'deps' in args:
 	third_party_mvn_opts = []
 	if 'deploy' in mvn_targets:
 		third_party_mvn_opts.append('-DaltDeploymentRepository=' +\
-				'faust-distribution::default::scpexe://faustedition.net/data/faust/maven-repository')
+			'faust-distribution::default::' +\
+			'scpexe://faustedition.net/data/faust/maven-repository')
 
 	for third_party_module in os.listdir(third_party_dir):
 		if third_party_module.startswith('.'): continue
 		os.chdir(os.path.join(third_party_dir, third_party_module))
-		print_stage("Building 3rd party module '%s'" % third_party_module)
-		os.system(' '.join(['mvn'] + third_party_mvn_opts + mvn_targets))
+		print_stage("Building 3rd party module '%s'" %\
+			third_party_module)
+		os.system(' '.join(['mvn'] + third_party_mvn_opts +\
+			mvn_targets))
 
 # ---------------------------------------- Faust modules
 
