@@ -56,9 +56,24 @@
 	</modules>
 	<repositories>
 		<repository>
+			<id>faust</id>
+			<name>Faust-Edition Repository</name>
+			<url>http://maven.faustedition.net/</url>
+		</repository>
+		<repository>
 			<id>spring-milestone</id>
 			<name>Spring Portfolio Milestone Repository</name>
 			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
 		</repository>
 	</repositories>
+	<distributionManagement>
+		<repository>
+			<id>faust-distribution</id>
+			<url>scpexe://faustedition.net/data/faust/maven-repository</url>
+		</repository>
+	</distributionManagement>
+	<scm>
+		<connection>scm:svn:https://intern.faustedition.net/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://intern.faustedition.net/svn/trunk/</developerConnection>
+	</scm>
 </project>
