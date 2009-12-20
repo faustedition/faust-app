@@ -35,6 +35,6 @@ if 'deps' in args:
 # ---------------------------------------- Faust modules
 
 print_stage("Building Faust modules")
-os.chdir(os.path.join(base_dir, 'project-pom'))
+os.chdir(base_dir)
 os.system(' '.join(['mvn'] + mvn_targets))
 
