@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0" exclude-result-prefixes="tei">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0"
+	exclude-result-prefixes="tei">
 	<xsl:output omit-xml-declaration="yes" />
+
+	<xsl:template match="/">
+		<xsl:apply-templates select="//tei:text" />
+	</xsl:template>
 	
-	<xsl:template match="/tei:text">
+	<xsl:template match="tei:text">
 		<div class="tei-text" style="font-family: tahoma">
 			<xsl:apply-templates />
 		</div>

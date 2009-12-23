@@ -44,7 +44,6 @@ public class WebConfiguration
 	public ViewResolver viewResolver()
 	{
 		FreeMarkerViewResolver viewResolver = new FreeMarkerViewResolver();
-		viewResolver.setViewClass(FaustFreemarkerView.class);
 		viewResolver.setContentType("application/xhtml+xml");
 		viewResolver.setPrefix("");
 		viewResolver.setSuffix(".ftl");

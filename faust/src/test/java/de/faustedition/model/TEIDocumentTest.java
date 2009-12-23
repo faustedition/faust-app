@@ -2,34 +2,34 @@ package de.faustedition.model;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXParseException;
+import org.w3c.dom.Element;
 
 import de.faustedition.model.tei.TEIDocument;
-import de.faustedition.model.tei.TEIDocumentManager;
 import de.faustedition.util.XMLUtil;
 
-public class TEIDocumentTest extends AbstractModelContextTest
-{
+public class TEIDocumentTest {
 
-	@Autowired
-	private TEIDocumentManager teiDocumentManager;
-	
+	private TEIDocument teiDocument = new TEIDocument();
+
 	@Test
-	public void parse() throws Exception
-	{
+	public void parse() throws Exception {
 		Assert.assertNotNull(XMLUtil.parse(new String("<TEI/>").getBytes("UTF-8")));
 	}
 
 	@Test
-	public void validate() throws Exception
-	{
-		Document testDocument = teiDocumentManager.create().getDocument();
-		XMLUtil.serialize(testDocument, System.out, true);
-		for (SAXParseException error : TEIDocument.validate(testDocument))
-		{
-			System.out.printf("\n[%d:%d] %s", error.getLineNumber(), error.getColumnNumber(), error.getLocalizedMessage());
-		}
+	public void serialize() {
+		XMLUtil.serialize(teiDocument.getDocument(), System.out, true);
+	}
+
+	@Test
+	public void xpath() {
+		Assert.assertTrue(teiDocument.xpath("/:TEI").iterator().hasNext());
+	}
+
+	@Test
+	public void findNode() {
+		Element tei = teiDocument.findNode("/:TEI", Element.class);
+		Assert.assertNotNull(tei);
+		Assert.assertEquals("TEI", tei.getLocalName());
 	}
 }

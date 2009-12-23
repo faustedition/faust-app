@@ -6,9 +6,9 @@
 [#macro page title]
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head profile="http://dublincore.org/documents/dcq-html/">
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Type" content="application/xhtml+xml;charset=UTF-8" />
 	<title>${title} :: Digitale Faust-Edition</title>
 	[@yuiHeader/]
     <script type="text/javascript" src="${ctx}/static/faust.js"></script>
@@ -16,7 +16,7 @@
     <script type="text/javascript">var ctx = "${ctx}"; yuiInit();</script>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
-	<meta name="DC.format" scheme="DCTERMS.IMT" content="text/html" />
+	<meta name="DC.format" scheme="DCTERMS.IMT" content="application/xhtml+xml" />
 	<meta name="DC.type" scheme="DCTERMS.DCMIType" content="Text" />
 	<meta name="DC.publisher" content="Digitale Faust-Edition" />
 	<meta name="DC.creator" content="Digitale Faust-Edition" />

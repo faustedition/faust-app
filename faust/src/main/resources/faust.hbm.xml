@@ -4,6 +4,9 @@
 	<typedef name="documentStructureNodeType" class="de.faustedition.util.EnumUserType">
 		<param name="enumClassName">de.faustedition.model.document.DocumentStructureNodeType</param>
 	</typedef>
+	<typedef name="transcriptionStatus" class="de.faustedition.util.EnumUserType">
+		<param name="enumClassName">de.faustedition.model.document.TranscriptionStatus</param>
+	</typedef>
 
 	<class name="de.faustedition.model.manuscript.Repository">
 		<id name="id">
@@ -90,6 +93,7 @@
 			<property name="documentData" not-null="true" column="document_data" />
 			<property name="created" not-null="true" />
 			<property name="lastModified" not-null="true" column="last_modified" />
+			<property name="status" type="transcriptionStatus" length="50" />
 		</joined-subclass>
 		<joined-subclass name="de.faustedition.model.document.ArchiveFacet" table="document_archive_facet">
 			<key column="node_facet_id" />

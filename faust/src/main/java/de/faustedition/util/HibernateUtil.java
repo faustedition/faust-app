@@ -17,7 +17,7 @@ public class HibernateUtil
 		return criteria.list();
 	}
 
-	public static <T> Iterable<T> scroll(Criteria criteria, Class<T> type)
+	public static <T> Iterable<T> scroll(Criteria criteria, final Class<T> type)
 	{
 		final ScrollableResults scrollableResults = criteria.scroll(ScrollMode.FORWARD_ONLY);
 		return new Iterable<T>()
@@ -33,7 +33,14 @@ public class HibernateUtil
 					@Override
 					protected T computeNext()
 					{
-						return (T) (scrollableResults.next() ? scrollableResults.get()[0] : endOfData());
+						if (!scrollableResults.next()) {
+							return endOfData();
+						}
+						if (Object[].class.equals(type)) {
+							return (T) scrollableResults.get();
+						}
+						
+						return (T) scrollableResults.get()[0];
 					}
 				};
 			}
