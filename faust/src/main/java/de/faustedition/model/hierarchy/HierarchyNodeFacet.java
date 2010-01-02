@@ -10,6 +10,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.dao.support.DataAccessUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -61,8 +62,7 @@ public abstract class HierarchyNodeFacet {
 		session.saveOrUpdate(this);
 	}
 
-	public static Map<Class<? extends HierarchyNodeFacet>, HierarchyNodeFacet> findByNode(Session session,
-			HierarchyNode node) {
+	public static Map<Class<? extends HierarchyNodeFacet>, HierarchyNodeFacet> findByNode(Session session, HierarchyNode node) {
 		Map<Class<? extends HierarchyNodeFacet>, HierarchyNodeFacet> facets = Maps.newHashMap();
 		Criteria facetCriteria = session.createCriteria(HierarchyNodeFacet.class);
 		facetCriteria = facetCriteria.createCriteria("facettedNode").add(Restrictions.idEq(node.getId()));
@@ -70,6 +70,12 @@ public abstract class HierarchyNodeFacet {
 			facets.put(facet.getClass(), facet);
 		}
 		return facets;
+	}
+
+	public static <T> T findByNode(Session session, HierarchyNode node, Class<T> facetType) {
+		Criteria facetCriteria = session.createCriteria(facetType);
+		facetCriteria = facetCriteria.createCriteria("facettedNode").add(Restrictions.idEq(node.getId()));
+		return DataAccessUtils.uniqueResult(HibernateUtil.list(facetCriteria, facetType));
 	}
 
 	public static List<HierarchyNodeFacet> sortedList(Collection<HierarchyNodeFacet> facets) {
@@ -86,9 +92,9 @@ public abstract class HierarchyNodeFacet {
 	@SuppressWarnings("unchecked")
 	private static final Comparator<HierarchyNodeFacet> NODE_FACET_COMPARATOR = new Comparator<HierarchyNodeFacet>() {
 
-		private final List<Class<? extends HierarchyNodeFacet>> ORDER_LIST = Lists.newArrayList(
-				FacsimileAssociation.class, TranscriptionDocument.class, ArchiveReference.class, DocumentDating.class,
-				PrintReference.class, LegacyMetadata.class);
+		private final List<Class<? extends HierarchyNodeFacet>> ORDER_LIST = Lists.newArrayList(FacsimileAssociation.class,
+				TranscriptionDocument.class, ArchiveReference.class, DocumentDating.class, PrintReference.class,
+				LegacyMetadata.class);
 
 		@Override
 		public int compare(HierarchyNodeFacet o1, HierarchyNodeFacet o2) {

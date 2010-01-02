@@ -91,8 +91,12 @@ public class HierarchyNode {
 	}
 
 	public Deque<String> getPathComponents() {
+		return getPathComponents(getPath());
+	}
+
+	public static Deque<String> getPathComponents(String path) {
 		ArrayDeque<String> pathComponents = new ArrayDeque<String>();
-		for (String pc : StringUtils.split(getPath(), PATH_SEPARATOR)) {
+		for (String pc : StringUtils.split(path, PATH_SEPARATOR)) {
 			pathComponents.add(pc);
 		}
 		return pathComponents;
@@ -161,6 +165,13 @@ public class HierarchyNode {
 		Criteria childCriteria = session.createCriteria(HierarchyNode.class);
 		childCriteria.createCriteria("parent").add(Restrictions.idEq(getId()));
 		return HibernateUtil.list(childCriteria.addOrder(Order.asc("name")), HierarchyNode.class);
+	}
+
+	public HierarchyNode findChild(Session session, String childName) {
+		Criteria childCriteria = session.createCriteria(HierarchyNode.class);
+		childCriteria.createCriteria("parent").add(Restrictions.idEq(getId()));
+		childCriteria.add(Restrictions.eq("name", childName));
+		return DataAccessUtils.uniqueResult(HibernateUtil.list(childCriteria, HierarchyNode.class));
 	}
 
 	public SortedSet<HierarchyNode> findParents(Session session) {

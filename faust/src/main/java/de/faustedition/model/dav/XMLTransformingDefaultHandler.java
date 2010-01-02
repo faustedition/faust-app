@@ -16,49 +16,36 @@ import org.apache.commons.io.IOUtils;
 
 import de.faustedition.util.XMLUtil;
 
-public class XMLTransformingDefaultHandler
-{
+public class XMLTransformingDefaultHandler {
 
-	public void transform(File dataFile, OutputStream stream) throws IOException
-	{
+	public void transform(File dataFile, OutputStream stream) throws IOException {
 		FileInputStream dataFileStream = null;
-		try
-		{
+		try {
 			IOUtils.copy((dataFileStream = new FileInputStream(dataFile)), stream);
-		}
-		finally
-		{
+		} finally {
 			IOUtils.closeQuietly(dataFileStream);
 			dataFile.delete();
 		}
 
 	}
 
-	public File transform(String path, InputStream inputStream) throws IOException
-	{
+	public File transform(String path, InputStream inputStream) throws IOException {
 		File bufferFile = createBufferFile(inputStream);
-		try
-		{
+		try {
 			return transform(bufferFile);
-		}
-		catch (TransformerException e)
-		{
+		} catch (TransformerException e) {
 			return bufferFile;
 		}
 	}
 
-	private File createBufferFile(InputStream inputStream) throws IOException
-	{
+	private File createBufferFile(InputStream inputStream) throws IOException {
 		File bufferFile = File.createTempFile(getClass().getName() + "_transform_input", ".xml");
 		FileOutputStream bufferFileStream = null;
 
-		try
-		{
+		try {
 			bufferFile.deleteOnExit();
 			IOUtils.copy(inputStream, (bufferFileStream = new FileOutputStream(bufferFile)));
-		}
-		finally
-		{
+		} finally {
 			IOUtils.closeQuietly(bufferFileStream);
 			IOUtils.closeQuietly(inputStream);
 		}
@@ -66,40 +53,31 @@ public class XMLTransformingDefaultHandler
 		return bufferFile;
 	}
 
-	private File transform(File file) throws IOException, TransformerException
-	{
+	private File transform(File file) throws IOException, TransformerException {
 		File resultFile = File.createTempFile(getClass().getName() + "_format_output", ".xml");
 		OutputStreamWriter tempWriter = null;
 		FileInputStream fileInputStream = null;
 		TransformerException transformerException = null;
 
-		try
-		{
+		try {
 			resultFile.deleteOnExit();
 			fileInputStream = new FileInputStream(file);
 			tempWriter = new OutputStreamWriter(new FileOutputStream(resultFile), "utf-8");
 			XMLUtil.nullTransformer(true).transform(new StreamSource(fileInputStream), new StreamResult(tempWriter));
 			IOUtils.closeQuietly(tempWriter);
 			IOUtils.closeQuietly(fileInputStream);
-		}
-		catch (TransformerException e)
-		{
+		} catch (TransformerException e) {
 			transformerException = e;
-		}
-		finally
-		{
+		} finally {
 			IOUtils.closeQuietly(tempWriter);
 			IOUtils.closeQuietly(fileInputStream);
 
 		}
 
-		if (transformerException == null)
-		{
+		if (transformerException == null) {
 			file.delete();
 			return resultFile;
-		}
-		else
-		{
+		} else {
 			resultFile.delete();
 			throw transformerException;
 		}

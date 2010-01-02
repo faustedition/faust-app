@@ -1,6 +1,5 @@
 package de.faustedition.model.dav;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,8 +9,9 @@ import java.util.Map;
 import net.sf.practicalxml.ParseUtil;
 import net.sf.practicalxml.XmlUtil;
 
-import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.InputSource;
 
 import com.bradmcevoy.http.Auth;
@@ -19,129 +19,95 @@ import com.bradmcevoy.http.GetableResource;
 import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
-import com.google.common.base.Preconditions;
 
-import de.faustedition.model.facsimile.Facsimile;
-import de.faustedition.model.manuscript.Manuscript;
-import de.faustedition.model.manuscript.Transcription;
+import de.faustedition.model.document.TranscriptionDocument;
 import de.faustedition.model.tei.TEIDocument;
 import de.faustedition.util.XMLUtil;
 
-public class TranscriptionDavResource extends DavResourceBase implements GetableResource, PropFindableResource
-{
+public class TranscriptionDavResource extends DavResourceBase implements GetableResource, PropFindableResource {
+	private static final String OXYGEN_SCHEMA_PI = "oxygen";
+	private static final String XML_STYLESHEET_PI = "xml-stylesheet";
+	public static final String RESOURCE_NAME_SUFFIX = "_transcription.xml";
 	private static final String CSS_STYLE_SHEET_PATH = "/schema/faust.css";
 	private static final String RNG_SCHEMA_PATH = "/schema/faust.rnc";
 
-	private final Manuscript manuscript;
-	private Transcription transcription;
-	private TEIDocument transcriptionDocument;
-	private byte[] transcriptionDocumentData;
+	private final TranscriptionDocument transcriptionDocument;
+	private byte[] documentData;
 
-	protected TranscriptionDavResource(DavResourceFactory factory, Manuscript manuscript)
-	{
+	protected TranscriptionDavResource(DavResourceFactory factory, TranscriptionDocument transcriptionDocument) {
 		super(factory);
-		this.manuscript = manuscript;
+		this.transcriptionDocument = transcriptionDocument;
 	}
 
 	@Override
-	public String getName()
-	{
-		return manuscript.getPortfolio().getName() + "_" + manuscript.getName() + ".xml";
+	public String getName() {
+		return transcriptionDocument.getFacettedNode().getName() + RESOURCE_NAME_SUFFIX;
 	}
 
 	@Override
-	public Date getCreateDate()
-	{
-		return getTranscription().getCreated();
+	public Date getCreateDate() {
+		return transcriptionDocument.getCreated();
 	}
 
 	@Override
-	public Date getModifiedDate()
-	{
-		return getTranscription().getLastModified();
+	public Date getModifiedDate() {
+		return transcriptionDocument.getLastModified();
 	}
 
-	protected TEIDocument getTranscriptionDocument()
-	{
-		if (transcriptionDocument == null)
-		{
-			transcriptionDocument = getTranscription().buildTEIDocument(factory.getTeiDocumentManager());
+	protected byte[] documentData() {
+		if (documentData == null) {
+			Document d = transcriptionDocument.getTeiDocument().getDocument();
 
-			Document document = transcriptionDocument.getDocument();
 			String cssStylesheetUri = XmlUtil.escape(factory.getBaseURI() + CSS_STYLE_SHEET_PATH);
+			String styleData = String.format("href=\"%s\" type=\"text/css\"", cssStylesheetUri);
+			d.insertBefore(d.createProcessingInstruction(XML_STYLESHEET_PI, styleData), d.getDocumentElement());
+
 			String rngSchemaUri = XmlUtil.escape(factory.getBaseURI() + RNG_SCHEMA_PATH);
-			document.insertBefore(document.createProcessingInstruction("xml-stylesheet", String.format("href=\"%s\" type=\"text/css\"", cssStylesheetUri)), document.getDocumentElement());
-			document.insertBefore(document.createProcessingInstruction("oxygen", String.format("RNGSchema=\"%s\" type=\"compact\"", rngSchemaUri)), document.getDocumentElement());
+			String schemaData = String.format("RNGSchema=\"%s\" type=\"compact\"", rngSchemaUri);
+			d.insertBefore(d.createProcessingInstruction(OXYGEN_SCHEMA_PI, schemaData), d.getDocumentElement());
+			documentData = XMLUtil.serialize(d, true);
 		}
-
-		return transcriptionDocument;
-
-	}
-
-	protected Transcription getTranscription()
-	{
-		if (transcription == null)
-		{
-			Facsimile facsimile = Facsimile.find(factory.getDbSessionFactory().getCurrentSession(), manuscript, manuscript.getName());
-			Preconditions.checkNotNull(facsimile);
-			transcription = Transcription.find(factory.getDbSessionFactory().getCurrentSession(), facsimile);
-			Preconditions.checkNotNull(transcription);
-		}
-		return transcription;
-	}
-
-	public byte[] getTranscriptionDocumentData()
-	{
-		if (transcriptionDocumentData == null)
-		{
-			ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
-			XMLUtil.serialize(getTranscriptionDocument().getDocument(), dataStream, true);
-			transcriptionDocumentData = dataStream.toByteArray();
-		}
-
-		return transcriptionDocumentData;
+		return documentData;
 	}
 
 	@Override
-	public Long getContentLength()
-	{
-		return Long.valueOf(getTranscriptionDocumentData().length);
+	public Long getContentLength() {
+		return Long.valueOf(documentData().length);
 	}
 
 	@Override
-	public String getContentType(String accepts)
-	{
+	public String getContentType(String accepts) {
 		return "application/xml";
 	}
 
 	@Override
-	public Long getMaxAgeSeconds(Auth auth)
-	{
+	public Long getMaxAgeSeconds(Auth auth) {
 		return null;
 	}
 
 	@Override
-	public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException
-	{
-		if (transcriptionDocumentData == null)
-		{
-			XMLUtil.serialize(getTranscriptionDocument().getDocument(), out, true);
-		}
-		else
-		{
-			IOUtils.write(getTranscriptionDocumentData(), out);
-		}
+	public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException,
+			NotAuthorizedException {
+		out.write(documentData());
 		out.flush();
 	}
 
 	@Override
-	public Object getLockResource()
-	{
-		return manuscript;
+	public Object getLockResource() {
+		return transcriptionDocument;
 	}
 
-	public void update(InputStream inputStream) throws IOException
-	{
-		getTranscription().update(new TEIDocument(ParseUtil.parse(new InputSource(inputStream))));
+	public void update(InputStream inputStream) throws IOException {
+		Document d = ParseUtil.parse(new InputSource(inputStream));
+		for (Node child : XMLUtil.iterableNodeList(d.getChildNodes())) {
+			if (child.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
+				ProcessingInstruction pi = (ProcessingInstruction) child;
+				if (XML_STYLESHEET_PI.equals(pi.getNodeName()) || OXYGEN_SCHEMA_PI.equals(pi.getNodeName())) {
+					d.removeChild(child);
+				}
+			}
+		}
+		transcriptionDocument.setDocumentData(new TEIDocument(d));
+		transcriptionDocument.setLastModified(new Date());
 	}
 }

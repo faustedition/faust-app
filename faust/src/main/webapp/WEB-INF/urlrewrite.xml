@@ -2,6 +2,18 @@
 <!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 3.0//EN" "http://tuckey.org/res/dtds/urlrewrite3.0.dtd">
 <urlrewrite default-match-type="wildcard">
 	<rule>
+		<from>/</from>
+		<to type="redirect">project/about</to>
+	</rule>
+	<rule>
+		<from>/login</from>
+		<to type="redirect">browse</to>
+	</rule>
+	<rule>
+		<from>/dav</from>
+		<to type="redirect">dav/</to>
+	</rule>
+	<rule>
 		<from>/css/**</from>
 		<to>/css/$1</to>
 	</rule>
