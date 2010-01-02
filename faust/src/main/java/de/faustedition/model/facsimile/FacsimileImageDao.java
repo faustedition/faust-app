@@ -1,4 +1,4 @@
-package de.faustedition.model.manuscript;
+package de.faustedition.model.facsimile;
 
 import java.io.File;
 import java.io.FileOutputStream;

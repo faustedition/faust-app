@@ -34,7 +34,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import de.faustedition.model.ObjectNotFoundException;
-import de.faustedition.model.manuscript.Facsimile;
+import de.faustedition.model.facsimile.Facsimile;
 import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;

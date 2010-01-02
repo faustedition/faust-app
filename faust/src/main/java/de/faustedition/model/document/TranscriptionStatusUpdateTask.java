@@ -24,7 +24,7 @@ public class TranscriptionStatusUpdateTask {
 		stopWatch.start();
 		
 		Session session = sessionFactory.getCurrentSession();
-		for (TranscriptionFacet facet : TranscriptionFacet.scrollAll(session)) {
+		for (TranscriptionDocument facet : TranscriptionDocument.scrollAll(session)) {
 			LoggingUtil.LOG.debug("Updating transcription status of " + facet);
 			facet.updateStatus();
 			session.flush();

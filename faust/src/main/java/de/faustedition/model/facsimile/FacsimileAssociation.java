@@ -1,8 +1,10 @@
-package de.faustedition.model.document;
+package de.faustedition.model.facsimile;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-public class FacsimileFacet extends DocumentStructureNodeFacet
+import de.faustedition.model.hierarchy.HierarchyNodeFacet;
+
+public class FacsimileAssociation extends HierarchyNodeFacet
 {
 	private FacsimileFile facsimileFile;
 	private boolean primary = true;
@@ -30,9 +32,9 @@ public class FacsimileFacet extends DocumentStructureNodeFacet
 	@Override
 	public boolean equals(Object obj)
 	{
-		if ((obj != null) && (obj instanceof FacsimileFacet))
+		if ((obj != null) && (obj instanceof FacsimileAssociation))
 		{
-			FacsimileFacet other = (FacsimileFacet) obj;
+			FacsimileAssociation other = (FacsimileAssociation) obj;
 			return facettedNode.equals(other.facettedNode) && facsimileFile.equals(other.facsimileFile);
 		}
 

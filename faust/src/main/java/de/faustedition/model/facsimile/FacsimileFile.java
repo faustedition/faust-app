@@ -1,4 +1,4 @@
-package de.faustedition.model.document;
+package de.faustedition.model.facsimile;
 
 import org.hibernate.Session;
 

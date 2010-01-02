@@ -1,7 +1,9 @@
 package de.faustedition.model.document;
 
+import de.faustedition.model.hierarchy.HierarchyNodeFacet;
 
-public class PrintReferenceFacet extends DocumentStructureNodeFacet
+
+public class PrintReference extends HierarchyNodeFacet
 {
 	private String referenceWeimarerAusgabe;
 	private String manuscriptReferenceWeimarerAusgabe;

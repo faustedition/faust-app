@@ -21,7 +21,7 @@ import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.google.common.base.Preconditions;
 
-import de.faustedition.model.manuscript.Facsimile;
+import de.faustedition.model.facsimile.Facsimile;
 import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Transcription;
 import de.faustedition.model.tei.TEIDocument;

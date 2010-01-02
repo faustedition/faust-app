@@ -14,7 +14,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.springframework.core.io.ClassPathResource;
 
-import de.faustedition.model.document.TranscriptionFacet;
+import de.faustedition.model.document.TranscriptionDocument;
 import de.faustedition.util.ErrorUtil;
 
 import freemarker.template.TemplateMethodModelEx;
@@ -46,12 +46,12 @@ public class Tei2XhtmlTransformer implements TemplateMethodModelEx {
 		}
 
 		Object argument = DeepUnwrap.unwrap((TemplateModel) arguments.get(0));
-		if (!(argument instanceof TranscriptionFacet)) {
+		if (!(argument instanceof TranscriptionDocument)) {
 			throw new TemplateModelException("Please provide a transcription facet to transform");
 		}
 
 		try {
-			TranscriptionFacet facet = (TranscriptionFacet) argument;
+			TranscriptionDocument facet = (TranscriptionDocument) argument;
 			StreamSource teiSource = new StreamSource(new ByteArrayInputStream(facet.getDocumentData()));
 
 			StringWriter htmlTranscription = new StringWriter();

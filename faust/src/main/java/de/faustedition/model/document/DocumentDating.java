@@ -2,7 +2,9 @@ package de.faustedition.model.document;
 
 import java.util.Date;
 
-public class DatingFacet extends DocumentStructureNodeFacet
+import de.faustedition.model.hierarchy.HierarchyNodeFacet;
+
+public class DocumentDating extends HierarchyNodeFacet
 {
 	private Date fromDate;
 	private Date toDate;

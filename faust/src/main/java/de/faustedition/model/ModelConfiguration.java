@@ -22,9 +22,9 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import com.google.common.collect.Lists;
 
 import de.abohnenkamp.paralipomena.ParalipomenaBootstrapPostProcessor;
+import de.faustedition.model.facsimile.FacsimileImageDao;
 import de.faustedition.model.init.BootstrapPostProcessor;
 import de.faustedition.model.init.Bootstrapper;
-import de.faustedition.model.manuscript.FacsimileImageDao;
 import de.faustedition.model.search.SearchIndex;
 import de.faustedition.model.security.HasRoleTemplateMethod;
 import de.faustedition.util.ResourceUtil;

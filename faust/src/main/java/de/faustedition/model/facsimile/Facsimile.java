@@ -1,4 +1,4 @@
-package de.faustedition.model.manuscript;
+package de.faustedition.model.facsimile;
 
 import java.io.Serializable;
 import java.util.List;
@@ -8,6 +8,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
+
+import de.faustedition.model.manuscript.Manuscript;
 
 public class Facsimile implements Serializable
 {

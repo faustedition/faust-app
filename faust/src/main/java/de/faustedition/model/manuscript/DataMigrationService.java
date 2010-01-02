@@ -1,5 +1,9 @@
 package de.faustedition.model.manuscript;
 
+import static de.faustedition.model.hierarchy.HierarchyNodeType.FILE;
+import static de.faustedition.model.hierarchy.HierarchyNodeType.PAGE;
+import static de.faustedition.model.hierarchy.HierarchyNodeType.REPOSITORY;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -16,17 +20,17 @@ import org.w3c.dom.Element;
 
 import com.google.common.collect.Lists;
 
-import de.faustedition.model.document.ArchiveFacet;
-import de.faustedition.model.document.DatingFacet;
-import de.faustedition.model.document.DocumentStructureNode;
-import de.faustedition.model.document.DocumentStructureNodeFacet;
-import de.faustedition.model.document.DocumentStructureNodeType;
-import de.faustedition.model.document.FacsimileFacet;
-import de.faustedition.model.document.FacsimileFile;
-import de.faustedition.model.document.LegacyMetadataFacet;
-import de.faustedition.model.document.PrintReferenceFacet;
-import de.faustedition.model.document.TranscriptionFacet;
+import de.faustedition.model.document.ArchiveReference;
+import de.faustedition.model.document.DocumentDating;
+import de.faustedition.model.document.LegacyMetadata;
+import de.faustedition.model.document.PrintReference;
+import de.faustedition.model.document.TranscriptionDocument;
 import de.faustedition.model.document.TranscriptionStatus;
+import de.faustedition.model.facsimile.Facsimile;
+import de.faustedition.model.facsimile.FacsimileAssociation;
+import de.faustedition.model.facsimile.FacsimileFile;
+import de.faustedition.model.hierarchy.HierarchyNode;
+import de.faustedition.model.hierarchy.HierarchyNodeFacet;
 import de.faustedition.model.metadata.MetadataAssignment;
 import de.faustedition.model.tei.TEIDocument;
 import de.faustedition.model.tei.TEIDocumentManager;
@@ -45,28 +49,23 @@ public class DataMigrationService {
 	@Transactional
 	public void migrate() {
 		Session session = sessionFactory.getCurrentSession();
-		if (DocumentStructureNode.existsAny(session)) {
+		if (HierarchyNode.existsAny(session)) {
 			return;
 		}
 
-		LoggingUtil.LOG.info("Migrating data to document structure model");
-		int repositoryCount = 0;
-		for (Repository repository : Repository.find(session)) {
-			DocumentStructureNode repositoryNode = new DocumentStructureNode();
-			repositoryNode.setNodeType(DocumentStructureNodeType.REPOSITORY);
-			repositoryNode.setNodeOrder(repositoryCount++);
-			repositoryNode.setName(repository.getName());
-			repositoryNode.setParent(null);
-			repositoryNode.save(session);
-			LoggingUtil.LOG.debug("Migrated " + repositoryNode.toString());
+		HierarchyNode root = HierarchyNode.rootNode(session);
 
-			migrateRepository(session, repository, repositoryNode);
+		LoggingUtil.LOG.info("Migrating document data");
+		HierarchyNode docs = new HierarchyNode(root, "Dokumente", FILE).save(session);
+		for (Repository repo : Repository.find(session)) {
+			HierarchyNode rn = new HierarchyNode(docs, repo.getName(), REPOSITORY).save(session);
+			LoggingUtil.LOG.debug("Migrating " + rn.toString());
+			migrateRepository(session, repo, rn);
 		}
 
 		LoggingUtil.LOG.info("Updating revision descriptions");
 		String when = DateFormatUtils.ISO_DATE_FORMAT.format(System.currentTimeMillis());
-		for (TranscriptionFacet facet : TranscriptionFacet.scrollAll(session)) {
-			LoggingUtil.LOG.debug("Updating transcription status of " + facet);
+		for (TranscriptionDocument facet : TranscriptionDocument.scrollAll(session)) {
 			facet.updateStatus();
 			if (TranscriptionStatus.EMPTY.equals(facet.getStatus())) {
 				TEIDocument teiDocument = facet.getTeiDocument();
@@ -105,39 +104,30 @@ public class DataMigrationService {
 			session.clear();
 		}
 
+		LoggingUtil.LOG.info("Creating text node");
+		new HierarchyNode(root, "Texte", FILE).save(session);
 	}
 
-	private void migrateRepository(Session session, Repository repository, DocumentStructureNode repositoryNode) {
-		int portfolioCount = 0;
+	
+	private void migrateRepository(Session session, Repository repository, HierarchyNode repoNode) {
 		for (Portfolio portfolio : Portfolio.find(session, repository)) {
-			DocumentStructureNode portfolioNode = new DocumentStructureNode();
-			portfolioNode.setNodeType(DocumentStructureNodeType.FILE);
-			portfolioNode.setNodeOrder(portfolioCount++);
-			portfolioNode.setParent(repositoryNode);
-			portfolioNode.setName(portfolio.getName());
-			portfolioNode.save(session);
-			for (DocumentStructureNodeFacet facet : buildPortfolioFacets(session, repository, portfolio)) {
-				facet.setFacettedNode(portfolioNode);
+			HierarchyNode pn = new HierarchyNode(repoNode, portfolio.getName(), FILE).save(session);
+			LoggingUtil.LOG.debug("Migrating " + pn);
+			for (HierarchyNodeFacet facet : buildPortfolioFacets(session, repository, portfolio)) {
+				facet.setFacettedNode(pn);
 				facet.save(session);
 			}
-			LoggingUtil.LOG.debug("Migrated " + portfolioNode);
-
-			migratePortfolio(session, portfolio, portfolioNode);
+			migratePortfolio(session, portfolio, pn);
 			session.flush();
 			session.clear();
 		}
 
 	}
 
-	private void migratePortfolio(Session session, Portfolio portfolio, DocumentStructureNode portfolioNode) {
-		int pageCount = 0;
+	private void migratePortfolio(Session session, Portfolio portfolio, HierarchyNode portfolioNode) {
 		for (Manuscript manuscript : Manuscript.find(session, portfolio)) {
-			DocumentStructureNode pageNode = new DocumentStructureNode();
-			pageNode.setNodeType(DocumentStructureNodeType.PAGE);
-			pageNode.setNodeOrder(pageCount++);
-			pageNode.setParent(portfolioNode);
-			pageNode.setName(StringUtils.stripStart(manuscript.getName(), "0"));
-			pageNode.save(session);
+			String pageName = StringUtils.stripStart(manuscript.getName(), "0");
+			HierarchyNode pn = new HierarchyNode(portfolioNode, pageName, PAGE).save(session);
 
 			Facsimile facsimile = Facsimile.find(session, manuscript, manuscript.getName());
 			if (facsimile != null) {
@@ -145,15 +135,15 @@ public class DataMigrationService {
 				facsimileFile.setPath(facsimile.getImagePath());
 				facsimileFile.save(session);
 
-				FacsimileFacet facsimileFacet = new FacsimileFacet();
-				facsimileFacet.setFacettedNode(pageNode);
+				FacsimileAssociation facsimileFacet = new FacsimileAssociation();
+				facsimileFacet.setFacettedNode(pn);
 				facsimileFacet.setFacsimileFile(facsimileFile);
 				facsimileFacet.save(session);
 
 				Transcription transcription = Transcription.find(session, facsimile);
 				if (transcription != null) {
-					TranscriptionFacet transcriptionFacet = new TranscriptionFacet();
-					transcriptionFacet.setFacettedNode(pageNode);
+					TranscriptionDocument transcriptionFacet = new TranscriptionDocument();
+					transcriptionFacet.setFacettedNode(pn);
 					transcriptionFacet.setCreated(transcription.getCreated());
 					transcriptionFacet.setLastModified(transcriptionFacet.getLastModified());
 
@@ -167,15 +157,15 @@ public class DataMigrationService {
 		}
 	}
 
-	private Collection<DocumentStructureNodeFacet> buildPortfolioFacets(Session session, Repository repository,
+	private Collection<HierarchyNodeFacet> buildPortfolioFacets(Session session, Repository repository,
 			Portfolio portfolio) {
-		ArchiveFacet archiveFacet = new ArchiveFacet();
+		ArchiveReference archiveFacet = new ArchiveReference();
 		archiveFacet.setRepository(repository.getName());
 		archiveFacet.setCallnumber(portfolio.getName());
 
-		PrintReferenceFacet printReferenceFacet = null;
-		LegacyMetadataFacet legacyMetadataFacet = null;
-		DatingFacet datingFacet = null;
+		PrintReference printReferenceFacet = null;
+		LegacyMetadata legacyMetadataFacet = null;
+		DocumentDating datingFacet = null;
 
 		for (MetadataAssignment ma : MetadataAssignment.find(session, Portfolio.class.getName(), portfolio.getId())) {
 			String field = ma.getField();
@@ -198,7 +188,7 @@ public class DataMigrationService {
 						.trim();
 				if (id.length() > 0) {
 					if (printReferenceFacet == null) {
-						printReferenceFacet = new PrintReferenceFacet();
+						printReferenceFacet = new PrintReference();
 					}
 					if (printReferenceFacet.getReferenceWeimarerAusgabe() == null) {
 						printReferenceFacet.setReferenceWeimarerAusgabe("");
@@ -209,22 +199,22 @@ public class DataMigrationService {
 				}
 			} else if ("manuscript_reference_weimarer_ausgabe".equals(field)) {
 				if (printReferenceFacet == null) {
-					printReferenceFacet = new PrintReferenceFacet();
+					printReferenceFacet = new PrintReference();
 				}
 				printReferenceFacet.setManuscriptReferenceWeimarerAusgabe(normalizeWhitespace(ma.getValue()));
 			} else if ("id_paralipomenon_weimarer_ausgabe".equals(field)) {
 				if (printReferenceFacet == null) {
-					printReferenceFacet = new PrintReferenceFacet();
+					printReferenceFacet = new PrintReference();
 				}
 				printReferenceFacet.setParalipomenonReferenceWeimarerAusgabe(normalizeWhitespace(ma.getValue()));
 			} else if ("record_number".equals(field)) {
 				if (legacyMetadataFacet == null) {
-					legacyMetadataFacet = new LegacyMetadataFacet();
+					legacyMetadataFacet = new LegacyMetadata();
 				}
 				legacyMetadataFacet.setRecordNumber(normalizeWhitespace(ma.getValue()));
 			} else if ("hand_1".equals(field) || "hand_4".equals(field) || "hand_7".equals(field)) {
 				if (legacyMetadataFacet == null) {
-					legacyMetadataFacet = new LegacyMetadataFacet();
+					legacyMetadataFacet = new LegacyMetadata();
 				}
 				if (legacyMetadataFacet.getHands() == null) {
 					legacyMetadataFacet.setHands("");
@@ -236,7 +226,7 @@ public class DataMigrationService {
 				legacyMetadataFacet.setHands(StringUtils.trimToNull(legacyMetadataFacet.getHands()));
 			} else if ("work_genetic_level_goethe".equals(field) || "work_genetic_level_custom".equals(field)) {
 				if (legacyMetadataFacet == null) {
-					legacyMetadataFacet = new LegacyMetadataFacet();
+					legacyMetadataFacet = new LegacyMetadata();
 				}
 				if (legacyMetadataFacet.getGeneticLevel() == null) {
 					legacyMetadataFacet.setGeneticLevel("");
@@ -245,12 +235,12 @@ public class DataMigrationService {
 						+ " " + normalizeWhitespace(ma.getValue())));
 			} else if ("remarks".equals(field)) {
 				if (legacyMetadataFacet == null) {
-					legacyMetadataFacet = new LegacyMetadataFacet();
+					legacyMetadataFacet = new LegacyMetadata();
 				}
 				legacyMetadataFacet.setRemarks(normalizeWhitespace(ma.getValue()));
 			} else if ("dating_normalized".equals(field) || "dating_given".equals(field)) {
 				if (datingFacet == null) {
-					datingFacet = new DatingFacet();
+					datingFacet = new DocumentDating();
 				}
 				if (datingFacet.getRemarks() == null) {
 					datingFacet.setRemarks("");
@@ -260,7 +250,7 @@ public class DataMigrationService {
 			}
 
 		}
-		List<DocumentStructureNodeFacet> facets = Lists.newArrayList();
+		List<HierarchyNodeFacet> facets = Lists.newArrayList();
 		facets.add(archiveFacet);
 		if (printReferenceFacet != null) {
 			facets.add(printReferenceFacet);

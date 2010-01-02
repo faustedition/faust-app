@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>de.faustedition</groupId>
@@ -200,6 +201,11 @@
 			<version>2.3.15</version>
 		</dependency>
 		<dependency>
+			<groupId>org.tuckey</groupId>
+			<artifactId>urlrewritefilter</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>fop</artifactId>
 			<version>0.95beta-1</version>
@@ -219,7 +225,7 @@
 	<properties>
 		<slf4j.version>1.5.8</slf4j.version>
 		<spring.version>3.0.0.RELEASE</spring.version>
-		<spring.security.version>3.0.0.RC1</spring.security.version>
+		<spring.security.version>3.0.0.RELEASE</spring.security.version>
 		<milton.version>1.4.2</milton.version>
 		<lucene.version>2.9.0</lucene.version>
 	</properties>

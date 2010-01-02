@@ -1,14 +1,16 @@
 [#ftl]
-[#assign nodeTitle][#if node??]${node.name}[#else]Dokumente[/#if][/#assign]
+[#assign nodeTitle][#if node.root]Edition[#else]${node.name}[/#if][/#assign]
 [@faust.page title=(nodeTitle?html)]
-	[#if node?? || parentPath??]
+	[#if !(node.root)]
 		<p class="node-path">
-			[#if node??]<a href="${ctx}/document/" title="Dokumente">Dokumente</a> <strong>&gt;</strong>[/#if]
-			[#if parentPath??]
-				[#list parentPath?values as p]
-					<a href="${ctx}/document/${encodePath(p.pathComponents)}/" title="${p.name?html}">${p.name?html}</a> <strong>&gt;</strong>
-				[/#list]
-			[/#if] 
+			[#list parentPath as p]
+				[#if p.root]
+					<a href="${ctx}/browse/" title="Edition">Edition</a>
+				[#else]
+					<a href="${ctx}/browse/${encodePath(p.pathComponents)}/" title="${p.name?html}">${p.name?html}</a>
+				[/#if]
+				<strong>&gt;</strong>
+			[/#list]
 		</p>
 	[/#if]
 	<div class="yui-g">
@@ -18,11 +20,11 @@
 			<table class="border" style="width: 90%; margin: 0 5%">
 				[@faust.tableGrid children ; c]
 					<td style="width: 20%" class="center no-border">
-						<a class="img" href="${ctx}/document/${encodePath(c.pathComponents)}/" title="${c.name?html}">
-							<img src="${ctx}/static/document/node_type_${c.nodeType?lower_case}.png" alt="${c.nodeType}" />
+						<a class="img" href="${ctx}/browse/${encodePath(c.pathComponents)}/" title="${c.name?html}">
+							<img src="${ctx}/img/hierarchy/node_type_${c.nodeType?lower_case}.png" alt="${c.nodeType}" />
 						</a>
 						<br/>
-						<a href="${ctx}/document/${encodePath(c.pathComponents)}/" title="${c.name?html}">${c.name?html}</a>
+						<a href="${ctx}/browse/${encodePath(c.pathComponents)}/" title="${c.name?html}">${c.name?html}</a>
 					</td>
 				[/@faust.tableGrid]
 			</table>

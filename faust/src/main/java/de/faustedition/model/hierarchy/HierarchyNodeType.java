@@ -1,6 +1,6 @@
-package de.faustedition.model.document;
+package de.faustedition.model.hierarchy;
 
-public enum DocumentStructureNodeType
+public enum HierarchyNodeType
 {
 	/** Bestandshaltende Institution. */
 	REPOSITORY,

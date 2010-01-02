@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<display-name>faustedition.de</display-name>
 
 	<description>Digitale Faust-Edition</description>
@@ -29,31 +30,20 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>/spring/*</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
 		<servlet-name>dav</servlet-name>
 		<servlet-class>de.faustedition.model.dav.FaustDavServlet</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 
-	<servlet>
-		<servlet-name>static</servlet-name>
-		<servlet-class>de.faustedition.web.StaticWrapperServlet</servlet-class>
-		<load-on-startup>3</load-on-startup>
-	</servlet>
-	
-	<servlet-mapping>
-		<servlet-name>static</servlet-name>
-		<url-pattern>/static/*</url-pattern>
-	</servlet-mapping>
-
 	<servlet-mapping>
 		<servlet-name>dav</servlet-name>
 		<url-pattern>/dav/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>springmvc</servlet-name>
-		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
 	<filter>
@@ -71,9 +61,19 @@
 
 	<filter-mapping>
 		<filter-name>character-encoding</filter-name>
-		<servlet-name>springmvc</servlet-name>
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
+	<filter>
+		<filter-name>url-rewrite</filter-name>
+		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>url-rewrite</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
 	<mime-mapping>
 		<extension>rnc</extension>
 		<mime-type>application/relax-ng-compact-syntax</mime-type>

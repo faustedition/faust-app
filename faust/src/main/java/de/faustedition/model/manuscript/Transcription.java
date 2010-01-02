@@ -18,6 +18,7 @@ import org.springframework.dao.support.DataAccessUtils;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import de.faustedition.model.facsimile.Facsimile;
 import de.faustedition.model.search.SearchIndex;
 import de.faustedition.model.tei.TEIDocument;
 import de.faustedition.model.tei.TEIDocumentManager;

@@ -2,8 +2,6 @@ package de.faustedition.model.search;
 
 import java.io.IOException;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.lucene.index.IndexWriter;
@@ -109,7 +107,7 @@ public class SearchIndexBuildTask implements Runnable
 		}
 	}
 
-	@PostConstruct
+	//@PostConstruct
 	public void init() throws Exception
 	{
 		taskExecutor.execute(this);

@@ -11,8 +11,8 @@
 	<meta http-equiv="Content-Type" content="application/xhtml+xml;charset=UTF-8" />
 	<title>${title} :: Digitale Faust-Edition</title>
 	[@yuiHeader/]
-    <script type="text/javascript" src="${ctx}/static/faust.js"></script>
-    <link rel="stylesheet" type="text/css" href="${ctx}/static/faust.css" />
+    <script type="text/javascript" src="${ctx}/js/faust.js"></script>
+    <link rel="stylesheet" type="text/css" href="${ctx}/css/faust.css" />
     <script type="text/javascript">var ctx = "${ctx}"; yuiInit();</script>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
@@ -34,10 +34,8 @@
 	<div class="bd">
 	<ul class="first-of-type">
 		[#if hasRole("ROLE_EDITOR")]
-			<li class="yuimenubaritem"><a href="${ctx}/document/" class="yuimenubaritemlabel">Dokumente</a></li>
-			<li class="yuimenubaritem"><a href="${ctx}/text/" class="yuimenubaritemlabel">Text</a></li>
+			<li class="yuimenubaritem"><a href="${ctx}/browse/" class="yuimenubaritemlabel">Browser</a></li>
 			<li class="yuimenubaritem"><a href="${ctx}/genesis/" class="yuimenubaritemlabel">Genese</a></li>
-			<li class="yuimenubaritem"><a href="${ctx}/manuscripts/" class="yuimenubaritemlabel">Manuskripte</a></li>
 			<li class="yuimenubaritem"><a href="${ctx}/search" class="yuimenubaritemlabel">Suche</a></li>
 		[/#if]
 		<li class="yuimenubaritem"><a href="${ctx}/project/about" class="yuimenubaritemlabel">Projekt</a>
@@ -90,7 +88,7 @@
 [/#macro]
 
 [#macro uplink url title=""]
-<a href="${url}"[#if title?has_content] title="${title}"[/#if]><img src="${ctx}/static/arrow_up.png"[#if title?has_content] alt="${title}"[/#if] /></a>
+<a href="${url}"[#if title?has_content] title="${title}"[/#if]><img src="${ctx}/img/arrow_up.png"[#if title?has_content] alt="${title}"[/#if] /></a>
 [/#macro]
 
 [#macro tableGrid contents rows=5]

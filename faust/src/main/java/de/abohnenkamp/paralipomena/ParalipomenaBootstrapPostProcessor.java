@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import de.faustedition.model.facsimile.Facsimile;
 import de.faustedition.model.init.BootstrapPostProcessor;
-import de.faustedition.model.manuscript.Facsimile;
 import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;

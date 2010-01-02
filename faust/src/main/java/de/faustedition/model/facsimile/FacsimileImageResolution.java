@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.faustedition.model.manuscript;
+package de.faustedition.model.facsimile;
 
 public enum FacsimileImageResolution
 {

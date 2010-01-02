@@ -1,6 +1,8 @@
 package de.faustedition.model.document;
 
-public class ArchiveFacet extends DocumentStructureNodeFacet
+import de.faustedition.model.hierarchy.HierarchyNodeFacet;
+
+public class ArchiveReference extends HierarchyNodeFacet
 {
 	private String repository;
 	private String callnumber;

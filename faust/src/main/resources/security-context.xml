@@ -3,6 +3,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
               http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 	<http auto-config="true" realm="Digitale Faust-Edition" create-session="never">
+		<intercept-url pattern="/browse/**" access="ROLE_EDITOR" />
 		<intercept-url pattern="/dav/**" access="ROLE_EDITOR" />
 		<intercept-url pattern="/facsimile/**" access="ROLE_EDITOR" />
 		<intercept-url pattern="/manuscripts/**" access="ROLE_EDITOR" />

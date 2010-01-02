@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import de.faustedition.model.ObjectNotFoundException;
-import de.faustedition.model.manuscript.Facsimile;
-import de.faustedition.model.manuscript.FacsimileImageDao;
-import de.faustedition.model.manuscript.FacsimileImageResolution;
+import de.faustedition.model.facsimile.Facsimile;
+import de.faustedition.model.facsimile.FacsimileImageDao;
+import de.faustedition.model.facsimile.FacsimileImageResolution;
 import de.faustedition.web.ControllerUtil;
 
 @Controller

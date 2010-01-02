@@ -1,6 +1,8 @@
 package de.faustedition.model.document;
 
-public class LegacyMetadataFacet extends DocumentStructureNodeFacet
+import de.faustedition.model.hierarchy.HierarchyNodeFacet;
+
+public class LegacyMetadata extends HierarchyNodeFacet
 {
 	private String hands;
 	private String recordNumber;

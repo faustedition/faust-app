@@ -10,11 +10,13 @@ import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 
+import de.faustedition.model.hierarchy.HierarchyNode;
+import de.faustedition.model.hierarchy.HierarchyNodeFacet;
 import de.faustedition.model.tei.TEIDocument;
 import de.faustedition.util.HibernateUtil;
 import de.faustedition.util.XMLUtil;
 
-public class TranscriptionFacet extends DocumentStructureNodeFacet {
+public class TranscriptionDocument extends HierarchyNodeFacet {
 	private byte[] documentData;
 	private Date created = new Date();
 	private Date lastModified = new Date();
@@ -68,18 +70,17 @@ public class TranscriptionFacet extends DocumentStructureNodeFacet {
 		setStatus(TranscriptionStatus.extract(getTeiDocument()));
 	}
 
-	public static Iterable<TranscriptionFacet> scrollAll(Session session) {
-		return HibernateUtil.scroll(session.createCriteria(TranscriptionFacet.class), TranscriptionFacet.class);
+	public static Iterable<TranscriptionDocument> scrollAll(Session session) {
+		return HibernateUtil.scroll(session.createCriteria(TranscriptionDocument.class), TranscriptionDocument.class);
 	}
 
-	public static SortedMap<TranscriptionStatus, Integer> summarizeTranscriptionStatus(Session session,
-			DocumentStructureNode node) {
+	public static SortedMap<TranscriptionStatus, Integer> summarizeTranscriptionStatus(Session session, HierarchyNode node) {
 		ProjectionList projectionList = Projections.projectionList();
 		projectionList.add(Projections.groupProperty("status"));
 		projectionList.add(Projections.rowCount());
 
-		Criteria facetCriteria = session.createCriteria(TranscriptionFacet.class).setProjection(projectionList);
-		DocumentStructureNode.addDescendantCriteria(facetCriteria.createCriteria("facettedNode"), node);
+		Criteria facetCriteria = session.createCriteria(TranscriptionDocument.class).setProjection(projectionList);
+		node.addDescendantCriteria(facetCriteria.createCriteria("facettedNode"));
 
 		SortedMap<TranscriptionStatus, Integer> summary = new TreeMap<TranscriptionStatus, Integer>();
 		for (Object[] transcriptionStats : HibernateUtil.scroll(facetCriteria, Object[].class)) {
