@@ -39,7 +39,7 @@ public class DavResourceFactory implements ResourceFactory {
 	@Autowired
 	private TEIDocumentManager teiDocumentManager;
 
-	public SessionFactory getDbSessionFactory() {
+	public SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
 
@@ -47,11 +47,11 @@ public class DavResourceFactory implements ResourceFactory {
 		return teiDocumentManager;
 	}
 
-	public Resource createResource(HierarchyNode node) {
+	public HierarchyNodeDavResource createResource(HierarchyNode node) {
 		return new HierarchyNodeDavResource(this, node);
 	}
 	
-	public Resource createResource(HierarchyNode node, String resourceName) {
+	public DavResource createResource(HierarchyNode node, String resourceName) {
 		Session session = sessionFactory.getCurrentSession();
 
 		if ((node.getName() + TranscriptionDavResource.RESOURCE_NAME_SUFFIX).equals(resourceName)) {
@@ -62,7 +62,7 @@ public class DavResourceFactory implements ResourceFactory {
 		return null;
 	}
 
-	public Resource createResource(HierarchyNodeFacet facet) {
+	public DavResource createResource(HierarchyNodeFacet facet) {
 		if (facet instanceof TranscriptionDocument) {
 			return new TranscriptionDavResource(this, (TranscriptionDocument) facet);
 		}

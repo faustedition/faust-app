@@ -15,16 +15,18 @@ import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.InputSource;
 
 import com.bradmcevoy.http.Auth;
-import com.bradmcevoy.http.GetableResource;
-import com.bradmcevoy.http.PropFindableResource;
+import com.bradmcevoy.http.CollectionResource;
+import com.bradmcevoy.http.FileItem;
+import com.bradmcevoy.http.FileResource;
 import com.bradmcevoy.http.Range;
+import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 import de.faustedition.model.document.TranscriptionDocument;
 import de.faustedition.model.tei.TEIDocument;
 import de.faustedition.util.XMLUtil;
 
-public class TranscriptionDavResource extends DavResourceBase implements GetableResource, PropFindableResource {
+public class TranscriptionDavResource extends DavResource implements FileResource {
 	private static final String OXYGEN_SCHEMA_PI = "oxygen";
 	private static final String XML_STYLESHEET_PI = "xml-stylesheet";
 	public static final String RESOURCE_NAME_SUFFIX = "_transcription.xml";
@@ -109,5 +111,29 @@ public class TranscriptionDavResource extends DavResourceBase implements Getable
 		}
 		transcriptionDocument.setDocumentData(new TEIDocument(d));
 		transcriptionDocument.setLastModified(new Date());
+	}
+
+	@Override
+	public void copyTo(CollectionResource toCollection, String name) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void delete() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void moveTo(CollectionResource rDest, String name) throws ConflictException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String processForm(Map<String, String> parameters, Map<String, FileItem> files) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -23,6 +23,11 @@
 			<version>1.1</version>
 		</dependency>
 		<dependency>
+			<groupId>javax.jcr</groupId>
+			<artifactId>jcr</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.collections</groupId>
 			<artifactId>google-collections</artifactId>
 			<version>1.0-rc3</version>
@@ -149,6 +154,16 @@
 			<version>${spring.security.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.jackrabbit</groupId>
+			<artifactId>jackrabbit-core</artifactId>
+			<version>${jackrabbit.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.jackrabbit</groupId>
+			<artifactId>jackrabbit-jcr-server</artifactId>
+			<version>${jackrabbit.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>3.3.2.GA</version>
@@ -226,6 +241,7 @@
 		<slf4j.version>1.5.8</slf4j.version>
 		<spring.version>3.0.0.RELEASE</spring.version>
 		<spring.security.version>3.0.0.RELEASE</spring.security.version>
+		<jackrabbit.version>2.0-beta4</jackrabbit.version>
 		<milton.version>1.4.2</milton.version>
 		<lucene.version>2.9.0</lucene.version>
 	</properties>

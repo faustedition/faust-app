@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.jcr.Repository;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.jackrabbit.core.TransientRepository;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +46,11 @@ public class ModelConfiguration {
 		} else {
 			throw new IllegalStateException("Non of the data directories specified exists on this system.");
 		}
+	}
+
+	@Bean
+	public Repository repository() throws IOException {
+		return new TransientRepository(new File(dataDirectory(), "repository"));
 	}
 
 	@Bean
@@ -109,7 +116,7 @@ public class ModelConfiguration {
 	public FreeMarkerConfigurer freemarkerConfigurer() {
 		FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
 		configurer.setTemplateLoaderPath("/WEB-INF/freemarker");
-		
+
 		Properties settings = new Properties();
 		settings.put("auto_include", "/header.ftl");
 		settings.put("default_encoding", "UTF-8");
@@ -118,7 +125,7 @@ public class ModelConfiguration {
 		settings.put("strict_syntax", "true");
 		settings.put("whitespace_stripping", "true");
 		configurer.setFreemarkerSettings(settings);
-		
+
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("hasRole", new HasRoleTemplateMethod());
 		variables.put("encodePath", new URLPathEncoder());

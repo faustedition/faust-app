@@ -51,7 +51,6 @@ public class ManuscriptController implements MessageSourceAware
 	private static final ClassPathResource TEI_2_HTML_XSL_RESOURCE = new ClassPathResource("/xsl/tei-2-xhtml.xsl");
 	private static final ClassPathResource TEI_2_XSLFO_XSL_RESOURCE = new ClassPathResource("/xsl/manuscript-tei-2-xsl-fo.xsl");
 	private static final ClassPathResource TEI_2_SVG_XSL_RESOURCE = new ClassPathResource("/xsl/manuscript-tei-2-svg.xsl");
-	private static final FopFactory FOP_FACTORY = FopFactory.newInstance();
 	private static Templates tei2htmlTemplates;
 	private static Templates tei2xslFoTemplates;
 	private static Templates tei2SvgTemplates;
@@ -184,13 +183,14 @@ public class ManuscriptController implements MessageSourceAware
 		Transcription transcription = Transcription.find(session, facsimile);
 		response.setContentType(MimeConstants.MIME_PDF);
 		ServletOutputStream outputStream = response.getOutputStream();
-		FOUserAgent userAgent = new FOUserAgent(FOP_FACTORY);
+		FopFactory fopFactory = FopFactory.newInstance();
+		FOUserAgent userAgent = new FOUserAgent(fopFactory);
 		userAgent.setTitle("Digitale Faust-Edition :: " + manuscript.getName());
 		userAgent.setAuthor("Johann Wolfgang von Goethe");
 		userAgent.setCreator("Digitale Faust-Edition");
 		userAgent.setCreationDate(new Date());
 		userAgent.setProducer("Digitale Faust-Edition");
-		Fop fop = FOP_FACTORY.newFop(MimeConstants.MIME_PDF, userAgent, outputStream);
+		Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, outputStream);
 		
 		tei2xslFoTemplates.newTransformer().transform(new StreamSource(new ByteArrayInputStream(transcription.getTextData())), new SAXResult(fop.getDefaultHandler()));
 		outputStream.flush();

@@ -31,11 +31,11 @@
 
 			[#if facets??]
 				[#list facets as f]
-					[#if (f.class.simpleName == 'FacsimileFacet') && (f.primary)]
+					[#if (f.class.simpleName == 'FacsimileAssociation') && (f.primary)]
 						<div class="center" style="margin: 1em 0">
 							<img src="${ctx}/facsimile/${encodePath(f.facsimileFile.path)}.jpg" width="400" />
 						</div>
-					[#elseif f.class.simpleName == 'TranscriptionFacet']
+					[#elseif f.class.simpleName == 'TranscriptionDocument']
 						<div style="margin: 1em 0">${tei2xhtml(f)}</div>
 					[/#if]
 				[/#list]

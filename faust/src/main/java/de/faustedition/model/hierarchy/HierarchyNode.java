@@ -156,15 +156,35 @@ public class HierarchyNode {
 		return this;
 	}
 
+	public void delete(Session session) {
+		Criteria facetCriteria = session.createCriteria(HierarchyNodeFacet.class);
+		addDescendantCriteria(facetCriteria.createCriteria("facettedNode"));
+		for (HierarchyNodeFacet facet : HibernateUtil.scroll(facetCriteria, HierarchyNodeFacet.class)) {
+			session.delete(facet);
+		}
+
+		Criteria nodeCriteria = session.createCriteria(HierarchyNode.class);
+		addDescendantCriteria(nodeCriteria);
+		for (HierarchyNode node : HibernateUtil.scroll(nodeCriteria, HierarchyNode.class)) {
+			session.delete(node);
+		}
+	}
+
 	public static boolean existsAny(Session session) {
 		Criteria existCriteria = session.createCriteria(HierarchyNode.class).setProjection(Projections.rowCount());
 		return DataAccessUtils.intResult(existCriteria.list()) > 0;
 	}
 
 	public List<HierarchyNode> findChildren(Session session) {
-		Criteria childCriteria = session.createCriteria(HierarchyNode.class);
-		childCriteria.createCriteria("parent").add(Restrictions.idEq(getId()));
-		return HibernateUtil.list(childCriteria.addOrder(Order.asc("name")), HierarchyNode.class);
+		return HibernateUtil.list(childCriteria(session).addOrder(Order.asc("name")), HierarchyNode.class);
+	}
+
+	public boolean hasChildren(Session session) {
+		return DataAccessUtils.intResult(childCriteria(session).setProjection(Projections.rowCount()).list()) > 0;
+	}
+
+	private Criteria childCriteria(Session session) {
+		return session.createCriteria(HierarchyNode.class).createCriteria("parent").add(Restrictions.idEq(getId()));
 	}
 
 	public HierarchyNode findChild(Session session, String childName) {

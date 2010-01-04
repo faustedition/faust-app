@@ -6,6 +6,7 @@ import static de.faustedition.model.hierarchy.HierarchyNodeType.REPOSITORY;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -91,7 +92,7 @@ public class DataMigrationService {
 
 				change.setAttributeNS(TEIDocument.TEI_NS_URI, "when", when);
 				change.setAttributeNS(TEIDocument.TEI_NS_URI, "who", "system");
-				if ("1".equals(facet.getFacettedNode().getName())) {
+				if (Pattern.matches("^0*1$", facet.getFacettedNode().getName())) {
 					change.setTextContent("Rohzustand");
 					facet.setStatus(TranscriptionStatus.RAW);
 				} else {
@@ -126,8 +127,7 @@ public class DataMigrationService {
 
 	private void migratePortfolio(Session session, Portfolio portfolio, HierarchyNode portfolioNode) {
 		for (Manuscript manuscript : Manuscript.find(session, portfolio)) {
-			String pageName = StringUtils.stripStart(manuscript.getName(), "0");
-			HierarchyNode pn = new HierarchyNode(portfolioNode, pageName, PAGE).save(session);
+			HierarchyNode pn = new HierarchyNode(portfolioNode, manuscript.getName(), PAGE).save(session);
 
 			Facsimile facsimile = Facsimile.find(session, manuscript, manuscript.getName());
 			if (facsimile != null) {
