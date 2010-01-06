@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<iomanager>
+		<class name="org.apache.jackrabbit.server.io.IOManagerImpl" />
+		<iohandler>
+			<class name="org.apache.jackrabbit.server.io.DirListingExportHandler" />
+		</iohandler>
+
+	</iomanager>
+	<propertymanager>
+		<class name="org.apache.jackrabbit.server.io.PropertyManagerImpl" />
+	</propertymanager>
+	<noncollection>
+		<nodetypes>
+			<nodetype>nt:file</nodetype>
+			<nodetype>nt:resource</nodetype>
+			<nodetype>faust:facsimile</nodetype>
+		</nodetypes>
+	</noncollection>
+	<filter>
+		<class name="org.apache.jackrabbit.webdav.simple.DefaultItemFilter" />
+		<namespaces>
+			<prefix>rep</prefix>
+			<prefix>jcr</prefix>
+			<!-- <uri>internal</uri> <uri>http://www.jcp.org/jcr/1.0</uri> -->
+		</namespaces>
+	</filter>
+</config>
+
