@@ -1,6 +1,6 @@
 package de.faustedition.model.tei;
 
-import static de.faustedition.model.tei.TEIDocument.TEI_NS_URI;
+import static de.faustedition.model.tei.EncodedDocument.TEI_NS_URI;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
 
 import de.faustedition.util.XMLUtil;
 
-public class CharacterDeclarationProcessor implements TEIDocumentProcessor
+public class CharacterDeclarationProcessor implements EncodedDocumentProcessor
 {
 	private static final String LEFT_PARANTHESIS_DESCRIPTION = "In 18th century there were different ways to represent parentheses in handwritten documents. "
 			+ "Then the token most often used (default) symbol was a vertical stroke combined with a colon. "
@@ -30,7 +30,7 @@ public class CharacterDeclarationProcessor implements TEIDocumentProcessor
 		declarations.put("truncation", new CharacterDeclaration("TRUNCATION SIGN", TRUNCATION_SIGN_DESCRIPTION, "."));
 	}
 
-	public void process(TEIDocument teiDocument)
+	public void process(EncodedDocument teiDocument)
 	{
 		Document domDocument = teiDocument.getDocument();
 		Element charDeclElement = teiDocument.findElementByPath("teiHeader", "encodingDesc", "charDecl");

@@ -10,8 +10,6 @@ import net.sf.practicalxml.DomUtil;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
@@ -19,9 +17,8 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import de.faustedition.model.facsimile.Facsimile;
-import de.faustedition.model.search.SearchIndex;
-import de.faustedition.model.tei.TEIDocument;
-import de.faustedition.model.tei.TEIDocumentManager;
+import de.faustedition.model.tei.EncodedDocument;
+import de.faustedition.model.tei.EncodedDocumentManager;
 import de.faustedition.util.XMLUtil;
 
 public class Transcription implements Serializable
@@ -119,44 +116,21 @@ public class Transcription implements Serializable
 		return revisions;
 	}
 
-	public void update(TEIDocument document)
+	public void update(EncodedDocument document)
 	{
 		setTextData(XMLUtil.serializeFragment(document.getTextElement()));
 		setRevisionData(XMLUtil.serializeFragment(document.getRevisionElement()));
 	}
 
 
-	public TEIDocument buildTEIDocument(TEIDocumentManager manager)
+	public EncodedDocument buildTEIDocument(EncodedDocumentManager manager)
 	{
-		TEIDocument teiDocument = manager.create();
+		EncodedDocument teiDocument = manager.create();
 
 		org.w3c.dom.Document domDocument = teiDocument.getDocument();
 		domDocument.getDocumentElement().appendChild(domDocument.importNode(XMLUtil.parse(getTextData()).getDocumentElement(), true));
 
 		return teiDocument;
-	}
-
-	public Document getLuceneDocument()
-	{
-		StringBuilder defaultFieldValue = new StringBuilder();
-		Document document = new Document();
-		document.add(new Field("class", getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-		document.add(new Field("id", Long.toString(getId()), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-		if (textData != null)
-		{
-			String textData = XMLUtil.parse(this.textData).getDocumentElement().getTextContent();
-			document.add(new Field("textData", textData, Field.Store.NO, Field.Index.ANALYZED));
-			defaultFieldValue.append("\n" + textData);
-		}
-		if (revisionData != null)
-		{
-			String revisionData = XMLUtil.parse(this.revisionData).getDocumentElement().getTextContent();
-			document.add(new Field("revisionData", revisionData, Field.Store.NO, Field.Index.ANALYZED));
-			defaultFieldValue.append("\n" + revisionData);
-		}
-		document.add(new Field(SearchIndex.DEFAULT_FIELD, defaultFieldValue.toString(), Field.Store.YES, Field.Index.ANALYZED));
-
-		return document;
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package de.faustedition.model.tei;
 
-import static de.faustedition.model.tei.TEIDocument.TEI_NS_URI;
+import static de.faustedition.model.tei.EncodedDocument.TEI_NS_URI;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -14,7 +14,7 @@ import org.w3c.dom.Element;
 
 import de.faustedition.util.XMLUtil;
 
-public class HandDeclarationProcessor implements TEIDocumentProcessor
+public class HandDeclarationProcessor implements EncodedDocumentProcessor
 {
 	private final Map<String, String> declarations = new LinkedHashMap<String, String>();
 
@@ -89,7 +89,7 @@ public class HandDeclarationProcessor implements TEIDocumentProcessor
 	}
 
 	@Override
-	public void process(TEIDocument teiDocument)
+	public void process(EncodedDocument teiDocument)
 	{
 		Document domDocument = teiDocument.getDocument();
 

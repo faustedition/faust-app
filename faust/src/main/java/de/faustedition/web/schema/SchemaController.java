@@ -12,31 +12,27 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
-import de.faustedition.model.tei.TEIDocument;
+import de.faustedition.model.tei.EncodedDocument;
 
 @Controller
 @RequestMapping("/schema")
-public class SchemaController
-{
+public class SchemaController {
 	private static final Resource CSS_STYLESHEET_RESOURCE = new ClassPathResource("/css/faust-tei.css");
 	private long startupTime = System.currentTimeMillis();
 
 	@RequestMapping("/faust.rnc")
-	public void streamRelaxSchema(WebRequest request, HttpServletResponse response) throws IOException
-	{
-		streamResource(request, response, TEIDocument.RELAX_NG_SCHEMA_RESOURCE, "application/relax-ng-compact-syntax");
+	public void streamRelaxSchema(WebRequest request, HttpServletResponse response) throws IOException {
+		streamResource(request, response, EncodedDocument.RELAX_NG_SCHEMA_RESOURCE, "application/relax-ng-compact-syntax");
 	}
 
 	@RequestMapping("/faust.css")
-	public void streamStylesheet(WebRequest request, HttpServletResponse response) throws IOException
-	{
+	public void streamStylesheet(WebRequest request, HttpServletResponse response) throws IOException {
 		streamResource(request, response, CSS_STYLESHEET_RESOURCE, "text/css");
 	}
 
-	private void streamResource(WebRequest request, HttpServletResponse response, Resource resource, String contentType) throws IOException
-	{
-		if (request.checkNotModified(startupTime))
-		{
+	private void streamResource(WebRequest request, HttpServletResponse response, Resource resource, String contentType)
+			throws IOException {
+		if (request.checkNotModified(startupTime)) {
 			return;
 		}
 

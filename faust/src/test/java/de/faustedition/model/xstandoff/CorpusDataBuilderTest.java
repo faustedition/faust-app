@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
 
 import com.google.common.collect.Sets;
 
-import de.faustedition.model.tei.TEIDocument;
+import de.faustedition.model.tei.EncodedDocument;
 import de.faustedition.util.XMLUtil;
 
 public class CorpusDataBuilderTest
@@ -75,14 +75,14 @@ public class CorpusDataBuilderTest
 				@Override
 				public boolean extract(AnnotationElement element)
 				{
-					return TEIDocument.TEI_NS_URI.equals(element.getNamespace()) && EDITING_ELEMENTS.contains(element.getLocalName());
+					return EncodedDocument.TEI_NS_URI.equals(element.getNamespace()) && EDITING_ELEMENTS.contains(element.getLocalName());
 				}
 			}).extract();
 
 			Document document = XMLUtil.documentBuilder().newDocument();
 			
 			Map<String, String> namespaces = new HashMap<String, String>();
-			namespaces.put(TEIDocument.TEI_NS_URI, "");
+			namespaces.put(EncodedDocument.TEI_NS_URI, "");
 			corpusData.serialize(document, namespaces);
 			XMLUtil.serialize(document, System.out, true);
 		}

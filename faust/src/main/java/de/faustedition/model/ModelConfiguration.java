@@ -6,37 +6,40 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.jackrabbit.core.TransientRepository;
+import org.apache.jackrabbit.api.JackrabbitRepository;
+import org.apache.jackrabbit.core.RepositoryImpl;
+import org.apache.jackrabbit.core.config.RepositoryConfig;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-import com.google.common.collect.Lists;
-
-import de.abohnenkamp.paralipomena.ParalipomenaBootstrapPostProcessor;
 import de.faustedition.model.facsimile.FacsimileImageDao;
-import de.faustedition.model.init.BootstrapPostProcessor;
-import de.faustedition.model.init.Bootstrapper;
-import de.faustedition.model.search.SearchIndex;
+import de.faustedition.model.report.ReportSender;
+import de.faustedition.model.repository.RepositoryObject;
+import de.faustedition.model.repository.RepositoryUtil;
 import de.faustedition.model.security.HasRoleTemplateMethod;
 import de.faustedition.util.ResourceUtil;
 import de.faustedition.web.URLPathEncoder;
 import de.faustedition.web.document.Tei2XhtmlTransformer;
-import de.swkk.metadata.MetadataBootstrapPostProcessor;
 
 @Configuration
 public class ModelConfiguration {
 	@Bean
+	@Qualifier("data")
 	public File dataDirectory() throws IOException {
 		Resource resource = ResourceUtil.chooseExistingResource(new Resource[] { new FileSystemResource("/data/faust"),
 				new FileSystemResource("/Users/gregor/Documents/Faustedition/data"),
@@ -48,14 +51,39 @@ public class ModelConfiguration {
 		}
 	}
 
+	protected File dataSubDirectory(String name) throws IOException {
+		File subDirectory = new File(dataDirectory(), name);
+		if (subDirectory.isDirectory() || subDirectory.mkdirs()) {
+			return subDirectory;
+		}
+		throw new IllegalStateException("Cannot create data subdirectory '" + subDirectory.getAbsolutePath() + "'");
+		
+	}
+	
 	@Bean
-	public Repository repository() throws IOException {
-		return new TransientRepository(new File(dataDirectory(), "repository"));
+	@Qualifier("repository")
+	public File repositoryDirectory() throws IOException {
+		return dataSubDirectory("repository");
 	}
 
 	@Bean
-	public SearchIndex searchIndex() {
-		return new SearchIndex("faust");
+	@Qualifier("backup")
+	public File backupDirectory() throws IOException {
+		return dataSubDirectory("repository-backup");
+	}
+	
+	@Bean(destroyMethod = "shutdown")
+	public JackrabbitRepository repository() throws IOException, RepositoryException {
+		JackrabbitRepository repository = RepositoryImpl.create(RepositoryConfig.install(repositoryDirectory()));
+		Session session = null;
+		try {
+			RepositoryUtil.registerNamespace(session = RepositoryUtil.login(repository));
+			RepositoryObject.registerNodeTypes(session.getWorkspace().getNodeTypeManager());
+		} finally {
+			RepositoryUtil.logoutQuietly(session);
+		}
+
+		return repository;
 	}
 
 	@Bean
@@ -64,21 +92,6 @@ public class ModelConfiguration {
 		facsimileImageDao.setConversionTools(new String[] { "/usr/bin/convert", "/usr/local/bin/convert",
 				"/opt/local/bin/convert" });
 		return facsimileImageDao;
-	}
-
-	@Bean
-	public Bootstrapper bootstrapper() {
-		return new Bootstrapper(Lists.newArrayList(paralipomenaBootstrapper(), metadataBootstrapper()));
-	}
-
-	@Bean
-	public BootstrapPostProcessor paralipomenaBootstrapper() {
-		return new ParalipomenaBootstrapPostProcessor();
-	}
-
-	@Bean
-	public BootstrapPostProcessor metadataBootstrapper() {
-		return new MetadataBootstrapPostProcessor();
 	}
 
 	@Bean(destroyMethod = "close")
@@ -110,6 +123,19 @@ public class ModelConfiguration {
 	@Bean
 	public PlatformTransactionManager transactionManager() throws Exception {
 		return new HibernateTransactionManager(sessionFactory());
+	}
+
+	@Bean
+	public JavaMailSender mailSender() {
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setDefaultEncoding("UTF-8");
+		mailSender.setHost("localhost");
+		return mailSender;
+	}
+
+	@Bean
+	public ReportSender reportSender() {
+		return new ReportSender("Faust-Edition <noreply@faustedition.net>", "Gregor Middell <gregor@middell.net>");
 	}
 
 	@Bean

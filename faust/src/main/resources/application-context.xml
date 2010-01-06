@@ -15,11 +15,15 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
 	<context:component-scan base-package="de.faustedition.model" />
-
-	<task:scheduler id="scheduler" />
-	<task:annotation-driven scheduler="scheduler" />
-
 	<tx:annotation-driven />
 
+	<task:executor id="executor" pool-size="5"/>
+	<task:scheduler id="scheduler" pool-size="10" />
+	<task:scheduled-tasks scheduler="scheduler">
+		<task:scheduled ref="transcriptionStatusUpdateTask" method="updateTranscriptionStatus" cron="0 0 * * * *" />
+		<task:scheduled ref="repositoryBackupTask" method="backupRepository" cron="0 0 */12 * * *" />
+		<task:scheduled ref="encodedDocumentValidationTask" method="validateDocuments" cron="0 0 * * * *"/>	
+	</task:scheduled-tasks>
+	
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource" p:basename="messages" />
 </beans>

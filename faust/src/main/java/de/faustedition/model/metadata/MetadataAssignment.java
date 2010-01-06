@@ -3,13 +3,9 @@ package de.faustedition.model.metadata;
 import java.io.Serializable;
 import java.util.List;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
-
-import de.faustedition.model.search.SearchIndex;
 
 public class MetadataAssignment implements Serializable
 {
@@ -96,18 +92,5 @@ public class MetadataAssignment implements Serializable
 	public static List<MetadataAssignment> find(Session session, String associatedType, long associatedId)
 	{
 		return session.createCriteria(MetadataAssignment.class).add(Restrictions.eq("associatedType", associatedType)).add(Restrictions.eq("associatedId", associatedId)).list();
-	}
-
-	public Document getLuceneDocument()
-	{
-		Document document = new Document();
-		document.add(new Field("class", getClass().getName(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-		document.add(new Field("id", Long.toString(getId()), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-		document.add(new Field("associatedType", getAssociatedType(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-		document.add(new Field("associatedId", Long.toString(getAssociatedId()), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-		document.add(new Field("field", getField(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-		document.add(new Field("value", getValue(), Field.Store.YES, Field.Index.ANALYZED));
-		document.add(new Field(SearchIndex.DEFAULT_FIELD, getValue(), Field.Store.NO, Field.Index.ANALYZED));
-		return document;
 	}
 }

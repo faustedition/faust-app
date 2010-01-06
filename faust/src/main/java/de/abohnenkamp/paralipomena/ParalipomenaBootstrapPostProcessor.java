@@ -15,8 +15,8 @@ import de.faustedition.model.manuscript.Manuscript;
 import de.faustedition.model.manuscript.Portfolio;
 import de.faustedition.model.manuscript.Repository;
 import de.faustedition.model.manuscript.Transcription;
-import de.faustedition.model.tei.TEIDocument;
-import de.faustedition.model.tei.TEIDocumentManager;
+import de.faustedition.model.tei.EncodedDocument;
+import de.faustedition.model.tei.EncodedDocumentManager;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
 import de.faustedition.util.XMLUtil;
@@ -33,7 +33,7 @@ public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcesso
 	private ArchiveDatabase archiveDatabase;
 
 	@Autowired
-	private TEIDocumentManager teiDocumentManager;
+	private EncodedDocumentManager teiDocumentManager;
 
 	@Override
 	public void afterBootstrapping()
@@ -73,7 +73,7 @@ public class ParalipomenaBootstrapPostProcessor implements BootstrapPostProcesso
 					LoggingUtil.LOG.info(paralipomenon.getCallNumber() + " ===> " + portfolio.getName() + "/" + manuscript.getName());
 					try
 					{
-						TEIDocument transcriptionDocument = transcription.buildTEIDocument(teiDocumentManager);
+						EncodedDocument transcriptionDocument = transcription.buildTEIDocument(teiDocumentManager);
 						Element textBodyElement = XMLUtil.getChild(transcriptionDocument.getTextElement(), "body");
 						if (!XMLUtil.hasText(textBodyElement))
 						{

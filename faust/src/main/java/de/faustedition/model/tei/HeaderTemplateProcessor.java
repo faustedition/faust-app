@@ -1,19 +1,19 @@
 package de.faustedition.model.tei;
 
-import static de.faustedition.model.tei.TEIDocument.TEI_NS_URI;
+import static de.faustedition.model.tei.EncodedDocument.TEI_NS_URI;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.faustedition.util.XMLUtil;
 
-public class HeaderTemplateProcessor implements TEIDocumentProcessor
+public class HeaderTemplateProcessor implements EncodedDocumentProcessor
 {
 
 	private static final String DEFAULT_TITLE = "Johann Wolfgang von Goethe: Faust";
 
 	@Override
-	public void process(TEIDocument teiDocument)
+	public void process(EncodedDocument teiDocument)
 	{
 		Document domDocument = teiDocument.getDocument();
 

@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import org.w3c.dom.Node;
 
-import de.faustedition.model.tei.TEIDocument;
+import de.faustedition.model.tei.EncodedDocument;
 
 public enum TranscriptionStatus {
 	EMPTY(null), RAW("Rohzustand"), ENCODED("kodiert"), FINISHED("abgeschlossen"), PROOF_READ_1("1. korrekturlesen"), PROOF_READ_2(
@@ -21,7 +21,7 @@ public enum TranscriptionStatus {
 		}
 	}
 
-	public static TranscriptionStatus extract(TEIDocument teiDocument) {
+	public static TranscriptionStatus extract(EncodedDocument teiDocument) {
 		TranscriptionStatus status = EMPTY;
 		for (Node changeElement : teiDocument.xpath("/:TEI/:teiHeader/:revisionDesc/:change")) {
 			String textContent = changeElement.getTextContent();

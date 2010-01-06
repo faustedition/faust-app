@@ -1,10 +1,9 @@
 package de.faustedition.model.document;
 
 import org.apache.commons.lang.time.StopWatch;
-import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +14,6 @@ public class TranscriptionStatusUpdateTask {
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Scheduled(cron = "0 0 * * * *")
 	@Transactional
 	public void updateTranscriptionStatus() {
 		LoggingUtil.LOG.debug("Updating transcription status");

@@ -1,6 +1,7 @@
 package de.faustedition.model.tei;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
@@ -9,6 +10,8 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
+
+import net.sf.practicalxml.XmlException;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -34,7 +37,7 @@ import com.thaiopensource.validate.rng.CompactSchemaReader;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLUtil;
 
-public class TEIDocument {
+public class EncodedDocument {
 	public static final Resource RELAX_NG_SCHEMA_RESOURCE = new ClassPathResource("/schema/faust-tei.rnc");
 	public static final String TEI_NS_URI = "http://www.tei-c.org/ns/1.0";
 	public static final String TEI_SIG_GE_URI = "http://www.tei-c.org/ns/geneticEditions";
@@ -43,19 +46,31 @@ public class TEIDocument {
 
 	private Node node;
 
-	public TEIDocument() {
-		this(XMLUtil.documentBuilder().newDocument());
-		node.appendChild(getDocument().createElementNS(TEI_NS_URI, "TEI"));
+	public EncodedDocument(Node node) {
+		this.node = node;
+		
+		Element root = getDocument().getDocumentElement();
+		String localName = root.getLocalName();
+		if (!TEI_NS_URI.equals(root.getNamespaceURI()) || (!"TEI".equals(localName) || !"teiCorpus".equals(localName))) {
+			throw new XmlException("Provided DOM is not a TEI document");
+		}
 	}
 
-	public TEIDocument(Node node) {
-		this.node = node;
+	public static EncodedDocument create() {
+		Document document = XMLUtil.documentBuilder().newDocument();
+		document.appendChild(document.createElementNS(TEI_NS_URI, "TEI"));
+		return new EncodedDocument(document);
+	}
+	
+	public static EncodedDocument parse(InputStream inputStream) {
+		return new EncodedDocument(XMLUtil.parse(inputStream));
 	}
 
 	public Document getDocument() {
 		return XMLUtil.getDocument(node);
 	}
 
+	
 	public Element getTextElement() {
 		return Preconditions.checkNotNull(findElementByPath("text"));
 	}

@@ -4,12 +4,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
-import de.faustedition.model.tei.TEIDocument;
+import de.faustedition.model.tei.EncodedDocument;
 import de.faustedition.util.XMLUtil;
 
 public class TEIDocumentTest {
 
-	private TEIDocument teiDocument = new TEIDocument();
+	private EncodedDocument teiDocument = EncodedDocument.create();
 
 	@Test
 	public void parse() throws Exception {
