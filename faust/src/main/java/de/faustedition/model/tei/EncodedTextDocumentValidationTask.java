@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import de.faustedition.model.report.ReportSender;
 
 @Service
-public class EncodedDocumentValidationTask {
+public class EncodedTextDocumentValidationTask {
 
 	@Autowired
 	private Repository repository;

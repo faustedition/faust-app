@@ -37,33 +37,34 @@ import com.thaiopensource.validate.rng.CompactSchemaReader;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLUtil;
 
-public class EncodedDocument {
+public class EncodedTextDocument {
 	public static final Resource RELAX_NG_SCHEMA_RESOURCE = new ClassPathResource("/schema/faust-tei.rnc");
 	public static final String TEI_NS_URI = "http://www.tei-c.org/ns/1.0";
 	public static final String TEI_SIG_GE_URI = "http://www.tei-c.org/ns/geneticEditions";
 	public static final String SVG_NS_URI = "http://www.w3.org/2000/svg";
+	public static final String FAUST_NS_URI = "http://www.faustedition.net/ns";
 	private static Schema schema;
 
 	private Node node;
 
-	public EncodedDocument(Node node) {
+	public EncodedTextDocument(Node node) {
 		this.node = node;
 		
 		Element root = getDocument().getDocumentElement();
 		String localName = root.getLocalName();
-		if (!TEI_NS_URI.equals(root.getNamespaceURI()) || (!"TEI".equals(localName) || !"teiCorpus".equals(localName))) {
+		if (!TEI_NS_URI.equals(root.getNamespaceURI()) || (!"TEI".equals(localName) && !"teiCorpus".equals(localName))) {
 			throw new XmlException("Provided DOM is not a TEI document");
 		}
 	}
 
-	public static EncodedDocument create() {
+	public static EncodedTextDocument create() {
 		Document document = XMLUtil.documentBuilder().newDocument();
 		document.appendChild(document.createElementNS(TEI_NS_URI, "TEI"));
-		return new EncodedDocument(document);
+		return new EncodedTextDocument(document);
 	}
 	
-	public static EncodedDocument parse(InputStream inputStream) {
-		return new EncodedDocument(XMLUtil.parse(inputStream));
+	public static EncodedTextDocument parse(InputStream inputStream) {
+		return new EncodedTextDocument(XMLUtil.parse(inputStream));
 	}
 
 	public Document getDocument() {

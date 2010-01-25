@@ -9,7 +9,7 @@ import javax.jcr.nodetype.NodeTypeManager;
 import javax.jcr.nodetype.NodeTypeTemplate;
 import javax.jcr.nodetype.PropertyDefinitionTemplate;
 
-import de.faustedition.model.repository.RepositoryFile;
+import de.faustedition.model.repository.RepositoryDocument;
 import de.faustedition.model.repository.RepositoryObject;
 
 public class TranscriptionStatusMixin extends RepositoryObject {
@@ -20,7 +20,7 @@ public class TranscriptionStatusMixin extends RepositoryObject {
 		super(node);
 	}
 
-	public static TranscriptionStatusMixin create(RepositoryFile file, TranscriptionStatus status) throws RepositoryException {
+	public static TranscriptionStatusMixin create(RepositoryDocument file, TranscriptionStatus status) throws RepositoryException {
 		Node fileNode = file.getNode();
 		if (!fileNode.isNodeType(FAUST_TRANSCRIPTION_STATUS_NAME)) {
 			fileNode.addMixin(FAUST_TRANSCRIPTION_STATUS_NAME);

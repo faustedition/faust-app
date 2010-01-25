@@ -8,7 +8,6 @@ import javax.jcr.nodetype.NodeTypeManager;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import de.faustedition.model.document.TranscriptionStatusMixin;
-import de.faustedition.model.facsimile.FacsimileReference;
 import de.faustedition.util.ErrorUtil;
 
 public class RepositoryObject {
@@ -28,7 +27,6 @@ public class RepositoryObject {
 	}
 
 	public static void registerNodeTypes(NodeTypeManager nodeTypeManager) throws RepositoryException {
-		FacsimileReference.registerNodeType(nodeTypeManager);
 		TranscriptionStatusMixin.registerNodeType(nodeTypeManager);
 	}
 

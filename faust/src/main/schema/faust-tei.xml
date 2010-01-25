@@ -23,6 +23,7 @@
 	<text>
 		<front>
 			<divGen type="toc"/>
+
 		</front>
 		<body>
 			<div>
@@ -678,9 +679,27 @@
 						</classes>
 					</classSpec>
 					
+					<elementSpec ident="hi" module="core" mode="change">
+						<classes mode="change">
+							<memberOf key="att.transcriptional"/>
+						</classes>
+					</elementSpec>
+					
 					<elementSpec ident="fw" module="transcr" mode="change">
 						<classes mode="change">
 							<memberOf key="att.transcriptional"/>
+						</classes>
+					</elementSpec>
+					
+					<elementSpec ident="date" module="core" mode="change">
+						<classes mode="change">
+							<memberOf key="model.linePart"/>
+						</classes>
+					</elementSpec>
+
+					<elementSpec ident="ref" module="core" mode="change">
+						<classes mode="change">
+							<memberOf key="model.linePart"/>
 						</classes>
 					</elementSpec>
 					
@@ -706,79 +725,115 @@
 							</attDef>
 						</attList>	
 					</elementSpec>
-					
-					<classSpec ident="att.alignable" type="atts" mode="add">
-						<desc>Definiert Attribute zur topographischen Alignierung von (graphischen) Elementen.</desc>
-						<classes>
-							<memberOf>att.global</memberOf>
-						</classes>
+
+					<classSpec ident="att.graphicOrientation" type="atts" mode="add">
+						<desc>Definiert Attribute zur Orientierung graphischer Elemente.</desc>
 						<attList>
-							<attDef ident="align-top-with" ns="http://www.faustedition.net/ns" usage="opt">
-								<desc>Aligniert die obere Kante des Elements mit der oberen Kante des referenzierten.</desc>
-								<datatype minOccurs="1">
+							<attDef ident="orient" ns="http://www.faustedition.net/ns" usage="req">
+								<desc>Attribut zur Orientierung eines graphischen Elements.</desc>
+								<valList type="closed">
+									<valItem ident="horiz"><gloss>horizontal</gloss></valItem>
+									<valItem ident="horiz-top"><gloss>horizontal und nach oben</gloss></valItem>
+									<valItem ident="horiz-bottom"><gloss>horizontal und nach unten</gloss></valItem>
+									<valItem ident="vert"><gloss>vertikal</gloss></valItem>
+									<valItem ident="vert-left"><gloss>vertikal und nach links</gloss></valItem>
+									<valItem ident="vert-right"><gloss>vertikal und nach rechts</gloss></valItem>
+								</valList>
+							</attDef>
+						</attList>
+					</classSpec>
+					
+					<classSpec ident="att.graphicStyle" type="atts" mode="add">
+						<desc>Definiert den Stil eines graphischen Elements.</desc>
+						<attList>
+							<attDef ident="style" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Stil, in dem ein graphisches Element wiedergegeben werden soll.</desc>
+								<valList type="closed">
+									<valItem ident="linear"><gloss>geradlinig</gloss></valItem>
+									<valItem ident="curly"><gloss>geschwungen</gloss></valItem>
+								</valList>
+							</attDef>
+						</attList>
+					</classSpec>
+
+					<classSpec ident="att.graphicExtent" type="atts" mode="add">
+						<desc>Definiert die Ausdehnung eines graphischen Elements.</desc>
+						<attList>
+							<attDef ident="left" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dem die linke Kante des graphischen Elements aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
 									<rng:ref name="data.pointer"/>
 								</datatype>
 							</attDef>
-							<attDef ident="align-bottom-with" ns="http://www.faustedition.net/ns" usage="opt">
-								<desc>Aligniert die untere Kante des Elements mit der unteren Kante des referenzierten.</desc>
-								<datatype minOccurs="1">
+							<attDef ident="right" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dem die rechte Kante des graphischen Elements aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
 									<rng:ref name="data.pointer"/>
 								</datatype>
 							</attDef>
-							<attDef ident="align-left-with" ns="http://www.faustedition.net/ns" usage="opt">
-								<desc>Aligniert die linke Kante des Elements mit der linken Kante des referenzierten.</desc>
-								<datatype minOccurs="1">
+							<attDef ident="top" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dem die obere Kante des graphischen Elements aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
 									<rng:ref name="data.pointer"/>
 								</datatype>
 							</attDef>
-							<attDef ident="align-right-with" ns="http://www.faustedition.net/ns" usage="opt">
-								<desc>Aligniert die rechte Kante des Elements mit der rechten Kante des referenzierten.</desc>
-								<datatype minOccurs="1">
+							<attDef ident="bottom" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dem die untere Kante des graphischen Elements aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
 									<rng:ref name="data.pointer"/>
 								</datatype>
 							</attDef>
 						</attList>
 					</classSpec>
 					
-					<elementSpec ident="stroke" ns="http://www.faustedition.net/ns" mode="add">
-						<desc>Kodiert ein graphisches Element auf Dokumentebene</desc>
+					<elementSpec ident="grLine" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Kodiert eine Linie auf Dokumentebene</desc>
 						<classes>
-							<memberOf key="model.global"/>
-							<memberOf key="att.alignable"/>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.transcriptional"/>
+							<memberOf key="att.graphicAlignment"/>
+							<memberOf key="att.graphicOrientation"/>
+							<memberOf key="att.graphicStyle"/>
+							<memberOf key="att.graphicExtent"/>
 						</classes>
-						<content>
-							<rng:empty/>
-						</content>
-						<attList>
-							<attDef ident="type" mode="add">
-								<desc>Typ des graphischen Elements</desc>
-								<valList type="closed">
-									<valItem ident="horiz_line"><gloss>horizontale gerade Linie</gloss></valItem>
-									<valItem ident="vert_line"><gloss>vertikale gerade Linie</gloss></valItem>
-									<valItem ident="horiz_curly_line"><gloss>horizontale geschwungene Linie</gloss></valItem>
-									<valItem ident="vert_curly_line"><gloss>vertikale geschwungene Linie</gloss></valItem>
-									
-									<valItem ident="horiz_brace"><gloss>horizontale gerade Klammer</gloss></valItem>
-									<valItem ident="vert_brace"><gloss>vertikale gerade Klammer</gloss></valItem>									
-									<valItem ident="horiz_curly_brace"><gloss>horizontale geschwungene Klammer</gloss></valItem>
-									<valItem ident="vert_curly_brace"><gloss>vertikale geschwungene Klammer</gloss></valItem>									
-								</valList>
-							</attDef>
-						</attList>
+					</elementSpec>
+
+					<elementSpec ident="grBrace" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Kodiert eine Klammer auf Dokumentebene</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.transcriptional"/>
+							<memberOf key="att.graphicAlignment"/>
+							<memberOf key="att.graphicOrientation"/>
+							<memberOf key="att.graphicStyle"/>
+							<memberOf key="att.graphicExtent"/>
+						</classes>
 					</elementSpec>
 					
 					<elementSpec ident="ins" ns="http://www.faustedition.net/ns" mode="add">
-						<desc>Kodiert Einfügungszeichen.</desc>
+						<desc>Kodiert Einfügungszeichen auf Dokumentebene.</desc>
 						<classes>
 							<memberOf key="model.linePart"/>
-							<memberOf key="att.alignable"/>
+							<memberOf key="att.graphicAlignment"/>
+							<memberOf key="att.transcriptional"/>
 						</classes>
 						<attList>
-							<attDef ident="at" usage="opt">
+							<attDef ident="at" ns="http://www.faustedition.net/ns" usage="req">
 								<desc>Verweist auf die Stelle, an der etwas eingefügt wird.</desc>
 								<datatype minOccurs="1" maxOccurs="1">
 									<rng:ref name="data.pointer"/>
 								</datatype>
+							</attDef>
+							<attDef ident="orient" ns="http://www.faustedition.net/ns" usage="req">
+								<desc>Gibt an, ob der eingefügte Text zur Linken, oder zur Rechten des Einfügungszeichens steht.</desc>
+								<valList type="closed">
+									<valItem ident="left"><gloss>eingefügter Text links vom Einfügungszeichen</gloss></valItem>
+									<valItem ident="right"><gloss>eingefügter Text rechts vom Einfügungszeichen</gloss></valItem>
+								</valList>
 							</attDef>
 						</attList>
 					</elementSpec>
@@ -789,6 +844,7 @@
 							<memberOf key="model.zonePart"/>
 							<memberOf key="model.linePart"/>
 							<memberOf key="att.spanning"/>
+							<memberOf key="att.transcriptional"/>
 						</classes>
 						<content>
 							<rng:ref name="macro.lineContent"/>
@@ -807,7 +863,7 @@
 					
 					<classSpec ident="model.linePart.overwritten" type="model"/>
 					
-					<elementSpec ident="on" ns="http://www.faustedition.net/ns" mode="add">
+					<elementSpec ident="under" ns="http://www.faustedition.net/ns" mode="add">
 						<desc>Das unter der Überschreibung stehende.</desc>
 						<classes>
 							<memberOf key="model.linePart.overwritten"/>
@@ -817,7 +873,7 @@
 						</content>
 					</elementSpec>
 
-					<elementSpec ident="sup" ns="http://www.faustedition.net/ns" mode="add">
+					<elementSpec ident="over" ns="http://www.faustedition.net/ns" mode="add">
 						<desc>Das auf dem Überschriebenden stehende.</desc>
 						<classes>
 							<memberOf key="model.linePart.overwritten"/>
@@ -848,12 +904,15 @@
 					
 					<classSpec ident="att.changeRelated" type="atts" mode="add">
 						<attList>
-							<attDef ident="revType" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+							<attDef ident="revType" ns="http://www.faustedition.net/ns" usage="req" mode="add">
 								<valList type="closed">
 									<valItem ident="instant"><gloss>Sofortrevision</gloss></valItem>
+									<valItem ident="instant-or-soon"><gloss>Sofort- oder Baldrevision</gloss></valItem>
 									<valItem ident="soon"><gloss>Baldrevision</gloss></valItem>
+									<valItem ident="soon-or-late"><gloss>Bald- oder Spätrevision</gloss></valItem>
 									<valItem ident="late"><gloss>Spätrevision</gloss></valItem>
 									<valItem ident="uncertain"><gloss>nicht zuzuordnen</gloss></valItem>
+									<valItem ident="aborted"><gloss>abgebrochene/vorgeschlagene Änderung</gloss></valItem>
 								</valList>
 							</attDef>
 							<attDef ident="changeRef" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
@@ -869,6 +928,11 @@
 						</classes>
 					</elementSpec>
 					<elementSpec ident="del" mode="change">
+						<classes mode="change">
+							<memberOf key="att.changeRelated"/>
+						</classes>
+					</elementSpec>
+					<elementSpec ident="restore" mode="change">
 						<classes mode="change">
 							<memberOf key="att.changeRelated"/>
 						</classes>

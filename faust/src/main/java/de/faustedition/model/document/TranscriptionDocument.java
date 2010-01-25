@@ -12,7 +12,7 @@ import org.hibernate.criterion.Projections;
 
 import de.faustedition.model.hierarchy.HierarchyNode;
 import de.faustedition.model.hierarchy.HierarchyNodeFacet;
-import de.faustedition.model.tei.EncodedDocument;
+import de.faustedition.model.tei.EncodedTextDocument;
 import de.faustedition.util.HibernateUtil;
 import de.faustedition.util.XMLUtil;
 
@@ -30,15 +30,15 @@ public class TranscriptionDocument extends HierarchyNodeFacet {
 		return new String(documentData, Charset.forName("UTF-8"));
 	}
 
-	public EncodedDocument getTeiDocument() {
-		return (documentData == null ? null : new EncodedDocument(XMLUtil.parse(documentData)));
+	public EncodedTextDocument getTeiDocument() {
+		return (documentData == null ? null : new EncodedTextDocument(XMLUtil.parse(documentData)));
 	}
 
 	public void setDocumentData(byte[] documentData) {
 		this.documentData = documentData;
 	}
 
-	public void setDocumentData(EncodedDocument teiDocument) {
+	public void setDocumentData(EncodedTextDocument teiDocument) {
 		setDocumentData(XMLUtil.serialize(teiDocument.getDocument(), false));
 	}
 

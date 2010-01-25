@@ -59,7 +59,10 @@ public class XMLUtil {
 			documentBuilderFactory.setNamespaceAware(true);
 			documentBuilderFactory.setCoalescing(true);
 			documentBuilderFactory.setValidating(false);
-			return documentBuilderFactory.newDocumentBuilder();
+			
+			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+			documentBuilder.setErrorHandler(new StrictNoOutputErrorCallback());
+			return documentBuilder;
 		} catch (ParserConfigurationException e) {
 			throw ErrorUtil.fatal(e, "Error configuring DOM builder");
 		}

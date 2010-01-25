@@ -17,8 +17,8 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import de.faustedition.model.facsimile.Facsimile;
-import de.faustedition.model.tei.EncodedDocument;
-import de.faustedition.model.tei.EncodedDocumentManager;
+import de.faustedition.model.tei.EncodedTextDocument;
+import de.faustedition.model.tei.EncodedTextDocumentManager;
 import de.faustedition.util.XMLUtil;
 
 public class Transcription implements Serializable
@@ -116,16 +116,16 @@ public class Transcription implements Serializable
 		return revisions;
 	}
 
-	public void update(EncodedDocument document)
+	public void update(EncodedTextDocument document)
 	{
 		setTextData(XMLUtil.serializeFragment(document.getTextElement()));
 		setRevisionData(XMLUtil.serializeFragment(document.getRevisionElement()));
 	}
 
 
-	public EncodedDocument buildTEIDocument(EncodedDocumentManager manager)
+	public EncodedTextDocument buildTEIDocument(EncodedTextDocumentManager manager)
 	{
-		EncodedDocument teiDocument = manager.create();
+		EncodedTextDocument teiDocument = manager.create();
 
 		org.w3c.dom.Document domDocument = teiDocument.getDocument();
 		domDocument.getDocumentElement().appendChild(domDocument.importNode(XMLUtil.parse(getTextData()).getDocumentElement(), true));

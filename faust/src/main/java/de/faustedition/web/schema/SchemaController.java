@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
-import de.faustedition.model.tei.EncodedDocument;
+import de.faustedition.model.tei.EncodedTextDocument;
 
 @Controller
 @RequestMapping("/schema")
@@ -22,7 +22,7 @@ public class SchemaController {
 
 	@RequestMapping("/faust.rnc")
 	public void streamRelaxSchema(WebRequest request, HttpServletResponse response) throws IOException {
-		streamResource(request, response, EncodedDocument.RELAX_NG_SCHEMA_RESOURCE, "application/relax-ng-compact-syntax");
+		streamResource(request, response, EncodedTextDocument.RELAX_NG_SCHEMA_RESOURCE, "application/relax-ng-compact-syntax");
 	}
 
 	@RequestMapping("/faust.css")

@@ -1,32 +1,33 @@
-package de.faustedition.model.manuscript;
+package de.faustedition.model.repository;
 
+import static de.faustedition.model.tei.EncodedTextDocument.TEI_NS_URI;
 import static javax.jcr.ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import javax.annotation.PostConstruct;
-import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -44,26 +45,23 @@ import de.faustedition.model.document.PrintReference;
 import de.faustedition.model.document.TranscriptionStatus;
 import de.faustedition.model.document.TranscriptionStatusMixin;
 import de.faustedition.model.facsimile.Facsimile;
-import de.faustedition.model.facsimile.FacsimileImageResolution;
-import de.faustedition.model.facsimile.FacsimileReference;
 import de.faustedition.model.hierarchy.HierarchyNodeFacet;
+import de.faustedition.model.manuscript.Manuscript;
+import de.faustedition.model.manuscript.Portfolio;
+import de.faustedition.model.manuscript.Repository;
+import de.faustedition.model.manuscript.Transcription;
 import de.faustedition.model.metadata.MetadataAssignment;
-import de.faustedition.model.repository.RepositoryBackupTask;
-import de.faustedition.model.repository.RepositoryFile;
-import de.faustedition.model.repository.RepositoryFolder;
-import de.faustedition.model.repository.RepositoryUtil;
-import de.faustedition.model.tei.EncodedDocument;
-import de.faustedition.model.tei.EncodedDocumentManager;
+import de.faustedition.model.tei.EncodedTextDocument;
+import de.faustedition.model.tei.EncodedTextDocumentManager;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
+import de.faustedition.util.URIUtil;
 import de.faustedition.util.XMLUtil;
 
 @Service
 public class RepositoryRecoveryTask implements Runnable {
-	private static final String FACSIMILE_SUFFIX = FacsimileImageResolution.HIGH.getSuffix();
-
 	@Autowired
-	private EncodedDocumentManager encodedDocumentManager;
+	private EncodedTextDocumentManager encodedDocumentManager;
 
 	@Autowired
 	@Qualifier("backup")
@@ -78,12 +76,9 @@ public class RepositoryRecoveryTask implements Runnable {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@Autowired
-	private TaskExecutor taskExecutor;
-	
 	@PostConstruct
 	public void scheduleRecovery() {
-		// schedule recovery
+		Executors.newSingleThreadExecutor().execute(this);
 	}
 
 	public void run() {
@@ -94,13 +89,19 @@ public class RepositoryRecoveryTask implements Runnable {
 				LoggingUtil.LOG.debug("Repository is not empty; skip recovery");
 				return;
 			}
+			
+			StopWatch sw = new StopWatch();
+			sw.start();
+			
 			if (recoverFromBackup(repoSession)) {
-				LoggingUtil.LOG.info("Repository recovered from backup");
+				sw.stop();
+				LoggingUtil.LOG.info("Repository recovered from backup in " + sw);
 				return;
 			}
 
 			migrateFromRdbms(repoSession);
-			LoggingUtil.LOG.info("Repository recovered from RDBMS");
+			sw.stop();
+			LoggingUtil.LOG.info("Repository recovered from RDBMS in " + sw);
 		} catch (RepositoryException e) {
 			throw ErrorUtil.fatal(e, "Repository error while recovering repository: %s", e.getMessage());
 		} catch (IOException e) {
@@ -132,9 +133,9 @@ public class RepositoryRecoveryTask implements Runnable {
 		try {
 			backupStream = new GZIPInputStream(new FileInputStream(backupFile));
 
-			Node appNode = RepositoryUtil.appNode(repoSession).getNode();
+			RepositoryUtil.appNode(repoSession).getNode().remove();
 			repoSession.save();
-			repoSession.getWorkspace().importXML(appNode.getPath(), backupStream, IMPORT_UUID_COLLISION_THROW);
+			repoSession.getWorkspace().importXML("/", backupStream, IMPORT_UUID_COLLISION_THROW);
 			return true;
 		} finally {
 			IOUtils.closeQuietly(backupStream);
@@ -193,34 +194,45 @@ public class RepositoryRecoveryTask implements Runnable {
 
 			Facsimile facsimile = Facsimile.find(session, manuscript, name);
 			if (facsimile != null) {
-				FacsimileReference.create(pageFolder, name + FACSIMILE_SUFFIX, facsimile.getImagePath());
-
 				Transcription transcription = Transcription.find(session, facsimile);
 				if (transcription != null) {
-					EncodedDocument teiDocument = transcription.buildTEIDocument(encodedDocumentManager);
+					EncodedTextDocument document = transcription.buildTEIDocument(encodedDocumentManager);
+					Document xml = document.getDocument();
+					Element teiEl = xml.getDocumentElement();
+					Element textEl = document.findNode("/:TEI/:text", Element.class);
 
-					TranscriptionStatus status = TranscriptionStatus.extract(teiDocument);
+					Element facsimileRef = xml.createElementNS(TEI_NS_URI, "graphic");
+					URI facsimileUri = URIUtil.createFacsimileURI(facsimile.getImagePath());
+					facsimileRef.setAttributeNS(TEI_NS_URI, "url", facsimileUri.toASCIIString());
+					
+					Element facsimileEl = xml.createElementNS(TEI_NS_URI, "facsimile");
+					facsimileEl.appendChild(facsimileRef);					
+					if (textEl != null) {
+						teiEl.insertBefore(facsimileEl, textEl);
+					} else {
+						teiEl.appendChild(facsimileEl);
+					}
+					
+					TranscriptionStatus status = TranscriptionStatus.extract(document);
 					if (TranscriptionStatus.EMPTY.equals(status)) {
-						Element text = teiDocument.findNode("/:TEI/:text", Element.class);
-						if (text != null && XMLUtil.hasText(text)) {
-							Element teiHeader = teiDocument.findNode("/:TEI/:teiHeader", Element.class);
-							Element revisionDesc = EncodedDocument.findNode(teiHeader,
+						if (textEl != null && XMLUtil.hasText(textEl)) {
+							Element teiHeader = document.findNode("/:TEI/:teiHeader", Element.class);
+							Element revisionDesc = EncodedTextDocument.findNode(teiHeader,
 									"./:revisionDesc", Element.class);
 
-							Document document = teiDocument.getDocument();
 							if (revisionDesc == null) {
-								revisionDesc = document.createElementNS(EncodedDocument.TEI_NS_URI,
+								revisionDesc = xml.createElementNS(TEI_NS_URI,
 										"revisionDesc");
 								teiHeader.appendChild(revisionDesc);
 							}
-							Element change = document.createElementNS(EncodedDocument.TEI_NS_URI,
-									"change");
+							
+							Element change = xml.createElementNS(TEI_NS_URI, "change");
 							revisionDesc.appendChild(change);
 
 							String today = DateFormatUtils.ISO_DATE_FORMAT.format(System
 									.currentTimeMillis());
-							change.setAttributeNS(EncodedDocument.TEI_NS_URI, "when", today);
-							change.setAttributeNS(EncodedDocument.TEI_NS_URI, "who", "system");
+							change.setAttributeNS(TEI_NS_URI, "when", today);
+							change.setAttributeNS(TEI_NS_URI, "who", "system");
 							if (Pattern.matches("^0*1$", name)) {
 								change.setTextContent("Rohzustand");
 								status = TranscriptionStatus.RAW;
@@ -230,9 +242,7 @@ public class RepositoryRecoveryTask implements Runnable {
 							}
 						}
 					}
-					byte[] data = XMLUtil.serialize(teiDocument.getDocument(), false);
-					ByteArrayInputStream dataStream = new ByteArrayInputStream(data);
-					RepositoryFile file = RepositoryFile.create(pageFolder, name + ".xml", dataStream);
+					RepositoryDocument file = RepositoryDocument.create(pageFolder, name + ".xml", document);
 					TranscriptionStatusMixin.create(file, status);
 
 					session.flush();

@@ -4,7 +4,7 @@ import static org.apache.jackrabbit.JcrConstants.JCR_CONTENT;
 import static org.apache.jackrabbit.JcrConstants.JCR_DATA;
 import static org.apache.jackrabbit.JcrConstants.NT_RESOURCE;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.util.Date;
 
 import javax.jcr.Node;
@@ -12,28 +12,34 @@ import javax.jcr.RepositoryException;
 
 import org.apache.jackrabbit.JcrConstants;
 
-public class RepositoryFile extends RepositoryObject {
+import de.faustedition.model.tei.EncodedTextDocument;
+import de.faustedition.util.XMLUtil;
 
-	public RepositoryFile(Node node) {
+public class RepositoryDocument extends RepositoryObject {
+
+	public RepositoryDocument(Node node) {
 		super(node);
 	}
 
-	public static RepositoryFile create(Node parentNode, String name, InputStream content) throws RepositoryException {
-		RepositoryFile repositoryFile = new RepositoryFile(parentNode.addNode(name, JcrConstants.NT_FILE));
-		repositoryFile.setContent(content);
-		return repositoryFile;
+	public static RepositoryDocument create(Node parentNode, String name, EncodedTextDocument document) throws RepositoryException {
+		RepositoryDocument repositoryDocument = new RepositoryDocument(parentNode.addNode(name, JcrConstants.NT_FILE));
+		repositoryDocument.setDocument(document);
+		return repositoryDocument;
 	}
 
-	public static RepositoryFile create(RepositoryObject parent, String name, InputStream content) throws RepositoryException {
-		return create(parent.getNode(), name, content);
+	public static RepositoryDocument create(RepositoryObject parent, String name, EncodedTextDocument document) throws RepositoryException {
+		return create(parent.getNode(), name, document);
 	}
 
-	public InputStream getContent() throws RepositoryException {
-		return getContentNode().getProperty(JCR_DATA).getBinary().getStream();
+	public EncodedTextDocument getDocument() throws RepositoryException {
+		return EncodedTextDocument.parse(getContentNode().getProperty(JCR_DATA).getBinary().getStream());
 	}
 
-	public void setContent(InputStream content) throws RepositoryException {
-		getContentNode().setProperty(JCR_DATA, getValueFactory().createBinary(content));
+	public void setDocument(EncodedTextDocument document) throws RepositoryException {
+		byte[] content = XMLUtil.serialize(document.getDocument(), false);
+		getContentNode().setProperty(JCR_DATA, getValueFactory().createBinary(new ByteArrayInputStream(content)));
+		setMimeType("application/xml");
+		setEncoding("UTF-8");
 		setLastModified(new Date());
 	}
 
