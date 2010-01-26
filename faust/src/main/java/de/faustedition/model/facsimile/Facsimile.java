@@ -9,7 +9,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.dao.support.DataAccessUtils;
 
-import de.faustedition.model.manuscript.Manuscript;
+import de.faustedition.model.db.Manuscript;
 
 public class Facsimile implements Serializable
 {

@@ -1,39 +1,30 @@
 package de.faustedition.model.repository;
 
+import static org.apache.jackrabbit.JcrConstants.NT_HIERARCHYNODE;
+
 import javax.jcr.Credentials;
-import javax.jcr.NamespaceException;
-import javax.jcr.NamespaceRegistry;
 import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.query.qom.Constraint;
+import javax.jcr.query.qom.QueryObjectModelFactory;
+import javax.jcr.query.qom.Selector;
+
+import org.apache.jackrabbit.commons.JcrUtils;
+
+import de.faustedition.util.LoggingUtil;
 
 public class RepositoryUtil {
 	public static final Credentials DEFAULT_CREDENTIALS = new SimpleCredentials("admin", new char[0]);
-	private static final String FAUST_NS_PREFIX = "faust";
-	private static final String FAUST_NS_URI = "http://www.faustedition.net/ns#";
-	private static final String APP_NODE_NAME = "faust";
+	public static final String XML_WS = "xml";
 
 	private RepositoryUtil() {
 	}
 
-	public static String faustNs(String localName) {
-		return FAUST_NS_PREFIX + ":" + localName;
-	}
-
-	public static Session login(Repository repository) throws RepositoryException {
-		return repository.login(DEFAULT_CREDENTIALS);
-	}
-
-	public static RepositoryFolder appNode(Session session) throws RepositoryException {
-		Node rootNode = session.getRootNode();
-		try {
-			return new RepositoryFolder(rootNode.getNode(APP_NODE_NAME));
-		} catch (PathNotFoundException e) {
-			return RepositoryFolder.create(rootNode, APP_NODE_NAME);
-		}
+	public static Session login(Repository repository, String workspace) throws RepositoryException {
+		return repository.login(DEFAULT_CREDENTIALS, workspace);
 	}
 
 	public static void logoutQuietly(Session session) {
@@ -41,13 +32,17 @@ public class RepositoryUtil {
 			session.logout();
 		}
 	}
-
-	public static void registerNamespace(Session session) throws RepositoryException {
-		NamespaceRegistry namespaceRegistry = session.getWorkspace().getNamespaceRegistry();
-		try {
-			namespaceRegistry.getPrefix(FAUST_NS_URI);
-		} catch (NamespaceException e) {
-			namespaceRegistry.registerNamespace(FAUST_NS_PREFIX, FAUST_NS_URI);
+	
+	public static boolean isNotEmpty(Session session) throws RepositoryException {
+		QueryObjectModelFactory qf = session.getWorkspace().getQueryManager().getQOMFactory();		
+		Selector selector = qf.selector(NT_HIERARCHYNODE, "hn");		
+		Constraint constraint = qf.descendantNode("hn", "/");
+		
+		for (Node node : JcrUtils.getNodes(qf.createQuery(selector, constraint, null, null).execute())) {
+			LoggingUtil.LOG.debug("Found hierarchy node '" + node.getPath() + "'; repository not empty");
+			return true;
 		}
+		
+		return false;
 	}
 }

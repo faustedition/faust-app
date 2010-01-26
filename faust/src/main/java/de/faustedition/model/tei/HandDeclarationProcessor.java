@@ -11,15 +11,14 @@ import javax.xml.XMLConstants;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import de.faustedition.util.XMLUtil;
 
-public class HandDeclarationProcessor implements EncodedTextDocumentProcessor
-{
+public class HandDeclarationProcessor implements EncodedTextDocumentProcessor {
 	private final Map<String, String> declarations = new LinkedHashMap<String, String>();
 
-	public HandDeclarationProcessor()
-	{
+	public HandDeclarationProcessor() {
 		final Map<String, String> typefaces = new LinkedHashMap<String, String>();
 		typefaces.put("lat", "latin");
 		typefaces.put("gr", "greek");
@@ -72,46 +71,44 @@ public class HandDeclarationProcessor implements EncodedTextDocumentProcessor
 		writerMaterials.put("xy", "t, tr, bl, blau");
 		writerMaterials.put("xz", "t, tr, bl, blau");
 
-		for (String writer : writerMaterials.keySet())
-		{
+		for (String writer : writerMaterials.keySet()) {
 			String writerName = writers.get(writer);
-			for (String material : StringUtils.stripAll(StringUtils.split(writerMaterials.get(writer), ",")))
-			{
+			for (String material : StringUtils.stripAll(StringUtils.split(writerMaterials.get(writer), ","))) {
 				String materialDesc = materials.get(material);
-				for (String typeface : typefaces.keySet())
-				{
+				for (String typeface : typefaces.keySet()) {
 					String typefaceDesc = typefaces.get(typeface);
-					declarations.put(String.format("%s_%s", writer, material, typeface), String.format("%s (%s)", writerName, materialDesc));
-					declarations.put(String.format("%s_%s_%s", writer, material, typeface), String.format("%s (%s - %s)", writerName, materialDesc, typefaceDesc));
+					declarations.put(String.format("%s_%s", writer, material, typeface), String.format(
+							"%s (%s)", writerName, materialDesc));
+					declarations.put(String.format("%s_%s_%s", writer, material, typeface), String.format(
+							"%s (%s - %s)", writerName, materialDesc, typefaceDesc));
 				}
 			}
 		}
 	}
 
 	@Override
-	public void process(EncodedTextDocument teiDocument)
-	{
+	public void process(EncodedTextDocument teiDocument) {
 		Document domDocument = teiDocument.getDocument();
 
 		Element handNotesElement = teiDocument.findElementByPath("teiHeader", "profileDesc", "handNotes");
-		if (handNotesElement == null)
-		{
+		if (handNotesElement == null) {
 			Element profileDescElement = teiDocument.findElementByPath("teiHeader", "profileDesc");
-			if (profileDescElement == null)
-			{
+			if (profileDescElement == null) {
 				throw new IllegalStateException();
 			}
-			if (!XMLUtil.hasText(profileDescElement))
-			{
-				XMLUtil.removeChildren(profileDescElement);
+			for (Node childNode : XMLUtil.iterableNodeList(profileDescElement.getChildNodes())) {
+				if ((Node.ELEMENT_NODE == childNode.getNodeType()) && "p".equals(childNode.getLocalName())) {
+					if (!XMLUtil.hasText((Element) childNode)) {
+						profileDescElement.removeChild(childNode);
+					}
+				}
 			}
 			profileDescElement.appendChild(handNotesElement = domDocument.createElementNS(TEI_NS_URI, "handNotes"));
 		}
 
 		XMLUtil.removeChildren(handNotesElement);
 
-		for (String id : declarations.keySet())
-		{
+		for (String id : declarations.keySet()) {
 			Element handNoteElement = domDocument.createElementNS(TEI_NS_URI, "handNote");
 			handNotesElement.appendChild(handNoteElement);
 

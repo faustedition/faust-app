@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<typedef name="hierarchyNodeType" class="de.faustedition.util.EnumUserType">
-		<param name="enumClassName">de.faustedition.model.hierarchy.HierarchyNodeType</param>
-	</typedef>
-	<typedef name="transcriptionStatus" class="de.faustedition.util.EnumUserType">
-		<param name="enumClassName">de.faustedition.model.document.TranscriptionStatus</param>
-	</typedef>
-
-	<class name="de.faustedition.model.manuscript.Repository">
+	<class name="de.faustedition.model.db.Repository">
 		<id name="id">
 			<generator class="native" />
 		</id>
 		<property name="name" not-null="true" length="50" unique="true" />
 	</class>
 
-	<class name="de.faustedition.model.manuscript.Portfolio">
+	<class name="de.faustedition.model.db.Portfolio">
 		<id name="id">
 			<generator class="native" />
 		</id>
@@ -23,7 +16,7 @@
 		<property name="name" length="50" not-null="true" index="portfolio_index" />
 	</class>
 
-	<class name="de.faustedition.model.manuscript.Manuscript">
+	<class name="de.faustedition.model.db.Manuscript">
 		<id name="id">
 			<generator class="native" />
 		</id>
@@ -40,7 +33,7 @@
 		<property name="imagePath" not-null="true" length="200" />
 	</class>
 
-	<class name="de.faustedition.model.manuscript.Transcription">
+	<class name="de.faustedition.model.db.Transcription">
 		<id name="id">
 			<generator class="native" />
 		</id>
@@ -61,63 +54,5 @@
 		<property name="value">
 			<column name="value" sql-type="text" not-null="true" />
 		</property>
-	</class>
-	<class name="de.faustedition.model.hierarchy.HierarchyNode" table="hierarchy_node">
-		<id name="id">
-			<generator class="native" />
-		</id>
-		<property name="nodeType" type="hierarchyNodeType" not-null="true" length="100" />
-		<property name="name" not-null="true" length="100" />
-		<many-to-one name="parent" column="parent_id" />
-		<property name="parentPath" column="parent_path" length="1024" />
-	</class>
-	<class name="de.faustedition.model.facsimile.FacsimileFile" table="facsimile_file">
-		<id name="id">
-			<generator class="native" />
-		</id>
-		<property name="path" not-null="true" length="1024" unique="true" />
-	</class>
-	<class name="de.faustedition.model.hierarchy.HierarchyNodeFacet" table="hierarchy_node_facet">
-		<id name="id">
-			<generator class="native" />
-		</id>
-		<many-to-one name="facettedNode" not-null="true" column="facetted_node_id" />
-		<joined-subclass name="de.faustedition.model.facsimile.FacsimileAssociation" table="facsimile_association">
-			<key column="node_facet_id" />
-			<many-to-one name="facsimileFile" not-null="true" column="facsimile_file_id" />
-			<property name="primary" not-null="true" column="is_primary" />
-		</joined-subclass>
-		<joined-subclass name="de.faustedition.model.document.TranscriptionDocument" table="document_transcription_document">
-			<key column="node_facet_id" />
-			<property name="documentData" not-null="true" column="document_data" />
-			<property name="created" not-null="true" />
-			<property name="lastModified" not-null="true" column="last_modified" />
-			<property name="status" type="transcriptionStatus" length="50" />
-		</joined-subclass>
-		<joined-subclass name="de.faustedition.model.document.ArchiveReference" table="document_archive_reference">
-			<key column="node_facet_id" />
-			<property name="repository" not-null="true" length="200" />
-			<property name="callnumber" not-null="true" length="100" />
-			<property name="legacyCallnumber" length="100" column="legacy_callnumber" />
-		</joined-subclass>
-		<joined-subclass name="de.faustedition.model.document.DocumentDating" table="document_dating">
-			<key column="node_facet_id" />
-			<property name="fromDate" column="from_date" />
-			<property name="toDate" column="to_date" />
-			<property name="remarks" length="1000" />
-		</joined-subclass>
-		<joined-subclass name="de.faustedition.model.document.PrintReference" table="document_print_reference">
-			<key column="node_facet_id" />
-			<property name="referenceWeimarerAusgabe" column="reference_wa" length="1000" />
-			<property name="manuscriptReferenceWeimarerAusgabe" column="manuscript_ref_wa" length="1000" />
-			<property name="paralipomenonReferenceWeimarerAusgabe" column="pp_ref_wa" length="1000" />
-		</joined-subclass>
-		<joined-subclass name="de.faustedition.model.document.LegacyMetadata" table="document_legacy_metadata">
-			<key column="node_facet_id" />
-			<property name="hands" length="1000" />
-			<property name="recordNumber" length="100" />
-			<property name="geneticLevel" length="200" column="genetic_level" />
-			<property name="remarks" length="1000" />
-		</joined-subclass>
 	</class>
 </hibernate-mapping>

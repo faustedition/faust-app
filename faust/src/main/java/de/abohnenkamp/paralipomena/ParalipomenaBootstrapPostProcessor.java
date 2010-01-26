@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import de.faustedition.model.db.Manuscript;
+import de.faustedition.model.db.Portfolio;
+import de.faustedition.model.db.Repository;
+import de.faustedition.model.db.Transcription;
 import de.faustedition.model.facsimile.Facsimile;
 import de.faustedition.model.init.BootstrapPostProcessor;
-import de.faustedition.model.manuscript.Manuscript;
-import de.faustedition.model.manuscript.Portfolio;
-import de.faustedition.model.manuscript.Repository;
-import de.faustedition.model.manuscript.Transcription;
 import de.faustedition.model.tei.EncodedTextDocument;
 import de.faustedition.model.tei.EncodedTextDocumentManager;
 import de.faustedition.util.ErrorUtil;

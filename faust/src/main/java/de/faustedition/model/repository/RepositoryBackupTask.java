@@ -45,8 +45,8 @@ public class RepositoryBackupTask {
 		try {
 			sw.start();
 			backupStream = new GZIPOutputStream(new FileOutputStream(backupFile));
-			RepositoryFolder appNode = RepositoryUtil.appNode(session = RepositoryUtil.login(repository));
-			session.exportSystemView(appNode.getNode().getPath(), backupStream, false, false);
+			session = RepositoryUtil.login(repository, RepositoryUtil.XML_WS);
+			session.exportSystemView("/", backupStream, false, false);
 			sw.stop();
 			success = true;
 		} catch (IOException e) {

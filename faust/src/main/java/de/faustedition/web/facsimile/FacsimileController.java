@@ -20,8 +20,8 @@ import org.springframework.web.context.request.WebRequest;
 
 import de.faustedition.model.ObjectNotFoundException;
 import de.faustedition.model.facsimile.Facsimile;
-import de.faustedition.model.facsimile.FacsimileImageDao;
-import de.faustedition.model.facsimile.FacsimileImageResolution;
+import de.faustedition.model.facsimile.FacsimileManager;
+import de.faustedition.model.facsimile.FacsimileResolution;
 import de.faustedition.web.ControllerUtil;
 
 @Controller
@@ -29,7 +29,7 @@ public class FacsimileController
 {
 	public static final String URL_PREFIX = "facsimile";
 	@Autowired
-	private FacsimileImageDao facsimileStore;
+	private FacsimileManager facsimileStore;
 
 	@Autowired
 	private SessionFactory dbSessionFactory;
@@ -48,8 +48,8 @@ public class FacsimileController
 		}
 
 		String filename = pathComponents.removeLast();
-		FacsimileImageResolution facsimileResolution = null;
-		for (FacsimileImageResolution resolution : FacsimileImageResolution.values())
+		FacsimileResolution facsimileResolution = null;
+		for (FacsimileResolution resolution : FacsimileResolution.values())
 		{
 			if (resolution.matches(filename))
 			{
@@ -57,7 +57,7 @@ public class FacsimileController
 				filename = StringUtils.removeEnd(filename, resolution.getSuffix());
 			}
 		}
-		if (facsimileResolution == null || facsimileResolution == FacsimileImageResolution.HIGH)
+		if (facsimileResolution == null || facsimileResolution == FacsimileResolution.HIGH)
 		{
 			throw new ObjectNotFoundException();
 		}

@@ -1,6 +1,5 @@
 package de.faustedition.web.document;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
@@ -9,14 +8,14 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.springframework.core.io.ClassPathResource;
 
-import de.faustedition.model.document.TranscriptionDocument;
+import de.faustedition.model.tei.EncodedTextDocument;
 import de.faustedition.util.ErrorUtil;
-
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -46,18 +45,16 @@ public class Tei2XhtmlTransformer implements TemplateMethodModelEx {
 		}
 
 		Object argument = DeepUnwrap.unwrap((TemplateModel) arguments.get(0));
-		if (!(argument instanceof TranscriptionDocument)) {
+		if (!(argument instanceof EncodedTextDocument)) {
 			throw new TemplateModelException("Please provide a transcription facet to transform");
 		}
 
 		try {
-			TranscriptionDocument facet = (TranscriptionDocument) argument;
-			StreamSource teiSource = new StreamSource(new ByteArrayInputStream(facet.getDocumentData()));
-
 			StringWriter htmlTranscription = new StringWriter();
 			StreamResult htmlResult = new StreamResult(htmlTranscription);
 
-			tei2htmlTemplates.newTransformer().transform(teiSource, htmlResult);
+			EncodedTextDocument d = (EncodedTextDocument) argument;
+			tei2htmlTemplates.newTransformer().transform(new DOMSource(d.getDocument()), htmlResult);
 
 			return htmlTranscription.toString();
 		} catch (TransformerConfigurationException e) {

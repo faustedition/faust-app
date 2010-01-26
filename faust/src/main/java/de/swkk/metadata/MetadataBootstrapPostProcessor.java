@@ -9,9 +9,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import de.faustedition.model.db.Portfolio;
+import de.faustedition.model.db.Repository;
 import de.faustedition.model.init.BootstrapPostProcessor;
-import de.faustedition.model.manuscript.Portfolio;
-import de.faustedition.model.manuscript.Repository;
 import de.faustedition.model.metadata.MetadataAssignment;
 import de.faustedition.util.LoggingUtil;
 import de.swkk.metadata.archivedb.ArchiveDatabase;

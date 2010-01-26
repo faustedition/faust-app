@@ -1,7 +1,5 @@
 package de.faustedition.web.dav;
 
-import java.util.Map;
-
 import javax.jcr.Credentials;
 import javax.jcr.LoginException;
 import javax.jcr.Repository;
@@ -9,9 +7,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.jackrabbit.server.CredentialsProvider;
-import org.apache.jackrabbit.server.io.DefaultHandler;
-import org.apache.jackrabbit.server.io.IOManager;
-import org.apache.jackrabbit.webdav.simple.ResourceConfig;
 import org.apache.jackrabbit.webdav.simple.SimpleWebdavServlet;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -22,20 +17,6 @@ public class FaustDavServlet extends SimpleWebdavServlet {
 
 	private ApplicationContext applicationContext;
 
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		
-		Map<String, FaustDavHandler> handlerMap = getApplicationContext().getBeansOfType(FaustDavHandler.class);
-		ResourceConfig resourceConfig = getResourceConfig();
-		
-		IOManager ioManager = resourceConfig.getIOManager();		
-		ioManager.addIOHandler(new FaustDavIOHandler(handlerMap.values()));
-		ioManager.addIOHandler(new DefaultHandler());
-		
-		resourceConfig.getPropertyManager().addPropertyHandler(new DefaultHandler());
-	}
-	
 	@Override
 	public Repository getRepository() {
 		return getApplicationContext().getBean(Repository.class);

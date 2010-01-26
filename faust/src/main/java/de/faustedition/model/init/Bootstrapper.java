@@ -14,7 +14,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import de.faustedition.model.manuscript.Repository;
+import de.faustedition.model.db.Repository;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
 

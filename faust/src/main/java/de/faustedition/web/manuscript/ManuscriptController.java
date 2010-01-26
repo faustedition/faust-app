@@ -34,11 +34,11 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import de.faustedition.model.ObjectNotFoundException;
+import de.faustedition.model.db.Manuscript;
+import de.faustedition.model.db.Portfolio;
+import de.faustedition.model.db.Repository;
+import de.faustedition.model.db.Transcription;
 import de.faustedition.model.facsimile.Facsimile;
-import de.faustedition.model.manuscript.Manuscript;
-import de.faustedition.model.manuscript.Portfolio;
-import de.faustedition.model.manuscript.Repository;
-import de.faustedition.model.manuscript.Transcription;
 import de.faustedition.model.metadata.MetadataAssignment;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLUtil;

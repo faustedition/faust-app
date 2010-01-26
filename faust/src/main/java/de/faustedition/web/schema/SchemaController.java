@@ -15,17 +15,17 @@ import org.springframework.web.context.request.WebRequest;
 import de.faustedition.model.tei.EncodedTextDocument;
 
 @Controller
-@RequestMapping("/schema")
+@RequestMapping("/schema/")
 public class SchemaController {
 	private static final Resource CSS_STYLESHEET_RESOURCE = new ClassPathResource("/css/faust-tei.css");
 	private long startupTime = System.currentTimeMillis();
 
-	@RequestMapping("/faust.rnc")
+	@RequestMapping("faust.rnc")
 	public void streamRelaxSchema(WebRequest request, HttpServletResponse response) throws IOException {
 		streamResource(request, response, EncodedTextDocument.RELAX_NG_SCHEMA_RESOURCE, "application/relax-ng-compact-syntax");
 	}
 
-	@RequestMapping("/faust.css")
+	@RequestMapping("faust.css")
 	public void streamStylesheet(WebRequest request, HttpServletResponse response) throws IOException {
 		streamResource(request, response, CSS_STYLESHEET_RESOURCE, "text/css");
 	}

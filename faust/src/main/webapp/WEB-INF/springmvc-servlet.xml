@@ -11,16 +11,5 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
 	<context:component-scan base-package="de.faustedition.web" />
-
 	<mvc:annotation-driven />
-	<mvc:interceptors>
-		<bean class="de.faustedition.web.TransactionContextHandlerInterceptor" />
-	</mvc:interceptors>
-
-	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver" />
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
-		<property name="contentType" value="application/xhtml+xml;charset=UTF-8" />
-		<property name="prefix" value="" />
-		<property name="suffix" value=".ftl" />
-	</bean>
 </beans>

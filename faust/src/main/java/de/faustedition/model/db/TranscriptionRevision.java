@@ -1,4 +1,4 @@
-package de.faustedition.model.manuscript;
+package de.faustedition.model.db;
 
 public class TranscriptionRevision
 {

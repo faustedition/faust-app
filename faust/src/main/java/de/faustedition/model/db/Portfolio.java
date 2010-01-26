@@ -1,4 +1,4 @@
-package de.faustedition.model.manuscript;
+package de.faustedition.model.db;
 
 import java.io.Serializable;
 import java.util.List;
