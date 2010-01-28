@@ -20,7 +20,7 @@ public class ErrorUtil
 		String message = createMessage(messages);
 		if (message != null)
 		{
-			LoggingUtil.LOG.fatal(message);
+			LoggingUtil.LOG.fatal(message, cause);
 		}
 		return (message == null ? new RuntimeException(cause) : new RuntimeException(message, cause));
 	}

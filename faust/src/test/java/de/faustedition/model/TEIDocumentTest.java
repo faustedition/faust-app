@@ -18,7 +18,7 @@ public class TEIDocumentTest {
 
 	@Test
 	public void serialize() {
-		XMLUtil.serialize(teiDocument.getDocument(), System.out, true);
+		XMLUtil.serialize(teiDocument.getDom(), System.out, true);
 	}
 
 	@Test

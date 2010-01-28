@@ -19,10 +19,16 @@ public class FaustInventory extends AllegroRecordSet {
 	private CategoryResolver categoryResolver;
 	private WeimarerAusgabeFaustRegister waRegister;
 
-	public FaustInventory() throws IOException {
-		parse(DATABASE_RESOURCE);
-		categoryResolver = new CategoryResolver();
-		waRegister = new WeimarerAusgabeFaustRegister();
+	public static FaustInventory parse() throws IOException {
+		FaustInventory fi = new FaustInventory();
+		fi.categoryResolver = CategoryResolver.parse();
+		fi.waRegister = WeimarerAusgabeFaustRegister.parse();
+		fi.parse(DATABASE_RESOURCE);
+		return fi;
+	}
+	
+	
+	private FaustInventory() {
 	}
 
 	public GSACallNumber getCallNumber(AllegroRecord record) {

@@ -21,8 +21,13 @@ public class WeimarerAusgabeFaustRegister extends AllegroRecordSet {
 	private Map<String, Integer> registerToHierarchyMapping = new HashMap<String, Integer>();
 	private Integer unregisteredFile;
 
-	public WeimarerAusgabeFaustRegister() throws IOException {
-		parse(FAUST_REGISTER_RESOURCE);
+	public static WeimarerAusgabeFaustRegister parse() throws IOException {
+		WeimarerAusgabeFaustRegister wafr = new WeimarerAusgabeFaustRegister();
+		wafr.parse(FAUST_REGISTER_RESOURCE);
+		return wafr;
+	}
+
+	private WeimarerAusgabeFaustRegister() {
 	}
 
 	public SortedSet<String> getDescriptionSet() {
@@ -59,6 +64,7 @@ public class WeimarerAusgabeFaustRegister extends AllegroRecordSet {
 	}
 
 	public Integer resolveMetadataNode(String description) {
-		return (description == null || !registerToHierarchyMapping.containsKey(description) ? unregisteredFile : registerToHierarchyMapping.get(description));
+		return (description == null || !registerToHierarchyMapping.containsKey(description) ? unregisteredFile
+				: registerToHierarchyMapping.get(description));
 	}
 }

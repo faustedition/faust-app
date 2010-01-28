@@ -10,7 +10,13 @@ import de.swkk.metadata.AllegroRecordSet;
 public class ParalipomenaMetadata extends AllegroRecordSet {
 	private static final Resource METADATA_RESOURCE = new ClassPathResource("/data/weimar_manuscripts_paralipomena.txt");
 
-	public ParalipomenaMetadata() throws IOException {
-		parse(METADATA_RESOURCE);
+	public static ParalipomenaMetadata parse() throws IOException {
+		ParalipomenaMetadata pm = new ParalipomenaMetadata();
+		pm.parse(METADATA_RESOURCE);
+		return pm;
 	}
+
+	private ParalipomenaMetadata() {
+	}
+
 }

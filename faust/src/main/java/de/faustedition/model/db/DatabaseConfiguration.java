@@ -9,6 +9,11 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -18,7 +23,6 @@ public class DatabaseConfiguration {
 
 	@Value("#{config['db.driver']}")
 	private String databaseDriver;
-
 
 	@Value("#{config['db.dialect']}")
 	private String databaseDialect;
@@ -43,6 +47,28 @@ public class DatabaseConfiguration {
 	}
 
 	@Bean
+	public DataSourceInitializer dataSourceInitializer() {
+		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+		databasePopulator.addScript(new ClassPathResource("/db-schema.sql"));
+		databasePopulator.setContinueOnError(true);
+
+		DataSourceInitializer initializer = new DataSourceInitializer();
+		initializer.setDataSource(dataSource());
+		initializer.setDatabasePopulator(databasePopulator);
+		return initializer;
+	}
+
+	@Bean
+	public PlatformTransactionManager transactionManager() {
+		return new DataSourceTransactionManager(dataSource());
+	}
+
+	@Bean
+	public SimpleJdbcTemplate jdbcTemplate() {
+		return new SimpleJdbcTemplate(dataSource());
+	}
+
+	@Bean
 	public SessionFactory sessionFactory() throws Exception {
 		LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
 		sessionFactoryBean.setDataSource(dataSource());
@@ -59,7 +85,7 @@ public class DatabaseConfiguration {
 	}
 
 	@Bean
-	public PlatformTransactionManager transactionManager() throws Exception {
+	public PlatformTransactionManager hibernateTransactionManager() throws Exception {
 		return new HibernateTransactionManager(sessionFactory());
 	}
 }

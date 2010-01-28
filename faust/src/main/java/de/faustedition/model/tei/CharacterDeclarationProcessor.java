@@ -32,7 +32,7 @@ public class CharacterDeclarationProcessor implements EncodedTextDocumentProcess
 
 	public void process(EncodedTextDocument teiDocument)
 	{
-		Document domDocument = teiDocument.getDocument();
+		Document domDocument = teiDocument.getDom();
 		Element charDeclElement = teiDocument.findElementByPath("teiHeader", "encodingDesc", "charDecl");
 		if (charDeclElement == null)
 		{

@@ -34,23 +34,20 @@ import com.thaiopensource.validate.ValidateProperty;
 import com.thaiopensource.validate.Validator;
 import com.thaiopensource.validate.rng.CompactSchemaReader;
 
+import de.faustedition.model.XmlDocument;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.XMLUtil;
 
-public class EncodedTextDocument {
+public class EncodedTextDocument extends XmlDocument {
 	public static final Resource RELAX_NG_SCHEMA_RESOURCE = new ClassPathResource("/schema/faust-tei.rnc");
 	public static final String TEI_NS_URI = "http://www.tei-c.org/ns/1.0";
 	public static final String TEI_SIG_GE_URI = "http://www.tei-c.org/ns/geneticEditions";
 	public static final String SVG_NS_URI = "http://www.w3.org/2000/svg";
-	public static final String FAUST_NS_URI = "http://www.faustedition.net/ns";
 	private static Schema schema;
 
-	private Node node;
-
-	public EncodedTextDocument(Node node) {
-		this.node = node;
-		
-		Element root = getDocument().getDocumentElement();
+	public EncodedTextDocument(Document document) {
+		super(document);
+		Element root = document.getDocumentElement();
 		String localName = root.getLocalName();
 		if (!TEI_NS_URI.equals(root.getNamespaceURI()) || (!"TEI".equals(localName) && !"teiCorpus".equals(localName))) {
 			throw new XmlException("Provided DOM is not a TEI document");
@@ -58,20 +55,15 @@ public class EncodedTextDocument {
 	}
 
 	public static EncodedTextDocument create() {
-		Document document = XMLUtil.documentBuilder().newDocument();
+		Document document = new XmlDocument().getDom();
 		document.appendChild(document.createElementNS(TEI_NS_URI, "TEI"));
 		return new EncodedTextDocument(document);
 	}
-	
+
 	public static EncodedTextDocument parse(InputStream inputStream) {
 		return new EncodedTextDocument(XMLUtil.parse(inputStream));
 	}
 
-	public Document getDocument() {
-		return XMLUtil.getDocument(node);
-	}
-
-	
 	public Element getTextElement() {
 		return Preconditions.checkNotNull(findElementByPath("text"));
 	}
@@ -92,7 +84,7 @@ public class EncodedTextDocument {
 	}
 
 	public <T extends Node> T findNode(String expr, Class<T> type) {
-		return findNode(getDocument(), expr, type);
+		return findNode(dom, expr, type);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -106,7 +98,7 @@ public class EncodedTextDocument {
 	}
 
 	public Iterable<Node> xpath(String expr) {
-		return xpath(getDocument(), expr);
+		return xpath(dom, expr);
 	}
 
 	public static Iterable<Node> xpath(Node context, String expr) {
@@ -119,7 +111,7 @@ public class EncodedTextDocument {
 	}
 
 	public Element findElementByPath(String... pathComponents) {
-		Element element = getDocument().getDocumentElement();
+		Element element = dom.getDocumentElement();
 
 		for (String localName : pathComponents) {
 			element = XMLUtil.getChild(element, localName);

@@ -1,11 +1,7 @@
 package de.swkk.metadata.inventory;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-
-import de.faustedition.model.metadata.MetadataAssignment;
 
 public class MetadataFieldMapping extends HashMap<String, String> {
 	public MetadataFieldMapping() {
@@ -69,26 +65,17 @@ public class MetadataFieldMapping extends HashMap<String, String> {
 		put("994", "reproduction_number");
 	}
 
-	public Collection<MetadataAssignment> map(Map<String, String> metadata, String associatedType, long associatedId) {
-		Map<String, MetadataAssignment> mappedMetadata = new LinkedHashMap<String, MetadataAssignment>();
+	public MetadataRecord map(Map<String, String> metadata) {
+		MetadataRecord record = new MetadataRecord();
+
 		for (String field : metadata.keySet()) {
 			String mappedKey = get(field);
 			if (mappedKey == null) {
 				continue;
 			}
-			MetadataAssignment assignment = new MetadataAssignment();
-			if (mappedMetadata.containsKey(mappedKey)) {
-				assignment = mappedMetadata.get(mappedKey);
-				assignment.setValue( assignment.getValue() + "\n" + metadata.get(field));
-			} else {
-				assignment = new MetadataAssignment();
-				assignment.setAssociatedType(associatedType);
-				assignment.setAssociatedId(associatedId);
-				assignment.setField(mappedKey);
-				assignment.setValue(metadata.get(field));
-				mappedMetadata.put(mappedKey, assignment);
-			}
+			record.put(mappedKey, metadata.get(field));
 		}
-		return mappedMetadata.values();
+
+		return record;
 	}
 }

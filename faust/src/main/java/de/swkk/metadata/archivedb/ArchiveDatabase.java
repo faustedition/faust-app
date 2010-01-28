@@ -7,17 +7,13 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.faustedition.util.ErrorUtil;
+import de.faustedition.util.XMLUtil;
 import de.swkk.metadata.GSACallNumber;
 
 public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
@@ -25,15 +21,9 @@ public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
 
 	private Map<GSACallNumber, ArchiveDatabaseRecord> callNumberIndex = new HashMap<GSACallNumber, ArchiveDatabaseRecord>();
 
-	public ArchiveDatabase() throws SAXException, IOException {
-		SAXParser parser = null;
-		try {
-			parser = SAXParserFactory.newInstance().newSAXParser();
-		} catch (ParserConfigurationException e) {
-			throw ErrorUtil.fatal(e, "Error configuring SAX parser");
-		}
-		
-		parser.parse(DATABASE_RESOURCE.getInputStream(), new DefaultHandler() {
+	public static ArchiveDatabase parse() throws SAXException, IOException {
+		final ArchiveDatabase db = new ArchiveDatabase();
+		XMLUtil.saxParser().parse(DATABASE_RESOURCE.getInputStream(), new DefaultHandler() {
 
 			private ArchiveDatabaseRecord record;
 			private String currentProperty;
@@ -57,7 +47,7 @@ public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
 			@Override
 			public void endElement(String uri, String localName, String qName) throws SAXException {
 				if ("ITEM".equals(qName)) {
-					add(record);
+					db.add(record);
 					record = null;
 				} else if (currentProperty != null) {
 					record.put(currentProperty, currentValue.toString());
@@ -74,8 +64,13 @@ public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
 				}
 			}
 		});
+		return db;
 	}
+	
 
+	private ArchiveDatabase() {
+	}
+	
 	public SortedSet<ArchiveDatabaseRecord> collect(GSACallNumber callNumber) {
 		SortedSet<ArchiveDatabaseRecord> records = new TreeSet<ArchiveDatabaseRecord>();
 		for (GSACallNumber dbCallNumber : callNumberIndex.keySet()) {

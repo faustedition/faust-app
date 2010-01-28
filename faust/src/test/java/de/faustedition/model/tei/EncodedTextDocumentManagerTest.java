@@ -14,6 +14,6 @@ public class EncodedTextDocumentManagerTest extends AbstractModelContextTest {
 	@Test
 	public void enhanceNewDocument() {
 		EncodedTextDocument d = documentManager.process(EncodedTextDocument.create());
-		XMLUtil.serialize(d.getDocument(), System.out, true);
+		XMLUtil.serialize(d.getDom(), System.out, true);
 	}
 }

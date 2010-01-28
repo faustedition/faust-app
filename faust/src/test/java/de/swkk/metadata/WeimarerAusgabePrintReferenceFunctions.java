@@ -12,8 +12,8 @@ public class WeimarerAusgabePrintReferenceFunctions {
 
 	@Before
 	public void setUp() throws Exception {
-		inventoryDatabase = new FaustInventory();
-		waRegister = new WeimarerAusgabeFaustRegister();
+		inventoryDatabase = FaustInventory.parse();
+		waRegister = WeimarerAusgabeFaustRegister.parse();
 	}
 	
 	@Test

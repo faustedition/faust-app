@@ -9,8 +9,8 @@ public class NamespaceDeclarationProcessor implements EncodedTextDocumentProcess
 
 	@Override
 	public void process(EncodedTextDocument teiDocument) {
-		Document domDocument = teiDocument.getDocument();
-		Element documentElement = domDocument.getDocumentElement();
+		Document dom = teiDocument.getDom();
+		Element documentElement = dom.getDocumentElement();
 
 		if (!documentElement.hasAttributeNS(XMLNS_ATTRIBUTE_NS_URI, "svg")) {
 			documentElement.setAttributeNS(XMLNS_ATTRIBUTE_NS_URI, "xmlns:svg", EncodedTextDocument.SVG_NS_URI);

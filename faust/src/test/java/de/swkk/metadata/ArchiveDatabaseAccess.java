@@ -19,8 +19,8 @@ public class ArchiveDatabaseAccess {
 
 	@Before
 	public void setUp() throws Exception {
-		archiveDatabase = new ArchiveDatabase();
-		faustInventory = new FaustInventory();
+		archiveDatabase = ArchiveDatabase.parse();
+		faustInventory = FaustInventory.parse();
 	}
 
 	@Test

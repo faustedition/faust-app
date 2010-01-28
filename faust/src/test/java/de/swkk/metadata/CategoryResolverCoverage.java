@@ -28,10 +28,10 @@ public class CategoryResolverCoverage {
 
 	@Before
 	public void setUp() throws Exception {
-		categoryResolver = new CategoryResolver();
-		faustInventory = new FaustInventory();
-		paralipomenaMetadata = new ParalipomenaMetadata();
-		waRegister = new WeimarerAusgabeFaustRegister();
+		categoryResolver = CategoryResolver.parse();
+		faustInventory = FaustInventory.parse();
+		paralipomenaMetadata = ParalipomenaMetadata.parse();
+		waRegister = WeimarerAusgabeFaustRegister.parse();
 	}
 	
 	@Test

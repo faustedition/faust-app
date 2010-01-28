@@ -17,19 +17,19 @@ public class ProcessingInstructionProcessor implements EncodedTextDocumentProces
 
 	@Override
 	public void process(EncodedTextDocument teiDocument) {
-		Document d = teiDocument.getDocument();
+		Document dom = teiDocument.getDom();
 
 		for (Node piNode : teiDocument.xpath("/processing-instruction('xml-stylesheet')")) {
-			d.removeChild(piNode);
+			dom.removeChild(piNode);
 		}
-		Node cssPi = d.createProcessingInstruction("xml-stylesheet", String.format(CSS_ATTRS, stylesheetUrl));
-		d.insertBefore(cssPi, d.getFirstChild());
+		Node cssPi = dom.createProcessingInstruction("xml-stylesheet", String.format(CSS_ATTRS, stylesheetUrl));
+		dom.insertBefore(cssPi, dom.getFirstChild());
 
 		for (Node piNode : teiDocument.xpath("/processing-instruction('oxygen')")) {
-			d.removeChild(piNode);
+			dom.removeChild(piNode);
 		}
-		Node schemaPi = d.createProcessingInstruction("oxygen", String.format(SCHEMA_ATTRS, schemaUrl));
-		d.insertBefore(schemaPi, cssPi);
+		Node schemaPi = dom.createProcessingInstruction("oxygen", String.format(SCHEMA_ATTRS, schemaUrl));
+		dom.insertBefore(schemaPi, cssPi);
 
 	}
 

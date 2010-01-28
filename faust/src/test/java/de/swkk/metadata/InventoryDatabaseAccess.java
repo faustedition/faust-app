@@ -21,10 +21,10 @@ public class InventoryDatabaseAccess {
 
 	@Before
 	public void setUp() throws Exception {
-		faustInventory = new FaustInventory();
-		archiveDatabase = new ArchiveDatabase();
+		faustInventory = FaustInventory.parse();
+		archiveDatabase = ArchiveDatabase.parse();
 	}
-	
+
 	@Test
 	public void callNumbersGiven() {
 		for (AllegroRecord record : faustInventory) {
@@ -70,8 +70,10 @@ public class InventoryDatabaseAccess {
 		LoggingUtil.LOG.info(String.format("Sub-Portfolios: { %s }", StringUtils.join(subPortfolioSet, ", ")));
 		LoggingUtil.LOG.info(String.format("Files: { %s }", StringUtils.join(fileSet, ", ")));
 		LoggingUtil.LOG.info(String.format("Sub-Files: { %s }", StringUtils.join(subFileSet, ", ")));
-		LoggingUtil.LOG.info(String.format("Sub-File-Primary-Suffices: { %s }", StringUtils.join(subFilePrimarySuffixSet, ", ")));
-		LoggingUtil.LOG.info(String.format("Sub-File-Secondary-Suffices: { %s }", StringUtils.join(subFileSecondarySuffixSet, ", ")));
+		LoggingUtil.LOG.info(String.format("Sub-File-Primary-Suffices: { %s }", StringUtils.join(subFilePrimarySuffixSet,
+				", ")));
+		LoggingUtil.LOG.info(String.format("Sub-File-Secondary-Suffices: { %s }", StringUtils.join(
+				subFileSecondarySuffixSet, ", ")));
 		LoggingUtil.LOG.info(String.format("Content: { %s }", StringUtils.join(contentSet, ", ")));
 	}
 
@@ -88,7 +90,8 @@ public class InventoryDatabaseAccess {
 				for (ArchiveDatabaseRecord matchingRecord : matchingRecords) {
 					matchingCallNumbers.add(matchingRecord.getCallNumber());
 				}
-				LoggingUtil.LOG.info(String.format("%s ==> { %s }", callNumber, StringUtils.join(matchingCallNumbers, "; ")));
+				LoggingUtil.LOG.info(String.format("%s ==> { %s }", callNumber, StringUtils.join(
+						matchingCallNumbers, "; ")));
 			}
 		}
 

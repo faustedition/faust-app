@@ -904,7 +904,7 @@
 					
 					<classSpec ident="att.changeRelated" type="atts" mode="add">
 						<attList>
-							<attDef ident="revType" ns="http://www.faustedition.net/ns" usage="req" mode="add">
+							<attDef ident="revType" ns="http://www.faustedition.net/ns" usage="rec" mode="add">
 								<valList type="closed">
 									<valItem ident="instant"><gloss>Sofortrevision</gloss></valItem>
 									<valItem ident="instant-or-soon"><gloss>Sofort- oder Baldrevision</gloss></valItem>

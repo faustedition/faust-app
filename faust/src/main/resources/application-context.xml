@@ -23,15 +23,15 @@
 		</property>
 	</bean>
 	<context:component-scan base-package="de.faustedition.model" />
+	<context:component-scan base-package="de.swkk.metadata" />
 	<tx:annotation-driven />
 
 	<task:scheduler id="scheduler" pool-size="10" />
-	<!--
-		<task:scheduled-tasks scheduler="scheduler"> <task:scheduled ref="transcriptionStatusUpdateTask"
-		method="updateTranscriptionStatus" cron="0 0 * * * *" /> <task:scheduled ref="repositoryBackupTask" method="backupRepository"
-		cron="0 0 */12 * * *" /> <task:scheduled ref="encodedTextDocumentValidationTask" method="validateDocuments" cron="0 0 * * * *"/>
-		</task:scheduled-tasks>
-	-->
+<!--	<task:scheduled-tasks scheduler="scheduler">-->
+<!--		<task:scheduled ref="repositoryBackupTask" method="backupRepository" cron="0 0 */12 * * *" />-->
+<!--		<task:scheduled ref="encodedTextDocumentValidationTask" method="validateDocuments" cron="0 0 * * * *" />  -->
+<!--		<task:scheduled ref="transcriptionStatusUpdateTask" method="updateTranscriptionStatus" cron="0 0 * * * *" />-->
+<!--	</task:scheduled-tasks>-->
 
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource" p:basename="messages" />
 </beans>

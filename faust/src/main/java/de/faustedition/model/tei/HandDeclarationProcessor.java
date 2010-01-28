@@ -88,7 +88,7 @@ public class HandDeclarationProcessor implements EncodedTextDocumentProcessor {
 
 	@Override
 	public void process(EncodedTextDocument teiDocument) {
-		Document domDocument = teiDocument.getDocument();
+		Document dom = teiDocument.getDom();
 
 		Element handNotesElement = teiDocument.findElementByPath("teiHeader", "profileDesc", "handNotes");
 		if (handNotesElement == null) {
@@ -103,13 +103,13 @@ public class HandDeclarationProcessor implements EncodedTextDocumentProcessor {
 					}
 				}
 			}
-			profileDescElement.appendChild(handNotesElement = domDocument.createElementNS(TEI_NS_URI, "handNotes"));
+			profileDescElement.appendChild(handNotesElement = dom.createElementNS(TEI_NS_URI, "handNotes"));
 		}
 
 		XMLUtil.removeChildren(handNotesElement);
 
 		for (String id : declarations.keySet()) {
-			Element handNoteElement = domDocument.createElementNS(TEI_NS_URI, "handNote");
+			Element handNoteElement = dom.createElementNS(TEI_NS_URI, "handNote");
 			handNotesElement.appendChild(handNoteElement);
 
 			handNoteElement.setTextContent(declarations.get(id));

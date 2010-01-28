@@ -54,7 +54,7 @@ public class Tei2XhtmlTransformer implements TemplateMethodModelEx {
 			StreamResult htmlResult = new StreamResult(htmlTranscription);
 
 			EncodedTextDocument d = (EncodedTextDocument) argument;
-			tei2htmlTemplates.newTransformer().transform(new DOMSource(d.getDocument()), htmlResult);
+			tei2htmlTemplates.newTransformer().transform(new DOMSource(d.getDom()), htmlResult);
 
 			return htmlTranscription.toString();
 		} catch (TransformerConfigurationException e) {

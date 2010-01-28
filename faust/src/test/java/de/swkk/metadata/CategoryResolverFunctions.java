@@ -11,7 +11,7 @@ public class CategoryResolverFunctions {
 
 	@Before
 	public void setUp() throws Exception {
-		categoryResolver = new CategoryResolver();
+		categoryResolver = CategoryResolver.parse();
 	}
 
 	@Test

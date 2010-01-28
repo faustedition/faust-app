@@ -16,8 +16,13 @@ import de.swkk.metadata.AllegroRecordSet;
 public class CategoryResolver extends AllegroRecordSet {
 	private static final Resource RESOLVER_RESOURCE = new ClassPathResource("/data/weimar_manuscripts_category_desc.txt");
 
-	public CategoryResolver() throws IOException {
-		parse(RESOLVER_RESOURCE);
+	public static CategoryResolver parse() throws IOException {
+		CategoryResolver cr = new CategoryResolver();
+		cr.parse(RESOLVER_RESOURCE);
+		return cr;
+	}
+
+	private CategoryResolver() {
 	}
 
 	public List<String> getCategories() {

@@ -127,8 +127,8 @@ public class Transcription implements Serializable
 	{
 		EncodedTextDocument teiDocument = manager.create();
 
-		org.w3c.dom.Document domDocument = teiDocument.getDocument();
-		domDocument.getDocumentElement().appendChild(domDocument.importNode(XMLUtil.parse(getTextData()).getDocumentElement(), true));
+		org.w3c.dom.Document dom = teiDocument.getDom();
+		dom.getDocumentElement().appendChild(dom.importNode(XMLUtil.parse(getTextData()).getDocumentElement(), true));
 
 		return teiDocument;
 	}
