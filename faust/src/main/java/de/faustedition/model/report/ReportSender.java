@@ -1,17 +1,24 @@
 package de.faustedition.model.report;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.MessageFormat;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 import de.faustedition.util.ErrorUtil;
-import de.faustedition.util.LoggingUtil;
 
 public class ReportSender {
+	private static final String SUBJECT_FORMAT = "[Faust-Edition-Report] {0}";
+	private static final Logger LOG = LoggerFactory.getLogger(ReportSender.class);
 	@Autowired
 	private JavaMailSender mailSender;
 
@@ -22,20 +29,23 @@ public class ReportSender {
 	public ReportSender(String from, String to) {
 		this(from, to, null);
 	}
-	
+
 	public ReportSender(String from, String to, String[] cc) {
 		this.from = from;
 		this.to = to;
 		this.cc = cc;
 	}
-	
+
 	public void send(Report report) {
 		if (report.isEmpty()) {
+			LOG.debug("Not sending report {}; it is empty.", report);
 			return;
 		}
-		
-		String subject = report.getSubject();
-		String body = report.getBody();
+
+		String subject = MessageFormat.format(SUBJECT_FORMAT, report.getSubject());
+		StringWriter bodyWriter = new StringWriter();
+		report.printBody(new PrintWriter(bodyWriter));
+		String body = bodyWriter.toString();
 
 		try {
 			MimeMessage message = mailSender.createMimeMessage();
@@ -49,8 +59,8 @@ public class ReportSender {
 			helper.setText(body);
 			mailSender.send(message);
 		} catch (MailException e) {
-			LoggingUtil.LOG.debug("Error while sending mail report (mail contents follow exception output)", e);
-			LoggingUtil.LOG.warn(String.format("Subject: %s\n\n%s", subject, body));
+			LOG.debug("Error while sending mail report (mail contents follow exception output)", e);
+			LOG.warn("Subject: " + subject + "\n\n" + body);
 		} catch (MessagingException e) {
 			throw ErrorUtil.fatal(e);
 		}

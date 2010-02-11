@@ -1,9 +1,11 @@
 package de.faustedition.model.report;
 
+import java.io.PrintWriter;
+
 public interface Report {
 	String getSubject();
 
-	String getBody();
+	void printBody(PrintWriter body);
 
 	boolean isEmpty();
 }

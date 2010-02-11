@@ -1,74 +1,64 @@
 package de.faustedition.model.tei;
 
 import static de.faustedition.model.tei.EncodedTextDocument.TEI_NS_URI;
+import static de.faustedition.model.tei.EncodedTextDocument.xpath;
+import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.faustedition.util.XMLUtil;
-
-public class HeaderTemplateProcessor implements EncodedTextDocumentProcessor
-{
+public class HeaderTemplateProcessor implements EncodedTextDocumentProcessor {
 
 	private static final String DEFAULT_TITLE = "Johann Wolfgang von Goethe: Faust";
 
 	@Override
-	public void process(EncodedTextDocument teiDocument)
-	{
+	public void process(EncodedTextDocument teiDocument) {
 		Document dom = teiDocument.getDom();
 
-		Element teiHeaderElement = teiDocument.findElementByPath("teiHeader");
-		if (teiHeaderElement == null)
-		{
-			Element documentElement = dom.getDocumentElement();
-			documentElement.insertBefore(teiHeaderElement = dom.createElementNS(TEI_NS_URI, "teiHeader"), documentElement.getFirstChild());
+		Element teiHeader = singleResult(xpath("//tei:teiHeader"), dom, Element.class);
+		if (teiHeader == null) {
+			Element document = dom.getDocumentElement();
+			document.insertBefore(teiHeader = dom.createElementNS(TEI_NS_URI, "teiHeader"), document.getFirstChild());
 		}
 
-		Element profileDescElement = XMLUtil.getChild(teiHeaderElement, "profileDesc");
-		if (profileDescElement == null)
-		{
-			teiHeaderElement.appendChild(profileDescElement = dom.createElementNS(TEI_NS_URI, "profileDesc"));
-			profileDescElement.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
+		Element profileDesc = singleResult(xpath("//tei:teiHeader/tei:profileDesc"), dom, Element.class);
+		if (profileDesc == null) {
+			teiHeader.appendChild(profileDesc = dom.createElementNS(TEI_NS_URI, "profileDesc"));
+			profileDesc.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
 		}
 
-		Element encodingDescElement = XMLUtil.getChild(teiHeaderElement, "encodingDesc");
-		if (encodingDescElement == null)
-		{
-			teiHeaderElement.insertBefore(encodingDescElement = dom.createElementNS(TEI_NS_URI, "encodingDesc"), profileDescElement);
-			encodingDescElement.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
+		Element encodingDesc = singleResult(xpath("//tei:teiHeader/tei:encodingDesc"), dom, Element.class);
+		if (encodingDesc == null) {
+			teiHeader.insertBefore(encodingDesc = dom.createElementNS(TEI_NS_URI, "encodingDesc"), profileDesc);
+			encodingDesc.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
 		}
 
-		Element fileDescElement = XMLUtil.getChild(teiHeaderElement, "fileDesc");
-		if (fileDescElement == null)
-		{
-			teiHeaderElement.insertBefore(fileDescElement = dom.createElementNS(TEI_NS_URI, "fileDesc"), encodingDescElement);
+		Element fileDesc = singleResult(xpath("//tei:teiHeader/tei:fileDesc"), dom, Element.class);
+		if (fileDesc == null) {
+			teiHeader.insertBefore(fileDesc = dom.createElementNS(TEI_NS_URI, "fileDesc"), encodingDesc);
 		}
 
-		Element sourceDescElement = XMLUtil.getChild(fileDescElement, "sourceDesc");
-		if (sourceDescElement == null)
-		{
-			fileDescElement.appendChild(sourceDescElement = dom.createElementNS(TEI_NS_URI, "sourceDesc"));
-			sourceDescElement.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
+		Element sourceDesc = singleResult(xpath("//tei:teiHeader/tei:fileDesc/tei:sourceDesc"), dom, Element.class);
+		if (sourceDesc == null) {
+			fileDesc.appendChild(sourceDesc = dom.createElementNS(TEI_NS_URI, "sourceDesc"));
+			sourceDesc.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
 		}
 
-		Element publicationStmtElement = XMLUtil.getChild(fileDescElement, "publicationStmt");
-		if (publicationStmtElement == null)
-		{
-			fileDescElement.insertBefore(publicationStmtElement = dom.createElementNS(TEI_NS_URI, "publicationStmt"), sourceDescElement);
-			publicationStmtElement.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
+		Element pubStmt = singleResult(xpath("//tei:teiHeader/tei:fileDesc/tei:publicationStmt"), dom, Element.class);
+		if (pubStmt == null) {
+			fileDesc.insertBefore(pubStmt = dom.createElementNS(TEI_NS_URI, "publicationStmt"), sourceDesc);
+			pubStmt.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
 		}
 
-		Element titleStmtElement = XMLUtil.getChild(fileDescElement, "titleStmt");
-		if (titleStmtElement == null)
-		{
-			fileDescElement.insertBefore(titleStmtElement = dom.createElementNS(TEI_NS_URI, "titleStmt"), fileDescElement.getFirstChild());
+		Element titleStmt = singleResult(xpath("//tei:teiHeader/tei:fileDesc/tei:titleStmt"), dom, Element.class);
+		if (titleStmt == null) {
+			fileDesc.insertBefore(titleStmt = dom.createElementNS(TEI_NS_URI, "titleStmt"), fileDesc.getFirstChild());
 		}
 
-		Element titleElement = XMLUtil.getChild(titleStmtElement, "title");
-		if (titleElement == null)
-		{
-			titleStmtElement.insertBefore(titleElement = dom.createElementNS(TEI_NS_URI, "title"), titleStmtElement.getFirstChild());
-			titleElement.setTextContent(DEFAULT_TITLE);
+		Element title = singleResult(xpath("//tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:title"), dom, Element.class);
+		if (title == null) {
+			titleStmt.insertBefore(title = dom.createElementNS(TEI_NS_URI, "title"), titleStmt.getFirstChild());
+			title.setTextContent(DEFAULT_TITLE);
 		}
 
 	}

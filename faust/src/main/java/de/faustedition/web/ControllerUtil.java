@@ -1,9 +1,5 @@
 package de.faustedition.web;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
@@ -18,21 +14,14 @@ public class ControllerUtil {
 		String port = Integer.toString(req.getServerPort());
 		if (("http".equals(scheme) && "80".equals(port)) || ("https".equals(scheme) && "443".equals(port))) {
 			port = null;
-		}		
-		return (scheme + "://" + req.getServerName() + (port == null ? "" : ":" + port) + req.getContextPath() + "/");	
+		}
+		return (scheme + "://" + req.getServerName() + (port == null ? "" : ":" + port) + req.getContextPath() + "/");
 	}
 
-	public static String getPath(HttpServletRequest request) {
-		return FilenameUtils.normalize(StringUtils.strip(StringUtils.defaultString(request.getPathInfo()), "/"));
-	}
-
-	public static Deque<String> getPathComponents(HttpServletRequest request) {
-		return getPathComponents(getPath(request));
-	}
-
-	public static Deque<String> getPathComponents(String path) {
-		return new ArrayDeque<String>(Arrays.asList(StringUtils.split(path, "/")));
-
+	public static String getPath(HttpServletRequest request, String prefix) {
+		String path = StringUtils.strip(StringUtils.defaultString(request.getPathInfo()), "/");
+		path = StringUtils.removeStart(path, StringUtils.strip(prefix, "/"));
+		return StringUtils.strip(FilenameUtils.normalize(path), "/");
 	}
 
 	public static <T> T foundObject(T object) throws ObjectNotFoundException {

@@ -1,14 +1,15 @@
 package de.faustedition.model;
 
 import static de.faustedition.model.tei.EncodedTextDocument.TEI_NS_URI;
+import static de.faustedition.model.tei.EncodedTextDocument.xpath;
+import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -23,35 +24,32 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
+import de.faustedition.model.db.Facsimile;
 import de.faustedition.model.db.Manuscript;
 import de.faustedition.model.db.Portfolio;
 import de.faustedition.model.db.Repository;
 import de.faustedition.model.db.Transcription;
-import de.faustedition.model.document.TranscriptionStatus;
-import de.faustedition.model.facsimile.Facsimile;
-import de.faustedition.model.repository.RepositoryXmlDocument;
-import de.faustedition.model.repository.RepositoryFolder;
-import de.faustedition.model.repository.RepositoryUtil;
+import de.faustedition.model.facsimile.FacsimileReference;
 import de.faustedition.model.tei.EncodedTextDocument;
 import de.faustedition.model.tei.EncodedTextDocumentManager;
-import de.faustedition.util.ErrorUtil;
+import de.faustedition.model.xmldb.XmlDbManager;
 import de.faustedition.util.LoggingUtil;
-import de.faustedition.util.URIUtil;
 import de.faustedition.util.XMLUtil;
 import de.swkk.metadata.MetadataImportTask;
 
 @Service
 public class DatabaseMigrationTask implements Runnable {
 	@Autowired
-	private javax.jcr.Repository repository;
-
-	@Autowired
 	private SessionFactory sessionFactory;
 
-	@Autowired()
+	@Autowired
 	@Qualifier("hibernateTransactionManager")
 	private PlatformTransactionManager transactionManager;
+
+	@Autowired
+	private XmlDbManager xmlDbManager;
 
 	@Autowired
 	private EncodedTextDocumentManager documentManager;
@@ -66,70 +64,42 @@ public class DatabaseMigrationTask implements Runnable {
 
 	@Override
 	public void run() {
-		javax.jcr.Session repoSession = null;
-		try {
-			repoSession = RepositoryUtil.login(repository, RepositoryUtil.XML_WS);
-			if (RepositoryUtil.isNotEmpty(repoSession)) {
-				LoggingUtil.LOG.debug("Repository is not empty; skip RDBMS migration");
-			} else {
-				StopWatch sw = new StopWatch();
-				sw.start();
-				migrateFromRdbms(repoSession);
-				sw.stop();
-				LoggingUtil.LOG.info("Repository migrated from RDBMS in " + sw);
-			}
-
-		} catch (RepositoryException e) {
-			throw ErrorUtil.fatal(e, "Repository error while recovering repository: %s", e.getMessage());
-		} finally {
-			RepositoryUtil.logoutQuietly(repoSession);
+		if (singleResult(XmlDocument.xpath("//f:resource[starts-with(text(), 'Witness/')]"), xmlDbManager.resources(),
+				Element.class) != null) {
+			LoggingUtil.LOG.debug("XML database contains witnesses; skip RDBMS migration");
+		} else {
+			StopWatch sw = new StopWatch();
+			sw.start();
+			migrateFromRdbms();
+			sw.stop();
+			LoggingUtil.LOG.info("Repository migrated from RDBMS in " + sw);
 		}
 
 		metadataImportTask.run();
 	}
 
-	private void migrateFromRdbms(final javax.jcr.Session repoSession) {
+	private void migrateFromRdbms() {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult() {
 
 			@Override
 			protected void doInTransactionWithoutResult(TransactionStatus status) {
-				try {
-					Node root = repoSession.getRootNode();
-					Session session = sessionFactory.getCurrentSession();
+				Session session = sessionFactory.getCurrentSession();
 
-					LoggingUtil.LOG.info("Repository recovery; migrating data from RDBMS");
-					for (Repository repository : Repository.find(session)) {
-						RepositoryFolder repoFolder = RepositoryFolder.create(root, repository.getName());
-						LoggingUtil.LOG.info("Migrating " + repoFolder);
-						migrateRepository(session, repository, repoFolder);
+				LoggingUtil.LOG.info("Repository recovery; migrating data from RDBMS");
+				for (Repository repository : Repository.find(session)) {
+					LoggingUtil.LOG.info("Migrating " + repository.getName());
+					for (Portfolio portfolio : Portfolio.find(session, repository)) {
+						LoggingUtil.LOG.debug("Migrating " + portfolio);
+						migratePortfolio(session, portfolio);
+						session.flush();
+						session.clear();
 					}
-
-					repoSession.save();
-				} catch (RepositoryException e) {
-					throw ErrorUtil.fatal(e, "Repository error while recovering from RDBMS");
 				}
 			}
 		});
 	}
 
-	private void migrateRepository(Session session, Repository repository, RepositoryFolder folder) throws RepositoryException {
-		for (Portfolio portfolio : Portfolio.find(session, repository)) {
-			RepositoryFolder portfolioFolder = RepositoryFolder.create(folder, portfolio.getName());
-			LoggingUtil.LOG.debug("Migrating " + portfolioFolder);
-			// for (HierarchyNodeFacet facet :
-			// buildPortfolioFacets(session, repository, portfolio))
-			// {
-			// facet.setFacettedNode(pn);
-			// facet.save(session);
-			// }
-			migratePortfolio(session, portfolio, portfolioFolder);
-			session.flush();
-			session.clear();
-		}
-
-	}
-
-	private void migratePortfolio(Session session, Portfolio portfolio, RepositoryFolder folder) throws RepositoryException {
+	private void migratePortfolio(Session session, Portfolio portfolio) {
 		for (Manuscript manuscript : Manuscript.find(session, portfolio)) {
 			String name = manuscript.getName();
 			Facsimile facsimile = Facsimile.find(session, manuscript, name);
@@ -137,27 +107,18 @@ public class DatabaseMigrationTask implements Runnable {
 				Transcription transcription = Transcription.find(session, facsimile);
 				if (transcription != null) {
 					EncodedTextDocument document = transcription.buildTEIDocument(documentManager);
+					FacsimileReference.writeTo(document, Collections.singletonList(new FacsimileReference(
+							facsimile.getImagePath())));
+
 					Document xml = document.getDom();
-					Element teiEl = xml.getDocumentElement();
-					Element textEl = document.findNode("/:TEI/:text", Element.class);
-
-					Element facsimileRef = xml.createElementNS(TEI_NS_URI, "graphic");
-					URI facsimileUri = URIUtil.createFacsimileURI(facsimile.getImagePath());
-					facsimileRef.setAttributeNS(TEI_NS_URI, "url", facsimileUri.toASCIIString());
-
-					Element facsimileEl = xml.createElementNS(TEI_NS_URI, "facsimile");
-					facsimileEl.appendChild(facsimileRef);
-					if (textEl != null) {
-						teiEl.insertBefore(facsimileEl, textEl);
-					} else {
-						teiEl.appendChild(facsimileEl);
-					}
-
-					if (TranscriptionStatus.EMPTY.equals(TranscriptionStatus.extract(document))) {
+					Element textEl = singleResult(xpath("//tei:text"), xml, Element.class);
+					if (singleResult(xpath("//tei:revisionDesc/tei:change"), xml, Node.class) == null) {
 						if (textEl != null && XMLUtil.hasText(textEl)) {
-							Element teiHeader = document.findNode("/:TEI/:teiHeader", Element.class);
-							Element revisionDesc = EncodedTextDocument.findNode(teiHeader,
-									"./:revisionDesc", Element.class);
+							Element teiHeader = singleResult(xpath("//tei:teiHeader"), xml,
+									Element.class);
+							Element revisionDesc = singleResult(
+									xpath("//tei:teiHeader/tei:revisionDesc"), xml,
+									Element.class);
 
 							if (revisionDesc == null) {
 								revisionDesc = xml.createElementNS(TEI_NS_URI, "revisionDesc");
@@ -178,12 +139,13 @@ public class DatabaseMigrationTask implements Runnable {
 							}
 						}
 					}
-					RepositoryXmlDocument file = RepositoryXmlDocument.create(folder, name + ".xml", xml);
 
+					String path = String.format("Witness/%s/%s/%s.xml", portfolio.getRepository().getName(),
+							portfolio.getName(), name);
+					xmlDbManager.put(URI.create(path), xml);
+					LoggingUtil.LOG.debug("Migrated " + path);
 					session.flush();
 					session.clear();
-					folder.save();
-					LoggingUtil.LOG.debug("Migrated " + file);
 				}
 			}
 

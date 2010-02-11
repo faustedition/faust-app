@@ -25,21 +25,18 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class XMLUtil {
+import de.faustedition.model.xmldb.NodeListIterable;
+import de.faustedition.model.xmldb.XPathUtil;
 
+public class XMLUtil {
 	public static SAXParser saxParser() {
 		try {
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -59,17 +56,13 @@ public class XMLUtil {
 			documentBuilderFactory.setNamespaceAware(true);
 			documentBuilderFactory.setCoalescing(true);
 			documentBuilderFactory.setValidating(false);
-			
+
 			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 			documentBuilder.setErrorHandler(new StrictNoOutputErrorCallback());
 			return documentBuilder;
 		} catch (ParserConfigurationException e) {
 			throw ErrorUtil.fatal(e, "Error configuring DOM builder");
 		}
-	}
-
-	public static XPath xpath() {
-		return XPathFactory.newInstance().newXPath();
 	}
 
 	public static Transformer newTransformer(Source source) {
@@ -93,6 +86,7 @@ public class XMLUtil {
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			transformer.setOutputProperty(OutputKeys.INDENT, (indent ? "yes" : "no"));
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "4");
 			return transformer;
 		} catch (TransformerConfigurationException e) {
@@ -148,18 +142,13 @@ public class XMLUtil {
 	}
 
 	public static boolean hasText(Element element) {
-		try {
-			for (Node textNode : iterableNodeList((NodeList) xpath().evaluate(".//text()", element,
-					XPathConstants.NODESET))) {
-				String textContent = textNode.getTextContent();
-				if (textContent != null && textContent.trim().length() > 0) {
-					return true;
-				}
+		for (Node textNode : new NodeListIterable<Node>(XPathUtil.xpath(".//text()", null), element)) {
+			String textContent = textNode.getTextContent();
+			if (textContent != null && textContent.trim().length() > 0) {
+				return true;
 			}
-			return false;
-		} catch (XPathExpressionException e) {
-			throw ErrorUtil.fatal(e, "XPath error while checking for text nodes on %s", element.toString());
 		}
+		return false;
 	}
 
 	public static class StrictNoOutputErrorCallback implements ErrorListener, ErrorHandler {
@@ -202,47 +191,28 @@ public class XMLUtil {
 		return (children.size() > 0) ? children.get(0) : null;
 	}
 
-	private static List<Element> getChildren(Element parent, String name) {
-		List<Element> ret = new ArrayList<Element>();
-		NodeList children = parent.getChildNodes();
-		for (int ii = 0; ii < children.getLength(); ii++) {
-			Node child = children.item(ii);
-			if ((child instanceof Element) && (name.equals(getLocalName((Element) child)))) {
-				ret.add((Element) child);
+	public static List<Element> getChildElements(Element parent) {
+		List<Element> children = new ArrayList<Element>();
+		for (Node node : new NodeListIterable<Node>(parent.getChildNodes())) {
+			if (Node.ELEMENT_NODE == node.getNodeType()) {
+				children.add((Element) node);
 			}
 		}
-		return ret;
+		return children;
+	}
+
+	private static List<Element> getChildren(Element parent, String name) {
+		List<Element> childElements = getChildElements(parent);
+		for (Iterator<Element> elementIt = childElements.iterator(); elementIt.hasNext();) {
+			if (!name.equals(getLocalName(elementIt.next()))) {
+				elementIt.remove();
+			}
+		}
+		return childElements;
 	}
 
 	private static String getLocalName(Element elem) {
 		return (elem.getNamespaceURI() == null) ? elem.getTagName() : elem.getLocalName();
-	}
-
-	public static Iterable<Node> iterableNodeList(final NodeList childNodes) {
-		return new Iterable<Node>() {
-			@Override
-			public Iterator<Node> iterator() {
-				return new Iterator<Node>() {
-					int nc = 0;
-
-					@Override
-					public boolean hasNext() {
-						return (nc < childNodes.getLength());
-					}
-
-					@Override
-					public Node next() {
-						return childNodes.item(nc++);
-					}
-
-					@Override
-					public void remove() {
-						throw new UnsupportedOperationException();
-					}
-				};
-			}
-
-		};
 	}
 
 	public static Document getDocument(Node node) {

@@ -1,19 +1,27 @@
 package de.faustedition.web;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 
-import de.faustedition.model.security.HasRoleTemplateMethod;
-import de.faustedition.web.document.Tei2XhtmlTransformer;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import de.faustedition.web.freemarker.HasRoleTemplateMethod;
+import de.faustedition.web.freemarker.Tei2XhtmlTransformer;
+import de.faustedition.web.freemarker.URLPathEncoder;
 
 @Configuration
 public class WebConfiguration {
@@ -22,7 +30,7 @@ public class WebConfiguration {
 	public LocaleResolver localeResolver() {
 		return new AcceptHeaderLocaleResolver();
 	}
-	
+
 	@Bean
 	public FreeMarkerConfigurer freemarkerConfigurer() {
 		FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
@@ -47,11 +55,33 @@ public class WebConfiguration {
 	}
 
 	@Bean
+	public ViewResolver htmlViewResolver() {
+		FreeMarkerViewResolver htmlViewResolver = new FreeMarkerViewResolver();
+		htmlViewResolver.setContentType("application/xhtml+xml;charset=utf-8");
+		htmlViewResolver.setPrefix("");
+		htmlViewResolver.setSuffix(".ftl");
+		return htmlViewResolver;
+	}
+
+	@Bean
 	public ViewResolver viewResolver() {
-		FreeMarkerViewResolver viewResolver = new FreeMarkerViewResolver();
-		viewResolver.setContentType("application/xhtml+xml");
-		viewResolver.setPrefix("");
-		viewResolver.setSuffix(".ftl");
+		Map<String, String> mediaTypes = Maps.newHashMap();
+		mediaTypes.put("html", "application/xhtml+xml;charset=utf-8");
+		mediaTypes.put("svg", "image/svg+xml");
+		mediaTypes.put("json", "application/json");
+
+		List<ViewResolver> resolverList = Lists.newArrayList();
+		resolverList.add(htmlViewResolver());
+
+		List<View> defaultViews = Lists.newArrayList();
+		defaultViews.add(new MappingJacksonJsonView());
+		defaultViews.add(new Tei2SvgView());
+
+		ContentNegotiatingViewResolver viewResolver = new ContentNegotiatingViewResolver();
+		viewResolver.setMediaTypes(mediaTypes);
+		viewResolver.setViewResolvers(resolverList);
+		viewResolver.setDefaultViews(defaultViews);
+
 		return viewResolver;
 	}
 }

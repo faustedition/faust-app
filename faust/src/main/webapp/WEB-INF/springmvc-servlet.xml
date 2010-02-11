@@ -11,5 +11,10 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
 	<context:component-scan base-package="de.faustedition.web" />
+	
 	<mvc:annotation-driven />
+	
+	<mvc:view-controller path="/project/about" />
+	<mvc:view-controller path="/project/contact" />
+	<mvc:view-controller path="/project/imprint" />
 </beans>

@@ -1,6 +1,10 @@
 package de.faustedition.model;
 
+import static de.faustedition.model.tei.EncodedTextDocument.xpath;
+import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
@@ -9,7 +13,12 @@ import de.faustedition.util.XMLUtil;
 
 public class TEIDocumentTest {
 
-	private EncodedTextDocument teiDocument = EncodedTextDocument.create();
+	private EncodedTextDocument teiDocument;
+
+	@Before
+	public void createDocument() {
+		teiDocument = EncodedTextDocument.create();
+	}
 
 	@Test
 	public void parse() throws Exception {
@@ -22,14 +31,7 @@ public class TEIDocumentTest {
 	}
 
 	@Test
-	public void xpath() {
-		Assert.assertTrue(teiDocument.xpath("/:TEI").iterator().hasNext());
-	}
-
-	@Test
-	public void findNode() {
-		Element tei = teiDocument.findNode("/:TEI", Element.class);
-		Assert.assertNotNull(tei);
-		Assert.assertEquals("TEI", tei.getLocalName());
+	public void xpathEvaluation() {
+		Assert.assertNotNull(singleResult(xpath("/tei:TEI"), teiDocument, Element.class));
 	}
 }

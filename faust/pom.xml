@@ -23,11 +23,6 @@
 			<version>1.1</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.jcr</groupId>
-			<artifactId>jcr</artifactId>
-			<version>2.0</version>
-		</dependency>
-		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4.1</version>
@@ -36,11 +31,6 @@
 			<groupId>com.google.collections</groupId>
 			<artifactId>google-collections</artifactId>
 			<version>1.0-rc3</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.practicalxml</groupId>
-			<artifactId>practicalxml</artifactId>
-			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>thaiopensource</groupId>
@@ -92,6 +82,11 @@
 			<artifactId>commons-io</artifactId>
 			<version>1.4</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>		
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
@@ -159,16 +154,6 @@
 			<version>${spring.security.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>jackrabbit-core</artifactId>
-			<version>${jackrabbit.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>jackrabbit-jcr-server</artifactId>
-			<version>${jackrabbit.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>3.3.2.GA</version>
@@ -190,25 +175,14 @@
 			<version>1.2.2</version>
 		</dependency>
 		<dependency>
-			<groupId>com.ettrema</groupId>
-			<artifactId>milton-api</artifactId>
-			<version>${milton.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.ettrema</groupId>
-			<artifactId>milton-servlet</artifactId>
-			<version>${milton.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
-			<version>2.3.15</version>
+			<version>2.3.16</version>
 		</dependency>
 		<dependency>
 			<groupId>org.tuckey</groupId>

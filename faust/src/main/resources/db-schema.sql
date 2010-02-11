@@ -5,3 +5,8 @@ create table key_concordance (
 	wa_key varchar(50),
 	wa_citation varchar(100)	
 );
+
+create table encoding_status (
+	xml_path varchar(200) unique,
+	encoding_status varchar(20) not null
+);

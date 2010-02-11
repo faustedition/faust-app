@@ -1,189 +1,162 @@
 package de.faustedition.model.facsimile;
 
-import static de.faustedition.model.facsimile.FacsimileResolution.LOW;
-import static de.faustedition.model.facsimile.FacsimileResolution.THUMB;
-
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Comparator;
+import java.text.MessageFormat;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.AbstractFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.util.Assert;
 
 import de.faustedition.util.ErrorUtil;
 
 public class FacsimileManager {
-	private String conversionTool;
-	private File lowResolutionImageDirectory;
-	private File highResolutionImageDirectory;
-	private File thumbnailDirectory;
-	private int thumbnailHeight = 150;
-	private int thumbnailWidth = 75;
+	private static final Logger LOG = LoggerFactory.getLogger(FacsimileManager.class);
+	private Map<FacsimileResolution, File> baseDirectories;
+	private Map<FacsimileResolution, String> conversionCommands;
 
 	@Required
-	public void setConversionTool(String conversionTool) {
-		this.conversionTool = conversionTool;
+	public void setBaseDirectories(Map<FacsimileResolution, File> baseDirectories) {
+		this.baseDirectories = baseDirectories;
 	}
-	
+
 	@Required
-	public void setLowResolutionImageDirectory(File lowResolutionImageDirectory) {
-		this.lowResolutionImageDirectory = lowResolutionImageDirectory;
-	}
-	
-	@Required
-	public void setHighResolutionImageDirectory(File highResolutionImageDirectory) {
-		this.highResolutionImageDirectory = highResolutionImageDirectory;
-	}
-	
-	@Required
-	public void setThumbnailDirectory(File thumbnailDirectory) {
-		this.thumbnailDirectory = thumbnailDirectory;
-	}
-	
-	public void setThumbnailHeight(int thumbnailHeight) {
-		this.thumbnailHeight = thumbnailHeight;
+	public void setConversionCommands(Map<FacsimileResolution, String> conversionCommands) {
+		this.conversionCommands = conversionCommands;
 	}
 
-	public void setThumbnailWidth(int thumbnailWidth) {
-		this.thumbnailWidth = thumbnailWidth;
-	}
+	public File find(String path, FacsimileResolution resolution) {
+		LOG.debug("Retrieving facsimile {} ({})", path, resolution);
+		File result = file(resolution, path);
+		File source = null;
 
-	@SuppressWarnings("unchecked")
-	public SortedSet<File> findImageFiles(final FacsimileResolution resolution) {
-		SortedSet<File> imageFileSet = new TreeSet<File>(new Comparator<File>() {
-
-			@Override
-			public int compare(File o1, File o2) {
-				return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
-			}
-		});
-		imageFileSet.addAll(FileUtils.listFiles(getBaseDirectory(resolution), new AbstractFileFilter() {
-
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(resolution.getSuffix());
-			}
-
-		}, TrueFileFilter.INSTANCE));
-		return imageFileSet;
-	}
-
-	public File findImageFile(Facsimile facsimile) {
-		return findImageFile(facsimile, LOW);
-	}
-
-	public File findImageFile(String path) {
-		return findImageFile(path, LOW);
-	}
-
-	public File findImageFile(String path, FacsimileResolution resolution) {
-		final File imageFile = new File(getBaseDirectory(resolution), path + resolution.getSuffix());
-
-		if (imageFile.isFile() && imageFile.canRead()) {
-			return imageFile;
-		}
-
-		if (resolution == THUMB) {
-			File sourceFile = new File(getBaseDirectory(LOW), path + LOW.getSuffix());
-
-			if (!sourceFile.isFile() || !sourceFile.canRead()) {
-				return null;
-			}
-
-			return createThumbnailImage(sourceFile, imageFile);
-		}
-
-		return null;
-	}
-
-	public File findImageFile(Facsimile facsimile, FacsimileResolution resolution) {
-		return findImageFile(facsimile.getImagePath(), resolution);
-	}
-
-	private File createThumbnailImage(File source, final File thumbnailFile) {
-		if (!thumbnailFile.getParentFile().isDirectory()) {
-			thumbnailFile.getParentFile().mkdirs();
-			if (!thumbnailFile.getParentFile().isDirectory()) {
-				throw ErrorUtil.fatal("Cannot create directory for thumbnail '" + thumbnailFile.getAbsolutePath()
-						+ "'");
+		FacsimileResolution sourceResolution = findSourceResolution(resolution);
+		if (sourceResolution != null) {
+			source = file(sourceResolution, path);
+			if (!source.isFile() || !source.canRead()) {
+				source = null;
 			}
 		}
 
+		if (result.isFile() && result.canRead() && result.length() > 0
+				&& (source == null || (source.lastModified() <= result.lastModified()))) {
+			LOG.debug("Returning up-to-date facsimile file {}", result);
+			return result;
+		}
+
+		if (source == null || !conversionCommands.containsKey(resolution)) {
+			LOG.debug("No facsimile or no source for facsimile {} ({})", path, resolution);
+			return null;
+		}
+
+		File resultDir = result.getParentFile();
+		if (!resultDir.isDirectory() && !resultDir.mkdirs()) {
+			throw ErrorUtil.fatal("Cannot access/create directory '%s'", resultDir.getAbsolutePath());
+		}
+
+		String sourcePath = escapePath(source.getAbsolutePath());
+		String resultPath = escapePath(result.getAbsolutePath());
+		String command = MessageFormat.format(conversionCommands.get(resolution), sourcePath, resultPath);
 		try {
-			final Process convertProcess = new ProcessBuilder(conversionTool, source.getAbsolutePath(),
-					"-resize", thumbnailWidth + "x" + thumbnailHeight, "-").start();
-			Thread conversionResultReaderThread = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					InputStream convertOutput = null;
-					OutputStream thumbnailStream = null;
-					try {
-						convertOutput = convertProcess.getInputStream();
-						thumbnailStream = new FileOutputStream(thumbnailFile);
-						IOUtils.copy(convertOutput, thumbnailStream);
-					} catch (IOException e) {
-						IOUtils.closeQuietly(thumbnailStream);
-						thumbnailFile.delete();
-					} finally {
-						IOUtils.closeQuietly(thumbnailStream);
-						IOUtils.closeQuietly(convertOutput);
-					}
-				}
-			});
-			conversionResultReaderThread.setDaemon(true);
-			conversionResultReaderThread.start();
-
-			int conversionResult = -1;
+			int exitValue = -1;
 			try {
-				conversionResult = convertProcess.waitFor();
+				LOG.debug("Generating facsimile: '{}'", command);
+				Process conversionProcess = Runtime.getRuntime().exec(command);
+				exitValue = conversionProcess.waitFor();
 			} catch (InterruptedException e) {
 			}
 
-			try {
-				conversionResultReaderThread.join();
-			} catch (InterruptedException ie) {
+			if (exitValue == 0) {
+				LOG.debug("Returning generated facsimile file {}", result);
+				return result;
 			}
 
-			if (conversionResult == 0) {
-				return thumbnailFile;
-			}
-		} catch (IOException ioe) {
-			ErrorUtil.fatal(ioe, "I/O error while generating thumbnail '%s'", thumbnailFile.getAbsolutePath());
+			throw ErrorUtil.fatal("Error while converting '%s': %s", sourcePath, Integer.toString(exitValue));
+		} catch (IOException e) {
+			throw ErrorUtil.fatal(e, "I/O error while converting '%s'", sourcePath);
 		}
-		thumbnailFile.delete();
+	}
+
+	public SortedSet<String> findAllPaths() {
+		final SortedSet<String> uris = new TreeSet<String>();
+		FacsimileResolution[] resolutions = FacsimileResolution.values();
+		for (int rc = resolutions.length - 1; rc >= 0; rc--) {
+			final FacsimileResolution res = resolutions[rc];
+			for (Object file : FileUtils.listFiles(baseDirectories.get(res), new FileFileFilter() {
+				@Override
+				public boolean accept(File file) {
+					return super.accept(file) && file.getName().endsWith(res.getSuffix());
+				}
+			}, TrueFileFilter.INSTANCE)) {
+				uris.add(uriPath(res, (File) file));
+			}
+			if (!uris.isEmpty()) {
+				return uris;
+			}
+		}
+		return uris;
+	}
+
+	public void generateAll() {
+		FacsimileResolution[] resolutions = FacsimileResolution.values();
+		for (int rc = resolutions.length - 1; rc >= 0; rc--) {
+			generateAllFor(resolutions[rc]);
+		}
+	}
+
+	public void generateAllFor(FacsimileResolution resultResolution) {
+		FacsimileResolution sourceResolution = findSourceResolution(resultResolution);
+		if (sourceResolution == null) {
+			return;
+		}
+
+		File baseDirectory = baseDirectories.get(sourceResolution);
+		generate(baseDirectory, baseDirectory, sourceResolution, resultResolution);
+	}
+
+	private void generate(File base, File current, FacsimileResolution sourceResolution, FacsimileResolution resultResolution) {
+		for (File file : current.listFiles()) {
+			if (file.isDirectory()) {
+				generate(base, file, sourceResolution, resultResolution);
+			}
+			if (!file.isFile()) {
+				continue;
+			}
+			if (file.getName().endsWith(sourceResolution.getSuffix())) {
+				find(uriPath(sourceResolution, file), resultResolution);
+			}
+		}
+	}
+
+	protected String uriPath(FacsimileResolution res, File file) {
+		String basePath = FilenameUtils.separatorsToUnix(baseDirectories.get(res).getAbsolutePath());
+		String currentPath = StringUtils.removeEnd(FilenameUtils.separatorsToUnix(file.getAbsolutePath()), res.getSuffix());
+		return StringUtils.strip(StringUtils.removeStart(currentPath, basePath), "/");
+	}
+
+	protected File file(FacsimileResolution resolution, String path) {
+		return new File(baseDirectories.get(resolution), path + resolution.getSuffix());
+	}
+
+	public static String escapePath(String path) {
+		return path.replaceAll("\\s", "\\\\ ");
+	}
+
+	private static FacsimileResolution findSourceResolution(FacsimileResolution dest) {
+		FacsimileResolution[] resolutions = FacsimileResolution.values();
+		for (int rc = 0; rc < (resolutions.length - 1); rc++) {
+			if (dest.equals(resolutions[rc])) {
+				return resolutions[rc + 1];
+			}
+		}
 		return null;
-	}
-
-	protected File getBaseDirectory(FacsimileResolution resolution) {
-		switch (resolution) {
-		case LOW:
-			return lowResolutionImageDirectory;
-		case HIGH:
-			return highResolutionImageDirectory;
-		case THUMB:
-			return thumbnailDirectory;
-		}
-
-		throw new IllegalArgumentException(resolution.toString());
-	}
-
-	public String getRelativePath(File imageFile, FacsimileResolution resolution) {
-		String imageFilePath = FilenameUtils.separatorsToUnix(imageFile.getAbsolutePath());
-		String basePath = getBaseDirectory(resolution).getAbsolutePath();
-		Assert.isTrue(imageFilePath.startsWith(basePath));
-
-		return StringUtils.removeStart(basePath + "/", imageFilePath);
 	}
 }

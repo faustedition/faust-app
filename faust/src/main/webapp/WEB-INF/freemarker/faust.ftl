@@ -8,12 +8,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head profile="http://dublincore.org/documents/dcq-html/">
-	<meta http-equiv="Content-Type" content="application/xhtml+xml;charset=UTF-8" />
-	<title>${title} :: Digitale Faust-Edition</title>
+	<title>${title} :: faustedition.net</title>
+	<script type="text/javascript">var ctx = "${ctx}";</script>
+	<script type="text/javascript" src="${ctx}/js/faust.js"></script>
 	[@yuiHeader/]
-    <script type="text/javascript" src="${ctx}/js/faust.js"></script>
-    <link rel="stylesheet" type="text/css" href="${ctx}/css/faust.css" />
-    <script type="text/javascript">var ctx = "${ctx}"; yuiInit();</script>
+	<link rel="stylesheet" type="text/css" href="${ctx}/css/faust.css" id="custom-css"/>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
 	<meta name="DC.format" scheme="DCTERMS.IMT" content="application/xhtml+xml" />
@@ -29,25 +28,27 @@
 <body class="yui-skin-sam">
 <div id="doc2" class="yui-t7">
 <div id="hd">
-	<h1><span style="color: #764F27">faustedition.net&nbsp;::</span>&nbsp;${title}</h1>
+	<h1>${title}&nbsp;<span style="color: #764F27">::&nbsp;faustedition.net</span></h1>
 	<div id="top-navigation" class="yuimenubar yuimenubarnav">
 	<div class="bd">
 	<ul class="first-of-type">
 		[#if hasRole("ROLE_EDITOR")]
-			<li class="yuimenubaritem"><a href="${ctx}/browse/" class="yuimenubaritemlabel">Browser</a></li>
-			<li class="yuimenubaritem"><a href="${ctx}/genesis/" class="yuimenubaritemlabel">Genese</a></li>
-			<li class="yuimenubaritem"><a href="${ctx}/search" class="yuimenubaritemlabel">Suche</a></li>
+			<li class="yuimenubaritem"><a href="${ctx}/repository/" class="yuimenubaritemlabel">[@spring.message "menu.repository" /]</a></li>
+			<li class="yuimenubaritem"><a href="${ctx}/text/" class="yuimenubaritemlabel">[@spring.message "menu.text" /]</a></li>
+			<li class="yuimenubaritem"><a href="${ctx}/genesis/" class="yuimenubaritemlabel">[@spring.message "menu.genesis" /]</a></li>
+			<li class="yuimenubaritem"><a href="${ctx}/search/" class="yuimenubaritemlabel">[@spring.message "menu.search" /]</a></li>
 		[/#if]
-		<li class="yuimenubaritem"><a href="${ctx}/project/about" class="yuimenubaritemlabel">Projekt</a>
+		<li class="yuimenubaritem"><span class="yuimenubaritemlabel">[@spring.message "menu.project" /]</span>
 		<div class="yuimenu">
 		<div class="bd">
 		<ul>
-			<li class="yuimenuitem"><a href="${ctx}/static/dfg-grant-application.pdf" class="yuimenuitemlabel">DFG-Antrag</a></li>
+			<li class="yuimenuitem"><a href="${ctx}/project/about" class="yuimenuitemlabel">[@spring.message "menu.about" /]</a></li>
+			<li class="yuimenuitem"><a href="${ctx}/static/dfg-grant-application.pdf" class="yuimenuitemlabel">[@spring.message "menu.grant_application" /]</a></li>
 		</ul>
 		</div>
 		</div>
 		</li>
-		<li class="yuimenubaritem"><span class="yuimenubaritemlabel">Partner</span>
+		<li class="yuimenubaritem"><span class="yuimenubaritemlabel">[@spring.message "menu.partners" /]</span>
 		<div class="yuimenu">
 		<div class="bd">
 		<ul>
@@ -58,10 +59,10 @@
 		</div>
 		</div>
 		</li>
-		<li class="yuimenubaritem"><a href="${ctx}/project/contact" class="yuimenubaritemlabel">Kontakt</a></li>
-		<li class="yuimenubaritem"><a href="${ctx}/project/imprint" class="yuimenubaritemlabel">Impressum</a></li>
+		<li class="yuimenubaritem"><a href="${ctx}/project/contact" class="yuimenubaritemlabel">[@spring.message "menu.contact" /]</a></li>
+		<li class="yuimenubaritem"><a href="${ctx}/project/imprint" class="yuimenubaritemlabel">[@spring.message "menu.imprint" /]</a></li>
 		<li class="yuimenubaritem">
-			<a href="http://wiki.faustedition.net/" class="yuimenubaritemlabel">Intern</a>
+			<a href="http://wiki.faustedition.net/" class="yuimenubaritemlabel">[@spring.message "menu.restricted" /]</a>
 			[#if !hasRole("ROLE_EDITOR")]
 				<div class="yuimenu">
 					<div class="bd">
@@ -104,15 +105,20 @@
 [/#macro]
 
 [#macro yuiHeader]
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css"/>
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/base/base-min.css"/>
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/menu/assets/skins/sam/menu.css"/>
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/paginator/assets/skins/sam/paginator.css"/>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/utilities/utilities.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/container/container_core-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/menu/menu-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/event-mouseenter/event-mouseenter-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/selector/selector-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/event-delegate/event-delegate-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/paginator/paginator-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/yuiloader/yuiloader-min.js"></script>
+<script type="text/javascript">
+var loader = new YAHOO.util.YUILoader( {
+	require : [ "base", "connection", "datasource", "datatable", "fonts", "grids", "json", "menu", "reset", "yuiloader" ],
+	loadOptional : true,
+	combine : true,
+	insertBefore : "custom-css",
+	allowRollup : true,
+	onSuccess : yuiInit,
+	onFailure : function(msg, obj) {
+		alert("YUI loader failed: " + msg +  "\n" + obj);
+	}
+});
+loader.insert();
+</script>
 [/#macro]
+

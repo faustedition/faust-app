@@ -1,105 +1,87 @@
 package de.swkk.metadata;
 
 import static de.faustedition.model.XmlDocument.FAUST_NS_URI;
-import static javax.jcr.query.qom.QueryObjectModelConstants.JCR_OPERATOR_EQUAL_TO;
+import static de.faustedition.model.XmlDocument.xpath;
+import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
 
 import java.io.IOException;
-
-import javax.jcr.Node;
-import javax.jcr.Repository;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.Value;
-import javax.jcr.query.qom.Constraint;
-import javax.jcr.query.qom.QueryObjectModelFactory;
-import javax.jcr.query.qom.Selector;
+import java.net.URI;
 
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.jackrabbit.JcrConstants;
-import org.apache.jackrabbit.commons.JcrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import de.faustedition.model.XmlDocument;
-import de.faustedition.model.repository.RepositoryUtil;
-import de.faustedition.model.repository.RepositoryXmlDocument;
+import de.faustedition.model.metadata.MetadataRecord;
+import de.faustedition.model.xmldb.XmlDbManager;
 import de.faustedition.util.ErrorUtil;
+import de.faustedition.util.LoggingUtil;
 import de.faustedition.util.XMLUtil;
 import de.swkk.metadata.archivedb.ArchiveDatabase;
 import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
 import de.swkk.metadata.inventory.FaustInventory;
-import de.swkk.metadata.inventory.MetadataRecord;
+import de.swkk.metadata.inventory.MetadataFieldMapping;
 
 @Service
 public class MetadataImportTask implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(MetadataImportTask.class);
 
 	@Autowired
-	private Repository repository;
+	private XmlDbManager xmlDbManager;
+
+	private MetadataFieldMapping mapping = new MetadataFieldMapping();
 
 	@Override
 	public void run() {
-		Session session = null;
+		if (singleResult(xpath("//f:resource[contains(text(), 'metadata.xml')]"), xmlDbManager.resources(), Element.class) != null) {
+			LoggingUtil.LOG.debug("XML database contains metadata; skipping import");
+			return;
+		}
+
 		try {
-			session = RepositoryUtil.login(repository, RepositoryUtil.XML_WS);
-
-			QueryObjectModelFactory qf = session.getWorkspace().getQueryManager().getQOMFactory();
-			Value fileName = session.getValueFactory().createValue("metadata.xml");
-			Selector source = qf.selector(JcrConstants.NT_FILE, "f");
-			Constraint constraint = qf.comparison(qf.nodeLocalName("f"), JCR_OPERATOR_EQUAL_TO, qf.literal(fileName));
-			for (Node node : JcrUtils.getNodes(qf.createQuery(source, constraint, null, null).execute())) {
-				LOG.debug("Skipping metadata import; found '" + node.getPath() + "'");
-				return;
-			}
-
 			LOG.info("Importing metadata ...");
 			StopWatch sw = new StopWatch();
 			sw.start();
-			doImport(session);
+			doImport();
 			sw.stop();
 			LOG.info("Metadata imported in " + sw);
 		} catch (Exception e) {
-			ErrorUtil.fatal(e, "Fatal error while importing metadata");
-		} finally {
-			RepositoryUtil.logoutQuietly(session);
+			ErrorUtil.fatal(e, "Error while importing metadata");
 		}
-
 	}
 
-	public void doImport(Session session) throws IOException, RepositoryException, SAXException {
+	public void doImport() throws IOException, SAXException {
 		FaustInventory faustInventory = FaustInventory.parse();
 		ArchiveDatabase archiveDatabase = ArchiveDatabase.parse();
 
 		for (AllegroRecord allegroRecord : faustInventory) {
 			GSACallNumber callNumber = faustInventory.getCallNumber(allegroRecord);
-			MetadataRecord newMetadata = MetadataRecord.map(allegroRecord);
+			MetadataRecord newMetadata = mapping.map(allegroRecord);
 			newMetadata.remove("callnumber_old");
 			for (ArchiveDatabaseRecord archiveDbRecord : archiveDatabase.filter(callNumber)) {
 				newMetadata.put("callnumber_old", archiveDbRecord.getCallNumber().toString());
 				String identNum = Integer.toString(archiveDbRecord.getIdentNum());
-				
-				String portfolioPath = "/GSA/" + identNum;
-				if (!session.nodeExists(portfolioPath)) {
-					LOG.warn("Portfolio '{}' does not exist in repository", portfolioPath);
-					continue;
-				}
-				
-				LOG.debug("Importing metadata for GSA signature '{}' to '{}'", callNumber, portfolioPath);
-				Node portfolioNode = session.getNode(portfolioPath);
 
-				RepositoryXmlDocument repositoryDocument = null;
+				URI metadataUri = URI.create(String.format("Witness/GSA/%s/metadata.xml", identNum));
+				LOG.debug("Importing metadata for GSA signature '{}' to '{}'", callNumber, metadataUri.toString());
+
 				Document dom = null;
-
-				if (portfolioNode.hasNode("metadata.xml")) {
-					repositoryDocument = new RepositoryXmlDocument(portfolioNode.getNode("metadata.xml"));
-					dom = repositoryDocument.getDocument();
-				} else {
-					dom = new XmlDocument().getDom();
-					dom.appendChild(dom.createElementNS(FAUST_NS_URI, "metadata"));
+				try {
+					dom = (Document) xmlDbManager.get(metadataUri);
+				} catch (HttpClientErrorException e) {
+					if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
+						dom = new XmlDocument().getDom();
+						dom.appendChild(dom.createElementNS(FAUST_NS_URI, "metadata"));
+					} else {
+						throw e;
+					}
 				}
 
 				MetadataRecord record = MetadataRecord.fromXml(dom.getDocumentElement());
@@ -109,12 +91,7 @@ public class MetadataImportTask implements Runnable {
 				XMLUtil.removeChildren(dom.getDocumentElement());
 				record.toXml(dom.getDocumentElement());
 
-				if (repositoryDocument == null) {
-					RepositoryXmlDocument.create(portfolioNode, "metadata.xml", dom);
-				} else {
-					repositoryDocument.setDocument(dom);
-				}
-				session.save();
+				xmlDbManager.put(metadataUri, dom);
 			}
 		}
 	}

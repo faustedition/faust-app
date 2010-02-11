@@ -28,6 +28,8 @@
 
 	<task:scheduler id="scheduler" pool-size="10" />
 <!--	<task:scheduled-tasks scheduler="scheduler">-->
+<!--		<task:scheduled ref="facsimileManager" method="generateAll" cron="0 0 * * * *"/>-->
+<!--		<task:scheduled ref="transcriptionStatusManager" method="update" cron="0 0 * * * *"/>-->
 <!--		<task:scheduled ref="repositoryBackupTask" method="backupRepository" cron="0 0 */12 * * *" />-->
 <!--		<task:scheduled ref="encodedTextDocumentValidationTask" method="validateDocuments" cron="0 0 * * * *" />  -->
 <!--		<task:scheduled ref="transcriptionStatusUpdateTask" method="updateTranscriptionStatus" cron="0 0 * * * *" />-->

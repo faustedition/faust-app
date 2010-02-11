@@ -4,84 +4,70 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Deque;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import de.faustedition.model.ObjectNotFoundException;
-import de.faustedition.model.facsimile.Facsimile;
 import de.faustedition.model.facsimile.FacsimileManager;
 import de.faustedition.model.facsimile.FacsimileResolution;
 import de.faustedition.web.ControllerUtil;
 
 @Controller
-public class FacsimileController
-{
-	public static final String URL_PREFIX = "facsimile";
-	@Autowired
-	private FacsimileManager facsimileStore;
+public class FacsimileController {
+	private static final Logger LOG = LoggerFactory.getLogger(FacsimileController.class);
 
 	@Autowired
-	private SessionFactory dbSessionFactory;
+	private FacsimileManager facsimileManager;
 
 	@RequestMapping("/facsimile/**")
-	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws ObjectNotFoundException, IOException
-	{
-		Deque<String> pathComponents = ControllerUtil.getPathComponents(request);
-		if (!pathComponents.isEmpty() && "facsimile".equals(pathComponents.getFirst()))
-		{
-			pathComponents.removeFirst();
-		}
-		if (pathComponents.isEmpty())
-		{
+	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response)
+			throws ObjectNotFoundException, IOException {
+		String path = ControllerUtil.getPath(request, "facsimile");
+		if (path.length() == 0) {
 			throw new ObjectNotFoundException();
 		}
-
-		String filename = pathComponents.removeLast();
-		FacsimileResolution facsimileResolution = null;
-		for (FacsimileResolution resolution : FacsimileResolution.values())
-		{
-			if (resolution.matches(filename))
-			{
-				facsimileResolution = resolution;
-				filename = StringUtils.removeEnd(filename, resolution.getSuffix());
+		
+		FacsimileResolution resolution = null;
+		String filename = FilenameUtils.getName(path);		
+		for (FacsimileResolution candidate : FacsimileResolution.values()) {
+			if (candidate.matches(filename)) {
+				resolution = candidate;
+				path = StringUtils.removeEnd(path, resolution.getSuffix());
+				break;
 			}
 		}
-		if (facsimileResolution == null || facsimileResolution == FacsimileResolution.HIGH)
-		{
+		if (resolution == null || resolution == FacsimileResolution.HIGH) {
 			throw new ObjectNotFoundException();
 		}
-		pathComponents.addLast(filename);
 
-		Facsimile facsimile = ControllerUtil.foundObject(Facsimile.findByImagePath(dbSessionFactory.getCurrentSession(), StringUtils.join(pathComponents, "/")));
-		File facsimileImageFile = ControllerUtil.foundObject(facsimileStore.findImageFile(facsimile, facsimileResolution));
-		response.setContentType(facsimileResolution.getMimeType());
-		response.setContentLength((int) facsimileImageFile.length());
+		LOG.debug("Retrieving facsimile '{}' with resolution {}", path, resolution);
+		File file = facsimileManager.find(path, resolution);
+		if (file == null) {
+			throw new ObjectNotFoundException();
+		}
+		
+		response.setContentType(resolution.getMimeType());
+		response.setContentLength((int) file.length());
 
-		if (webRequest.checkNotModified(facsimileImageFile.lastModified()))
-		{
+		if (webRequest.checkNotModified(file.lastModified())) {
 			return;
 		}
 
-		ServletOutputStream responseStream = response.getOutputStream();
 		InputStream imageStream = null;
-		try
-		{
-			IOUtils.copy(imageStream = new FileInputStream(facsimileImageFile), responseStream);
-			responseStream.flush();
-		}
-		finally
-		{
+		try {
+			IOUtils.copy(imageStream = new FileInputStream(file), response.getOutputStream());
+		} finally {
 			IOUtils.closeQuietly(imageStream);
 		}
 	}

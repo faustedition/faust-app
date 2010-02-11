@@ -3,6 +3,8 @@ package de.swkk.metadata.inventory;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.faustedition.model.metadata.MetadataRecord;
+
 public class MetadataFieldMapping extends HashMap<String, String> {
 	public MetadataFieldMapping() {
 		put("26", "id_bohnenkamp");

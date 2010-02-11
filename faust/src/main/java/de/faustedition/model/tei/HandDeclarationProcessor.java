@@ -1,6 +1,8 @@
 package de.faustedition.model.tei;
 
 import static de.faustedition.model.tei.EncodedTextDocument.TEI_NS_URI;
+import static de.faustedition.model.tei.EncodedTextDocument.xpath;
+import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,6 +15,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import de.faustedition.model.xmldb.NodeListIterable;
 import de.faustedition.util.XMLUtil;
 
 public class HandDeclarationProcessor implements EncodedTextDocumentProcessor {
@@ -90,20 +93,20 @@ public class HandDeclarationProcessor implements EncodedTextDocumentProcessor {
 	public void process(EncodedTextDocument teiDocument) {
 		Document dom = teiDocument.getDom();
 
-		Element handNotesElement = teiDocument.findElementByPath("teiHeader", "profileDesc", "handNotes");
+		Element handNotesElement = singleResult(xpath("//tei:handNotes"), dom, Element.class);
 		if (handNotesElement == null) {
-			Element profileDescElement = teiDocument.findElementByPath("teiHeader", "profileDesc");
-			if (profileDescElement == null) {
+			Element profileDescEl = singleResult(xpath("//tei:profileDesc"), dom, Element.class);
+			if (profileDescEl == null) {
 				throw new IllegalStateException();
 			}
-			for (Node childNode : XMLUtil.iterableNodeList(profileDescElement.getChildNodes())) {
+			for (Node childNode : new NodeListIterable<Node>(profileDescEl.getChildNodes())) {
 				if ((Node.ELEMENT_NODE == childNode.getNodeType()) && "p".equals(childNode.getLocalName())) {
 					if (!XMLUtil.hasText((Element) childNode)) {
-						profileDescElement.removeChild(childNode);
+						profileDescEl.removeChild(childNode);
 					}
 				}
 			}
-			profileDescElement.appendChild(handNotesElement = dom.createElementNS(TEI_NS_URI, "handNotes"));
+			profileDescEl.appendChild(handNotesElement = dom.createElementNS(TEI_NS_URI, "handNotes"));
 		}
 
 		XMLUtil.removeChildren(handNotesElement);

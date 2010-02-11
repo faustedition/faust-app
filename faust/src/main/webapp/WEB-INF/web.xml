@@ -17,7 +17,7 @@
 	<listener>
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener>
-	
+
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -40,39 +40,6 @@
 	</servlet-mapping>
 
 	<filter>
-		<filter-name>character-encoding</filter-name>
-		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>character-encoding</filter-name>
-		<servlet-name>springmvc</servlet-name>
-	</filter-mapping>
-
-	<servlet>
-		<servlet-name>dav</servlet-name>
-		<servlet-class>de.faustedition.web.dav.FaustDavServlet</servlet-class>
-		<init-param>
-			<param-name>resource-path-prefix</param-name>
-			<param-value>/dav</param-value>
-		</init-param>
-		<init-param>
-			<param-name>resource-config</param-name>
-			<param-value>/WEB-INF/webdav-config.xml</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>dav</servlet-name>
-		<url-pattern>/dav/*</url-pattern>
-	</servlet-mapping>
-
-	<filter>
 		<filter-name>url-rewrite</filter-name>
 		<filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
 	</filter>
@@ -80,6 +47,24 @@
 	<filter-mapping>
 		<filter-name>url-rewrite</filter-name>
 		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>character-encoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>character-encoding</filter-name>
+		<servlet-name>springmvc</servlet-name>
 	</filter-mapping>
 
 	<mime-mapping>
