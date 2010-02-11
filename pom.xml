@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.faustedition</groupId>
 	<artifactId>project</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>Digitale Faustedition</name>
 	<packaging>pom</packaging>
 	<dependencies>
@@ -42,20 +42,15 @@
 			<name>Faust-Edition Repository</name>
 			<url>http://maven.faustedition.net/</url>
 		</repository>
-		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Portfolio Milestone Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
-		</repository>
 	</repositories>
 	<distributionManagement>
 		<repository>
 			<id>faust-distribution</id>
-			<url>scpexe://faustedition.net/data/faust/maven-repository</url>
+			<url>dav:http://maven.faustedition.net/</url>
 		</repository>
 	</distributionManagement>
 	<scm>
-		<connection>scm:svn:https://intern.faustedition.net/svn/trunk/</connection>
-		<developerConnection>scm:svn:https://intern.faustedition.net/svn/trunk/</developerConnection>
+		<connection>scm:svn:https://intern.faustedition.net/svn/tags/project-1.0</connection>
+		<developerConnection>scm:svn:https://intern.faustedition.net/svn/tags/project-1.0</developerConnection>
 	</scm>
 </project>
