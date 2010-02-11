@@ -2,7 +2,7 @@ package de.faustedition.model.facsimile;
 
 import static de.faustedition.model.tei.EncodedTextDocument.TEI_NS_URI;
 import static de.faustedition.model.tei.EncodedTextDocument.xpath;
-import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.NodeListIterable.singleResult;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,9 +14,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.faustedition.model.tei.EncodedTextDocument;
-import de.faustedition.model.xmldb.NodeListIterable;
+import de.faustedition.model.xml.NodeListIterable;
+import de.faustedition.model.xml.XmlUtil;
 import de.faustedition.util.URIUtil;
-import de.faustedition.util.XMLUtil;
 
 public class FacsimileReference {
 	private static final String FACSIMILE_AUTHORITY = "facsimile";
@@ -68,7 +68,7 @@ public class FacsimileReference {
 				documentEl.insertBefore(facsimile, headerEl.getNextSibling());
 			}
 		} else {
-			XMLUtil.removeChildren(facsimile);
+			XmlUtil.removeChildren(facsimile);
 		}
 
 		for (FacsimileReference reference : references) {

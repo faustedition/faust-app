@@ -1,11 +1,9 @@
-package de.faustedition.model.xmldb;
+package de.faustedition.model.xml;
 
-import static de.faustedition.model.xmldb.XmlDbManager.EXIST_NS_URI;
+import static de.faustedition.model.xml.XmlDbManager.EXIST_NS_URI;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import de.faustedition.util.XMLUtil;
 
 public class XmlDbQuery {
 	private int start = 0;
@@ -19,7 +17,7 @@ public class XmlDbQuery {
 	}
 	
 	public Document toDocument() {
-		Document d = XMLUtil.documentBuilder().newDocument();
+		Document d = XmlUtil.documentBuilder().newDocument();
 
 		Element textEl = d.createElementNS(EXIST_NS_URI, "text");
 		textEl.setTextContent(xquery);

@@ -13,7 +13,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.faustedition.util.XMLUtil;
+import de.faustedition.model.xml.XmlUtil;
 import de.swkk.metadata.GSACallNumber;
 
 public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
@@ -23,7 +23,7 @@ public class ArchiveDatabase extends LinkedList<ArchiveDatabaseRecord> {
 
 	public static ArchiveDatabase parse() throws SAXException, IOException {
 		final ArchiveDatabase db = new ArchiveDatabase();
-		XMLUtil.saxParser().parse(DATABASE_RESOURCE.getInputStream(), new DefaultHandler() {
+		XmlUtil.saxParser().parse(DATABASE_RESOURCE.getInputStream(), new DefaultHandler() {
 
 			private ArchiveDatabaseRecord record;
 			private String currentProperty;

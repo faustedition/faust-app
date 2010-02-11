@@ -1,4 +1,4 @@
-package de.faustedition.model.xmldb;
+package de.faustedition.model.xml;
 
 import java.net.URI;
 import java.net.URISyntaxException;

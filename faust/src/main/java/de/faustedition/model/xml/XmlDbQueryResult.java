@@ -1,6 +1,6 @@
-package de.faustedition.model.xmldb;
+package de.faustedition.model.xml;
 
-import static de.faustedition.model.xmldb.XmlDbManager.EXIST_NS_URI;
+import static de.faustedition.model.xml.XmlDbManager.EXIST_NS_URI;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

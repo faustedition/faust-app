@@ -2,7 +2,7 @@ package de.faustedition.model.tei;
 
 import static de.faustedition.model.tei.EncodedTextDocument.TEI_NS_URI;
 import static de.faustedition.model.tei.EncodedTextDocument.xpath;
-import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.NodeListIterable.singleResult;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,8 +15,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import de.faustedition.model.xmldb.NodeListIterable;
-import de.faustedition.util.XMLUtil;
+import de.faustedition.model.xml.NodeListIterable;
+import de.faustedition.model.xml.XmlUtil;
 
 public class HandDeclarationProcessor implements EncodedTextDocumentProcessor {
 	private final Map<String, String> declarations = new LinkedHashMap<String, String>();
@@ -101,7 +101,7 @@ public class HandDeclarationProcessor implements EncodedTextDocumentProcessor {
 			}
 			for (Node childNode : new NodeListIterable<Node>(profileDescEl.getChildNodes())) {
 				if ((Node.ELEMENT_NODE == childNode.getNodeType()) && "p".equals(childNode.getLocalName())) {
-					if (!XMLUtil.hasText((Element) childNode)) {
+					if (!XmlUtil.hasText((Element) childNode)) {
 						profileDescEl.removeChild(childNode);
 					}
 				}
@@ -109,7 +109,7 @@ public class HandDeclarationProcessor implements EncodedTextDocumentProcessor {
 			profileDescEl.appendChild(handNotesElement = dom.createElementNS(TEI_NS_URI, "handNotes"));
 		}
 
-		XMLUtil.removeChildren(handNotesElement);
+		XmlUtil.removeChildren(handNotesElement);
 
 		for (String id : declarations.keySet()) {
 			Element handNoteElement = dom.createElementNS(TEI_NS_URI, "handNote");

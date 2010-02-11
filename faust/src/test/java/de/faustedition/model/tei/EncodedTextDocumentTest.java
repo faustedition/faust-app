@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.faustedition.model.AbstractModelContextTest;
-import de.faustedition.util.XMLUtil;
+import de.faustedition.model.xml.XmlUtil;
 
 public class EncodedTextDocumentTest extends AbstractModelContextTest {
 
@@ -17,7 +17,7 @@ public class EncodedTextDocumentTest extends AbstractModelContextTest {
 	@Test
 	public void enhanceNewDocument() {
 		EncodedTextDocument d = documentManager.process(EncodedTextDocument.create());
-		XMLUtil.serialize(d.getDom(), System.out, true);
+		XmlUtil.serialize(d.getDom(), System.out, true);
 	}
 	
 	@Test

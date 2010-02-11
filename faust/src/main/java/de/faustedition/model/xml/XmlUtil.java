@@ -1,4 +1,4 @@
-package de.faustedition.util;
+package de.faustedition.model.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,10 +33,9 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import de.faustedition.model.xmldb.NodeListIterable;
-import de.faustedition.model.xmldb.XPathUtil;
+import de.faustedition.util.ErrorUtil;
 
-public class XMLUtil {
+public class XmlUtil {
 	public static SAXParser saxParser() {
 		try {
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -44,9 +43,9 @@ public class XMLUtil {
 			parserFactory.setValidating(false);
 			return parserFactory.newSAXParser();
 		} catch (ParserConfigurationException e) {
-			throw new XMLException("Error configuring SAX parser factory", e);
+			throw new XmlException("Error configuring SAX parser factory", e);
 		} catch (SAXException e) {
-			throw new XMLParserException("Error configuring SAX parser factory", e);
+			throw new XmlParserException("Error configuring SAX parser factory", e);
 		}
 	}
 
@@ -69,7 +68,7 @@ public class XMLUtil {
 		try {
 			return transformerFactory().newTransformer(source);
 		} catch (TransformerConfigurationException e) {
-			throw new XMLException("Error configuring XSLT tranformer factory", e);
+			throw new XmlException("Error configuring XSLT tranformer factory", e);
 		}
 	}
 
@@ -90,7 +89,7 @@ public class XMLUtil {
 			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "4");
 			return transformer;
 		} catch (TransformerConfigurationException e) {
-			throw new XMLException("Error configuring XSLT tranformer factory", e);
+			throw new XmlException("Error configuring XSLT tranformer factory", e);
 		}
 	}
 
@@ -100,7 +99,7 @@ public class XMLUtil {
 			serialize(node, new OutputStreamWriter(byteStream, "UTF-8"), indent);
 			return byteStream.toByteArray();
 		} catch (IOException e) {
-			throw new XMLException("I/O error while serializing XML data");
+			throw new XmlException("I/O error while serializing XML data");
 		}
 	}
 
@@ -108,7 +107,7 @@ public class XMLUtil {
 		try {
 			serialize(node, new OutputStreamWriter(stream, "UTF-8"), indent);
 		} catch (IOException e) {
-			throw new XMLException("I/O error while serializing XML data");
+			throw new XmlException("I/O error while serializing XML data");
 		}
 	}
 
@@ -116,7 +115,7 @@ public class XMLUtil {
 		try {
 			nullTransformer(indent).transform(new DOMSource(node), new StreamResult(writer));
 		} catch (TransformerException e) {
-			throw new XMLException("XSLT error while serializing XML data");
+			throw new XmlException("XSLT error while serializing XML data");
 		}
 	}
 
@@ -131,9 +130,9 @@ public class XMLUtil {
 		try {
 			return documentBuilder().parse(inputStream);
 		} catch (SAXException e) {
-			throw new XMLParserException("XML error while parsing DOM", e);
+			throw new XmlParserException("XML error while parsing DOM", e);
 		} catch (IOException e) {
-			throw new XMLException("XSLT error while parsing DOM", e);
+			throw new XmlException("XSLT error while parsing DOM", e);
 		}
 	}
 

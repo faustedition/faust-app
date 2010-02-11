@@ -11,7 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import de.faustedition.util.XMLUtil;
+import de.faustedition.model.xml.XmlUtil;
 
 public class CorpusData
 {
@@ -57,7 +57,7 @@ public class CorpusData
 	{
 		namespacePrefixes.put(XMLConstants.XML_NS_URI, XMLConstants.XML_NS_PREFIX);
 		
-		Document document = XMLUtil.getDocument(parent);
+		Document document = XmlUtil.getDocument(parent);
 
 		Element corpusDataElement = document.createElementNS(XSTANDOFF_NS_URI, "xsf:corpusData");
 		corpusDataElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);

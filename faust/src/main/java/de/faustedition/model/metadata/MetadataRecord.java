@@ -1,6 +1,6 @@
 package de.faustedition.model.metadata;
 
-import static de.faustedition.model.XmlDocument.FAUST_NS_URI;
+import static de.faustedition.model.xml.XmlDocument.FAUST_NS_URI;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.faustedition.util.XMLUtil;
+import de.faustedition.model.xml.XmlUtil;
 
 public class MetadataRecord extends LinkedHashMap<String, String> {
 	public void toXml(Element parent) {
@@ -22,7 +22,7 @@ public class MetadataRecord extends LinkedHashMap<String, String> {
 
 	public static MetadataRecord fromXml(Element parent) {
 		MetadataRecord record = new MetadataRecord();
-		for (Element field : XMLUtil.getChildElements(parent)) {
+		for (Element field : XmlUtil.getChildElements(parent)) {
 			if (FAUST_NS_URI.equals(field.getNamespaceURI())
 					&& MetadataFieldDefinition.REGISTRY_LOOKUP_TABLE.containsKey(field.getLocalName())) {
 				record.put(field.getLocalName(), field.getTextContent());

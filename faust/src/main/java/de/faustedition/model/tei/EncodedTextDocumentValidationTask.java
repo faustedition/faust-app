@@ -1,6 +1,6 @@
 package de.faustedition.model.tei;
 
-import static de.faustedition.model.XmlDocument.xpath;
+import static de.faustedition.model.xml.XmlDocument.xpath;
 
 import java.io.PrintWriter;
 import java.net.URI;
@@ -18,8 +18,8 @@ import org.w3c.dom.Element;
 
 import de.faustedition.model.report.Report;
 import de.faustedition.model.report.ReportSender;
-import de.faustedition.model.xmldb.NodeListIterable;
-import de.faustedition.model.xmldb.XmlDbManager;
+import de.faustedition.model.xml.NodeListIterable;
+import de.faustedition.model.xml.XmlDbManager;
 
 @Service
 public class EncodedTextDocumentValidationTask {

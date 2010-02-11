@@ -2,7 +2,7 @@ package de.faustedition.model.tei;
 
 import static de.faustedition.model.tei.EncodedTextDocument.TEI_NS_URI;
 import static de.faustedition.model.tei.EncodedTextDocument.xpath;
-import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.NodeListIterable.singleResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

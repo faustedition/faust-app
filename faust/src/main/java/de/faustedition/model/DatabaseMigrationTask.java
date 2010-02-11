@@ -2,7 +2,7 @@ package de.faustedition.model;
 
 import static de.faustedition.model.tei.EncodedTextDocument.TEI_NS_URI;
 import static de.faustedition.model.tei.EncodedTextDocument.xpath;
-import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.NodeListIterable.singleResult;
 
 import java.net.URI;
 import java.util.Collections;
@@ -34,9 +34,10 @@ import de.faustedition.model.db.Transcription;
 import de.faustedition.model.facsimile.FacsimileReference;
 import de.faustedition.model.tei.EncodedTextDocument;
 import de.faustedition.model.tei.EncodedTextDocumentManager;
-import de.faustedition.model.xmldb.XmlDbManager;
+import de.faustedition.model.xml.XmlDbManager;
+import de.faustedition.model.xml.XmlDocument;
+import de.faustedition.model.xml.XmlUtil;
 import de.faustedition.util.LoggingUtil;
-import de.faustedition.util.XMLUtil;
 import de.swkk.metadata.MetadataImportTask;
 
 @Service
@@ -113,7 +114,7 @@ public class DatabaseMigrationTask implements Runnable {
 					Document xml = document.getDom();
 					Element textEl = singleResult(xpath("//tei:text"), xml, Element.class);
 					if (singleResult(xpath("//tei:revisionDesc/tei:change"), xml, Node.class) == null) {
-						if (textEl != null && XMLUtil.hasText(textEl)) {
+						if (textEl != null && XmlUtil.hasText(textEl)) {
 							Element teiHeader = singleResult(xpath("//tei:teiHeader"), xml,
 									Element.class);
 							Element revisionDesc = singleResult(

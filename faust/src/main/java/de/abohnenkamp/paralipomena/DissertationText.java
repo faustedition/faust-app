@@ -1,6 +1,6 @@
 package de.abohnenkamp.paralipomena;
 
-import static de.faustedition.model.xmldb.XPathUtil.xpath;
+import static de.faustedition.model.xml.XPathUtil.xpath;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,9 +20,9 @@ import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.faustedition.model.xmldb.NodeListIterable;
+import de.faustedition.model.xml.NodeListIterable;
+import de.faustedition.model.xml.XmlUtil;
 import de.faustedition.util.ErrorUtil;
-import de.faustedition.util.XMLUtil;
 import de.swkk.metadata.GSACallNumber;
 
 public class DissertationText implements InitializingBean {
@@ -40,12 +40,12 @@ public class DissertationText implements InitializingBean {
 	public List<ParalipomenonTranscription> extractParalipomena() throws XPathExpressionException {
 		List<ParalipomenonTranscription> result = new LinkedList<ParalipomenonTranscription>();
 		for (Element paralipomenonRoot : new NodeListIterable<Element>(xpath("/texte/text", null), document)) {
-			Element textElement = XMLUtil.getChild((Element) paralipomenonRoot, "paralipomenon");
+			Element textElement = XmlUtil.getChild((Element) paralipomenonRoot, "paralipomenon");
 			Matcher callNumberMatcher = GSA_CALL_NUMBER_PATTERN.matcher(textElement.getAttribute("n"));
 			if (callNumberMatcher.find()) {
 				GSACallNumber gsaCallNumber = new GSACallNumber("25/" + callNumberMatcher.group(1) + ","
 						+ callNumberMatcher.group(2) + "," + callNumberMatcher.group(3));
-				result.add(new ParalipomenonTranscription(gsaCallNumber, toTei(textElement), toTei(XMLUtil
+				result.add(new ParalipomenonTranscription(gsaCallNumber, toTei(textElement), toTei(XmlUtil
 						.getChild((Element) paralipomenonRoot, "kommentar"))));
 			}
 		}
@@ -64,7 +64,7 @@ public class DissertationText implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		document = XMLUtil.parse(XML_RESOURCE.getInputStream());
-		teiTransformer = XMLUtil.newTransformer(new StreamSource(TEI_TRANSFORMATION_RESOURCE.getInputStream()));
+		document = XmlUtil.parse(XML_RESOURCE.getInputStream());
+		teiTransformer = XmlUtil.newTransformer(new StreamSource(TEI_TRANSFORMATION_RESOURCE.getInputStream()));
 	}
 }

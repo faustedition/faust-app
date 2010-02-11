@@ -1,8 +1,8 @@
 package de.faustedition.model.tei;
 
-import de.faustedition.util.XMLException;
+import de.faustedition.model.xml.XmlException;
 
-public class EncodedTextDocumentException extends XMLException {
+public class EncodedTextDocumentException extends XmlException {
 
 	public EncodedTextDocumentException() {
 		super();

@@ -2,7 +2,7 @@ package de.faustedition.model.tei;
 
 import static de.faustedition.model.tei.EncodedTextDocument.TEI_NS_URI;
 import static de.faustedition.model.tei.EncodedTextDocument.xpath;
-import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.NodeListIterable.singleResult;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import javax.xml.XMLConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.faustedition.util.XMLUtil;
+import de.faustedition.model.xml.XmlUtil;
 
 public class CharacterDeclarationProcessor implements EncodedTextDocumentProcessor {
 	private static final String LEFT_PARANTHESIS_DESCRIPTION = "In 18th century there were different ways to represent parentheses in handwritten documents. "
@@ -40,13 +40,13 @@ public class CharacterDeclarationProcessor implements EncodedTextDocumentProcess
 			if (encodingDescEl == null) {
 				throw new IllegalStateException();
 			}
-			if (!XMLUtil.hasText(encodingDescEl)) {
-				XMLUtil.removeChildren(encodingDescEl);
+			if (!XmlUtil.hasText(encodingDescEl)) {
+				XmlUtil.removeChildren(encodingDescEl);
 			}
 			encodingDescEl.appendChild(charDeclElement = dom.createElementNS(TEI_NS_URI, "charDecl"));
 		}
 
-		XMLUtil.removeChildren(charDeclElement);
+		XmlUtil.removeChildren(charDeclElement);
 
 		for (String id : declarations.keySet()) {
 			CharacterDeclaration declaration = declarations.get(id);

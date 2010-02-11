@@ -1,6 +1,6 @@
 package de.faustedition.model.tei;
 
-import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.NodeListIterable.singleResult;
 
 import java.io.InputStream;
 
@@ -12,9 +12,9 @@ import org.w3c.dom.Element;
 
 import com.google.common.base.Preconditions;
 
-import de.faustedition.model.XmlDocument;
-import de.faustedition.model.xmldb.XPathUtil;
-import de.faustedition.util.XMLUtil;
+import de.faustedition.model.xml.XPathUtil;
+import de.faustedition.model.xml.XmlDocument;
+import de.faustedition.model.xml.XmlUtil;
 
 public class EncodedTextDocument extends XmlDocument {
 	public static final String TEI_NS_URI = "http://www.tei-c.org/ns/1.0";
@@ -44,7 +44,7 @@ public class EncodedTextDocument extends XmlDocument {
 	}
 
 	public static EncodedTextDocument parse(InputStream inputStream) {
-		return new EncodedTextDocument(XMLUtil.parse(inputStream));
+		return new EncodedTextDocument(XmlUtil.parse(inputStream));
 	}
 
 	public Element getTextElement() {

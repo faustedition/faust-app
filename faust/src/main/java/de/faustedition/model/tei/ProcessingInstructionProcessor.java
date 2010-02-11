@@ -1,12 +1,12 @@
 package de.faustedition.model.tei;
 
 import static de.faustedition.model.tei.EncodedTextDocumentValidator.SCHEMA_URI;
-import static de.faustedition.model.xmldb.XPathUtil.xpath;
+import static de.faustedition.model.xml.XPathUtil.xpath;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import de.faustedition.model.xmldb.NodeListIterable;
+import de.faustedition.model.xml.NodeListIterable;
 
 public class ProcessingInstructionProcessor implements EncodedTextDocumentProcessor {
 	public static final String CSS_URI = "http://xml.faustedition.net/schema/faust-tei.css";

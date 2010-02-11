@@ -1,6 +1,6 @@
 package de.faustedition.model.facsimile;
 
-import static de.faustedition.model.XmlDocument.xpath;
+import static de.faustedition.model.xml.XmlDocument.xpath;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,8 +17,8 @@ import org.w3c.dom.Element;
 
 import de.faustedition.model.tei.EncodedTextDocument;
 import de.faustedition.model.tei.EncodedTextDocumentManager;
-import de.faustedition.model.xmldb.NodeListIterable;
-import de.faustedition.model.xmldb.XmlDbManager;
+import de.faustedition.model.xml.NodeListIterable;
+import de.faustedition.model.xml.XmlDbManager;
 
 @Service
 public class FacsimileUpdateTask {

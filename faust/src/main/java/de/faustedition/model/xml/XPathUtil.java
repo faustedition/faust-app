@@ -1,4 +1,4 @@
-package de.faustedition.model.xmldb;
+package de.faustedition.model.xml;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
@@ -6,7 +6,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import de.faustedition.util.XMLException;
 
 public class XPathUtil {
 
@@ -18,7 +17,7 @@ public class XPathUtil {
 			}
 			return xpath.compile(expression);
 		} catch (XPathExpressionException e) {
-			throw new XMLException(e);
+			throw new XmlException(e);
 		}
 	}
 }

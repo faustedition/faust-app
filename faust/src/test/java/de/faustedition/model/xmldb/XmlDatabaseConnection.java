@@ -1,7 +1,7 @@
 package de.faustedition.model.xmldb;
 
-import static de.faustedition.model.XmlDocument.xpath;
-import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.XmlDocument.xpath;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
@@ -10,6 +10,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.faustedition.model.AbstractModelContextTest;
+import de.faustedition.model.xml.XmlDbManager;
 
 public class XmlDatabaseConnection extends AbstractModelContextTest {
 

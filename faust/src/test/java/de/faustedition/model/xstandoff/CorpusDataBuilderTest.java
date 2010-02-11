@@ -23,7 +23,7 @@ import org.w3c.dom.Document;
 import com.google.common.collect.Sets;
 
 import de.faustedition.model.tei.EncodedTextDocument;
-import de.faustedition.util.XMLUtil;
+import de.faustedition.model.xml.XmlUtil;
 
 public class CorpusDataBuilderTest
 {
@@ -38,9 +38,9 @@ public class CorpusDataBuilderTest
 		{
 			cleanupTransformer.transform(new StreamSource(getClass().getResourceAsStream(testResourcePath)), new SAXResult(builder));
 			CorpusData corpusData = builder.getCorpusData();
-			Document document = XMLUtil.documentBuilder().newDocument();
+			Document document = XmlUtil.documentBuilder().newDocument();
 			corpusData.serialize(document, new HashMap<String, String>());
-			XMLUtil.serialize(document, System.out, false);
+			XmlUtil.serialize(document, System.out, false);
 		}
 	}
 
@@ -79,18 +79,18 @@ public class CorpusDataBuilderTest
 				}
 			}).extract();
 
-			Document document = XMLUtil.documentBuilder().newDocument();
+			Document document = XmlUtil.documentBuilder().newDocument();
 			
 			Map<String, String> namespaces = new HashMap<String, String>();
 			namespaces.put(EncodedTextDocument.TEI_NS_URI, "");
 			corpusData.serialize(document, namespaces);
-			XMLUtil.serialize(document, System.out, true);
+			XmlUtil.serialize(document, System.out, true);
 		}
 	}
 
 	@Before
 	public void setUp() throws Exception
 	{
-		cleanupTransformer = XMLUtil.newTransformer(new StreamSource(CorpusDataBuildingHandler.class.getResourceAsStream("/xsl/text-tei-cleanup.xsl")));
+		cleanupTransformer = XmlUtil.newTransformer(new StreamSource(CorpusDataBuildingHandler.class.getResourceAsStream("/xsl/text-tei-cleanup.xsl")));
 	}
 }

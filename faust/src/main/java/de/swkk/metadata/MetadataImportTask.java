@@ -1,8 +1,8 @@
 package de.swkk.metadata;
 
-import static de.faustedition.model.XmlDocument.FAUST_NS_URI;
-import static de.faustedition.model.XmlDocument.xpath;
-import static de.faustedition.model.xmldb.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.NodeListIterable.singleResult;
+import static de.faustedition.model.xml.XmlDocument.FAUST_NS_URI;
+import static de.faustedition.model.xml.XmlDocument.xpath;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,12 +18,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import de.faustedition.model.XmlDocument;
 import de.faustedition.model.metadata.MetadataRecord;
-import de.faustedition.model.xmldb.XmlDbManager;
+import de.faustedition.model.xml.XmlDbManager;
+import de.faustedition.model.xml.XmlDocument;
+import de.faustedition.model.xml.XmlUtil;
 import de.faustedition.util.ErrorUtil;
 import de.faustedition.util.LoggingUtil;
-import de.faustedition.util.XMLUtil;
 import de.swkk.metadata.archivedb.ArchiveDatabase;
 import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
 import de.swkk.metadata.inventory.FaustInventory;
@@ -88,7 +88,7 @@ public class MetadataImportTask implements Runnable {
 				record.merge(newMetadata);
 				record.put("callnumber", identNum);
 
-				XMLUtil.removeChildren(dom.getDocumentElement());
+				XmlUtil.removeChildren(dom.getDocumentElement());
 				record.toXml(dom.getDocumentElement());
 
 				xmlDbManager.put(metadataUri, dom);

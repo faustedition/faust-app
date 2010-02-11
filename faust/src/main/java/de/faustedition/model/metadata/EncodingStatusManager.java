@@ -1,6 +1,6 @@
 package de.faustedition.model.metadata;
 
-import static de.faustedition.model.XmlDocument.xpath;
+import static de.faustedition.model.xml.XmlDocument.xpath;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 
-import de.faustedition.model.xmldb.NodeListIterable;
-import de.faustedition.model.xmldb.XmlDbManager;
+import de.faustedition.model.xml.NodeListIterable;
+import de.faustedition.model.xml.XmlDbManager;
 
 @Service
 public class EncodingStatusManager {

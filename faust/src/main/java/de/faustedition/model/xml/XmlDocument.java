@@ -1,12 +1,9 @@
-package de.faustedition.model;
+package de.faustedition.model.xml;
 
 import javax.xml.xpath.XPathExpression;
 
 import org.springframework.util.xml.SimpleNamespaceContext;
 import org.w3c.dom.Document;
-
-import de.faustedition.model.xmldb.XPathUtil;
-import de.faustedition.util.XMLUtil;
 
 public class XmlDocument {
 	public static final String FAUST_NS_URI = "http://www.faustedition.net/ns";
@@ -19,7 +16,7 @@ public class XmlDocument {
 	protected final Document dom;
 
 	public XmlDocument() {
-		this(XMLUtil.documentBuilder().newDocument());
+		this(XmlUtil.documentBuilder().newDocument());
 	}
 
 	public XmlDocument(Document document) {

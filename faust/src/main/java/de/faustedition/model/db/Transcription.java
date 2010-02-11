@@ -13,7 +13,7 @@ import org.xml.sax.SAXException;
 
 import de.faustedition.model.tei.EncodedTextDocument;
 import de.faustedition.model.tei.EncodedTextDocumentManager;
-import de.faustedition.util.XMLUtil;
+import de.faustedition.model.xml.XmlUtil;
 
 public class Transcription implements Serializable {
 
@@ -69,7 +69,7 @@ public class Transcription implements Serializable {
 	}
 
 	public boolean hasText() throws SAXException, IOException {
-		return XMLUtil.hasText(XMLUtil.parse(getTextData()).getDocumentElement());
+		return XmlUtil.hasText(XmlUtil.parse(getTextData()).getDocumentElement());
 	}
 
 	public byte[] getRevisionData() {
@@ -81,15 +81,15 @@ public class Transcription implements Serializable {
 	}
 
 	public void update(EncodedTextDocument document) {
-		setTextData(XMLUtil.serializeFragment(document.getTextElement()));
-		setRevisionData(XMLUtil.serializeFragment(document.getRevisionElement()));
+		setTextData(XmlUtil.serializeFragment(document.getTextElement()));
+		setRevisionData(XmlUtil.serializeFragment(document.getRevisionElement()));
 	}
 
 	public EncodedTextDocument buildTEIDocument(EncodedTextDocumentManager manager) {
 		EncodedTextDocument teiDocument = manager.create();
 
 		org.w3c.dom.Document dom = teiDocument.getDom();
-		dom.getDocumentElement().appendChild(dom.importNode(XMLUtil.parse(getTextData()).getDocumentElement(), true));
+		dom.getDocumentElement().appendChild(dom.importNode(XmlUtil.parse(getTextData()).getDocumentElement(), true));
 
 		return teiDocument;
 	}
