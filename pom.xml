@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.faustedition</groupId>
 	<artifactId>project</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<name>Digitale Faustedition</name>
 	<packaging>pom</packaging>
 	<dependencies>
@@ -50,7 +50,7 @@
 		</repository>
 	</distributionManagement>
 	<scm>
-		<connection>scm:svn:https://intern.faustedition.net/svn/tags/project-1.0</connection>
-		<developerConnection>scm:svn:https://intern.faustedition.net/svn/tags/project-1.0</developerConnection>
+		<connection>scm:svn:https://intern.faustedition.net/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://intern.faustedition.net/svn/trunk/</developerConnection>
 	</scm>
 </project>
