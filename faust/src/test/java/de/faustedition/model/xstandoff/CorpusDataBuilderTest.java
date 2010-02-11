@@ -25,18 +25,17 @@ import com.google.common.collect.Sets;
 import de.faustedition.model.tei.EncodedTextDocument;
 import de.faustedition.model.xml.XmlUtil;
 
-public class CorpusDataBuilderTest
-{
-	private static final String[] TEST_RESOURCE_PATHS = new String[] { "/xstandoff/391098_0349.xml", "/xstandoff/391098_0360.xml", "/xstandoff/391098_0377.xml" };
+public class CorpusDataBuilderTest {
+	private static final String[] TEST_RESOURCE_PATHS = new String[] { "/xstandoff/391098_0349.xml",
+			"/xstandoff/391098_0360.xml", "/xstandoff/391098_0377.xml" };
 	private CorpusDataBuildingHandler builder = new CorpusDataBuildingHandler();
 	private static Transformer cleanupTransformer;
 
 	@Test
-	public void buildCorpusData() throws Exception
-	{
-		for (String testResourcePath : TEST_RESOURCE_PATHS)
-		{
-			cleanupTransformer.transform(new StreamSource(getClass().getResourceAsStream(testResourcePath)), new SAXResult(builder));
+	public void buildCorpusData() throws Exception {
+		for (String testResourcePath : TEST_RESOURCE_PATHS) {
+			cleanupTransformer.transform(new StreamSource(getClass().getResourceAsStream(testResourcePath)),
+					new SAXResult(builder));
 			CorpusData corpusData = builder.getCorpusData();
 			Document document = XmlUtil.documentBuilder().newDocument();
 			corpusData.serialize(document, new HashMap<String, String>());
@@ -45,11 +44,10 @@ public class CorpusDataBuilderTest
 	}
 
 	@Test
-	public void extractLayer() throws Exception
-	{
-		for (String testResourcePath : TEST_RESOURCE_PATHS)
-		{
-			cleanupTransformer.transform(new StreamSource(getClass().getResourceAsStream(testResourcePath)), new SAXResult(builder));
+	public void extractLayer() throws Exception {
+		for (String testResourcePath : TEST_RESOURCE_PATHS) {
+			cleanupTransformer.transform(new StreamSource(getClass().getResourceAsStream(testResourcePath)),
+					new SAXResult(builder));
 			CorpusData corpusData = builder.getCorpusData();
 			AnnotationLevel annotationLevel = corpusData.getAnnotationLevels().get(0);
 
@@ -57,30 +55,27 @@ public class CorpusDataBuilderTest
 			AnnotationLayer destination = new AnnotationLayer(corpusData, annotationLevel);
 			annotationLevel.add(destination);
 
-			(new AnnotationLayerExtractor(source, destination)
-			{
+			(new AnnotationLayerExtractor(source, destination) {
 				private final Set<String> EDITING_ELEMENTS = Sets.newHashSet("add", "del", "subst");
 
 				@Override
-				public AnnotationElement transform(AnnotationElement element)
-				{
+				public AnnotationElement transform(AnnotationElement element) {
 					AnnotationElement transformed = (AnnotationElement) element.copy();
-					for (AnnotationAttribute attr : element.getChildrenOfType(AnnotationAttribute.class))
-					{
+					for (AnnotationAttribute attr : element.getChildrenOfType(AnnotationAttribute.class)) {
 						transformed.add(attr.copy());
 					}
 					return transformed;
 				}
 
 				@Override
-				public boolean extract(AnnotationElement element)
-				{
-					return EncodedTextDocument.TEI_NS_URI.equals(element.getNamespace()) && EDITING_ELEMENTS.contains(element.getLocalName());
+				public boolean extract(AnnotationElement element) {
+					return EncodedTextDocument.TEI_NS_URI.equals(element.getNamespace())
+							&& EDITING_ELEMENTS.contains(element.getLocalName());
 				}
 			}).extract();
 
 			Document document = XmlUtil.documentBuilder().newDocument();
-			
+
 			Map<String, String> namespaces = new HashMap<String, String>();
 			namespaces.put(EncodedTextDocument.TEI_NS_URI, "");
 			corpusData.serialize(document, namespaces);
@@ -89,8 +84,8 @@ public class CorpusDataBuilderTest
 	}
 
 	@Before
-	public void setUp() throws Exception
-	{
-		cleanupTransformer = XmlUtil.newTransformer(new StreamSource(CorpusDataBuildingHandler.class.getResourceAsStream("/xsl/text-tei-cleanup.xsl")));
+	public void setUp() throws Exception {
+		cleanupTransformer = XmlUtil.newTransformer(new StreamSource(CorpusDataBuildingHandler.class
+				.getResourceAsStream("/xsl/text-tei-cleanup.xsl")));
 	}
 }

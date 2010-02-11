@@ -32,6 +32,6 @@ public class TEIDocumentTest {
 
 	@Test
 	public void xpathEvaluation() {
-		Assert.assertNotNull(singleResult(xpath("/tei:TEI"), teiDocument, Element.class));
+		Assert.assertNotNull(singleResult(xpath("/tei:TEI"), teiDocument.getDom(), Element.class));
 	}
 }
