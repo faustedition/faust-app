@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+   spec="1.0+" 
+   codebase="http://tei-eclipse.gforge.inria.fr/transcripteur/"
+   href="transcripteur.jnlp">
+  <information>
+    <title>Transcripteur WebStart</title>
+    <vendor>AVIZ, INRIA</vendor>
+    <homepage href="index.html"/>
+    <description>Transcripteur</description> 
+    <description kind="short">Transcripteur</description>
+    <offline-allowed/>
+  </information>
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.5+" max-heap-size="150M"/>
+    <jar href="transcripteur.jar"/>
+    <jar href="piccolo.jar"/>
+    <jar href="piccolox.jar"/>
+    <jar href="xml-writer.jar"/>
+    <jar href="freehep-base.jar" download="lazy"/>
+    <jar href="freehep-graphics2d.jar" download="lazy"/>
+    <jar href="freehep-graphicsio-pdf.jar" download="lazy"/>
+    <jar href="freehep-graphicsio-ps.jar" download="lazy"/>
+    <jar href="freehep-graphicsio-svg.jar" download="lazy"/>
+    <jar href="freehep-graphicsio-swf.jar" download="lazy"/>
+    <jar href="freehep-graphicsio.jar" download="lazy"/>
+  </resources>
+  <application-desc main-class="fr.inria.aviz.PTranscripteur"/>
+
+
+</jnlp>
+
