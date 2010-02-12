@@ -14,8 +14,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.springframework.core.io.ClassPathResource;
 
+import de.faustedition.ErrorUtil;
 import de.faustedition.model.tei.EncodedTextDocument;
-import de.faustedition.util.ErrorUtil;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;

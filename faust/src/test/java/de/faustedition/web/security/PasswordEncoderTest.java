@@ -2,16 +2,18 @@ package de.faustedition.web.security;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Test;
-
-import de.faustedition.util.LoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PasswordEncoderTest {
+	private static final Logger LOG = LoggerFactory.getLogger(PasswordEncoderTest.class);
+	
 	public static final String[] PASSWORDS = new String[] { "hallo", "welt" };
 
 	@Test
 	public void encode() {
 		for (String password : PASSWORDS) {
-			LoggingUtil.LOG.info(String.format("%s ==> %s", password, DigestUtils.shaHex(password)));
+			LOG.info(String.format("%s ==> %s", password, DigestUtils.shaHex(password)));
 		}
 	}
 }

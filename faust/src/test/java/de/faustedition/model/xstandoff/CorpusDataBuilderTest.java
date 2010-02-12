@@ -39,7 +39,7 @@ public class CorpusDataBuilderTest {
 			CorpusData corpusData = builder.getCorpusData();
 			Document document = XmlUtil.documentBuilder().newDocument();
 			corpusData.serialize(document, new HashMap<String, String>());
-			XmlUtil.serialize(document, System.out, false);
+			XmlUtil.serialize(document, System.out);
 		}
 	}
 
@@ -79,7 +79,7 @@ public class CorpusDataBuilderTest {
 			Map<String, String> namespaces = new HashMap<String, String>();
 			namespaces.put(EncodedTextDocument.TEI_NS_URI, "");
 			corpusData.serialize(document, namespaces);
-			XmlUtil.serialize(document, System.out, true);
+			XmlUtil.serialize(document, System.out);
 		}
 	}
 

@@ -1,7 +1,11 @@
 package de.faustedition.model.xml;
 
+import static de.faustedition.model.xml.XmlDocument.xpath;
+
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.xml.transform.dom.DOMSource;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 @Service
@@ -76,6 +81,14 @@ public class XmlDbManager {
 
 	public Document resources() {
 		return (Document) get(URI.create("Query/Resources.xq"));
+	}
+
+	public List<URI> resourceUris() {
+		List<URI> resourceUris = new ArrayList<URI>();
+		for (Element resource : new NodeListIterable<Element>(xpath("//f:resource"), resources())) {
+			resourceUris.add(URI.create(resource.getTextContent()));
+		}
+		return resourceUris;
 	}
 
 	public Document facsimileReferences() {

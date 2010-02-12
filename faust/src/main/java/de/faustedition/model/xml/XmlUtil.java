@@ -17,15 +17,17 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.ErrorListener;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
+import org.springframework.util.xml.TransformerUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -33,9 +35,20 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import de.faustedition.util.ErrorUtil;
+import de.faustedition.ErrorUtil;
 
 public class XmlUtil {
+	public static final Templates SERIALIZATION_TEMPLATES;
+
+	static {
+		try {
+			SERIALIZATION_TEMPLATES = transformerFactory().newTemplates(
+					new StreamSource(XmlUtil.class.getResourceAsStream("/xsl/serialization.xsl")));
+		} catch (TransformerConfigurationException e) {
+			throw ErrorUtil.fatal(e, "XSL error while creating serialization transform");
+		}
+	}
+
 	public static SAXParser saxParser() {
 		try {
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -78,42 +91,29 @@ public class XmlUtil {
 		return transformerFactory;
 	}
 
-	public static Transformer nullTransformer(boolean indent) {
-		try {
-			Transformer transformer = transformerFactory().newTransformer();
-			transformer.setErrorListener(new StrictNoOutputErrorCallback());
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-			transformer.setOutputProperty(OutputKeys.INDENT, (indent ? "yes" : "no"));
-			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "4");
-			return transformer;
-		} catch (TransformerConfigurationException e) {
-			throw new XmlException("Error configuring XSLT tranformer factory", e);
-		}
-	}
-
-	public static byte[] serialize(Node node, boolean indent) {
+	public static byte[] serialize(Node node) {
 		try {
 			ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-			serialize(node, new OutputStreamWriter(byteStream, "UTF-8"), indent);
+			serialize(node, new OutputStreamWriter(byteStream, "UTF-8"));
 			return byteStream.toByteArray();
 		} catch (IOException e) {
 			throw new XmlException("I/O error while serializing XML data");
 		}
 	}
 
-	public static void serialize(Node node, OutputStream stream, boolean indent) {
+	public static void serialize(Node node, OutputStream stream) {
 		try {
-			serialize(node, new OutputStreamWriter(stream, "UTF-8"), indent);
+			serialize(node, new OutputStreamWriter(stream, "UTF-8"));
 		} catch (IOException e) {
 			throw new XmlException("I/O error while serializing XML data");
 		}
 	}
 
-	public static void serialize(Node node, Writer writer, boolean indent) {
+	public static void serialize(Node node, Writer writer) {
 		try {
-			nullTransformer(indent).transform(new DOMSource(node), new StreamResult(writer));
+			Transformer transformer = SERIALIZATION_TEMPLATES.newTransformer();
+			TransformerUtils.enableIndenting(transformer, 4);
+			transformer.transform(new DOMSource(node), new StreamResult(writer));
 		} catch (TransformerException e) {
 			throw new XmlException("XSLT error while serializing XML data");
 		}
@@ -122,7 +122,7 @@ public class XmlUtil {
 	public static byte[] serializeFragment(Element fragmentElement) {
 		Document fragmentDataDocument = documentBuilder().newDocument();
 		fragmentDataDocument.appendChild(fragmentDataDocument.importNode(fragmentElement, true));
-		return serialize(fragmentDataDocument, false);
+		return serialize(fragmentDataDocument);
 
 	}
 

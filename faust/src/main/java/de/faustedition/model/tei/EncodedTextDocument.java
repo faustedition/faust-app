@@ -37,9 +37,9 @@ public class EncodedTextDocument extends XmlDocument {
 		}
 	}
 
-	public static EncodedTextDocument create() {
+	public static EncodedTextDocument create(String rootElement) {
 		Document document = new XmlDocument().getDom();
-		document.appendChild(document.createElementNS(TEI_NS_URI, "TEI"));
+		document.appendChild(document.createElementNS(TEI_NS_URI, rootElement));
 		return new EncodedTextDocument(document);
 	}
 

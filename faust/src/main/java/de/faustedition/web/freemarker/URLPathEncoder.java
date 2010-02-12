@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.faustedition.util.ErrorUtil;
+import de.faustedition.ErrorUtil;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;

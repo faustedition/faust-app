@@ -18,12 +18,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import de.faustedition.ErrorUtil;
 import de.faustedition.model.metadata.MetadataRecord;
 import de.faustedition.model.xml.XmlDbManager;
 import de.faustedition.model.xml.XmlDocument;
 import de.faustedition.model.xml.XmlUtil;
-import de.faustedition.util.ErrorUtil;
-import de.faustedition.util.LoggingUtil;
 import de.swkk.metadata.archivedb.ArchiveDatabase;
 import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
 import de.swkk.metadata.inventory.FaustInventory;
@@ -41,7 +40,7 @@ public class MetadataImportTask implements Runnable {
 	@Override
 	public void run() {
 		if (singleResult(xpath("//f:resource[contains(text(), 'metadata.xml')]"), xmlDbManager.resources(), Element.class) != null) {
-			LoggingUtil.LOG.debug("XML database contains metadata; skipping import");
+			LOG.debug("XML database contains metadata; skipping import");
 			return;
 		}
 

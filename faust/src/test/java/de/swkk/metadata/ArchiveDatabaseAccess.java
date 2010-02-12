@@ -7,13 +7,16 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import de.faustedition.util.LoggingUtil;
 import de.swkk.metadata.archivedb.ArchiveDatabase;
 import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
 import de.swkk.metadata.inventory.FaustInventory;
 
 public class ArchiveDatabaseAccess {
+	private static final Logger LOG = LoggerFactory.getLogger(ArchiveDatabaseAccess.class);
+	
 	private ArchiveDatabase archiveDatabase;
 	private FaustInventory faustInventory;
 
@@ -52,7 +55,7 @@ public class ArchiveDatabaseAccess {
 			}
 		}
 
-		LoggingUtil.LOG.info(String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
+		LOG.info(String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
 	}
 
 }

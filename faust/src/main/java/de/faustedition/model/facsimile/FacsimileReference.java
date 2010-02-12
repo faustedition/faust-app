@@ -13,10 +13,10 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.faustedition.URIUtil;
 import de.faustedition.model.tei.EncodedTextDocument;
 import de.faustedition.model.xml.NodeListIterable;
 import de.faustedition.model.xml.XmlUtil;
-import de.faustedition.util.URIUtil;
 
 public class FacsimileReference {
 	private static final String FACSIMILE_AUTHORITY = "facsimile";

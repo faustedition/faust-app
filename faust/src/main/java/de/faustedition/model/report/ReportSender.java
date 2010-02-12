@@ -14,7 +14,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import de.faustedition.util.ErrorUtil;
+import de.faustedition.ErrorUtil;
 
 public class ReportSender {
 	private static final String SUBJECT_FORMAT = "[Faust-Edition-Report] {0}";

@@ -20,9 +20,9 @@ import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.faustedition.ErrorUtil;
 import de.faustedition.model.xml.NodeListIterable;
 import de.faustedition.model.xml.XmlUtil;
-import de.faustedition.util.ErrorUtil;
 import de.swkk.metadata.GSACallNumber;
 
 public class DissertationText implements InitializingBean {

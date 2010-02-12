@@ -23,8 +23,8 @@ import com.thaiopensource.validate.ValidateProperty;
 import com.thaiopensource.validate.Validator;
 import com.thaiopensource.validate.rng.CompactSchemaReader;
 
+import de.faustedition.ErrorUtil;
 import de.faustedition.model.xml.XmlUtil;
-import de.faustedition.util.ErrorUtil;
 
 @Service
 public class EncodedTextDocumentValidator {
@@ -77,8 +77,9 @@ public class EncodedTextDocumentValidator {
 
 		Validator validator = schema.createValidator(propertyMapBuilder.toPropertyMap());
 		try {
-			byte[] documentData = XmlUtil.serialize(document.getDom(), true);
-			XmlUtil.nullTransformer(true).transform(new StreamSource(new ByteArrayInputStream(documentData)),
+			byte[] documentData = XmlUtil.serialize(document.getDom());
+			XmlUtil.SERIALIZATION_TEMPLATES.newTransformer().transform(
+					new StreamSource(new ByteArrayInputStream(documentData)),
 					new SAXResult(validator.getContentHandler()));
 			return errors;
 		} catch (TransformerException e) {

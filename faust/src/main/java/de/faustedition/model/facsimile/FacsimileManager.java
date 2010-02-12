@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
-import de.faustedition.util.ErrorUtil;
+import de.faustedition.ErrorUtil;
 
 public class FacsimileManager {
 	private static final Logger LOG = LoggerFactory.getLogger(FacsimileManager.class);

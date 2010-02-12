@@ -8,14 +8,15 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import de.faustedition.util.LoggingUtil;
 import de.swkk.metadata.archivedb.ArchiveDatabase;
 import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
 import de.swkk.metadata.inventory.FaustInventory;
 
 public class InventoryDatabaseAccess {
-
+	private static final Logger LOG = LoggerFactory.getLogger(InventoryDatabaseAccess.class);
 	private FaustInventory faustInventory;
 	private ArchiveDatabase archiveDatabase;
 
@@ -66,15 +67,13 @@ public class InventoryDatabaseAccess {
 
 		}
 
-		LoggingUtil.LOG.info(String.format("Portfolios: { %s }", StringUtils.join(portfolioSet, ", ")));
-		LoggingUtil.LOG.info(String.format("Sub-Portfolios: { %s }", StringUtils.join(subPortfolioSet, ", ")));
-		LoggingUtil.LOG.info(String.format("Files: { %s }", StringUtils.join(fileSet, ", ")));
-		LoggingUtil.LOG.info(String.format("Sub-Files: { %s }", StringUtils.join(subFileSet, ", ")));
-		LoggingUtil.LOG.info(String.format("Sub-File-Primary-Suffices: { %s }", StringUtils.join(subFilePrimarySuffixSet,
-				", ")));
-		LoggingUtil.LOG.info(String.format("Sub-File-Secondary-Suffices: { %s }", StringUtils.join(
-				subFileSecondarySuffixSet, ", ")));
-		LoggingUtil.LOG.info(String.format("Content: { %s }", StringUtils.join(contentSet, ", ")));
+		LOG.info(String.format("Portfolios: { %s }", StringUtils.join(portfolioSet, ", ")));
+		LOG.info(String.format("Sub-Portfolios: { %s }", StringUtils.join(subPortfolioSet, ", ")));
+		LOG.info(String.format("Files: { %s }", StringUtils.join(fileSet, ", ")));
+		LOG.info(String.format("Sub-Files: { %s }", StringUtils.join(subFileSet, ", ")));
+		LOG.info(String.format("Sub-File-Primary-Suffices: { %s }", StringUtils.join(subFilePrimarySuffixSet, ", ")));
+		LOG.info(String.format("Sub-File-Secondary-Suffices: { %s }", StringUtils.join(subFileSecondarySuffixSet, ", ")));
+		LOG.info(String.format("Content: { %s }", StringUtils.join(contentSet, ", ")));
 	}
 
 	@Test
@@ -90,11 +89,10 @@ public class InventoryDatabaseAccess {
 				for (ArchiveDatabaseRecord matchingRecord : matchingRecords) {
 					matchingCallNumbers.add(matchingRecord.getCallNumber());
 				}
-				LoggingUtil.LOG.info(String.format("%s ==> { %s }", callNumber, StringUtils.join(
-						matchingCallNumbers, "; ")));
+				LOG.info(String.format("%s ==> { %s }", callNumber, StringUtils.join(matchingCallNumbers, "; ")));
 			}
 		}
 
-		LoggingUtil.LOG.info(String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
+		LOG.info(String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
 	}
 }

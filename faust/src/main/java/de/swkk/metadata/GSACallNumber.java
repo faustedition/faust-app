@@ -9,7 +9,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import de.faustedition.util.PatternUtil;
+import de.faustedition.PatternUtil;
 
 public class GSACallNumber implements Comparable<GSACallNumber> {
 	private static final Pattern CALL_NUMBER_PATTERN = Pattern.compile("^(GSA\\s*)?(([0-9]+)/)?([XVI]+),([0-9]+)(,([0-9]+)(([a-z])?([,:0-9a-z]+)?)?)?(\\*([0-9a-z]+?))?$");

@@ -4,7 +4,6 @@ import static de.faustedition.model.tei.EncodedTextDocument.xpath;
 import static de.faustedition.model.xml.NodeListIterable.singleResult;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
@@ -13,12 +12,7 @@ import de.faustedition.model.xml.XmlUtil;
 
 public class TEIDocumentTest {
 
-	private EncodedTextDocument teiDocument;
-
-	@Before
-	public void createDocument() {
-		teiDocument = EncodedTextDocument.create();
-	}
+	private EncodedTextDocument teiDocument = EncodedTextDocument.create("TEI");
 
 	@Test
 	public void parse() throws Exception {
@@ -27,7 +21,7 @@ public class TEIDocumentTest {
 
 	@Test
 	public void serialize() {
-		XmlUtil.serialize(teiDocument.getDom(), System.out, true);
+		XmlUtil.serialize(teiDocument.getDom(), System.out);
 	}
 
 	@Test
