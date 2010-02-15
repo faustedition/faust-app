@@ -7,7 +7,7 @@
 		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>document-applet</artifactId>
-	<name>Digitale Faustedition :: Document Applet</name>
+	<name>Digitale Faust-Edition :: Document Applet</name>
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
