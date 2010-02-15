@@ -7,6 +7,7 @@
     </meta>
     <projectTree name="faust.xpr">
         <folder path="faust/src/main/resources/"/>
+        <folder path="schema/"/>
         <folder path="sources/wa_chadwyck_healey/"/>
     </projectTree>
 </project>
