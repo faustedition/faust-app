@@ -3,17 +3,15 @@ package de.swkk.metadata;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.swkk.metadata.inventory.FaustInventory;
-import de.swkk.metadata.inventory.WeimarerAusgabeFaustRegister;
 
 public class WeimarerAusgabePrintReferenceFunctions {
-	private FaustInventory inventoryDatabase;
-	private WeimarerAusgabeFaustRegister waRegister;
+	private InventoryDatabase inventoryDatabase;
+	private WaPrintMapping waRegister;
 
 	@Before
 	public void setUp() throws Exception {
-		inventoryDatabase = FaustInventory.parse();
-		waRegister = WeimarerAusgabeFaustRegister.parse();
+		inventoryDatabase = InventoryDatabase.parse();
+		waRegister = WaPrintMapping.parse();
 	}
 	
 	@Test

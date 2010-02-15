@@ -12,26 +12,22 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
-import de.swkk.metadata.inventory.CategoryResolver;
-import de.swkk.metadata.inventory.FaustInventory;
-import de.swkk.metadata.inventory.ParalipomenaMetadata;
-import de.swkk.metadata.inventory.WeimarerAusgabeFaustRegister;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/faust-model-context.xml", "/faust-weimar-import-context.xml" })
 public class CategoryResolverCoverage {
 
 	private CategoryResolver categoryResolver;
-	private FaustInventory faustInventory;
-	private ParalipomenaMetadata paralipomenaMetadata;
-	private WeimarerAusgabeFaustRegister waRegister;
+	private InventoryDatabase faustInventory;
+	private ParalipomenaMapping paralipomenaMetadata;
+	private WaPrintMapping waRegister;
 
 	@Before
 	public void setUp() throws Exception {
 		categoryResolver = CategoryResolver.parse();
-		faustInventory = FaustInventory.parse();
-		paralipomenaMetadata = ParalipomenaMetadata.parse();
-		waRegister = WeimarerAusgabeFaustRegister.parse();
+		faustInventory = InventoryDatabase.parse();
+		paralipomenaMetadata = ParalipomenaMapping.parse();
+		waRegister = WaPrintMapping.parse();
 	}
 	
 	@Test

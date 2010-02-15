@@ -10,20 +10,17 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.swkk.metadata.archivedb.ArchiveDatabase;
-import de.swkk.metadata.archivedb.ArchiveDatabaseRecord;
-import de.swkk.metadata.inventory.FaustInventory;
 
 public class ArchiveDatabaseAccess {
 	private static final Logger LOG = LoggerFactory.getLogger(ArchiveDatabaseAccess.class);
 	
 	private ArchiveDatabase archiveDatabase;
-	private FaustInventory faustInventory;
+	private InventoryDatabase faustInventory;
 
 	@Before
 	public void setUp() throws Exception {
 		archiveDatabase = ArchiveDatabase.parse();
-		faustInventory = FaustInventory.parse();
+		faustInventory = InventoryDatabase.parse();
 	}
 
 	@Test

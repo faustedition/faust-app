@@ -1,6 +1,6 @@
 package de.abohnenkamp.paralipomena;
 
-import static de.faustedition.model.xml.XPathUtil.xpath;
+import static de.faustedition.xml.XPathUtil.xpath;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,14 +21,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.faustedition.ErrorUtil;
-import de.faustedition.model.xml.NodeListIterable;
-import de.faustedition.model.xml.XmlUtil;
+import de.faustedition.xml.NodeListIterable;
+import de.faustedition.xml.XmlUtil;
 import de.swkk.metadata.GSACallNumber;
 
 public class DissertationText implements InitializingBean {
-	private static final Resource XML_RESOURCE = new ClassPathResource("/data/abr-dissertation-text.xml");
-	private static final Resource TEI_TRANSFORMATION_RESOURCE = new ClassPathResource(
-			"/xsl/abr-dissertation-tei-transformation.xsl");
+	private static final Resource XML_RESOURCE = new ClassPathResource("dissertation-text.xml", DissertationText.class);
+	private static final Resource TEI_TRANSFORMATION_RESOURCE = new ClassPathResource("dissertation-2-tei.xsl", DissertationText.class);
 	private static final Pattern GSA_CALL_NUMBER_PATTERN = Pattern.compile("^GSA ([XVI]+) \\(([0-9]+),([0-9]+)");
 	private Document document;
 	private Transformer teiTransformer;
