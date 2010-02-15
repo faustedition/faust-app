@@ -27,7 +27,7 @@
 		<body>
 			<div>
 				<p>TEI Extension for Faust&#xD; &#xD; preliminary version</p>
-				<schemaSpec ident="faust-tei" docLang="en" prefix="tei_" start="TEI" xml:lang="en" targetLang="en">
+				<schemaSpec ident="faust-tei" docLang="en" prefix="tei_" start="TEI teiCorpus" xml:lang="en" targetLang="en">
 					<moduleRef key="core"/>
 					<moduleRef key="tei"/>
 					<moduleRef key="header"/>
@@ -780,7 +780,17 @@
 							<memberOf key="att.changeRelated"/>
 						</classes>
 					</elementSpec>
+					<elementSpec ident="addSpan" mode="change">
+						<classes mode="change">
+							<memberOf key="att.changeRelated"/>
+						</classes>
+					</elementSpec>
 					<elementSpec ident="del" mode="change">
+						<classes mode="change">
+							<memberOf key="att.changeRelated"/>
+						</classes>
+					</elementSpec>
+					<elementSpec ident="delSpan" mode="change">
 						<classes mode="change">
 							<memberOf key="att.changeRelated"/>
 						</classes>
