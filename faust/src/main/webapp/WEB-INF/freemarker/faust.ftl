@@ -10,8 +10,23 @@
 <head profile="http://dublincore.org/documents/dcq-html/">
 	<title>${title} :: faustedition.net</title>
 	<script type="text/javascript">var ctx = "${ctx}";</script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.js"></script>
 	<script type="text/javascript" src="${ctx}/js/faust.js"></script>
-	[@yuiHeader/]
+	<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/yuiloader/yuiloader-min.js"></script>
+	<script type="text/javascript">
+		var loader = new YAHOO.util.YUILoader( {
+			require : [ "base", "connection", "datasource", "datatable", "fonts", "grids", "json", "menu", "reset", "yuiloader" ],
+			loadOptional : true,
+			combine : true,
+			insertBefore : "custom-css",
+			allowRollup : true,
+			onSuccess : yuiInit,
+			onFailure : function(msg, obj) {
+				alert("YUI loader failed: " + msg +  "\n" + obj);
+			}
+		});
+		loader.insert();
+	</script>
 	<link rel="stylesheet" type="text/css" href="${ctx}/css/faust.css" id="custom-css"/>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
@@ -104,25 +119,7 @@
 [/#if]
 [/#macro]
 
-[#macro yuiHeader]
-<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/yuiloader/yuiloader-min.js"></script>
-<script type="text/javascript">
-var loader = new YAHOO.util.YUILoader( {
-	require : [ "base", "connection", "datasource", "datatable", "fonts", "grids", "json", "menu", "reset", "yuiloader" ],
-	loadOptional : true,
-	combine : true,
-	insertBefore : "custom-css",
-	allowRollup : true,
-	onSuccess : yuiInit,
-	onFailure : function(msg, obj) {
-		alert("YUI loader failed: " + msg +  "\n" + obj);
-	}
-});
-loader.insert();
-</script>
-[/#macro]
-
-[#macro breadcrumbs path rootName]
+[#macro breadcrumbs path rootName][#compress]
 <p class="node-path">
 	[#local cp = '' /]
 	[#if path?ends_with("/")][#local path = path[0..(path?length - 2)] /][/#if]
@@ -136,9 +133,9 @@ loader.insert();
 		[#if !p_has_next]${name}[/#if]
 	[/#list]
 </p>
-[/#macro]
+[/#compress][/#macro]
 
-[#macro nameOf path]
-	[#if path?ends_with("/")][#local path = path[0..(path?length - 2)] /][/#if]
-	${path[(path?last_index_of("/") + 1)..]}
-[/#macro]
+[#macro nameOf path][#compress]
+		[#if path?ends_with("/")][#local path = path[0..(path?length - 2)] /][/#if]
+		${path[(path?last_index_of("/") + 1)..]}
+[/#compress][/#macro]

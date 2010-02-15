@@ -69,7 +69,7 @@ public class GenesisExampleChart extends AbstractXYDataset implements IntervalXY
 			public String generateURL(XYDataset dataset, int series, int item)
 			{
 				LineInterval interval = GENESIS_DATASET.get(WITNESSES.get(series))[item];
-				return manuscriptBaseUrl + String.format("GSA/%s/%s", interval.portfolio, interval.manuscript);
+				return manuscriptBaseUrl + String.format("GSA/%s/%s.xml", interval.portfolio, interval.manuscript);
 			}
 		});
 

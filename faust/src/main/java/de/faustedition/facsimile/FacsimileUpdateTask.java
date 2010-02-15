@@ -38,7 +38,7 @@ public class FacsimileUpdateTask {
 		StopWatch sw = new StopWatch();
 		sw.start();
 
-		manager.generateAll();
+		manager.generate();
 		final SortedSet<String> facsimilePaths = manager.findAllPaths();
 		Document facsimileReferences = xmlDbManager.facsimileReferences();
 		for (Element facsimileReference : new NodeListIterable<Element>(xpath("//f:ref"), facsimileReferences)) {

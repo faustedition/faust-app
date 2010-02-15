@@ -34,9 +34,10 @@ public class FacsimileManager {
 	}
 
 	public File find(String path, FacsimileResolution resolution) {
-		LOG.debug("Retrieving facsimile {} ({})", path, resolution);
 		File result = file(resolution, path);
 		File source = null;
+
+		LOG.debug("Retrieving facsimile {} ({}) ==> {}", new Object[] { path, resolution, result.getAbsolutePath() });
 
 		FacsimileResolution sourceResolution = findSourceResolution(resolution);
 		if (sourceResolution != null) {
@@ -105,7 +106,7 @@ public class FacsimileManager {
 		return uris;
 	}
 
-	public void generateAll() {
+	public void generate() {
 		FacsimileResolution[] resolutions = FacsimileResolution.values();
 		for (int rc = resolutions.length - 1; rc >= 0; rc--) {
 			generateAllFor(resolutions[rc]);

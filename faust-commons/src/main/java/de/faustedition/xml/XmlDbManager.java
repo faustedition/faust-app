@@ -131,11 +131,15 @@ public class XmlDbManager {
 	}
 
 	public Document facsimileReferences() {
-		return (Document) get(URI.create("Query/FacsimileRefs.xq"));
+		return get(URI.create("Query/FacsimileRefs.xq"));
 	}
 
 	public Document encodingStati() {
-		return (Document) get(URI.create("Query/EncodingStati.xq"));
+		return get(URI.create("Query/EncodingStati.xq"));
+	}
+
+	public Document identifiers() {
+		return get(URI.create("Query/Identifiers.xq"));
 	}
 
 	protected URI relativize(URI uri) {

@@ -19,10 +19,9 @@
 	<tx:annotation-driven />
 
 	<task:scheduler id="scheduler" pool-size="10" />
-	<!--	<task:scheduled-tasks scheduler="scheduler">-->
-	<!--		<task:scheduled ref="facsimileManager" method="generateAll" cron="0 0 * * * *"/>-->
-	<!--		<task:scheduled ref="encodingStatusManager" method="update" cron="0 0 * * * *"/>-->
-	<!--		<task:scheduled ref="encodedTextDocumentValidationTask" method="validateDocuments" cron="0 0 * * * *" />  -->
-	<!--	</task:scheduled-tasks>-->
+	<task:scheduled-tasks scheduler="scheduler">
+		<task:scheduled ref="encodingStatusManager" method="update" cron="0 0 * * * *" />
+<!--		<task:scheduled ref="facsimileManager" method="generate" cron="0 0 0 * * *" />-->
+	</task:scheduled-tasks>
 
 </beans>

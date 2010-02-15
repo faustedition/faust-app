@@ -13,7 +13,7 @@
 		<h3>Urfaust</h3>
 
 		<ol>
-			<li><a href="${ctx}/manuscripts/GSA/${urfaust.portfolio?url}/${urfaust.manuscript}" title="Zum Manuskript">${urfaust.name?html}</a></li>
+			<li><a href="${ctx}/Witness/GSA/${urfaust.portfolio?url}/${urfaust.manuscript}.xml" title="Zum Manuskript">${urfaust.name?html}</a></li>
 		</ol>
 	</div>
 	<div class="yui-u">
@@ -21,7 +21,7 @@
 	
 		<ol>
 			[#list paralipomena as p]
-				<li><a href="${ctx}/manuscripts/GSA/${p.portfolio?url}/${p.manuscript?url}" title="Zum Manuskript">${p.name?html}</a></li>
+				<li><a href="${ctx}/Witness/GSA/${p.portfolio?url}/${p.manuscript?url}.xml" title="Zum Manuskript">${p.name?html}</a></li>
 			[/#list]
 		</ol>
 	</div>

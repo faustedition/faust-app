@@ -41,3 +41,7 @@ function encodingStatus(path) {
 		} ], transcriptionStatusDs);
 	});
 }
+
+function resizeFacsimile() {
+	YAHOO.util.Dom.setStyle("facsimile", "display", "block");
+}

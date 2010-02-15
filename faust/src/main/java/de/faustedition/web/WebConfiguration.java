@@ -44,7 +44,6 @@ public class WebConfiguration {
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("hasRole", new HasRoleTemplateMethod());
 		variables.put("encodePath", new URLPathEncoder());
-		variables.put("tei2xhtml", new Tei2XhtmlTransformer());
 
 		configurer.setFreemarkerVariables(variables);
 		return configurer;

@@ -2,7 +2,7 @@
 [#assign title][#if path == 'Witness/']Überlieferungsträger[#else][@faust.nameOf path /][/#if][/#assign]
 [@faust.page title=(title?html)]
 	[@faust.breadcrumbs path "Überlieferungsträger" /]
-	<div class="yui-g">
+	<div class="yui-gc">
 		<div class="yui-u first">
 			<h2>${title?html}</h2>
 	
