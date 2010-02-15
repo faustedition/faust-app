@@ -33,7 +33,7 @@
 	<div class="bd">
 	<ul class="first-of-type">
 		[#if hasRole("ROLE_EDITOR")]
-			<li class="yuimenubaritem"><a href="${ctx}/repository/" class="yuimenubaritemlabel">[@spring.message "menu.repository" /]</a></li>
+			<li class="yuimenubaritem"><a href="${ctx}/Witness/" class="yuimenubaritemlabel">[@spring.message "menu.witness" /]</a></li>
 			<li class="yuimenubaritem"><a href="${ctx}/text/" class="yuimenubaritemlabel">[@spring.message "menu.text" /]</a></li>
 			<li class="yuimenubaritem"><a href="${ctx}/genesis/" class="yuimenubaritemlabel">[@spring.message "menu.genesis" /]</a></li>
 			<li class="yuimenubaritem"><a href="${ctx}/search/" class="yuimenubaritemlabel">[@spring.message "menu.search" /]</a></li>
@@ -122,3 +122,23 @@ loader.insert();
 </script>
 [/#macro]
 
+[#macro breadcrumbs path rootName]
+<p class="node-path">
+	[#local cp = '' /]
+	[#if path?ends_with("/")][#local path = path[0..(path?length - 2)] /][/#if]
+	[#list path?split("/") as p]
+		[#local name][#if p_index == 0]${rootName}[#else]${p?html}[/#if][/#local]
+		[#if p_has_next]
+			[#local cp = (cp + p + "/") /]
+			<a href="${ctx}/${encodePath(cp)}" title="${name}">${name}</a>
+		[/#if]
+		[#if p_has_next]<strong>&gt;</strong>[/#if]
+		[#if !p_has_next]${name}[/#if]
+	[/#list]
+</p>
+[/#macro]
+
+[#macro nameOf path]
+	[#if path?ends_with("/")][#local path = path[0..(path?length - 2)] /][/#if]
+	${path[(path?last_index_of("/") + 1)..]}
+[/#macro]

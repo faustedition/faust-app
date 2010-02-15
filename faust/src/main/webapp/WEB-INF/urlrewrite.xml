@@ -7,7 +7,7 @@
 	</rule>
 	<rule>
 		<from>/login</from>
-		<to type="redirect">browse</to>
+		<to type="redirect">text/</to>
 	</rule>
 	<rule>
 		<from>/dav</from>

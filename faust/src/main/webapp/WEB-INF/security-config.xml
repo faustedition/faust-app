@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	<http auto-config="true" realm="Digitale Faust-Edition" create-session="never">
+		<intercept-url pattern="/" access="ROLE_ANONYMOUS,ROLE_EDITOR" />
+		<intercept-url pattern="/project/**" access="ROLE_ANONYMOUS,ROLE_EDITOR" />
+		<intercept-url pattern="/**" access="ROLE_EDITOR" />
+		<intercept-url pattern="/css/**" filters="none" />
+		<intercept-url pattern="/img/**" filters="none" />
+		<intercept-url pattern="/js/**" filters="none" />
+		<intercept-url pattern="/static/**" filters="none" />
+		<intercept-url pattern="/swf/**" filters="none" />
+		<http-basic />
+		<custom-filter ref="localNetPreAuthenticatedProcessingFilter" before="PRE_AUTH_FILTER" />
+	</http>
+
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider ref="preAuthenticatedAuthenticationProvider" />
+		<authentication-provider>
+			<password-encoder hash="sha" />
+			<user-service>
+				<user name="wissenbach" password="d63040a7d05731210b35c04d8f7cda368853f224" authorities="ROLE_EDITOR, ROLE_ADMIN" />
+				<user name="jannidis" password="6a8fa2ea76debbe8131ec750b57e9c48d1e17a23" authorities="ROLE_EDITOR, ROLE_ADMIN" />
+				<user name="henke" password="43d479cd8936f1092a0608a346ba2f9b65098f35" authorities="ROLE_EDITOR" />
+				<user name="bohnenkamp" password="94fd183569cd134171120fbc746ebc13a7fc9dca" authorities="ROLE_EDITOR" />
+				<user name="henzel" password="ef9bdb418fcf5f4b906d170628cf7935dd2a5dab" authorities="ROLE_EDITOR" />
+				<user name="bruening" password="f88279a7be8bde13c6c5c750ef2cabe5d73da78e" authorities="ROLE_EDITOR" />
+				<user name="pravida" password="3c0bfdcc47d9dc1aa3a11d149fb4a836b3c408fc" authorities="ROLE_EDITOR" />
+				<user name="middell" password="e33d633cdd4c2f569bbe91d92b0ad2e11b8de58b" authorities="ROLE_EDITOR, ROLE_ADMIN" />
+				<user name="faust" password="ed34f4e7e660d18083745fc0982623eb6e095f5e" authorities="ROLE_EDITOR" />
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+</beans:beans>

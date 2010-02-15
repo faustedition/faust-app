@@ -1,14 +1,14 @@
 package de.faustedition.model;
 
-import static de.faustedition.model.tei.EncodedTextDocument.xpath;
-import static de.faustedition.model.xml.NodeListIterable.singleResult;
+import static de.faustedition.tei.EncodedTextDocument.xpath;
+import static de.faustedition.xml.NodeListIterable.singleResult;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
-import de.faustedition.model.tei.EncodedTextDocument;
-import de.faustedition.model.xml.XmlUtil;
+import de.faustedition.tei.EncodedTextDocument;
+import de.faustedition.xml.XmlUtil;
 
 public class TEIDocumentTest {
 

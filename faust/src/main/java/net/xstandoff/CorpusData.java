@@ -11,7 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import de.faustedition.model.xml.XmlUtil;
+import de.faustedition.xml.XmlUtil;
 
 public class CorpusData
 {

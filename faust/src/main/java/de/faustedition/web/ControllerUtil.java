@@ -5,8 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
-import de.faustedition.model.ObjectNotFoundException;
-
 public class ControllerUtil {
 
 	public static String getBaseURI(HttpServletRequest req) {
@@ -20,14 +18,7 @@ public class ControllerUtil {
 
 	public static String getPath(HttpServletRequest request, String prefix) {
 		String path = StringUtils.strip(StringUtils.defaultString(request.getPathInfo()), "/");
-		path = StringUtils.removeStart(path, StringUtils.strip(prefix, "/"));
+		path = StringUtils.removeStart(path, StringUtils.strip(StringUtils.defaultString(prefix), "/"));
 		return StringUtils.strip(FilenameUtils.normalize(path), "/");
-	}
-
-	public static <T> T foundObject(T object) throws ObjectNotFoundException {
-		if (object == null) {
-			throw new ObjectNotFoundException();
-		}
-		return object;
 	}
 }

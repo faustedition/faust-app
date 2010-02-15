@@ -19,10 +19,6 @@ import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import de.faustedition.web.freemarker.HasRoleTemplateMethod;
-import de.faustedition.web.freemarker.Tei2XhtmlTransformer;
-import de.faustedition.web.freemarker.URLPathEncoder;
-
 @Configuration
 public class WebConfiguration {
 

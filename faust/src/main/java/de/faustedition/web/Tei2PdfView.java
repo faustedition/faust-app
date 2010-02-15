@@ -1,16 +1,22 @@
 package de.faustedition.web;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.view.xslt.XsltView;
+
+import de.faustedition.ErrorUtil;
 
 public class Tei2PdfView extends XsltView {
 	private FopFactory fopFactory;
@@ -18,7 +24,6 @@ public class Tei2PdfView extends XsltView {
 	public Tei2PdfView() {
 		fopFactory = FopFactory.newInstance();
 		setContentType("application/pdf");
-		setUrl("classpath:/xsl/manuscript-tei-2-xsl-fo.xsl");
 	}
 
 	@Override
@@ -32,5 +37,15 @@ public class Tei2PdfView extends XsltView {
 		Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, response.getOutputStream());
 
 		return new SAXResult(fop.getDefaultHandler());
+	}
+
+	@Override
+	protected Source getStylesheetSource() {
+		try {
+			ClassPathResource xslResource = new ClassPathResource("manuscript-tei-2-xsl-fo.xsl", Tei2PdfView.class);
+			return new StreamSource(xslResource.getInputStream(), xslResource.getURI().toASCIIString());
+		} catch (IOException e) {
+			throw ErrorUtil.fatal(e, "I/O error while loading TEI-PDF conversion stylesheet");
+		}
 	}
 }

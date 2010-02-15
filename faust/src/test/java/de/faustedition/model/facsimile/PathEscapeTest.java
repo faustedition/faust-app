@@ -4,6 +4,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import de.faustedition.facsimile.FacsimileManager;
+
 public class PathEscapeTest {
 
 	@Test

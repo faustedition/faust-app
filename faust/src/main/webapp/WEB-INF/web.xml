@@ -7,7 +7,16 @@
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:/application-context.xml classpath:/security-context.xml</param-value>
+		<param-value>
+			classpath:/de/faustedition/tei/context.xml
+			classpath:/de/faustedition/xml/context.xml
+			classpath:/de/faustedition/db/context.xml
+			classpath:/de/faustedition/facsimile/context.xml
+			classpath:/de/faustedition/metadata/context.xml 
+			classpath:/de/faustedition/security/context.xml
+			/WEB-INF/application-context.xml
+			/WEB-INF/security-config.xml
+		</param-value>
 	</context-param>
 
 	<listener>

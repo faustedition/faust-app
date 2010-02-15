@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.faustedition.model.AbstractModelContextTest;
+import de.faustedition.model.report.EncodedTextDocumentSanitizer;
 
 public class EncodedTextDocumentSanitizerRun extends AbstractModelContextTest {
 

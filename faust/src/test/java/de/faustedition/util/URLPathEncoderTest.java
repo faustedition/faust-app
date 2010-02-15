@@ -3,7 +3,7 @@ package de.faustedition.util;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.faustedition.web.freemarker.URLPathEncoder;
+import de.faustedition.web.URLPathEncoder;
 
 public class URLPathEncoderTest {
 	@Test
