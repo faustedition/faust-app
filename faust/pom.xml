@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.faustedition</groupId>
 		<artifactId>project</artifactId>
-		<version>1.1</version>
+		<version>1.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>faust</artifactId>
 	<name>Digitale Faust-Edition :: Web-Application</name>
