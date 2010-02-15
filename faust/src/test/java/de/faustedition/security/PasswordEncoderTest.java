@@ -1,4 +1,4 @@
-package de.faustedition.web.security;
+package de.faustedition.security;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package de.faustedition.util;
+package de.faustedition;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -1,10 +1,10 @@
-package de.faustedition.model.tei;
+package de.faustedition.report;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.faustedition.model.AbstractModelContextTest;
-import de.faustedition.model.report.EncodedTextDocumentSanitizer;
+import de.faustedition.AbstractModelContextTest;
+import de.faustedition.report.EncodedTextDocumentSanitizer;
 
 public class EncodedTextDocumentSanitizerRun extends AbstractModelContextTest {
 

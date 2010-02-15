@@ -1,4 +1,4 @@
-package de.faustedition.model.report;
+package de.faustedition.report;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

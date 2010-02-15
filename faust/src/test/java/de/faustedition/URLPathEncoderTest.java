@@ -1,4 +1,4 @@
-package de.faustedition.util;
+package de.faustedition;
 
 import org.junit.Assert;
 import org.junit.Test;

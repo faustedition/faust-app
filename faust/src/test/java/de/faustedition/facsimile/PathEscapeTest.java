@@ -1,4 +1,4 @@
-package de.faustedition.model.facsimile;
+package de.faustedition.facsimile;
 
 import junit.framework.Assert;
 
