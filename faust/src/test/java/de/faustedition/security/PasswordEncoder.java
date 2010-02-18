@@ -5,8 +5,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PasswordEncoderTest {
-	private static final Logger LOG = LoggerFactory.getLogger(PasswordEncoderTest.class);
+public class PasswordEncoder {
+	private static final Logger LOG = LoggerFactory.getLogger(PasswordEncoder.class);
 	
 	public static final String[] PASSWORDS = new String[] { "hallo", "welt" };
 

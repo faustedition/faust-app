@@ -1,10 +1,11 @@
-package de.faustedition.metadata;
+package de.faustedition;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.faustedition.AbstractModelContextTest;
 import de.faustedition.metadata.EncodingStatusManager;
+import de.faustedition.metadata.IdentifierManager;
+import de.faustedition.tei.EncodedTextDocumentSanitizer;
 
 public class PeriodicalTasks extends AbstractModelContextTest {
 
@@ -13,14 +14,21 @@ public class PeriodicalTasks extends AbstractModelContextTest {
 
 	@Autowired
 	private IdentifierManager identifierManager;
-	
-	@Test
+
+	@Autowired
+	private EncodedTextDocumentSanitizer sanitizer;
+
 	public void runEncodingStatusUpdate() {
 		encodingStatusManager.update();
 	}
 
-	@Test
 	public void runIdentifierUpdate() {
 		identifierManager.update();
 	}
+
+	@Test
+	public void runSanitizer() {
+		sanitizer.sanitize();
+	}
+
 }

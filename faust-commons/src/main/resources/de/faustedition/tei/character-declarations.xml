@@ -4,11 +4,9 @@
 		<charName>LEFT PARENTHESIS</charName>
 		<desc>In 18th century there were different ways to represent parentheses in
 			handwritten documents. Then the token most often used
-			(default) symbol was a
-			vertical stroke combined with a colon. We want to be able to differentiate
-			between this default
-			representation, which we encode as normal parenthesis
-			characters, and the very (same) characters, that are used today, and that
+			(default symbol) was a vertical stroke combined with a colon. We want to be able
+			to differentiate between this default representation, which we encode as normal
+			parenthesis characters, and the very (same) characters, that are used today, and that
 			also appear in documents of that time. Therefore we encode the contemporary
 			representation of parantheses, if encountered in
 			handwritten documents, as glyphs.</desc>

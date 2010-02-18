@@ -12,7 +12,8 @@
 			classpath:/de/faustedition/xml/context.xml
 			classpath:/de/faustedition/db/context.xml
 			classpath:/de/faustedition/facsimile/context.xml
-			classpath:/de/faustedition/metadata/context.xml 
+			classpath:/de/faustedition/metadata/context.xml
+			classpath:/de/faustedition/report/context.xml 
 			classpath:/de/faustedition/security/context.xml
 			/WEB-INF/application-context.xml
 			/WEB-INF/security-config.xml

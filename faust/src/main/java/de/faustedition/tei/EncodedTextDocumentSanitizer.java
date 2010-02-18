@@ -1,4 +1,4 @@
-package de.faustedition.report;
+package de.faustedition.tei;
 
 import java.io.PrintWriter;
 import java.net.URI;
@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
+import de.faustedition.report.Report;
+import de.faustedition.report.ReportSender;
 import de.faustedition.tei.EncodedTextDocument;
 import de.faustedition.tei.EncodedTextDocumentException;
 import de.faustedition.tei.EncodedTextDocumentManager;
