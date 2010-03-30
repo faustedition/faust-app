@@ -17,7 +17,6 @@ public class URLPathEncoder implements TemplateMethodModelEx {
 	private static final String UTF8_ENCODED_SLASH_PATTERN = Pattern.quote("%2F");
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public Object exec(List arguments) throws TemplateModelException {
 		if (arguments.size() != 1) {
 			throw new TemplateModelException("Please provide a path to encode");

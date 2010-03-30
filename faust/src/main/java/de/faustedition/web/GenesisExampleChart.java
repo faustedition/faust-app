@@ -27,14 +27,12 @@ import org.jfree.data.xy.XYDataset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class GenesisExampleChart extends AbstractXYDataset implements IntervalXYDataset
-{
+public class GenesisExampleChart extends AbstractXYDataset implements IntervalXYDataset {
 	private static final List<String> WITNESSES = Lists.newArrayList("V.H15", "V.H13v", "V.H14", "V.H18", "V.H17r", "V.H2", "V.H16", "V.H");
 
 	private static final Map<String, LineInterval[]> GENESIS_DATASET = Maps.newLinkedHashMap();
 
-	static
-	{
+	static {
 		GENESIS_DATASET.put("V.H15", new LineInterval[] { new LineInterval("391506", "0002", 11519, 11526) });
 		GENESIS_DATASET.put("V.H13v", new LineInterval[] { new LineInterval("391027", "0004", 11511, 11530) });
 		GENESIS_DATASET.put("V.H14", new LineInterval[] { new LineInterval("391505", "0002", 11511, 11530) });
@@ -50,8 +48,7 @@ public class GenesisExampleChart extends AbstractXYDataset implements IntervalXY
 
 	private boolean transposed;
 
-	public void render(OutputStream imageStream, PrintWriter imageMapWriter, final String manuscriptBaseUrl, String mapId) throws IOException
-	{
+	public void render(OutputStream imageStream, PrintWriter imageMapWriter, final String manuscriptBaseUrl, String mapId) throws IOException {
 		JFreeChart chart = ChartFactory.createXYBarChart(null, "Handschrift", false, "Vers", this, PlotOrientation.HORIZONTAL, false, false, false);
 		chart.setBackgroundPaint(Color.white);
 
@@ -62,12 +59,9 @@ public class GenesisExampleChart extends AbstractXYDataset implements IntervalXY
 
 		XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
 		renderer.setUseYInterval(true);
-		renderer.setURLGenerator(new XYURLGenerator()
-		{
+		renderer.setURLGenerator(new XYURLGenerator() {
 
-			@Override
-			public String generateURL(XYDataset dataset, int series, int item)
-			{
+			public String generateURL(XYDataset dataset, int series, int item) {
 				LineInterval interval = GENESIS_DATASET.get(WITNESSES.get(series))[item];
 				return manuscriptBaseUrl + String.format("GSA/%s/%s.xml", interval.portfolio, interval.manuscript);
 			}
@@ -89,168 +83,126 @@ public class GenesisExampleChart extends AbstractXYDataset implements IntervalXY
 		ImageMapUtilities.writeImageMap(imageMapWriter, mapId, chartRenderingInfo);
 	}
 
-	public boolean isTransposed()
-	{
+	public boolean isTransposed() {
 		return this.transposed;
 	}
 
-	public void setTransposed(boolean transposed)
-	{
+	public void setTransposed(boolean transposed) {
 		this.transposed = transposed;
 		fireDatasetChanged();
 	}
 
-	public int getSeriesCount()
-	{
+	public int getSeriesCount() {
 		return WITNESSES.size();
 	}
 
 	@SuppressWarnings("unchecked")
-	public Comparable getSeriesKey(int series)
-	{
+	public Comparable getSeriesKey(int series) {
 		return WITNESSES.get(series);
 	}
 
-	public int getItemCount(int series)
-	{
+	public int getItemCount(int series) {
 		return GENESIS_DATASET.get(WITNESSES.get(series)).length;
 	}
 
-	public double getXValue(int series, int item)
-	{
-		if (!this.transposed)
-		{
+	public double getXValue(int series, int item) {
+		if (!this.transposed) {
 			return getSeriesValue(series);
-		}
-		else
-		{
+		} else {
 			return getItemValue(series, item);
 		}
 	}
 
-	public double getStartXValue(int series, int item)
-	{
-		if (!this.transposed)
-		{
+	public double getStartXValue(int series, int item) {
+		if (!this.transposed) {
 			return getSeriesStartValue(series);
-		}
-		else
-		{
+		} else {
 			return getItemStartValue(series, item);
 		}
 	}
 
-	public double getEndXValue(int series, int item)
-	{
-		if (!this.transposed)
-		{
+	public double getEndXValue(int series, int item) {
+		if (!this.transposed) {
 			return getSeriesEndValue(series);
-		}
-		else
-		{
+		} else {
 			return getItemEndValue(series, item);
 		}
 	}
 
-	public Number getX(int series, int item)
-	{
+	public Number getX(int series, int item) {
 		return new Double(getXValue(series, item));
 	}
 
-	public Number getStartX(int series, int item)
-	{
+	public Number getStartX(int series, int item) {
 		return new Double(getStartXValue(series, item));
 	}
 
-	public Number getEndX(int series, int item)
-	{
+	public Number getEndX(int series, int item) {
 		return new Double(getEndXValue(series, item));
 	}
 
-	public double getYValue(int series, int item)
-	{
-		if (!this.transposed)
-		{
+	public double getYValue(int series, int item) {
+		if (!this.transposed) {
 			return getItemValue(series, item);
-		}
-		else
-		{
+		} else {
 			return getSeriesValue(series);
 		}
 	}
 
-	public double getStartYValue(int series, int item)
-	{
-		if (!this.transposed)
-		{
+	public double getStartYValue(int series, int item) {
+		if (!this.transposed) {
 			return getItemStartValue(series, item);
-		}
-		else
-		{
+		} else {
 			return getSeriesStartValue(series);
 		}
 	}
 
-	public double getEndYValue(int series, int item)
-	{
-		if (!this.transposed)
-		{
+	public double getEndYValue(int series, int item) {
+		if (!this.transposed) {
 			return getItemEndValue(series, item);
-		}
-		else
-		{
+		} else {
 			return getSeriesEndValue(series);
 		}
 	}
 
-	public Number getY(int series, int item)
-	{
+	public Number getY(int series, int item) {
 		return new Double(getYValue(series, item));
 	}
 
-	public Number getStartY(int series, int item)
-	{
+	public Number getStartY(int series, int item) {
 		return new Double(getStartYValue(series, item));
 	}
 
-	public Number getEndY(int series, int item)
-	{
+	public Number getEndY(int series, int item) {
 		return new Double(getEndYValue(series, item));
 	}
 
-	private double getSeriesValue(int series)
-	{
+	private double getSeriesValue(int series) {
 		return series;
 	}
 
-	private double getSeriesStartValue(int series)
-	{
+	private double getSeriesStartValue(int series) {
 		return series - 0.4;
 	}
 
-	private double getSeriesEndValue(int series)
-	{
+	private double getSeriesEndValue(int series) {
 		return series + 0.4;
 	}
 
-	private double getItemValue(int series, int item)
-	{
+	private double getItemValue(int series, int item) {
 		LineInterval interval = GENESIS_DATASET.get(WITNESSES.get(series))[item];
 		return (interval.start + interval.end) / 2.0;
 	}
 
-	private double getItemStartValue(int series, int item)
-	{
+	private double getItemStartValue(int series, int item) {
 		return GENESIS_DATASET.get(WITNESSES.get(series))[item].start;
 	}
 
-	private double getItemEndValue(int series, int item)
-	{
+	private double getItemEndValue(int series, int item) {
 		return GENESIS_DATASET.get(WITNESSES.get(series))[item].end;
 	}
 
-	public void datasetChanged(DatasetChangeEvent event)
-	{
+	public void datasetChanged(DatasetChangeEvent event) {
 		fireDatasetChanged();
 	}
 
@@ -262,19 +214,15 @@ public class GenesisExampleChart extends AbstractXYDataset implements IntervalXY
 	 * 
 	 * @return A boolean.
 	 */
-	public boolean equals(Object obj)
-	{
-		if (obj == this)
-		{
+	public boolean equals(Object obj) {
+		if (obj == this) {
 			return true;
 		}
-		if (!(obj instanceof GenesisExampleChart))
-		{
+		if (!(obj instanceof GenesisExampleChart)) {
 			return false;
 		}
 		GenesisExampleChart that = (GenesisExampleChart) obj;
-		if (this.transposed != that.transposed)
-		{
+		if (this.transposed != that.transposed) {
 			return false;
 		}
 		return true;
@@ -288,20 +236,17 @@ public class GenesisExampleChart extends AbstractXYDataset implements IntervalXY
 	 * @throws CloneNotSupportedException
 	 *                 if there is a problem cloning.
 	 */
-	public Object clone() throws CloneNotSupportedException
-	{
+	public Object clone() throws CloneNotSupportedException {
 		return (GenesisExampleChart) super.clone();
 	}
 
-	private static class LineInterval
-	{
+	private static class LineInterval {
 		private int start;
 		private int end;
 		private String portfolio;
 		private String manuscript;
 
-		private LineInterval(String portfolio, String manuscript, int start, int end)
-		{
+		private LineInterval(String portfolio, String manuscript, int start, int end) {
 			this.portfolio = portfolio;
 			this.manuscript = manuscript;
 			this.start = start;

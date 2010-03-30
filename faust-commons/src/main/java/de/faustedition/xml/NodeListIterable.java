@@ -31,23 +31,19 @@ public class NodeListIterable<T extends Node> implements Iterable<T> {
 		}
 	}
 
-	@Override
 	public Iterator<T> iterator() {
 		return new Iterator<T>() {
 			int nc = 0;
 
-			@Override
 			public boolean hasNext() {
 				return (nc < list.getLength());
 			}
 
 			@SuppressWarnings("unchecked")
-			@Override
 			public T next() {
 				return (T) list.item(nc++);
 			}
 
-			@Override
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}

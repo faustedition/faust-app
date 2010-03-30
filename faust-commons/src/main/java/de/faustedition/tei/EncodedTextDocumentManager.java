@@ -9,9 +9,6 @@ import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -23,7 +20,6 @@ import org.xml.sax.SAXException;
 
 import de.faustedition.ErrorUtil;
 import de.faustedition.xml.NodeListIterable;
-import de.faustedition.xml.XmlDbManager;
 
 @Service
 public class EncodedTextDocumentManager {
@@ -36,10 +32,6 @@ public class EncodedTextDocumentManager {
 			EncodedTextDocumentManager.class);
 	private static final Resource CHAR_DECL_RESOURCE = new ClassPathResource("character-declarations.xml",
 			EncodedTextDocumentManager.class);
-	private static final Logger LOG = LoggerFactory.getLogger(EncodedTextDocumentManager.class);
-
-	@Autowired
-	private XmlDbManager xmlDbManager;
 
 	public EncodedTextDocument create() {
 		return process(EncodedTextDocument.create("TEI"));

@@ -32,7 +32,6 @@ public class ArchiveDatabaseRecord extends LinkedHashMap<String, String> impleme
 		}
 	}
 
-	@Override
 	public int compareTo(ArchiveDatabaseRecord o) {
 		return getCallNumber().compareTo(o.getCallNumber());
 	}

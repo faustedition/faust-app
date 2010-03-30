@@ -47,7 +47,6 @@ public class MetadataFieldDefinition implements Comparable<MetadataFieldDefiniti
 		return lowestLevel;
 	}
 
-	@Override
 	public int compareTo(MetadataFieldDefinition o) {
 		return (group.equals(o.group) ? (order - o.order) : (group.ordinal() - o.group.ordinal()));
 	}

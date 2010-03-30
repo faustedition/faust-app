@@ -1,4 +1,4 @@
-package de.faustedition.documentview;
+package de.faustedition.document;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,55 +33,46 @@ import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.gvt.AbstractPanInteractor;
 import org.apache.batik.util.XMLResourceDescriptor;
 
-public class DocumentViewer extends JApplet
-{
+public class DocumentViewer extends JApplet {
 	@SuppressWarnings("unchecked")
 	@Override
-	public void init()
-	{
+	public void init() {
 		super.init();
 		setLayout(new BorderLayout(5, 5));
-		try
-		{
+		try {
 
 			URL svgData = null;
-			if (getParameter("svgSrc") != null)
-			{
+			if (getParameter("svgSrc") != null) {
 				svgData = new URL(getDocumentBase(), getParameter("svgSrc"));
 
-			}
-			else if (getParameter("svgUri") != null)
-			{
+			} else if (getParameter("svgUri") != null) {
 				svgData = new URL(getParameter("svgUri"));
-			}
-			else
-			{
+			} else {
 				throw new IllegalArgumentException("No applet parameter given for SVG source");
 			}
 			final JSVGCanvas transcriptionCanvas = new JSVGCanvas();
-			transcriptionCanvas.setDocument(new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName()).createSVGDocument(svgData.toExternalForm()));
+			transcriptionCanvas.setDocument(new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName())
+					.createSVGDocument(svgData.toExternalForm()));
 			transcriptionCanvas.setBackground(new Color(1f, 1f, 1f, 0f));
 			transcriptionCanvas.getInteractors().clear();
-			transcriptionCanvas.getInteractors().add(new AbstractPanInteractor()
-			{
+			transcriptionCanvas.getInteractors().add(new AbstractPanInteractor() {
 				@Override
-				public boolean startInteraction(InputEvent ie)
-				{
+				public boolean startInteraction(InputEvent ie) {
 					return ie.getID() == MouseEvent.MOUSE_PRESSED;
 				}
 			});
-			final JPanel facsimilePanel = new JPanel()
-			{
+			final JPanel facsimilePanel = new JPanel() {
 				@Override
-				protected void paintComponent(Graphics g)
-				{
+				protected void paintComponent(Graphics g) {
 					super.paintComponent(g);
 					Graphics2D g2 = (Graphics2D) g;
 
-					BufferedImage backgroundImage = g2.getDeviceConfiguration().createCompatibleImage(200, 60, Transparency.TRANSLUCENT);
+					BufferedImage backgroundImage = g2.getDeviceConfiguration().createCompatibleImage(200, 60,
+							Transparency.TRANSLUCENT);
 					Graphics2D backgroundGraphics = (Graphics2D) backgroundImage.getGraphics();
 
-					backgroundGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					backgroundGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+							RenderingHints.VALUE_ANTIALIAS_ON);
 					backgroundGraphics.setFont(new Font("Serif", Font.ITALIC, 30));
 					backgroundGraphics.setColor(Color.LIGHT_GRAY);
 					backgroundGraphics.drawString("Facsimile", 10, 40);
@@ -92,11 +83,9 @@ public class DocumentViewer extends JApplet
 			};
 
 			final JSlider zoomSlider = new JSlider(10, 30, 10);
-			zoomSlider.addChangeListener(new ChangeListener()
-			{
+			zoomSlider.addChangeListener(new ChangeListener() {
 
-				public void stateChanged(ChangeEvent e)
-				{
+				public void stateChanged(ChangeEvent e) {
 
 					AffineTransform at = transcriptionCanvas.getRenderingTransform();
 
@@ -106,23 +95,20 @@ public class DocumentViewer extends JApplet
 
 					scaleAt.concatenate(at);
 					transcriptionCanvas.setRenderingTransform(scaleAt);
-					transcriptionCanvas.setSize((int) (transcriptionCanvas.getSize().width * scale), (int) (transcriptionCanvas.getSize().height * scale));
+					transcriptionCanvas.setSize((int) (transcriptionCanvas.getSize().width * scale),
+							(int) (transcriptionCanvas.getSize().height * scale));
 				}
 			});
-			JCheckBox facsimileCheckBox = new JCheckBox(new AbstractAction("Facsimile")
-			{
+			JCheckBox facsimileCheckBox = new JCheckBox(new AbstractAction("Facsimile") {
 
-				public void actionPerformed(ActionEvent e)
-				{
+				public void actionPerformed(ActionEvent e) {
 					facsimilePanel.setVisible(((JCheckBox) e.getSource()).isSelected());
 				}
 			});
 			facsimileCheckBox.setSelected(true);
-			JCheckBox transcriptionCheckBox = new JCheckBox(new AbstractAction("Transkription")
-			{
+			JCheckBox transcriptionCheckBox = new JCheckBox(new AbstractAction("Transkription") {
 
-				public void actionPerformed(ActionEvent e)
-				{
+				public void actionPerformed(ActionEvent e) {
 					transcriptionCanvas.setVisible(((JCheckBox) e.getSource()).isSelected());
 				}
 			});
@@ -140,9 +126,7 @@ public class DocumentViewer extends JApplet
 			overlayPanel.add(transcriptionCanvas);
 			overlayPanel.add(facsimilePanel);
 			add(overlayPanel, BorderLayout.CENTER);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			String message = MessageFormat.format("Cannot load SVG source: {0}", e.getMessage());
 			JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
 			throw new RuntimeException(message, e);

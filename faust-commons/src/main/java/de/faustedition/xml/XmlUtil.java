@@ -157,33 +157,27 @@ public class XmlUtil {
 
 	public static class StrictNoOutputErrorCallback implements ErrorListener, ErrorHandler {
 
-		@Override
 		public void error(TransformerException exception) throws TransformerException {
 			throw exception;
 		}
 
-		@Override
 		public void fatalError(TransformerException exception) throws TransformerException {
 			throw exception;
 		}
 
-		@Override
 		public void warning(TransformerException exception) throws TransformerException {
 			throw exception;
 		}
 
-		@Override
 		public void error(SAXParseException exception) throws SAXException {
 			throw exception;
 
 		}
 
-		@Override
 		public void fatalError(SAXParseException exception) throws SAXException {
 			throw exception;
 		}
 
-		@Override
 		public void warning(SAXParseException exception) throws SAXException {
 			throw exception;
 		}

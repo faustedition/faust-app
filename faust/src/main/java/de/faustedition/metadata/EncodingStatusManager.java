@@ -40,7 +40,6 @@ public class EncodingStatusManager {
 		jt.query("select encoding_status, count(*) as status_count from encoding_status "
 				+ "where xml_path like ? group by encoding_status", new RowMapper<Void>() {
 
-			@Override
 			public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
 				EncodingStatus status = EncodingStatus.valueOf(rs.getString("encoding_status"));
 				statusMap.put(status, rs.getInt("status_count"));

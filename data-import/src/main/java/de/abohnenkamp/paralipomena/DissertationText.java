@@ -61,7 +61,6 @@ public class DissertationText implements InitializingBean {
 		}
 	}
 
-	@Override
 	public void afterPropertiesSet() throws Exception {
 		document = XmlUtil.parse(XML_RESOURCE.getInputStream());
 		teiTransformer = XmlUtil.newTransformer(new StreamSource(TEI_TRANSFORMATION_RESOURCE.getInputStream()));

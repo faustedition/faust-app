@@ -4,11 +4,9 @@ import static de.faustedition.xml.XPathUtil.xpath;
 import static de.faustedition.xml.XmlDocument.xpath;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.annotation.PostConstruct;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.XPathExpression;
 
@@ -19,6 +17,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.CommonsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @Service
-public class XmlDbManager {
+public class XmlDbManager implements InitializingBean {
 	private static Logger LOG = LoggerFactory.getLogger(XmlDbManager.class);
 	public static final String EXIST_NS_URI = "http://exist.sourceforge.net/NS/exist";
 	private static SimpleNamespaceContext EXIST_NS_CONTEXT = new SimpleNamespaceContext();
@@ -51,8 +50,7 @@ public class XmlDbManager {
 
 	private RestTemplate rt;
 
-	@PostConstruct
-	public void init() throws URISyntaxException {
+	public void afterPropertiesSet() throws Exception {
 		this.dbBaseUri = new URI(dbBase);
 
 		MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
@@ -67,8 +65,7 @@ public class XmlDbManager {
 	public XmlDbQueryResult query(URI uri, XmlDbQuery query) {
 		uri = relativize(uri);
 		LOG.debug("Posting XQuery to XML-DB: {} ==> {}", uri.toString(), query.getXquery());
-		return XmlDbQueryResult.parse((Document) rt.postForObject(uri, new DOMSource(query.toDocument()), DOMSource.class)
-				.getNode());
+		return XmlDbQueryResult.parse((Document) rt.postForObject(uri, new DOMSource(query.toDocument()), DOMSource.class).getNode());
 	}
 
 	public XmlDbQueryResult query(XmlDbQuery query) {
@@ -143,9 +140,7 @@ public class XmlDbManager {
 	}
 
 	protected URI relativize(URI uri) {
-		Assert.isTrue(!uri.isAbsolute() && (StringUtils.isBlank(uri.getPath()) || !uri.getPath().startsWith("/")),
-				"Invalid URI");
+		Assert.isTrue(!uri.isAbsolute() && (StringUtils.isBlank(uri.getPath()) || !uri.getPath().startsWith("/")), "Invalid URI");
 		return dbBaseUri.resolve(uri);
 	}
-
 }

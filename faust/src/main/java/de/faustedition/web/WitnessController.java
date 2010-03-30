@@ -6,7 +6,6 @@ import static de.faustedition.xml.NodeListIterable.singleResult;
 import java.io.StringWriter;
 import java.net.URI;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerFactory;
@@ -15,6 +14,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -28,18 +28,12 @@ import de.faustedition.tei.EncodedTextDocument;
 import de.faustedition.xml.XmlDbManager;
 
 @Controller
-public class WitnessController {
+public class WitnessController implements InitializingBean {
 	private static final Resource TEI_2_HTML_XSL_RESOURCE = new ClassPathResource("tei-2-xhtml.xsl", WitnessController.class);
 	private Templates tei2HtmlTemplates;
 
 	@Autowired
 	private XmlDbManager xmlDbManager;
-
-	@PostConstruct
-	public void init() throws Exception {
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		tei2HtmlTemplates = transformerFactory.newTemplates(new StreamSource(TEI_2_HTML_XSL_RESOURCE.getInputStream()));
-	}
 
 	@RequestMapping("/Witness/**")
 	public ModelAndView display(HttpServletRequest request) throws Exception {
@@ -77,5 +71,10 @@ public class WitnessController {
 
 		mv.addObject("htmlTranscription", htmlWriter.toString());
 		mv.setViewName("witness/witness");
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		tei2HtmlTemplates = transformerFactory.newTemplates(new StreamSource(TEI_2_HTML_XSL_RESOURCE.getInputStream()));
 	}
 }

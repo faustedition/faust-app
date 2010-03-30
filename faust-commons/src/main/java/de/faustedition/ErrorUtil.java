@@ -1,7 +1,6 @@
 package de.faustedition;
 
-import java.util.Arrays;
-
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class ErrorUtil {
 		} else if (messages.length == 1) {
 			return messages[0];
 		} else {
-			return String.format(messages[0], (Object[]) Arrays.copyOfRange(messages, 1, messages.length));
+			return String.format(messages[0], ArrayUtils.subarray(messages, 1, messages.length));
 		}
 	}
 }

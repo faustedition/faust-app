@@ -63,17 +63,14 @@ public class EncodedTextDocumentSanitizer {
 
 		reportSender.send(new Report() {
 
-			@Override
 			public String getSubject() {
 				return REPORT_SUBJECT;
 			}
 
-			@Override
 			public boolean isEmpty() {
 				return errors.isEmpty();
 			}
 
-			@Override
 			public void printBody(PrintWriter body) {
 				for (String path : errors.keySet()) {
 					body.println(StringUtils.repeat("=", 78));

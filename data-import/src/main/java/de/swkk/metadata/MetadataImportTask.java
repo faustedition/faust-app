@@ -39,7 +39,6 @@ public class MetadataImportTask implements Runnable {
 
 	private MetadataFieldMapping mapping = new MetadataFieldMapping();
 
-	@Override
 	public void run() {
 		try {
 			LOG.info("Importing metadata ...");
