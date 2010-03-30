@@ -15,6 +15,12 @@
             </sourceDesc>
         </fileDesc>
         <profileDesc>
+            <ge:transposeGrp>
+                <ge:transpose f:revType="late" f:changeRef="#ec_bl">
+                    <ptr target="#ec_bl"/>
+                    <ptr target="#ec_bl_lat"/>
+                </ge:transpose>
+            </ge:transposeGrp>
             <handNotes>
                 <handNote/>
             </handNotes>
@@ -196,7 +202,7 @@
                     <ge:line><hi rend="underline"><f:st>test</f:st></hi></ge:line>
                     <ge:line rend="centered"><hi rend="underline" hand="#g_bl"><seg>test</seg>Phork<f:overw><f:under>i</f:under><f:over>:</f:over></f:overw></hi></ge:line>
                     <ge:used hand="#ec_bl" />
-                    <ge:line><g ref="#g_transp_1"/></ge:line>
+                    <ge:line><g ref="#g_transp_1"/><f:overw><f:under>ha</f:under><f:over>ha</f:over></f:overw></ge:line>
                 </zone>
             </surface>
         </ge:document>

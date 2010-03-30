@@ -141,8 +141,8 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.5</source>
+					<target>1.5</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -162,14 +162,14 @@
 	</modules>
 	<repositories>
 		<repository>
-			<id>faust</id>
+			<id>maven.faustedition.net</id>
 			<name>Faust-Edition Repository</name>
 			<url>http://maven.faustedition.net/</url>
 		</repository>
 	</repositories>
 	<distributionManagement>
 		<repository>
-			<id>faust-distribution</id>
+			<id>maven.faustedition.net</id>
 			<url>dav:http://maven.faustedition.net/</url>
 		</repository>
 	</distributionManagement>
