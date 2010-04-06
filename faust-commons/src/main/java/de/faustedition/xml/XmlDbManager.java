@@ -37,13 +37,13 @@ public class XmlDbManager implements InitializingBean {
 		EXIST_NS_CONTEXT.bindNamespaceUri("exist", EXIST_NS_URI);
 	}
 
-	@Value("#{xmlConfig['xmldb.base']}")
+	@Value("#{config['xmldb.base']}")
 	private String dbBase;
 
-	@Value("#{xmlConfig['xmldb.user']}")
+	@Value("#{config['xmldb.user']}")
 	private String dbUser;
 
-	@Value("#{xmlConfig['xmldb.password']}")
+	@Value("#{config['xmldb.password']}")
 	private String dbPassword;
 
 	private URI dbBaseUri;
