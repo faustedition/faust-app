@@ -16,11 +16,11 @@ import com.google.common.collect.Maps;
 
 @Configuration
 public class FacsimileConfiguration {
-	@Value("#{facsimileConfig['facsimile.home']}")
+	@Value("#{config['facsimile.home']}")
 	private String facsimileHomeDirPath;
 
 	@Autowired
-	@Qualifier("facsimileConfig")
+	@Qualifier("config")
 	private Properties configProperties;
 
 	@Bean

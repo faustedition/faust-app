@@ -1,4 +1,4 @@
-package de.faustedition.web;
+package de.faustedition.security;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,4 +1,4 @@
-package de.faustedition.web;
+package de.faustedition.metadata;
 
 import java.util.List;
 import java.util.Locale;
@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import de.faustedition.metadata.EncodingStatus;
-import de.faustedition.metadata.EncodingStatusManager;
+import de.faustedition.web.ControllerUtil;
 
 @Controller
 @RequestMapping("/metadata/")

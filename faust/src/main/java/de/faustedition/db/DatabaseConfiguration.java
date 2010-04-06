@@ -16,16 +16,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class DatabaseConfiguration {
 
-	@Value("#{dbConfig['db.driver']}")
+	@Value("#{config['db.driver']}")
 	private String databaseDriver;
 
-	@Value("#{dbConfig['db.url']}")
+	@Value("#{config['db.url']}")
 	private String databaseUrl;
 
-	@Value("#{dbConfig['db.user']}")
+	@Value("#{config['db.user']}")
 	private String databaseUser;
 
-	@Value("#{dbConfig['db.password']}")
+	@Value("#{config['db.password']}")
 	private String databasePassword;
 
 	@Bean(destroyMethod = "close")
