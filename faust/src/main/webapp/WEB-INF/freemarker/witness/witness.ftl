@@ -3,14 +3,22 @@
 [@faust.page title=(title?html)]
 	[@faust.breadcrumbs path "Überlieferungsträger" /]
 	
-	<h2>${title?html}</h2>
+	<h2>
+		${title?html}
+		<a href="${ctx}/${encodePath(path)}?format=pdf" title="PDF-Test"><img src="${ctx}/img/pdf-logo.png" alt="PDF-Test"/></a>
+		<a href="${ctx}/${encodePath(path)}?format=svg" title="SVG-Test"><img src="${ctx}/img/svg-logo.png" alt="SVG-Test"/></a>		
+	</h2>
 	
 	<div class="yui-gc">
 		<div class="yui-u first">
-			[#if facsimile??]
-				<img src="${ctx}/facsimile/${encodePath(facsimile.path)}.jpg" id="facsimile" style="max-width: 500px"/>
+			[#if facsimile??]			
+				<p><a href="${ctx}/facsimile/${encodePath(facsimile.path)}.jpg" title="Vergrößern">
+					<img src="${ctx}/facsimile/${encodePath(facsimile.path)}.jpg" id="facsimile" style="max-width: 500px"/>
+				</a></p>
 			[/#if]
 		</div>
-		<div class="yui-u">${htmlTranscription}</div>	
+		<div class="yui-u">
+			${htmlTranscription}
+		</div>	
 	</div>
 [/@faust.page]

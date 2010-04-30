@@ -30,12 +30,13 @@ import de.faustedition.xml.XmlDbManager;
 @Controller
 public class WitnessController implements InitializingBean {
 	private static final Resource TEI_2_HTML_XSL_RESOURCE = new ClassPathResource("tei-2-xhtml.xsl", WitnessController.class);
+	public static final String WITNESS_VIEW_NAME = "witness/witness";
 	private Templates tei2HtmlTemplates;
 
 	@Autowired
 	private XmlDbManager xmlDbManager;
 
-	@RequestMapping("/Witness/**")
+	@RequestMapping(value = "/Witness/**")
 	public ModelAndView display(HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView();
 		String path = ControllerUtil.getPath(request, null);
@@ -60,6 +61,7 @@ public class WitnessController implements InitializingBean {
 
 	private void displayWitness(ModelAndView mv, String path) throws Exception {
 		EncodedTextDocument document = new EncodedTextDocument(xmlDbManager.get(URI.create(path)));
+		mv.addObject("document", document);
 
 		Element facsimile = singleResult(xpath("//tei:facsimile/tei:graphic"), document.getDom(), Element.class);
 		if (facsimile != null) {
@@ -68,9 +70,9 @@ public class WitnessController implements InitializingBean {
 
 		StringWriter htmlWriter = new StringWriter();
 		tei2HtmlTemplates.newTransformer().transform(new DOMSource(document.getDom()), new StreamResult(htmlWriter));
-
 		mv.addObject("htmlTranscription", htmlWriter.toString());
-		mv.setViewName("witness/witness");
+
+		mv.setViewName(WITNESS_VIEW_NAME);
 	}
 
 	public void afterPropertiesSet() throws Exception {

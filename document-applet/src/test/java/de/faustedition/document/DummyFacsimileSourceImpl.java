@@ -10,7 +10,7 @@ import javax.imageio.ImageReader;
 
 import de.faustedition.document.facsimile.FacsimileSource;
 
-public class TestFacsimileSource implements FacsimileSource {
+public class DummyFacsimileSourceImpl implements FacsimileSource {
 
 	public Image get(int x, int y, int width, int height) throws IOException {
 		ImageReader imageReader = getImageReader();

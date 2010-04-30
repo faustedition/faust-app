@@ -10,7 +10,7 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
-	<context:component-scan base-package="de.faustedition">
+	<context:component-scan base-package="de.faustedition" use-default-filters="false">
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 
@@ -47,11 +47,15 @@
 	</bean>
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="defaultContentType" value="application/xhtml+xml;charset=utf-8" />
+		<property name="favorPathExtension" value="false" />
+		<property name="favorParameter" value="true" />
 		<property name="mediaTypes">
 			<map>
 				<entry key="html" value="application/xhtml+xml;charset=utf-8" />
 				<entry key="svg" value="image/svg+xml" />
 				<entry key="json" value="application/json" />
+				<entry key="pdf" value="application/pdf" />
 			</map>
 		</property>
 		<property name="viewResolvers">
@@ -61,15 +65,14 @@
 					<property name="prefix" value="" />
 					<property name="suffix" value=".ftl" />
 				</bean>
+				<bean class="de.faustedition.web.Tei2PdfViewResolver" />
+				<bean class="de.faustedition.web.Tei2SvgViewResolver" />
 			</list>
 		</property>
-		<!-- TODO: init error
 		<property name="defaultViews">
 			<list>
 				<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
-				<bean class="de.faustedition.web.Tei2SvgView" />
 			</list>
 		</property>
-		 -->
 	</bean>
 </beans>

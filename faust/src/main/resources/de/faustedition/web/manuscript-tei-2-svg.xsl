@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns="http://www.w3.org/2000/svg" exclude-result-prefixes="tei">
-	<xsl:template match="/tei:text">
+	<xsl:template match="/">
 		<svg viewBox="0 0 270 400" width="100%" height="100%" xmlns:xlink="http://www.w3.org/1999/xlink">
 			<g id="mainlayer">
 				<rect fill="red" stroke="black" x="15" y="15" width="100" height="50" />

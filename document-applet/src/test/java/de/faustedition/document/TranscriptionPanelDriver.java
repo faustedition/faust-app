@@ -6,7 +6,7 @@ import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 
-public class TranscriptionPanelTest {
+public class TranscriptionPanelDriver {
 
 	public static void main(String[] args) {
 		Zone child = new Zone(new Rectangle(200, 200, 50, 400));

@@ -76,6 +76,6 @@ public class EncodedTextDocumentValidator implements InitializingBean {
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		schema = CompactSchemaReader.getInstance().createSchema(new InputSource(SCHEMA_URI), new PropertyMapBuilder().toPropertyMap());
+		//schema = CompactSchemaReader.getInstance().createSchema(new InputSource(SCHEMA_URI), new PropertyMapBuilder().toPropertyMap());
 	}
 }
