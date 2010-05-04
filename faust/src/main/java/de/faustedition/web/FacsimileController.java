@@ -1,4 +1,4 @@
-package de.faustedition.facsimile;
+package de.faustedition.web;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
-import de.faustedition.web.ControllerUtil;
+import de.faustedition.facsimile.FacsimileManager;
+import de.faustedition.facsimile.FacsimileResolution;
 
 @Controller
 public class FacsimileController {

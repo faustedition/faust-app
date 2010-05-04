@@ -3,6 +3,7 @@ package de.faustedition.db;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.postgresql.Driver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +17,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class DatabaseConfiguration {
 
-	@Value("#{config['db.driver']}")
-	private String databaseDriver;
-
 	@Value("#{config['db.url']}")
 	private String databaseUrl;
 
@@ -31,7 +29,7 @@ public class DatabaseConfiguration {
 	@Bean(destroyMethod = "close")
 	public DataSource dataSource() {
 		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setDriverClassName(databaseDriver);
+		dataSource.setDriverClassName(Driver.class.getName());
 		dataSource.setUrl(databaseUrl);
 		dataSource.setUsername(databaseUser);
 		dataSource.setPassword(databasePassword);

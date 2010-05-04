@@ -12,6 +12,5 @@
 			</list>
 		</property>
 	</bean>
-	<context:component-scan base-package="de.faustedition.tei" />
-	<context:component-scan base-package="de.faustedition.xml" />
+	<context:component-scan base-package="de.faustedition" />
 </beans>
