@@ -6,7 +6,7 @@
 		<artifactId>faust-project</artifactId>
 		<version>1.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>data-import</artifactId>
+	<artifactId>faust-data-import</artifactId>
 	<name>Digitale Faust-Edition :: Data import routines</name>
 	<packaging>jar</packaging>
 	<dependencies>

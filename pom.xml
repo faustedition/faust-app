@@ -156,9 +156,8 @@
 	</build>
 	<modules>
 		<module>faust-commons</module>
+		<module>faust-data-import</module>
 		<module>faust</module>
-		<module>data-import</module>
-		<module>document-applet</module>
 	</modules>
 	<repositories>
 		<repository>
@@ -173,10 +172,6 @@
 			<url>dav:http://maven.faustedition.net/</url>
 		</repository>
 	</distributionManagement>
-	<scm>
-		<connection>scm:svn:https://intern.faustedition.net/svn/tags/project-1.1</connection>
-		<developerConnection>scm:svn:https://intern.faustedition.net/svn/tags/project-1.1</developerConnection>
-	</scm>
 	<properties>
 		<slf4j.version>1.5.11</slf4j.version>
 		<spring.version>3.0.2.RELEASE</spring.version>
