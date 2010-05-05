@@ -4,11 +4,14 @@
 
 	<h2>Historisch-kritische Edition von Goethes Faust</h2>
 
-	<p>Gegenstand des Projekts ist die Erarbeitung der historisch-kritischen Edition des Goetheschen Faust. Der Faust ist
-	unbestritten das zentrale Werk des deutschsprachigen Kanons und ein wichtiges Werk der Weltliteratur. Die Ausgabe wird eine
-	moderne Faksimile-Edition mit einem innovativen genetischen Apparat im elektronischen Medium verbinden und damit sowohl der
-	Faust-Forschung erstmals eine gesicherte Grundlage bieten als auch einer breiteren Öffentlichkeit Einblick in die „Werkstatt“
-	gewähren, in der eines der wichtigsten Werke der deutschen Literatur entstand.</p>
+	<p>Gegenstand des Projekts ist die Erarbeitung der historisch-kritischen Edition des Goetheschen Faust. Der „Faust” ist 
+	unbestritten das zentrale Werk des deutschsprachigen Kanons und ein wichtiges Werk der Weltliteratur.</p>
+	
+	<p>Die Bereitstellung aller überlieferten Handschriften mittels Faksimiles und Transkriptionen sowie die darauf 
+	basierende Rekonstruktion und Darstellung genetischer Zusammenhänge im elektronischen Medium bilden den Schwerpunkt der
+	Ausgabe. Sie soll sowohl der Faust-Forschung erstmals eine gesicherte Grundlage bieten, als auch einer breiteren 
+	Öffentlichkeit einen detaillierten Einblick in die „Werkstatt” eines der wichtigsten Texte der deutschen Literatur
+	geben.</p>
 
 	<p>Das Projekt wird geleitet von Prof.&nbsp;Dr.&nbsp;Anne Bohnenkamp-Renken
 	(<a href="http://www.goethehaus-frankfurt.de/" title="Homepage">Freies Deutsches Hochstift</a>), Dr.&nbsp;Silke Henke
