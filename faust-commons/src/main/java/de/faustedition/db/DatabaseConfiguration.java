@@ -7,6 +7,7 @@ import org.postgresql.Driver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -54,6 +55,7 @@ public class DatabaseConfiguration {
 	}
 
 	@Bean
+	@DependsOn("dataSourceInitializer")
 	public SimpleJdbcTemplate jdbcTemplate() {
 		return new SimpleJdbcTemplate(dataSource());
 	}
