@@ -12,6 +12,13 @@ create table encoding_status (
 	encoding_status varchar(20) not null
 );
 
+create table glyph (
+	id varchar(50) primary key,
+	name varchar(50) not null,
+	description text not null,
+	equivalent varchar(25)
+);
+
 create table hand (
 	id serial,
 	scribe varchar(50),

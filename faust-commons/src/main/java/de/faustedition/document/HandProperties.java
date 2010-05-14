@@ -1,13 +1,17 @@
 package de.faustedition.document;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import com.google.common.collect.Lists;
 
-public class HandProperties {
+public class HandProperties implements Comparable<HandProperties> {
 	private Integer id;
 	private final Scribe scribe;
 	private final WritingMaterial material;
@@ -79,5 +83,27 @@ public class HandProperties {
 		ps.addValue("material", material == null ? null : material.toString());
 		ps.addValue("style", style == null ? null : style.toString());
 		return ps;
+	}
+
+	public static final RowMapper<HandProperties> ROW_MAPPER = new ParameterizedRowMapper<HandProperties>() {
+
+		@Override
+		public HandProperties mapRow(ResultSet rs, int rowNum) throws SQLException {
+			final String scribe = rs.getString("scribe");
+			final String material = rs.getString("material");
+			final String style = rs.getString("style");
+			HandProperties hp = new HandProperties(//
+					scribe == null ? null : Scribe.valueOf(scribe),//
+					material == null ? null : WritingMaterial.valueOf(material),//
+					style == null ? null : FontStyle.valueOf(style));
+
+			hp.setId(rs.getInt("id"));
+			return hp;
+		}
+	};
+
+	@Override
+	public int compareTo(HandProperties o) {
+		return id.compareTo(o.id);
 	}
 }
