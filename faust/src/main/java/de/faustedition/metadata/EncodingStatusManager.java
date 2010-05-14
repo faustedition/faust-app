@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 
 import de.faustedition.xml.NodeListIterable;
-import de.faustedition.xml.XmlDbManager;
+import de.faustedition.xml.XmlStore;
 
 @Service
 public class EncodingStatusManager {
@@ -32,7 +32,7 @@ public class EncodingStatusManager {
 	private SimpleJdbcTemplate jt;
 
 	@Autowired
-	private XmlDbManager xmlDbManager;
+	private XmlStore xmlStore;
 	
 	@Transactional(readOnly = true)
 	public SortedMap<EncodingStatus, Integer> statusOf(String path) {
@@ -56,7 +56,7 @@ public class EncodingStatusManager {
 		sw.start();
 		
 		final List<SqlParameterSource> statusList = new ArrayList<SqlParameterSource>();
-		for (Element statusEl : new NodeListIterable<Element>(xpath("//f:status"), xmlDbManager.encodingStati())) {
+		for (Element statusEl : new NodeListIterable<Element>(xpath("//f:status"), xmlStore.encodingStati())) {
 			MapSqlParameterSource status = new MapSqlParameterSource();
 			status.addValue("path", statusEl.getAttribute("path"));
 			status.addValue("status", EncodingStatus.valueOf(statusEl.getAttribute("value")).toString());

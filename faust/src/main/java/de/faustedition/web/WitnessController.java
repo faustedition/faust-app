@@ -3,6 +3,7 @@ package de.faustedition.web;
 import static de.faustedition.tei.EncodedTextDocument.xpath;
 import static de.faustedition.xml.NodeListIterable.singleResult;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 
@@ -25,7 +26,7 @@ import org.w3c.dom.Element;
 
 import de.faustedition.facsimile.FacsimileReference;
 import de.faustedition.tei.EncodedTextDocument;
-import de.faustedition.xml.XmlDbManager;
+import de.faustedition.xml.XmlStore;
 
 @Controller
 public class WitnessController implements InitializingBean {
@@ -34,7 +35,7 @@ public class WitnessController implements InitializingBean {
 	private Templates tei2HtmlTemplates;
 
 	@Autowired
-	private XmlDbManager xmlDbManager;
+	private XmlStore xmlStore;
 
 	@RequestMapping(value = "/Witness/**")
 	public ModelAndView display(HttpServletRequest request) throws Exception {
@@ -54,13 +55,13 @@ public class WitnessController implements InitializingBean {
 		return mv;
 	}
 
-	private void displayCollection(ModelAndView mv, String path) {
+	private void displayCollection(ModelAndView mv, String path) throws IOException {
 		mv.setViewName("witness/collection");
-		mv.addObject("contents", xmlDbManager.contentsOf(URI.create(path)));
+		mv.addObject("contents", xmlStore.list(URI.create(path)));
 	}
 
 	private void displayWitness(ModelAndView mv, String path) throws Exception {
-		EncodedTextDocument document = new EncodedTextDocument(xmlDbManager.get(URI.create(path)));
+		EncodedTextDocument document = new EncodedTextDocument(xmlStore.get(URI.create(path)));
 		mv.addObject("document", document);
 
 		Element facsimile = singleResult(xpath("//tei:facsimile/tei:graphic"), document.getDom(), Element.class);

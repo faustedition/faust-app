@@ -1,5 +1,6 @@
 package de.faustedition.tei;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.util.LinkedHashMap;
@@ -15,11 +16,7 @@ import org.w3c.dom.Document;
 
 import de.faustedition.report.Report;
 import de.faustedition.report.ReportSender;
-import de.faustedition.tei.EncodedTextDocument;
-import de.faustedition.tei.EncodedTextDocumentException;
-import de.faustedition.tei.EncodedTextDocumentManager;
-import de.faustedition.tei.EncodedTextDocumentValidator;
-import de.faustedition.xml.XmlDbManager;
+import de.faustedition.xml.XmlStore;
 
 @Service
 public class EncodedTextDocumentSanitizer {
@@ -28,7 +25,7 @@ public class EncodedTextDocumentSanitizer {
 	private static final Logger LOG = LoggerFactory.getLogger(EncodedTextDocumentSanitizer.class);
 
 	@Autowired
-	private XmlDbManager xmlDbManager;
+	private XmlStore xmlStore;
 
 	@Autowired
 	private EncodedTextDocumentManager documentManager;
@@ -39,18 +36,18 @@ public class EncodedTextDocumentSanitizer {
 	@Autowired
 	private EncodedTextDocumentValidator validator;
 
-	public void sanitize() {
+	public void sanitize() throws IOException {
 		final Map<String, List<String>> errors = new LinkedHashMap<String, List<String>>();
 
-		for (URI resourceUri : xmlDbManager.resourceUris()) {
+		for (URI resourceUri : xmlStore.contents()) {
 			if (!resourceUri.getPath().endsWith(".xml")) {
 				continue;
 			}
 			try {
 				LOG.debug("Sanitizing XML in {}", resourceUri.toString());
-				EncodedTextDocument doc = new EncodedTextDocument((Document) xmlDbManager.get(resourceUri));
+				EncodedTextDocument doc = new EncodedTextDocument((Document) xmlStore.get(resourceUri));
 				documentManager.process(doc);
-				xmlDbManager.put(resourceUri, doc.getDom());
+				xmlStore.put(resourceUri, doc.getDom());
 				List<String> documentErrors = validator.validate(doc);
 				if (!documentErrors.isEmpty()) {
 					errors.put(resourceUri.toString(), documentErrors);

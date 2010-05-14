@@ -2,6 +2,7 @@ package de.faustedition.facsimile;
 
 import static de.faustedition.xml.XmlDocument.xpath;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import org.w3c.dom.Element;
 import de.faustedition.tei.EncodedTextDocument;
 import de.faustedition.tei.EncodedTextDocumentManager;
 import de.faustedition.xml.NodeListIterable;
-import de.faustedition.xml.XmlDbManager;
+import de.faustedition.xml.XmlStore;
 
 @Service
 public class FacsimileUpdateTask {
@@ -28,19 +29,19 @@ public class FacsimileUpdateTask {
 	private FacsimileManager manager;
 
 	@Autowired
-	private XmlDbManager xmlDbManager;
+	private XmlStore xmlStore;
 
 	@Autowired
 	private EncodedTextDocumentManager documentManager;
 
-	public void update() {
+	public void update() throws IOException {
 		LOG.info("Updating facsimiles ...");
 		StopWatch sw = new StopWatch();
 		sw.start();
 
 		manager.generate();
 		final SortedSet<String> facsimilePaths = manager.findAllPaths();
-		Document facsimileReferences = xmlDbManager.facsimileReferences();
+		Document facsimileReferences = xmlStore.facsimileReferences();
 		for (Element facsimileReference : new NodeListIterable<Element>(xpath("//f:ref"), facsimileReferences)) {
 			String uri = facsimileReference.getTextContent();
 			try {
@@ -54,7 +55,7 @@ public class FacsimileUpdateTask {
 			FacsimileReference.writeTo(document, Collections.singletonList(new FacsimileReference(facsimilePath)));			
 			URI templateDocUri = FACSIMILES_URI.resolve(facsimilePath.replaceAll("/", "_") + ".xml");
 			LOG.debug("Creating new template document for facsimile '{}'", templateDocUri.toString());
-			xmlDbManager.put(templateDocUri, document.getDom());
+			xmlStore.put(templateDocUri, document.getDom());
 		}
 		
 		sw.stop();

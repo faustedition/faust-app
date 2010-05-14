@@ -14,31 +14,20 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.CommonsClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.util.xml.SimpleNamespaceContext;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-@Service
-public class XmlDbManager implements InitializingBean {
-	private static Logger LOG = LoggerFactory.getLogger(XmlDbManager.class);
-	public static final String EXIST_NS_URI = "http://exist.sourceforge.net/NS/exist";
+public class ExistDbXmlStore extends BaseXmlStore {
+	private static final String EXIST_NS_URI = "http://exist.sourceforge.net/NS/exist";
 	private static SimpleNamespaceContext EXIST_NS_CONTEXT = new SimpleNamespaceContext();
 
 	static {
 		EXIST_NS_CONTEXT.bindNamespaceUri("exist", EXIST_NS_URI);
 	}
-
-	@Value("#{config['xmldb.base']}")
-	private String dbBase;
 
 	@Value("#{config['xmldb.user']}")
 	private String dbUser;
@@ -46,12 +35,10 @@ public class XmlDbManager implements InitializingBean {
 	@Value("#{config['xmldb.password']}")
 	private String dbPassword;
 
-	private URI dbBaseUri;
-
 	private RestTemplate rt;
 
 	public void afterPropertiesSet() throws Exception {
-		this.dbBaseUri = new URI(dbBase);
+		super.afterPropertiesSet();
 
 		MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
 		connectionManager.getParams().setDefaultMaxConnectionsPerHost(10);
@@ -60,16 +47,6 @@ public class XmlDbManager implements InitializingBean {
 		httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(dbUser, dbPassword));
 
 		this.rt = new RestTemplate(new CommonsClientHttpRequestFactory(httpClient));
-	}
-
-	public XmlDbQueryResult query(URI uri, XmlDbQuery query) {
-		uri = relativize(uri);
-		LOG.debug("Posting XQuery to XML-DB: {} ==> {}", uri.toString(), query.getXquery());
-		return XmlDbQueryResult.parse((Document) rt.postForObject(uri, new DOMSource(query.toDocument()), DOMSource.class).getNode());
-	}
-
-	public XmlDbQueryResult query(XmlDbQuery query) {
-		return query(URI.create(""), query);
 	}
 
 	public Document get(URI uri) {
@@ -90,13 +67,14 @@ public class XmlDbManager implements InitializingBean {
 		rt.delete(uri);
 	}
 
-	public SortedSet<URI> contentsOf(URI uri) {
-		Assert.isTrue(isCollectionURI(uri), "URI does not point to a collection");
+	public SortedSet<URI> list(URI uri) {
 		SortedSet<URI> contents = new TreeSet<URI>();
-		XPathExpression contentXPath = xpath("//exist:result/exist:collection/*", EXIST_NS_CONTEXT);
-		Document contentDocument = get(uri);
-
-		for (Element content : new NodeListIterable<Element>(contentXPath, contentDocument)) {
+		if (!isCollection(uri)) {
+			return contents;
+		}
+		
+		XPathExpression contentXP = xpath("//exist:result/exist:collection/*", EXIST_NS_CONTEXT);
+		for (Element content : new NodeListIterable<Element>(contentXP, get(uri))) {
 			if (!EXIST_NS_URI.equals(content.getNamespaceURI())) {
 				continue;
 			}
@@ -111,20 +89,12 @@ public class XmlDbManager implements InitializingBean {
 		return contents;
 	}
 
-	public static boolean isCollectionURI(URI uri) {
-		return StringUtils.isBlank(uri.getPath()) || uri.getPath().endsWith("/");
-	}
-
-	public Document resources() {
-		return (Document) get(URI.create("Query/Resources.xq"));
-	}
-
-	public SortedSet<URI> resourceUris() {
-		SortedSet<URI> resourceUris = new TreeSet<URI>();
-		for (Element resource : new NodeListIterable<Element>(xpath("//f:resource"), resources())) {
-			resourceUris.add(URI.create(resource.getTextContent()));
+	public SortedSet<URI> contents() {
+		SortedSet<URI> contents = new TreeSet<URI>();
+		for (Element resource : new NodeListIterable<Element>(xpath("//f:resource"), get(URI.create("Query/Resources.xq")))) {
+			contents.add(URI.create(resource.getTextContent()));
 		}
-		return resourceUris;
+		return contents;
 	}
 
 	public Document facsimileReferences() {
@@ -137,10 +107,5 @@ public class XmlDbManager implements InitializingBean {
 
 	public Document identifiers() {
 		return get(URI.create("Query/Identifiers.xq"));
-	}
-
-	protected URI relativize(URI uri) {
-		Assert.isTrue(!uri.isAbsolute() && (StringUtils.isBlank(uri.getPath()) || !uri.getPath().startsWith("/")), "Invalid URI");
-		return dbBaseUri.resolve(uri);
 	}
 }

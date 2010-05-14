@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 import de.faustedition.ErrorUtil;
 import de.faustedition.tei.EncodedTextDocument;
 import de.faustedition.tei.EncodedTextDocumentManager;
-import de.faustedition.xml.XmlDbManager;
+import de.faustedition.xml.XmlStore;
 import de.faustedition.xml.XmlUtil;
 
 @Service
@@ -32,7 +32,7 @@ public class MetadataImportTask implements Runnable {
 	private static final Pattern SIGLA_PATTERN = Pattern.compile("[A-Za-z0-9]");
 
 	@Autowired
-	private XmlDbManager xmlDbManager;
+	private XmlStore xmlDbManager;
 
 	@Autowired
 	private EncodedTextDocumentManager documentManager;
@@ -69,7 +69,7 @@ public class MetadataImportTask implements Runnable {
 				URI destinationUri = null;
 				EncodedTextDocument destination = null;
 				try {
-					for (URI portfolioContent : xmlDbManager.contentsOf(portfolio)) {
+					for (URI portfolioContent : xmlDbManager.list(portfolio)) {
 						if (portfolio.relativize(portfolioContent).getPath().startsWith(portfolioName)) {
 							destinationUri = portfolioContent;
 							destination = new EncodedTextDocument(xmlDbManager.get(destinationUri));

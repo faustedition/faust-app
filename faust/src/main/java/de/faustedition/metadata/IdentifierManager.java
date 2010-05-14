@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 
 import de.faustedition.xml.NodeListIterable;
-import de.faustedition.xml.XmlDbManager;
+import de.faustedition.xml.XmlStore;
 
 @Service
 public class IdentifierManager {
@@ -27,7 +27,7 @@ public class IdentifierManager {
 	private SimpleJdbcTemplate jt;
 
 	@Autowired
-	private XmlDbManager xmlDbManager;
+	private XmlStore xmlStore;
 
 	@Transactional
 	public void update() {
@@ -36,7 +36,7 @@ public class IdentifierManager {
 		sw.start();
 		
 		final List<SqlParameterSource> identifierList = new ArrayList<SqlParameterSource>();
-		for (Element identifier : new NodeListIterable<Element>(xpath("//f:id"), xmlDbManager.identifiers())) {
+		for (Element identifier : new NodeListIterable<Element>(xpath("//f:id"), xmlStore.identifiers())) {
 			MapSqlParameterSource identifierRecord = new MapSqlParameterSource();
 			identifierRecord.addValue("path", identifier.getAttribute("path"));
 			identifierRecord.addValue("type", identifier.getAttribute("type"));

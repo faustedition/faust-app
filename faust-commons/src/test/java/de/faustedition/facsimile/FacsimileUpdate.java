@@ -1,5 +1,7 @@
 package de.faustedition.facsimile;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,7 +13,7 @@ public class FacsimileUpdate extends AbstractContextTest {
 	private FacsimileUpdateTask updateTask;
 
 	@Test
-	public void runUpdate() {
+	public void runUpdate() throws IOException {
 		updateTask.update();
 	}
 }

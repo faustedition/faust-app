@@ -1,5 +1,7 @@
 package de.faustedition;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +29,7 @@ public class PeriodicalTasks extends AbstractModelContextTest {
 	}
 
 	@Test
-	public void runSanitizer() {
+	public void runSanitizer() throws IOException {
 		sanitizer.sanitize();
 	}
 
