@@ -2,7 +2,6 @@ package de.faustedition.tei;
 
 import static de.faustedition.tei.EncodedTextDocument.TEI_NS_URI;
 import static de.faustedition.tei.EncodedTextDocument.xpath;
-import static de.faustedition.tei.EncodedTextDocumentValidator.SCHEMA_URI;
 import static de.faustedition.xml.NodeListIterable.singleResult;
 import static de.faustedition.xml.XmlUtil.documentBuilder;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
@@ -23,7 +22,8 @@ import de.faustedition.xml.NodeListIterable;
 
 @Service
 public class EncodedTextDocumentManager {
-	public static final String CSS_URI = "http://xml.faustedition.net/schema/faust-tei.css";
+	public static final String SCHEMA_URI = "http://www.faustedition.net/schema/faust-tei.rng";
+	public static final String CSS_URI = "http://www.faustedition.net/css/faust-tei.css";
 	private static final String CSS_ATTRS = "href=\"%s\" type=\"text/css\"";
 	private static final String SCHEMA_ATTRS = "RNGSchema=\"%s\" type=\"compact\"";
 	private static final Resource HEADER_TEMPLATE_RESOURCE = new ClassPathResource("header-template.xml",

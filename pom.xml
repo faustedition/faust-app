@@ -22,6 +22,11 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>de.faustedition</groupId>
+				<artifactId>faust-schema</artifactId>
+				<version>1.0</version>
+			</dependency>
+			<dependency>
 				<groupId>com.google.collections</groupId>
 				<artifactId>google-collections</artifactId>
 				<version>1.0</version>
@@ -141,8 +146,8 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -155,7 +160,6 @@
 		</plugins>
 	</build>
 	<modules>
-		<module>faust-odd-plugin</module>
 		<module>faust-commons</module>
 		<module>faust-data-import</module>
 		<module>faust</module>

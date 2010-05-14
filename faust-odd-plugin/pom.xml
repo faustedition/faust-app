@@ -5,8 +5,8 @@
 		<artifactId>faust-project</artifactId>
 		<version>1.2-SNAPSHOT</version>
 	</parent>
-	<groupId>de.faustedition</groupId>
 	<artifactId>faust-odd-plugin</artifactId>
+	<version>1.0</version>
 	<packaging>maven-plugin</packaging>
 	<name>Digitale Faust-Edition :: ODD schema generation</name>
 	<dependencies>

@@ -18,6 +18,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Generates XML schemata from ODDs.
@@ -85,18 +86,18 @@ public class SchemaMojo extends AbstractMojo {
 
 			if (outputDirectory.exists() && outputDirectory.lastModified() >= source.lastModified()) {
 				getLog().info("Schema exists and seems up-to-date. Skipping ODD evaluation");
-				return;
-			}
-			
-			if (source.isDirectory()) {
-				for (File file : source.listFiles()) {
-					if (file.isDirectory()) {
-						continue;
-					}
-					generateSchema(file);
-				}
 			} else {
-				generateSchema(source);
+
+				if (source.isDirectory()) {
+					for (File file : source.listFiles()) {
+						if (file.isDirectory()) {
+							continue;
+						}
+						generateSchema(file);
+					}
+				} else {
+					generateSchema(source);
+				}
 			}
 
 			if (outputDirectory.exists()) {
@@ -108,9 +109,11 @@ public class SchemaMojo extends AbstractMojo {
 	}
 
 	private void generateSchema(File schemaFile) throws Exception {
-		getLog().info(String.format("Generating schema from %s into %s", schemaFile.getAbsolutePath(), getOutputDirectory().getAbsolutePath()));
+		final File out = new File(getOutputDirectory(), FileUtils.basename(schemaFile.getName()) + "rng");
+		getLog().info(String.format("Generating schema from %s into %s", schemaFile.getAbsolutePath(), out.getAbsolutePath()));
+
 		Serializer serializer = new Serializer();
-		serializer.setOutputFile(getOutputDirectory());
+		serializer.setOutputFile(out);
 
 		try {
 			Processor processor = new Processor(false);

@@ -11,6 +11,10 @@
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
+			<groupId>de.faustedition</groupId>
+			<artifactId>faust-schema</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.google.collections</groupId>
 			<artifactId>google-collections</artifactId>
 		</dependency>
