@@ -12,7 +12,11 @@
 	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css&amp;2.8.0r4/build/base/base-min.css&amp;2.8.0r4/build/assets/skins/sam/skin.css"/>
 	<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.0r4/build/utilities/utilities.js&amp;2.8.0r4/build/datasource/datasource-min.js&amp;2.8.0r4/build/autocomplete/autocomplete-min.js&amp;2.8.0r4/build/event-mouseenter/event-mouseenter-min.js&amp;2.8.0r4/build/selector/selector-min.js&amp;2.8.0r4/build/event-delegate/event-delegate-min.js&amp;2.8.0r4/build/paginator/paginator-min.js&amp;2.8.0r4/build/calendar/calendar-min.js&amp;2.8.0r4/build/datatable/datatable-min.js&amp;2.8.0r4/build/json/json-min.js&amp;2.8.0r4/build/container/container_core-min.js&amp;2.8.0r4/build/menu/menu-min.js&amp;2.8.0r4/build/treeview/treeview-min.js"></script>
 	<link rel="stylesheet" type="text/css" href="${ctx}/css/faust.css" />
+	<link rel="stylesheet" type="text/css" href="${ctx}/css/iip.css" />
 	<script type="text/javascript" src="${ctx}/js/faust.js"></script>
+	<script type="text/javascript" src="${ctx}/js/mootools-1.2-core-compressed.js"></script>
+	<script type="text/javascript" src="${ctx}/js/mootools-1.2-more-compressed.js"></script>
+	<script type="text/javascript" src="${ctx}/js/iipmooviewer-1.1.js"></script>	
 	<script type="text/javascript">var ctx = "${ctx}"; yuiInit();</script>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />

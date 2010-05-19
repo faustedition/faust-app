@@ -15,7 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 import de.faustedition.tei.EncodedTextDocumentValidator;
 
 @Controller
-@RequestMapping("/schema/")
+@RequestMapping("/schema")
 public class SchemaController {
 	private final long CONTROLLER_CREATION_TIME = System.currentTimeMillis();
 

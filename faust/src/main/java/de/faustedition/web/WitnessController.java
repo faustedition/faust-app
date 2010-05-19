@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.Element;
 
-import de.faustedition.facsimile.FacsimileReference;
+import de.faustedition.facsimile.Facsimile;
 import de.faustedition.tei.EncodedTextDocument;
 import de.faustedition.xml.XmlStore;
 
@@ -66,7 +66,7 @@ public class WitnessController implements InitializingBean {
 
 		Element facsimile = singleResult(xpath("//tei:facsimile/tei:graphic"), document.getDom(), Element.class);
 		if (facsimile != null) {
-			mv.addObject("facsimile", FacsimileReference.fromURI(URI.create(facsimile.getAttribute("url"))));
+			mv.addObject("facsimile", Facsimile.fromUri(URI.create(facsimile.getAttribute("url"))));
 		}
 
 		StringWriter htmlWriter = new StringWriter();

@@ -1,5 +1,7 @@
 package de.faustedition.tei;
 
+import static de.faustedition.tei.EncodedTextDocument.TEI_NS_URI;
+import static de.faustedition.tei.EncodedTextDocument.TEI_SIG_GE_URI;
 import static de.faustedition.tei.EncodedTextDocument.xpath;
 import static de.faustedition.xml.NodeListIterable.singleResult;
 import static de.faustedition.xml.XmlUtil.documentBuilder;
@@ -9,7 +11,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,10 +24,13 @@ import de.faustedition.document.HandPropertiesManager;
 import de.faustedition.xml.NodeListIterable;
 
 @Service
-public class EncodedTextDocumentManager {
-	public static final String SCHEMA_URI = "http://www.faustedition.net/schema/faust-tei.rng";
-	public static final String CSS_URI = "http://www.faustedition.net/css/faust-tei.css";
+public class EncodedTextDocumentBuilder {
+	public static final String SCHEMA_URI = "schema/faust-tei.rng";
+	public static final String CSS_URI = "css/faust-tei.css";
 
+	@Value("#{config['http.base']}")
+	private String baseUrl;
+	
 	@Autowired
 	private HandPropertiesManager handProperties;
 
@@ -31,20 +38,51 @@ public class EncodedTextDocumentManager {
 	private GlyphManager glyphs;
 
 	public EncodedTextDocument create() {
-		return process(EncodedTextDocument.create("TEI"));
+		return addTemplate(EncodedTextDocument.create("TEI"));
 	}
 
-	public EncodedTextDocument process(EncodedTextDocument document) {
+	public EncodedTextDocument addTemplate(EncodedTextDocument document) {
 		Document dom = document.getDom();
 
 		addProcessingInstructions(dom);
 		addNamespaces(dom);
 		addHeader(dom);
-		
+
 		handProperties.declareIn(dom);
 		glyphs.declareIn(dom);
 
+		addBody(dom);
+
 		return document;
+	}
+
+	private void addBody(Document dom) {
+		Element tei = dom.getDocumentElement();
+		Assert.isTrue("TEI".equals(tei.getLocalName()), "No <TEI/> root element");
+
+		Element text = singleResult(xpath("./tei:text"), tei, Element.class);
+		if (text == null) {
+			text = dom.createElementNS(TEI_NS_URI, "text");
+			tei.appendChild(text);
+
+			Element body = dom.createElementNS(TEI_NS_URI, "body");
+			text.appendChild(body);
+			
+			body.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
+		}
+		
+		if (singleResult(xpath("//ge:document"), dom, Element.class) == null) {
+			Element document = dom.createElementNS(TEI_SIG_GE_URI, "ge:document");
+			tei.insertBefore(document, text);
+			
+			Element surface = dom.createElementNS(TEI_NS_URI, "surface");
+			document.appendChild(surface);
+			
+			Element zone  = dom.createElementNS(TEI_NS_URI, "zone");
+			surface.appendChild(zone);
+			
+			zone.appendChild(dom.createElementNS(TEI_SIG_GE_URI, "ge:line"));
+		}
 	}
 
 	private void addHeader(Document dom) {
@@ -83,13 +121,13 @@ public class EncodedTextDocumentManager {
 		for (Node piNode : new NodeListIterable<Node>(xpath("/processing-instruction('xml-stylesheet')"), dom)) {
 			dom.removeChild(piNode);
 		}
-		Node cssPi = dom.createProcessingInstruction("xml-stylesheet", String.format("href=\"%s\" type=\"text/css\"", CSS_URI));
+		Node cssPi = dom.createProcessingInstruction("xml-stylesheet", String.format("href=\"%s\" type=\"text/css\"", baseUrl + CSS_URI));
 		dom.insertBefore(cssPi, dom.getFirstChild());
 
 		for (Node piNode : new NodeListIterable<Node>(xpath("/processing-instruction('oxygen')"), dom)) {
 			dom.removeChild(piNode);
 		}
-		Node schemaPi = dom.createProcessingInstruction("oxygen", String.format("RNGSchema=\"%s\" type=\"xml\"", SCHEMA_URI));
+		Node schemaPi = dom.createProcessingInstruction("oxygen", String.format("RNGSchema=\"%s\" type=\"xml\"", baseUrl + SCHEMA_URI));
 		dom.insertBefore(schemaPi, cssPi);
 	}
 

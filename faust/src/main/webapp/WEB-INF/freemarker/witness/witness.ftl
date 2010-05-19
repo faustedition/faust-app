@@ -11,11 +11,24 @@
 	
 	<div class="yui-gc">
 		<div class="yui-u first">
+			[#--
 			[#if facsimile??]			
 				<p><a href="${ctx}/facsimile/${encodePath(facsimile.path)}.jpg" title="Vergrößern">
 					<img src="${ctx}/facsimile/${encodePath(facsimile.path)}.jpg" id="facsimile" style="max-width: 500px"/>
 				</a></p>
 			[/#if]
+			--]
+			<div id="facsimile" style="position: relative; left: 0; top: 0; width: 500px; height: 500px"></div>
+			<script type="text/javascript">
+    				iip = new IIP( "facsimile", {
+						image: 'test.tif',
+						server: '${ctx}/facsimile/iip',
+						credit: '&copy; Digitale Faust-Edition', 
+						zoom: 1,
+						render: 'spiral',
+						showNavButtons: true
+    						});
+    			</script>
 		</div>
 		<div class="yui-u">
 			${htmlTranscription}

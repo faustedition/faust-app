@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 
 import de.faustedition.ErrorUtil;
 import de.faustedition.tei.EncodedTextDocument;
-import de.faustedition.tei.EncodedTextDocumentManager;
+import de.faustedition.tei.EncodedTextDocumentBuilder;
 import de.faustedition.xml.XmlStore;
 import de.faustedition.xml.XmlUtil;
 
@@ -35,7 +35,7 @@ public class MetadataImportTask implements Runnable {
 	private XmlStore xmlDbManager;
 
 	@Autowired
-	private EncodedTextDocumentManager documentManager;
+	private EncodedTextDocumentBuilder documentBuilder;
 
 	private MetadataFieldMapping mapping = new MetadataFieldMapping();
 
@@ -84,13 +84,13 @@ public class MetadataImportTask implements Runnable {
 
 				if (destinationUri == null) {
 					destinationUri = portfolio.resolve(portfolioName + ".xml");
-					destination = documentManager.create();
+					destination = documentBuilder.create();
 				}
 
-				documentManager.process(destination);
+				documentBuilder.addTemplate(destination);
 				LOG.info("Writing metadata to {}", destinationUri);
 				writeMetadataTo(destination, metadata, portfolioName, archiveDbRecord.getCallNumber());
-				documentManager.process(destination);
+				documentBuilder.addTemplate(destination);
 				xmlDbManager.put(destinationUri, destination.getDom());
 
 				// MetadataRecord record =

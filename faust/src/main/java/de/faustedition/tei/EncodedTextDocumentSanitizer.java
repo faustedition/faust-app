@@ -28,7 +28,7 @@ public class EncodedTextDocumentSanitizer {
 	private XmlStore xmlStore;
 
 	@Autowired
-	private EncodedTextDocumentManager documentManager;
+	private EncodedTextDocumentBuilder documentBuilder;
 	
 	@Autowired
 	private ReportSender reportSender;
@@ -46,7 +46,7 @@ public class EncodedTextDocumentSanitizer {
 			try {
 				LOG.debug("Sanitizing XML in {}", resourceUri.toString());
 				EncodedTextDocument doc = new EncodedTextDocument((Document) xmlStore.get(resourceUri));
-				documentManager.process(doc);
+				documentBuilder.addTemplate(doc);
 				xmlStore.put(resourceUri, doc.getDom());
 				List<String> documentErrors = validator.validate(doc);
 				if (!documentErrors.isEmpty()) {

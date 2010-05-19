@@ -12,21 +12,21 @@ import de.faustedition.xml.XmlUtil;
 public class EncodedTextDocumentValidatorTest extends AbstractContextTest {
 
 	@Autowired
-	private EncodedTextDocumentManager documentManager;
+	private EncodedTextDocumentBuilder builder;
 
 	@Autowired
 	private EncodedTextDocumentValidator validator;
 
 	@Test
-	public void checkForInvalidity() throws Exception {
-		EncodedTextDocument document = documentManager.create();
+	public void validateTemplate() throws Exception {
+		EncodedTextDocument document = builder.create();
 		if (LOG.isTraceEnabled()) {
 			XmlUtil.serialize(document.getDom(), System.out);
 		}
 
 		List<String> errors = validator.validate(document);
-		Assert.assertTrue("Validation errors exist", errors.size() > 0);
-		if (LOG.isTraceEnabled()) {
+		Assert.assertTrue("Template document validates", errors.isEmpty());
+		if (errors.size() > 0 && LOG.isTraceEnabled()) {
 			for (String error : errors) {
 				LOG.trace(error);
 			}
@@ -34,7 +34,7 @@ public class EncodedTextDocumentValidatorTest extends AbstractContextTest {
 	}
 
 	@Test
-	public void checkForValidity() throws Exception {
+	public void validateSample() throws Exception {
 		EncodedTextDocument document = new EncodedTextDocument(XmlUtil.parse(getClass().getResourceAsStream("faust-tei-sample.xml")));
 		List<String> errors = validator.validate(document);
 		Assert.assertTrue("Test document validates", errors.isEmpty());

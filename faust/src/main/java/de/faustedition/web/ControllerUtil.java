@@ -1,9 +1,16 @@
 package de.faustedition.web;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Document;
+
+import de.faustedition.xml.XmlUtil;
 
 public class ControllerUtil {
 
@@ -20,5 +27,17 @@ public class ControllerUtil {
 		String path = StringUtils.strip(StringUtils.defaultString(request.getPathInfo()), "/");
 		path = StringUtils.removeStart(path, StringUtils.strip(StringUtils.defaultString(prefix), "/"));
 		return StringUtils.strip(FilenameUtils.normalize(path), "/");
+	}
+
+	public static void xmlResponse(Document document, HttpServletResponse response) throws IOException {
+		xmlResponse(document, response, "application/xml");
+	}
+
+	public static void xmlResponse(Document document, HttpServletResponse response, String contentType) throws IOException {
+		response.setContentType(contentType);
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+		XmlUtil.serialize(document, out);
+		out.flush();
 	}
 }
