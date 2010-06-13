@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.faustedition.AbstractContextTest;
+import de.faustedition.Log;
 
 public class XmlStoreTest extends AbstractContextTest {
 	@Autowired
@@ -17,15 +18,10 @@ public class XmlStoreTest extends AbstractContextTest {
 	@Test
 	public void readContents() throws IOException {
 		assertTrue("XML database contains resources", !store.list(URI.create("Witness/")).isEmpty());
-		if (LOG.isTraceEnabled()) {
-			logContents(URI.create(""));
-		}
-	}
-
-	private void logContents(URI uri) throws IOException {
-		for (URI content : store.list(uri)) {
-			LOG.trace(content.toString());
-			logContents(content);
+		if (Log.LOGGER.isTraceEnabled()) {
+			for (URI uri : store) {
+				Log.LOGGER.trace(uri.toString());
+			}
 		}
 	}
 }

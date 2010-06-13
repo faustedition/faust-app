@@ -6,6 +6,11 @@
 	<version>1.2-SNAPSHOT</version>
 	<name>Digitale Faust-Edition</name>
 	<packaging>pom</packaging>
+	<modules>
+		<module>faust-commons</module>
+		<module>faust-data-import</module>
+		<module>faust</module>
+	</modules>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -24,7 +29,12 @@
 			<dependency>
 				<groupId>de.faustedition</groupId>
 				<artifactId>faust-schema</artifactId>
-				<version>1.0</version>
+				<version>1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>1.4.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.collections</groupId>
@@ -159,11 +169,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<modules>
-		<module>faust-commons</module>
-		<module>faust-data-import</module>
-		<module>faust</module>
-	</modules>
 	<repositories>
 		<repository>
 			<id>maven.faustedition.net</id>

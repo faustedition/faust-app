@@ -10,7 +10,7 @@ public class URIUtil {
 		try {
 			return new URI(FAUST_SCHEME, authority, path, null, null);
 		} catch (URISyntaxException e) {
-			throw ErrorUtil.fatal(e, "Syntax error while constructing URI for %s/%s'", authority, path);
+			throw Log.fatalError(e, "Syntax error while constructing URI for %s/%s'", authority, path);
 		}
 	}
 

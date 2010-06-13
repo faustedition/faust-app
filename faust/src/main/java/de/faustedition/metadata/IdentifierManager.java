@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.time.StopWatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -16,13 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 
+import de.faustedition.Log;
 import de.faustedition.xml.NodeListIterable;
 import de.faustedition.xml.XmlStore;
 
 @Service
 public class IdentifierManager {
-	private static final Logger LOG = LoggerFactory.getLogger(IdentifierManager.class);
-
 	@Autowired
 	private SimpleJdbcTemplate jt;
 
@@ -31,7 +28,7 @@ public class IdentifierManager {
 
 	@Transactional
 	public void update() {
-		LOG.info("Updating identifier cache ...");
+		Log.LOGGER.info("Updating identifier cache ...");
 		StopWatch sw = new StopWatch();
 		sw.start();
 		
@@ -49,7 +46,7 @@ public class IdentifierManager {
 		jt.batchUpdate("insert into identifier values (:path, :type, :id)", identifierArray);
 		
 		sw.stop();
-		LOG.info("Updated identifier cache in {}", sw);
+		Log.LOGGER.info("Updated identifier cache in {}", sw);
 
 	}
 }

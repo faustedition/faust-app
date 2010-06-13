@@ -8,6 +8,6 @@ public class PathEscapeTest {
 
 	@Test
 	public void escapePaths() {
-		Assert.assertEquals("C:\\Dokumente\\ und\\ Einstellungen", FacsimileTileStore.escapePath("C:\\Dokumente und Einstellungen"));
+		Assert.assertEquals("C:\\Dokumente\\ und\\ Einstellungen", FacsimileStore.escapePath("C:\\Dokumente und Einstellungen"));
 	}
 }

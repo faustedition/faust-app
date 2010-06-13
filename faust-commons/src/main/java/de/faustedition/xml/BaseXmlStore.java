@@ -3,14 +3,14 @@ package de.faustedition.xml;
 import java.net.URI;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 
+import de.faustedition.Log;
+
 public abstract class BaseXmlStore implements XmlStore, InitializingBean {
-	protected Logger LOG = LoggerFactory.getLogger(getClass());
+
 
 	@Value("#{config['xmldb.base']}")
 	private String baseUri;
@@ -19,7 +19,7 @@ public abstract class BaseXmlStore implements XmlStore, InitializingBean {
 
 	public void afterPropertiesSet() throws Exception {
 		this.base = new URI(baseUri);
-		LOG.info("Initialized XML store with base URI: " + base.toString());
+		Log.LOGGER.info("Initialized XML store with base URI: " + base.toString());
 	}
 
 	protected boolean isCollection(URI uri) {

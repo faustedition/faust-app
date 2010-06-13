@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -12,22 +13,26 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.util.Assert;
 import org.w3c.dom.Document;
 
+import de.faustedition.Log;
+
 public class FileSystemXmlStore extends BaseXmlStore {
 
-	public SortedSet<URI> contents() {
-		return contents(URI.create(""));
+	@Override
+	public Iterator<URI> iterator() {
+		return contents(URI.create("")).iterator();
 	}
-
+	
 	protected SortedSet<URI> contents(URI uri) {
 		SortedSet<URI> contents = new TreeSet<URI>();
 		File file = new File(relativize(uri));
 		if (file.isDirectory()) {
 			for (String content : file.list()) {
-				URI contentUri = uri.resolve("./" + content);
 				if (new File(file, content).isDirectory()) {
-					contents.addAll(contents(contentUri));
+					URI dir = uri.resolve("./" + content + "/");
+					contents.add(dir);
+					contents.addAll(contents(dir));
 				} else {
-					contents.add(contentUri);
+					contents.add(uri.resolve("./" + content));
 				}
 			}
 		}
@@ -47,13 +52,13 @@ public class FileSystemXmlStore extends BaseXmlStore {
 
 	public void delete(URI uri) {
 		uri = relativize(uri);
-		LOG.debug("Deleting XML resource from file system: {}", uri.toString());
+		Log.LOGGER.debug("Deleting XML resource from file system: {}", uri.toString());
 		Assert.isTrue(new File(uri).delete(), "Cannot delete " + uri.toString());
 	}
 
 	public Document get(URI uri) throws IOException {
 		uri = relativize(uri);
-		LOG.debug("Getting XML resource from file system: {}", uri.toString());
+		Log.LOGGER.debug("Getting XML resource from file system: {}", uri.toString());
 		FileInputStream in = null;
 		try {
 			in = new FileInputStream(new File(uri));
@@ -65,11 +70,13 @@ public class FileSystemXmlStore extends BaseXmlStore {
 
 	public void put(URI uri, Document document) throws IOException {
 		uri = relativize(uri);
-		LOG.debug("Putting XML document in file system: {}", uri.toString());
+		Log.LOGGER.debug("Putting XML document in file system: {}", uri.toString());
 		FileOutputStream out = null;
 		try {
-			out = new FileOutputStream(new File(uri));
-			XmlUtil.serialize(document, out);
+			File file = new File(uri);
+			file.getParentFile().mkdirs();
+			
+			XmlUtil.serialize(document, out = new FileOutputStream(file));
 		} finally {
 			IOUtils.closeQuietly(out);
 		}

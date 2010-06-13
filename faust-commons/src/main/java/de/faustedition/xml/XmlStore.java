@@ -6,11 +6,9 @@ import java.util.SortedSet;
 
 import org.w3c.dom.Document;
 
-public interface XmlStore {
+public interface XmlStore extends Iterable<URI> {
 
-	SortedSet<URI> contents() throws IOException;;
-
-	SortedSet<URI> list(URI uri) throws IOException;;
+	SortedSet<URI> list(URI uri) throws IOException;
 
 	Document get(URI uri) throws IOException;
 

@@ -2,18 +2,25 @@ package de.faustedition.tei;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.ErrorHandler;
@@ -29,15 +36,81 @@ import com.thaiopensource.validate.ValidateProperty;
 import com.thaiopensource.validate.rng.SAXSchemaReader;
 import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
 
-import de.faustedition.ErrorUtil;
+import de.faustedition.Log;
+import de.faustedition.report.Report;
+import de.faustedition.report.ReportSender;
+import de.faustedition.xml.XmlStore;
 import de.faustedition.xml.XmlUtil;
 
 @Service
-public class EncodedTextDocumentValidator implements InitializingBean {
-	private static final Logger LOG = LoggerFactory.getLogger(EncodedTextDocumentValidator.class);
+public class EncodedTextDocumentValidator implements InitializingBean, Runnable {
+
 	private static final String SCHEMA_RESOURCE = "/faust-tei.rng";
+
+	@Autowired
+	private XmlStore xmlStore;
+	
+	@Autowired
+	private ReportSender reportSender;
+	
 	private Schema schema;
 
+	@Override
+	public void run() {
+		try {
+			Log.LOGGER.info("Validating TEI documents");
+			final Map<String, List<String>> errors = new LinkedHashMap<String, List<String>>();
+			for (URI resource : xmlStore) {
+				if (!resource.getPath().endsWith(".xml")) {
+					continue;
+				}
+				try {
+					Log.LOGGER.debug("Validating XML in {}", resource.toString());
+					EncodedTextDocument doc = new EncodedTextDocument((Document) xmlStore.get(resource));
+					xmlStore.put(resource, doc.getDom());
+					List<String> documentErrors = validate(doc);
+					if (!documentErrors.isEmpty()) {
+						errors.put(resource.toString(), documentErrors);
+					}
+				} catch (EncodedTextDocumentException e) {
+					Log.LOGGER.warn("Resource '{}' is not a TEI document", resource.toString());
+				}
+
+			}
+			reportSender.send(new Report() {
+
+				public String getSubject() {
+					return "TEI validation";
+				}
+
+				public boolean isEmpty() {
+					return errors.isEmpty();
+				}
+
+				public void printBody(PrintWriter body) {
+					for (String path : errors.keySet()) {
+						body.println(StringUtils.repeat("=", 78));
+						body.println(path);
+						body.println(StringUtils.repeat("-", 78));
+						for (String e : errors.get(path)) {
+							body.println(e);
+						}
+						body.println(StringUtils.repeat("=", 78));
+						body.println();
+					}
+				}
+				
+				@Override
+				public String toString() {
+					return "TEI validation report [" + DateFormatUtils.ISO_DATETIME_FORMAT.format(new Date()) + "]";
+				}
+
+			});
+		} catch (IOException e) {
+			Log.fatalError(e, "I/O error while validating TEI");
+		}
+	}
+	
 	public boolean isValid(EncodedTextDocument document) {
 		return validate(document).isEmpty();
 	}
@@ -105,9 +178,9 @@ public class EncodedTextDocumentValidator implements InitializingBean {
 			});
 			return errorHandler.getErrors();
 		} catch (IOException e) {
-			throw ErrorUtil.fatal(e, "I/O error while validating TEI document");
+			throw Log.fatalError(e, "I/O error while validating TEI document");
 		} catch (SAXException e) {
-			throw ErrorUtil.fatal(e, "XML error while validating TEI document");
+			throw Log.fatalError(e, "XML error while validating TEI document");
 		}
 	}
 
@@ -127,7 +200,7 @@ public class EncodedTextDocumentValidator implements InitializingBean {
 		schema = SAXSchemaReader.getInstance().createSchema(schemaSource, builder.toPropertyMap());
 		Assert.isTrue(errorHandler.getErrors().isEmpty(), "No errors in schema");
 
-		LOG.info("Initialized RelaxNG-based TEI validator from " + schemaUrl);
+		Log.LOGGER.info("Initialized RelaxNG-based TEI validator from " + schemaUrl);
 	}
 
 	private static class CustomErrorHandler implements ErrorHandler {

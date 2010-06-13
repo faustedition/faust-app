@@ -9,6 +9,7 @@ import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,23 +20,27 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import de.faustedition.ErrorUtil;
+import de.faustedition.Log;
 import de.faustedition.document.HandPropertiesManager;
 import de.faustedition.xml.NodeListIterable;
+import de.faustedition.xml.XmlStore;
 
 @Service
-public class EncodedTextDocumentBuilder {
+public class EncodedTextDocumentBuilder implements Runnable {
 	public static final String SCHEMA_URI = "schema/faust-tei.rng";
 	public static final String CSS_URI = "css/faust-tei.css";
 
 	@Value("#{config['http.base']}")
 	private String baseUrl;
-	
+
 	@Autowired
 	private HandPropertiesManager handProperties;
 
 	@Autowired
 	private GlyphManager glyphs;
+
+	@Autowired
+	private XmlStore xmlStore;
 
 	public EncodedTextDocument create() {
 		return addTemplate(EncodedTextDocument.create("TEI"));
@@ -56,6 +61,30 @@ public class EncodedTextDocumentBuilder {
 		return document;
 	}
 
+	@Override
+	public void run() {
+		try {
+			Log.LOGGER.info("Templating TEI documents");
+			for (URI resource : xmlStore) {
+				Log.LOGGER.debug(resource.toASCIIString());
+				if (!resource.getPath().endsWith(".xml")) {
+					continue;
+				}
+				try {
+					Log.LOGGER.debug("Templating TEI-XML in {}", resource.toString());
+					EncodedTextDocument doc = new EncodedTextDocument((Document) xmlStore.get(resource));
+					addTemplate(doc);
+					xmlStore.put(resource, doc.getDom());
+				} catch (EncodedTextDocumentException e) {
+					Log.LOGGER.warn("Resource '{}' is not a TEI document", resource.toString());
+				}
+
+			}
+		} catch (IOException e) {
+			Log.fatalError(e, "I/O error while templating TEI");
+		}
+	}
+
 	private void addBody(Document dom) {
 		Element tei = dom.getDocumentElement();
 		Assert.isTrue("TEI".equals(tei.getLocalName()), "No <TEI/> root element");
@@ -67,20 +96,20 @@ public class EncodedTextDocumentBuilder {
 
 			Element body = dom.createElementNS(TEI_NS_URI, "body");
 			text.appendChild(body);
-			
+
 			body.appendChild(dom.createElementNS(TEI_NS_URI, "p"));
 		}
-		
+
 		if (singleResult(xpath("//ge:document"), dom, Element.class) == null) {
 			Element document = dom.createElementNS(TEI_SIG_GE_URI, "ge:document");
 			tei.insertBefore(document, text);
-			
+
 			Element surface = dom.createElementNS(TEI_NS_URI, "surface");
 			document.appendChild(surface);
-			
-			Element zone  = dom.createElementNS(TEI_NS_URI, "zone");
+
+			Element zone = dom.createElementNS(TEI_NS_URI, "zone");
 			surface.appendChild(zone);
-			
+
 			zone.appendChild(dom.createElementNS(TEI_SIG_GE_URI, "ge:line"));
 		}
 	}
@@ -95,9 +124,9 @@ public class EncodedTextDocumentBuilder {
 			Element root = dom.getDocumentElement();
 			root.insertBefore(dom.importNode(template.getDocumentElement(), true), root.getFirstChild());
 		} catch (SAXException e) {
-			throw ErrorUtil.fatal(e, "XML error while adding TEI header template");
+			throw Log.fatalError(e, "XML error while adding TEI header template");
 		} catch (IOException e) {
-			throw ErrorUtil.fatal(e, "I/O error while adding TEI header template");
+			throw Log.fatalError(e, "I/O error while adding TEI header template");
 		}
 	}
 

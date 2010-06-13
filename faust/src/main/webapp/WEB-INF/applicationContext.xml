@@ -22,20 +22,16 @@
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource" p:basename="/WEB-INF/messages" />
 
 	<context:component-scan base-package="de.faustedition">
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
-	
+
 	<tx:annotation-driven />
 
-	<task:scheduler id="scheduler" pool-size="10" />
-	<task:scheduled-tasks scheduler="scheduler">
-		<task:scheduled ref="encodingStatusManager" method="update" cron="0 0 * * * *" />
-		<!--		<task:scheduled ref="facsimileManager" method="generate" cron="0 0 0 * * *" />-->
-	</task:scheduled-tasks>
+	<task:executor id="executor" pool-size="10" />
 
 	<sec:http auto-config="true" realm="Digitale Faust-Edition" create-session="never">
 		<sec:intercept-url pattern="/" access="ROLE_ANONYMOUS,ROLE_EDITOR" />
@@ -64,8 +60,8 @@
 				<sec:user name="pravida" password="3c0bfdcc47d9dc1aa3a11d149fb4a836b3c408fc" authorities="ROLE_EDITOR" />
 				<sec:user name="middell" password="e33d633cdd4c2f569bbe91d92b0ad2e11b8de58b" authorities="ROLE_EDITOR, ROLE_ADMIN" />
 				<sec:user name="faust" password="ed34f4e7e660d18083745fc0982623eb6e095f5e" authorities="ROLE_EDITOR" />
-				<sec:user name="gutachter1" password="615133dfb5ec73bcf9b9bc3b9f82662dfa9a3aad" authorities="ROLE_EDITOR"/>
-				<sec:user name="gutachter2" password="cf15478d01bbab6364684fdc563ba71cad6b104b" authorities="ROLE_EDITOR"/>
+				<sec:user name="gutachter1" password="615133dfb5ec73bcf9b9bc3b9f82662dfa9a3aad" authorities="ROLE_EDITOR" />
+				<sec:user name="gutachter2" password="cf15478d01bbab6364684fdc563ba71cad6b104b" authorities="ROLE_EDITOR" />
 			</sec:user-service>
 		</sec:authentication-provider>
 	</sec:authentication-manager>

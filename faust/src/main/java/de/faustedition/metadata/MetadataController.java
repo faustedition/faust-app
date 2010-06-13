@@ -7,8 +7,6 @@ import java.util.SortedMap;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -18,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import de.faustedition.Log;
 import de.faustedition.web.ControllerUtil;
 
 @Controller
 @RequestMapping("/metadata/")
 public class MetadataController {
-	private static final Logger LOG = LoggerFactory.getLogger(MetadataController.class);
 
 	@Autowired
 	private EncodingStatusManager encodingStatusManager;
@@ -35,7 +33,7 @@ public class MetadataController {
 	public void encodingStatus(HttpServletRequest request, ModelMap model, Locale locale) {
 		String path = ControllerUtil.getPath(request, "metadata/encoding");
 
-		LOG.debug("Delivering transcription status of '{}'", path);
+		Log.LOGGER.debug("Delivering transcription status of '{}'", path);
 		SortedMap<EncodingStatus, Integer> statusMap = encodingStatusManager.statusOf(path);
 		List<Map<String, Object>> statusList = Lists.newArrayListWithCapacity(statusMap.size());
 		for (EncodingStatus status : EncodingStatus.values()) {

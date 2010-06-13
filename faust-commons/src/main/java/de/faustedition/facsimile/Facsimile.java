@@ -97,7 +97,7 @@ public class Facsimile implements Comparable<Facsimile> {
 
 		for (Facsimile reference : references) {
 			Element graphicEl = d.createElementNS(TEI_NS_URI, "graphic");
-			graphicEl.setAttributeNS(TEI_NS_URI, "url", reference.toUri().toASCIIString());
+			graphicEl.setAttribute("url", reference.toUri().toASCIIString());
 			facsimile.appendChild(graphicEl);
 		}
 	}

@@ -8,12 +8,12 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import de.faustedition.Log;
 
 
 public class InventoryDatabaseAccess {
-	private static final Logger LOG = LoggerFactory.getLogger(InventoryDatabaseAccess.class);
+
 	private InventoryDatabase faustInventory;
 	private ArchiveDatabase archiveDatabase;
 
@@ -64,13 +64,13 @@ public class InventoryDatabaseAccess {
 
 		}
 
-		LOG.info(String.format("Portfolios: { %s }", StringUtils.join(portfolioSet, ", ")));
-		LOG.info(String.format("Sub-Portfolios: { %s }", StringUtils.join(subPortfolioSet, ", ")));
-		LOG.info(String.format("Files: { %s }", StringUtils.join(fileSet, ", ")));
-		LOG.info(String.format("Sub-Files: { %s }", StringUtils.join(subFileSet, ", ")));
-		LOG.info(String.format("Sub-File-Primary-Suffices: { %s }", StringUtils.join(subFilePrimarySuffixSet, ", ")));
-		LOG.info(String.format("Sub-File-Secondary-Suffices: { %s }", StringUtils.join(subFileSecondarySuffixSet, ", ")));
-		LOG.info(String.format("Content: { %s }", StringUtils.join(contentSet, ", ")));
+		Log.LOGGER.info(String.format("Portfolios: { %s }", StringUtils.join(portfolioSet, ", ")));
+		Log.LOGGER.info(String.format("Sub-Portfolios: { %s }", StringUtils.join(subPortfolioSet, ", ")));
+		Log.LOGGER.info(String.format("Files: { %s }", StringUtils.join(fileSet, ", ")));
+		Log.LOGGER.info(String.format("Sub-Files: { %s }", StringUtils.join(subFileSet, ", ")));
+		Log.LOGGER.info(String.format("Sub-File-Primary-Suffices: { %s }", StringUtils.join(subFilePrimarySuffixSet, ", ")));
+		Log.LOGGER.info(String.format("Sub-File-Secondary-Suffices: { %s }", StringUtils.join(subFileSecondarySuffixSet, ", ")));
+		Log.LOGGER.info(String.format("Content: { %s }", StringUtils.join(contentSet, ", ")));
 	}
 
 	@Test
@@ -86,10 +86,10 @@ public class InventoryDatabaseAccess {
 				for (ArchiveDatabaseRecord matchingRecord : matchingRecords) {
 					matchingCallNumbers.add(matchingRecord.getCallNumber());
 				}
-				LOG.info(String.format("%s ==> { %s }", callNumber, StringUtils.join(matchingCallNumbers, "; ")));
+				Log.LOGGER.info(String.format("%s ==> { %s }", callNumber, StringUtils.join(matchingCallNumbers, "; ")));
 			}
 		}
 
-		LOG.info(String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
+		Log.LOGGER.info(String.format("Missing call numbers: { %s }", StringUtils.join(missingCallNumbers, ", ")));
 	}
 }

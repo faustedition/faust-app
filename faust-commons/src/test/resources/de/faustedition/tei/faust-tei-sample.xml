@@ -16,7 +16,7 @@
         </fileDesc>
         <profileDesc>
             <ge:transposeGrp>
-                <ge:transpose f:revType="late" f:changeRef="#ec_bl">
+                <ge:transpose f:revType="late" stage="#ec_bl">
                     <ptr target="#ec_bl"/>
                     <ptr target="#ec_bl_lat"/>
                 </ge:transpose>

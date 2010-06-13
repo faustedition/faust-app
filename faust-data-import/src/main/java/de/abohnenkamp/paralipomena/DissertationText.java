@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.faustedition.ErrorUtil;
+import de.faustedition.Log;
 import de.faustedition.xml.NodeListIterable;
 import de.faustedition.xml.XmlUtil;
 import de.swkk.metadata.GSACallNumber;
@@ -57,7 +57,7 @@ public class DissertationText implements InitializingBean {
 			teiTransformer.transform(new DOMSource(element), result);
 			return ((Document) result.getNode()).getDocumentElement();
 		} catch (TransformerException e) {
-			throw ErrorUtil.fatal(e, "Error transforming paralipomenon snippet to TEI");
+			throw Log.fatalError(e, "Error transforming paralipomenon snippet to TEI");
 		}
 	}
 

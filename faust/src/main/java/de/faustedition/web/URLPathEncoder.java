@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.faustedition.ErrorUtil;
+import de.faustedition.Log;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -30,7 +30,7 @@ public class URLPathEncoder implements TemplateMethodModelEx {
 		try {
 			return URLEncoder.encode(path, "UTF-8").replaceAll(UTF8_ENCODED_SLASH_PATTERN, "/");
 		} catch (UnsupportedEncodingException e) {
-			throw ErrorUtil.fatal(e, "UTF-8 encoding unsupported");
+			throw Log.fatalError(e, "UTF-8 encoding unsupported");
 		}
 	}
 
@@ -42,7 +42,7 @@ public class URLPathEncoder implements TemplateMethodModelEx {
 			}
 			return path.toString();
 		} catch (UnsupportedEncodingException e) {
-			throw ErrorUtil.fatal(e, "UTF-8 encoding unsupported");
+			throw Log.fatalError(e, "UTF-8 encoding unsupported");
 		}
 	}
 

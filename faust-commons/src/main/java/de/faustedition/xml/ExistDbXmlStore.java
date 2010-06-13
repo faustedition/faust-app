@@ -4,6 +4,7 @@ import static de.faustedition.xml.XPathUtil.xpath;
 import static de.faustedition.xml.XmlDocument.xpath;
 
 import java.net.URI;
+import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -20,6 +21,8 @@ import org.springframework.util.xml.SimpleNamespaceContext;
 import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import de.faustedition.Log;
 
 public class ExistDbXmlStore extends BaseXmlStore {
 	private static final String EXIST_NS_URI = "http://exist.sourceforge.net/NS/exist";
@@ -51,19 +54,19 @@ public class ExistDbXmlStore extends BaseXmlStore {
 
 	public Document get(URI uri) {
 		uri = relativize(uri);
-		LOG.debug("Getting XML resource from XML-DB: {}", uri.toString());
+		Log.LOGGER.debug("Getting XML resource from XML-DB: {}", uri.toString());
 		return (Document) rt.getForObject(uri, DOMSource.class).getNode();
 	}
 
 	public void put(URI uri, Document document) {
 		uri = relativize(uri);
-		LOG.debug("Putting XML document to XML-DB: {}", uri.toString());
+		Log.LOGGER.debug("Putting XML document to XML-DB: {}", uri.toString());
 		rt.put(uri, new DOMSource(document));
 	}
 
 	public void delete(URI uri) {
 		uri = relativize(uri);
-		LOG.debug("Deleting URI in XML-DB: {}", uri.toString());
+		Log.LOGGER.debug("Deleting URI in XML-DB: {}", uri.toString());
 		rt.delete(uri);
 	}
 
@@ -72,7 +75,7 @@ public class ExistDbXmlStore extends BaseXmlStore {
 		if (!isCollection(uri)) {
 			return contents;
 		}
-		
+
 		XPathExpression contentXP = xpath("//exist:result/exist:collection/*", EXIST_NS_CONTEXT);
 		for (Element content : new NodeListIterable<Element>(contentXP, get(uri))) {
 			if (!EXIST_NS_URI.equals(content.getNamespaceURI())) {
@@ -89,12 +92,13 @@ public class ExistDbXmlStore extends BaseXmlStore {
 		return contents;
 	}
 
-	public SortedSet<URI> contents() {
+	@Override
+	public Iterator<URI> iterator() {
 		SortedSet<URI> contents = new TreeSet<URI>();
 		for (Element resource : new NodeListIterable<Element>(xpath("//f:resource"), get(URI.create("Query/Resources.xq")))) {
 			contents.add(URI.create(resource.getTextContent()));
 		}
-		return contents;
+		return contents.iterator();
 	}
 
 	public Document facsimileReferences() {

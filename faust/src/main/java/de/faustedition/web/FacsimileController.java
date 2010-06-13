@@ -18,8 +18,6 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,9 +29,10 @@ import org.w3c.dom.Element;
 
 import com.google.common.collect.Sets;
 
+import de.faustedition.Log;
 import de.faustedition.facsimile.Facsimile;
 import de.faustedition.facsimile.FacsimileProperties;
-import de.faustedition.facsimile.FacsimileTileStore;
+import de.faustedition.facsimile.FacsimileStore;
 import de.faustedition.xml.XmlUtil;
 
 @Controller
@@ -42,10 +41,10 @@ public class FacsimileController implements InitializingBean {
 	private static final String TMS_VERSION = "1.1.0";
 	private static final String TMS_TITLE = "Digitale Faust-Edition :: Facsimile Tile Map Service";
 	private static final int ZOOM_LEVELS = 5;
-	private static final Logger LOG = LoggerFactory.getLogger(FacsimileController.class);
 	private static final Set<String> IIP_PASSTHROUGH_HEADERS = Sets.newHashSet("Content-Type", "Date");
+	
 	@Autowired
-	private FacsimileTileStore store;
+	private FacsimileStore store;
 
 	@Value("#{config['http.base']}")
 	private String baseUrl;
@@ -91,7 +90,7 @@ public class FacsimileController implements InitializingBean {
 		service.appendChild(tileMaps);
 
 		URI base = new URI(baseUrl + "facsimile/tms/" + TMS_VERSION + "/map/");
-		for (Facsimile facsimile : store.all()) {
+		for (Facsimile facsimile : store) {
 			Element map = descriptor.createElement("TileMap");
 			tileMaps.appendChild(map);
 
@@ -203,14 +202,14 @@ public class FacsimileController implements InitializingBean {
 
 	@RequestMapping("/**")
 	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		final String path = StringUtils.removeEnd(ControllerUtil.getPath(request, "facsimile"), FacsimileTileStore.TIF_EXTENSION);
+		final String path = StringUtils.removeEnd(ControllerUtil.getPath(request, "facsimile"), FacsimileStore.TIF_EXTENSION);
 		if (path.length() == 0) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
 		final Facsimile facsimile = new Facsimile(path);
-		LOG.debug("Retrieving {}", facsimile);
+		Log.LOGGER.debug("Retrieving {}", facsimile);
 
 		File file = store.facsimile(facsimile);
 		if (file == null) {

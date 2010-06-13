@@ -4,8 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Iterator;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -13,20 +12,16 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import de.faustedition.ErrorUtil;
+import de.faustedition.Log;
 
 @Service
-public class FacsimileTileStore implements InitializingBean {
+public class FacsimileStore implements InitializingBean, Iterable<Facsimile> {
 	public static final String TIF_EXTENSION = ".tif";
-
-	private static final Logger LOG = LoggerFactory.getLogger(FacsimileTileStore.class);
 
 	@Value("#{config['facsimile.home']}")
 	private String baseDirectory;
@@ -60,7 +55,7 @@ public class FacsimileTileStore implements InitializingBean {
 		String facsimilePath = escapePath(facsimileFile.getAbsolutePath());
 		try {
 			String identifyCommand = MessageFormat.format(this.identifyCommand, facsimilePath);
-			LOG.trace("Identifying facsimile: '{}'", identifyCommand);
+			Log.LOGGER.trace("Identifying facsimile: '{}'", identifyCommand);
 			Process identifyProcess = Runtime.getRuntime().exec(identifyCommand);
 
 			int exitValue = -1;
@@ -81,9 +76,9 @@ public class FacsimileTileStore implements InitializingBean {
 				return properties;
 			}
 
-			throw ErrorUtil.fatal("Error while identifying '%s': %s", facsimilePath, Integer.toString(exitValue));
+			throw Log.fatalError("Error while identifying '%s': %s", facsimilePath, Integer.toString(exitValue));
 		} catch (IOException e) {
-			throw ErrorUtil.fatal(e, "I/O error while identifying '%s'", facsimilePath);
+			throw Log.fatalError(e, "I/O error while identifying '%s'", facsimilePath);
 		}
 
 	}
@@ -93,16 +88,16 @@ public class FacsimileTileStore implements InitializingBean {
 		File result = new File(ptifBase, facsimile.getPath() + TIF_EXTENSION);
 
 		Assert.isTrue(source.isFile(), source.getAbsolutePath() + " exists");
-		LOG.trace("Building tiles for {} ==> {}", new Object[] { facsimile, result.getAbsolutePath() });
+		Log.LOGGER.trace("Building tiles for {} ==> {}", new Object[] { facsimile, result.getAbsolutePath() });
 
 		if (result.isFile() && result.canRead() && result.length() > 0 && (source.lastModified() <= result.lastModified())) {
-			LOG.trace("Found up-to-date tiles for {} in {}", new Object[] { facsimile, result.getAbsolutePath() });
+			Log.LOGGER.trace("Found up-to-date tiles for {} in {}", new Object[] { facsimile, result.getAbsolutePath() });
 			return result;
 		}
 
 		File resultDir = result.getParentFile();
 		if (!resultDir.isDirectory() && !resultDir.mkdirs()) {
-			throw ErrorUtil.fatal("Cannot access/create directory '%s'", resultDir.getAbsolutePath());
+			throw Log.fatalError("Cannot access/create directory '%s'", resultDir.getAbsolutePath());
 		}
 
 		String sourcePath = escapePath(source.getAbsolutePath());
@@ -111,56 +106,42 @@ public class FacsimileTileStore implements InitializingBean {
 		try {
 			int exitValue = -1;
 			try {
-				LOG.trace("Generating facsimile tiles: '{}'", command);
+				Log.LOGGER.trace("Generating facsimile tiles: '{}'", command);
 				Process conversionProcess = Runtime.getRuntime().exec(command);
 				exitValue = conversionProcess.waitFor();
 			} catch (InterruptedException e) {
 			}
 
 			if (exitValue != 0) {
-				throw ErrorUtil.fatal("Error while converting '%s': %s", sourcePath, Integer.toString(exitValue));
+				throw Log.fatalError("Error while converting '%s': %s", sourcePath, Integer.toString(exitValue));
 			}
 		} catch (IOException e) {
-			throw ErrorUtil.fatal(e, "I/O error while converting '%s'", sourcePath);
+			throw Log.fatalError(e, "I/O error while converting '%s'", sourcePath);
 		}
 
 		return result;
 	}
 
-	public SortedSet<Facsimile> all() {
-		final SortedSet<Facsimile> facsimiles = new TreeSet<Facsimile>();
-		for (Object file : FileUtils.listFiles(tifBase, new FileFileFilter() {
+	@Override
+	public Iterator<Facsimile> iterator() {
+		final Iterator<?> facsimiles = FileUtils.listFiles(tifBase, FACSIMILE_FILE_FILTER, TrueFileFilter.INSTANCE).iterator();
+		return new Iterator<Facsimile>() {
+
 			@Override
-			public boolean accept(File file) {
-				return super.accept(file) && file.getName().endsWith(TIF_EXTENSION);
+			public boolean hasNext() {
+				return facsimiles.hasNext();
 			}
-		}, TrueFileFilter.INSTANCE)) {
-			facsimiles.add(toFacsimile((File) file));
-		}
-		if (!facsimiles.isEmpty()) {
-			return facsimiles;
-		}
-		return facsimiles;
-	}
 
-	public void build() {
-		LOG.debug("Building complete facsimile tile store");
-		build(tifBase);
-	}
+			@Override
+			public Facsimile next() {
+				return toFacsimile((File) facsimiles.next());
+			}
 
-	private void build(File base) {
-		LOG.debug("Building facsimile tile store contents in " + base.getAbsolutePath());
-		for (File sourceContent : base.listFiles()) {
-			if (sourceContent.isDirectory()) {
-				build(sourceContent);
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
 			}
-			if (!sourceContent.isFile()) {
-				continue;
-			}
-			if (sourceContent.getName().endsWith(TIF_EXTENSION)) {
-				tiles(toFacsimile(sourceContent));
-			}
-		}
+		};
 	}
 
 	protected static String escapePath(String path) {
@@ -185,4 +166,12 @@ public class FacsimileTileStore implements InitializingBean {
 		throw new IllegalStateException("Cannot create subdirectory '" + subDirectory.getAbsolutePath() + "'");
 
 	}
+
+	private static final FileFileFilter FACSIMILE_FILE_FILTER = new FileFileFilter() {
+		@Override
+		public boolean accept(File file) {
+			return super.accept(file) && file.getName().endsWith(TIF_EXTENSION);
+		}
+	};
+
 }

@@ -21,7 +21,7 @@ public class PurgeLegacyMetadata {
 
 	@Test
 	public void purgeLegacyFiles() throws IOException {
-		for (URI resource : xmlStore.contents()) {
+		for (URI resource : xmlStore) {
 			if ("metadata.xml".equals(FilenameUtils.getName(resource.getPath()))) {
 				xmlStore.delete(resource);
 			}

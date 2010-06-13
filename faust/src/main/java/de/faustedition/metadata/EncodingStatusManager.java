@@ -10,8 +10,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.time.StopWatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -21,13 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 
+import de.faustedition.Log;
 import de.faustedition.xml.NodeListIterable;
 import de.faustedition.xml.XmlStore;
 
 @Service
 public class EncodingStatusManager {
-	private static final Logger LOG = LoggerFactory.getLogger(EncodingStatusManager.class);
-	
 	@Autowired
 	private SimpleJdbcTemplate jt;
 
@@ -51,7 +48,7 @@ public class EncodingStatusManager {
 
 	@Transactional
 	public void update()  {
-		LOG.info("Updating encoding status cache ...");
+		Log.LOGGER.info("Updating encoding status cache ...");
 		StopWatch sw = new StopWatch();
 		sw.start();
 		
@@ -68,6 +65,6 @@ public class EncodingStatusManager {
 		jt.batchUpdate("insert into encoding_status values (:path, :status)", statusArray);
 		
 		sw.stop();
-		LOG.info("Updated encoding status cache in {}", sw);
+		Log.LOGGER.info("Updated encoding status cache in {}", sw);
 	}
 }

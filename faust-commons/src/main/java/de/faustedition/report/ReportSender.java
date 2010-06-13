@@ -7,18 +7,16 @@ import java.text.MessageFormat;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import de.faustedition.ErrorUtil;
+import de.faustedition.Log;
 
 public class ReportSender {
 	private static final String SUBJECT_FORMAT = "[Faust-Edition-Report] {0}";
-	private static final Logger LOG = LoggerFactory.getLogger(ReportSender.class);
+
 	@Autowired
 	private JavaMailSender mailSender;
 
@@ -38,7 +36,7 @@ public class ReportSender {
 
 	public void send(Report report) {
 		if (report.isEmpty()) {
-			LOG.debug("Not sending report {}; it is empty.", report);
+			Log.LOGGER.debug("Not sending report '{}'; it is empty.", report);
 			return;
 		}
 
@@ -59,10 +57,10 @@ public class ReportSender {
 			helper.setText(body);
 			mailSender.send(message);
 		} catch (MailException e) {
-			LOG.debug("Error while sending mail report (mail contents follow exception output)", e);
-			LOG.warn("Subject: " + subject + "\n\n" + body);
+			Log.LOGGER.debug("Error while sending mail report (mail contents follow exception output)", e);
+			Log.LOGGER.warn("Subject: " + subject + "\n\n" + body);
 		} catch (MessagingException e) {
-			throw ErrorUtil.fatal(e);
+			throw Log.fatalError(e);
 		}
 	}
 

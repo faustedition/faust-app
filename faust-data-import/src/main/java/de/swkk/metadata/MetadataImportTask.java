@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import de.faustedition.ErrorUtil;
+import de.faustedition.Log;
 import de.faustedition.tei.EncodedTextDocument;
 import de.faustedition.tei.EncodedTextDocumentBuilder;
 import de.faustedition.xml.XmlStore;
@@ -28,7 +26,6 @@ import de.faustedition.xml.XmlUtil;
 
 @Service
 public class MetadataImportTask implements Runnable {
-	private static final Logger LOG = LoggerFactory.getLogger(MetadataImportTask.class);
 	private static final Pattern SIGLA_PATTERN = Pattern.compile("[A-Za-z0-9]");
 
 	@Autowired
@@ -41,14 +38,14 @@ public class MetadataImportTask implements Runnable {
 
 	public void run() {
 		try {
-			LOG.info("Importing metadata ...");
+			Log.LOGGER.info("Importing metadata ...");
 			StopWatch sw = new StopWatch();
 			sw.start();
 			doImport();
 			sw.stop();
-			LOG.info("Metadata imported in " + sw);
+			Log.LOGGER.info("Metadata imported in " + sw);
 		} catch (Exception e) {
-			ErrorUtil.fatal(e, "Error while importing metadata");
+			Log.fatalError(e, "Error while importing metadata");
 		}
 	}
 
@@ -64,7 +61,7 @@ public class MetadataImportTask implements Runnable {
 				String portfolioName = Integer.toString(archiveDbRecord.getIdentNum());
 
 				URI portfolio = URI.create(String.format("Witness/GSA/%s/", portfolioName));
-				LOG.info("Importing metadata for GSA signature '{}' to '{}'", callNumber, portfolio.toString());
+				Log.LOGGER.info("Importing metadata for GSA signature '{}' to '{}'", callNumber, portfolio.toString());
 
 				URI destinationUri = null;
 				EncodedTextDocument destination = null;
@@ -88,7 +85,7 @@ public class MetadataImportTask implements Runnable {
 				}
 
 				documentBuilder.addTemplate(destination);
-				LOG.info("Writing metadata to {}", destinationUri);
+				Log.LOGGER.info("Writing metadata to {}", destinationUri);
 				writeMetadataTo(destination, metadata, portfolioName, archiveDbRecord.getCallNumber());
 				documentBuilder.addTemplate(destination);
 				xmlDbManager.put(destinationUri, destination.getDom());

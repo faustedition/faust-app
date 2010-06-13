@@ -1,6 +1,5 @@
 package de.faustedition.xml;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,18 +17,13 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.util.xml.TransformerUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,29 +31,21 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import de.faustedition.ErrorUtil;
+import de.faustedition.Log;
 
 public class XmlUtil {
-	private static final Resource SERIALIZATION_XSL_RESOURCE = new ClassPathResource("serialization.xsl", XmlUtil.class);
-	public static final Templates SERIALIZATION_TEMPLATES;
-
-	static {
-		try {
-			SERIALIZATION_TEMPLATES = transformerFactory().newTemplates(
-					new StreamSource(SERIALIZATION_XSL_RESOURCE.getInputStream()));
-		} catch (TransformerConfigurationException e) {
-			throw ErrorUtil.fatal(e, "XSL error while creating serialization transform");
-		} catch (IOException e) {
-			throw ErrorUtil.fatal(e, "I/O error while creating serialization transform");
-		}
-	}
+	private static SAXParserFactory saxParserFactory;
+	private static DocumentBuilderFactory documentBuilderFactory;
+	private static TransformerFactory transformerFactory;
 
 	public static SAXParser saxParser() {
 		try {
-			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-			parserFactory.setNamespaceAware(true);
-			parserFactory.setValidating(false);
-			return parserFactory.newSAXParser();
+			if (saxParserFactory == null) {
+				saxParserFactory = SAXParserFactory.newInstance();
+				saxParserFactory.setNamespaceAware(true);
+				saxParserFactory.setValidating(false);
+			}
+			return saxParserFactory.newSAXParser();
 		} catch (ParserConfigurationException e) {
 			throw new XmlException("Error configuring SAX parser factory", e);
 		} catch (SAXException e) {
@@ -69,16 +55,18 @@ public class XmlUtil {
 
 	public static DocumentBuilder documentBuilder() {
 		try {
-			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-			documentBuilderFactory.setNamespaceAware(true);
-			documentBuilderFactory.setCoalescing(true);
-			documentBuilderFactory.setValidating(false);
+			if (documentBuilderFactory == null) {
+				documentBuilderFactory = DocumentBuilderFactory.newInstance();
+				documentBuilderFactory.setNamespaceAware(true);
+				documentBuilderFactory.setCoalescing(true);
+				documentBuilderFactory.setValidating(false);
+			}
 
 			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 			documentBuilder.setErrorHandler(new StrictNoOutputErrorCallback());
 			return documentBuilder;
 		} catch (ParserConfigurationException e) {
-			throw ErrorUtil.fatal(e, "Error configuring DOM builder");
+			throw Log.fatalError(e, "Error configuring DOM builder");
 		}
 	}
 
@@ -91,8 +79,10 @@ public class XmlUtil {
 	}
 
 	public static TransformerFactory transformerFactory() {
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		transformerFactory.setErrorListener(new StrictNoOutputErrorCallback());
+		if (transformerFactory == null) {
+			transformerFactory = TransformerFactory.newInstance();
+			transformerFactory.setErrorListener(new StrictNoOutputErrorCallback());
+		}
 		return transformerFactory;
 	}
 
@@ -116,9 +106,7 @@ public class XmlUtil {
 
 	public static void serialize(Node node, Writer writer) {
 		try {
-			Transformer transformer = SERIALIZATION_TEMPLATES.newTransformer();
-			TransformerUtils.enableIndenting(transformer, 4);
-			transformer.transform(new DOMSource(node), new StreamResult(writer));
+			transformerFactory().newTransformer().transform(new DOMSource(node), new StreamResult(writer));
 		} catch (TransformerException e) {
 			throw new XmlException("XSLT error while serializing XML data");
 		}
@@ -139,10 +127,6 @@ public class XmlUtil {
 		} catch (IOException e) {
 			throw new XmlException("XSLT error while parsing DOM", e);
 		}
-	}
-
-	public static Document parse(byte[] data) {
-		return parse(new ByteArrayInputStream(data));
 	}
 
 	public static boolean hasText(Element element) {
