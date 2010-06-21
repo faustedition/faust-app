@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,7 +23,7 @@ import de.faustedition.xml.NodeListIterable;
 import de.faustedition.xml.XmlStore;
 
 @Service
-public class EncodingStatusManager {
+public class EncodingStatusManager implements Runnable {
 	@Autowired
 	private SimpleJdbcTemplate jt;
 
@@ -46,11 +45,10 @@ public class EncodingStatusManager {
 		return statusMap;
 	}
 
+	@Override
 	@Transactional
-	public void update()  {
-		Log.LOGGER.info("Updating encoding status cache ...");
-		StopWatch sw = new StopWatch();
-		sw.start();
+	public void run() {
+		Log.LOGGER.info("Updating encoding status cache");
 		
 		final List<SqlParameterSource> statusList = new ArrayList<SqlParameterSource>();
 		for (Element statusEl : new NodeListIterable<Element>(xpath("//f:status"), xmlStore.encodingStati())) {
@@ -62,9 +60,6 @@ public class EncodingStatusManager {
 
 		final SqlParameterSource[] statusArray = statusList.toArray(new SqlParameterSource[statusList.size()]);
 		jt.update("delete from encoding_status");
-		jt.batchUpdate("insert into encoding_status values (:path, :status)", statusArray);
-		
-		sw.stop();
-		Log.LOGGER.info("Updated encoding status cache in {}", sw);
+		jt.batchUpdate("insert into encoding_status values (:path, :status)", statusArray);		
 	}
 }

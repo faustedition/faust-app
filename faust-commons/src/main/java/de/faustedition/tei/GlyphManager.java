@@ -49,6 +49,7 @@ public class GlyphManager implements InitializingBean {
 					for (Glyph glyph : glyphs) {
 						glyphData.add(glyph.toSqlParameterSource());
 					}
+					jt.update("delete from glyph");
 					jt.batchUpdate("insert into glyph (id, name, description, equivalent) values (:id, :name, :description, :equivalent)",//
 							glyphData.toArray(new SqlParameterSource[glyphData.size()]));
 				}
@@ -104,6 +105,7 @@ public class GlyphManager implements InitializingBean {
 			glyphs.add(new Glyph("g_transp_1", "TRANSPOSITION SIGN 1", "„Einweisungzeichen“ mit einem nach rechts weisendem Querbalken.", null));
 			glyphs.add(new Glyph("g_transp_2", "TRANSPOSITION SIGN 2", "„Einweisungzeichen“ mit zwei nach rechts weisendem Querbalken.", null));
 			glyphs.add(new Glyph("g_transp_3", "TRANSPOSITION SIGN 3", "Geschwungenes „Einweisungzeichen“.", null));
+			glyphs.add(new Glyph("g_transp_4", "TRANSPOSITION SIGN 4", "Gekreuztes „Einweisungzeichen“.", null));
 			glyphs.add(new Glyph("parenthesis_left", "LEFT PARENTHESIS",//
 					"In 18th century there were different ways to represent parentheses in handwritten documents. " + //
 							"Then the token most often used (default symbol) was a vertical stroke combined with a colon. " + //

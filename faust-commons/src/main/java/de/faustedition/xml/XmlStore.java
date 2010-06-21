@@ -7,7 +7,8 @@ import java.util.SortedSet;
 import org.w3c.dom.Document;
 
 public interface XmlStore extends Iterable<URI> {
-
+	final URI WITNESS_BASE = URI.create("Witness/");
+	
 	SortedSet<URI> list(URI uri) throws IOException;
 
 	Document get(URI uri) throws IOException;
@@ -21,4 +22,10 @@ public interface XmlStore extends Iterable<URI> {
 	Document encodingStati();
 
 	Document identifiers();
+	
+	boolean isWitnessEncodingDocument(URI uri) ;
+	
+	boolean isDocumentEncodingDocument(URI uri) ;
+	
+	boolean isTextEncodingDocument(URI uri);
 }

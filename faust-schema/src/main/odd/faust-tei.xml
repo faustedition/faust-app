@@ -165,6 +165,64 @@
 
 					<!-- ================== TEI-SIG Genetic Editions: START ================== -->
 
+					<classSpec ident="att.staged" type="atts" mode="add" module="tei">
+						<desc>groups elements which can be assigned to a specific text stage by means of the attributes it
+							provides.</desc>
+						<attList>
+							<attDef ident="stage" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+								<desc> points to one or more <gi>stageNote</gi> elements which contain a description of a text-stage
+									to which the editors think the alteration/ text passage marked by the element bearing this
+									attribute (and its children) belongs. </desc>
+								<datatype minOccurs="1" maxOccurs="unbounded">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+						</attList>
+					</classSpec>
+
+					<!--  ================================ MODIFIED for Faust !!! -->
+					<classSpec type="atts" ident="att.global" mode="change" module="tei">
+						<classes>
+							<!-- 
+								<memberOf key="att.global.linking" />
+								<memberOf key="att.global.analytic" />
+								<memberOf key="att.global.facs" />
+							-->
+							<memberOf key="att.staged"/>
+							<memberOf key="att.layoutAlignment"/>
+						</classes>
+						<attList>
+							<attDef ident="rend" usage="opt" mode="change">
+								<valList type="semi" mode="add">
+									<valItem ident="left">
+										<gloss>linksbündigen Ausrichtung</gloss>
+									</valItem>
+									<valItem ident="right">
+										<gloss>rechtsbündige Ausrichtung</gloss>
+									</valItem>
+									<valItem ident="center">
+										<gloss>zentrierte Ausrichtung</gloss>
+									</valItem>
+									<valItem ident="inline">
+										<gloss>innerhalb der (vorherigen) Zeile</gloss>
+									</valItem>
+									<valItem ident="underline">
+										<gloss>unterstrichen</gloss>
+									</valItem>
+									<valItem ident="double">
+										<gloss>doppelte/mehrfach, z. B. bei Streichungen</gloss>
+									</valItem>
+									<valItem ident="vertical">
+										<gloss>vertikal, z. B. vertikal durchgestrichen</gloss>
+									</valItem>
+									<valItem ident="erase">
+										<gloss>Rasur</gloss>
+									</valItem>
+								</valList>
+							</attDef>
+						</attList>						
+					</classSpec>
+										
 					<!-- =============== Content models for the documentary view =============== -->
 
 					<classSpec ident="model.zonePart" type="model" mode="add">
@@ -255,30 +313,13 @@
 							<memberOf key="model.zonePart"/>
 							<memberOf key="model.linePart"/>
 							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
 							<memberOf key="att.spanning"/>
 							<memberOf key="att.transcriptional"/>
 						</classes>
 						<content>
 							<rng:ref name="macro.lineContent"/>
 						</content>
-						<attList>
-							<attDef ident="rend" usage="opt">
-								<valList type="closed" mode="add">
-									<valItem ident="double">
-										<gloss>doppelte Streichung</gloss>
-									</valItem>
-									<valItem ident="double">
-										<gloss>mehrfache Streichung</gloss>
-									</valItem>
-									<valItem ident="vertical">
-										<gloss>vertikal durchgestrichen</gloss>
-									</valItem>
-									<valItem ident="erase">
-										<gloss>Rasur</gloss>
-									</valItem>
-								</valList>
-							</attDef>
-						</attList>
 					</elementSpec>
 
 					<classSpec ident="model.linePart.overwritten" type="model"/>
@@ -453,32 +494,7 @@
 						</content>
 					</elementSpec>
 					<!-- =============== Text stages =============== -->
-					<classSpec ident="att.staged" type="atts" mode="add" module="tei">
-						<desc>groups elements which can be assigned to a specific text stage by means of the attributes it
-							provides.</desc>
-						<attList>
-							<attDef ident="stage" mode="add">
-								<desc> points to one or more <gi>stageNote</gi> elements which contain a description of a text-stage
-									to which the editors think the alteration/ text passage marked by the element bearing this
-									attribute (and its children) belongs. </desc>
-								<datatype minOccurs="1" maxOccurs="unbounded">
-									<rng:ref name="data.pointer"/>
-								</datatype>
-							</attDef>
-						</attList>
-					</classSpec>
-					<!--  ================================ MODIFIED for Faust !!! -->
-					<classSpec type="atts" ident="att.global" mode="change" module="tei">
-						<classes>
-							<!-- 
-							<memberOf key="att.global.linking" />
-							<memberOf key="att.global.analytic" />
-							<memberOf key="att.global.facs" />
-							 -->
-							<memberOf key="att.staged"/>
-							<memberOf key="att.layoutAlignment"/>
-						</classes>
-					</classSpec>
+
 					<elementSpec ident="creation" mode="change">
 						<content>
 							<rng:ref name="macro.phraseSeq.limited"/>

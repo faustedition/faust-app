@@ -26,7 +26,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @goal schema
  * @phase generate-resources
  */
-public class SchemaMojo extends AbstractMojo {
+public class OddSchemaMojo extends AbstractMojo {
 	/**
 	 * Base URL of the TEI P5 stylesheets.
 	 * 

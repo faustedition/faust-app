@@ -14,9 +14,4 @@ public class ReportConfiguration {
 		mailSender.setHost("localhost");
 		return mailSender;
 	}
-
-	@Bean
-	public ReportSender reportSender() {
-		return new ReportSender("Faust-Edition <noreply@faustedition.net>", "Gregor Middell <gregor@middell.net>");
-	}
 }

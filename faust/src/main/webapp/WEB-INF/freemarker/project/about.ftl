@@ -1,6 +1,5 @@
-[#ftl]
-[@faust.page title="The Project"]
-	<p style="float: left; margin-right: 1em"><img src="${ctx}/img/emblem.jpg" alt="Faust-Emblem" /></p>
+<@faust.page title="The Project">
+	<p style="float: left; margin-right: 1em"><img src="${cp}/img/emblem.jpg" alt="Faust-Emblem" /></p>
 
 	<h2>Goethe’s Faust. A genetic edition</h2>
 
@@ -18,4 +17,4 @@
 	(<a href="http://www.digital-humanities.de/" title="Homepage">Julius-Maximilians-Universität Würzburg</a>). 
 	It is financed by the <a href="http://www.dfg.de/" title="Homepage">Deutsche Forschungsgemeinschaft</a>
 	(German Research Foundation).</p>	
-[/@faust.page]
+</@faust.page>

@@ -5,7 +5,6 @@ import static de.faustedition.xml.XmlDocument.xpath;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -19,19 +18,18 @@ import de.faustedition.xml.NodeListIterable;
 import de.faustedition.xml.XmlStore;
 
 @Service
-public class IdentifierManager {
+public class IdentifierManager implements Runnable {
 	@Autowired
 	private SimpleJdbcTemplate jt;
 
 	@Autowired
 	private XmlStore xmlStore;
 
+	@Override
 	@Transactional
-	public void update() {
-		Log.LOGGER.info("Updating identifier cache ...");
-		StopWatch sw = new StopWatch();
-		sw.start();
-		
+	public void run() {
+		Log.LOGGER.info("Updating identifier cache");
+
 		final List<SqlParameterSource> identifierList = new ArrayList<SqlParameterSource>();
 		for (Element identifier : new NodeListIterable<Element>(xpath("//f:id"), xmlStore.identifiers())) {
 			MapSqlParameterSource identifierRecord = new MapSqlParameterSource();
@@ -44,9 +42,5 @@ public class IdentifierManager {
 		final SqlParameterSource[] identifierArray = identifierList.toArray(new SqlParameterSource[identifierList.size()]);
 		jt.update("delete from identifier");
 		jt.batchUpdate("insert into identifier values (:path, :type, :id)", identifierArray);
-		
-		sw.stop();
-		Log.LOGGER.info("Updated identifier cache in {}", sw);
-
 	}
 }

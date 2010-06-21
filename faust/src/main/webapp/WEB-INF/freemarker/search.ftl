@@ -1,17 +1,16 @@
-[#ftl]
-[@faust.page title="Suche"]
+<@faust.page title="Suche">
 	<div>
-	<form action="${ctx}/search" method="get">
-		<p>[@spring.formInput "searchCommand.query" 'size="40"' /]</p>
+	<form action="${cp}/search" method="get">
+		<p><@spring.formInput "searchCommand.query" 'size="40"' /></p>
 		<p><input type="submit" value="Suchen" /></p>
 	</form>
 	</div>
 
-	[#if searchResultList??]
+	<#if searchResultList??>
 		<div>
-			[#list searchResultList as r]
+			<#list searchResultList as r>
 				<p>${r.description?html}</p>
-			[/#list]
+			</#list>
 		</div>
-	[/#if]
-[/@faust.page]
+	</#if>
+</@faust.page>

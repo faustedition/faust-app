@@ -1,5 +1,4 @@
-[#ftl]
-[@faust.page title="Text"]
+<@faust.page title="Text">
 	<h2>Lesetext – Beispiel/ Auszug</h2>
 
 	<p class="small-font" style="margin-bottom: 2em">Johann Wolfgang Goethe. Sämtliche Werke nach Epochen seines Schaffens (Münchener Ausgabe). Band 18.1. München, Wien. 1997. S.&nbsp;333-336.</p>
@@ -167,4 +166,4 @@
 
 	</div>
 	</div>
-[/@faust.page]
+</@faust.page>

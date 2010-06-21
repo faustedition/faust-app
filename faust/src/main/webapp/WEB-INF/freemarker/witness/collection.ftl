@@ -1,22 +1,21 @@
-[#ftl]
-[#assign title][#if path == 'Witness/']Überlieferungsträger[#else][@faust.nameOf path /][/#if][/#assign]
-[@faust.page title=(title?html)]
-	[@faust.breadcrumbs path "Überlieferungsträger" /]
+<#assign title><#if path == 'Witness/'>Überlieferungsträger<#else><@faust.nameOf path /></#if></#assign>
+<@faust.page title=(title?html)>
+	<@faust.breadcrumbs path "Überlieferungsträger" />
 	<div class="yui-gc">
 		<div class="yui-u first">
 			<h2>${title?html}</h2>
 	
 			<table class="border" style="width: 90%; margin: 0 5%">
-				[@faust.tableGrid contents ; c]
-					[#assign name][@faust.nameOf c?string /][/#assign]
+				<@faust.tableGrid contents ; c>
+					<#assign name><@faust.nameOf c?string /></#assign>
 					<td style="width: 20%" class="center no-border">
-						<a class="img" href="${ctx}/${encodePath(c?string)}" title="${name?html}">
-							<img src="${ctx}/img/witness/[#if c?string?ends_with("/")]collection[#else]witness[/#if].png" alt="[Typ-Icon]" />
+						<a class="img" href="${cp}/${encodePath(c?string)}" title="${name?html}">
+							<img src="${cp}/img/witness/<#if c?string?ends_with("/")>collection<#else>witness</#if>.png" alt="[Typ-Icon]" />
 						</a>
 						<br/>
-						<a href="${ctx}/${encodePath(c?string)}" title="${name?html}">${name?html}</a>
+						<a href="${cp}/${encodePath(c?string)}" title="${name?html}">${name?html}</a>
 					</td>
-				[/@faust.tableGrid]
+				</@faust.tableGrid>
 			</table>
 		</div>
 		<div class="yui-u">
@@ -28,4 +27,4 @@
 			}
 		</script>
 	</div>
-[/@faust.page]
+</@faust.page>

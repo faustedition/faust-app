@@ -17,25 +17,26 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<list>
-				<value>/WEB-INF/config-default.properties</value>
-				<value>/WEB-INF/config-#{T(java.net.InetAddress).localHost.hostName}.properties</value>
+				<value>classpath:/web-config-default.properties</value>
+				<value>classpath:/web-config-#{T(java.net.InetAddress).localHost.hostName}.properties</value>
 			</list>
 		</property>
 	</bean>
 
-	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource" p:basename="/WEB-INF/messages" />
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource" p:basenames="classpath:/messages,/WEB-INF/messages" />
 
 	<context:component-scan base-package="de.faustedition">
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 
-	<tx:annotation-driven />
+	<tx:annotation-driven proxy-target-class="true" />
 
 	<task:executor id="executor" pool-size="10" />
 
 	<sec:http auto-config="true" realm="Digitale Faust-Edition" create-session="never">
 		<sec:intercept-url pattern="/" access="ROLE_ANONYMOUS,ROLE_EDITOR" />
 		<sec:intercept-url pattern="/project/**" access="ROLE_ANONYMOUS,ROLE_EDITOR" />
+		<sec:intercept-url pattern="/task/**" access="ROLE_ADMIN" />
 		<sec:intercept-url pattern="/**" access="ROLE_EDITOR" />
 		<sec:intercept-url pattern="/css/**" filters="none" />
 		<sec:intercept-url pattern="/img/**" filters="none" />

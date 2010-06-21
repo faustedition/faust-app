@@ -1,9 +1,8 @@
-[#ftl]
-[#assign title][@spring.message "project.contact.title" /][/#assign]
-[@faust.page title=title]
+<#assign title><@spring.message "project.contact.title" /></#assign>
+<@faust.page title=title>
 	<div class="yui-g">
 	<div class="yui-u first">
-		<h2>[@spring.message "project.contact.editors" /]</h2>
+		<h2><@spring.message "project.contact.editors" /></h2>
 	
 		<p><strong>Prof. Dr. Anne Bohnenkamp</strong><br />
 		Direktorin des Freien Deutschen Hochstifts<br />
@@ -28,7 +27,7 @@
 		<a href="mailto:fotis.jannidis@uni-wuerzburg.de" title="E-Mail">fotis.jannidis@uni-wuerzburg.de</a></p>
 	</div>
 	<div class="yui-u">
-		<h2>[@spring.message "project.contact.staff" /]</h2>
+		<h2><@spring.message "project.contact.staff" /></h2>
 	
 		<p>Freies Deutsches Hochstift – Frankfurter Goethe-Museum<br />
 		Großer Hirschgraben 23-25<br />
@@ -61,4 +60,4 @@
 		<a href="mailto:m.wissenbach@gmx.de" title="E-Mail">m.wissenbach@gmx.de</a></p>
 	</div>
 	</div>
-[/@faust.page]
+</@faust.page>

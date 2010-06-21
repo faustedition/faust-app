@@ -25,7 +25,7 @@ function onDOM(func) {
 
 function encodingStatus(path) {
 	onContent("encoding-status", function() {
-		var transcriptionStatusDs = new YAHOO.util.XHRDataSource(ctx + '/metadata/encoding/' + encodeURI(path));
+		var transcriptionStatusDs = new YAHOO.util.XHRDataSource(cp + '/metadata/encoding/' + encodeURI(path));
 		transcriptionStatusDs.connMgr.initHeader('Content-Type', 'application/json', true);
 		transcriptionStatusDs.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;
 		transcriptionStatusDs.responseSchema = {

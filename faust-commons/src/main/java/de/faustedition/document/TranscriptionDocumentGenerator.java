@@ -1,13 +1,13 @@
 package de.faustedition.document;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +19,13 @@ import de.faustedition.Log;
 import de.faustedition.facsimile.Facsimile;
 import de.faustedition.facsimile.FacsimileStore;
 import de.faustedition.report.Report;
-import de.faustedition.report.ReportSender;
+import de.faustedition.report.ReportManager;
 import de.faustedition.tei.EncodedTextDocument;
 import de.faustedition.tei.EncodedTextDocumentBuilder;
 import de.faustedition.xml.XmlStore;
 
 @Service
 public class TranscriptionDocumentGenerator implements Runnable {
-	private static final URI WITNESS_BASE = URI.create("Witness/");
-
 	@Autowired
 	private FacsimileStore facsimileStore;
 
@@ -38,7 +36,7 @@ public class TranscriptionDocumentGenerator implements Runnable {
 	private EncodedTextDocumentBuilder documentBuilder;
 
 	@Autowired
-	private ReportSender reportSender;
+	private ReportManager reportManager;
 
 	@Override
 	public void run() {
@@ -49,7 +47,7 @@ public class TranscriptionDocumentGenerator implements Runnable {
 
 			Log.LOGGER.debug("Generating missing page-base transcription documents");
 			for (Facsimile facsimile : facsimiles) {
-				URI uri = WITNESS_BASE.resolve(facsimile.getPath() + ".xml");
+				URI uri = XmlStore.WITNESS_BASE.resolve(facsimile.getPath() + ".xml");
 				if (!xml.contains(uri)) {
 					EncodedTextDocument document = documentBuilder.create();
 					Facsimile.writeTo(document, Collections.singletonList(facsimile));
@@ -61,7 +59,7 @@ public class TranscriptionDocumentGenerator implements Runnable {
 			}
 
 			Log.LOGGER.debug("Generating missing text-oriented transcription documents");
-			final String witnessBasePath = WITNESS_BASE.getPath();
+			final String witnessBasePath = XmlStore.WITNESS_BASE.getPath();
 			for (URI uri : xml) {
 				final String path = uri.getPath();
 				if (!path.endsWith("/") || !path.startsWith(witnessBasePath)) {
@@ -95,25 +93,10 @@ public class TranscriptionDocumentGenerator implements Runnable {
 					detached.add(uri);
 				}
 			}
-			reportSender.send(new Report() {
-
-				@Override
-				public void printBody(PrintWriter body) {
-					for (URI uri : detached) {
-						body.println(uri.toString());
-					}
-				}
-
-				@Override
-				public boolean isEmpty() {
-					return detached.isEmpty();
-				}
-
-				@Override
-				public String getSubject() {
-					return "Detached transcription documents";
-				}
-			});
+			
+			Report report = new Report("detached_transcription_documents");
+			report.setBody(StringUtils.join(detached, "\n"));
+			reportManager.send(report);
 		} catch (IOException e) {
 			Log.fatalError(e, "I/O error while generating page transcription documents");
 		}

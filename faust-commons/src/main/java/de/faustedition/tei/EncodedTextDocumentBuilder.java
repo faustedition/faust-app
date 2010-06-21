@@ -27,11 +27,10 @@ import de.faustedition.xml.XmlStore;
 
 @Service
 public class EncodedTextDocumentBuilder implements Runnable {
-	public static final String SCHEMA_URI = "schema/faust-tei.rng";
-	public static final String CSS_URI = "css/faust-tei.css";
+	public static final String CSS_URI = "http://xml.faustedition.net/schema/faust-tei.css";
 
-	@Value("#{config['http.base']}")
-	private String baseUrl;
+	@Value("#{config['tei.schema.url']}")
+	private String teiSchemaUrl;
 
 	@Autowired
 	private HandPropertiesManager handProperties;
@@ -65,16 +64,15 @@ public class EncodedTextDocumentBuilder implements Runnable {
 	public void run() {
 		try {
 			Log.LOGGER.info("Templating TEI documents");
+
 			for (URI resource : xmlStore) {
-				Log.LOGGER.debug(resource.toASCIIString());
-				if (!resource.getPath().endsWith(".xml")) {
-					continue;
+				if (!xmlStore.isWitnessEncodingDocument(resource)) {
+					continue;					
 				}
 				try {
 					Log.LOGGER.debug("Templating TEI-XML in {}", resource.toString());
 					EncodedTextDocument doc = new EncodedTextDocument((Document) xmlStore.get(resource));
-					addTemplate(doc);
-					xmlStore.put(resource, doc.getDom());
+					xmlStore.put(resource, addTemplate(doc).getDom());
 				} catch (EncodedTextDocumentException e) {
 					Log.LOGGER.warn("Resource '{}' is not a TEI document", resource.toString());
 				}
@@ -150,13 +148,13 @@ public class EncodedTextDocumentBuilder implements Runnable {
 		for (Node piNode : new NodeListIterable<Node>(xpath("/processing-instruction('xml-stylesheet')"), dom)) {
 			dom.removeChild(piNode);
 		}
-		Node cssPi = dom.createProcessingInstruction("xml-stylesheet", String.format("href=\"%s\" type=\"text/css\"", baseUrl + CSS_URI));
+		Node cssPi = dom.createProcessingInstruction("xml-stylesheet", String.format("href=\"%s\" type=\"text/css\"", CSS_URI));
 		dom.insertBefore(cssPi, dom.getFirstChild());
 
 		for (Node piNode : new NodeListIterable<Node>(xpath("/processing-instruction('oxygen')"), dom)) {
 			dom.removeChild(piNode);
 		}
-		Node schemaPi = dom.createProcessingInstruction("oxygen", String.format("RNGSchema=\"%s\" type=\"xml\"", baseUrl + SCHEMA_URI));
+		Node schemaPi = dom.createProcessingInstruction("oxygen", String.format("RNGSchema=\"%s\" type=\"xml\"", teiSchemaUrl));
 		dom.insertBefore(schemaPi, cssPi);
 	}
 

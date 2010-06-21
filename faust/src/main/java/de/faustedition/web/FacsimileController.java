@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
@@ -24,153 +23,28 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import com.google.common.collect.Sets;
 
 import de.faustedition.Log;
 import de.faustedition.facsimile.Facsimile;
-import de.faustedition.facsimile.FacsimileProperties;
 import de.faustedition.facsimile.FacsimileStore;
-import de.faustedition.xml.XmlUtil;
 
 @Controller
 @RequestMapping("/facsimile")
 public class FacsimileController implements InitializingBean {
-	private static final String TMS_VERSION = "1.1.0";
-	private static final String TMS_TITLE = "Digitale Faust-Edition :: Facsimile Tile Map Service";
-	private static final int ZOOM_LEVELS = 5;
 	private static final Set<String> IIP_PASSTHROUGH_HEADERS = Sets.newHashSet("Content-Type", "Date");
-	
-	@Autowired
-	private FacsimileStore store;
-
-	@Value("#{config['http.base']}")
-	private String baseUrl;
 
 	@Value("#{config['iipsrv.url']}")
 	private String iipServerUrl;
 
+	@Autowired
+	private FacsimileStore store;
+
 	private HttpClient httpClient;
 
-	@RequestMapping("/tms")
-	public void tileMappingServiceRoot(HttpServletResponse response) throws IOException {
-		Document descriptor = XmlUtil.documentBuilder().newDocument();
-		Element services = descriptor.createElement("Services");
-		descriptor.appendChild(services);
-
-		Element service = descriptor.createElement("TileMapService");
-		service.setAttribute("title", TMS_TITLE);
-		service.setAttribute("version", TMS_VERSION);
-		service.setAttribute("href", baseUrl + "facsimile/tms/" + TMS_VERSION + "/");
-		services.appendChild(service);
-
-		ControllerUtil.xmlResponse(descriptor, response, "text/xml");
-	}
-
-	@RequestMapping("/tms/" + TMS_VERSION)
-	public void tileMappingService(HttpServletResponse response) throws Exception {
-		Document descriptor = XmlUtil.documentBuilder().newDocument();
-
-		Element service = descriptor.createElement("TileMapService");
-		service.setAttribute("version", TMS_VERSION);
-		service.setAttribute("services", baseUrl + "facsimile/tms/");
-		descriptor.appendChild(service);
-
-		Element title = descriptor.createElement("Title");
-		service.appendChild(title);
-		title.setTextContent(TMS_TITLE);
-
-		Element description = descriptor.createElement("Abstract");
-		service.appendChild(description);
-		description.setTextContent(TMS_TITLE);
-
-		Element tileMaps = descriptor.createElement("TileMaps");
-		service.appendChild(tileMaps);
-
-		URI base = new URI(baseUrl + "facsimile/tms/" + TMS_VERSION + "/map/");
-		for (Facsimile facsimile : store) {
-			Element map = descriptor.createElement("TileMap");
-			tileMaps.appendChild(map);
-
-			map.setAttribute("title", facsimile.toUri().toString());
-			map.setAttribute("srs", "n/a");
-			map.setAttribute("profile", "local");
-			map.setAttribute("href", base.resolve(facsimile.getPath()).toASCIIString());
-		}
-
-		ControllerUtil.xmlResponse(descriptor, response, "text/xml");
-	}
-
-	@RequestMapping("/tms/1.1.0/map/**")
-	public void tileMap(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final String path = ControllerUtil.getPath(request, "facsimile/tms/" + TMS_VERSION + "/map");
-		final Facsimile facsimile = new Facsimile(path);
-		if (path.length() == 0 || store.facsimile(facsimile) == null) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			return;
-		}
-
-		FacsimileProperties properties = store.properties(facsimile);
-
-		Document descriptor = XmlUtil.documentBuilder().newDocument();
-
-		Element map = descriptor.createElement("TileMap");
-		map.setAttribute("version", TMS_VERSION);
-		map.setAttribute("tilemapservice", baseUrl + "tms/" + TMS_VERSION + "/");
-		descriptor.appendChild(map);
-
-		Element title = descriptor.createElement("Title");
-		map.appendChild(title);
-		title.setTextContent(facsimile.toUri().toString());
-
-		Element description = descriptor.createElement("Abstract");
-		map.appendChild(description);
-		description.setTextContent(facsimile.toUri().toString());
-
-		Element srs = descriptor.createElement("SRS");
-		map.appendChild(srs);
-		srs.setTextContent("n/a");
-
-		Element boundingBox = descriptor.createElement("BoundingBox");
-		boundingBox.setAttribute("minx", "0");
-		boundingBox.setAttribute("miny", "0");
-		boundingBox.setAttribute("maxx", Integer.toString(properties.getWidth()));
-		boundingBox.setAttribute("maxy", Integer.toString(properties.getHeight()));
-		map.appendChild(boundingBox);
-
-		Element origin = descriptor.createElement("Origin");
-		origin.setAttribute("x", "0");
-		origin.setAttribute("y", "0");
-		map.appendChild(origin);
-
-		Element format = descriptor.createElement("TileFormat");
-		format.setAttribute("width", "256");
-		format.setAttribute("height", "256");
-		format.setAttribute("mime-type", "image/jpeg");
-		format.setAttribute("extension", "jpg");
-		map.appendChild(format);
-
-		Element tileSets = descriptor.createElement("TileSets");
-		tileSets.setAttribute("profile", "local");
-		map.appendChild(tileSets);
-
-		URI base = new URI(baseUrl + "facsimile/tms/" + TMS_VERSION + "/tile/" + facsimile.getPath() + "/");
-		for (int level = ZOOM_LEVELS; level > 0; level--) {
-			String units = Integer.toString((int) Math.pow(2, level - 1));
-			Element tileSet = descriptor.createElement("TileSet");
-			tileSet.setAttribute("href", base.resolve(units).toASCIIString());
-			tileSet.setAttribute("units-per-pixel", units);
-			tileSet.setAttribute("order", Integer.toString(ZOOM_LEVELS - level));
-			tileSets.appendChild(tileSet);
-		}
-
-		ControllerUtil.xmlResponse(descriptor, response, "text/xml");
-	}
-
 	@RequestMapping("/iip")
-	public void iipProxy(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public void proxyIIP(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		GetMethod get = new GetMethod(iipServerUrl);
 		try {
 			InputStream in = null;
@@ -201,7 +75,7 @@ public class FacsimileController implements InitializingBean {
 	}
 
 	@RequestMapping("/**")
-	public void stream(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void streamFacsimile(WebRequest webRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		final String path = StringUtils.removeEnd(ControllerUtil.getPath(request, "facsimile"), FacsimileStore.TIF_EXTENSION);
 		if (path.length() == 0) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);

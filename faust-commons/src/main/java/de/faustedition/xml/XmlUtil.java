@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -17,15 +19,18 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -37,6 +42,7 @@ public class XmlUtil {
 	private static SAXParserFactory saxParserFactory;
 	private static DocumentBuilderFactory documentBuilderFactory;
 	private static TransformerFactory transformerFactory;
+	private static Templates serialization;
 
 	public static SAXParser saxParser() {
 		try {
@@ -106,17 +112,20 @@ public class XmlUtil {
 
 	public static void serialize(Node node, Writer writer) {
 		try {
-			transformerFactory().newTransformer().transform(new DOMSource(node), new StreamResult(writer));
+			if (serialization == null) {
+				serialization = transformerFactory().newTemplates(//
+						new StreamSource(XmlUtil.class.getResourceAsStream("serialization.xsl")));
+			}
+			serialization.newTransformer().transform(new DOMSource(node), new StreamResult(writer));
 		} catch (TransformerException e) {
 			throw new XmlException("XSLT error while serializing XML data");
 		}
 	}
 
-	public static byte[] serializeFragment(Element fragmentElement) {
-		Document fragmentDataDocument = documentBuilder().newDocument();
-		fragmentDataDocument.appendChild(fragmentDataDocument.importNode(fragmentElement, true));
-		return serialize(fragmentDataDocument);
-
+	public static String toString(Node node) {
+		StringWriter out = new StringWriter();
+		serialize(node, out);
+		return out.toString();		
 	}
 
 	public static Document parse(InputStream inputStream) {
@@ -205,5 +214,27 @@ public class XmlUtil {
 		while (node.hasChildNodes()) {
 			node.removeChild(node.getFirstChild());
 		}
+	}
+
+	public static Node stripNamespace(Node node) {
+		Node stripped = null;
+		String ns = node.getNamespaceURI();
+		if (ns == null || XMLConstants.XML_NS_URI.equals(ns)) {
+			stripped = node.cloneNode(false);
+		} else if (Node.ELEMENT_NODE == node.getNodeType()) {
+			stripped = getDocument(node).createElement(node.getLocalName());
+			NamedNodeMap attributes = node.getAttributes();
+			for (int ac = 0; ac < attributes.getLength(); ac++) {
+				stripped.getAttributes().setNamedItem(stripNamespace(attributes.item(ac)));
+			}
+			for (Node child : new NodeListIterable<Node>(node.getChildNodes())) {
+				stripped.appendChild(stripNamespace(child));
+			}
+		} else if (Node.ATTRIBUTE_NODE == node.getNodeType()) {
+			stripped = getDocument(node).createAttribute(node.getLocalName());
+			stripped.setNodeValue(node.getNodeValue());
+		}
+
+		return stripped;
 	}
 }

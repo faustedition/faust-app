@@ -26,3 +26,9 @@ create table hand (
 	style varchar(50),
 	unique (scribe, material, style)
 );
+
+create table report (
+	name varchar(50) primary key,
+	generated_on timestamp not null,
+	body text
+);

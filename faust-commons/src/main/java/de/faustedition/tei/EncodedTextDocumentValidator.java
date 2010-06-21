@@ -2,11 +2,10 @@ package de.faustedition.tei;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,6 @@ import java.util.regex.Pattern;
 import javax.xml.XMLConstants;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +36,7 @@ import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
 
 import de.faustedition.Log;
 import de.faustedition.report.Report;
-import de.faustedition.report.ReportSender;
+import de.faustedition.report.ReportManager;
 import de.faustedition.xml.XmlStore;
 import de.faustedition.xml.XmlUtil;
 
@@ -49,10 +47,10 @@ public class EncodedTextDocumentValidator implements InitializingBean, Runnable 
 
 	@Autowired
 	private XmlStore xmlStore;
-	
+
 	@Autowired
-	private ReportSender reportSender;
-	
+	private ReportManager reportManager;
+
 	private Schema schema;
 
 	@Override
@@ -61,13 +59,12 @@ public class EncodedTextDocumentValidator implements InitializingBean, Runnable 
 			Log.LOGGER.info("Validating TEI documents");
 			final Map<String, List<String>> errors = new LinkedHashMap<String, List<String>>();
 			for (URI resource : xmlStore) {
-				if (!resource.getPath().endsWith(".xml")) {
+				if (!xmlStore.isWitnessEncodingDocument(resource)) {
 					continue;
 				}
 				try {
 					Log.LOGGER.debug("Validating XML in {}", resource.toString());
 					EncodedTextDocument doc = new EncodedTextDocument((Document) xmlStore.get(resource));
-					xmlStore.put(resource, doc.getDom());
 					List<String> documentErrors = validate(doc);
 					if (!documentErrors.isEmpty()) {
 						errors.put(resource.toString(), documentErrors);
@@ -77,40 +74,27 @@ public class EncodedTextDocumentValidator implements InitializingBean, Runnable 
 				}
 
 			}
-			reportSender.send(new Report() {
 
-				public String getSubject() {
-					return "TEI validation";
-				}
-
-				public boolean isEmpty() {
-					return errors.isEmpty();
-				}
-
-				public void printBody(PrintWriter body) {
-					for (String path : errors.keySet()) {
-						body.println(StringUtils.repeat("=", 78));
-						body.println(path);
-						body.println(StringUtils.repeat("-", 78));
-						for (String e : errors.get(path)) {
-							body.println(e);
-						}
-						body.println(StringUtils.repeat("=", 78));
-						body.println();
+			Report report = new Report("tei_validation");
+			if (!errors.isEmpty()) {
+				StringWriter body = new StringWriter();
+				for (String path : errors.keySet()) {
+					body.write(StringUtils.repeat("=", 78) + "\n");
+					body.write(path + "\n");
+					body.write(StringUtils.repeat("-", 78) + "\n");
+					for (String e : errors.get(path)) {
+						body.write(e + "\n");
 					}
+					body.write(StringUtils.repeat("=", 78) + "\n\n");
 				}
-				
-				@Override
-				public String toString() {
-					return "TEI validation report [" + DateFormatUtils.ISO_DATETIME_FORMAT.format(new Date()) + "]";
-				}
-
-			});
+				report.setBody(body.toString());
+			}
+			reportManager.send(report);
 		} catch (IOException e) {
 			Log.fatalError(e, "I/O error while validating TEI");
 		}
 	}
-	
+
 	public boolean isValid(EncodedTextDocument document) {
 		return validate(document).isEmpty();
 	}
