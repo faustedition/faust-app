@@ -15,12 +15,12 @@ create table encoding_status (
 create table glyph (
 	id varchar(50) primary key,
 	name varchar(50) not null,
-	description text not null,
+	description varchar(1024) not null,
 	equivalent varchar(25)
 );
 
 create table hand (
-	id serial,
+	id integer generated always as identity primary key,
 	scribe varchar(50),
 	material varchar(50),
 	style varchar(50),
@@ -30,5 +30,5 @@ create table hand (
 create table report (
 	name varchar(50) primary key,
 	generated_on timestamp not null,
-	body text
+	body varchar(64k)
 );
