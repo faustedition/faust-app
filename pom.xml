@@ -7,8 +7,6 @@
 	<name>Digitale Faust-Edition</name>
 	<packaging>pom</packaging>
 	<modules>
-		<module>faust-commons</module>
-		<module>faust-data-import</module>
 		<module>faust</module>
 	</modules>
 	<dependencies>
