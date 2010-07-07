@@ -1,26 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>de.faustedition</groupId>
-		<artifactId>faust-project</artifactId>
-		<version>1.2-SNAPSHOT</version>
-	</parent>
+	<groupId>de.faustedition</groupId>
 	<artifactId>faust-schema</artifactId>
 	<version>1.1</version>
 	<name>Digitale Faust-Edition :: Faust TEI P5 schema</name>
 	<packaging>jar</packaging>
-	<distributionManagement>
-		<site>
-			<id>faustedition.net</id>
-			<url>scp://faustedition.net/data/faust/htdocs/xml.faustedition.net/schema/${project.version}</url>
-		</site>
-	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>de.faustedition</groupId>
-				<artifactId>faust-odd-plugin</artifactId>
+				<groupId>org.tei</groupId>
+				<artifactId>tei-odd-plugin</artifactId>
 				<version>1.0</version>
 				<executions>
 					<execution>
@@ -33,4 +23,10 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+		<site>
+			<id>faustedition.net</id>
+			<url>scp://faustedition.net/data/faust/htdocs/xml.faustedition.net/schema/${project.version}</url>
+		</site>
+	</distributionManagement>
 </project>
