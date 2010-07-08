@@ -280,6 +280,11 @@
 			<name>Faust-Edition Repository</name>
 			<url>http://wuerzburg.faustedition.net/maven/</url>
 		</repository>
+		<repository>
+			<id>lmnl4j</id>
+			<name>lmnl4j Maven Repository</name>
+			<url>http://www.middell.net/lmnl4j/repository</url>
+		</repository>
 	</repositories>
 	<properties>
 		<slf4j.version>1.5.11</slf4j.version>
