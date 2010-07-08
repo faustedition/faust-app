@@ -35,7 +35,7 @@
 	<div id="top-navigation" class="yuimenubar yuimenubarnav">
 	<div class="bd">
 	<ul class="first-of-type">
-		<#if hasRole("ROLE_EDITOR")>
+		<#if authAuthorities?seq_contains("ROLE_EDITOR")>
 			<li class="yuimenubaritem"><a href="${cp}/Witness/" class="yuimenubaritemlabel"><@spring.message "menu.witness" /></a></li>
 			<li class="yuimenubaritem"><a href="${cp}/text/" class="yuimenubaritemlabel"><@spring.message "menu.text" /></a></li>
 			<li class="yuimenubaritem"><a href="${cp}/genesis/" class="yuimenubaritemlabel"><@spring.message "menu.genesis" /></a></li>
@@ -65,8 +65,8 @@
 		<li class="yuimenubaritem"><a href="${cp}/project/contact" class="yuimenubaritemlabel"><@spring.message "menu.contact" /></a></li>
 		<li class="yuimenubaritem"><a href="${cp}/project/imprint" class="yuimenubaritemlabel"><@spring.message "menu.imprint" /></a></li>
 		<li class="yuimenubaritem">
-			<a href="http://wiki.faustedition.net/" class="yuimenubaritemlabel"><@spring.message "menu.restricted" /></a>
-			<#if !hasRole("ROLE_EDITOR")>
+			<a href="https://wuerzburg.faustedition.net/" class="yuimenubaritemlabel"><@spring.message "menu.restricted" /></a>
+			<#if !authAuthorities?seq_contains("ROLE_EDITOR")>
 				<div class="yuimenu">
 					<div class="bd">
 						<ul>
@@ -76,7 +76,7 @@
 				</div>				
 			</#if>
 		</li>
-		<#if hasRole("ROLE_EDITOR")>
+		<#if authAuthorities?seq_contains("ROLE_EDITOR")>
 			<li class="yuimenubaritem">
 				<span class="yuimenubaritemlabel"><@spring.message "report" /></span>
 				<div class="yuimenu">

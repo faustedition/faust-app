@@ -16,6 +16,10 @@
 
 	<mvc:annotation-driven />
 
+	<mvc:interceptors>
+		<bean class="de.faustedition.security.SecurityContextModelProvider" />
+	</mvc:interceptors>
+
 	<mvc:view-controller path="/project/about" />
 	<mvc:view-controller path="/project/contact" />
 	<mvc:view-controller path="/project/imprint" />
@@ -36,9 +40,6 @@
 		</property>
 		<property name="freemarkerVariables">
 			<map>
-				<entry key="hasRole">
-					<bean class="de.faustedition.security.HasRoleTemplateMethod" />
-				</entry>
 				<entry key="encodePath">
 					<bean class="de.faustedition.web.URLPathEncoder" />
 				</entry>
