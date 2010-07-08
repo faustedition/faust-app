@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -49,7 +50,7 @@ public class Report {
 		MapSqlParameterSource ps = new MapSqlParameterSource();
 		ps.addValue("name", name);
 		ps.addValue("generated_on", new Date());
-		ps.addValue("body", body);
+		ps.addValue("body", StringUtils.abbreviate(body, 65535));
 		return ps;
 	}
 

@@ -29,8 +29,8 @@ public class FacsimileStore implements InitializingBean, Iterable<Facsimile> {
 	@Value("#{config['facsimile.identify']}")
 	private String identifyCommand;
 
-	@Value("#{config['facsimile.convert_ptif']}")
-	private String convertToPyramidalTiffCommmand;
+	@Value("#{config['facsimile.gm']}")
+	private String gmCommand;
 
 	private File tifBase;
 	private File ptifBase;
@@ -52,11 +52,13 @@ public class FacsimileStore implements InitializingBean, Iterable<Facsimile> {
 			return null;
 		}
 
-		String facsimilePath = escapePath(facsimileFile.getAbsolutePath());
+		String facsimilePath = facsimileFile.getAbsolutePath();
 		try {
 			String identifyCommand = MessageFormat.format(this.identifyCommand, facsimilePath);
 			Log.LOGGER.trace("Identifying facsimile: '{}'", identifyCommand);
-			Process identifyProcess = Runtime.getRuntime().exec(identifyCommand);
+			Process identifyProcess = Runtime.getRuntime().exec(new String[] { identifyCommand, "-format",//
+					"%[width],%[height],%[xresolution],%[yresolution],%[depth],%[colorspace]",//
+					facsimilePath });
 
 			int exitValue = -1;
 			InputStream identifyData = null;
@@ -100,14 +102,14 @@ public class FacsimileStore implements InitializingBean, Iterable<Facsimile> {
 			throw Log.fatalError("Cannot access/create directory '%s'", resultDir.getAbsolutePath());
 		}
 
-		String sourcePath = escapePath(source.getAbsolutePath());
-		String resultPath = escapePath(result.getAbsolutePath());
-		String command = MessageFormat.format(convertToPyramidalTiffCommmand, sourcePath, resultPath);
+		String sourcePath = source.getAbsolutePath();
+		String resultPath = result.getAbsolutePath();
 		try {
 			int exitValue = -1;
 			try {
-				Log.LOGGER.trace("Generating facsimile tiles: '{}'", command);
-				Process conversionProcess = Runtime.getRuntime().exec(command);
+				Process conversionProcess = Runtime.getRuntime().exec(new String[] { gmCommand,// 
+						"convert", sourcePath, "-define", "tiff:tile-geometry=256x256", "-compress", "jpeg",//
+						resultPath });
 				exitValue = conversionProcess.waitFor();
 			} catch (InterruptedException e) {
 			}

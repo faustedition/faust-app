@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import de.faustedition.Log;
 import de.faustedition.document.TranscriptionDocumentGenerator;
+import de.faustedition.facsimile.FacsimileTiler;
 import de.faustedition.metadata.EncodingStatusManager;
 import de.faustedition.metadata.IdentifierManager;
 import de.faustedition.tei.EncodedTextDocumentBuilder;
@@ -23,6 +24,9 @@ public class TaskController {
 	@Autowired
 	private TaskExecutor taskExecutor;
 
+	@Autowired
+	private FacsimileTiler facsimileTiler;
+	
 	@Autowired
 	private EncodedTextDocumentBuilder documentBuilder;
 
@@ -55,12 +59,13 @@ public class TaskController {
 				StopWatch sw = new StopWatch();
 				sw.start();
 				
+				facsimileTiler.run();
 				transcriptionDocumentGenerator.run();
 				documentBuilder.run();
 				documentSanitizer.run();
 				documentValidator.run();
-				encodingStatusManager.run();
-				identifierManager.run();
+				//encodingStatusManager.run();
+				//identifierManager.run();
 				whitespaceNormalizationReporter.run();
 				
 				sw.stop();

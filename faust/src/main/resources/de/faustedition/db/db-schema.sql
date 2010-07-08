@@ -30,5 +30,5 @@ create table hand (
 create table report (
 	name varchar(50) primary key,
 	generated_on timestamp not null,
-	body varchar(64k)
+	body varchar(65535)
 );

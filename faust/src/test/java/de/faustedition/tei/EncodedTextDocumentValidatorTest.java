@@ -3,6 +3,7 @@ package de.faustedition.tei;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,6 +36,7 @@ public class EncodedTextDocumentValidatorTest extends AbstractContextTest {
 	}
 
 	@Test
+	@Ignore
 	public void validateSample() throws Exception {
 		EncodedTextDocument document = new EncodedTextDocument(XmlUtil.parse(getClass().getResourceAsStream("faust-tei-sample.xml")));
 		List<String> errors = validator.validate(document);

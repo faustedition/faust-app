@@ -5,13 +5,12 @@
 	<description>Digitale Faust-Edition</description>
 
 	<context-param>
-		<param-name>log4jConfigLocation</param-name>
-		<param-value>/WEB-INF/log4j.properties</param-value>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:/applicationConfig.xml
+			classpath:/applicationContext.xml
+		</param-value>
 	</context-param>
-
-	<listener>
-		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-	</listener>
 
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -69,9 +68,4 @@
 		<filter-name>character-encoding</filter-name>
 		<servlet-name>springmvc</servlet-name>
 	</filter-mapping>
-
-	<mime-mapping>
-		<extension>rnc</extension>
-		<mime-type>application/relax-ng-compact-syntax</mime-type>
-	</mime-mapping>
 </web-app>

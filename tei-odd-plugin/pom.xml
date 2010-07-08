@@ -55,4 +55,10 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+		<repository>
+			<id>faustedition.net</id>
+			<url>scp://wuerzburg.faustedition.net/mnt/data/htdocs/maven/</url>
+		</repository>
+	</distributionManagement>
 </project>

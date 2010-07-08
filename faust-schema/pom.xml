@@ -24,9 +24,13 @@
 		</plugins>
 	</build>
 	<distributionManagement>
+		<repository>
+			<id>faustedition.net</id>
+			<url>scp://wuerzburg.faustedition.net/mnt/data/htdocs/maven/</url>
+		</repository>
 		<site>
 			<id>faustedition.net</id>
-			<url>scp://faustedition.net/data/faust/htdocs/xml.faustedition.net/schema/${project.version}</url>
+			<url>scp://wuerzburg.faustedition.net/mnt/data/htdocs/schema/${project.version}</url>
 		</site>
 	</distributionManagement>
 </project>
