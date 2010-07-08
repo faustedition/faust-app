@@ -1,4 +1,4 @@
-package de.faustedition.web;
+package de.faustedition.facsimile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +14,10 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,16 +30,22 @@ import org.springframework.web.context.request.WebRequest;
 import com.google.common.collect.Sets;
 
 import de.faustedition.Log;
-import de.faustedition.facsimile.Facsimile;
-import de.faustedition.facsimile.FacsimileStore;
+import de.faustedition.security.EasySSLProtocolSocketFactory;
+import de.faustedition.web.ControllerUtil;
 
 @Controller
 @RequestMapping("/facsimile")
 public class FacsimileController implements InitializingBean {
 	private static final Set<String> IIP_PASSTHROUGH_HEADERS = Sets.newHashSet("Content-Type", "Date");
 
-	@Value("#{config['iipsrv.url']}")
+	@Value("#{config['facsimile.iip.server.url']}")
 	private String iipServerUrl;
+
+	@Value("#{config['facsimile.iip.server.user']}")
+	private String iipServerUser;
+
+	@Value("#{config['facsimile.iip.server.password']}")
+	private String iipServerPassword;
 
 	@Autowired
 	private FacsimileStore store;
@@ -108,8 +117,11 @@ public class FacsimileController implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		Protocol.registerProtocol("https", new Protocol("https", new EasySSLProtocolSocketFactory(), 443));
 		MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
 		connectionManager.getParams().setDefaultMaxConnectionsPerHost(10);
 		httpClient = new HttpClient(connectionManager);
+		httpClient.getParams().setAuthenticationPreemptive(true);
+		httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(iipServerUser, iipServerPassword));
 	}
 }

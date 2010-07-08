@@ -17,6 +17,7 @@
 	<mvc:annotation-driven />
 
 	<mvc:interceptors>
+		<bean class="de.faustedition.ConfigModelProvider" />
 		<bean class="de.faustedition.security.SecurityContextModelProvider" />
 	</mvc:interceptors>
 

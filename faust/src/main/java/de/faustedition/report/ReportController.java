@@ -1,4 +1,4 @@
-package de.faustedition.web;
+package de.faustedition.report;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -8,7 +8,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import de.faustedition.report.Report;
 
 @Controller
 @RequestMapping("/report/")

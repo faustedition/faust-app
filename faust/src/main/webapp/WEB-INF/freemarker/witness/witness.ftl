@@ -20,11 +20,10 @@
 			<div id="facsimile" style="position: relative; left: 0; top: 0; width: 500px; height: 500px"></div>
 			<script type="text/javascript">
     				iip = new IIP( "facsimile", {
-						image: 'test.tif',
-						server: '${cp}/facsimile/iip',
+						image: '${encodePath("Basel_Universitaetsbibliothek/G_H_2301_0001.tif")}',
+						server: '<#if config['facsimile.iip.url']?starts_with("/")>${cp}</#if>${config["facsimile.iip.url"]?js_string}',
 						credit: '&copy; Digitale Faust-Edition', 
 						zoom: 1,
-						render: 'spiral',
 						showNavButtons: true
     						});
     			</script>

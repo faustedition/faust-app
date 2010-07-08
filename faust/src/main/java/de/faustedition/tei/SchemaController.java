@@ -1,4 +1,4 @@
-package de.faustedition.web;
+package de.faustedition.tei;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
-import de.faustedition.tei.EncodedTextDocumentValidator;
 
 @Controller
 @RequestMapping("/schema")
