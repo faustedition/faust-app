@@ -7,8 +7,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head profile="http://dublincore.org/documents/dcq-html/">
 	<title>${title} :: faustedition.net</title>
-	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css&amp;2.8.0r4/build/base/base-min.css&amp;2.8.0r4/build/assets/skins/sam/skin.css"/>
-	<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.0r4/build/utilities/utilities.js&amp;2.8.0r4/build/datasource/datasource-min.js&amp;2.8.0r4/build/autocomplete/autocomplete-min.js&amp;2.8.0r4/build/event-mouseenter/event-mouseenter-min.js&amp;2.8.0r4/build/selector/selector-min.js&amp;2.8.0r4/build/event-delegate/event-delegate-min.js&amp;2.8.0r4/build/paginator/paginator-min.js&amp;2.8.0r4/build/calendar/calendar-min.js&amp;2.8.0r4/build/datatable/datatable-min.js&amp;2.8.0r4/build/json/json-min.js&amp;2.8.0r4/build/container/container_core-min.js&amp;2.8.0r4/build/menu/menu-min.js&amp;2.8.0r4/build/treeview/treeview-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.1.1/build/cssreset/reset-min.css&amp;3.1.1/build/cssfonts/fonts-min.css&amp;3.1.1/build/cssgrids/grids-min.css&amp;3.1.1/build/cssbase/base-min.css" />
+	<script src="http://yui.yahooapis.com/3.1.1/build/yui/yui-min.js" type="text/javascript"></script>	
 	<link rel="stylesheet" type="text/css" href="${cp}/css/faust.css" />
 	<link rel="stylesheet" type="text/css" href="${cp}/css/iip.css" />
 	<script type="text/javascript" src="${cp}/js/faust.js"></script>
@@ -28,63 +28,64 @@
 	<meta name="DCTERMS.rightsHolder" content="Wikimedia Foundation Inc." />
 	 -->
 </head>
-<body class="yui-skin-sam">
-<div id="doc2" class="yui-t7">
-<div id="hd">
+<body class="yui3-skin-sam">
+<div class="yui3-d2">
+<div id="header">
 	<h1>${title}&nbsp;<span style="color: #764F27">::&nbsp;faustedition.net</span></h1>
-	<div id="top-navigation" class="yuimenubar yuimenubarnav">
-	<div class="bd">
-	<ul class="first-of-type">
+	<div id="top-navigation" class="yui3-menu yui3-menu-horizontal">
+	<div class="yui3-menu-content">
 		<#if authAuthorities?seq_contains("ROLE_EDITOR")>
-			<li class="yuimenubaritem"><a href="${cp}/Witness/" class="yuimenubaritemlabel"><@spring.message "menu.witness" /></a></li>
-			<li class="yuimenubaritem"><a href="${cp}/text/" class="yuimenubaritemlabel"><@spring.message "menu.text" /></a></li>
-			<li class="yuimenubaritem"><a href="${cp}/genesis/" class="yuimenubaritemlabel"><@spring.message "menu.genesis" /></a></li>
-			<li class="yuimenubaritem"><a href="${cp}/search/" class="yuimenubaritemlabel"><@spring.message "menu.search" /></a></li>
+			
+			<ul class="first-of-type"><li class="yui3-menuitem"><a href="${cp}/Witness/" class="yui3-menu-label"><@spring.message "menu.witness" /></a></li></ul>
+			<ul><li class="yui3-menuitem"><a href="${cp}/text/" class="yui3-menu-label"><@spring.message "menu.text" /></a></li></ul>
+			<ul><li class="yui3-menuitem"><a href="${cp}/genesis/" class="yui3-menu-label"><@spring.message "menu.genesis" /></a></li></ul>
+			<ul><li class="yui3-menuitem"><a href="${cp}/search/" class="yui3-menu-label"><@spring.message "menu.search" /></a></li></ul>
 		</#if>
-		<li class="yuimenubaritem"><span class="yuimenubaritemlabel"><@spring.message "menu.project" /></span>
-		<div class="yuimenu">
-		<div class="bd">
+	<ul>
+		<li><span class="yui3-menu-label"><em><@spring.message "menu.project" /></em></span>
+		<div class="yui3-menu">
+		<div class="yui3-menu-content">
 		<ul>
-			<li class="yuimenuitem"><a href="${cp}/project/about" class="yuimenuitemlabel"><@spring.message "menu.about" /></a></li>
-			<li class="yuimenuitem"><a href="${cp}/static/dfg-grant-application.pdf" class="yuimenuitemlabel"><@spring.message "menu.grant_application" /></a></li>
+			<li><a href="${cp}/project/about" class="yui3-menu-label"><@spring.message "menu.about" /></a></li>
+			<li><a href="${cp}/static/dfg-grant-application.pdf" class="yui3-menu-label"><@spring.message "menu.grant_application" /></a></li>
 		</ul>
 		</div>
 		</div>
 		</li>
-		<li class="yuimenubaritem"><span class="yuimenubaritemlabel"><@spring.message "menu.partners" /></span>
-		<div class="yuimenu">
-		<div class="bd">
+		<li><span class="yui3-menu-label"><em><@spring.message "menu.partners" /></em></span>
+		<div class="yui3-menu">
+		<div class="yui3-menu-content">
 		<ul>
-			<li class="yuimenuitem"><a href="http://www.goethehaus-frankfurt.de/" class="yuimenuitemlabel">Freies Deutsches Hochstift Frankfurt</a></li>
-			<li class="yuimenuitem"><a href="http://www.klassik-stiftung.de/" class="yuimenuitemlabel">Klassik Stiftung Weimar</a></li>
-			<li class="yuimenuitem"><a href="http://www.uni-wuerzburg.de/" class="yuimenuitemlabel">Julius-Maximilians-Universität Würzburg</a></li>
+			<li><a href="http://www.goethehaus-frankfurt.de/" class="yui3-menu-label">Freies Deutsches Hochstift Frankfurt</a></li>
+			<li><a href="http://www.klassik-stiftung.de/" class="yui3-menu-label">Klassik Stiftung Weimar</a></li>
+			<li><a href="http://www.uni-wuerzburg.de/" class="yui3-menu-label">Julius-Maximilians-Universität Würzburg</a></li>
 		</ul>
 		</div>
 		</div>
 		</li>
-		<li class="yuimenubaritem"><a href="${cp}/project/contact" class="yuimenubaritemlabel"><@spring.message "menu.contact" /></a></li>
-		<li class="yuimenubaritem"><a href="${cp}/project/imprint" class="yuimenubaritemlabel"><@spring.message "menu.imprint" /></a></li>
-		<li class="yuimenubaritem">
-			<a href="https://wuerzburg.faustedition.net/" class="yuimenubaritemlabel"><@spring.message "menu.restricted" /></a>
+		<li><a href="${cp}/project/contact" class="yui3-menu-label"><@spring.message "menu.contact" /></a></li>
+		<li><a href="${cp}/project/imprint" class="yui3-menu-label"><@spring.message "menu.imprint" /></a></li>
+		<li>
+			<a href="https://wuerzburg.faustedition.net/" class="yui3-menu-label"><em><@spring.message "menu.restricted" /></em></a>
 			<#if !authAuthorities?seq_contains("ROLE_EDITOR")>
-				<div class="yuimenu">
-					<div class="bd">
+				<div class="yui3-menu">
+					<div class="yui3-menu-content">
 						<ul>
-							<li class="yuimenuitem"><a href="${cp}/login" class="yuimenuitemlabel">Login</a></li>
+							<li><a href="${cp}/login" class="yui3-menu-label">Login</a></li>
 						</ul>
 					</div>
 				</div>				
 			</#if>
 		</li>
 		<#if authAuthorities?seq_contains("ROLE_EDITOR")>
-			<li class="yuimenubaritem">
-				<span class="yuimenubaritemlabel"><@spring.message "report" /></span>
-				<div class="yuimenu">
-					<div class="bd">
+			<li>
+				<span class="yui3-menu-label"><em><@spring.message "report" /></em></span>
+				<div class="yui3-menu">
+					<div class="yui3-menu-content">
 						<ul>
-							<li class="yuimenuitem"><a href="${cp}/report/tei_validation" class="yuimenuitemlabel"><@spring.message "report.tei_validation" /></a></li>
-							<li class="yuimenuitem"><a href="${cp}/report/detached_transcription_documents" class="yuimenuitemlabel"><@spring.message "report.detached_transcription_documents" /></a></li>
-							<li class="yuimenuitem"><a href="${cp}/report/whitespace_normalization" class="yuimenuitemlabel"><@spring.message "report.whitespace_normalization" /></a></li>
+							<li><a href="${cp}/report/tei_validation" class="yui3-menu-label"><@spring.message "report.tei_validation" /></a></li>
+							<li><a href="${cp}/report/detached_transcription_documents" class="yui3-menu-label"><@spring.message "report.detached_transcription_documents" /></a></li>
+							<li><a href="${cp}/report/whitespace_normalization" class="yui3-menu-label"><@spring.message "report.whitespace_normalization" /></a></li>
 						</ul>
 					</div>
 				</div>
@@ -94,10 +95,10 @@
 	</div>
 	</div>
 </div>
-<div id="bd">
+<div id="main">
 	<#nested>
 </div>
-<div id="ft">
+<div id="footer">
 	<p>Digitale Faust-Edition. Copyright (c) 2009 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
 </div>
 </div>

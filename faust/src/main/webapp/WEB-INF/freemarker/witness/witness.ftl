@@ -8,28 +8,18 @@
 		<a href="${cp}/${encodePath(path)}?format=svg" title="SVG-Test"><img src="${cp}/img/svg-logo.png" alt="SVG-Test"/></a>		
 	</h2>
 	
-	<div class="yui-gc">
-		<div class="yui-u first">
-			<#--
-			<#if facsimile??>			
-				<p><a href="${cp}/facsimile/${encodePath(facsimile.path)}.jpg" title="Vergrößern">
-					<img src="${cp}/facsimile/${encodePath(facsimile.path)}.jpg" id="facsimile" style="max-width: 500px"/>
-				</a></p>
-			</#if>
-			-->
-			<div id="facsimile" style="position: relative; left: 0; top: 0; width: 500px; height: 500px"></div>
-			<script type="text/javascript">
-    				iip = new IIP( "facsimile", {
-						image: '${encodePath("Basel_Universitaetsbibliothek/G_H_2301_0001.tif")}',
-						server: '<#if config['facsimile.iip.url']?starts_with("/")>${cp}</#if>${config["facsimile.iip.url"]?js_string}',
-						credit: '&copy; Digitale Faust-Edition', 
-						zoom: 1,
-						showNavButtons: true
-    						});
-    			</script>
-		</div>
-		<div class="yui-u">
-			${htmlTranscription}
-		</div>	
-	</div>
+	<div id="facsimile" style="position: relative; left: 0; top: 0; width: 800px; height: 500px"></div>
+	<script type="text/javascript">
+		iip = new IIP( "facsimile", {
+				image: '${encodePath("Berlin_Staatsbibliothek/SBB-IIIA_Ms_germ_qu_527_010_r.tif")}',
+				server: '<#if config['facsimile.iip.url']?starts_with("/")>${cp}</#if>${config["facsimile.iip.url"]?js_string}',
+				credit: '&copy; Digitale Faust-Edition', 
+				zoom: 1,
+				showNavButtons: true
+				});
+	</script>
+	
+	<div id="transcription">
+	${htmlTranscription}
+	</div>	
 </@faust.page>

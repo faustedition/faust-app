@@ -13,11 +13,11 @@ table,table th,table td,table tr {
 	border: 0;
 }
 
-#bd a:hover {
+#main a:hover {
 	
 }
 
-#bd a {
+#main a {
 	color: #1F2850;
 	font-weight: bold;
 }
@@ -26,21 +26,21 @@ a.img {
 	text-decoration: none;
 }
 
-#hd,#ft {
+#header,#footer {
 	margin: 0em;
 	padding: 0.5em;
 }
 
-#bd {
+#main {
 	margin: 1em;
 	padding: 1em;
 }
 
-#hd h1 {
+#header h1 {
 	text-align: right;
 }
 
-#ft {
+#footer {
 	font-size: 77%;
 	text-align: center;
 }
