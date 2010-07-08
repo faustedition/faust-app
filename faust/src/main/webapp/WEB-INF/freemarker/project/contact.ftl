@@ -1,7 +1,7 @@
 <#assign title><@spring.message "project.contact.title" /></#assign>
 <@faust.page title=title>
-	<div class="yui-g">
-	<div class="yui-u first">
+	<div class="yui3-g">
+	<div class="yui3-u first">
 		<h2><@spring.message "project.contact.editors" /></h2>
 	
 		<p><strong>Prof. Dr. Anne Bohnenkamp</strong><br />
@@ -26,7 +26,7 @@
 		Tel: +49 (0)931 / 31 80078<br />
 		<a href="mailto:fotis.jannidis@uni-wuerzburg.de" title="E-Mail">fotis.jannidis@uni-wuerzburg.de</a></p>
 	</div>
-	<div class="yui-u">
+	<div class="yui3-u">
 		<h2><@spring.message "project.contact.staff" /></h2>
 	
 		<p>Freies Deutsches Hochstift – Frankfurter Goethe-Museum<br />

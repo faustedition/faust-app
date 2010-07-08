@@ -1,7 +1,7 @@
 [#ftl]
 [@faust.page title=(portfolio.name?html)]
-	<div class="yui-g">
-	<div class="yui-u first">
+	<div class="yui3-g">
+	<div class="yui3-u first">
 		<h2>Portfolio ${portfolio.name?html} [@faust.uplink url=(ctx + "/manuscripts/" + encodePath(repository.name) + "/") title="Bestandsübersicht" /]</h2>
 	
 		<table class="no-border" style="margin: 0 5%">
@@ -20,7 +20,7 @@
 			[/@faust.tableGrid]
 		</table>
 	</div>
-	<div class="yui-u">
+	<div class="yui3-u">
 		[#if !(metadataTable.empty)]
 			<h2>Metadaten</h2>
 			

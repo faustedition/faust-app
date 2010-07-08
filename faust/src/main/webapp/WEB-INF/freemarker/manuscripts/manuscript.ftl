@@ -7,12 +7,12 @@
 		<a href="${ctx}/dav/${repository.name}/${portfolio.name}/${manuscript.name}" title="Transkription bearbeiten"><img src="${ctx}/img/edit.png" alt="Transkription bearbeiten" /></a>
 	</h2>
 
-	<div class="yui-g">
-	<div class="yui-u first">
+	<div class="yui3-g">
+	<div class="yui3-u first">
 		<p class="small-font italic" ><strong>Tipp:</strong> Zum Vergrößern klicken Sie bitte auf das Faksimile.</p>
 		<p><a href="${ctx}/facsimile/${encodePath(facsimile.imagePath)}.jpg" wicket:id="facsimileLink" title="Vergrößern"><img wicket:id="facsimile" src="${ctx}/facsimile/${encodePath(facsimile.imagePath)}.jpg" width="400" /></a></p>
 	</div>
-	<div class="yui-u">
+	<div class="yui3-u">
 		<div style="font-family: tahoma; padding: 0.5em; margin: 0.5em">${htmlTranscription}</div>
 	</div>
 	</div>

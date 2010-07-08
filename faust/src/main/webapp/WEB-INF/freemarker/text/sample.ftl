@@ -3,8 +3,8 @@
 
 	<p class="small-font" style="margin-bottom: 2em">Johann Wolfgang Goethe. Sämtliche Werke nach Epochen seines Schaffens (Münchener Ausgabe). Band 18.1. München, Wien. 1997. S.&nbsp;333-336.</p>
 
-	<div class="yui-gb">
-	<div class="yui-u first">
+	<div class="yui3-gb">
+	<div class="yui3-u first">
 	<p class="center small-caps primary-color">Großer Vorhof des Pallasts.</p>
 
 	<p class="center small-caps primary-color">Fackeln.</p>
@@ -60,7 +60,7 @@
 	Das Meer mit strengem Band umzieht.</p>
 
 	</div>
-	<div class="yui-u">
+	<div class="yui3-u">
 	<p class="center secondary-color">Mephist. <span class="small-caps primary-color">(bey Seite)</span></p>
 
 	<p>Du bist doch nur für uns bemüht<br />
@@ -115,7 +115,7 @@
 	Der täglich sie erobern muß.</p>
 	</div>
 
-	<div class="yui-u">
+	<div class="yui3-u">
 	<p>Und so verbringt, umrungen von Gefahr,<br />
 	Hier Kindheit, Mann und Greis sein tüchtig Jahr.<br />
 	Solch ein Gewimmel möcht ich sehn,<br />

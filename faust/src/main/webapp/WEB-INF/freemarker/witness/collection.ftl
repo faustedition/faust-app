@@ -1,8 +1,8 @@
 <#assign title><#if path == 'Witness/'>Überlieferungsträger<#else><@faust.nameOf path /></#if></#assign>
 <@faust.page title=(title?html)>
 	<@faust.breadcrumbs path "Überlieferungsträger" />
-	<div class="yui-gc">
-		<div class="yui-u first">
+	<div class="yui3-gc">
+		<div class="yui3-u first">
 			<h2>${title?html}</h2>
 	
 			<table class="border" style="width: 90%; margin: 0 5%">
@@ -18,7 +18,7 @@
 				</@faust.tableGrid>
 			</table>
 		</div>
-		<div class="yui-u">
+		<div class="yui3-u">
 			<div id="encoding-status" style="padding: 2em">&nbsp;</div>
 		</div>
 		<script type="text/javascript">

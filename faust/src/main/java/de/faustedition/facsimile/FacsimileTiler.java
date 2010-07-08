@@ -16,10 +16,7 @@ public class FacsimileTiler implements Runnable {
 		Log.LOGGER.debug("Building complete facsimile tile store");
 
 		for (Facsimile f : store) {
-			try {
-				store.tiles(f);
-			} catch (Exception e) {				
-			}
+			store.tiles(f);
 		}
 	}
 }

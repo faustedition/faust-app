@@ -29,8 +29,8 @@ public class FacsimileStore implements InitializingBean, Iterable<Facsimile> {
 	@Value("#{config['facsimile.identify']}")
 	private String identifyCommand;
 
-	@Value("#{config['facsimile.vips']}")
-	private String vipsCommand;
+	@Value("#{config['facsimile.convert']}")
+	private String convertCommand;
 
 	private File tifBase;
 	private File ptifBase;
@@ -107,8 +107,9 @@ public class FacsimileStore implements InitializingBean, Iterable<Facsimile> {
 		try {
 			int exitValue = -1;
 			try {
-				Process conversionProcess = Runtime.getRuntime().exec(new String[] { vipsCommand,// 
-						"im_vips2tiff", sourcePath, resultPath + ":jpeg:75,tile:256x256,pyramid" });
+				Process conversionProcess = Runtime.getRuntime().exec(new String[] { convertCommand,// 
+						sourcePath, "-define", "tiff:tile-geometry=256x256", "-compress", "jpeg",//
+						"ptif:" + resultPath });
 				exitValue = conversionProcess.waitFor();
 			} catch (InterruptedException e) {
 			}

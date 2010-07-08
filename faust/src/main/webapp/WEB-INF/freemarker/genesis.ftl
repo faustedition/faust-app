@@ -7,15 +7,15 @@
 		<img src="${cp}/genesis/chart.png" alt="Versanalyse" usemap="#genesisChart" />
 	</p>
 	
-	<div class="yui-g">
-	<div class="yui-u first">
+	<div class="yui3-g">
+	<div class="yui3-u first">
 		<h3>Urfaust</h3>
 
 		<ol>
 			<li><a href="${cp}/Witness/GSA/${urfaust.portfolio?url}/${urfaust.manuscript}.xml" title="Zum Manuskript">${urfaust.name?html}</a></li>
 		</ol>
 	</div>
-	<div class="yui-u">
+	<div class="yui3-u">
 		<h3>Paralipomena</h3>
 	
 		<ol>
