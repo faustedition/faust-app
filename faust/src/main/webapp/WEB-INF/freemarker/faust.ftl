@@ -125,7 +125,7 @@
 <#macro breadcrumbs path rootName><#compress>
 <p class="node-path">
 	<#local uri = '' />
-	<#if path?ends_with("/")><#local path = path[0..(path?length - 2)] /></#if>
+	<#if path?ends_with("/")><#local path = path[0..(path?length - 1)] /></#if>
 	<#list path?split("/") as p>
 		<#local name><#if p_index == 0>${rootName}<#else>${p?html}</#if></#local>
 		<#if p_has_next>

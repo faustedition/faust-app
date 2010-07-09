@@ -55,11 +55,11 @@ public class FacsimileController implements InitializingBean {
 	@RequestMapping("/iip")
 	public void proxyIIP(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		GetMethod get = new GetMethod(iipServerUrl);
+		get.setQueryString(request.getQueryString());
+
 		try {
 			InputStream in = null;
 			try {
-				get.setQueryString(request.getQueryString());
-
 				int statusCode = httpClient.executeMethod(get);
 				if (statusCode != HttpStatus.SC_OK) {
 					response.sendError(statusCode, get.getStatusText());

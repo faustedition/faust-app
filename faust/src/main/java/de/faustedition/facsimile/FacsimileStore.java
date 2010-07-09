@@ -109,7 +109,7 @@ public class FacsimileStore implements InitializingBean, Iterable<Facsimile> {
 			try {
 				Process conversionProcess = Runtime.getRuntime().exec(new String[] { convertCommand,// 
 						sourcePath, "-define", "tiff:tile-geometry=256x256", "-compress", "jpeg",//
-						"ptif:" + resultPath });
+						"-depth", "8", "ptif:" + resultPath });
 				exitValue = conversionProcess.waitFor();
 			} catch (InterruptedException e) {
 			}

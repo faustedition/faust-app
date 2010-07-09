@@ -68,8 +68,9 @@
 		<filter-name>character-encoding</filter-name>
 		<servlet-name>springmvc</servlet-name>
 	</filter-mapping>
-	
-		<filter>
+
+<!-- 
+	<filter>
 		<filter-name>etagFilter</filter-name>
 		<filter-class>org.springframework.web.filter.ShallowEtagHeaderFilter</filter-class>
 	</filter>
@@ -78,4 +79,5 @@
 		<filter-name>etagFilter</filter-name>
 		<servlet-name>springmvc</servlet-name>
 	</filter-mapping>
+ -->
 </web-app>

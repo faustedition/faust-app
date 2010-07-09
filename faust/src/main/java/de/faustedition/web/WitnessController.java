@@ -63,16 +63,13 @@ public class WitnessController implements InitializingBean {
 	private void displayWitness(ModelAndView mv, String path) throws Exception {
 		EncodedTextDocument document = new EncodedTextDocument(xmlStore.get(URI.create(path)));
 		mv.addObject("document", document);
-
 		Element facsimile = singleResult(xpath("//tei:facsimile/tei:graphic"), document.getDom(), Element.class);
 		if (facsimile != null) {
 			mv.addObject("facsimile", Facsimile.fromUri(URI.create(facsimile.getAttribute("url"))));
 		}
-
 		StringWriter htmlWriter = new StringWriter();
 		tei2HtmlTemplates.newTransformer().transform(new DOMSource(document.getDom()), new StreamResult(htmlWriter));
 		mv.addObject("htmlTranscription", htmlWriter.toString());
-
 		mv.setViewName(WITNESS_VIEW_NAME);
 	}
 
