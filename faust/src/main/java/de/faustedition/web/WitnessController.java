@@ -6,8 +6,10 @@ import static de.faustedition.xml.NodeListIterable.singleResult;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -15,6 +17,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FilenameUtils;
+import org.lmnl.lom.base.DefaultLmnlDocument;
+import org.lmnl.xml.PlainTextXmlFilter;
+import org.lmnl.xml.SaxBasedLmnlBuilder;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -23,6 +28,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import com.google.common.collect.Sets;
 
 import de.faustedition.facsimile.Facsimile;
 import de.faustedition.tei.EncodedTextDocument;
@@ -36,6 +44,20 @@ public class WitnessController implements InitializingBean {
 
 	@Autowired
 	private XmlStore xmlStore;
+
+	@RequestMapping(value = "/Witness/**", headers = { "Accept=application/json" })
+	public void witnessModel(HttpServletRequest request, HttpServletResponse response) throws IOException, SAXException, URISyntaxException {
+		String path = ControllerUtil.getPath(request, null);
+		if (!"xml".equals(FilenameUtils.getExtension(path))) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, path);
+			return;
+		}
+
+		SaxBasedLmnlBuilder builder = new SaxBasedLmnlBuilder(new PlainTextXmlFilter()//
+				.withLineElements(Sets.newHashSet("pb", "lb", "zone", "line")));
+		DefaultLmnlDocument document = new DefaultLmnlDocument(new URI("witness", path, null));
+		EncodedTextDocument witness = new EncodedTextDocument(xmlStore.get(URI.create(path)));
+	}
 
 	@RequestMapping(value = "/Witness/**")
 	public ModelAndView display(HttpServletRequest request) throws Exception {

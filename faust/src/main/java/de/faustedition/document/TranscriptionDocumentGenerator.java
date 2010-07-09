@@ -2,6 +2,7 @@ package de.faustedition.document;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
@@ -47,7 +48,7 @@ public class TranscriptionDocumentGenerator implements Runnable {
 
 			Log.LOGGER.debug("Generating missing page-base transcription documents");
 			for (Facsimile facsimile : facsimiles) {
-				URI uri = XmlStore.WITNESS_BASE.resolve(facsimile.getPath() + ".xml");
+				URI uri = XmlStore.WITNESS_BASE.resolve(new URI(null, facsimile.getPath() + ".xml", null));
 				if (!xml.contains(uri)) {
 					EncodedTextDocument document = documentBuilder.create();
 					Facsimile.writeTo(document, Collections.singletonList(facsimile));
@@ -66,7 +67,7 @@ public class TranscriptionDocumentGenerator implements Runnable {
 					continue;
 				}
 				if (Iterables.any(xml, new IsXmlDocumentInCollectionPredicate(path))) {
-					URI text = uri.resolve(FilenameUtils.getName(path.substring(0, path.length() - 1)) + ".xml");
+					URI text = uri.resolve(new URI(null, FilenameUtils.getName(path.substring(0, path.length() - 1)) + ".xml", null));
 					if (!xml.contains(text)) {
 						Log.LOGGER.debug("Creating new text transcription document: '{}'", text.toString());
 						xmlStore.put(text, documentBuilder.create().getDom());
@@ -81,24 +82,21 @@ public class TranscriptionDocumentGenerator implements Runnable {
 				if (!path.endsWith(".xml") || !path.startsWith(witnessBasePath)) {
 					continue;
 				}
-				path = path.substring(witnessBasePath.length(), path.length() - 4);
-
-				String name = FilenameUtils.getName(path);
-				if (FilenameUtils.getPathNoEndSeparator(path).endsWith(name)) {
-					// text-oriented transcription
-					continue;
-				}
-
-				if (!facsimiles.contains(new Facsimile(path))) {
-					detached.add(uri);
+				for (Facsimile facsimile : Facsimile.readFrom(new EncodedTextDocument(xmlStore.get(uri)))) {
+					if (!facsimiles.contains(facsimile)) {
+						detached.add(uri);
+						break;
+					}
 				}
 			}
-			
+
 			Report report = new Report("detached_transcription_documents");
 			report.setBody(StringUtils.join(detached, "\n"));
 			reportManager.send(report);
 		} catch (IOException e) {
 			Log.fatalError(e, "I/O error while generating page transcription documents");
+		} catch (URISyntaxException e) {
+			Log.fatalError(e, "URI encoding error while generating page transcription documents");
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -21,33 +22,41 @@ public class FileSystemXmlStore extends BaseXmlStore {
 	public Iterator<URI> iterator() {
 		return contents(URI.create("")).iterator();
 	}
-	
+
 	protected SortedSet<URI> contents(URI uri) {
-		SortedSet<URI> contents = new TreeSet<URI>();
-		File file = new File(relativize(uri));
-		if (file.isDirectory()) {
-			for (String content : file.list()) {
-				if (new File(file, content).isDirectory()) {
-					URI dir = uri.resolve("./" + content + "/");
-					contents.add(dir);
-					contents.addAll(contents(dir));
-				} else {
-					contents.add(uri.resolve("./" + content));
+		try {
+			SortedSet<URI> contents = new TreeSet<URI>();
+			File file = new File(relativize(uri));
+			if (file.isDirectory()) {
+				for (String content : file.list()) {
+					if (new File(file, content).isDirectory()) {
+						URI dir = uri.resolve(new URI(null, "./" + content + "/", null));
+						contents.add(dir);
+						contents.addAll(contents(dir));
+					} else {
+						contents.add(uri.resolve(new URI(null, "./" + content, null)));
+					}
 				}
 			}
+			return contents;
+		} catch (URISyntaxException e) {
+			throw Log.fatalError(e);
 		}
-		return contents;
 	}
 
 	public SortedSet<URI> list(URI uri) {
-		SortedSet<URI> contents = new TreeSet<URI>();
-		File file = new File(relativize(uri));
-		if (file.isDirectory()) {
-			for (String content : file.list()) {
-				contents.add(uri.resolve("./" + content + (new File(file, content).isDirectory() ? "/" : "")));
+		try {
+			SortedSet<URI> contents = new TreeSet<URI>();
+			File file = new File(relativize(uri));
+			if (file.isDirectory()) {
+				for (String content : file.list()) {
+					contents.add(uri.resolve(new URI("./" + content + (new File(file, content).isDirectory() ? "/" : ""))));
+				}
 			}
+			return contents;
+		} catch (URISyntaxException e) {
+			throw Log.fatalError(e);
 		}
-		return contents;
 	}
 
 	public void delete(URI uri) {
@@ -75,7 +84,7 @@ public class FileSystemXmlStore extends BaseXmlStore {
 		try {
 			File file = new File(uri);
 			file.getParentFile().mkdirs();
-			
+
 			XmlUtil.serialize(document, out = new FileOutputStream(file));
 		} finally {
 			IOUtils.closeQuietly(out);

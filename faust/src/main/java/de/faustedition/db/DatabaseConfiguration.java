@@ -4,7 +4,6 @@ import java.io.File;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +11,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -23,18 +23,13 @@ public class DatabaseConfiguration {
 	@Value("#{config['db.home']}")
 	private String databaseHome;
 
-
-	@Bean(destroyMethod = "close")
+	@Bean
 	public DataSource dataSource() {
 		File db = new File(databaseHome);
 		if (!db.isDirectory()) {
 			Assert.isTrue(db.mkdirs(), "Could not create database home directory '" + db.getAbsolutePath() + "'");
 		}
-		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setUrl("jdbc:hsqldb:file:" + db.getAbsolutePath() + "/faust");
-		dataSource.setUsername("SA");
-		dataSource.setPassword("");
-		return dataSource;
+		return new DriverManagerDataSource("jdbc:hsqldb:file:" + db.getAbsolutePath() + "/faust", "SA", "");
 	}
 
 	@Bean
