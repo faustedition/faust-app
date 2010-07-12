@@ -24,6 +24,7 @@
 	<mvc:view-controller path="/project/about" />
 	<mvc:view-controller path="/project/contact" />
 	<mvc:view-controller path="/project/imprint" />
+	<mvc:view-controller path="/visualization/style_catalogue" />
 
 	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver" />
 

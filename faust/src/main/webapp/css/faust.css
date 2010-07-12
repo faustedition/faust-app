@@ -1,30 +1,8 @@
-/*
- * Color scheme:
- * - #193F49 primary
- * - #1F2850 secondary A
- * - #1D572E secondary B
- * - #764F27 complementary
- */
-h1,h2,h3,h4,h5,h6,strong,em {
-	color: #000;
-}
+body { font-family: sans-serif; font-size: 80% }
 
-table,table th,table td,table tr {
-	border: 0;
-}
+a { color: #805F40 }
 
-#main a:hover {
-	
-}
-
-#main a {
-	color: #1F2850;
-	font-weight: bold;
-}
-
-a.img {
-	text-decoration: none;
-}
+table, td, th, tr { border: 0 }
 
 #header,#footer {
 	margin: 0em;
@@ -32,6 +10,7 @@ a.img {
 }
 
 #main {
+	font-size: 100%;
 	margin: 1em;
 	padding: 1em;
 }
@@ -41,72 +20,42 @@ a.img {
 }
 
 #footer {
-	font-size: 77%;
+	font-size: smaller;
 	text-align: center;
 }
 
-.data-table {
-	width: 90%;
-	margin: 1em 5%;
-}
+/* Stilkatalog */
 
-.primary-color {
-	color: #000;
-}
+.font-family-0 { font-family: serif }
+.font-family-1 { font-family: sans-serif }
+.font-family-2 { font-family: monospace }
 
-.secondary-color {
-	color: #764F27;
-}
+.font-size-0 { font-size: medium; font-variant: normal }
+.font-size-1 { font-size: large; font-variant: normal }
+.font-size-2 { font-size: small; font-variant: normal }
+.font-size-3 { font-size: medium; font-variant: small-caps }
 
-.add-color-1 {
-	color: #1F2850;
-}
+.font-variant-0 { font-style: normal; font-weight: normal }
+.font-variant-1 { font-style: normal; font-weight: bold }
+.font-variant-2 { font-style: italic; font-weight: normal }
+.font-variant-3 { font-style: italic; font-weight: bold }
 
-.add-color-2 {
-	color: #1D572E;
-}
+.color-0 { color: #000 }
+.color-1 { color: #805F40 }
+.color-2 { color: #404D80 }
+.color-3 { color: #408051 }
 
-.no-border {
-	border: 0;
-}
+.stroke-0 { stroke: #000 }
+.stroke-1 { stroke: #805F40 }
+.stroke-2 { stroke: #404D80 }
+.stroke-3 { stroke: #408051 }
 
-.border {
-	border: 1px dashed #ccc;
-}
+.fill-0 { fill: #000 }
+.fill-1 { fill: #805F40 }
+.fill-2 { fill: #404D80 }
+.fill-3 { fill: #408051 }
 
-.float-right {
-	float: right;
-	margin-left: 1em;
-}
-
-.center {
-	text-align: center;
-}
-
-.left {
-	text-align: left;
-}
-
-.right {
-	text-align: right;
-}
-
-.small-font {
-	font-size: 85%;
-}
-
-.normal-variant {
-	font-variant: normal;
-}
-
-.small-caps {
-	font-variant: small-caps;
-}
-
-.normal-style {
-	font-style: normal;
-}
-
-.italic {
-	font-style: italic;
-}
+.text-decoration-0 { text-decoration: normal }
+.text-decoration-1 { text-decoration: underline }
+.text-decoration-2 { text-decoration: line-through }
+.text-decoration-3 { text-decoration: overline }

@@ -7,15 +7,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head profile="http://dublincore.org/documents/dcq-html/">
 	<title>${title} :: faustedition.net</title>
-	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.1.1/build/cssreset/reset-min.css&amp;3.1.1/build/cssfonts/fonts-min.css&amp;3.1.1/build/cssgrids/grids-min.css&amp;3.1.1/build/cssbase/base-min.css" />
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.1.1/build/cssreset/reset-min.css&amp;3.1.1/build/cssgrids/grids-min.css&amp;3.1.1/build/cssbase/base-min.css" />
 	<script src="http://yui.yahooapis.com/3.1.1/build/yui/yui-min.js" type="text/javascript"></script>	
 	<link rel="stylesheet" type="text/css" href="${cp}/css/faust.css" />
 	<link rel="stylesheet" type="text/css" href="${cp}/css/iip.css" />
+	<script type="text/javascript">var cp = "${cp}";</script>
 	<script type="text/javascript" src="${cp}/js/faust.js"></script>
 	<script type="text/javascript" src="${cp}/js/mootools-1.2-core-compressed.js"></script>
 	<script type="text/javascript" src="${cp}/js/mootools-1.2-more-compressed.js"></script>
 	<script type="text/javascript" src="${cp}/js/iipmooviewer-1.1.js"></script>	
-	<script type="text/javascript">var cp = "${cp}"; yuiInit();</script>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
 	<meta name="DC.format" scheme="DCTERMS.IMT" content="application/xhtml+xml" />
@@ -31,16 +31,25 @@
 <body class="yui-skin-sam">
 <div class="yui3-d2">
 <div id="header">
-	<h1>${title}&nbsp;<span style="color: #764F27">::&nbsp;faustedition.net</span></h1>
+	<h1>${title}&nbsp;<span class="color-1">::&nbsp;faustedition.net</span></h1>
 	<div id="top-navigation" class="yuimenubar yuimenubarnav">
 	<div class="bd">
 	<ul class="first-of-type">
 		<#if authAuthorities?seq_contains("ROLE_EDITOR")>
 			
-			<li class="yuimenubaritem"><a href="${cp}/Witness/" class="yuimenubaritemlabel"><@spring.message "menu.witness" /></a></li>
+			<li class="yuimenubaritem">
+				<a href="${cp}/Witness/" class="yuimenubaritemlabel"><@spring.message "menu.witness" /></a>
+				<div class="yuimenu">
+				<div class="bd">
+				<ul>
+					<li class="yuimenuitem"><a href="${cp}/visualization/style_catalogue" class="yuimenuitemlabel"><@spring.message "menu.visualization.style_catalogue" /></a></li>
+				</ul>
+				</div>
+				</div>
+			</li>
 			<li class="yuimenubaritem"><a href="${cp}/text/" class="yuimenubaritemlabel"><@spring.message "menu.text" /></a></li>
 			<li class="yuimenubaritem"><a href="${cp}/genesis/" class="yuimenubaritemlabel"><@spring.message "menu.genesis" /></a></li>
-			<li class="yuimenubaritem"><a href="${cp}/search/" class="yuimenubaritemlabel"><@spring.message "menu.search" /></a></li>
+			<#-- <li class="yuimenubaritem"><a href="${cp}/search/" class="yuimenubaritemlabel"><@spring.message "menu.search" /></a></li> -->
 		</#if>
 		<li class="yuimenubaritem"><span class="yuimenuibartemlabel"><@spring.message "menu.project" /></span>
 		<div class="yuimenu">

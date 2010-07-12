@@ -5,10 +5,10 @@
 		<div class="yui3-u first">
 			<h2>${title?html}</h2>
 	
-			<table class="border" style="width: 90%; margin: 0 5%">
+			<table style="width: 90%; margin: 0 5%">
 				<@faust.tableGrid contents ; c>
 					<#assign name><@faust.nameOf c?string /></#assign>
-					<td style="width: 20%" class="center no-border">
+					<td style="width: 20%; border: 0; text-align: center">
 						<a class="img" href="${cp}/${encodePath(c?string)}" title="${name?html}">
 							<img src="${cp}/img/witness/<#if c?string?ends_with("/")>collection<#else>witness</#if>.png" alt="[Typ-Icon]" />
 						</a>
