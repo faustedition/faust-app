@@ -119,7 +119,7 @@
 <a href="${url}"<#if title?has_content> title="${title}"</#if>><img src="${cp}/img/arrow_up.png"<#if title?has_content> alt="${title}"</#if> /></a>
 </#macro>
 
-<#macro tableGrid contents rows=5>
+<#macro tableGrid contents rows=4>
 <#if contents?size gt 0>
 	<tr>
 	<#list contents as c>
