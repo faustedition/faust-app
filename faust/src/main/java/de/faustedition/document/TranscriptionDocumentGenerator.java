@@ -44,7 +44,13 @@ public class TranscriptionDocumentGenerator implements Runnable {
 		Log.LOGGER.info("Generating transcription documents");
 		try {
 			Set<URI> xml = Sets.newHashSet(xmlStore);
+
 			Set<Facsimile> facsimiles = Sets.newHashSet(facsimileStore);
+			for (URI uri : xml) {
+				if (xmlStore.isDocumentEncodingDocument(uri)) {
+					facsimiles.removeAll(Facsimile.readFrom(new EncodedTextDocument(xmlStore.get(uri))));
+				}
+			}
 
 			Log.LOGGER.debug("Generating missing page-base transcription documents");
 			for (Facsimile facsimile : facsimiles) {
@@ -78,8 +84,7 @@ public class TranscriptionDocumentGenerator implements Runnable {
 			Log.LOGGER.debug("Generating report on detached transcription documents");
 			final SortedSet<URI> detached = Sets.newTreeSet();
 			for (URI uri : xml) {
-				String path = uri.getPath();
-				if (!path.endsWith(".xml") || !path.startsWith(witnessBasePath)) {
+				if (!xmlStore.isDocumentEncodingDocument(uri)) {
 					continue;
 				}
 				for (Facsimile facsimile : Facsimile.readFrom(new EncodedTextDocument(xmlStore.get(uri)))) {
