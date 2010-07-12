@@ -60,7 +60,7 @@ public class WitnessController implements InitializingBean {
 			return null;
 		}
 
-		EncodedTextDocument witness = new EncodedTextDocument(xmlStore.get(URI.create(path)));
+		EncodedTextDocument witness = new EncodedTextDocument(xmlStore.get(new URI(null, path, null)));
 		return new LmnlDocumentJsonView(LmnlXmlUtils.buildDocument(documentExtraction.newTransformer(), new DOMSource(witness.getDom())));
 	}
 
@@ -82,13 +82,13 @@ public class WitnessController implements InitializingBean {
 		return mv;
 	}
 
-	private void displayCollection(ModelAndView mv, String path) throws IOException {
+	private void displayCollection(ModelAndView mv, String path) throws IOException, URISyntaxException {
 		mv.setViewName("witness/collection");
-		mv.addObject("contents", xmlStore.list(URI.create(path)));
+		mv.addObject("contents", xmlStore.list(new URI(null, path, null)));
 	}
 
 	private void displayWitness(ModelAndView mv, String path) throws Exception {
-		EncodedTextDocument document = new EncodedTextDocument(xmlStore.get(URI.create(path)));
+		EncodedTextDocument document = new EncodedTextDocument(xmlStore.get(new URI(null, path, null)));
 		mv.addObject("document", document);
 		Element facsimile = singleResult(xpath("//tei:facsimile/tei:graphic"), document.getDom(), Element.class);
 		if (facsimile != null) {

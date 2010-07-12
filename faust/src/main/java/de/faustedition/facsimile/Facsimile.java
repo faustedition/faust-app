@@ -68,7 +68,7 @@ public class Facsimile implements Comparable<Facsimile> {
 	
 	public static List<Facsimile> readFrom(EncodedTextDocument document) throws URISyntaxException {
 		List<Facsimile> references = new ArrayList<Facsimile>();
-		for (Element graphicEl : new NodeListIterable<Element>(xpath("//tei:facsimile/tei:graphic"), document)) {
+		for (Element graphicEl : new NodeListIterable<Element>(xpath("//tei:facsimile/tei:graphic"), document.getDom())) {
 			if (!graphicEl.hasAttributeNS(TEI_NS_URI, "url")) {
 				continue;
 			}

@@ -284,6 +284,9 @@
 			<id>lmnl4j</id>
 			<name>lmnl4j Maven Repository</name>
 			<url>http://www.middell.net/lmnl4j/repository</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 	<properties>
