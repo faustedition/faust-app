@@ -49,14 +49,14 @@
 					<tspan class="font-variant-3">Variante #4</tspan>
 				</text>
 			</@style>
-			<@style title="Dekoration">
-				<text x="1em" y="1.25em">
-					<tspan class="text-decoration-0">normal,</tspan>
-					<tspan class="text-decoration-1">unterstrichen,</tspan>
-					<tspan class="text-decoration-2">durchstrichen,</tspan>
-					<tspan class="text-decoration-3">überstrichen</tspan>
-				</text>
-			</@style>
+
+			<h3>Dekoration</h3>
+			<p>
+				<span class="text-decoration-0">normal,</span>
+				<span class="text-decoration-1">unterstrichen,</span>
+				<span class="text-decoration-2">durchstrichen,</span>
+				<span class="text-decoration-3">überstrichen</span>
+			</p>
 		</div>
 	</div>
 	
@@ -90,5 +90,57 @@
 			</@style>
 		</div>
 	</div>
+
+	<hr/>
+		
+	<h2>Positionierung</h2>
 	
+	<div class="yui3-g">
+		<div class="yui3-u first">
+			<h3>Interlineare Einfügung</h3>
+			
+			<canvas id="test-canvas1" width="350" height="120" style="background: #eee">Keine HTML5-Canvas-Unterstützung</canvas>
+			<script type="text/javascript">
+				var ctx = document.getElementById("test-canvas1").getContext("2d");
+				ctx.font = "20px serif";
+				ctx.textAlign = "start";
+				ctx.fillText("Die Tat!", 40, 60);
+
+				var xOffset = ctx.measureText("Die ").width;
+				ctx.strokeStyle = "rgba(96,96,96,1)";
+				ctx.beginPath();
+				ctx.moveTo(40 + (xOffset - 2), 60);
+				ctx.lineTo(40 + (xOffset - 2), 35);
+				ctx.lineTo(40 + (xOffset + 4), 35);
+				ctx.stroke();
+				ctx.font = "15px sans-serif";
+				ctx.fillText("Wort", 40 + xOffset + 5, 40);
+			</script>
+
+			<h3>Fixierung</h3>
+		
+			<canvas id="test-canvas3" width="350" height="120" style="background: #eee">Keine HTML5-Canvas-Unterstützung</canvas>
+			<script type="text/javascript">
+				var ctx3 = document.getElementById("test-canvas3").getContext("2d");
+				ctx3.font = "20px serif";
+				ctx3.textAlign = "start";
+				ctx3.fillStyle = "rgba(128,128,128,1)";
+				ctx3.fillText("Im Anfang war ...", 80, 40);
+				ctx3.fillStyle = "rgba(0,0,0,0.75)";
+				ctx3.fillText("Im Anfang war ...", 82, 38);
+			</script>
+		</div>
+		<div class="yui3-u">
+			<h3>Drehung</h3>
+		
+			<canvas id="test-canvas2" width="350" height="120" style="background: #eee">Keine HTML5-Canvas-Unterstützung</canvas>
+			<script type="text/javascript">
+				var ctx2 = document.getElementById("test-canvas2").getContext("2d");
+				ctx2.font = "15px serif";
+				ctx2.textAlign = "start";
+				ctx2.rotate(0.75);
+				ctx2.fillText("Im Anfang war ...", 30, 10);
+			</script>
+		</div>
+	</div>		
 </@faust.page>
