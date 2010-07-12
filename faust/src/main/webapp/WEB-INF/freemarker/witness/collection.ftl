@@ -7,13 +7,13 @@
 	
 			<table style="width: 90%; margin: 0 5%">
 				<@faust.tableGrid contents ; c>
-					<#assign name><@faust.nameOf c?string /></#assign>
+					<#assign name><@faust.nameOf c.path /></#assign>
 					<td style="width: 20%; border: 0; text-align: center">
-						<a class="img" href="${cp}/${encodePath(c?string)}" title="${name?html}">
+						<a class="img" href="${cp}/${c?string}" title="${name?html}">
 							<img src="${cp}/img/witness/<#if c?string?ends_with("/")>collection<#else>witness</#if>.png" alt="[Typ-Icon]" />
 						</a>
 						<br/>
-						<a href="${cp}/${encodePath(c?string)}" title="${name?html}">${name?html}</a>
+						<a href="${cp}/${c?string}" title="${name?html}">${name?html}</a>
 					</td>
 				</@faust.tableGrid>
 			</table>
