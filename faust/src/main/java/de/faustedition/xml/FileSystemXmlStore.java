@@ -50,7 +50,7 @@ public class FileSystemXmlStore extends BaseXmlStore {
 			File file = new File(relativize(uri));
 			if (file.isDirectory()) {
 				for (String content : file.list()) {
-					contents.add(uri.resolve(new URI("./" + content + (new File(file, content).isDirectory() ? "/" : ""))));
+					contents.add(uri.resolve(new URI(null, "./" + content + (new File(file, content).isDirectory() ? "/" : ""), null)));
 				}
 			}
 			return contents;
