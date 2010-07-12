@@ -139,7 +139,7 @@
 		<#local name><#if p_index == 0>${rootName}<#else>${p?html}</#if></#local>
 		<#if p_has_next>
 			<#local uri = (uri + p + "/") />
-			<a href="${cp}/${encodePath(uri)}" title="${name}">${name}</a>
+			<a href="${cp}/${uri?url?replace("%2F", "/")}" title="${name}">${name}</a>
 		</#if>
 		<#if p_has_next><strong>&gt;</strong></#if>
 		<#if !p_has_next>${name}</#if>

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.web.util.UrlPathHelper;
 import org.w3c.dom.Document;
 
 import de.faustedition.xml.XmlUtil;
@@ -24,7 +25,7 @@ public class ControllerUtil {
 	}
 
 	public static String getPath(HttpServletRequest request, String prefix) {
-		String path = StringUtils.strip(StringUtils.defaultString(request.getPathInfo()), "/");
+		String path = StringUtils.strip(StringUtils.defaultString(new UrlPathHelper().getPathWithinServletMapping(request)), "/");
 		path = StringUtils.removeStart(path, StringUtils.strip(StringUtils.defaultString(prefix), "/"));
 		return StringUtils.strip(FilenameUtils.normalize(path), "/");
 	}

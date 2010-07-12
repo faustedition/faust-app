@@ -4,7 +4,7 @@
 	
 	<h2>
 		${title?html}
-		<a href="${cp}/${encodePath(path)}?format=pdf" title="PDF-Test"><img src="${cp}/img/pdf-logo.png" alt="PDF-Test"/></a>
+		<a href="${cp}/${path?url?replace("%2F", "/")}?format=pdf" title="PDF-Test"><img src="${cp}/img/pdf-logo.png" alt="PDF-Test"/></a>
 	</h2>
 	
 	<#if facsimile??>
@@ -19,8 +19,4 @@
 				});
 	</script>
 	</#if>
-	
-	<div id="transcription">
-	${htmlTranscription}
-	</div>	
 </@faust.page>

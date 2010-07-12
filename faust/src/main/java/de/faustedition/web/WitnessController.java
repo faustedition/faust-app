@@ -33,9 +33,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.AbstractView;
+import org.springframework.web.util.UrlPathHelper;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import de.faustedition.Log;
 import de.faustedition.facsimile.Facsimile;
 import de.faustedition.tei.EncodedTextDocument;
 import de.faustedition.xml.XmlStore;
@@ -68,7 +70,6 @@ public class WitnessController implements InitializingBean {
 	public ModelAndView display(HttpServletRequest request) throws Exception {
 		ModelAndView mv = new ModelAndView();
 		String path = ControllerUtil.getPath(request, null);
-
 		if ("xml".equals(FilenameUtils.getExtension(path))) {
 			displayWitness(mv, path);
 		} else {
