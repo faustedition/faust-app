@@ -136,7 +136,7 @@ public class OddSchemaMojo extends AbstractMojo {
 			odd2odd.setParameter(new QName("selectedSchema"), new XdmAtomicValue("faust-tei"));
 			odd2odd.setParameter(new QName("verbose"), new XdmAtomicValue("false"));
 			odd2odd.setParameter(new QName("stripped"), new XdmAtomicValue("true"));
-			odd2odd.setParameter(new QName("localsource"), new XdmAtomicValue(new URI(p5subsetUrl)));
+			odd2odd.setParameter(new QName("defaultSource"), new XdmAtomicValue(new URI(p5subsetUrl)));
 			odd2odd.setParameter(new QName("TEIC"), new XdmAtomicValue("true"));
 			odd2odd.setParameter(new QName("lang"), new XdmAtomicValue("en"));
 			odd2odd.setParameter(new QName("doclang"), new XdmAtomicValue("en"));
