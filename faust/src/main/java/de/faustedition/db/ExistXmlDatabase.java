@@ -1,4 +1,4 @@
-package de.faustedition.xml;
+package de.faustedition.db;
 
 import static de.faustedition.xml.XPathUtil.xpath;
 
@@ -24,8 +24,10 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import de.faustedition.Log;
+import de.faustedition.xml.CustomNamespaceContext;
+import de.faustedition.xml.NodeListIterable;
 
-public class XmlDatabase implements Iterable<URI> {
+public class ExistXmlDatabase implements Iterable<URI> {
     public static final String EXIST_NS_URI = "http://exist.sourceforge.net/NS/exist";
     private static final URI WITNESS_BASE = URI.create("Witness/");
 
@@ -35,7 +37,7 @@ public class XmlDatabase implements Iterable<URI> {
     private final Logger logger;
 
     @Inject
-    public XmlDatabase(@Named("xmldb.base") String baseUri, @Named("xmldb.user") String dbUser,
+    public ExistXmlDatabase(@Named("xmldb.base") String baseUri, @Named("xmldb.user") String dbUser,
             @Named("xmldb.password") String dbPassword, Logger logger) {
         this.base = URI.create(baseUri);
         this.dbUser = dbUser;

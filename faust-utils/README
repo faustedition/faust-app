@@ -1,0 +1,6 @@
+Python-based utility scripts for data curation and the like.
+
+== Requirements ==
+
+* Python 2.5 or later (not tested on Python 3)
+* lxml2 (http://codespeak.net/lxml/) 

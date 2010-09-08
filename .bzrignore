@@ -4,3 +4,4 @@ target
 .springBeans
 .classpath
 META-INF
+local.ini

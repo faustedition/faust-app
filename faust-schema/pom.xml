@@ -26,11 +26,11 @@
 	<distributionManagement>
 		<repository>
 			<id>faustedition.net</id>
-			<url>scp://wuerzburg.faustedition.net/mnt/data/htdocs/maven/</url>
+			<url>scp://faustedition.uni-wuerzburg.de/mnt/data/htdocs/maven/</url>
 		</repository>
 		<site>
 			<id>faustedition.net</id>
-			<url>scp://wuerzburg.faustedition.net/mnt/data/htdocs/schema/${project.version}</url>
+			<url>scp://faustedition.uni-wuerzburg.de/mnt/data/htdocs/schema/${project.version}</url>
 		</site>
 	</distributionManagement>
 </project>

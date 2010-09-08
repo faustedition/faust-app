@@ -13,12 +13,13 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.name.Names;
 
+import de.faustedition.db.ExistXmlDatabase;
 import de.faustedition.db.GraphDatabaseLifecycleProvider;
+import de.faustedition.db.XmlStorage;
 import de.faustedition.document.ArchiveResource;
 import de.faustedition.template.TemplateConfiguration;
 import de.faustedition.template.TemplateRenderingResource;
 import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.xml.XmlDatabase;
 import freemarker.template.Configuration;
 
 public class ServerModule extends AbstractModule {
@@ -29,7 +30,8 @@ public class ServerModule extends AbstractModule {
         Names.bindProperties(binder(), configuration);
         bind(Properties.class).annotatedWith(Names.named("config")).toInstance(configuration);
 
-        bind(XmlDatabase.class);
+        bind(XmlStorage.class);
+        bind(ExistXmlDatabase.class);
         bind(GraphDatabaseLifecycle.class).toProvider(GraphDatabaseLifecycleProvider.class).asEagerSingleton();               
         
         bind(Configuration.class).to(TemplateConfiguration.class);

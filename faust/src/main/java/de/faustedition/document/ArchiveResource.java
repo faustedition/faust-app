@@ -4,7 +4,6 @@ import static de.faustedition.xml.NodeListIterable.singleResult;
 import static de.faustedition.xml.XPathUtil.xpath;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,17 +18,17 @@ import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
 
+import de.faustedition.db.XmlStorage;
 import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.xml.XmlDatabase;
 
 public class ArchiveResource extends ServerResource {
 
-    private final XmlDatabase xmlDatabase;
+    private final XmlStorage xmlStorage;
     private final TemplateRepresentationFactory viewFactory;
 
     @Inject
-    public ArchiveResource(XmlDatabase xmlDatabase, TemplateRepresentationFactory viewFactory) {
-        this.xmlDatabase = xmlDatabase;
+    public ArchiveResource(XmlStorage xmlStorage, TemplateRepresentationFactory viewFactory) {
+        this.xmlStorage = xmlStorage;
         this.viewFactory = viewFactory;
     }
 
@@ -37,7 +36,7 @@ public class ArchiveResource extends ServerResource {
     public Representation render() throws IOException {
         final Map<String, Object> model = new HashMap<String, Object>();
         final String id = (String) getRequestAttributes().get("id");
-        final Document archives = xmlDatabase.get(URI.create("archives.xml"));
+        final Document archives = xmlStorage.getDocument("archives.xml");
 
         if (id == null) {
             model.put("archives", archives.getDocumentElement());

@@ -12,6 +12,7 @@ import javax.xml.namespace.NamespaceContext;
 
 import com.google.common.base.Preconditions;
 
+import de.faustedition.db.ExistXmlDatabase;
 import de.faustedition.tei.EncodedTextDocument;
 
 public class CustomNamespaceContext implements NamespaceContext { 
@@ -115,7 +116,7 @@ public class CustomNamespaceContext implements NamespaceContext {
         INSTANCE.bindNamespaceUri("ge", EncodedTextDocument.TEI_SIG_GE_URI);
         INSTANCE.bindNamespaceUri("f", XmlDocument.FAUST_NS_URI);
         INSTANCE.bindNamespaceUri("svg", EncodedTextDocument.SVG_NS_URI);
-        INSTANCE.bindNamespaceUri("exist", XmlDatabase.EXIST_NS_URI);
+        INSTANCE.bindNamespaceUri("exist", ExistXmlDatabase.EXIST_NS_URI);
 
     }
     
