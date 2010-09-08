@@ -35,7 +35,7 @@ def validate(last=False):
 	validation_queue = []
 	
 # Validate all XML documents
-for xml_file in faust.xml_files()[:300]:
+for xml_file in faust.xml_files():
 	if faust.is_tei_document(xml_file):
 		validation_queue.append(xml_file)
 		validate()
