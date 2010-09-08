@@ -1,7 +1,6 @@
 package de.faustedition.xml;
 
 import static de.faustedition.xml.XPathUtil.xpath;
-import static de.faustedition.xml.XmlDocument.xpath;
 
 import java.net.URI;
 import java.util.Iterator;

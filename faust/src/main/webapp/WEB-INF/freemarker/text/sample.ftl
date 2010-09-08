@@ -1,7 +1,7 @@
 <@faust.page title="Text">
 	<h2>Lesetext – Beispiel/ Auszug</h2>
 
-	<p class="small-font" style="margin-bottom: 2em">Johann Wolfgang Goethe. Sämtliche Werke nach Epochen seines Schaffens (Münchener Ausgabe). Band 18.1. München, Wien. 1997. S.&nbsp;333-336.</p>
+	<p class="small-font" style="margin-bottom: 2em">Johann Wolfgang Goethe. Sämtliche Werke nach Epochen seines Schaffens (Münchener Ausgabe). Band 18.1. München, Wien. 1997. S.&#160;333-336.</p>
 
 	<div class="yui3-gb">
 	<div class="yui3-u first">

@@ -4,6 +4,8 @@ import de.faustedition.xml.XmlException;
 
 public class EncodedTextDocumentException extends XmlException {
 
+	private static final long serialVersionUID = 4668535695299489502L;
+
 	public EncodedTextDocumentException() {
 		super();
 	}

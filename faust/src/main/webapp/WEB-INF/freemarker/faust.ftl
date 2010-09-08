@@ -1,42 +1,38 @@
 <#import "/spring.ftl" as spring>
-<#assign xhtmlCompliant = true in spring>
 <#assign cp = springMacroRequestContext.getContextPath()>
 
-<#macro page title>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head profile="http://dublincore.org/documents/dcq-html/">
+<#macro page title css="" header="">
+<!DOCTYPE html>
+<html>
+<head>
 	<title>${title} :: faustedition.net</title>
-	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.1.1/build/cssreset/reset-min.css&amp;3.1.1/build/cssgrids/grids-min.css&amp;3.1.1/build/cssbase/base-min.css" />
-	<script src="http://yui.yahooapis.com/3.1.1/build/yui/yui-min.js" type="text/javascript"></script>	
-	<link rel="stylesheet" type="text/css" href="${cp}/css/faust.css" />
-	<link rel="stylesheet" type="text/css" href="${cp}/css/iip.css" />
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.1.1/build/cssfonts/fonts-min.css&3.1.1/build/cssreset/reset-min.css&3.1.1/build/cssgrids/grids-min.css&3.1.1/build/cssbase/base-min.css">
+	<script type="text/javascript" src="http://yui.yahooapis.com/combo?3.1.1/build/yui/yui-debug.js&3.1.1/build/oop/oop-debug.js&3.1.1/build/dom/dom-debug.js&3.1.1/build/dump/dump-debug.js&3.1.1/build/event-custom/event-custom-base-debug.js&3.1.1/build/event/event-debug.js&3.1.1/build/pluginhost/pluginhost-debug.js&3.1.1/build/node/node-debug.js&3.1.1/build/querystring/querystring-stringify-simple-debug.js&3.1.1/build/queue-promote/queue-promote-debug.js&3.1.1/build/datatype/datatype-xml-debug.js&3.1.1/build/io/io-debug.js&3.1.1/build/json/json-debug.js"></script>	<link rel="stylesheet" type="text/css" href="${cp}/css/faust.css">
 	<script type="text/javascript">var cp = "${cp}";</script>
 	<script type="text/javascript" src="${cp}/js/faust.js"></script>
-	<script type="text/javascript" src="${cp}/js/mootools-1.2-core-compressed.js"></script>
-	<script type="text/javascript" src="${cp}/js/mootools-1.2-more-compressed.js"></script>
-	<script type="text/javascript" src="${cp}/js/iipmooviewer-1.1.js"></script>	
-	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
-	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
-	<meta name="DC.format" scheme="DCTERMS.IMT" content="application/xhtml+xml" />
-	<meta name="DC.type" scheme="DCTERMS.DCMIType" content="Text" />
-	<meta name="DC.publisher" content="Digitale Faust-Edition" />
-	<meta name="DC.creator" content="Digitale Faust-Edition" />
-	<meta name="DC.subject" content="Faust, Johann Wolfgang von Goethe, Historisch-kritische Edition, digital humanities" />
+	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/">
+	<meta name="DC.format" scheme="DCTERMS.IMT" content="text/html">
+	<meta name="DC.type" scheme="DCTERMS.DCMIType" content="Text">
+	<meta name="DC.publisher" content="Digitale Faust-Edition">
+	<meta name="DC.creator" content="Digitale Faust-Edition">
+	<meta name="DC.subject" content="Faust, Johann Wolfgang von Goethe, Historisch-kritische Edition, digital humanities">
 	<!-- 
-	<meta name="DCTERMS.license"  scheme="DCTERMS.URI" content="http://www.gnu.org/copyleft/fdl.html" />
-	<meta name="DCTERMS.rightsHolder" content="Wikimedia Foundation Inc." />
+	<meta name="DCTERMS.license"  scheme="DCTERMS.URI" content="http://www.gnu.org/copyleft/fdl.html">
+	<meta name="DCTERMS.rightsHolder" content="Wikimedia Foundation Inc.">
 	 -->
+	 <#if css?has_content><style type="text/css">${css}</style></#if>
+	 <#if header?has_content>${header}</#if>
 </head>
 <body class="yui-skin-sam">
 <div class="yui3-d2">
 <div id="header">
-	<h1>${title}&nbsp;<span class="color-1">::&nbsp;faustedition.net</span></h1>
+	<h1>${title}&#160;<span class="color-1">::&#160;faustedition.net</span></h1>
 	<div id="top-navigation" class="yuimenubar yuimenubarnav">
 	<div class="bd">
 	<ul class="first-of-type">
-		<#if authAuthorities?seq_contains("ROLE_EDITOR")>
-			
+		<#if authAuthorities?seq_contains("ROLE_EDITOR")>			
+			<li class="yuimenubaritem"><a href="${cp}/archive/" class="yuimenubaritemlabel"><@spring.message "menu.archives" /></a></li>
 			<li class="yuimenubaritem">
 				<a href="${cp}/Witness/" class="yuimenubaritemlabel"><@spring.message "menu.witness" /></a>
 				<div class="yuimenu">
@@ -126,7 +122,7 @@
 		<#nested c>
 		<#if c_has_next && ((c_index % rows) == (rows - 1))></tr><tr></#if>
 	</#list>
-	<#if (contents?size % rows) gt 0><#list (rows - 1)..(contents?size % rows) as remainder><td>&nbsp;</td></#list></#if>
+	<#if (contents?size % rows) gt 0><#list (rows - 1)..(contents?size % rows) as remainder><td>&#160;</td></#list></#if>
 	</tr>
 </#if>
 </#macro>
@@ -151,3 +147,7 @@
 		<#if path?ends_with("/")><#local path = path[0..(path?length - 2)] /></#if>
 		${path[(path?last_index_of("/") + 1)..]}
 </#compress></#macro>
+
+<#macro googleMaps>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+</#macro>

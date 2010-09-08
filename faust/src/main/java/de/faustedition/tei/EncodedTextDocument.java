@@ -6,12 +6,12 @@ import java.io.InputStream;
 
 import javax.xml.xpath.XPathExpression;
 
-import org.springframework.util.xml.SimpleNamespaceContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Preconditions;
 
+import de.faustedition.xml.CustomNamespaceContext;
 import de.faustedition.xml.XPathUtil;
 import de.faustedition.xml.XmlDocument;
 import de.faustedition.xml.XmlUtil;
@@ -20,13 +20,6 @@ public class EncodedTextDocument extends XmlDocument {
 	public static final String TEI_NS_URI = "http://www.tei-c.org/ns/1.0";
 	public static final String TEI_SIG_GE_URI = "http://www.tei-c.org/ns/geneticEditions";
 	public static final String SVG_NS_URI = "http://www.w3.org/2000/svg";
-	private static final SimpleNamespaceContext NS_CONTEXT = new SimpleNamespaceContext();
-
-	static {
-		NS_CONTEXT.bindNamespaceUri("tei", TEI_NS_URI);
-		NS_CONTEXT.bindNamespaceUri("svg", SVG_NS_URI);
-		NS_CONTEXT.bindNamespaceUri("ge", TEI_SIG_GE_URI);
-	}
 
 	public EncodedTextDocument(Document document) {
 		super(document);
@@ -56,6 +49,6 @@ public class EncodedTextDocument extends XmlDocument {
 	}
 
 	public static XPathExpression xpath(String expr) {
-		return XPathUtil.xpath(expr, NS_CONTEXT);
+		return XPathUtil.xpath(expr, CustomNamespaceContext.INSTANCE);
 	}
 }

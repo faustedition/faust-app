@@ -1,6 +1,6 @@
 package de.faustedition.metadata;
 
-import static de.faustedition.xml.XmlDocument.xpath;
+import static de.faustedition.xml.XPathUtil.xpath;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -2,6 +2,8 @@ package de.faustedition.xml;
 
 public class XmlParserException extends XmlException {
 
+	private static final long serialVersionUID = -4166404686870399040L;
+
 	public XmlParserException() {
 		super();
 	}

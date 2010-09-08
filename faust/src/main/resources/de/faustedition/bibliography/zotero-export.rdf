@@ -1,0 +1,204 @@
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:dcterms="http://purl.org/dc/terms/"
+ xmlns:z="http://www.zotero.org/namespaces/export#"
+ xmlns:bib="http://purl.org/net/biblio#"
+ xmlns:foaf="http://xmlns.com/foaf/0.1/">
+    <bib:Document rdf:about="http://lexika.digitale-sammlungen.de/adelung/online/angebot">
+        <dc:date>1811</dc:date>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://lexika.digitale-sammlungen.de/adelung/online/angebot</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dc:title>Grammatisch-kritisches Wörterbuch der Hochdeutschen Mundart</dc:title>
+        <dcterms:dateSubmitted>2009-09-03 14:07:26</dcterms:dateSubmitted>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname>Johann Christoph</foaf:givenname>
+                        <foaf:surname>Adelung</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <z:itemType>webpage</z:itemType>
+    </bib:Document>
+    <bib:Book rdf:about="#item_8">
+        <dc:date>1988</dc:date>
+        <dc:title>Der griechische Mythos im Faust II : eine Studie zum Einfluss von Karl Philipp Moritz' Götterlehre und zu Goethes "Arbeit am Mythos" in Akt II and III</dc:title>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname>Maria</foaf:givenname>
+                        <foaf:surname>Alden</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <z:itemType>book</z:itemType>
+        <z:libraryCatalog>Open WorldCat</z:libraryCatalog>
+        <z:shortTitle>alden_mythos_faust_ii</z:shortTitle>
+    </bib:Book>
+    <bib:Document rdf:about="http://www.jgoethe.uni-muenchen.de/">
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://www.jgoethe.uni-muenchen.de/</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dc:title>Der junge Goethe in seiner Zeit</dc:title>
+        <dcterms:dateSubmitted>2009-09-03 14:06:00</dcterms:dateSubmitted>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname>Karl</foaf:givenname>
+                        <foaf:surname>Eibl</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname>Fotis</foaf:givenname>
+                        <foaf:surname>Jannidis</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname>Marianne</foaf:givenname>
+                        <foaf:surname>Willems</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <z:itemType>webpage</z:itemType>
+        <z:shortTitle>junger_goethe</z:shortTitle>
+    </bib:Document>
+    <bib:Document rdf:about="http://opac.ub.uni-weimar.de/DB=4.1/">
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://opac.ub.uni-weimar.de/DB=4.1/</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dc:subject>goethe</dc:subject>
+        <dc:title>Weimarer Goethe-Bibliographie online (WGB)</dc:title>
+        <dcterms:dateSubmitted>2009-09-03 13:54:30</dcterms:dateSubmitted>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname></foaf:givenname>
+                        <foaf:surname>Herzogin Anna Amalia Bibliothek</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <z:itemType>webpage</z:itemType>
+    </bib:Document>
+    <bib:Document rdf:about="http://www.klassik-stiftung.de/forschung/online-datenbanken.html">
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://www.klassik-stiftung.de/forschung/online-datenbanken.html</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dc:subject>gsa</dc:subject>
+        <dc:title>Online-Datenbanken</dc:title>
+        <dcterms:dateSubmitted>2009-09-03 13:55:27</dcterms:dateSubmitted>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname></foaf:givenname>
+                        <foaf:surname>Klassik Stiftung Weimar</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <z:itemType>webpage</z:itemType>
+    </bib:Document>
+    <bib:Document rdf:about="http://www.woerterbuchnetz.de/">
+        <dc:identifier>
+            <dcterms:URI>
+               <rdf:value>http://www.woerterbuchnetz.de/</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dc:title>Das Wörterbuchnetz</dc:title>
+        <dcterms:dateSubmitted>2009-09-03 14:08:12</dcterms:dateSubmitted>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname></foaf:givenname>
+                        <foaf:surname>Kompetenzzentrums für elektronische Erschließungs- und Publikationsverfahren in den Geisteswissenschaften an der Universität Trier</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <z:itemType>webpage</z:itemType>
+    </bib:Document>
+    <bib:Document rdf:about="http://www.tei-c.org/">
+        <dc:identifier>
+           <dcterms:URI><rdf:value>http://www.tei-c.org/</rdf:value></dcterms:URI>
+        </dc:identifier>
+        <dc:subject>tei</dc:subject>
+        <dc:title>Homepage</dc:title>
+        <dcterms:dateSubmitted>2009-09-03 13:53:13</dcterms:dateSubmitted>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname></foaf:givenname>
+                        <foaf:surname>Text Encoding Initiative</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <z:itemType>webpage</z:itemType>
+        <z:shortTitle>tei-c</z:shortTitle>
+    </bib:Document>
+    <bib:Document rdf:about="http://www.zeno.org/Kategorien/T/Hederich-1770">
+        <dc:date>1770</dc:date>
+        <dc:identifier>
+            <dcterms:URI>
+                <rdf:value>http://www.zeno.org/Kategorien/T/Hederich-1770</rdf:value>
+            </dcterms:URI>
+        </dc:identifier>
+        <dc:title>Hederich: Gründliches mythologisches Lexikon</dc:title>
+        <dcterms:dateSubmitted>2009-09-03 14:04:22</dcterms:dateSubmitted>
+        <dcterms:isPartOf>
+           <z:Website></z:Website>
+        </dcterms:isPartOf>
+        <bib:authors>
+            <rdf:Seq>
+                <rdf:li>
+                    <foaf:Person>
+                        <foaf:givenname></foaf:givenname>
+                        <foaf:surname>Zeno.org</foaf:surname>
+                    </foaf:Person>
+                </rdf:li>
+            </rdf:Seq>
+        </bib:authors>
+        <z:itemType>webpage</z:itemType>
+        <z:shortTitle>hederich</z:shortTitle>
+    </bib:Document>
+</rdf:RDF>

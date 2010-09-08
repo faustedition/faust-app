@@ -19,7 +19,7 @@
 			</table>
 		</div>
 		<div class="yui3-u">
-			<div id="encoding-status" style="padding: 2em">&nbsp;</div>
+			<div id="encoding-status" style="padding: 2em">&#160;</div>
 		</div>
 		<script type="text/javascript">
 			function initPage() {

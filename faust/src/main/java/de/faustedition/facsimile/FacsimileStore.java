@@ -170,6 +170,8 @@ public class FacsimileStore implements InitializingBean, Iterable<Facsimile> {
 	}
 
 	private static final FileFileFilter FACSIMILE_FILE_FILTER = new FileFileFilter() {
+		private static final long serialVersionUID = 340878516880378536L;
+
 		@Override
 		public boolean accept(File file) {
 			return super.accept(file) && file.getName().endsWith(TIF_EXTENSION);

@@ -76,6 +76,14 @@ public class XmlUtil {
 		}
 	}
 
+	public static Templates newTemplates(Source source) {
+		try {
+			return transformerFactory().newTemplates(source);
+		} catch (TransformerConfigurationException e) {
+			throw new XmlException("Error configuring XSLT tranformer factory", e);
+		}
+	}
+
 	public static Transformer newTransformer(Source source) {
 		try {
 			return transformerFactory().newTransformer(source);

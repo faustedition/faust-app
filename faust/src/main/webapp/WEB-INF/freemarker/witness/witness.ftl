@@ -1,5 +1,11 @@
 <#assign title><@faust.nameOf path /></#assign>
-<@faust.page title=(title?html)>
+<#assign header>
+	<link rel="stylesheet" type="text/css" href="${cp}/css/iip.css">
+	<script type="text/javascript" src="${cp}/js/mootools-1.2-core-compressed.js"></script>
+	<script type="text/javascript" src="${cp}/js/mootools-1.2-more-compressed.js"></script>
+	<script type="text/javascript" src="${cp}/js/iipmooviewer-1.1.js"></script>
+</#assign>
+<@faust.page title=(title?html) header=header>
 	<@faust.breadcrumbs path "Überlieferungsträger" />
 	
 	<h2>
@@ -13,7 +19,7 @@
 		iip = new IIP( "facsimile", {
 				image: '${(facsimile.path + ".tif")?url}',
 				server: '<#if config['facsimile.iip.url']?starts_with("/")>${cp}</#if>${config["facsimile.iip.url"]?js_string}',
-				credit: '&copy; Digitale Faust-Edition', 
+				credit: '&#169; Digitale Faust-Edition', 
 				zoom: 1,
 				showNavButtons: true
 				});
