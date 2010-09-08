@@ -4,6 +4,7 @@ import ConfigParser
 import email.mime.text
 import os
 import os.path
+import smtplib
 
 import lxml.etree
 

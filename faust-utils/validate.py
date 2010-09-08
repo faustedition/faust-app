@@ -35,7 +35,7 @@ def validate(last=False):
 	validation_queue = []
 	
 # Validate all XML documents
-for xml_file in faust.xml_files():
+for xml_file in faust.xml_files()[:300]:
 	if faust.is_tei_document(xml_file):
 		validation_queue.append(xml_file)
 		validate()
@@ -44,9 +44,11 @@ validate(True)
 # Generate validation report
 if len(validation_report) > 0:
 	report = ""
+	xml_url = faust.config.get("xml", "url")
 	xml_files = validation_report.keys()
 	xml_files.sort()
 	for xml_file in xml_files:
-		report += ("== " + xml_file + " ==\n\n")
-		report += "\n".join(validation_report[xml_file]) + "\n\n"
-	faust.send_report("TEI-P5 Validator Report", report)
+		report += ((" " + xml_url + xml_file).rjust(78, "=") + "\n\n")
+		report += ("\n".join(validation_report[xml_file]) + "\n\n")
+		report += ("".rjust(78, "=") + "\n\n")
+	faust.send_report("TEI-P5 Validation Errors", report)
