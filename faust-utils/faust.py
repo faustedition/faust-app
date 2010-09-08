@@ -10,17 +10,22 @@ import lxml.etree
 config = ConfigParser.ConfigParser()
 config.read(['faust.ini', "local.ini"])
 
+xml_dir = config.get("xml", "dir")
 report_sender = "Faust-Edition <noreply@faustedition.net>"
 report_recipients = ["Gregor Middell <gregor@middell.net>"]
 
 def relative_path(xml_file):
 	"""Returns the path of the given XML file relative to the base directory"""
-	return os.path.relpath(xml_file, config.get("xml", "dir"))
+	prefix = xml_dir + "/"
+	if xml_file.startswith(prefix):
+		return xml_file[len(prefix):]
+	else:
+		return xml_file
 
 def xml_files():
 	"""Returns paths of all XML documents in the edition"""
 	xml_files = []
-	for root, dirs, files in os.walk(config.get("xml", "dir")):		
+	for root, dirs, files in os.walk(xml_dir):		
 		for f in files: 
 			if f.endswith(".xml"): xml_files.append(os.path.join(root, f))
 	xml_files.sort()
