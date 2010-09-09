@@ -3,7 +3,9 @@
 import re
 import shlex
 import subprocess
+
 import lxml.etree
+
 import faust
 
 validation_command = "java -jar '%s' '%s'" % (faust.config.get("validate", "jing"), faust.config.get("validate", "schema"))
