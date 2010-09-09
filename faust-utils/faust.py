@@ -17,7 +17,13 @@ config.read(['faust.ini', "local.ini"])
 
 xml_dir = config.get("xml", "dir")
 report_sender = "Faust-Edition <noreply@faustedition.net>"
-report_recipients = ["Gregor Middell <gregor@middell.net>"]
+report_recipients = [
+	"Katrin Henzel <henzel@faustedition.de>",
+	"Gerrit Bruening <bruening@faustedition.de>",
+	"Dietmar Pravida <pravida@faustedition.de>",
+	"Moritz Wissenbach <m.wissenbach@gmx.de>",
+	"Gregor Middell <middell@faustedition.de>",
+]
 
 def relative_path(xml_file):
 	"""Returns the path of the given XML file relative to the base directory"""
@@ -49,14 +55,16 @@ def is_tei_document(xml_file):
 def send_report(subject, msg):
 	if config.getboolean("mail", "enabled"):
 		msg = email.mime.text.MIMEText(msg)
-		msg["Subject"] = subject
 		msg["From"] = report_sender
 		msg["To"] = ", ".join(report_recipients)
+		msg["Subject"] = subject
 		
 		server = smtplib.SMTP('localhost')
 		server.sendmail(report_sender, report_recipients, msg.as_string())
 		server.quit()
 	else:
+		print "From:", report_sender
+		print "To:", ", ".join(report_recipients)
 		print "Subject:", subject
 		print
 		print msg
