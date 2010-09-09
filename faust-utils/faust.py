@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#
+# Helper functions and routines common to Faust related tasks
+#
 
 import ConfigParser
 import StringIO

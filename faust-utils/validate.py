@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#
+# Reports on the validity of TEI documents
+#
 
 import re
 import shlex
