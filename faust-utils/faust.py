@@ -22,7 +22,7 @@ report_recipients = [
 	"Gerrit Bruening <bruening@faustedition.de>",
 	"Dietmar Pravida <pravida@faustedition.de>",
 	"Moritz Wissenbach <m.wissenbach@gmx.de>",
-	"Gregor Middell <middell@faustedition.de>",
+	"Gregor Middell <gregor@middell.net>",
 ]
 
 def relative_path(xml_file):
