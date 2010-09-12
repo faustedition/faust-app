@@ -86,7 +86,7 @@ tei_serialization_xslt = StringIO.StringIO('''\
 </xsl:stylesheet>''' % config.get("validate", "schema"))
 tei_serialize = lxml.etree.XSLT(lxml.etree.parse(tei_serialization_xslt))
 	
-xpath_namespaces = {
+namespaces = {
 	"tei": "http://www.tei-c.org/ns/1.0",
         "ge": "http://www.tei-c.org/ns/geneticEditions",
         "f": "http://www.faustedition.net/ns",
@@ -94,4 +94,4 @@ xpath_namespaces = {
         "exist": "http://exist.sourceforge.net/NS/exist"
 }
 def xpath(expr):
-	return lxml.etree.XPath(expr, namespaces=xpath_namespaces)
+	return lxml.etree.XPath(expr, namespaces=namespaces)
