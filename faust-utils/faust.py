@@ -91,7 +91,12 @@ namespaces = {
         "ge": "http://www.tei-c.org/ns/geneticEditions",
         "f": "http://www.faustedition.net/ns",
         "svg": "http://www.w3.org/2000/svg",
-        "exist": "http://exist.sourceforge.net/NS/exist"
+        "exist": "http://exist.sourceforge.net/NS/exist",
+	"xml": "http://www.w3.org/XML/1998/namespace"
 }
-def xpath(expr):
-	return lxml.etree.XPath(expr, namespaces=namespaces)
+
+ns = lambda prefix: "{" + namespaces[prefix] + "}"
+
+def xpath(expr, node=None):
+	if node is None: return lxml.etree.XPath(expr, namespaces=namespaces)
+	return node.xpath(expr, namespaces=namespaces)

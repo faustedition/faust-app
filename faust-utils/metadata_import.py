@@ -183,9 +183,9 @@ def cleaned_up_abr_commentary(src, dest):
 	dest.append(src)
 
 # create metadata structure
-faust_ns = "{" + faust.namespaces["f"] + "}"
-tei_ns = "{" + faust.namespaces["tei"] + "}"
-xml_ns = "{http://www.w3.org/XML/1998/namespace}"
+faust_ns = faust.ns("f")
+tei_ns = faust.ns("tei")
+xml_ns = faust.ns("xml")
 
 metadata_struct = dict()
 documents_struct = dict()
