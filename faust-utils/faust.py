@@ -91,7 +91,7 @@ namespaces = {
         "ge": "http://www.tei-c.org/ns/geneticEditions",
         "f": "http://www.faustedition.net/ns",
         "svg": "http://www.w3.org/2000/svg",
-        "exist": "http://exist.sourceforge.net/NS/exist",
+        #"exist": "http://exist.sourceforge.net/NS/exist",
 	"xml": "http://www.w3.org/XML/1998/namespace"
 }
 

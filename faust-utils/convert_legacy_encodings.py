@@ -4,6 +4,8 @@
 #
 
 import copy
+import os
+import os.path
 import re
 
 import lxml.etree
@@ -37,17 +39,22 @@ def convert():
 		print xml_file
 				
 		xml = lxml.etree.parse(xml_file)
-		tei_text = tei_text_xp(xml)[0]
 		
 		# prepare <ge:document/> context
 		root = lxml.etree.Element(faust.ns("ge") + "document", nsmap=faust.namespaces)
-		root.set("type", "converted")
-		root = lxml.etree.SubElement(root, faust.ns("tei") + "surface")
-		surface = root
-		if len(faust.xpath(".//tei:div[@type='zone']", tei_text)) == 0:
-			root = lxml.etree.SubElement(root, faust.ns("tei") + "zone")
-		for body_content in faust.xpath("tei:body/*", tei_text):
-			root.append(copy.deepcopy(body_content))
+		root.set(faust.ns("xml") + "id", "converted")
+		for child in xml.getroot():
+			if child.tag not in (faust.ns("tei") + "teiHeader", faust.ns("tei") + "facsimile"):
+				child.addprevious(root)
+				break
+		
+		surface = lxml.etree.SubElement(root, faust.ns("tei") + "surface")
+		for body in faust.xpath(".//tei:body", xml):
+			body_zone = copy.deepcopy(body)
+			body_zone.tag = faust.ns("tei") + "zone"
+			surface.append(body_zone)
+
+		root = surface
 
 		# let <add/>/<del/> inherit @hand from <subst/>/<restore/>
 		for container_with_hand in faust.xpath(".//tei:subst[@hand]|./tei:restore[@hand]", root):
@@ -101,8 +108,13 @@ def convert():
 		# throw away text structure tagging
 		lxml.etree.strip_tags(root,\
 			faust.ns("tei") + "div", faust.ns("tei") + "lg",\
-			faust.ns("tei") + "sp", faust.ns("tei") + "subst")
+			faust.ns("tei") + "sp", faust.ns("tei") + "subst",\
+			faust.ns("tei") + "name", faust.ns("tei") + "addSpan")
 
+		# remove Schroer numbers
+		for l in root.iter(faust.ns("tei") + "l"): 
+			if "n" in l.attrib: del l.attrib["n"]
+		
 		# create simple lines
 		for line_element in ("speaker", "l", "p", "stage", "note", "head", "ab"):
 			for le in root.iter(faust.ns("tei") + line_element):
@@ -111,9 +123,9 @@ def convert():
 		# turn deletions into <f:st/> by default
 		for del_xml in root.iter(faust.ns("tei") + "del"):
 			del_xml.tag = faust.ns("f") + "st"
-			del_type = del_xml.get("type", "")
+			del_type = del_xml.get("rend", "")
 			if del_type == "strikethrough" or del_type == "strikedthrough": 
-				del del_xml.attrib["type"]
+				del del_xml.attrib["rend"]
 			
 		# rename tags for fixations
 		for rewrite_tag in ("fix", "repetition"):
@@ -125,7 +137,6 @@ def convert():
 			parent = lb.getparent()
 			if parent.tag != (faust.ns("ge") + "line"): continue
 
-			lb.addprevious(lxml.etree.Comment("lbconversion"))
 			lb.tag = faust.ns("ge") + "line"
 			lb.text = lb.tail
 			lb.tail = None
@@ -146,6 +157,7 @@ def convert():
 				"bottom", "bottom-left", "bottomleft", "bottom-right", "bottomright"):
 				continue
 
+			del margin.attrib["place"]
 			parent = margin.getparent()
 			
 			margin_zone = lxml.etree.Element(faust.ns("tei") + "zone")
@@ -158,24 +170,69 @@ def convert():
 			if margin.tag != faust.ns("ge") + "line":
 				margin_parent = lxml.etree.SubElement(margin_parent, faust.ns("ge") + "line")
 				
-			if parent.tag == (faust.ns("ge") + "line"):
-				line_id = parent.get(faust.ns("xml") + "id", None)
+			for ancestor in margin.iterancestors(faust.ns("ge") + "line"):
+				line_id = ancestor.get(faust.ns("xml") + "id", None)
 				if line_id is None:
 					xml_id_cnt += 1
 					line_id = "line_" + str(xml_id_cnt)
-					parent.set(faust.ns("xml") + "id", line_id)
+					ancestor.set(faust.ns("xml") + "id", line_id)
 				margin_zone.set(faust.ns("f") + "top", "#" + line_id)
+				break
 			
 			parent.remove(margin)
 			margin_parent.append(margin)
 			
+		# detach interlinear additions
+		for inter_add in list(faust.xpath(".//tei:add[@place='above' or @place='below']", root)):
+			line = None
+			for ancestor in inter_add.iterancestors(faust.ns("ge") + "line"):
+				line = ancestor
+				break
+			if line is None: raise Exception(lxml.etree.tostring(inter_add))
+			
+			adjunct_line = None
+			if inter_add.get("place") == "above":
+				line.getprevious()
+			else:
+				line.getnext()
+			if (adjunct_line is None) or (adjunct_line.tag != (faust.ns("ge") + "line")) or\
+				(adjunct_line.get("type", "") != "inter"):
+				adjunct_line = lxml.etree.Element(faust.ns("ge") + "line")
+				adjunct_line.set("type", "inter")
+				if inter_add.get("place") == "above":
+					line.addprevious(adjunct_line)
+				else:
+					line.addnext(adjunct_line)
+			
+			xml_id_cnt += 1
+			anchor_id = "anchor_" + str(xml_id_cnt)
+			
+			ins_mark = lxml.etree.SubElement(adjunct_line, faust.ns("f") + "ins")
+			ins_mark.set(faust.ns("f") + "at", "#" + anchor_id)
+			
+			ins_mark.tail = inter_add.text
+			inter_add.text = None
+			inter_add.tag = faust.ns("tei") + "anchor"
+			inter_add.set(faust.ns("xml") + "id", anchor_id)
+			for child in inter_add.getchildren():
+				inter_add.remove(child)
+				adjunct_line.append(child)
+			del inter_add.attrib["place"]
+			
+		# remove remaining <add/> elements
+		lxml.etree.strip_tags(root, faust.ns("tei") + "add")
+		
 		# remove <lb/>s, which are located in zones after conversion
 		for lb in list(root.iter(faust.ns("tei") + "lb")):
 			parent = lb.getparent()
 			if parent.tag == (faust.ns("tei") + "zone"):
 				parent.remove(lb)
 
-		print lxml.etree.tostring(root, pretty_print=True)
+		path = ("conversion_test/" + faust.relative_path(xml_file)).split("/")
+		dir_path = "/".join(path[:-1])
+		if not os.path.isdir(dir_path): os.makedirs(dir_path)
+		
+		xml.write("/".join(path), encoding="UTF-8")
 
 def static_to_convert():
 	return [
