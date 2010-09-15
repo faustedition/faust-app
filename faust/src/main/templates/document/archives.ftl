@@ -3,10 +3,9 @@
 <#assign title = message("menu.archives")>
 <#assign css>
 	#archives_map { text-align: center; margin: 2em auto; width: 800px; height: 400px }
-	#archives { margin: 1em auto; border-collapse: collapse; }
-	#archives tr th, #archives tr td { border-bottom: 1px solid #ccc }
-	#archives tr th { width: 40%; text-align: left }
-	#archives tr td.archive_description { width: 50%; padding: 1em }
+	#archives { margin: 1em; border-collapse: collapse; }
+	.archive-row {border-bottom: 1px solid #ccc }
+	.archive-container { padding: 1em }
 </#assign>
 <#assign header>
 	<@faust.googleMaps />
@@ -14,13 +13,16 @@
 	<script type="text/javascript">archiveOverviewMap();</script>
 </#assign>
 <@faust.page title=title css=css header=header>
-	<table id="archives">
+	<div id="archives">
 		<#list archives.archive as a>
-			<tr>
-				<td>${a_index + 1}.</td>
-				<th><a href="${cp}/archive/${(a.@id)?url}">${a.name?html}</a></th>
-				<td><@snippets.archiveData a false /></td>			
-			</tr>
+			<#if (a_index % 3) == 0><div class="yui3-g archive-row"></#if>
+			<div class="yui3-u-1-3">
+			<div class="archive-container">
+				<p>${a_index + 1}.<br><a href="${cp}/archive/${(a.@id)?url}">${a.name?html}</a></p>
+				<@snippets.archiveData a false />
+			</div>
+			</div>
+			<#if ((a_index % 3) == 2) || !a_has_next></div></#if>
 		</#list>		
-	</table>
+	</div>
 </@faust.page>

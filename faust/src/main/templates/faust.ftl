@@ -5,11 +5,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>${title} :: faustedition.net</title>
-	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.2.0/build/cssreset/reset-min.css&amp;3.2.0/build/cssfonts/fonts-min.css&amp;3.2.0/build/cssgrids/grids-min.css&amp;3.2.0/build/cssbase/base-min.css">
-	<script type="text/javascript" src="http://yui.yahooapis.com/combo?3.2.0/build/yui/yui-min.js"></script>
+	<title>Digitale Faust-Edition: ${title}</title>
+	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssreset/reset-min.css">
+	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssfonts/fonts-min.css">
+	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssgrids/grids-min.css">
+	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssbase/base-min.css"> 
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css">
 	<script type="text/javascript">var cp = "${cp}";</script>	
+	<script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-min.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/">
@@ -25,87 +28,20 @@
 	 <#if css?has_content><style type="text/css">${css}</style></#if>
 	 <#if header?has_content>${header}</#if>
 </head>
-<body class="yui-skin-sam">
+<body class="yui3-skin-sam">
 <div id="header">
 	<h1>${title}&#160;<span class="color-1">::&#160;faustedition.net</span></h1>
-	<div id="top-navigation" class="yuimenubar yuimenubarnav">
-	<div class="bd">
-	<ul class="first-of-type">
-		<#if roles?seq_contains("editor")>			
-			<li class="yuimenubaritem"><a href="${cp}/archive/" class="yuimenubaritemlabel">${message("menu.archives")}</a></li>
-			<li class="yuimenubaritem">
-				<a href="${cp}/Witness/" class="yuimenubaritemlabel">${message("menu.witness")}</a>
-				<div class="yuimenu">
-				<div class="bd">
-				<ul>
-					<li class="yuimenuitem"><a href="${cp}/visualization/style_catalogue" class="yuimenuitemlabel">${message("menu.visualization.style_catalogue")}</a></li>
-				</ul>
-				</div>
-				</div>
-			</li>
-			<li class="yuimenubaritem"><a href="${cp}/text/" class="yuimenubaritemlabel">${message("menu.text")}</a></li>
-			<li class="yuimenubaritem"><a href="${cp}/genesis/" class="yuimenubaritemlabel"${message("menu.genesis")}></a></li>
-			<#-- <li class="yuimenubaritem"><a href="${cp}/search/" class="yuimenubaritemlabel">${message("menu.search")}</a></li> -->
-		</#if>
-		<li class="yuimenubaritem"><span class="yuimenuibartemlabel">${message("menu.project")}</span>
-		<div class="yuimenu">
-		<div class="bd">
-		<ul>
-			<li class="yuimenuitem"><a href="${cp}/project/about" class="yuimenuitemlabel">${message("menu.about")}</a></li>
-			<li class="yuimenuitem"><a href="${cp}/static/dfg-grant-application.pdf" class="yuimenuitemlabel">${message("menu.grant_application")}</a></li>
-		</ul>
-		</div>
-		</div>
-		</li>
-		<li class="yuimenubaritem"><span class="yuimenubaritemlabel">${message("menu.partners")}</span>
-		<div class="yuimenu">
-		<div class="bd">
-		<ul>
-			<li class="yuimenuitem"><a href="http://www.goethehaus-frankfurt.de/" class="yuimenuitemlabel">Freies Deutsches Hochstift Frankfurt</a></li>
-			<li class="yuimenuitem"><a href="http://www.klassik-stiftung.de/" class="yuimenuitemlabel">Klassik Stiftung Weimar</a></li>
-			<li class="yuimenuitem"><a href="http://www.uni-wuerzburg.de/" class="yuimenuitemlabel">Julius-Maximilians-Universität Würzburg</a></li>
-		</ul>
-		</div>
-		</div>
-		</li>
-		<li class="yuimenubaritem"><a href="${cp}/project/contact" class="yuimenubaritemlabel">${message("menu.contact")}</a></li>
-		<li class="yuimenubaritem"><a href="${cp}/project/imprint" class="yuimenubaritemlabel">${message("menu.imprint")}</a></li>
-		<li class="yuimenubaritem">
-			<a href="https://wuerzburg.faustedition.net/" class="yuimenubaritemlabel">${message("menu.restricted")}</a>
-			<#if !roles?seq_contains("editor")>
-				<div class="yuimenu">
-					<div class="bd">
-						<ul>
-							<li class="yuimenuitem"><a href="${cp}/login" class="yuimenuitemlabel">Login</a></li>
-						</ul>
-					</div>
-				</div>				
-			</#if>
-		</li>
-		<#if roles?seq_contains("editor")>
-			<li class="yuimenubaritem">
-				<span class="yuimenubaritemlabel">${message("report")}</span>
-				<div class="yuimenu">
-					<div class="bd">
-						<ul>
-							<li class="yuimenuitem"><a href="${cp}/report/tei_validation" class="yuimenuitemlabel">${message("report.tei_validation")}</a></li>
-							<li class="yuimenuitem"><a href="${cp}/report/detached_transcription_documents" class="yuimenuitemlabel">${message("report.detached_transcription_documents")}</a></li>
-							<li class="yuimenuitem"><a href="${cp}/report/whitespace_normalization" class="yuimenuitemlabel">${message("report.whitespace_normalization")}</a></li>
-						</ul>
-					</div>
-				</div>
-			</li>
-		</#if>		
-	</ul>
-	</div>
-	</div>
+	<@topNavigation />
 </div>
 <div id="main">
-	<#nested>
+	<#nested />
 </div>
 <div id="footer">
 	<p>Digitale Faust-Edition. Copyright (c) 2009, 2010 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
 </div>
+<script type="text/javascript">
+	FaustYUI().use("node-menunav", function(Y) { Y.one("#top-navigation").plug(Y.Plugin.NodeMenuNav); });
+</script>
 </body>
 </html>
 </#macro>
@@ -149,4 +85,56 @@
 
 <#macro googleMaps>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+</#macro>
+
+<#macro topNavigation>
+<div id="top-navigation" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav">
+	<div class="yui3-menu-content">
+		<ul class="first-of-type">
+			<#if roles?seq_contains("editor")>							
+			<li class="yui3-menuitem"><a href="${cp}/archive/" class="yui3-menuitem-content">${message("menu.archives")}</a></li>
+			<li>
+				<a href="${cp}/Witness/" class="yui3-menu-label"><em>${message("menu.witness")}</em></a>
+				<div class="yui3-menu">
+				<div class="yui3-menu-content">
+				<ul>
+					<li class="yui3-menuitem"><a href="${cp}/visualization/style_catalogue" class="yui3-menuitem-content">${message("menu.visualization.style_catalogue")}</a></li>
+				</ul>
+				</div>
+				</div>
+			</li>
+			<li class="yui3-menuitem"><a href="${cp}/text/" class="yui3-menuitem-content">${message("menu.text")}</a></li>
+			<li class="yui3-menuitem"><a href="${cp}/genesis/" class="yui3-menuitem-content">${message("menu.genesis")}</a></li>
+			<li class="yui3-menuitem"><a href="${cp}/search/" class="yui3-menuitem-content">${message("menu.search")}</a></li>				
+			</#if>
+			<li><a class="yui3-menu-label" href="#project"><em>${message("menu.project")}</em></a>
+				<div id="project" class="yui3-menu">
+				<div class="yui3-menu-content">
+				<ul>
+					<li class="yui3-menuitem"><a href="${cp}/project/about" class="yui3-menuitem-content">${message("menu.about")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/static/dfg-grant-application.pdf" class="yui3-menuitem-content">${message("menu.grant_application")}</a></li>
+				</ul>
+				</div>
+				</div>
+			</li>
+			<li><a class="yui3-menu-label" href="#partners"><em>${message("menu.partners")}</em></a>
+				<div id="partners" class="yui3-menu">
+				<div class="yui3-menu-content">
+				<ul>
+					<li class="yui3-menuitem"><a href="http://www.goethehaus-frankfurt.de/" class="yui3-menuitem-content">Freies Deutsches Hochstift Frankfurt</a></li>
+					<li class="yui3-menuitem"><a href="http://www.klassik-stiftung.de/" class="yui3-menuitem-content">Klassik Stiftung Weimar</a></li>
+					<li class="yui3-menuitem"><a href="http://www.uni-wuerzburg.de/" class="yui3-menuitem-content">Julius-Maximilians-Universität Würzburg</a></li>
+				</ul>
+				</div>
+				</div>
+			</li>
+			<li class="yui3-menuitem"><a href="${cp}/project/contact" class="yui3-menuitem-content">${message("menu.contact")}</a></li>
+			<li class="yui3-menuitem"><a href="${cp}/project/imprint" class="yui3-menuitem-content">${message("menu.imprint")}</a></li>
+			<li class="yui3-menuitem"><a href="https://faustedition.uni-wuerzburg.de/" class="yui3-menuitem-content">${message("menu.restricted")}</a></li>
+			<#if !roles?seq_contains("editor")>
+			<li class="yui3-menuitem"><a href="${cp}/login" class="yui3-menuitem-content">Login</a></li>
+			</#if>
+		</ul>
+	</div>
+</div>	
 </#macro>
