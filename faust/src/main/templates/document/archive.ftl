@@ -5,12 +5,12 @@
 </#assign>
 <#assign header>
 	<@faust.googleMaps />
-	<script type="text/javascript" src="${cp}/js/archive.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 	<script type="text/javascript">archiveLocation('${archive.geolocation.@lat?js_string}', ${archive.geolocation.@lng?js_string});</script>
 </#assign>
 <@faust.page title=(archive.name?html) header=header css=css>
 	<div class="yui3-g">
-		<div class="yui3-u first">
+		<div class="yui3-u-1-2 first">
 			<@snippets.archiveData archive />
 		</div>
 		<div class="yui3-u" id="archive_map_slot"></div>

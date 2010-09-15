@@ -6,10 +6,11 @@
 <html>
 <head>
 	<title>${title} :: faustedition.net</title>
-	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.1.1/build/cssfonts/fonts-min.css&3.1.1/build/cssreset/reset-min.css&3.1.1/build/cssgrids/grids-min.css&3.1.1/build/cssbase/base-min.css">
-	<script type="text/javascript" src="http://yui.yahooapis.com/combo?3.1.1/build/yui/yui-debug.js&3.1.1/build/oop/oop-debug.js&3.1.1/build/dom/dom-debug.js&3.1.1/build/dump/dump-debug.js&3.1.1/build/event-custom/event-custom-base-debug.js&3.1.1/build/event/event-debug.js&3.1.1/build/pluginhost/pluginhost-debug.js&3.1.1/build/node/node-debug.js&3.1.1/build/querystring/querystring-stringify-simple-debug.js&3.1.1/build/queue-promote/queue-promote-debug.js&3.1.1/build/datatype/datatype-xml-debug.js&3.1.1/build/io/io-debug.js&3.1.1/build/json/json-debug.js"></script>	<link rel="stylesheet" type="text/css" href="${cp}/css/faust.css">
-	<script type="text/javascript">var cp = "${cp}";</script>
-	<script type="text/javascript" src="${cp}/js/faust.js"></script>
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.2.0/build/cssreset/reset-min.css&amp;3.2.0/build/cssfonts/fonts-min.css&amp;3.2.0/build/cssgrids/grids-min.css&amp;3.2.0/build/cssbase/base-min.css">
+	<script type="text/javascript" src="http://yui.yahooapis.com/combo?3.2.0/build/yui/yui-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css">
+	<script type="text/javascript">var cp = "${cp}";</script>	
+	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/">
 	<meta name="DC.format" scheme="DCTERMS.IMT" content="text/html">
@@ -25,7 +26,6 @@
 	 <#if header?has_content>${header}</#if>
 </head>
 <body class="yui-skin-sam">
-<div class="yui3-d2">
 <div id="header">
 	<h1>${title}&#160;<span class="color-1">::&#160;faustedition.net</span></h1>
 	<div id="top-navigation" class="yuimenubar yuimenubarnav">
@@ -104,8 +104,7 @@
 	<#nested>
 </div>
 <div id="footer">
-	<p>Digitale Faust-Edition. Copyright (c) 2009 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
-</div>
+	<p>Digitale Faust-Edition. Copyright (c) 2009, 2010 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
 </div>
 </body>
 </html>

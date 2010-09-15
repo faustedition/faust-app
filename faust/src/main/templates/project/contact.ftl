@@ -1,7 +1,7 @@
 <#assign title = message("project.contact.title")>
 <@faust.page title=title>
 	<div class="yui3-g">
-	<div class="yui3-u first">
+	<div class="yui3-u-1-2">
 		<h2>${message("project.contact.editors")}</h2>
 	
 		<p><strong>Prof. Dr. Anne Bohnenkamp</strong><br />

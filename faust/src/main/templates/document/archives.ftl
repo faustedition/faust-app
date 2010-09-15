@@ -10,7 +10,7 @@
 </#assign>
 <#assign header>
 	<@faust.googleMaps />
-	<script type="text/javascript" src="${cp}/js/archive.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 	<script type="text/javascript">archiveOverviewMap();</script>
 </#assign>
 <@faust.page title=title css=css header=header>

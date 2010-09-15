@@ -1,5 +1,5 @@
 <@faust.page title="Das Projekt">
-	<p style="float: left; margin-right: 1em"><img src="${cp}/img/emblem.jpg" alt="Faust-Emblem" /></p>
+	<p style="float: left; margin-right: 1em"><img src="${cp}/static/img/emblem.jpg" alt="Faust-Emblem" /></p>
 
 	<h2>Historisch-kritische Edition von Goethes Faust</h2>
 

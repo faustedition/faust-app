@@ -1,5 +1,7 @@
 package de.faustedition.template;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -7,7 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 
@@ -15,9 +17,10 @@ import freemarker.template.TemplateModelException;
 public class TemplateConfiguration extends Configuration {
 
     @Inject
-    public TemplateConfiguration(@Named("config") Properties config) throws TemplateModelException {
+    public TemplateConfiguration(@Named("config") Properties config, @Named("template.home") String templateDirectory)
+            throws TemplateModelException, IOException {
         super();
-        setTemplateLoader(new ClassTemplateLoader(getClass(), "/template"));
+        setTemplateLoader(new FileTemplateLoader(new File(templateDirectory)));
         setAutoIncludes(Collections.singletonList("/header.ftl"));
         setDefaultEncoding("UTF-8");
         setOutputEncoding("UTF-8");

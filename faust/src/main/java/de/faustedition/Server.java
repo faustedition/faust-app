@@ -51,7 +51,7 @@ public class Server extends Application implements Runnable {
             Component component = new Component();
 
             ClientList clients = component.getClients();
-            clients.add(Protocol.CLAP);
+            clients.add(Protocol.FILE);
             clients.add(Protocol.HTTP);
             clients.add(Protocol.HTTPS);
 
@@ -82,12 +82,11 @@ public class Server extends Application implements Runnable {
         final Router router = new Router(getContext());
 
         router.attach("", EntryPageRedirectionResource.class);
-        router.attach("css", new Directory(getContext(), "clap:///css"));
-        router.attach("img", new Directory(getContext(), "clap:///img"));
-        router.attach("js", new Directory(getContext(), "clap:///js"));
-        router.attach("static", new Directory(getContext(), "clap:///static"));
-
         router.attach("login", new Finder(getContext(), EntryPageRedirectionResource.class));
+
+
+        final String staticResourceDirectory = injector.getInstance(Key.get(String.class, Names.named("static.home")));
+        router.attach("static", new Directory(getContext(), "file://" + staticResourceDirectory));
 
         Restlet archiveResource = new GuiceFinder(Key.get(ArchiveResource.class));
         router.attach("archive/", archiveResource);

@@ -1,5 +1,5 @@
 <@faust.page title="The Project">
-	<p style="float: left; margin-right: 1em"><img src="${cp}/img/emblem.jpg" alt="Faust-Emblem" /></p>
+	<p style="float: left; margin-right: 1em"><img src="${cp}/static/img/emblem.jpg" alt="Faust-Emblem" /></p>
 
 	<h2>Goethe’s Faust. A genetic edition</h2>
 
