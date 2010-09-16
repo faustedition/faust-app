@@ -11,7 +11,7 @@
 	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssgrids/grids-min.css">
 	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssbase/base-min.css"> 
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css">
-	<script type="text/javascript">var cp = "${cp}";</script>	
+	<script type="text/javascript">var cp = "${cp}"; document.documentElement.className = "yui3-loading";</script>	
 	<script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-min.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
@@ -40,7 +40,11 @@
 	<p>Digitale Faust-Edition. Copyright (c) 2009, 2010 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
 </div>
 <script type="text/javascript">
-	FaustYUI().use("node-menunav", function(Y) { Y.one("#top-navigation").plug(Y.Plugin.NodeMenuNav); });
+	FaustYUI().use("node-menunav", function(Y) { 
+		topNav = Y.one("#top-navigation")
+		topNav.plug(Y.Plugin.NodeMenuNav); 
+		topNav.get("ownerDocument").get("documentElement").removeClass("yui3-loading");
+	});
 </script>
 </body>
 </html>

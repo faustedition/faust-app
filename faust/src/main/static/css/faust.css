@@ -18,6 +18,8 @@ table, td, th, tr { border: 0 }
 .big { font-size: 123.1% }
 .small { font-size: 85% }
 
+.yui3-loading #top-navigation { display: none; }
+
 /* Stilkatalog */
 
 .font-family-0 { font-family: serif }

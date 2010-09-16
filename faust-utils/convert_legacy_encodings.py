@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=UTF-8
 #
 # Convert old text-based encodings to document oriented ones
 #
@@ -116,8 +117,18 @@ def convert():
 			if "n" in l.attrib: del l.attrib["n"]
 		
 		# create simple lines
-		for line_element in ("speaker", "l", "p", "stage", "note", "head", "ab"):
-			for le in root.iter(faust.ns("tei") + line_element):
+		for line_element in ("speaker", "l", "p", "stage", "head", "ab"):
+			line_elements = list(root.iter(faust.ns("tei") + line_element))
+			for le in line_elements:
+				if le.get("rend", "") == "underline":
+					hi = copy.deepcopy(le)
+					hi.tag = faust.ns("tei") + "hi"
+					le.clear()
+					for attr in list(hi.attrib.keys()):
+						if attr == "rend": continue
+						le.set(attr, hi.get(attr))
+						del hi.attrib[attr]
+					le.append(hi)
 				le.tag = faust.ns("ge") + "line"
 		
 		# turn deletions into <f:st/> by default
@@ -132,6 +143,38 @@ def convert():
 			for rewrite in root.iter(faust.ns("tei") + rewrite_tag):
 				rewrite.tag = faust.ns("ge") + "rewrite"
 
+		# rename semantic tags with @rend="underline"
+		for sem_hi_tag in ("emph", "name"):
+			for sem_hi in root.iter(faust.ns("tei") + sem_hi_tag):
+				if sem_hi.get("rend", "") == "underline":
+					sem_hi.tag = faust.ns("tei") + "hi"
+		
+		# convert umlaut corrections
+		umlaut_mapping = { 
+			u"ä":u"a", u"Ä":u"A", 
+			u"ö":u"o", u"Ö":u"O", 
+			u"ü":u"u", u"Ü":u"U" 
+			}
+		for corr in root.iter(faust.ns("tei") + "corr"):
+			for umlaut in umlaut_mapping:
+				if corr.text == umlaut:
+					corr.text = umlaut_mapping[umlaut]
+					corr.tag = faust.ns("tei") + "orig"
+					
+		# join lines with @rend='inline'
+		for inline_line in list(faust.xpath(".//ge:line[@rend='inline']", root)):
+			prev_lines = faust.xpath("./preceding::ge:line", inline_line)
+			if len(prev_lines) == 0: continue
+			prev_line = prev_lines[-1]
+			
+			if inline_line.text is None: 
+				inline_line.text = " "
+			else:
+				inline_line.text += " "				
+			inline_line.getparent().remove(inline_line)
+			prev_line.append(inline_line)
+			lxml.etree.strip_tags(prev_line, faust.ns("ge") + "line")
+			
 		# convert inline <lb/> to <ge:line/>
 		for lb in list(root.iter(faust.ns("tei") + "lb")):
 			parent = lb.getparent()
@@ -148,8 +191,21 @@ def convert():
 				sibling = next_sibling			
 			parent.remove(lb)
 			parent.addnext(lb)
-
-		# detach marginal notes
+		
+		# put <note/> in zones		
+		for note in list(root.iter(faust.ns("tei") + "note")):
+			parent = surface
+			if len(faust.xpath(".//ge:line", note)) == 0:
+				parent = lxml.etree.SubElement(parent, faust.ns("tei") + "zone")
+				note.tag = faust.ns("ge") + "line"
+			else:
+				note.tag = faust.ns("tei") + "zone"
+			note.getparent().remove(note)			
+			parent.append(note)
+			if "place" in note.attrib: del note.attrib["place"]
+			
+		
+		# detach marginal elements
 		for margin in list(faust.xpath(".//*[@place]", root)):
 			place = margin.get("place")
 			if place not in ("margin",\
@@ -192,9 +248,9 @@ def convert():
 			
 			adjunct_line = None
 			if inter_add.get("place") == "above":
-				line.getprevious()
+				adjunct_line = line.getprevious()
 			else:
-				line.getnext()
+				adjunct_line = line.getnext()
 			if (adjunct_line is None) or (adjunct_line.tag != (faust.ns("ge") + "line")) or\
 				(adjunct_line.get("type", "") != "inter"):
 				adjunct_line = lxml.etree.Element(faust.ns("ge") + "line")
