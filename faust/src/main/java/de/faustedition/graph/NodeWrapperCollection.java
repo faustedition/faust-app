@@ -1,4 +1,4 @@
-package de.faustedition.db;
+package de.faustedition.graph;
 
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;

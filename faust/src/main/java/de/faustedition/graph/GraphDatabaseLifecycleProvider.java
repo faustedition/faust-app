@@ -1,4 +1,4 @@
-package de.faustedition.db;
+package de.faustedition.graph;
 
 import java.io.File;
 import java.util.logging.Logger;

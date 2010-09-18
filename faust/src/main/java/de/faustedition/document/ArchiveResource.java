@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 
 import com.google.inject.Inject;
 
-import de.faustedition.db.GraphDatabaseTransactional;
+import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.template.TemplateRepresentationFactory;
 import de.faustedition.xml.NodeListWrapper;
 import de.faustedition.xml.XMLStorage;

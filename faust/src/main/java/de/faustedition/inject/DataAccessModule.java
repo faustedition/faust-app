@@ -1,4 +1,4 @@
-package de.faustedition;
+package de.faustedition.inject;
 
 import static com.google.inject.matcher.Matchers.annotatedWith;
 import static com.google.inject.matcher.Matchers.any;
@@ -10,12 +10,12 @@ import org.restlet.resource.ServerResource;
 
 import com.google.inject.AbstractModule;
 
-import de.faustedition.db.GraphDatabaseLifecycleProvider;
-import de.faustedition.db.GraphDatabaseRoot;
-import de.faustedition.db.GraphDatabaseTransactionInterceptor;
-import de.faustedition.db.GraphDatabaseTransactional;
 import de.faustedition.document.ArchiveManager;
 import de.faustedition.document.DocumentManager;
+import de.faustedition.graph.GraphDatabaseLifecycleProvider;
+import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.GraphDatabaseTransactionInterceptor;
+import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.tei.TeiValidator;
 import de.faustedition.transcript.TranscriptManager;
 import de.faustedition.xml.XMLDatabase;
@@ -30,7 +30,7 @@ public class DataAccessModule extends AbstractModule {
         bind(TeiValidator.class);
 
         bind(GraphDatabaseLifecycle.class).toProvider(GraphDatabaseLifecycleProvider.class).asEagerSingleton();
-        bind(GraphDatabaseRoot.class).asEagerSingleton();
+        bind(GraphReference.class).asEagerSingleton();
 
         try {
             final GraphDatabaseTransactionInterceptor txInterceptor = new GraphDatabaseTransactionInterceptor();

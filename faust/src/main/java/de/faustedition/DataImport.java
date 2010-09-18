@@ -10,6 +10,8 @@ import com.google.inject.Module;
 
 import de.faustedition.document.ArchiveManager;
 import de.faustedition.document.DocumentManager;
+import de.faustedition.inject.ConfigurationModule;
+import de.faustedition.inject.DataAccessModule;
 import de.faustedition.xml.XMLStorage;
 
 public class DataImport extends MainBase implements Runnable {

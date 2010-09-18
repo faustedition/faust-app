@@ -19,27 +19,27 @@ import org.xml.sax.helpers.XMLFilterImpl;
 import com.google.inject.Inject;
 
 import de.faustedition.FaustURI;
-import de.faustedition.db.GraphDatabaseRoot;
-import de.faustedition.db.GraphDatabaseTransactional;
+import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLFragmentFilter;
 import de.faustedition.xml.XMLStorage;
 
 public class TranscriptManager {
 
-    private final GraphDatabaseRoot root;
+    private final GraphReference graph;
     private final Logger logger;
     private final GraphDatabaseService db;
     private IndexService indexService;
     private final XMLStorage xml;
 
     @Inject
-    public TranscriptManager(GraphDatabaseRoot root, XMLStorage xml, Logger logger) {
-        this.root = root;
+    public TranscriptManager(GraphReference graph, XMLStorage xml, Logger logger) {
+        this.graph = graph;
         this.xml = xml;
         this.logger = logger;
-        this.db = root.getGraphDatabaseService();
-        this.indexService = root.getIndexService();
+        this.db = graph.getGraphDatabaseService();
+        this.indexService = graph.getIndexService();
     }
 
     @GraphDatabaseTransactional
@@ -61,7 +61,7 @@ public class TranscriptManager {
         final DocumentaryTranscript transcript = new DocumentaryTranscript(db.createNode(), source, facsRefHandler.references);
         transcript.addRoot(documentRoot);
         
-        root.getTranscripts().add(transcript);
+        graph.getTranscripts().add(transcript);
         indexService.index(transcript.getUnderlyingNode(), Transcript.SOURCE_KEY, source.toString());
         return transcript;
     }

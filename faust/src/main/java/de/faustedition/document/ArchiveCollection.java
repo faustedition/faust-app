@@ -2,7 +2,7 @@ package de.faustedition.document;
 
 import org.neo4j.graphdb.Node;
 
-import de.faustedition.db.NodeWrapperCollection;
+import de.faustedition.graph.NodeWrapperCollection;
 
 public class ArchiveCollection extends NodeWrapperCollection<Archive> {
     public ArchiveCollection(Node node) {

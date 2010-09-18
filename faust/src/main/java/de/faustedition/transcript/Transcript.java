@@ -4,8 +4,8 @@ import org.juxtasoftware.goddag.MultiRootedTree;
 import org.neo4j.graphdb.Node;
 
 import de.faustedition.FaustURI;
-import de.faustedition.db.FaustRelationshipType;
-import de.faustedition.db.GraphDatabaseRoot;
+import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.graph.GraphReference;
 
 public class Transcript extends MultiRootedTree {
     public enum Type {
@@ -13,7 +13,7 @@ public class Transcript extends MultiRootedTree {
     }
 
     private static final FaustRelationshipType MARKUP_VIEW_RT = new FaustRelationshipType("markup-view");
-    protected static final String PREFIX = GraphDatabaseRoot.PREFIX + ".transcript";
+    protected static final String PREFIX = GraphReference.PREFIX + ".transcript";
     public static final FaustRelationshipType TRANSCRIPT_RT = new FaustRelationshipType("transcribes");
     public static final String SOURCE_KEY = PREFIX + ".source";
 

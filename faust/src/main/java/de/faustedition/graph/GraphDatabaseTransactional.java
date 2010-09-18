@@ -1,4 +1,4 @@
-package de.faustedition.db;
+package de.faustedition.graph;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -7,9 +7,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.util.NodeWrapperImpl;
 
-import de.faustedition.db.FaustRelationshipType;
-import de.faustedition.db.GraphDatabaseRoot;
-import de.faustedition.db.NodeWrapperCollection;
+import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.transcript.DocumentaryTranscript;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
@@ -17,7 +17,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
         ARCHIVAL_UNIT, DOCUMENT, QUIRE, SHEET, FOLIO, PAGE, SURFACE
     }
 
-    private static final String PREFIX = GraphDatabaseRoot.PREFIX + ".material-unit";
+    private static final String PREFIX = GraphReference.PREFIX + ".material-unit";
     private static final FaustRelationshipType MATERIAL_PART_OF_RT = new FaustRelationshipType("is-material-part-of");
 
     public MaterialUnit(Node node) {

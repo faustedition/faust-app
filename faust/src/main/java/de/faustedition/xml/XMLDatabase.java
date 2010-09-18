@@ -13,7 +13,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.ext.xml.DomRepresentation;
 import org.restlet.resource.ClientResource;
@@ -24,8 +23,6 @@ import org.w3c.dom.Element;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-
-import de.faustedition.Log;
 
 public class XMLDatabase implements Iterable<URI> {
     public static final String EXIST_NS_URI = "http://exist.sourceforge.net/NS/exist";
@@ -45,15 +42,11 @@ public class XMLDatabase implements Iterable<URI> {
         this.logger = logger;
     }
 
-    public Document get(URI uri) {
-        try {
-            logger.fine(String.format("Getting XML resource from XML-DB: %s", uri.toString()));
-            DomRepresentation representation = createClientResource(uri).get(DomRepresentation.class);
-            representation.setNamespaceAware(true);
-            return representation.getDocument();
-        } catch (IOException e) {
-            throw Log.fatalError(e);
-        }
+    public Document get(URI uri) throws IOException {
+        logger.fine(String.format("Getting XML resource from XML-DB: %s", uri.toString()));
+        DomRepresentation representation = createClientResource(uri).get(DomRepresentation.class);
+        representation.setNamespaceAware(true);
+        return representation.getDocument();
     }
 
     public void put(URI uri, Document document) {
@@ -66,7 +59,7 @@ public class XMLDatabase implements Iterable<URI> {
         createClientResource(uri).delete();
     }
 
-    public SortedSet<URI> list(URI uri) {
+    public SortedSet<URI> list(URI uri) throws IOException {
         try {
             SortedSet<URI> contents = new TreeSet<URI>();
             if (!isCollection(uri)) {
@@ -103,18 +96,20 @@ public class XMLDatabase implements Iterable<URI> {
             throw new RuntimeException(e);
         } catch (DOMException e) {
             throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public Document facsimileReferences() {
+    public Document facsimileReferences() throws IOException {
         return get(URI.create("Query/FacsimileRefs.xq"));
     }
 
-    public Document encodingStati() {
+    public Document encodingStati() throws IOException {
         return get(URI.create("Query/EncodingStati.xq"));
     }
 
-    public Document identifiers() {
+    public Document identifiers() throws IOException {
         return get(URI.create("Query/Identifiers.xq"));
     }
 
@@ -125,11 +120,11 @@ public class XMLDatabase implements Iterable<URI> {
     }
 
     protected boolean isCollection(URI uri) {
-        return StringUtils.isBlank(uri.getPath()) || uri.getPath().endsWith("/");
+        return (uri.getPath() == null || uri.getPath().length() == 0) || uri.getPath().endsWith("/");
     }
 
     protected URI relativize(URI uri) {
-        Preconditions.checkArgument(!uri.isAbsolute() && (StringUtils.isBlank(uri.getPath()) || !uri.getPath().startsWith("/")));
+        Preconditions.checkArgument(!uri.isAbsolute() && (uri.getPath() == null || uri.getPath().length() == 0 || !uri.getPath().startsWith("/")));
         return base.resolve(uri);
     }
 

@@ -2,13 +2,13 @@ package de.faustedition.document;
 
 import org.neo4j.graphdb.Node;
 
-import de.faustedition.db.FaustRelationshipType;
-import de.faustedition.db.GraphDatabaseRoot;
-import de.faustedition.db.NodeWrapperCollection;
+import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.NodeWrapperCollection;
 
 public class Archive extends NodeWrapperCollection<MaterialUnit> {
     private static final FaustRelationshipType IN_ARCHIVE_RT = new FaustRelationshipType("in-archive");
-    private static final String PREFIX = GraphDatabaseRoot.PREFIX + ".archive";
+    private static final String PREFIX = GraphReference.PREFIX + ".archive";
 
     public Archive(Node node) {
         super(node, MaterialUnit.class, IN_ARCHIVE_RT);

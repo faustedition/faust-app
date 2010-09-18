@@ -19,6 +19,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.thaiopensource.util.PropertyMapBuilder;
 import com.thaiopensource.validate.IncorrectSchemaException;
 import com.thaiopensource.validate.Schema;
@@ -30,6 +31,7 @@ import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
 import de.faustedition.FaustURI;
 import de.faustedition.xml.XMLStorage;
 
+@Singleton
 public class TeiValidator {
     private static final URL SCHEMA_RESOURCE = TeiValidator.class.getResource("/faust-tei.rng");
 
@@ -54,10 +56,6 @@ public class TeiValidator {
         logger.info("Initialized RelaxNG-based TEI validator from " + SCHEMA_RESOURCE);
     }
 
-    public boolean isValid(FaustURI uri) throws SAXException, IOException {
-        return validate(uri).isEmpty();
-    }
-
     public List<String> validate(FaustURI uri) throws SAXException, IOException {
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("Validating via RelaxNG: " + uri);
@@ -70,6 +68,10 @@ public class TeiValidator {
         xmlReader.parse(xml.getInputSource(uri));
 
         return errorHandler.getErrors();
+    }
+
+    public boolean isValid(FaustURI uri) throws SAXException, IOException {
+        return validate(uri).isEmpty();
     }
 
     private static class CustomErrorHandler implements ErrorHandler {

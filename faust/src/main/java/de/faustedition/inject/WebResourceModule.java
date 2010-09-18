@@ -1,10 +1,11 @@
-package de.faustedition;
+package de.faustedition.inject;
 
 import org.restlet.Context;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 
+import de.faustedition.DeploymentMode;
 import de.faustedition.document.ArchiveResource;
 import de.faustedition.facsimile.FacsimileProxyResource;
 import de.faustedition.genesis.GenesisSampleResource;

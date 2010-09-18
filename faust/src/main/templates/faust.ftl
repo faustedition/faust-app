@@ -33,8 +33,8 @@
 		<div class="yui3-u-2-3"><h1><span class="color-1">Digitale Faustedition:&#160;</span>${title}</h1></div>
 		<div class="yui3-u">
 			<form id="search-form" action="${cp}/search" method="get">
-				<input id="term" type="text" value=""/>
-				<input type="submit" value="${message('search')}" />
+				<input id="term" type="text" value="" disabled="disabled"/>
+				<input type="submit" value="${message('search')}" disabled="disabled"/>
 			</form>
 		</div>		
 	</div>
@@ -52,7 +52,7 @@
 		topNav.plug(Y.Plugin.NodeMenuNav); 
 		topNav.get("ownerDocument").get("documentElement").removeClass("yui3-loading");
 		
-		Y.one("#search-form #term").focus();
+		//Y.one("#search-form #term").focus();
 	});
 </script>
 </body>

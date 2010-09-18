@@ -12,26 +12,26 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.google.inject.Inject;
 
 import de.faustedition.FaustURI;
-import de.faustedition.db.GraphDatabaseRoot;
-import de.faustedition.db.GraphDatabaseTransactional;
+import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 
 public class ArchiveManager {
     public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustURI.Authority.XML, "/archives.xml");
     
-    private final GraphDatabaseRoot root;
+    private final GraphReference graph;
     private GraphDatabaseService db;
 
     @Inject
-    public ArchiveManager(GraphDatabaseRoot root) {
-        this.root = root;
-        this.db = root.getGraphDatabaseService();
+    public ArchiveManager(GraphReference graph) {
+        this.graph = graph;
+        this.db = graph.getGraphDatabaseService();
     }
     
     @GraphDatabaseTransactional
     public void synchronize(XMLStorage xml) throws SAXException, IOException {
-        final ArchiveCollection archives = root.getArchives();
+        final ArchiveCollection archives = graph.getArchives();
         final List<Archive> archivesList = archives.asList();
         XMLUtil.saxParser().parse(xml.getInputSource(ARCHIVE_DESCRIPTOR_URI), new DefaultHandler() {
             @Override

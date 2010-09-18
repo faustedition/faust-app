@@ -4,10 +4,10 @@ import java.net.URI;
 
 import org.neo4j.graphdb.Node;
 
-import de.faustedition.db.GraphDatabaseRoot;
+import de.faustedition.graph.GraphReference;
 
 public class Document extends MaterialUnit {
-    private static final String PREFIX = GraphDatabaseRoot.PREFIX + ".document";
+    private static final String PREFIX = GraphReference.PREFIX + ".document";
 
     public Document(Node node) {
         super(node);

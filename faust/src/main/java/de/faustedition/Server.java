@@ -28,6 +28,9 @@ import de.faustedition.document.ArchiveResource;
 import de.faustedition.facsimile.FacsimileProxyResource;
 import de.faustedition.genesis.GenesisSampleChartResource;
 import de.faustedition.genesis.GenesisSampleResource;
+import de.faustedition.inject.ConfigurationModule;
+import de.faustedition.inject.DataAccessModule;
+import de.faustedition.inject.WebResourceModule;
 import de.faustedition.security.DevelopmentAuthenticator;
 import de.faustedition.template.TemplateRenderingResource;
 

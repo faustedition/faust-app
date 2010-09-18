@@ -11,9 +11,9 @@ import org.neo4j.graphdb.Transaction;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-import de.faustedition.ConfigurationModule;
-import de.faustedition.DataAccessModule;
-import de.faustedition.db.GraphDatabaseRoot;
+import de.faustedition.graph.GraphReference;
+import de.faustedition.inject.ConfigurationModule;
+import de.faustedition.inject.DataAccessModule;
 
 public class ArchiveTest {
 
@@ -24,7 +24,7 @@ public class ArchiveTest {
 
     @Before
     public void startTransaction() {
-        db = injector.getInstance(GraphDatabaseRoot.class).getGraphDatabaseService();
+        db = injector.getInstance(GraphReference.class).getGraphDatabaseService();
         tx = db.beginTx();
     }
 
@@ -40,7 +40,7 @@ public class ArchiveTest {
 
     @Test
     public void archiveAddition() {
-        final ArchiveCollection archives = injector.getInstance(GraphDatabaseRoot.class).getArchives();
+        final ArchiveCollection archives = injector.getInstance(GraphReference.class).getArchives();
         Assert.assertNotNull(archives);        
         Archive a1 = new Archive(db.createNode(), "test1");
         Archive a2 = new Archive(db.createNode(), "test2");

@@ -2,6 +2,7 @@ package de.faustedition.genesis;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class ParalipomenonReference implements Serializable {
 	private String name;
 	private String portfolio;

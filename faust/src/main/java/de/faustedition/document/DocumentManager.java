@@ -13,21 +13,21 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.google.inject.Inject;
 
 import de.faustedition.FaustURI;
-import de.faustedition.db.GraphDatabaseRoot;
-import de.faustedition.db.GraphDatabaseTransactional;
 import de.faustedition.document.MaterialUnit.Type;
+import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.xml.XMLUtil;
 
 public class DocumentManager {
     public static final FaustURI DOCUMENT_BASE_URI = new FaustURI(FaustURI.Authority.XML, "/document");
 
-    private final GraphDatabaseRoot dbRoot;
+    private final GraphReference graph;
     private GraphDatabaseService db;
 
     @Inject
-    public DocumentManager(GraphDatabaseRoot dbRoot) {
-        this.dbRoot = dbRoot;
-        this.db = dbRoot.getGraphDatabaseService();
+    public DocumentManager(GraphReference graph) {
+        this.graph = graph;
+        this.db = graph.getGraphDatabaseService();
     }
 
     @GraphDatabaseTransactional
@@ -63,7 +63,7 @@ public class DocumentManager {
 
                 // FIXME: real archive reference and type per material unit
                 document.setType(Type.ARCHIVAL_UNIT);
-                final Archive archive = dbRoot.getArchives().findById("gsa");
+                final Archive archive = graph.getArchives().findById("gsa");
                 if (archive == null) {
                     throw new SAXException("Invalid archive reference: gsa");
                 }

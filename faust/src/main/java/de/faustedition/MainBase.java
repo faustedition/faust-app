@@ -9,6 +9,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 
+
 public abstract class MainBase {
     protected DeploymentMode mode = DeploymentMode.DEVELOPMENT;
     protected Injector injector;

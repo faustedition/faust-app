@@ -1,4 +1,4 @@
-package de.faustedition.db;
+package de.faustedition.graph;
 
 import org.neo4j.graphdb.RelationshipType;
 
@@ -7,7 +7,7 @@ public class FaustRelationshipType implements RelationshipType {
     private final String name;
 
     public FaustRelationshipType(String name) {
-        this.name = GraphDatabaseRoot.PREFIX + "." + name;
+        this.name = GraphReference.PREFIX + "." + name;
     }
 
     @Override

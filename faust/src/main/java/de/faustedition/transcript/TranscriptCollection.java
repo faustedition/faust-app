@@ -3,7 +3,7 @@ package de.faustedition.transcript;
 import org.neo4j.graphdb.Node;
 import org.neo4j.helpers.collection.IterableWrapper;
 
-import de.faustedition.db.NodeWrapperCollection;
+import de.faustedition.graph.NodeWrapperCollection;
 
 public class TranscriptCollection extends NodeWrapperCollection<Transcript> {
 

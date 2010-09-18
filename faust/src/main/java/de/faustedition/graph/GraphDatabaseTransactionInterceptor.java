@@ -1,4 +1,4 @@
-package de.faustedition.db;
+package de.faustedition.graph;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,8 +18,8 @@ public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
     private Logger logger;
 
     @Inject
-    public void setGraphDatabaseRoot(GraphDatabaseRoot dbRoot) {
-        this.db = dbRoot.getGraphDatabaseService();
+    public void setGraphDatabaseRoot(GraphReference graph) {
+        this.db = graph.getGraphDatabaseService();
     }
 
     @Override

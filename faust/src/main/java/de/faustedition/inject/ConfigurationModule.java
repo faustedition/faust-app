@@ -1,4 +1,4 @@
-package de.faustedition;
+package de.faustedition.inject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +43,7 @@ public class ConfigurationModule extends AbstractModule {
             }
             return configuration;
         } catch (IOException e) {
-            throw Log.fatalError(e);
+            throw new RuntimeException(e);
         }
     }
 }

@@ -1,5 +1,5 @@
 package de.faustedition;
 
-enum DeploymentMode {
+public enum DeploymentMode {
     PRODUCTION, DEVELOPMENT
 }

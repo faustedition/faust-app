@@ -4,10 +4,10 @@ import org.junit.Test;
 
 import com.google.inject.Guice;
 
-import de.faustedition.ConfigurationModule;
-import de.faustedition.DataAccessModule;
 import de.faustedition.FaustURI;
 import de.faustedition.document.DocumentManager;
+import de.faustedition.inject.ConfigurationModule;
+import de.faustedition.inject.DataAccessModule;
 import de.faustedition.xml.XMLStorage;
 
 public class XMLStorageTest {

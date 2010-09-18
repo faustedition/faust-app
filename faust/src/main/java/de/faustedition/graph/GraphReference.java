@@ -1,4 +1,4 @@
-package de.faustedition.db;
+package de.faustedition.graph;
 
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -11,11 +11,13 @@ import org.neo4j.util.GraphDatabaseLifecycle;
 import org.neo4j.util.NodeWrapperImpl;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import de.faustedition.document.ArchiveCollection;
 import de.faustedition.transcript.TranscriptCollection;
 
-public class GraphDatabaseRoot extends NodeWrapperImpl {
+@Singleton
+public class GraphReference extends NodeWrapperImpl {
     public static final String PREFIX = "faust";
 
     private static final RelationshipType ROOT_RT = new FaustRelationshipType("root");
@@ -27,7 +29,7 @@ public class GraphDatabaseRoot extends NodeWrapperImpl {
     private final IndexService indexService;
 
     @Inject
-    public GraphDatabaseRoot(GraphDatabaseLifecycle db) {
+    public GraphReference(GraphDatabaseLifecycle db) {
         super(db.graphDb().getReferenceNode());
         this.indexService = db.indexService();
     }
