@@ -27,222 +27,205 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPathExpressionException;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import de.faustedition.Log;
+public class XMLUtil {
+    private static SAXParserFactory saxParserFactory;
+    private static DocumentBuilderFactory documentBuilderFactory;
+    private static TransformerFactory transformerFactory;
+    private static Templates serialization;
 
-public class XmlUtil {
-	private static SAXParserFactory saxParserFactory;
-	private static DocumentBuilderFactory documentBuilderFactory;
-	private static TransformerFactory transformerFactory;
-	private static Templates serialization;
+    public static SAXParser saxParser() {
+        try {
+            if (saxParserFactory == null) {
+                saxParserFactory = SAXParserFactory.newInstance();
+                saxParserFactory.setNamespaceAware(true);
+                saxParserFactory.setValidating(false);
+            }
+            return saxParserFactory.newSAXParser();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException("Error configuring SAX parser factory", e);
+        } catch (SAXException e) {
+            throw new RuntimeException("Error configuring SAX parser factory", e);
+        }
+    }
 
-	public static SAXParser saxParser() {
-		try {
-			if (saxParserFactory == null) {
-				saxParserFactory = SAXParserFactory.newInstance();
-				saxParserFactory.setNamespaceAware(true);
-				saxParserFactory.setValidating(false);
-			}
-			return saxParserFactory.newSAXParser();
-		} catch (ParserConfigurationException e) {
-			throw new XmlException("Error configuring SAX parser factory", e);
-		} catch (SAXException e) {
-			throw new XmlParserException("Error configuring SAX parser factory", e);
-		}
-	}
+    public static DocumentBuilder documentBuilder() {
+        try {
+            if (documentBuilderFactory == null) {
+                documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                documentBuilderFactory.setNamespaceAware(true);
+                documentBuilderFactory.setCoalescing(true);
+                documentBuilderFactory.setValidating(false);
+            }
 
-	public static DocumentBuilder documentBuilder() {
-		try {
-			if (documentBuilderFactory == null) {
-				documentBuilderFactory = DocumentBuilderFactory.newInstance();
-				documentBuilderFactory.setNamespaceAware(true);
-				documentBuilderFactory.setCoalescing(true);
-				documentBuilderFactory.setValidating(false);
-			}
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            documentBuilder.setErrorHandler(new StrictNoOutputErrorCallback());
+            return documentBuilder;
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException("Error configuring DOM builder", e);
+        }
+    }
 
-			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-			documentBuilder.setErrorHandler(new StrictNoOutputErrorCallback());
-			return documentBuilder;
-		} catch (ParserConfigurationException e) {
-			throw Log.fatalError(e, "Error configuring DOM builder");
-		}
-	}
+    public static Templates newTemplates(Source source) {
+        try {
+            return transformerFactory().newTemplates(source);
+        } catch (TransformerConfigurationException e) {
+            throw new RuntimeException("Error configuring XSLT tranformer factory", e);
+        }
+    }
 
-	public static Templates newTemplates(Source source) {
-		try {
-			return transformerFactory().newTemplates(source);
-		} catch (TransformerConfigurationException e) {
-			throw new XmlException("Error configuring XSLT tranformer factory", e);
-		}
-	}
+    public static Transformer newTransformer(Source source) throws TransformerException {
+        return transformerFactory().newTransformer(source);
+    }
 
-	public static Transformer newTransformer(Source source) {
-		try {
-			return transformerFactory().newTransformer(source);
-		} catch (TransformerConfigurationException e) {
-			throw new XmlException("Error configuring XSLT tranformer factory", e);
-		}
-	}
+    public static TransformerFactory transformerFactory() {
+        if (transformerFactory == null) {
+            transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setErrorListener(new StrictNoOutputErrorCallback());
+        }
+        return transformerFactory;
+    }
 
-	public static TransformerFactory transformerFactory() {
-		if (transformerFactory == null) {
-			transformerFactory = TransformerFactory.newInstance();
-			transformerFactory.setErrorListener(new StrictNoOutputErrorCallback());
-		}
-		return transformerFactory;
-	}
+    public static byte[] serialize(Node node) throws IOException, TransformerException {
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        serialize(node, new OutputStreamWriter(byteStream, "UTF-8"));
+        return byteStream.toByteArray();
+    }
 
-	public static byte[] serialize(Node node) {
-		try {
-			ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-			serialize(node, new OutputStreamWriter(byteStream, "UTF-8"));
-			return byteStream.toByteArray();
-		} catch (IOException e) {
-			throw new XmlException("I/O error while serializing XML data");
-		}
-	}
+    public static void serialize(Node node, OutputStream stream) throws IOException, TransformerException {
+        serialize(node, new OutputStreamWriter(stream, "UTF-8"));
+    }
 
-	public static void serialize(Node node, OutputStream stream) {
-		try {
-			serialize(node, new OutputStreamWriter(stream, "UTF-8"));
-		} catch (IOException e) {
-			throw new XmlException("I/O error while serializing XML data");
-		}
-	}
+    public static void serialize(Node node, Writer writer) throws TransformerException {
+        if (serialization == null) {
+            serialization = transformerFactory().newTemplates(//
+                    new StreamSource(XMLUtil.class.getResourceAsStream("serialization.xsl")));
+        }
+        serialization.newTransformer().transform(new DOMSource(node), new StreamResult(writer));
+    }
 
-	public static void serialize(Node node, Writer writer) {
-		try {
-			if (serialization == null) {
-				serialization = transformerFactory().newTemplates(//
-						new StreamSource(XmlUtil.class.getResourceAsStream("serialization.xsl")));
-			}
-			serialization.newTransformer().transform(new DOMSource(node), new StreamResult(writer));
-		} catch (TransformerException e) {
-			throw new XmlException("XSLT error while serializing XML data");
-		}
-	}
+    public static String toString(Node node) throws TransformerException {
+        StringWriter out = new StringWriter();
+        serialize(node, out);
+        return out.toString();
+    }
 
-	public static String toString(Node node) {
-		StringWriter out = new StringWriter();
-		serialize(node, out);
-		return out.toString();		
-	}
+    public static Document parse(InputStream inputStream) throws SAXException, IOException {
+        return documentBuilder().parse(inputStream);
+    }
 
-	public static Document parse(InputStream inputStream) {
-		try {
-			return documentBuilder().parse(inputStream);
-		} catch (SAXException e) {
-			throw new XmlParserException("XML error while parsing DOM", e);
-		} catch (IOException e) {
-			throw new XmlException("XSLT error while parsing DOM", e);
-		}
-	}
+    public static Document parse(InputSource inputSource) throws SAXException, IOException {
+        return documentBuilder().parse(inputSource);
+    }
 
-	public static boolean hasText(Element element) {
-		for (Node textNode : new NodeListIterable<Node>(XPathUtil.xpath(".//text()", null), element)) {
-			String textContent = textNode.getTextContent();
-			if (textContent != null && textContent.trim().length() > 0) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public static boolean hasText(Element element) throws XPathExpressionException, DOMException {
+        for (Node textNode : new NodeListWrapper<Node>(XPathUtil.xpath(".//text()", null), element)) {
+            String textContent = textNode.getTextContent();
+            if (textContent != null && textContent.trim().length() > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public static class StrictNoOutputErrorCallback implements ErrorListener, ErrorHandler {
+    public static class StrictNoOutputErrorCallback implements ErrorListener, ErrorHandler {
 
-		public void error(TransformerException exception) throws TransformerException {
-			throw exception;
-		}
+        public void error(TransformerException exception) throws TransformerException {
+            throw exception;
+        }
 
-		public void fatalError(TransformerException exception) throws TransformerException {
-			throw exception;
-		}
+        public void fatalError(TransformerException exception) throws TransformerException {
+            throw exception;
+        }
 
-		public void warning(TransformerException exception) throws TransformerException {
-			throw exception;
-		}
+        public void warning(TransformerException exception) throws TransformerException {
+            throw exception;
+        }
 
-		public void error(SAXParseException exception) throws SAXException {
-			throw exception;
+        public void error(SAXParseException exception) throws SAXException {
+            throw exception;
 
-		}
+        }
 
-		public void fatalError(SAXParseException exception) throws SAXException {
-			throw exception;
-		}
+        public void fatalError(SAXParseException exception) throws SAXException {
+            throw exception;
+        }
 
-		public void warning(SAXParseException exception) throws SAXException {
-			throw exception;
-		}
+        public void warning(SAXParseException exception) throws SAXException {
+            throw exception;
+        }
 
-	}
+    }
 
-	public static Element getChild(Element parent, String name) {
-		List<Element> children = getChildren(parent, name);
-		return (children.size() > 0) ? children.get(0) : null;
-	}
+    public static Element getChild(Element parent, String name) {
+        List<Element> children = getChildren(parent, name);
+        return (children.size() > 0) ? children.get(0) : null;
+    }
 
-	public static List<Element> getChildElements(Element parent) {
-		List<Element> children = new ArrayList<Element>();
-		for (Node node : new NodeListIterable<Node>(parent.getChildNodes())) {
-			if (Node.ELEMENT_NODE == node.getNodeType()) {
-				children.add((Element) node);
-			}
-		}
-		return children;
-	}
+    public static List<Element> getChildElements(Element parent) {
+        List<Element> children = new ArrayList<Element>();
+        for (Node node : new NodeListWrapper<Node>(parent.getChildNodes())) {
+            if (Node.ELEMENT_NODE == node.getNodeType()) {
+                children.add((Element) node);
+            }
+        }
+        return children;
+    }
 
-	private static List<Element> getChildren(Element parent, String name) {
-		List<Element> childElements = getChildElements(parent);
-		for (Iterator<Element> elementIt = childElements.iterator(); elementIt.hasNext();) {
-			if (!name.equals(getLocalName(elementIt.next()))) {
-				elementIt.remove();
-			}
-		}
-		return childElements;
-	}
+    private static List<Element> getChildren(Element parent, String name) {
+        List<Element> childElements = getChildElements(parent);
+        for (Iterator<Element> elementIt = childElements.iterator(); elementIt.hasNext();) {
+            if (!name.equals(getLocalName(elementIt.next()))) {
+                elementIt.remove();
+            }
+        }
+        return childElements;
+    }
 
-	private static String getLocalName(Element elem) {
-		return (elem.getNamespaceURI() == null) ? elem.getTagName() : elem.getLocalName();
-	}
+    private static String getLocalName(Element elem) {
+        return (elem.getNamespaceURI() == null) ? elem.getTagName() : elem.getLocalName();
+    }
 
-	public static Document getDocument(Node node) {
-		return (Document) (node instanceof Document ? node : node.getOwnerDocument());
-	}
+    public static Document getDocument(Node node) {
+        return (Document) (node instanceof Document ? node : node.getOwnerDocument());
+    }
 
-	public static void removeChildren(Node node) {
-		while (node.hasChildNodes()) {
-			node.removeChild(node.getFirstChild());
-		}
-	}
+    public static void removeChildren(Node node) {
+        while (node.hasChildNodes()) {
+            node.removeChild(node.getFirstChild());
+        }
+    }
 
-	public static Node stripNamespace(Node node) {
-		Node stripped = null;
-		String ns = node.getNamespaceURI();
-		if (ns == null || XMLConstants.XML_NS_URI.equals(ns)) {
-			stripped = node.cloneNode(false);
-		} else if (Node.ELEMENT_NODE == node.getNodeType()) {
-			stripped = getDocument(node).createElement(node.getLocalName());
-			NamedNodeMap attributes = node.getAttributes();
-			for (int ac = 0; ac < attributes.getLength(); ac++) {
-				stripped.getAttributes().setNamedItem(stripNamespace(attributes.item(ac)));
-			}
-			for (Node child : new NodeListIterable<Node>(node.getChildNodes())) {
-				stripped.appendChild(stripNamespace(child));
-			}
-		} else if (Node.ATTRIBUTE_NODE == node.getNodeType()) {
-			stripped = getDocument(node).createAttribute(node.getLocalName());
-			stripped.setNodeValue(node.getNodeValue());
-		}
+    public static Node stripNamespace(Node node) {
+        Node stripped = null;
+        String ns = node.getNamespaceURI();
+        if (ns == null || XMLConstants.XML_NS_URI.equals(ns)) {
+            stripped = node.cloneNode(false);
+        } else if (Node.ELEMENT_NODE == node.getNodeType()) {
+            stripped = getDocument(node).createElement(node.getLocalName());
+            NamedNodeMap attributes = node.getAttributes();
+            for (int ac = 0; ac < attributes.getLength(); ac++) {
+                stripped.getAttributes().setNamedItem(stripNamespace(attributes.item(ac)));
+            }
+            for (Node child : new NodeListWrapper<Node>(node.getChildNodes())) {
+                stripped.appendChild(stripNamespace(child));
+            }
+        } else if (Node.ATTRIBUTE_NODE == node.getNodeType()) {
+            stripped = getDocument(node).createAttribute(node.getLocalName());
+            stripped.setNodeValue(node.getNodeValue());
+        }
 
-		return stripped;
-	}
+        return stripped;
+    }
 }

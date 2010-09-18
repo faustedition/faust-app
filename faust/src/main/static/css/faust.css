@@ -4,8 +4,8 @@ a { color: #000; font-weight: bold; text-decoration: none }
 table, td, th, tr { border: 0 }
 
 #header, #footer { margin: 0em; padding: 0.5em; }
-#header h1 { text-align: right; }
 #header a { font-weight: normal; }
+#header #search-form { text-align: right; margin: 1em 0; font-size: 138.5%; }
 #footer { font-size: smaller; text-align: center; }
 #main { font-size: 100%; margin: 1em; padding: 1em; }
 
@@ -26,10 +26,10 @@ table, td, th, tr { border: 0 }
 .font-family-1 { font-family: sans-serif }
 .font-family-2 { font-family: monospace }
 
-.font-size-0 { font-size: medium; font-variant: normal }
-.font-size-1 { font-size: large; font-variant: normal }
-.font-size-2 { font-size: small; font-variant: normal }
-.font-size-3 { font-size: medium; font-variant: small-caps }
+.font-size-0 { font-size: 100%; font-variant: normal }
+.font-size-1 { font-size: 123.1%; font-variant: normal }
+.font-size-2 { font-size: 85%; font-variant: normal }
+.font-size-3 { font-size: 100%; font-variant: small-caps }
 
 .font-variant-0 { font-style: normal; font-weight: normal }
 .font-variant-1 { font-style: normal; font-weight: bold }

@@ -1,38 +1,34 @@
 package de.faustedition.document;
 
-import com.google.common.base.Objects;
+import org.neo4j.graphdb.Node;
 
-public class Archive extends DocumentUnit {
-	private String archiveId;
-	private String name;
+import de.faustedition.db.FaustRelationshipType;
+import de.faustedition.db.GraphDatabaseRoot;
+import de.faustedition.db.NodeWrapperCollection;
 
-	public String getArchiveId() {
-		return archiveId;
-	}
+public class Archive extends NodeWrapperCollection<MaterialUnit> {
+    private static final FaustRelationshipType IN_ARCHIVE_RT = new FaustRelationshipType("in-archive");
+    private static final String PREFIX = GraphDatabaseRoot.PREFIX + ".archive";
 
-	public void setArchiveId(String archiveId) {
-		this.archiveId = archiveId;
-	}
+    public Archive(Node node) {
+        super(node, MaterialUnit.class, IN_ARCHIVE_RT);
+    }
 
-	public String getName() {
-		return name;
-	}
+    public Archive(Node node, String id) {
+        this(node);
+        setId(id);
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getId() {
+        return (String) getUnderlyingNode().getProperty(PREFIX + ".id");
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof Archive) {
-			return Objects.equal(getArchiveId(), ((Archive) obj).getArchiveId());
-		}
+    public void setId(String id) {
+        getUnderlyingNode().setProperty(PREFIX + ".id", id);
+    }
 
-		return super.equals(obj);
-	}
-
-	@Override
-	public int hashCode() {
-		return getArchiveId().hashCode();
-	}
+    @Override
+    public String toString() {
+        return getClass().getName() + "[" + getId() + "]";
+    }
 }

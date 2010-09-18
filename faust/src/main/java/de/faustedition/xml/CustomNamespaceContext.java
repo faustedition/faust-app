@@ -1,5 +1,6 @@
 package de.faustedition.xml;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,10 +13,8 @@ import javax.xml.namespace.NamespaceContext;
 
 import com.google.common.base.Preconditions;
 
-import de.faustedition.db.ExistXmlDatabase;
-import de.faustedition.tei.EncodedTextDocument;
 
-public class CustomNamespaceContext implements NamespaceContext { 
+public class CustomNamespaceContext implements NamespaceContext {
     private Map<String, String> prefixToNamespaceUri = new HashMap<String, String>();
     private Map<String, List<String>> namespaceUriToPrefixes = new HashMap<String, List<String>>();
 
@@ -25,14 +24,11 @@ public class CustomNamespaceContext implements NamespaceContext {
         Preconditions.checkArgument(prefix != null, "prefix is null");
         if (XMLConstants.XML_NS_PREFIX.equals(prefix)) {
             return XMLConstants.XML_NS_URI;
-        }
-        else if (XMLConstants.XMLNS_ATTRIBUTE.equals(prefix)) {
+        } else if (XMLConstants.XMLNS_ATTRIBUTE.equals(prefix)) {
             return XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
-        }
-        else if (XMLConstants.DEFAULT_NS_PREFIX.equals(prefix)) {
+        } else if (XMLConstants.DEFAULT_NS_PREFIX.equals(prefix)) {
             return defaultNamespaceUri;
-        }
-        else if (prefixToNamespaceUri.containsKey(prefix)) {
+        } else if (prefixToNamespaceUri.containsKey(prefix)) {
             return prefixToNamespaceUri.get(prefix);
         }
         return "";
@@ -62,8 +58,7 @@ public class CustomNamespaceContext implements NamespaceContext {
         Preconditions.checkArgument(namespaceUri != null, "No namespaceUri given");
         if (XMLConstants.DEFAULT_NS_PREFIX.equals(prefix)) {
             defaultNamespaceUri = namespaceUri;
-        }
-        else {
+        } else {
             prefixToNamespaceUri.put(prefix, namespaceUri);
             getPrefixesInternal(namespaceUri).add(prefix);
         }
@@ -80,14 +75,11 @@ public class CustomNamespaceContext implements NamespaceContext {
     private List<String> getPrefixesInternal(String namespaceUri) {
         if (defaultNamespaceUri.equals(namespaceUri)) {
             return Collections.singletonList(XMLConstants.DEFAULT_NS_PREFIX);
-        }
-        else if (XMLConstants.XML_NS_URI.equals(namespaceUri)) {
+        } else if (XMLConstants.XML_NS_URI.equals(namespaceUri)) {
             return Collections.singletonList(XMLConstants.XML_NS_PREFIX);
-        }
-        else if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespaceUri)) {
+        } else if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespaceUri)) {
             return Collections.singletonList(XMLConstants.XMLNS_ATTRIBUTE);
-        }
-        else {
+        } else {
             List<String> list = namespaceUriToPrefixes.get(namespaceUri);
             if (list == null) {
                 list = new ArrayList<String>();
@@ -100,25 +92,21 @@ public class CustomNamespaceContext implements NamespaceContext {
     public void removeBinding(String prefix) {
         if (XMLConstants.DEFAULT_NS_PREFIX.equals(prefix)) {
             defaultNamespaceUri = "";
-        }
-        else {
+        } else {
             String namespaceUri = prefixToNamespaceUri.remove(prefix);
             List<?> prefixes = getPrefixesInternal(namespaceUri);
             prefixes.remove(prefix);
         }
     }
 
-    public static final CustomNamespaceContext INSTANCE;
-    
+    public static final CustomNamespaceContext INSTANCE = new CustomNamespaceContext();
+
     static {
-        INSTANCE = new CustomNamespaceContext();
-        INSTANCE.bindNamespaceUri("tei", EncodedTextDocument.TEI_NS_URI);
-        INSTANCE.bindNamespaceUri("ge", EncodedTextDocument.TEI_SIG_GE_URI);
-        INSTANCE.bindNamespaceUri("f", XmlDocument.FAUST_NS_URI);
-        INSTANCE.bindNamespaceUri("svg", EncodedTextDocument.SVG_NS_URI);
-        INSTANCE.bindNamespaceUri("exist", ExistXmlDatabase.EXIST_NS_URI);
-
+        for (URI ns : CustomNamespaceMap.INSTANCE.keySet()) {
+            if (XMLConstants.XML_NS_URI.equals(ns.toString()) || XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ns.toString())) {
+                continue;
+            }
+            INSTANCE.bindNamespaceUri(CustomNamespaceMap.INSTANCE.get(ns), ns.toString());
+        }
     }
-    
-
 }

@@ -1,20 +1,22 @@
 package de.faustedition.db;
 
-import java.io.File;
-
 import org.junit.Test;
 
 import com.google.inject.Guice;
 
-import de.faustedition.ServerModule;
+import de.faustedition.ConfigurationModule;
+import de.faustedition.DataAccessModule;
+import de.faustedition.FaustURI;
+import de.faustedition.document.DocumentManager;
+import de.faustedition.xml.XMLStorage;
 
-public class XmlStorageTest {
+public class XMLStorageTest {
 
     @Test
     public void listStorageContents() {
-        XmlStorage storage = Guice.createInjector(new ServerModule()).getInstance(XmlStorage.class);
-        for (File xml : storage) {
-            System.out.println(xml.getAbsolutePath());
+        XMLStorage storage = Guice.createInjector(new ConfigurationModule(), new DataAccessModule()).getInstance(XMLStorage.class);
+        for (FaustURI xml : storage.iterate(DocumentManager.DOCUMENT_BASE_URI)) {
+            System.out.println(xml);
         }
     }
 }

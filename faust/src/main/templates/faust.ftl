@@ -1,5 +1,4 @@
 <#assign cp = config["ctx.path"]>
-<#if cp?ends_with("/")><#assign cp = cp?substring(0, cp?last_index_of("/"))></#if>
 
 <#macro page title css="" header="">
 <!DOCTYPE html>
@@ -30,7 +29,15 @@
 </head>
 <body class="yui3-skin-sam">
 <div id="header">
-	<h1>${title}&#160;<span class="color-1">::&#160;faustedition.net</span></h1>
+	<div class="yui3-g">
+		<div class="yui3-u-2-3"><h1><span class="color-1">Digitale Faustedition:&#160;</span>${title}</h1></div>
+		<div class="yui3-u">
+			<form id="search-form" action="${cp}/search" method="get">
+				<input id="term" type="text" value=""/>
+				<input type="submit" value="${message('search')}" />
+			</form>
+		</div>		
+	</div>
 	<@topNavigation />
 </div>
 <div id="main">
@@ -40,10 +47,12 @@
 	<p>Digitale Faust-Edition. Copyright (c) 2009, 2010 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
 </div>
 <script type="text/javascript">
-	FaustYUI().use("node-menunav", function(Y) { 
+	FaustYUI().use("node", "dom", "node-menunav", function(Y) { 
 		topNav = Y.one("#top-navigation")
 		topNav.plug(Y.Plugin.NodeMenuNav); 
 		topNav.get("ownerDocument").get("documentElement").removeClass("yui3-loading");
+		
+		Y.one("#search-form #term").focus();
 	});
 </script>
 </body>
@@ -96,26 +105,24 @@
 	<div class="yui3-menu-content">
 		<ul class="first-of-type">
 			<#if roles?seq_contains("editor")>							
-			<li class="yui3-menuitem"><a href="${cp}/archive/" class="yui3-menuitem-content">${message("menu.archives")}</a></li>
 			<li>
-				<a href="${cp}/Witness/" class="yui3-menu-label"><em>${message("menu.witness")}</em></a>
+				<a href="${cp}/document/" class="yui3-menu-label"><em>${message("menu.witness")}</em></a>
 				<div class="yui3-menu">
 				<div class="yui3-menu-content">
 				<ul>
-					<li class="yui3-menuitem"><a href="${cp}/visualization/style_catalogue" class="yui3-menuitem-content">${message("menu.visualization.style_catalogue")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/document/styles" class="yui3-menuitem-content">${message("menu.visualization.style_catalogue")}</a></li>
 				</ul>
 				</div>
 				</div>
 			</li>
-			<li class="yui3-menuitem"><a href="${cp}/text/" class="yui3-menuitem-content">${message("menu.text")}</a></li>
+			<li class="yui3-menuitem"><a href="${cp}/text/sample" class="yui3-menuitem-content">${message("menu.text")}</a></li>
 			<li class="yui3-menuitem"><a href="${cp}/genesis/" class="yui3-menuitem-content">${message("menu.genesis")}</a></li>
-			<li class="yui3-menuitem"><a href="${cp}/search/" class="yui3-menuitem-content">${message("menu.search")}</a></li>				
+			<li class="yui3-menuitem"><a href="${cp}/archive/" class="yui3-menuitem-content">${message("menu.archives")}</a></li>
 			</#if>
-			<li><a class="yui3-menu-label" href="#project"><em>${message("menu.project")}</em></a>
+			<li><a class="yui3-menu-label" href="${cp}/project/about"><em>${message("menu.project")}</em></a>
 				<div id="project" class="yui3-menu">
 				<div class="yui3-menu-content">
 				<ul>
-					<li class="yui3-menuitem"><a href="${cp}/project/about" class="yui3-menuitem-content">${message("menu.about")}</a></li>
 					<li class="yui3-menuitem"><a href="${cp}/static/dfg-grant-application.pdf" class="yui3-menuitem-content">${message("menu.grant_application")}</a></li>
 				</ul>
 				</div>

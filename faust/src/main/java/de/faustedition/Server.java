@@ -1,6 +1,7 @@
 package de.faustedition;
 
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.restlet.Application;
 import org.restlet.Component;
@@ -19,35 +20,36 @@ import org.restlet.security.Authenticator;
 import org.restlet.util.ClientList;
 import org.restlet.util.ServerList;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.Stage;
+import com.google.inject.Module;
 import com.google.inject.name.Names;
 
 import de.faustedition.document.ArchiveResource;
 import de.faustedition.facsimile.FacsimileProxyResource;
+import de.faustedition.genesis.GenesisSampleChartResource;
+import de.faustedition.genesis.GenesisSampleResource;
 import de.faustedition.security.DevelopmentAuthenticator;
 import de.faustedition.template.TemplateRenderingResource;
 
-public class Server extends Application implements Runnable {
-    private Mode mode = Mode.DEVELOPMENT;
-    private Injector injector;
+public class Server extends MainBase implements Runnable {
 
     public static void main(String[] args) {
         Server server = new Server();
-        for (String arg : args) {
-            if ("-production".equalsIgnoreCase(arg)) {
-                server.mode = Mode.PRODUCTION;
-            }
-        }
+        server.init(args);
         server.run();
     }
 
     @Override
+    protected Module[] createModules() {
+        return new Module[] { new ConfigurationModule(), new DataAccessModule(), new WebResourceModule(mode) };
+    }
+
+    @Override
     public void run() {
+        final Logger logger = Logger.getLogger(getClass().getName());
+        final Application app = new FaustApplication();
         try {
-            getLogger().info("Starting Faust-Edition in " + mode + " mode");
+            logger.info("Starting Faust-Edition in " + mode + " mode");
             Component component = new Component();
 
             ClientList clients = component.getClients();
@@ -58,60 +60,62 @@ public class Server extends Application implements Runnable {
             ServerList servers = component.getServers();
             switch (mode) {
             case PRODUCTION:
-                injector = Guice.createInjector(Stage.PRODUCTION, new ServerModule());
                 servers.add(Protocol.AJP, 8089);
                 break;
             case DEVELOPMENT:
-                injector = Guice.createInjector(Stage.DEVELOPMENT, new DevelopmentServerModule());
                 servers.add(Protocol.HTTP, 8080);
                 break;
             }
 
             String contextPath = injector.getInstance(Key.get(String.class, Names.named("ctx.path")));
-            getLogger().info("Mounting application under '" + contextPath + "'");
-            component.getDefaultHost().attach(contextPath, this);
+            logger.info("Mounting application under '/" + contextPath + "'");
+            component.getDefaultHost().attach("/" + contextPath, app);
             component.start();
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Unexpected error while starting server", e);
+            logger.log(Level.SEVERE, "Unexpected error while starting server", e);
             System.exit(1);
         }
     }
 
-    @Override
-    public Restlet createInboundRoot() {
-        final Router router = new Router(getContext());
+    private class FaustApplication extends Application {
+        @Override
+        public Restlet createInboundRoot() {
+            final Router router = new Router(getContext());
 
-        router.attach("", EntryPageRedirectionResource.class);
-        router.attach("login", new Finder(getContext(), EntryPageRedirectionResource.class));
+            router.attach("", EntryPageRedirectionResource.class);
+            router.attach("login", new Finder(getContext(), EntryPageRedirectionResource.class));
 
+            final String staticResourceDirectory = injector.getInstance(Key.get(String.class, Names.named("static.home")));
+            router.attach("static", new Directory(getContext(), "file://" + staticResourceDirectory));
 
-        final String staticResourceDirectory = injector.getInstance(Key.get(String.class, Names.named("static.home")));
-        router.attach("static", new Directory(getContext(), "file://" + staticResourceDirectory));
+            Restlet archiveResource = new GuiceFinder(Key.get(ArchiveResource.class));
+            router.attach("archive/", archiveResource);
+            router.attach("archive/{id}", archiveResource);
 
-        Restlet archiveResource = new GuiceFinder(Key.get(ArchiveResource.class));
-        router.attach("archive/", archiveResource);
-        router.attach("archive/{id}", archiveResource);
+            router.attach("document/styles", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
+            
+            router.attach("genesis/", new GuiceFinder(Key.get(GenesisSampleResource.class)));
+            router.attach("genesis/chart.png", GenesisSampleChartResource.class);
+            
+            router.attach("project/about", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
+            router.attach("project/imprint", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
+            router.attach("project/contact", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
+            
+            router.attach("text/sample", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
 
-        router.attach("project/about", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
-        router.attach("project/imprint", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
-        router.attach("project/contact", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
+            if (mode == DeploymentMode.DEVELOPMENT) {
+                router.attach("facsimile/iip", new GuiceFinder(Key.get(FacsimileProxyResource.class)));
+            }
 
-        if (mode == Mode.DEVELOPMENT) {
-            router.attach("facsimile/iip", new GuiceFinder(Key.get(FacsimileProxyResource.class)));
+            Authenticator root = null;
+            switch (mode) {
+            case DEVELOPMENT:
+                root = new DevelopmentAuthenticator(getContext());
+                root.setNext(router);
+                break;
+            }
+            return root;
         }
-
-        Authenticator root = null;
-        switch (mode) {
-        case DEVELOPMENT:
-            root = new DevelopmentAuthenticator(getContext());
-            root.setNext(router);
-            break;
-        }
-        return root;
-    }
-
-    private enum Mode {
-        PRODUCTION, DEVELOPMENT
     }
 
     private class GuiceFinder extends Finder {

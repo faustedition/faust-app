@@ -234,10 +234,7 @@ for record in gsa_inventory_db:
 			
 			gsa_documents[gsa_ident] = document_xml
 	else:
-		document_xml = lxml.etree.Element(faust_ns + "document", nsmap=faust.namespaces)
-		imported_xml = lxml.etree.SubElement(document_xml, faust_ns + "metadataImport")
-		other_documents[cn] = document_xml
-		
+		continue
 
 	# categorize record and add paralipomena records
 	paralip_metadata_xml = list()	
@@ -309,17 +306,19 @@ for gsa_ident in gsa_documents:
 		if int(f_ident) == 1: continue
 		pages.append(f)
 	if len(pages) > 0:
+		document_xml.set(xml_ns + "base", "faust://xml/" + gathering_path + "/")
+		last = None
 		pages.sort()
-		phys_desc_xml = lxml.etree.Element(tei_ns + "physDesc", nsmap=faust.namespaces)
-		phys_desc_xml.set(xml_ns + "base", "faust://xml/" + gathering_path + "/")
-		document_xml.insert(0, phys_desc_xml)
 		for p in pages:
-			p_xml = lxml.etree.SubElement(phys_desc_xml, tei_ns + "objectDesc")
-			p_xml.set("form", "page")
-			p_xml.set(faust_ns + "uri", p)
+			p_xml = lxml.etree.Element(faust_ns + "component")
+			p_xml.set("type", "page")
+			p_xml.set("uri", p)
+			if last is None:
+				document_xml.insert(0, p_xml)
+			else:
+				last.addnext(p_xml)
+			last = p_xml
 		
 	xml_dir = faust.absolute_path("/".join(("document", ) + documents_struct[gsa_ident][0]))
 	if not os.path.isdir(xml_dir): os.makedirs(xml_dir)
 	document_xml.getroottree().write("/".join((xml_dir, "gsa_" + gsa_ident + ".xml")), encoding="UTF-8", pretty_print=True)
-	
-#print "\n".join(map(lambda x: repr(x) + " :: " + ", ".join(map(repr, documents_struct[x])), documents_struct.keys()))

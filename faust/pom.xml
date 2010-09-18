@@ -6,7 +6,7 @@
 	<artifactId>faust</artifactId>
 	<version>1.2-SNAPSHOT</version>
 	<name>Digitale Faust-Edition</name>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -28,6 +28,11 @@
 			<groupId>de.faustedition</groupId>
 			<artifactId>faust-schema</artifactId>
 			<version>${tei.schema.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.juxtasoftware</groupId>
+			<artifactId>juxta-goddag</artifactId>
+			<version>1.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.collections</groupId>

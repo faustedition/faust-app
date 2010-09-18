@@ -19,7 +19,9 @@ public class GraphDatabaseLifecycleProvider implements Provider<GraphDatabaseLif
     public GraphDatabaseLifecycleProvider(@Named("db.home") String dbDirectory, Logger logger) {
         this.logger = logger;
         this.dbDirectory = new File(dbDirectory, "graph");
-        this.dbDirectory.mkdirs();        
+        if (!this.dbDirectory.mkdirs() && !this.dbDirectory.isDirectory()) {
+            throw new IllegalStateException(this.dbDirectory + " does not exist");
+        }
     }
 
     @Override
