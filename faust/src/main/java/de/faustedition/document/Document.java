@@ -1,29 +1,29 @@
 package de.faustedition.document;
 
-import java.net.URI;
-
 import org.neo4j.graphdb.Node;
 
+import de.faustedition.FaustURI;
 import de.faustedition.graph.GraphReference;
 
 public class Document extends MaterialUnit {
     private static final String PREFIX = GraphReference.PREFIX + ".document";
 
+    public static final String SOURCE_KEY = PREFIX + ".uri";
+
     public Document(Node node) {
         super(node);
     }
 
-    public Document(Node node, URI uri) {
+    public Document(Node node, FaustURI source) {
         this(node);
-        setUri(uri);
+        setSource(source);
     }
 
-    public URI getUri() {
-        return URI.create((String) getUnderlyingNode().getProperty(PREFIX + ".uri"));
+    public FaustURI getSource() {
+        return FaustURI.parse((String) getUnderlyingNode().getProperty(SOURCE_KEY));
     }
 
-    public void setUri(URI uri) {
-        getUnderlyingNode().setProperty(PREFIX + ".uri", uri.toString());
+    public void setSource(FaustURI uri) {
+        getUnderlyingNode().setProperty(SOURCE_KEY, uri.toString());
     }
-
 }

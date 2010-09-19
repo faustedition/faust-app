@@ -6,39 +6,37 @@ import java.net.URISyntaxException;
 import com.google.common.base.Preconditions;
 
 public class FaustURI implements Comparable<FaustURI> {
-    public enum Authority {
-        XML, FACSIMILE
-    }
-
-    public static final String FAUST_NS_URI = "http://www.faustedition.net/ns";
     private static final String FAUST_SCHEME = "faust";
 
-    private final URI uri;
+    private URI uri;
 
-    public FaustURI(Authority authority, String path) {
+    public FaustURI(FaustAuthority authority, String path) {
         try {
-            this.uri = new URI(FAUST_SCHEME, authority.name().toLowerCase(), path, null);
+            setURI(new URI(FAUST_SCHEME, authority.name().toLowerCase(), path, null));
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(path);
+            throw new IllegalArgumentException(e);
         }
     }
 
-    protected FaustURI(URI uri) {
-        this.uri = uri;
+    public FaustURI(URI uri) {
+        setURI(uri);
     }
 
-    public static FaustURI parse(String uriStr) throws IllegalArgumentException, NullPointerException {
-        final URI uri = URI.create(uriStr);
+    protected void setURI(URI uri) {
         Preconditions.checkArgument(FAUST_SCHEME.equals(uri.getScheme()));
         Preconditions.checkNotNull(uri.getPath());
         Preconditions.checkNotNull(uri.getAuthority());
-        Preconditions.checkNotNull(Authority.valueOf(uri.getAuthority().toUpperCase()));
-        return new FaustURI(uri);
+        Preconditions.checkNotNull(FaustAuthority.valueOf(uri.getAuthority().toUpperCase()));
+        this.uri = uri;
+    }
+
+    public static FaustURI parse(String uriStr) {
+        return new FaustURI(URI.create(uriStr));
 
     }
 
-    public Authority getAuthority() {
-        return Authority.valueOf(uri.getAuthority().toUpperCase());
+    public FaustAuthority getAuthority() {
+        return FaustAuthority.valueOf(uri.getAuthority().toUpperCase());
     }
 
     public String getPath() {

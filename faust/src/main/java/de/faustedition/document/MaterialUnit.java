@@ -1,5 +1,6 @@
 package de.faustedition.document;
 
+import static de.faustedition.transcript.Transcript.TRANSCRIPT_RT;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -10,7 +11,8 @@ import org.neo4j.util.NodeWrapperImpl;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.GraphReference;
 import de.faustedition.graph.NodeWrapperCollection;
-import de.faustedition.transcript.DocumentaryTranscript;
+import de.faustedition.transcript.TextualTranscript;
+import de.faustedition.transcript.Transcript;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
     public enum Type {
@@ -61,9 +63,20 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
         return (Integer) getUnderlyingNode().getProperty(PREFIX + ".order", -1);
     }
 
-    public DocumentaryTranscript getDocumentaryTranscript() {
-        Relationship r = getUnderlyingNode().getSingleRelationship(DocumentaryTranscript.TRANSCRIPT_RT, INCOMING);
-        return (r == null ? null : new DocumentaryTranscript(r.getStartNode()));
+    public Transcript getTranscript() {
+        final Relationship r = getUnderlyingNode().getSingleRelationship(TRANSCRIPT_RT, INCOMING);
+        return (r == null ? null : new TextualTranscript(r.getStartNode()));
+    }
+
+    public void setTranscript(Transcript transcript) {
+        final Node node = getUnderlyingNode();
+        final Relationship r = node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
+        if (r != null) {
+            r.delete();
+        }
+        if (transcript != null) {
+            transcript.getUnderlyingNode().createRelationshipTo(node, TRANSCRIPT_RT);
+        }
     }
 
     @Override

@@ -298,21 +298,27 @@ for gsa_ident in gsa_documents:
 	gathering_path = "/".join(("transcript", "gsa", gsa_ident))
 	transcript_dir = faust.absolute_path(gathering_path)	
 	document_xml = gsa_documents[gsa_ident]
+	text = None
 	pages = list()
 	for f in os.listdir(transcript_dir):
 		if not f.endswith(".xml"): continue
 		f_ident = re.search(r'[0-9]+', f).group(0)
-		if f_ident == gsa_ident: continue
+		if f_ident == gsa_ident: 
+			text = f
+			continue
 		if int(f_ident) == 1: continue
 		pages.append(f)
 	if len(pages) > 0:
-		document_xml.set(xml_ns + "base", "faust://xml/" + gathering_path + "/")
+		document_xml.set(xml_ns + "base", "faust://xml/" + gathering_path + "/")		
+		if text is not None:
+			document_xml.set("transcript", text)
+		
 		last = None
 		pages.sort()
 		for p in pages:
 			p_xml = lxml.etree.Element(faust_ns + "component")
 			p_xml.set("type", "page")
-			p_xml.set("uri", p)
+			p_xml.set("transcript", p)
 			if last is None:
 				document_xml.insert(0, p_xml)
 			else:

@@ -25,14 +25,13 @@ public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Starting graph database transaction for " + invocation.getClass() + "#" + invocation.getMethod().getName());
+            logger.fine("Starting graph database transaction");
         }
         Transaction tx = db.beginTx();
         try {
             Object returnValue = invocation.proceed();
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Commiting graph database transaction after successful execution of" + invocation.getClass() + "#"
-                        + invocation.getMethod().getName());
+                logger.fine("Commiting graph database transaction");
             }
             tx.success();
             return returnValue;
@@ -48,14 +47,12 @@ public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
             }
             if (successfulException) {
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Commiting graph database transaction after successful exception throw of " + invocation.getClass()
-                            + "#" + invocation.getMethod().getName());
+                    logger.fine("Commiting graph database transaction");
                 }
                 tx.success();
             } else {
                 if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Rolling back graph database transaction after exception throw of " + invocation.getClass() + "#"
-                            + invocation.getMethod().getName());
+                    logger.fine("Rolling back graph database transaction after exception throw of " + e);
                 }
                 tx.failure();
             }
@@ -64,5 +61,4 @@ public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
             tx.finish();
         }
     }
-
 }

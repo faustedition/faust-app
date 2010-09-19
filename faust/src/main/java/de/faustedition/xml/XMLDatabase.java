@@ -32,6 +32,7 @@ public class XMLDatabase implements Iterable<URI> {
     private final String dbUser;
     private final String dbPassword;
     private final Logger logger;
+    public static final String EXIST_NS_PREFIX = "exist";
 
     @Inject
     public XMLDatabase(@Named("xmldb.base") String baseUri, @Named("xmldb.user") String dbUser,

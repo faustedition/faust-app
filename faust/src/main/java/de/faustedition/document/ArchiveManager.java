@@ -11,14 +11,16 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.inject.Inject;
 
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.GraphReference;
 import de.faustedition.graph.GraphDatabaseTransactional;
+import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 
 public class ArchiveManager {
-    public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustURI.Authority.XML, "/archives.xml");
+    public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
     
     private final GraphReference graph;
     private final XMLStorage xml;
@@ -38,7 +40,7 @@ public class ArchiveManager {
         XMLUtil.saxParser().parse(xml.getInputSource(ARCHIVE_DESCRIPTOR_URI), new DefaultHandler() {
             @Override
             public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                if ("archive".equals(localName) && FaustURI.FAUST_NS_URI.equals(uri)) {
+                if ("archive".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
                     String id = attributes.getValue("id");
                     if (id == null) {
                         throw new SAXException("<f:archive/> without @id");

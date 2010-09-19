@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 
 @Singleton
@@ -57,7 +58,7 @@ public class XMLStorage implements Iterable<FaustURI> {
     }
 
     protected File toFile(FaustURI uri) {
-        Preconditions.checkArgument(FaustURI.Authority.XML == uri.getAuthority(), uri + " not valid");
+        Preconditions.checkArgument(FaustAuthority.XML == uri.getAuthority(), uri + " not valid");
         final File file = new File(storageDirectory, uri.getPath());
         Preconditions.checkArgument(IN_STORE_FILTER.accept(file), file.getAbsolutePath() + " is not in XML storage");
         return file;
@@ -66,7 +67,7 @@ public class XMLStorage implements Iterable<FaustURI> {
     protected FaustURI toUri(File file) {
         final String filePath = file.getAbsolutePath();
         Preconditions.checkArgument(filePath.startsWith(storagePath), filePath + " not in XML store");
-        return new FaustURI(FaustURI.Authority.XML, filePath.substring(storagePath.length()));
+        return new FaustURI(FaustAuthority.XML, filePath.substring(storagePath.length()));
     }
 
     private class FileToUriWrapper extends IterableWrapper<FaustURI, File> {

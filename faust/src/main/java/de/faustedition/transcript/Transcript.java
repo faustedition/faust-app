@@ -7,7 +7,7 @@ import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.GraphReference;
 
-public class Transcript extends MultiRootedTree {
+public abstract class Transcript extends MultiRootedTree {
     public enum Type {
         DOCUMENTARY, TEXTUAL;
     }

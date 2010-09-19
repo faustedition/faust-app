@@ -20,6 +20,7 @@ import org.juxtasoftware.goddag.Element;
 import org.juxtasoftware.goddag.io.GoddagJsonSerializer;
 import org.juxtasoftware.goddag.io.GoddagXMLReader;
 import org.restlet.data.CharacterSet;
+import org.restlet.data.Form;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -30,6 +31,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.transcript.Transcript.Type;
@@ -47,6 +49,7 @@ public class TranscriptResource extends ServerResource {
     private String rootPrefix;
     private String rootLocalName;
     private FaustURI source;
+    private boolean goddagTextNodes;
 
     @Inject
     public TranscriptResource(TranscriptManager transcriptManager, @Named("ctx.path") String contextPath) {
@@ -56,7 +59,7 @@ public class TranscriptResource extends ServerResource {
 
     @Get("json")
     public Representation streamJson() {
-        parseReference();
+        init();
         final Transcript transcript = transcriptManager.find(source, transcriptType);
         if (transcript == null) {
             throw new IllegalArgumentException(source + "[" + transcriptType + "]");
@@ -74,7 +77,7 @@ public class TranscriptResource extends ServerResource {
 
     @Get("xml")
     public Representation streamXML() {
-        parseReference();
+        init();
         if (rootPrefix == null || rootLocalName == null) {
             throw new IllegalArgumentException();
         }
@@ -83,7 +86,7 @@ public class TranscriptResource extends ServerResource {
             throw new IllegalArgumentException(source + "[" + transcriptType + "]");
         }
 
-        final Element root = transcript.getRoot(rootLocalName, rootPrefix);
+        final Element root = transcript.findRoot(rootPrefix, rootLocalName);
         if (root == null) {
             throw new IllegalArgumentException(Element.getQName(rootPrefix, rootLocalName));
         }
@@ -94,7 +97,7 @@ public class TranscriptResource extends ServerResource {
             public void write(OutputStream outputStream) throws IOException {
                 try {
                     Transformer transformer = XMLUtil.transformerFactory().newTransformer();
-                    Source source = new GoddagXMLReader(root, CustomNamespaceMap.INSTANCE).getSAXSource();
+                    Source source = new GoddagXMLReader(root, CustomNamespaceMap.INSTANCE, goddagTextNodes).getSAXSource();
                     transformer.transform(source, new StreamResult(outputStream));
                 } catch (TransformerException e) {
                     throw new IOException(e);
@@ -103,7 +106,7 @@ public class TranscriptResource extends ServerResource {
         };
     }
 
-    public void parseReference() throws IllegalArgumentException {
+    public void init() throws IllegalArgumentException {
         final String path = getReference().getPath().replaceAll("^/+", "").replaceAll("/+$", "");
         final ArrayDeque<String> pathDeque = new ArrayDeque<String>(Arrays.asList(path.split("/+")));
         for (String prefix : pathPrefix) {
@@ -128,6 +131,9 @@ public class TranscriptResource extends ServerResource {
         }
         pathDeque.addFirst(PATH);
 
-        source = new FaustURI(FaustURI.Authority.XML, "/" + Joiner.on("/").join(pathDeque));
+        source = new FaustURI(FaustAuthority.XML, "/" + Joiner.on("/").join(pathDeque));
+        
+        final Form parameters = getReference().getQueryAsForm();
+        goddagTextNodes = Boolean.valueOf(parameters.getFirstValue("textmarkup", "false"));
     }
 }

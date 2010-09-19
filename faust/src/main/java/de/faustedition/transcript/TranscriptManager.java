@@ -1,6 +1,8 @@
 package de.faustedition.transcript;
 
+import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_PREFIX;
 import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
+import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_PREFIX;
 import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_URI;
 
 import java.io.IOException;
@@ -34,13 +36,13 @@ import de.faustedition.xml.XMLFragmentFilter;
 import de.faustedition.xml.XMLStorage;
 
 public class TranscriptManager {
-
+    private final ApparatusExtractor apparatusExtractor = new ApparatusExtractor();
     private final GraphReference graph;
     private final XMLStorage xml;
     private final Logger logger;
     private final GraphDatabaseService db;
     private final IndexService indexService;
-
+    
     @Inject
     public TranscriptManager(GraphReference graph, XMLStorage xml, Logger logger) {
         this.graph = graph;
@@ -78,6 +80,8 @@ public class TranscriptManager {
             }
             final DocumentaryTranscript transcript = new DocumentaryTranscript(db.createNode(), source, facsRefHandler.references);
             transcript.addRoot(documentRoot);
+            apparatusExtractor.extract(transcript, TEI_SIG_GE_PREFIX, "document");
+            new DocumentaryTranscriptPostProcessor(transcript).run();
             register(transcript, source);
             transcripts.add(transcript);
         }
@@ -89,6 +93,8 @@ public class TranscriptManager {
             }
             final TextualTranscript transcript = new TextualTranscript(db.createNode(), source);
             transcript.addRoot(textRoot);
+            apparatusExtractor.extract(transcript, TEI_NS_PREFIX, "text");
+            new TextualTranscriptPostProcessor(transcript).run();
             register(transcript, source);
             transcripts.add(transcript);
         }

@@ -8,6 +8,7 @@ import org.neo4j.graphdb.Node;
 import de.faustedition.FaustURI;
 
 public class DocumentaryTranscript extends Transcript {
+
     public DocumentaryTranscript(Node node) {
         super(node);
     }
