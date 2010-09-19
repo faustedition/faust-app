@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Report on the transcription status as specified under
+# Report on the transcript status as specified under
 #
 # https://faustedition.uni-wuerzburg.de/wiki/index.php/Stand_der_Transkription
 #

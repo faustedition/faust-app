@@ -1,5 +1,7 @@
 package de.faustedition;
 
+import static org.restlet.routing.Template.MODE_STARTS_WITH;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +35,7 @@ import de.faustedition.inject.DataAccessModule;
 import de.faustedition.inject.WebResourceModule;
 import de.faustedition.security.DevelopmentAuthenticator;
 import de.faustedition.template.TemplateRenderingResource;
+import de.faustedition.transcript.TranscriptResource;
 
 public class Server extends MainBase implements Runnable {
 
@@ -96,15 +99,17 @@ public class Server extends MainBase implements Runnable {
             router.attach("archive/{id}", archiveResource);
 
             router.attach("document/styles", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
-            
+
             router.attach("genesis/", new GuiceFinder(Key.get(GenesisSampleResource.class)));
             router.attach("genesis/chart.png", GenesisSampleChartResource.class);
-            
+
             router.attach("project/about", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
             router.attach("project/imprint", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
             router.attach("project/contact", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
-            
+
             router.attach("text/sample", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
+
+            router.attach(TranscriptResource.PATH + "/", new GuiceFinder(Key.get(TranscriptResource.class)), MODE_STARTS_WITH);
 
             if (mode == DeploymentMode.DEVELOPMENT) {
                 router.attach("facsimile/iip", new GuiceFinder(Key.get(FacsimileProxyResource.class)));
@@ -112,7 +117,7 @@ public class Server extends MainBase implements Runnable {
 
             Authenticator root = null;
             switch (mode) {
-            case DEVELOPMENT:
+            default:
                 root = new DevelopmentAuthenticator(getContext());
                 root.setNext(router);
                 break;

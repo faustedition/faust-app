@@ -295,11 +295,11 @@ for gsa_ident in documents_struct:
 		documents_struct[gsa_ident] = [ folders[-1] ]
 
 for gsa_ident in gsa_documents:
-	gathering_path = "/".join(("transcription", "gsa", gsa_ident))
-	transcription_dir = faust.absolute_path(gathering_path)	
+	gathering_path = "/".join(("transcript", "gsa", gsa_ident))
+	transcript_dir = faust.absolute_path(gathering_path)	
 	document_xml = gsa_documents[gsa_ident]
 	pages = list()
-	for f in os.listdir(transcription_dir):
+	for f in os.listdir(transcript_dir):
 		if not f.endswith(".xml"): continue
 		f_ident = re.search(r'[0-9]+', f).group(0)
 		if f_ident == gsa_ident: continue

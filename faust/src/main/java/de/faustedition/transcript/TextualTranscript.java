@@ -10,8 +10,7 @@ public class TextualTranscript extends Transcript {
         super(node);
     }
 
-    public TextualTranscript(Node node, Type type, FaustURI source) {
+    public TextualTranscript(Node node, FaustURI source) {
         super(node, Type.TEXTUAL, source);
     }
-
 }

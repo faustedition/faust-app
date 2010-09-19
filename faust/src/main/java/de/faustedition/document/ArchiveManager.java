@@ -21,16 +21,18 @@ public class ArchiveManager {
     public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustURI.Authority.XML, "/archives.xml");
     
     private final GraphReference graph;
-    private GraphDatabaseService db;
+    private final XMLStorage xml;
+    private final GraphDatabaseService db;
 
     @Inject
-    public ArchiveManager(GraphReference graph) {
+    public ArchiveManager(GraphReference graph, XMLStorage xml) {
         this.graph = graph;
+        this.xml = xml;
         this.db = graph.getGraphDatabaseService();
     }
     
     @GraphDatabaseTransactional
-    public void synchronize(XMLStorage xml) throws SAXException, IOException {
+    public void synchronize() throws SAXException, IOException {
         final ArchiveCollection archives = graph.getArchives();
         final List<Archive> archivesList = archives.asList();
         XMLUtil.saxParser().parse(xml.getInputSource(ARCHIVE_DESCRIPTOR_URI), new DefaultHandler() {

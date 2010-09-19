@@ -1,37 +1,45 @@
 package de.faustedition.transcript;
 
+import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
+import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_URI;
+
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.juxtasoftware.goddag.Element;
-import org.juxtasoftware.goddag.io.GoddagBuildingDefaultHandler;
+import org.juxtasoftware.goddag.io.GoddagContentHandler;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.index.IndexService;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.google.inject.Inject;
 
 import de.faustedition.FaustURI;
-import de.faustedition.graph.GraphReference;
 import de.faustedition.graph.GraphDatabaseTransactional;
+import de.faustedition.graph.GraphReference;
+import de.faustedition.transcript.Transcript.Type;
 import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.MultiplexingContentHandler;
 import de.faustedition.xml.XMLFragmentFilter;
 import de.faustedition.xml.XMLStorage;
 
 public class TranscriptManager {
 
     private final GraphReference graph;
+    private final XMLStorage xml;
     private final Logger logger;
     private final GraphDatabaseService db;
-    private IndexService indexService;
-    private final XMLStorage xml;
+    private final IndexService indexService;
 
     @Inject
     public TranscriptManager(GraphReference graph, XMLStorage xml, Logger logger) {
@@ -43,48 +51,76 @@ public class TranscriptManager {
     }
 
     @GraphDatabaseTransactional
-    public DocumentaryTranscript add(FaustURI source) throws SAXException, IOException {
+    public Iterable<Transcript> add(FaustURI source) throws SAXException, IOException {
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Adding documentary transcript for " + source);
-        }
-        final GoddagBuildingDefaultHandler builder = new GoddagBuildingDefaultHandler(db, CustomNamespaceMap.INSTANCE);
-        final XMLFragmentFilter fragmentFilter = new XMLFragmentFilter(builder.preConfiguredReader(), CustomNamespaceMap.TEI_SIG_GE_URI, "document");
-        final FacsimileReferenceExtractionHandler facsRefHandler = new FacsimileReferenceExtractionHandler(fragmentFilter, source);
-
-        facsRefHandler.parse(xml.getInputSource(source));
-        
-        final Element documentRoot = builder.getRoot();
-        if (documentRoot == null) {
-            throw new SAXException("No <ge:document/> found in " + source);
+            logger.fine("Adding transcripts for " + source);
         }
 
-        final DocumentaryTranscript transcript = new DocumentaryTranscript(db.createNode(), source, facsRefHandler.references);
-        transcript.addRoot(documentRoot);
-        
+        final GoddagContentHandler documentHandler = new GoddagContentHandler(db, CustomNamespaceMap.INSTANCE);
+        final XMLFragmentFilter docFragmentFilter = new XMLFragmentFilter(documentHandler, TEI_SIG_GE_URI, "document");
+
+        final GoddagContentHandler textHandler = new GoddagContentHandler(db, CustomNamespaceMap.INSTANCE);
+        final XMLFragmentFilter textFragmentFilter = new XMLFragmentFilter(textHandler, TEI_NS_URI, "text");
+
+        final FacsimileReferenceExtractionHandler facsRefHandler = new FacsimileReferenceExtractionHandler(source);
+
+        XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+        xmlReader.setFeature("http://xml.org/sax/features/namespaces", true);
+        xmlReader.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
+        xmlReader.setContentHandler(new MultiplexingContentHandler(docFragmentFilter, textFragmentFilter, facsRefHandler));
+        xmlReader.parse(xml.getInputSource(source));
+
+        Set<Transcript> transcripts = new HashSet<Transcript>();
+        final Element documentRoot = documentHandler.getRoot();
+        if (documentRoot != null) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Adding documentary transcript for " + source);
+            }
+            final DocumentaryTranscript transcript = new DocumentaryTranscript(db.createNode(), source, facsRefHandler.references);
+            transcript.addRoot(documentRoot);
+            register(transcript, source);
+            transcripts.add(transcript);
+        }
+
+        final Element textRoot = textHandler.getRoot();
+        if (textRoot != null) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Adding textual transcript for " + source);
+            }
+            final TextualTranscript transcript = new TextualTranscript(db.createNode(), source);
+            transcript.addRoot(textRoot);
+            register(transcript, source);
+            transcripts.add(transcript);
+        }
+        return transcripts;
+    }
+
+    protected void register(Transcript transcript, FaustURI source) {
         graph.getTranscripts().add(transcript);
         indexService.index(transcript.getUnderlyingNode(), Transcript.SOURCE_KEY, source.toString());
-        return transcript;
     }
 
-    public Transcript find(FaustURI source) {
-        Node transcriptNode = indexService.getSingleNode(Transcript.SOURCE_KEY, source.toString());
-        return (transcriptNode == null ? null : Transcript.forNode(transcriptNode));
+    public Transcript find(FaustURI source, Type type) {
+        for (Node transcriptNode : indexService.getNodes(Transcript.SOURCE_KEY, source.toString())) {
+            if (Transcript.getType(transcriptNode) == type) {
+                return Transcript.forNode(transcriptNode);
+            }
+        }
+        return null;
     }
 
-    private class FacsimileReferenceExtractionHandler extends XMLFilterImpl {
+    private class FacsimileReferenceExtractionHandler extends DefaultHandler {
 
         private boolean inFacsimile = false;
         private SortedSet<FaustURI> references = new TreeSet<FaustURI>();
         private final FaustURI source;
 
-        public FacsimileReferenceExtractionHandler(XMLReader parent, FaustURI source) {
-            super(parent);
+        private FacsimileReferenceExtractionHandler(FaustURI source) {
             this.source = source;
         }
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-            super.startElement(uri, localName, qName, atts);
             if (inFacsimile && "graphic".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
                 String facsimileRefAttr = atts.getValue("url");
                 if (facsimileRefAttr == null) {
@@ -92,7 +128,11 @@ public class TranscriptManager {
                     return;
                 }
                 try {
-                    references.add(FaustURI.parse(facsimileRefAttr));
+                    final FaustURI facsimileRef = FaustURI.parse(facsimileRefAttr);
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.fine("Found " + facsimileRef + " in " + source);
+                    }
+                    references.add(facsimileRef);
                 } catch (Exception e) {
                     logger.warning("Invalid @url='" + facsimileRefAttr + "' in <tei:graphic/> in " + source);
                 }
@@ -103,7 +143,6 @@ public class TranscriptManager {
 
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
-            super.endElement(uri, localName, qName);
             if ("facsimile".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
                 inFacsimile = false;
             }

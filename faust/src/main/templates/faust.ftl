@@ -31,7 +31,7 @@
 <div id="header">
 	<div class="yui3-g">
 		<div class="yui3-u-2-3"><h1><span class="color-1">Digitale Faustedition:&#160;</span>${title}</h1></div>
-		<div class="yui3-u">
+		<div class="yui3-u-1-3">
 			<form id="search-form" action="${cp}/search" method="get">
 				<input id="term" type="text" value="" disabled="disabled"/>
 				<input type="submit" value="${message('search')}" disabled="disabled"/>
