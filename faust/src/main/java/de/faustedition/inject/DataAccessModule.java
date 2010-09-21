@@ -29,7 +29,7 @@ public class DataAccessModule extends AbstractModule {
         bind(XMLDatabase.class);
         bind(TeiValidator.class);
 
-        bind(GraphDatabaseLifecycle.class).toProvider(GraphDatabaseLifecycleProvider.class).asEagerSingleton();
+        bind(GraphDatabaseLifecycle.class).toProvider(GraphDatabaseLifecycleProvider.class);
         bind(GraphReference.class).asEagerSingleton();
 
         try {

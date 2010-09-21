@@ -28,7 +28,7 @@ public class DataImport extends MainBase implements Runnable {
     @Override
     public void run() {
         final Logger logger = Logger.getLogger(getClass().getName());
-
+        final long startTime = System.currentTimeMillis();
         try {
             final ArchiveManager archiveManager = injector.getInstance(ArchiveManager.class);
             final TranscriptManager transcriptManager = injector.getInstance(TranscriptManager.class);
@@ -45,9 +45,11 @@ public class DataImport extends MainBase implements Runnable {
 
             logger.info("Importing documents");
             for (FaustURI documentDescriptor : xml.iterate(DocumentManager.DOCUMENT_BASE_URI)) {
+                logger.info("Importing document " + documentDescriptor);
                 documentManager.add(documentDescriptor);
             }
             
+            logger.info(String.format("Import finished in %.3f seconds", (System.currentTimeMillis() - startTime) / 1000.0f));
             System.exit(0);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error while importing data", e);

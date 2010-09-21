@@ -71,6 +71,7 @@ public class DocumentManager {
         private final XMLBaseTracker baseTracker;
         private Document document;
         private Deque<MaterialUnit> materialUnitStack = new ArrayDeque<MaterialUnit>();
+        private int materialUnitCounter = 0;
 
         private DocumentDescriptorHandler(FaustURI source) {
             this.source = source;
@@ -91,6 +92,7 @@ public class DocumentManager {
 
             if ("document".equals(localName)) {
                 document = new Document(db.createNode(), source);
+                document.setOrder(materialUnitCounter++);
                 materialUnitStack.push(document);
 
                 // FIXME: real archive reference and type per material unit
@@ -118,7 +120,7 @@ public class DocumentManager {
 
                 try {
                     MaterialUnit unit = new MaterialUnit(db.createNode(), MaterialUnit.Type.valueOf(type.toUpperCase()));
-
+                    unit.setOrder(materialUnitCounter++);
                     final String transcript = attributes.getValue("transcript");
                     if (transcript != null) {
                         final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));

@@ -1,5 +1,6 @@
 package de.faustedition;
 
+import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
 import static org.restlet.routing.Template.MODE_STARTS_WITH;
 
 import java.util.logging.Level;
@@ -17,23 +18,27 @@ import org.restlet.resource.Directory;
 import org.restlet.resource.Finder;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
 import org.restlet.security.Authenticator;
+import org.restlet.security.ChallengeAuthenticator;
+import org.restlet.security.RoleAuthorizer;
 import org.restlet.util.ClientList;
-import org.restlet.util.ServerList;
 
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 
 import de.faustedition.document.ArchiveResource;
+import de.faustedition.document.DocumentResource;
 import de.faustedition.facsimile.FacsimileProxyResource;
 import de.faustedition.genesis.GenesisSampleChartResource;
 import de.faustedition.genesis.GenesisSampleResource;
 import de.faustedition.inject.ConfigurationModule;
 import de.faustedition.inject.DataAccessModule;
 import de.faustedition.inject.WebResourceModule;
-import de.faustedition.security.DevelopmentAuthenticator;
+import de.faustedition.security.LdapSecurityStore;
+import de.faustedition.security.SecurityConstants;
 import de.faustedition.template.TemplateRenderingResource;
 import de.faustedition.transcript.TranscriptResource;
 
@@ -56,20 +61,19 @@ public class Server extends MainBase implements Runnable {
         final Application app = new FaustApplication();
         try {
             logger.info("Starting Faust-Edition in " + mode + " mode");
-            Component component = new Component();
 
+            final Component component = new Component();
             ClientList clients = component.getClients();
             clients.add(Protocol.FILE);
             clients.add(Protocol.HTTP);
             clients.add(Protocol.HTTPS);
 
-            ServerList servers = component.getServers();
             switch (mode) {
             case PRODUCTION:
-                servers.add(Protocol.AJP, 8089);
-                break;
+                component.getServers().add(Protocol.AJP, 8089);
+                //break;
             case DEVELOPMENT:
-                servers.add(Protocol.HTTP, 8080);
+                component.getServers().add(Protocol.HTTP, 8080);
                 break;
             }
 
@@ -84,45 +88,71 @@ public class Server extends MainBase implements Runnable {
     }
 
     private class FaustApplication extends Application {
+
         @Override
         public Restlet createInboundRoot() {
             final Router router = new Router(getContext());
 
             router.attach("", EntryPageRedirectionResource.class);
-            router.attach("login", new Finder(getContext(), EntryPageRedirectionResource.class));
 
             final String staticResourceDirectory = injector.getInstance(Key.get(String.class, Names.named("static.home")));
             router.attach("static", new Directory(getContext(), "file://" + staticResourceDirectory));
 
-            Restlet archiveResource = new GuiceFinder(Key.get(ArchiveResource.class));
+            Restlet archiveResource = authorized(new GuiceFinder(Key.get(ArchiveResource.class)));
             router.attach("archive/", archiveResource);
             router.attach("archive/{id}", archiveResource);
 
+            router.attach(DocumentResource.PATH + "/", authorized(new GuiceFinder(Key.get(DocumentResource.class))),
+                    MODE_STARTS_WITH);
             router.attach("document/styles", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
 
-            router.attach("genesis/", new GuiceFinder(Key.get(GenesisSampleResource.class)));
-            router.attach("genesis/chart.png", GenesisSampleChartResource.class);
+            router.attach("genesis/", authorized(new GuiceFinder(Key.get(GenesisSampleResource.class))));
+            router.attach("genesis/chart.png", authorized(router.createFinder(GenesisSampleChartResource.class)));
 
             router.attach("project/about", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
             router.attach("project/imprint", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
             router.attach("project/contact", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
 
-            router.attach("text/sample", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
+            router.attach("text/sample", authorized(new GuiceFinder(Key.get(TemplateRenderingResource.class))));
 
-            router.attach(TranscriptResource.PATH + "/", new GuiceFinder(Key.get(TranscriptResource.class)), MODE_STARTS_WITH);
+            router.attach(TranscriptResource.PATH + "/", authorized(new GuiceFinder(Key.get(TranscriptResource.class))),
+                    MODE_STARTS_WITH);
 
             if (mode == DeploymentMode.DEVELOPMENT) {
-                router.attach("facsimile/iip", new GuiceFinder(Key.get(FacsimileProxyResource.class)));
-            }
+                router.attach("facsimile/iip", authorized(new GuiceFinder(Key.get(FacsimileProxyResource.class))));
 
-            Authenticator root = null;
-            switch (mode) {
-            default:
-                root = new DevelopmentAuthenticator(getContext());
-                root.setNext(router);
-                break;
+                Filter assignAllRolesFilter = new Filter() {
+                    @Override
+                    protected int beforeHandle(Request request, Response response) {
+                        request.getClientInfo().getRoles().add(SecurityConstants.ADMIN_ROLE);
+                        request.getClientInfo().getRoles().add(SecurityConstants.EDITOR_ROLE);
+                        return super.beforeHandle(request, response);
+                    }
+                };
+                assignAllRolesFilter.setNext(router);
+                return assignAllRolesFilter;
+            } else {
+                final LdapSecurityStore ldap = injector.getInstance(LdapSecurityStore.class);
+                
+                final Authenticator nonOptional = new ChallengeAuthenticator(getContext(), false, HTTP_BASIC, "faustedition.net", ldap);
+                nonOptional.setEnroler(ldap);
+                nonOptional.setNext(authorized(new Finder(getContext(), EntryPageRedirectionResource.class)));
+                router.attach("login", nonOptional);
+                
+                final Authenticator optional = new ChallengeAuthenticator(getContext(), true, HTTP_BASIC, "faustedition.net", ldap);
+                optional.setEnroler(ldap);
+                optional.setNext(router);
+                
+                return optional;                
             }
-            return root;
+        }
+
+        private Restlet authorized(Restlet resource) {
+            final RoleAuthorizer authorizer = new RoleAuthorizer();
+            authorizer.getAuthorizedRoles().add(SecurityConstants.ADMIN_ROLE);
+            authorizer.getAuthorizedRoles().add(SecurityConstants.EDITOR_ROLE);
+            authorizer.setNext(resource);
+            return authorizer;
         }
     }
 

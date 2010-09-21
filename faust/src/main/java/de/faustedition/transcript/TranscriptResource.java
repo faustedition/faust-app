@@ -29,7 +29,6 @@ import org.restlet.resource.ServerResource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
@@ -43,8 +42,6 @@ public class TranscriptResource extends ServerResource {
     public static final String PATH = "transcript";
 
     private final TranscriptManager transcriptManager;
-    private final String[] pathPrefix;
-
     private Type transcriptType;
     private String rootPrefix;
     private String rootLocalName;
@@ -52,9 +49,8 @@ public class TranscriptResource extends ServerResource {
     private boolean goddagTextNodes;
 
     @Inject
-    public TranscriptResource(TranscriptManager transcriptManager, @Named("ctx.path") String contextPath) {
+    public TranscriptResource(TranscriptManager transcriptManager) {
         this.transcriptManager = transcriptManager;
-        this.pathPrefix = (contextPath.length() == 0 ? new String[] { PATH } : new String[] { contextPath, PATH });
     }
 
     @Get("json")
@@ -107,11 +103,8 @@ public class TranscriptResource extends ServerResource {
     }
 
     public void init() throws IllegalArgumentException {
-        final String path = getReference().getPath().replaceAll("^/+", "").replaceAll("/+$", "");
+        final String path = getReference().getRemainingPart().replaceAll("^/+", "").replaceAll("/+$", "");
         final ArrayDeque<String> pathDeque = new ArrayDeque<String>(Arrays.asList(path.split("/+")));
-        for (String prefix : pathPrefix) {
-            Preconditions.checkArgument(prefix.equals(pathDeque.removeFirst()), path);
-        }
         Preconditions.checkArgument(pathDeque.size() > 1);
 
         transcriptType = Transcript.Type.valueOf(pathDeque.removeFirst().toUpperCase());

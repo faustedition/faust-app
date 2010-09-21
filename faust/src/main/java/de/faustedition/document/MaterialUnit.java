@@ -4,6 +4,9 @@ import static de.faustedition.transcript.Transcript.TRANSCRIPT_RT;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.util.NodeWrapperImpl;
@@ -44,6 +47,19 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
             return new Document(mu.getUnderlyingNode());
         default:
             return mu;
+        }
+    }
+
+    public SortedSet<MaterialUnit> getSortedContents() {
+        final TreeSet<MaterialUnit> set = new TreeSet<MaterialUnit>();
+        addRecursively(set, this);
+        return set;
+    }
+
+    protected void addRecursively(TreeSet<MaterialUnit> set, MaterialUnit materialUnit) {
+        for (MaterialUnit child : materialUnit) {
+            set.add(child);
+            addRecursively(set, child);
         }
     }
 
