@@ -63,30 +63,14 @@
 			<artifactId>commons-io</artifactId>
 			<version>1.4</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
-			<version>2.2</version>
-		</dependency>
-		 -->
+		<!-- <dependency> <groupId>cglib</groupId> <artifactId>cglib</artifactId> <version>2.2</version> </dependency> -->
 		<dependency>
 			<groupId>thaiopensource</groupId>
 			<artifactId>jing</artifactId>
 			<version>20030619</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>com.hp.hpl.jena</groupId>
-			<artifactId>jena</artifactId>
-			<version>2.6.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>2.3.16</version>
-		</dependency>
-		 -->
+		<!-- <dependency> <groupId>com.hp.hpl.jena</groupId> <artifactId>jena</artifactId> <version>2.6.3</version> </dependency> <dependency> 
+			<groupId>org.freemarker</groupId> <artifactId>freemarker</artifactId> <version>2.3.16</version> </dependency> -->
 		<dependency>
 			<groupId>jfree</groupId>
 			<artifactId>jfreechart</artifactId>
@@ -132,6 +116,36 @@
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>de.faustedition.Server</mainClass>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/app.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

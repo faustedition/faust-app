@@ -71,7 +71,7 @@ public class Server extends MainBase implements Runnable {
             switch (mode) {
             case PRODUCTION:
                 component.getServers().add(Protocol.AJP, 8089);
-                //break;
+                break;
             case DEVELOPMENT:
                 component.getServers().add(Protocol.HTTP, 8080);
                 break;
