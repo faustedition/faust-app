@@ -14,7 +14,6 @@ import org.neo4j.util.NodeWrapperImpl;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.GraphReference;
 import de.faustedition.graph.NodeWrapperCollection;
-import de.faustedition.transcript.TextualTranscript;
 import de.faustedition.transcript.Transcript;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
@@ -81,7 +80,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 
     public Transcript getTranscript() {
         final Relationship r = getUnderlyingNode().getSingleRelationship(TRANSCRIPT_RT, INCOMING);
-        return (r == null ? null : new TextualTranscript(r.getStartNode()));
+        return (r == null ? null : Transcript.forNode(r.getStartNode()));
     }
 
     public void setTranscript(Transcript transcript) {

@@ -1,4 +1,5 @@
 <#assign cp = config["ctx.path"]>
+<#assign iipsrv><#if config['facsimile.iip.url']?starts_with("/")>${cp}</#if>${config['facsimile.iip.url']}</#assign>
 
 <#macro page title css="" header="">
 <!DOCTYPE html>
@@ -10,7 +11,7 @@
 	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssgrids/grids-min.css">
 	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssbase/base-min.css"> 
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css">
-	<script type="text/javascript">var cp = "${cp}"; document.documentElement.className = "yui3-loading";</script>	
+	<script type="text/javascript">var cp = "${cp}"; var iipSrv = "${iipsrv}"; document.documentElement.className = "yui3-loading";</script>
 	<script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-min.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
@@ -98,6 +99,22 @@
 
 <#macro googleMaps>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+</#macro>
+
+<#macro thumbnail uri alt="">
+	<img src="${iipsrv}?FIF=${(uri + '.tif')?replace('faust://facsimile/', '')?url}&amp;JTL=1,0" alt=${alt!''}>
+</#macro>
+
+<#macro iip uri container jsVar="iip">
+<script type="text/javascript">
+	${jsVar} = new IIP("${container?js_string}", {
+			image: "${(uri + '.tif')?replace('faust://facsimile/', '')?url}",
+			server: "${iipsrv?js_string}",
+			credit: '&#169; Digitale Faust-Edition', 
+			zoom: 1,
+			showNavButtons: true
+			});
+</script>
 </#macro>
 
 <#macro topNavigation>

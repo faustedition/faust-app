@@ -1,0 +1,27 @@
+<#assign title = document.getSource()?html>
+<#assign css>
+	#transcript { margin-bottom: 2em; }
+	#transcript-document { padding: 1em; }
+	.yui3-scrollview { background: #000; color: #ccc; border: 1px solid #ccc; }
+	#page-gallery { white-space: nowrap; margin: 1em }
+	#page-gallery li { width: 150px; text-align: center }	
+</#assign>
+<#assign header>
+	<link rel="stylesheet" type="text/css" href="${cp}/static/css/iip.css">
+	<script type="text/javascript" src="${cp}/static/js/mootools-1.2-core-compressed.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/mootools-1.2-more-compressed.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/iipmooviewer-1.1.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/document.js"></script>
+</#assign>
+<@faust.page title=title css=css header=header>
+	<div id="transcript" class="yui3-g">
+		<div class="yui3-u-1-2">
+			<div id="transcript-facsimile"></div>
+		</div>
+		<div class="yui3-u-1-2">
+			<div id="transcript-document"></div>
+		</div>
+	</div>
+	<div id="page-gallery">&nbsp;</div>
+</@faust.page>

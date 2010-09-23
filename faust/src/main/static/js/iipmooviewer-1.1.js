@@ -703,7 +703,7 @@ var IIP = new Class({
 
     // Add our logo and a tooltip explaining how to use the viewer
     new Element( 'a', {href: 'http://iipimage.sourceforge.net', id:'logo'} ).injectInside(this.source);
-    new Element('img', {src: cp + '/img/iip/iip.32x32.png', id: 'info', styles: { opacity: 0.8 } } ).injectInside('logo');
+    new Element('img', {src: cp + '/static/img/iip/iip.32x32.png', id: 'info', styles: { opacity: 0.8 } } ).injectInside('logo');
 
     // Fix IE7 PNG transparency problem
     if( Browser.Engine.trident5 ){
@@ -717,7 +717,7 @@ var IIP = new Class({
 	  onShow: function(t){ t.setStyle('opacity',0); t.fade(0.7); },
 	  onHide: function(t){ t.fade(0); }
     });
-    $('info').store('tip:text', '<h2><img src="' + cp + '"/img/iip/iip.32x32.png"/>IIPMooViewer</h2>IIPImage High Resolution Ajax Image Viewer<ul><li>To navigate within image:<ul><li>drag image within main window or</li><li>drag zone within the navigation window</li><li>click an area within navigation window</li></ul><li>To zoom in:<ul><li>double click with the mouse or</li><li>use the mouse scroll wheel or</li><li>or simply press the "+" key</li></ul><li>To zoom out:<ul><li>shift double click with the mouse or</li><li>use the mouse wheel or</li><li>press the "-" key</li></ul></li><li>To move the navigation window:<ul><li>drag navigation window toolbar</li></ul><li>To show / hide navigation buttons:</li><ul><li>double click navigation window toolbar</li></ul></ul>Written by Ruven Pillay<br/>For more information visit http://iipimage.sf.net');
+    $('info').store('tip:text', '<h2><img src="' + cp + '/static/img/iip/iip.32x32.png"/>IIPMooViewer</h2>IIPImage High Resolution Ajax Image Viewer<ul><li>To navigate within image:<ul><li>drag image within main window or</li><li>drag zone within the navigation window</li><li>click an area within navigation window</li></ul><li>To zoom in:<ul><li>double click with the mouse or</li><li>use the mouse scroll wheel or</li><li>or simply press the "+" key</li></ul><li>To zoom out:<ul><li>shift double click with the mouse or</li><li>use the mouse wheel or</li><li>press the "-" key</li></ul></li><li>To move the navigation window:<ul><li>drag navigation window toolbar</li></ul><li>To show / hide navigation buttons:</li><ul><li>double click navigation window toolbar</li></ul></ul>Written by Ruven Pillay<br/>For more information visit http://iipimage.sf.net');
 
 
     // Add some info
@@ -820,13 +820,13 @@ var IIP = new Class({
     var navbuttons = new Element('div', {
 	id: 'navbuttons',
 	html: 
-	'<img id="shiftLeft" src="' + cp + '/img/iip/left.png"/>' +
-	'<img id="shiftUp" src="' + cp + '/img/iip/up.png"/>' +
-	'<img id="shiftRight" src="' + cp + '/img/iip/right.png"/><br/>' +
-	'<img id="shiftDown" src="' + cp + '/img/iip/down.png"/><br/>' +
-	'<img id="zoomIn" src="' + cp + '/img/iip/zoomIn.png"/>' +
-	'<img id="zoomOut" src="' + cp + '/img/iip/zoomOut.png"/>' +
-	'<img id="reset" src="' + cp + '/img/iip/reset.png"/>'
+	'<img id="shiftLeft" src="' + cp + '/static/img/iip/left.png"/>' +
+	'<img id="shiftUp" src="' + cp + '/static/img/iip/up.png"/>' +
+	'<img id="shiftRight" src="' + cp + '/static/img/iip/right.png"/><br/>' +
+	'<img id="shiftDown" src="' + cp + '/static/img/iip/down.png"/><br/>' +
+	'<img id="zoomIn" src="' + cp + '/static/img/iip/zoomIn.png"/>' +
+	'<img id="zoomOut" src="' + cp + '/static/img/iip/zoomOut.png"/>' +
+	'<img id="reset" src="' + cp + '/static/img/iip/reset.png"/>'
     });
     navbuttons.injectInside(navcontainer);
     navbuttons.set('slide', {duration: 300, transition: Fx.Transitions.Quad.easeInOut, mode:'vertical'});

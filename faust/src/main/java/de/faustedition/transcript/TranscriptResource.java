@@ -1,6 +1,5 @@
 package de.faustedition.transcript;
 
-import static org.restlet.data.MediaType.APPLICATION_JSON;
 import static org.restlet.data.MediaType.APPLICATION_XML;
 
 import java.io.IOException;
@@ -13,13 +12,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
-import org.codehaus.jackson.JsonEncoding;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerator;
 import org.juxtasoftware.goddag.Element;
 import org.juxtasoftware.goddag.io.GoddagJsonSerializer;
 import org.juxtasoftware.goddag.io.GoddagXMLReader;
-import org.restlet.data.CharacterSet;
 import org.restlet.data.Form;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
@@ -32,6 +27,7 @@ import com.google.inject.Inject;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
+import de.faustedition.JsonRespresentation;
 import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.transcript.Transcript.Type;
 import de.faustedition.xml.CustomNamespaceMap;
@@ -60,12 +56,10 @@ public class TranscriptResource extends ServerResource {
         if (transcript == null) {
             throw new IllegalArgumentException(source + "[" + transcriptType + "]");
         }
-        return new OutputRepresentation(APPLICATION_JSON) {
+        return new JsonRespresentation() {
 
             @Override
-            public void write(OutputStream outputStream) throws IOException {
-                setCharacterSet(CharacterSet.UTF_8);
-                final JsonGenerator generator = new JsonFactory().createJsonGenerator(outputStream, JsonEncoding.UTF8);
+            protected void generate() throws IOException {
                 new GoddagJsonSerializer().serialize(generator, transcript);
             }
         };
@@ -125,7 +119,7 @@ public class TranscriptResource extends ServerResource {
         pathDeque.addFirst(PATH);
 
         source = new FaustURI(FaustAuthority.XML, "/" + Joiner.on("/").join(pathDeque));
-        
+
         final Form parameters = getReference().getQueryAsForm();
         goddagTextNodes = Boolean.valueOf(parameters.getFirstValue("textmarkup", "false"));
     }

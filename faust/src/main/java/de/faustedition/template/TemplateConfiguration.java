@@ -28,5 +28,6 @@ public class TemplateConfiguration extends Configuration {
         setStrictSyntaxMode(true);
         setWhitespaceStripping(true);
         setSharedVariable("config", config);
+        setObjectWrapper(new TemplateObjectWrapper());
     }
 }
