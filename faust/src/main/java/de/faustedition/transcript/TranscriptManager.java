@@ -108,7 +108,7 @@ public class TranscriptManager {
 
     public Transcript find(FaustURI source, Type type) {
         for (Node transcriptNode : indexService.getNodes(Transcript.SOURCE_KEY, source.toString())) {
-            if (Transcript.getType(transcriptNode) == type) {
+            if (type == null || Transcript.getType(transcriptNode) == type) {
                 return Transcript.forNode(transcriptNode);
             }
         }

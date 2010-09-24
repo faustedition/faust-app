@@ -10,7 +10,6 @@
 <#assign header>
 	<@faust.googleMaps />
 	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
-	<script type="text/javascript">archiveOverviewMap();</script>
 </#assign>
 <@faust.page title=title css=css header=header>
 	<div id="archives">
@@ -25,4 +24,7 @@
 			<#if ((a_index % 3) == 2) || !a_has_next></div></#if>
 		</#list>		
 	</div>
+	<script type="text/javascript">
+		var Y = FaustYUI().use("node", "dom", "event", function(Y) { archiveOverviewMap(); });
+	</script>	
 </@faust.page>

@@ -56,8 +56,8 @@ public abstract class MainBase {
         rootLogger.addHandler(handler);
 
         Log.setLog(new JettyRedirectingLogger());
-        for (String loggerName : new String[] { "de.faustedition", /* "com.google.inject", "org.restlet", "org.eclipse.jetty",
-                "freemarker" */ }) {
+        for (String loggerName : new String[] { "de.faustedition", "com.google.inject", "org.restlet", "org.eclipse.jetty",
+                "freemarker" }) {
             Logger.getLogger(loggerName).setLevel(level);
         }
     }

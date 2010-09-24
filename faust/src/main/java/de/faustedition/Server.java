@@ -30,8 +30,7 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 
 import de.faustedition.document.ArchiveResource;
-import de.faustedition.document.DocumentResource;
-import de.faustedition.facsimile.FacsimileProxyResource;
+import de.faustedition.document.DocumentFinder;
 import de.faustedition.genesis.GenesisSampleChartResource;
 import de.faustedition.genesis.GenesisSampleResource;
 import de.faustedition.inject.ConfigurationModule;
@@ -40,6 +39,7 @@ import de.faustedition.inject.WebResourceModule;
 import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.security.SecurityConstants;
 import de.faustedition.template.TemplateRenderingResource;
+import de.faustedition.transcript.TranscriptFinder;
 import de.faustedition.transcript.TranscriptResource;
 
 public class Server extends MainBase implements Runnable {
@@ -52,7 +52,7 @@ public class Server extends MainBase implements Runnable {
 
     @Override
     protected Module[] createModules() {
-        return new Module[] { new ConfigurationModule(), new DataAccessModule(), new WebResourceModule(mode) };
+        return new Module[] { new ConfigurationModule(), new DataAccessModule(), new WebResourceModule() };
     }
 
     @Override
@@ -102,9 +102,8 @@ public class Server extends MainBase implements Runnable {
             router.attach("archive/", archiveResource);
             router.attach("archive/{id}", archiveResource);
 
-            router.attach(DocumentResource.PATH + "/", authorized(new GuiceFinder(Key.get(DocumentResource.class))),
-                    MODE_STARTS_WITH);
             router.attach("document/styles", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
+            router.attach("document/", authorized(injector.getInstance(DocumentFinder.class)), MODE_STARTS_WITH);
 
             router.attach("genesis/", authorized(new GuiceFinder(Key.get(GenesisSampleResource.class))));
             router.attach("genesis/chart.png", authorized(router.createFinder(GenesisSampleChartResource.class)));
@@ -115,12 +114,9 @@ public class Server extends MainBase implements Runnable {
 
             router.attach("text/sample", authorized(new GuiceFinder(Key.get(TemplateRenderingResource.class))));
 
-            router.attach(TranscriptResource.PATH + "/", authorized(new GuiceFinder(Key.get(TranscriptResource.class))),
-                    MODE_STARTS_WITH);
+            router.attach("transcript/", authorized(injector.getInstance(TranscriptFinder.class)), MODE_STARTS_WITH);
 
             if (mode == DeploymentMode.DEVELOPMENT) {
-                router.attach("facsimile/iip", authorized(new GuiceFinder(Key.get(FacsimileProxyResource.class))));
-
                 Filter assignAllRolesFilter = new Filter() {
                     @Override
                     protected int beforeHandle(Request request, Response response) {
@@ -133,17 +129,18 @@ public class Server extends MainBase implements Runnable {
                 return assignAllRolesFilter;
             } else {
                 final LdapSecurityStore ldap = injector.getInstance(LdapSecurityStore.class);
-                
-                final Authenticator nonOptional = new ChallengeAuthenticator(getContext(), false, HTTP_BASIC, "faustedition.net", ldap);
+
+                final Authenticator nonOptional = new ChallengeAuthenticator(getContext(), false, HTTP_BASIC, "faustedition.net",
+                        ldap);
                 nonOptional.setEnroler(ldap);
                 nonOptional.setNext(authorized(new Finder(getContext(), EntryPageRedirectionResource.class)));
                 router.attach("login", nonOptional);
-                
+
                 final Authenticator optional = new ChallengeAuthenticator(getContext(), true, HTTP_BASIC, "faustedition.net", ldap);
                 optional.setEnroler(ldap);
                 optional.setNext(router);
-                
-                return optional;                
+
+                return optional;
             }
         }
 

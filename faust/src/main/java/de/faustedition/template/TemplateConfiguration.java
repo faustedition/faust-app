@@ -3,6 +3,9 @@ package de.faustedition.template;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import com.google.inject.Inject;
@@ -17,7 +20,7 @@ import freemarker.template.TemplateModelException;
 public class TemplateConfiguration extends Configuration {
 
     @Inject
-    public TemplateConfiguration(@Named("config") Properties config, @Named("template.home") String templateDirectory)
+    public TemplateConfiguration(@Named("config") Properties configProps, @Named("template.home") String templateDirectory)
             throws TemplateModelException, IOException {
         super();
         setTemplateLoader(new FileTemplateLoader(new File(templateDirectory)));
@@ -27,7 +30,14 @@ public class TemplateConfiguration extends Configuration {
         setURLEscapingCharset("UTF-8");
         setStrictSyntaxMode(true);
         setWhitespaceStripping(true);
-        setSharedVariable("config", config);
         setObjectWrapper(new TemplateObjectWrapper());
+
+        final Map<String, String> configuration = new HashMap<String, String>();
+        for (Enumeration<?> properties = configProps.propertyNames(); properties.hasMoreElements(); ) {
+            final String propertyName = (String) properties.nextElement();
+            configuration.put(propertyName, configProps.getProperty(propertyName));
+        }
+        setSharedVariable("config", configuration);
+
     }
 }

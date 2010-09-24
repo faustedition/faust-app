@@ -62,4 +62,8 @@ public class FaustURI implements Comparable<FaustURI> {
     public int compareTo(FaustURI o) {
         return uri.compareTo(o.uri);
     }
+
+    public FaustURI resolve(String relative) {        
+        return new FaustURI(this.uri.resolve(relative));
+    }
 }

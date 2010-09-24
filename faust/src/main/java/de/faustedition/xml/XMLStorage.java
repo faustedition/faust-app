@@ -57,6 +57,14 @@ public class XMLStorage implements Iterable<FaustURI> {
         return is;
     }
 
+    public boolean isDirectory(FaustURI uri) {
+        return toFile(uri).isDirectory();
+    }
+
+    public boolean isResource(FaustURI uri) {
+        return XML_FILE_FILTER.accept(toFile(uri));
+    }
+
     protected File toFile(FaustURI uri) {
         Preconditions.checkArgument(FaustAuthority.XML == uri.getAuthority(), uri + " not valid");
         final File file = new File(storageDirectory, uri.getPath());

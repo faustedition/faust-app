@@ -4,8 +4,7 @@ import static org.restlet.data.MediaType.APPLICATION_XML;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayDeque;
-import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -21,41 +20,28 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
 import de.faustedition.JsonRespresentation;
 import de.faustedition.graph.GraphDatabaseTransactional;
-import de.faustedition.transcript.Transcript.Type;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLUtil;
 
 @GraphDatabaseTransactional
 public class TranscriptResource extends ServerResource {
-    public static final String PATH = "transcript";
-
-    private final TranscriptManager transcriptManager;
-    private Type transcriptType;
-    private String rootPrefix;
-    private String rootLocalName;
-    private FaustURI source;
-    private boolean goddagTextNodes;
+    private Transcript transcript;
 
     @Inject
-    public TranscriptResource(TranscriptManager transcriptManager) {
-        this.transcriptManager = transcriptManager;
+    public TranscriptResource() {
+        super();
+    }
+
+    public void setTranscript(Transcript transcript) {
+        this.transcript = transcript;
     }
 
     @Get("json")
     public Representation streamJson() {
-        init();
-        final Transcript transcript = transcriptManager.find(source, transcriptType);
-        if (transcript == null) {
-            throw new IllegalArgumentException(source + "[" + transcriptType + "]");
-        }
         return new JsonRespresentation() {
 
             @Override
@@ -67,60 +53,43 @@ public class TranscriptResource extends ServerResource {
 
     @Get("xml")
     public Representation streamXML() {
-        init();
-        if (rootPrefix == null || rootLocalName == null) {
-            throw new IllegalArgumentException();
-        }
-        final Transcript transcript = transcriptManager.find(source, transcriptType);
-        if (transcript == null) {
-            throw new IllegalArgumentException(source + "[" + transcriptType + "]");
+        final Form parameters = getRequest().getResourceRef().getQueryAsForm();
+        final String rootQName = parameters.getFirstValue("root");
+
+        String rootPrefix = null;
+        String rootLocalName = null;
+        final int lcColonIndex = rootQName == null ? -1 : rootQName.indexOf(':');
+        if (lcColonIndex > 0 && (lcColonIndex + 1) < rootQName.length()) {
+            rootPrefix = rootQName.substring(0, lcColonIndex);
+            rootLocalName = rootQName.substring(lcColonIndex + 1);
         }
 
-        final Element root = transcript.findRoot(rootPrefix, rootLocalName);
-        if (root == null) {
-            throw new IllegalArgumentException(Element.getQName(rootPrefix, rootLocalName));
+        Element rootCandidate = null;
+        if (rootPrefix != null && rootLocalName != null) {
+            rootCandidate = transcript.findRoot(rootPrefix, rootLocalName);
+        } else {
+            Iterator<Element> rootIt = transcript.iterator();
+            rootCandidate = (rootIt.hasNext() ? rootIt.next() : null);
         }
 
+        if (rootCandidate == null) {
+            return null;
+        }
+
+        final Element root = rootCandidate;
+        final boolean showTextNodes = Boolean.valueOf(parameters.getFirstValue("textnodes", "false"));
         return new OutputRepresentation(APPLICATION_XML) {
 
             @Override
             public void write(OutputStream outputStream) throws IOException {
                 try {
                     Transformer transformer = XMLUtil.transformerFactory().newTransformer();
-                    Source source = new GoddagXMLReader(root, CustomNamespaceMap.INSTANCE, goddagTextNodes).getSAXSource();
+                    Source source = new GoddagXMLReader(root, CustomNamespaceMap.INSTANCE, showTextNodes).getSAXSource();
                     transformer.transform(source, new StreamResult(outputStream));
                 } catch (TransformerException e) {
                     throw new IOException(e);
                 }
             }
         };
-    }
-
-    public void init() throws IllegalArgumentException {
-        final String path = getReference().getRemainingPart().replaceAll("^/+", "").replaceAll("/+$", "");
-        final ArrayDeque<String> pathDeque = new ArrayDeque<String>(Arrays.asList(path.split("/+")));
-        Preconditions.checkArgument(pathDeque.size() > 1);
-
-        transcriptType = Transcript.Type.valueOf(pathDeque.removeFirst().toUpperCase());
-
-        String lastComponent = pathDeque.getLast();
-        final int lcColonIndex = lastComponent.indexOf(':');
-        if (lcColonIndex > 0 && (lcColonIndex + 1) < lastComponent.length()) {
-            rootPrefix = lastComponent.substring(0, lcColonIndex);
-            rootLocalName = lastComponent.substring(lcColonIndex + 1);
-            pathDeque.removeLast();
-        }
-
-        lastComponent = pathDeque.getLast();
-        if (!lastComponent.endsWith(".xml")) {
-            pathDeque.removeLast();
-            pathDeque.addLast(lastComponent + ".xml");
-        }
-        pathDeque.addFirst(PATH);
-
-        source = new FaustURI(FaustAuthority.XML, "/" + Joiner.on("/").join(pathDeque));
-
-        final Form parameters = getReference().getQueryAsForm();
-        goddagTextNodes = Boolean.valueOf(parameters.getFirstValue("textmarkup", "false"));
     }
 }
