@@ -87,7 +87,18 @@ DocumentView.prototype.renderTranscript = function() {
 	doc.scrollIntoView();
 	
 	this.pages[this.currentPage].loadTranscription(function(t) {
+		transcript = t;
 		doc.removeClass("transcript-loading");
-		doc.setContent(t.trees[0].text());				
+		doc.setContent("");
+		
+		var contents = t.root("ge:document").descendants();
+		for (var cc = 0; cc < contents.length; cc++) {
+			var treeNode = contents[cc];			
+			if (treeNode.node instanceof Element) {
+				Y.DOM.addHTML(doc, "<p><strong>" + treeNode.name() + "</strong></p>");
+			} else if (treeNode.node instanceof Text) {
+				Y.DOM.addHTML(doc, "<p>" + treeNode.text() + "</p>");
+			}
+		}
 	});
 };
