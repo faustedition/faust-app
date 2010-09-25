@@ -51,7 +51,7 @@
 	<p>Digitale Faust-Edition. Copyright (c) 2009, 2010 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
 </div>
 <script type="text/javascript">
-	FaustYUI().use("node", "dom", "node-menunav", function(Y) { 
+	Faust.YUI().use("node", "dom", "node-menunav", function(Y) { 
 		topNav = Y.one("#top-navigation")
 		topNav.plug(Y.Plugin.NodeMenuNav); 
 		topNav.get("ownerDocument").get("documentElement").removeClass("yui3-loading");
@@ -99,10 +99,6 @@
 		<#if path?ends_with("/")><#local path = path[0..(path?length - 2)] /></#if>
 		${path[(path?last_index_of("/") + 1)..]}
 </#compress></#macro>
-
-<#macro googleMaps>
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-</#macro>
 
 <#macro topNavigation>
 <div id="top-navigation" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav">

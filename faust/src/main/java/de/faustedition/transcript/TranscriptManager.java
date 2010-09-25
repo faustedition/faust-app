@@ -42,7 +42,7 @@ public class TranscriptManager {
     private final Logger logger;
     private final GraphDatabaseService db;
     private final IndexService indexService;
-    
+
     @Inject
     public TranscriptManager(GraphReference graph, XMLStorage xml, Logger logger) {
         this.graph = graph;
@@ -74,29 +74,29 @@ public class TranscriptManager {
 
         Set<Transcript> transcripts = new HashSet<Transcript>();
         final Element documentRoot = documentHandler.getRoot();
-        if (documentRoot != null) {
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Adding documentary transcript for " + source);
-            }
-            final DocumentaryTranscript transcript = new DocumentaryTranscript(db.createNode(), source, facsRefHandler.references);
-            transcript.addRoot(documentRoot);
-            apparatusExtractor.extract(transcript, TEI_SIG_GE_PREFIX, "document");
-            new DocumentaryTranscriptPostProcessor(transcript).run();
-            register(transcript, source);
-            transcripts.add(transcript);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("Adding documentary transcript for " + source);
         }
+        final DocumentaryTranscript dt = new DocumentaryTranscript(db.createNode(), source, facsRefHandler.references);
+        if (documentRoot != null) {
+            dt.addRoot(documentRoot);
+            apparatusExtractor.extract(dt, TEI_SIG_GE_PREFIX, "document");
+        }
+        new DocumentaryTranscriptPostProcessor(dt).run();
+        register(dt, source);
+        transcripts.add(dt);
 
         final Element textRoot = textHandler.getRoot();
         if (textRoot != null) {
             if (logger.isLoggable(Level.FINE)) {
                 logger.fine("Adding textual transcript for " + source);
             }
-            final TextualTranscript transcript = new TextualTranscript(db.createNode(), source);
-            transcript.addRoot(textRoot);
-            apparatusExtractor.extract(transcript, TEI_NS_PREFIX, "text");
-            new TextualTranscriptPostProcessor(transcript).run();
-            register(transcript, source);
-            transcripts.add(transcript);
+            final TextualTranscript tt = new TextualTranscript(db.createNode(), source);
+            tt.addRoot(textRoot);
+            apparatusExtractor.extract(tt, TEI_NS_PREFIX, "text");
+            new TextualTranscriptPostProcessor(tt).run();
+            register(tt, source);
+            transcripts.add(tt);
         }
         return transcripts;
     }

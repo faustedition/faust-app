@@ -1,6 +1,7 @@
 package de.faustedition.document;
 
 import org.neo4j.graphdb.Node;
+import org.neo4j.helpers.collection.IterableWrapper;
 
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.GraphReference;
@@ -30,5 +31,16 @@ public class Archive extends NodeWrapperCollection<MaterialUnit> {
     @Override
     public String toString() {
         return getClass().getName() + "[" + getId() + "]";
+    }
+
+    @Override
+    protected IterableWrapper<MaterialUnit, Node> newContentWrapper(Iterable<Node> nodes) {
+        return new IterableWrapper<MaterialUnit, Node>(nodes) {
+
+            @Override
+            protected MaterialUnit underlyingObjectToObject(Node object) {
+                return MaterialUnit.forNode(object);
+            }
+        };
     }
 }

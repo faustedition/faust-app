@@ -8,7 +8,7 @@
 	.archive-container { padding: 1em }
 </#assign>
 <#assign header>
-	<@faust.googleMaps />
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 </#assign>
 <@faust.page title=title css=css header=header>
@@ -25,6 +25,6 @@
 		</#list>		
 	</div>
 	<script type="text/javascript">
-		var Y = FaustYUI().use("node", "dom", "event", function(Y) { archiveOverviewMap(); });
+		var Y = Faust.YUI().use("node", "dom", "event", function(Y) { archiveOverviewMap(); });
 	</script>	
 </@faust.page>

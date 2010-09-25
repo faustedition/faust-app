@@ -22,6 +22,8 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
     }
 
     private static final String PREFIX = GraphReference.PREFIX + ".material-unit";
+    private static final String METADATA_PREFIX = PREFIX + ".metadata.";
+
     private static final FaustRelationshipType MATERIAL_PART_OF_RT = new FaustRelationshipType("is-material-part-of");
 
     public MaterialUnit(Node node) {
@@ -62,8 +64,22 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
         }
     }
 
+    public static Type getType(Node node) {
+        return Type.valueOf(((String) node.getProperty(PREFIX + ".type")).replaceAll("\\-", "_").toUpperCase());
+    }
+
+    public static MaterialUnit forNode(Node node) {
+        switch (getType(node)) {
+        case DOCUMENT:
+        case ARCHIVAL_UNIT:
+            return new Document(node);
+        default:
+            return new MaterialUnit(node);
+        }
+    }
+
     public Type getType() {
-        return Type.valueOf(((String) getUnderlyingNode().getProperty(PREFIX + ".type")).replaceAll("\\-", "_").toUpperCase());
+        return getType(getUnderlyingNode());
     }
 
     public void setType(Type type) {
@@ -91,6 +107,28 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
         }
         if (transcript != null) {
             transcript.getUnderlyingNode().createRelationshipTo(node, TRANSCRIPT_RT);
+        }
+    }
+
+    public String getMetadataValue(String key) {
+        final String[] metadata = getMetadata(key);
+        return (metadata == null ? null : metadata[0]);
+    }
+
+    public String[] getMetadata(String key) {
+        final Node node = getUnderlyingNode();
+        final String metadataKey = METADATA_PREFIX + key;
+        return node.hasProperty(metadataKey) ? (String[]) node.getProperty(metadataKey) : null;
+    }
+
+    public void setMetadata(String key, String[] values) {
+        final Node node = getUnderlyingNode();
+        final String metadataKey = METADATA_PREFIX + key;
+
+        if (values == null || values.length == 0) {
+            node.removeProperty(metadataKey);
+        } else {
+            node.setProperty(metadataKey, values);
         }
     }
 

@@ -22,12 +22,12 @@ import de.faustedition.xml.XMLStorage;
 public class DocumentFinder extends Finder {
 
     private final XMLStorage xml;
-    private final DocumentManager documentManager;
+    private final MaterialUnitManager documentManager;
     private final Injector injector;
     private final Logger logger;
 
     @Inject
-    public DocumentFinder(XMLStorage xml, DocumentManager documentManager, Injector injector, Logger logger) {
+    public DocumentFinder(XMLStorage xml, MaterialUnitManager documentManager, Injector injector, Logger logger) {
         this.xml = xml;
         this.documentManager = documentManager;
         this.injector = injector;

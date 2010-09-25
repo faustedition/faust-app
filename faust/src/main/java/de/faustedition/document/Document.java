@@ -14,8 +14,8 @@ public class Document extends MaterialUnit {
         super(node);
     }
 
-    public Document(Node node, FaustURI source) {
-        this(node);
+    public Document(Node node, Type type, FaustURI source) {
+        super(node, type);
         setSource(source);
     }
 

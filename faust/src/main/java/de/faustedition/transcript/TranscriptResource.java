@@ -46,7 +46,7 @@ public class TranscriptResource extends ServerResource {
 
             @Override
             protected void generate() throws IOException {
-                new GoddagJsonSerializer().serialize(generator, transcript);
+                new GoddagJsonSerializer().serialize(generator, CustomNamespaceMap.INSTANCE, transcript);
             }
         };
     }

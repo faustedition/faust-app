@@ -11,7 +11,7 @@ import org.restlet.resource.ServerResource;
 import com.google.inject.AbstractModule;
 
 import de.faustedition.document.ArchiveManager;
-import de.faustedition.document.DocumentManager;
+import de.faustedition.document.MaterialUnitManager;
 import de.faustedition.graph.GraphDatabaseLifecycleProvider;
 import de.faustedition.graph.GraphReference;
 import de.faustedition.graph.GraphDatabaseTransactionInterceptor;
@@ -44,7 +44,7 @@ public class DataAccessModule extends AbstractModule {
         }
 
         bind(ArchiveManager.class);
-        bind(DocumentManager.class);
+        bind(MaterialUnitManager.class);
         bind(TranscriptManager.class);
     }
 }

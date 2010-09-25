@@ -7,7 +7,6 @@
 	#page-gallery li { width: 150px; text-align: center }	
 </#assign>
 <#assign header>
-	<link rel="stylesheet" type="text/css" href="${cp}/static/css/iip.css">
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/goddag.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document.js"></script>
@@ -18,15 +17,15 @@
 		<div class="yui3-u-1-2">
 			<div id="transcript-facsimile"></div>
 		</div>
-		<div class="yui3-u-1-2">
-			<div id="transcript-document"></div>
+		<div class="yui3-u-1-2" id="transcript-document">
+			<svg width="100%" height="500px" version="1.1" xmlns="http://www.w3.org/2000/svg" />
 		</div>
 	</div>
 	<div id="page-gallery">&nbsp;</div>
 	<script type="text/javascript">
-		var Y = FaustYUI().use("node", "dom", "dump", "io", "json", "event", "scrollview", function(Y) {
-			FaustDocument.load(new FaustURI("${document.source?js_string}"), function(fd) {
-				documentView = new DocumentView(fd);				
+		var Y = Faust.YUI().use("node", "dom", "dump", "io", "json", "event", "scrollview", function(Y) {
+			Faust.Document.load(new Faust.URI("${document.source?js_string}"), function(fd) {
+				documentView = new Faust.DocumentView(fd);				
 				documentView.setPage(parseInt(window.location.hash.substring(1)));
 				documentView.renderPageNavigation();
 			});

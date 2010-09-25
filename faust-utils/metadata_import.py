@@ -9,6 +9,7 @@ import copy
 import os
 import os.path
 import re
+import sys
 
 import lxml.etree
 
@@ -137,6 +138,19 @@ print len(paralip_mappings), "GSA paralipomena mappings read"
 gsa_field_descrs = None
 for record in parse_allegro_file("metadata/gsa-category-descriptions.txt"): gsa_field_descrs = record
 
+# read GSA callnumber mappings
+gsa_callnumber_mapping = dict()
+gsa_callnumber = None
+for l in open("metadata/gsa_callnumber_mapping.txt"):
+	if gsa_callnumber is not None:
+		old_callnumber = l.strip()
+		gsa_callnumber_mapping[old_callnumber] = gsa_callnumber
+		gsa_callnumber = None
+	else:
+		gsa_callnumber = l.strip()
+		
+print len(gsa_callnumber_mapping), "GSA callnumber mappings read"
+	
 def write_metadata_xml(metadata, root):
 	fields = metadata.keys()
 	fields.sort()
@@ -210,7 +224,9 @@ for record in gsa_inventory_db:
 			document_xml = gsa_documents[gsa_ident]
 			imported_xml = document_xml.xpath("./f:metadataImport", namespaces=faust.namespaces)[0]
 		else:
-			document_xml = lxml.etree.Element(faust_ns + "document", nsmap=faust.namespaces)
+			document_xml = lxml.etree.Element(faust_ns + "materialUnit", nsmap=faust.namespaces)
+			document_xml.set("type", "archival_unit")
+			
 			imported_xml = lxml.etree.SubElement(document_xml, faust_ns + "metadataImport")			
 			archive_xml = lxml.etree.SubElement(imported_xml, faust_ns + "archiveDatabase")
 			archive_xml.set(xml_ns + "space", "preserve")
@@ -316,7 +332,7 @@ for gsa_ident in gsa_documents:
 		last = None
 		pages.sort()
 		for p in pages:
-			p_xml = lxml.etree.Element(faust_ns + "component")
+			p_xml = lxml.etree.Element(faust_ns + "materialUnit")
 			p_xml.set("type", "page")
 			p_xml.set("transcript", p)
 			if last is None:
@@ -324,6 +340,21 @@ for gsa_ident in gsa_documents:
 			else:
 				last.addnext(p_xml)
 			last = p_xml
+	metadata_xml = lxml.etree.Element(faust_ns + "metadata")
+	document_xml.insert(0, metadata_xml)
+	
+	lxml.etree.SubElement(metadata_xml, faust_ns + "archive").text = "gsa"
+	
+	callnumber = faust.xpath("//f:signatur/text()", document_xml)[0]
+	if callnumber in gsa_callnumber_mapping:
+		callnumber = gsa_callnumber_mapping[callnumber] + " (" + callnumber + ")" 
+	lxml.etree.SubElement(metadata_xml, faust_ns + "callnumber").text = callnumber
+			
+	wa_id_matches = faust.xpath("//f:key[@n='25']/following::f:value", document_xml)
+	if (len(wa_id_matches) > 0):
+		wa_id = wa_id_matches[0].text
+		if wa_id != "-" and wa_id != "oS":
+			lxml.etree.SubElement(metadata_xml, faust_ns + "waId").text = wa_id
 		
 	xml_dir = faust.absolute_path("/".join(("document", ) + documents_struct[gsa_ident][0]))
 	if not os.path.isdir(xml_dir): os.makedirs(xml_dir)

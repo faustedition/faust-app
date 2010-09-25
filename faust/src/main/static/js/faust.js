@@ -1,7 +1,9 @@
-FaustYUI = function() { 
+Faust = function() {};
+Faust.YUI = function() { 
 	return YUI({ base: cp + "/static/yui3/build/", combine: false }); 
 };
-FaustYUI.io = function(uri, callback, reviver) {
+
+Faust.io = function(uri, callback, reviver) {
 	Y.io(uri, {
 		method: "GET",
 		xdr: { responseXML: false },
@@ -16,13 +18,15 @@ FaustYUI.io = function(uri, callback, reviver) {
 	});
 };
 
-FaustURI = function(uri) { 
-	this.components = uri.match(/^faust:\/\/([^\/]+)\/(.*)/);	
+Faust.URI = function(uri) { 
+	this.components = uri.match(/^faust:\/\/([^\/]+)\/(.*)/);
 };
-FaustURI.prototype.encodedPath = function() {
-	var encoded = "";
-	this.components[2].split("/").forEach(function(c) {
-		encoded += (encoded.length == 0 ? "" : "/") + encodeURI(c);
-	});
-	return encoded;	
+Faust.URI.prototype = {
+	encodedPath: function() {
+		var encoded = "";
+		var pathComponents = this.components[2].split("/");
+		for (var pc = 0; pc < pathComponents.length; pc++)
+			encoded += (encoded.length == 0 ? "" : "/") + encodeURI(pathComponents[pc]);
+		return encoded;	
+	}
 };

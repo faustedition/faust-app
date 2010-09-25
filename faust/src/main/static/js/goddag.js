@@ -1,117 +1,116 @@
-const NT_TEXT = "0";
-const NT_ELEMENT = "1";
-const NT_COMMENT = "2";
-const NT_PI = "3";
+Goddag = function() {};
+Goddag.NT_TEXT = "0";
+Goddag.NT_ELEMENT = "1";
+Goddag.NT_COMMENT = "2";
+Goddag.NT_PI = "3";
 
-MultiRootedTree = function(data) {
+Goddag.Graph = function(data) {
 	var nodes = { "0": {}, "1": {}, "2": {}, "3": {}};
 	for (var nt = 0; (nt < 4 && nt < data.nodes.length); nt++) {
-		var nodeWrapper = null;
-		if (nt == 0) nodeWrapper = function(n) { nodes[NT_TEXT][n[0].toString()] = new Text(n); };
-		if (nt == 1) nodeWrapper = function(n) { nodes[NT_ELEMENT][n[0].toString()] = new Element(n); };
-		if (nt == 2) nodeWrapper = function(n) { nodes[NT_COMMENT][n[0].toString()] = new Comment(n); };
-		if (nt == 3) nodeWrapper = function(n) { nodes[NT_PI][n[0].toString()] = new ProcessingInstruction(n); };
-		
-		for (var nc = 0; nc < data.nodes[nt].length; nc++) 
-			nodeWrapper(data.nodes[nt][nc]);
+		var wrap = null;
+		if (nt == 0) wrap = function(n) { nodes[Goddag.NT_TEXT][n[0].toString()] = new Goddag.Text(n); };
+		if (nt == 1) wrap = function(n) { nodes[Goddag.NT_ELEMENT][n[0].toString()] = new Goddag.Element(n); };
+		if (nt == 2) wrap = function(n) { nodes[Goddag.NT_COMMENT][n[0].toString()] = new Goddag.Comment(n); };
+		if (nt == 3) wrap = function(n) { nodes[Goddag.NT_PI][n[0].toString()] = new Goddag.ProcessingInstruction(n); };
+
+		for (var nc = 0; nc < data.nodes[nt].length; nc++) wrap(data.nodes[nt][nc]);
 	}
 
-	var treeNodeWrapper = function(data, p, pos) { 
+	var wrapTree = function(data, p, pos) { 
 		var node = nodes[data.nt.toString()][data.id.toString()];
-		var tn = new TreeNode(p, pos, node);		
-		node.treeNodes.push(tn);
-		
-		if (data.ch != null)
-			for (var cc = 0; cc < data.ch.length; cc++)
-				tn.children.push(treeNodeWrapper(data.ch[cc], tn, cc));
+		var tree = new Goddag.Tree(p, pos, node);		
+		node.trees.push(tree);
 
-		return tn;
+		if (data.ch)
+			for (var cc = 0; cc < data.ch.length; cc++) 
+				tree.children.push(wrapTree(data.ch[cc], tree, cc));
+
+		return tree;
 	};
 
 	var roots = [];
-	for (var dc = 0; dc < data.trees.length; dc++) 
-		roots.push(treeNodeWrapper(data.trees[dc], null, -1));
+	for (var dc = 0; dc < data.trees.length; dc++) roots.push(wrapTree(data.trees[dc], null, -1));
 
 	this.nodes = nodes;
 	this.roots = roots;
 	this.ns = data.namespaces;
 };
-MultiRootedTree.prototype = {
-	texts: function() { return this.nodes[NT_TEXT]; },
+Goddag.Graph.prototype = {
+	texts: function() { return this.nodes[Goddag.NT_TEXT]; },
 	root: function(name) { 
 		for (var rc = 0; rc < this.roots.length; rc++)
 			if (this.roots[rc].name() == name) return this.roots[rc];
 	}
 };
 
-Node = function(data) {
-	this.treeNodes = [];
+Goddag.Node = function(data) {
+	this.trees = [];
 };
-Node.prototype = {
+Goddag.Node.prototype = {
 	text: function() { return "" },
 	ancestors: function() { 
 		var ancestors = [];
-		for (var tc = 0; tc < this.treeNodes.length; tc++) {
-			ancestors = ancestors.concat(this.treeNodes[tc].ancestors());
+		for (var tc = 0; tc < this.trees.length; tc++) {
+			ancestors = ancestors.concat(this.trees[tc].ancestors());
 		}
 		return ancestors;
 	}
 };
 
-Element = function(data) {
-	Node.call(this, data);
+Goddag.Element = function(data) {
+	Goddag.Node.call(this, data);
 	this.name = data[1];
 	this.attributes = data[2];
 };
-Element.prototype = {
+Goddag.Element.prototype = {
 	__proto__: Node.prototype
 };
 
-Text = function(data) {
-	Node.call(this, data);
+Goddag.Text = function(data) {
+	Goddag.Node.call(this, data);
 	this.content = data[1];
 };
-Text.prototype = {
+Goddag.Text.prototype = {
 	__proto__: Node.prototype,
 	text: function() { return this.content; }
 };
 
-Comment = function(data) {
-	Node.call(this, data);
+Goddag.Comment = function(data) {
+	Goddag.Node.call(this, data);
 	this.content = data[1];
 }
-Comment.prototype = {
+Goddag.Comment.prototype = {
 	__proto__: Node.prototype
 };
 
-ProcessingInstruction = function(data) {
-	Node.call(this, data);
+Goddag.ProcessingInstruction = function(data) {
+	Goddag.Node.call(this, data);
 	this.target = data[1];
 	this.data = data[2];
 };
-ProcessingInstruction.prototype = {
+Goddag.ProcessingInstruction.prototype = {
 	__proto__: Node.prototype
 };
 
-TreeNode = function(p, pos, node) {
+Goddag.Tree = function(p, pos, node) {
 	this.p = p;
 	this.pos = pos;
 	this.node = node;
 	this.children = [];
 }
-TreeNode.prototype = {
+Goddag.Tree.prototype = {
 	ancestors: function() {
-		return (function(list, tn) {
-			if (tn.p == null) return list;
-			list.push(tn.p);
-			return arguments.callee(list, tn.p);
+		return (function(list, tree) {
+			if (tree.p == null) return list;
+			list.push(tree.p);
+			return arguments.callee(list, tree.p);
 		})([], this);
 	},
 	descendants: function() {
-		return (function(list, tn) {
-			for (var cc = 0; cc < tn.children.length; cc++) {
-				list.push(tn.children[cc]); 
-				arguments.callee(list, tn.children[cc]); 				
+		return (function(list, tree) {
+			for (var cc = 0; cc < tree.children.length; cc++) {
+				list.push(tree.children[cc]); 
+				arguments.callee(list, tree.children[cc]); 				
 			}
 			return list;
 		})([], this);
@@ -124,5 +123,6 @@ TreeNode.prototype = {
 	},
 	name: function() { return this.node.name; },
 	attributes: function() { return this.node.attributes; }
-	
-};
+
+};			
+

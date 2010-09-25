@@ -14,6 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import de.faustedition.document.ArchiveCollection;
+import de.faustedition.document.MaterialUnitCollection;
 import de.faustedition.transcript.TranscriptCollection;
 
 @Singleton
@@ -24,6 +25,7 @@ public class GraphReference extends NodeWrapperImpl {
     private static final String ROOT_NAME_PROPERTY = ROOT_RT.name() + ".name";
 
     private static final String ARCHIVES_ROOT_NAME = PREFIX + ".archives";
+    private static final String MATERIAL_UNITS_ROOT_NAME = PREFIX + ".material-units";
     private static final String TRANSCRIPTS_ROOT_NAME = PREFIX + ".transcripts";
 
     private final IndexService indexService;
@@ -48,6 +50,10 @@ public class GraphReference extends NodeWrapperImpl {
 
     public TranscriptCollection getTranscripts() {
         return new TranscriptCollection(root(TRANSCRIPTS_ROOT_NAME));
+    }
+
+    public MaterialUnitCollection getMaterialUnits() {
+        return new MaterialUnitCollection(root(MATERIAL_UNITS_ROOT_NAME));
     }
 
     protected Node root(String rootName) {
