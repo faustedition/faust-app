@@ -22,7 +22,7 @@ public class TemplateRenderingResource extends ServerResource {
     @Get
     public TemplateRepresentation render() throws IOException {
         String templatePath = getReference().getPath(true);
-        if (templatePath.startsWith("/" + contextPath)) {
+        if (templatePath.startsWith(contextPath)) {
             templatePath = templatePath.substring(contextPath.length() + 1);
         }
         return viewFactory.create(templatePath, getClientInfo());

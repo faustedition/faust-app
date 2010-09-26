@@ -31,7 +31,7 @@ public class GenesisSampleChart extends AbstractXYDataset implements IntervalXYD
 
     @Inject
     public GenesisSampleChart(@Named("ctx.path") String contextPath) {
-        this.contextPath = (contextPath.length() == 0 ? "" : "/" + contextPath);
+        this.contextPath = contextPath;
     }
 
     public void render(OutputStream imageStream, PrintWriter imageMapWriter, final String mapId) throws IOException {
