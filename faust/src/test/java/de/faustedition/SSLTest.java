@@ -10,7 +10,7 @@ public class SSLTest {
 
     @Test
     public void connectViaHttps() throws Exception {
-        InputStream stream = new URL("https://faustedition.uni-wuerzburg.de/dev/").openStream();
+        InputStream stream = new URL("https://faustedition.uni-wuerzburg.de/wiki/").openStream();
         IOUtils.toByteArray(stream);
         stream.close();
     }
