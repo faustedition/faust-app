@@ -15,28 +15,26 @@ import org.restlet.resource.ServerResource;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 import de.faustedition.template.TemplateRepresentationFactory;
 
 public class GenesisSampleResource extends ServerResource {
 
-    private final String contextPath;
-
     private final TemplateRepresentationFactory viewFactory;
 
+    private final GenesisSampleChart chart;
+
     @Inject
-    public GenesisSampleResource(TemplateRepresentationFactory viewFactory, @Named("ctx.path") String contextPath) {
+    public GenesisSampleResource(GenesisSampleChart chart, TemplateRepresentationFactory viewFactory) {
         super();
+        this.chart = chart;
         this.viewFactory = viewFactory;
-        this.contextPath = contextPath;
     }
 
     @Get("html")
     public TemplateRepresentation render() throws IOException {
         StringWriter imageMap = new StringWriter();
-        new GenesisSampleChartResource.GenesisExampleChart().render(new ByteArrayOutputStream(), new PrintWriter(imageMap),
-                contextPath + "/document/", "genesisChart");
+        chart.render(new ByteArrayOutputStream(), new PrintWriter(imageMap), "genesisChart");
 
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("imageMap", imageMap.toString());
@@ -51,35 +49,37 @@ public class GenesisSampleResource extends ServerResource {
     static final Map<String, LineInterval[]> GENESIS_DATASET = Maps.newLinkedHashMap();
 
     static {
-        GENESIS_DATASET.put("V.H15", new LineInterval[] { new LineInterval("391506", "0002", 11519, 11526) });
-        GENESIS_DATASET.put("V.H13v", new LineInterval[] { new LineInterval("391027", "0004", 11511, 11530) });
-        GENESIS_DATASET.put("V.H14", new LineInterval[] { new LineInterval("391505", "0002", 11511, 11530) });
-        GENESIS_DATASET.put("V.H18", new LineInterval[] { new LineInterval("390757", "0002", 11595, 11603) });
-        GENESIS_DATASET.put("V.H17r", new LineInterval[] { new LineInterval("391510", "0002", 11593, 11595) });
-        GENESIS_DATASET.put("V.H2", new LineInterval[] { new LineInterval("390883", "0013", 11511, 11530),//
-                new LineInterval("390883", "0014", 11539, 11590),//
-                new LineInterval("390883", "0015", 11593, 11603) });
-        GENESIS_DATASET.put("V.H16", new LineInterval[] { new LineInterval("391507", "0002", 11573, 11576) });
-        GENESIS_DATASET.put("V.H", new LineInterval[] { new LineInterval("391098", "0360", 11511, 11522),//
-                new LineInterval("391098", "0361", 11523, 11543),//
-                new LineInterval("391098", "0362", 11544, 11562),//
-                new LineInterval("391098", "0363", 11563, 11586),//
-                new LineInterval("391098", "0364", 11587, 11593),//
-                new LineInterval("391098", "0365", 11594, 11619) });
+        GENESIS_DATASET.put("V.H15", new LineInterval[] { new LineInterval("faust/2.5/gsa_391506.xml", "1", 11519, 11526) });
+        GENESIS_DATASET.put("V.H13v", new LineInterval[] { new LineInterval("faust/2.5/gsa_391027.xml", "3", 11511, 11530) });
+        GENESIS_DATASET.put("V.H14", new LineInterval[] { new LineInterval("faust/2.5/gsa_391505.xml", "1", 11511, 11530) });
+        GENESIS_DATASET.put("V.H18", new LineInterval[] { new LineInterval("faust/2.5/gsa_390757.xml", "1", 11595, 11603) });
+        GENESIS_DATASET.put("V.H17r", new LineInterval[] { new LineInterval("faust/2.5/gsa_391510.xml", "1", 11593, 11595) });
+        GENESIS_DATASET.put("V.H2", new LineInterval[] {//
+                new LineInterval("faust/2.5/gsa_390883.xml", "12", 11511, 11530),//
+                        new LineInterval("faust/2.5/gsa_390883.xml", "13", 11539, 11590),//
+                        new LineInterval("faust/2.5/gsa_390883.xml", "14", 11593, 11603) });
+        GENESIS_DATASET.put("V.H16", new LineInterval[] { new LineInterval("faust/2.5/gsa_391507.xml", "1", 11573, 11576) });
+        GENESIS_DATASET.put("V.H", new LineInterval[] {//
+                new LineInterval("faust/2/gsa_391098.xml", "360", 11511, 11522),//
+                        new LineInterval("faust/2/gsa_391098.xml", "415", 11523, 11543),//
+                        new LineInterval("faust/2/gsa_391098.xml", "416", 11544, 11562),//
+                        new LineInterval("faust/2/gsa_391098.xml", "417", 11563, 11586),//
+                        new LineInterval("faust/2/gsa_391098.xml", "418", 11587, 11593),//
+                        new LineInterval("faust/2/gsa_391098.xml", "419", 11594, 11619) });
     }
 
-    static final List<ParalipomenonReference> PARALIPOMENA_REFS = Lists.newArrayList(new ParalipomenonReference("P195", "391082",
-            "0002"),//
-            new ParalipomenonReference("P21", "390782", "0002"),//
-            new ParalipomenonReference("P1", "390720", "0002"),//
-            new ParalipomenonReference("P93/P95", "390882", "0002"),//
-            new ParalipomenonReference("P91", "391314", "0002"),//
-            new ParalipomenonReference("P92a", "390781", "0002"),//
-            new ParalipomenonReference("P92b", "390826", "0002"),//
-            new ParalipomenonReference("P96", "390050", "0002"),//
-            new ParalipomenonReference("P97", "390777", "0002"),//
-            new ParalipomenonReference("P98a", "390705", "0002"),//
-            new ParalipomenonReference("P98b", "390705", "0003"));
+    static final List<ParalipomenonReference> PARALIPOMENA_REFS = Lists.newArrayList(//
+            new ParalipomenonReference("P195", "faust/2.5/gsa_391082.xml", "1"),//
+            new ParalipomenonReference("P21", "paralipomena/gsa_390782.xml", "1"),//
+            new ParalipomenonReference("P1", "paralipomena/gsa_390720.xml", "1"),//
+            new ParalipomenonReference("P93/P95", "paralipomena/gsa_390882.xml", "1"),//
+            new ParalipomenonReference("P91", "paralipomena/gsa_391314.xml", "1"),//
+            new ParalipomenonReference("P92a", "paralipomena/gsa_390781.xml", "1"),//
+            new ParalipomenonReference("P92b", "paralipomena/gsa_390826.xml", "1"),//
+            new ParalipomenonReference("P96", "paralipomena/gsa_390050.xml", "1"),//
+            new ParalipomenonReference("P97", "faust/2/gsa_390777.xml", "1"),//
+            new ParalipomenonReference("P98a", "faust/2/gsa_390705.xml", "1"),//
+            new ParalipomenonReference("P98b", "faust/2/gsa_390705.xml", "2"));
 
-    static final ParalipomenonReference URFAUST_REF = new ParalipomenonReference("Urfaust-Schluss", "390028", "0095");
+    static final ParalipomenonReference URFAUST_REF = new ParalipomenonReference("Urfaust-Schluss", "gsa_390028.xml", "95");
 }

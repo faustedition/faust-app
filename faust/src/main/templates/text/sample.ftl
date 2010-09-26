@@ -1,4 +1,4 @@
-<@faust.page title="Lesetext - Beispiel">
+<@faust.page title=message("text.sample")>
 	<div class="yui3-g" style="margin-top: 2em">
 	<div class="yui3-u-1-3">
 	<p class="center small-caps color-1">Großer Vorhof des Pallasts.</p>

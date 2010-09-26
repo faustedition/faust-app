@@ -1,5 +1,8 @@
 <@faust.page title="Das Projekt">
 	<div class="yui3-g">
+		<div class="yui3-u-1-3">
+			<p style="margin-right: 1em"><img src="${cp}/static/img/emblem.jpg" alt="Faust-Emblem" /></p>
+		</div>
 		<div class="yui3-u-2-3">
 			<h2>Historisch-kritische Edition von Goethes Faust</h2>
 
@@ -18,9 +21,6 @@
 			Schiller-Archiv</a>) und Prof.&#160;Dr.&#160;Fotis Jannidis
 			(<a href="http://www.digital-humanities.de/" title="Homepage">Julius-Maximilians-Universität Würzburg</a>). Es wird
 			finanziert durch die <a href="http://www.dfg.de/" title="Homepage">Deutsche Forschungsgemeinschaft</a>.</p>
-		</div>
-		<div class="yui3-u-1-3">
-			<p style="margin-left: 1em"><img src="${cp}/static/img/emblem.jpg" alt="Faust-Emblem" /></p>
 		</div>
 	</div>
 </@faust.page>

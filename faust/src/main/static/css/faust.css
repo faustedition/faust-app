@@ -3,13 +3,17 @@ a { color: #000; font-weight: bold; text-decoration: none }
 
 table, td, th, tr { border: 0 }
 
-#header, #footer { margin: 0em; padding: 0.5em; }
-#header a { font-weight: normal; }
-#header #search-form { text-align: right; margin: 1em 0; font-size: 138.5%; }
-#footer { font-size: smaller; text-align: center; }
-#main { font-size: 100%; margin: 1em; padding: 1em; }
+#header, #footer { margin: 0; padding: 0 }
 
-.hidden { display:none }
+#header { margin-bottom: 1em;}
+#header a { font-weight: normal;  }
+#header #search-form { text-align: right; margin: 1em 0; font-size: 138.5%; }
+
+#footer { margin-top: 2em; font-size: smaller; text-align: center; }
+
+#main { padding: 0 1em;}
+
+.hidden { visibility: hidden; }
 
 .left { text-align: left }
 .center { text-align: center }

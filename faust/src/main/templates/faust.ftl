@@ -63,61 +63,25 @@
 </html>
 </#macro>
 
-<#macro uplink url title="">
-<a href="${url}"<#if title?has_content> title="${title}"</#if>><img src="${cp}/img/arrow_up.png"<#if title?has_content> alt="${title}"</#if> /></a>
-</#macro>
-
-<#macro tableGrid contents rows=4>
-<#if contents?size gt 0>
-	<tr>
-	<#list contents as c>
-		<#nested c>
-		<#if c_has_next && ((c_index % rows) == (rows - 1))></tr><tr></#if>
-	</#list>
-	<#if (contents?size % rows) gt 0><#list (rows - 1)..(contents?size % rows) as remainder><td>&#160;</td></#list></#if>
-	</tr>
-</#if>
-</#macro>
-
-<#macro breadcrumbs path rootName><#compress>
-<p class="node-path">
-	<#local uri = '' />
-	<#if path?ends_with("/")><#local path = path[0..(path?length - 1)] /></#if>
-	<#list path?split("/") as p>
-		<#local name><#if p_index == 0>${rootName}<#else>${p?html}</#if></#local>
-		<#if p_has_next>
-			<#local uri = (uri + p + "/") />
-			<a href="${cp}/${uri?url?replace("%2F", "/")}" title="${name}">${name}</a>
-		</#if>
-		<#if p_has_next><strong>&gt;</strong></#if>
-		<#if !p_has_next>${name}</#if>
-	</#list>
-</p>
-</#compress></#macro>
-
-<#macro nameOf path><#compress>
-		<#if path?ends_with("/")><#local path = path[0..(path?length - 2)] /></#if>
-		${path[(path?last_index_of("/") + 1)..]}
-</#compress></#macro>
-
 <#macro topNavigation>
 <div id="top-navigation" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav">
 	<div class="yui3-menu-content">
 		<ul class="first-of-type">
 			<#if roles?seq_contains("editor")>							
 			<li>
-				<a href="${cp}/document/" class="yui3-menu-label"><em>${message("menu.witness")}</em></a>
-				<div class="yui3-menu">
+				<a href="#documents" class="yui3-menu-label"><em>${message("menu.document")}</em></a>
+				<div id="documents" class="yui3-menu">
 				<div class="yui3-menu-content">
 				<ul>
-					<li class="yui3-menuitem"><a href="${cp}/document/styles" class="yui3-menuitem-content">${message("menu.visualization.style_catalogue")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/archive/" class="yui3-menuitem-content">${message("menu.archives")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/document/faust/2/gsa_391098.xml" class="yui3-menuitem-content"><em>GSA/ W 1804 (XIX,3) – H</em></a></li>
+					<li class="yui3-menuitem"><a href="${cp}/document/faust/2.5/gsa_390883.xml" class="yui3-menuitem-content"><em>GSA/ W 1698 (XVIII,7,3) – V H.2</em></a></li>
 				</ul>
 				</div>
 				</div>
 			</li>
 			<li class="yui3-menuitem"><a href="${cp}/text/sample" class="yui3-menuitem-content">${message("menu.text")}</a></li>
 			<li class="yui3-menuitem"><a href="${cp}/genesis/" class="yui3-menuitem-content">${message("menu.genesis")}</a></li>
-			<li class="yui3-menuitem"><a href="${cp}/archive/" class="yui3-menuitem-content">${message("menu.archives")}</a></li>
 			</#if>
 			<li><a class="yui3-menu-label" href="${cp}/project/about"><em>${message("menu.project")}</em></a>
 				<div id="project" class="yui3-menu">

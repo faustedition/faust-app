@@ -9,9 +9,47 @@ Faust.DocumentView = function(fd) {
 			
 	this.pages = pages;
 	this.currentPage = 0;
+	this.initUI();
+	this.setPage(parseInt(window.location.hash.substring(1)));	
 };
 
 Faust.DocumentView.prototype = {
+	initUI: function() {
+		this.browserOverlay = new Y.Overlay({
+			srcNode: "#transcript-browser",
+			width: "800px",
+			height: "280px",
+			align: { node: null},
+			centered: true,
+			visible: false,			
+		});
+		
+		Y.on("click", function(e) {
+			e.preventDefault();
+			this.renderPageBrowser();
+			this.browserOverlay.show();
+		}, "#transcript-browse", this);
+		Y.on("click", function(e) {
+			e.preventDefault(); 
+			this.browserOverlay.hide();
+		}, "#transcript-hide-browser", this);
+		
+		Y.on("click", function(e) {
+			e.preventDefault();
+			if (this.currentPage > 0) {
+				this.currentPage = this.currentPage - 1;
+				this.renderPage();			
+			}		
+		}, "#transcript-prev-page", this);
+
+		Y.on("click", function(e) {
+			e.preventDefault();
+			if ((this.currentPage + 1) < this.pages.length) {
+				this.currentPage = this.currentPage + 1;
+				this.renderPage();	
+			}		
+		}, "#transcript-next-page", this);		
+	},
 	setPage: function(page) {
 		this.currentPage = 0;
 		if (Y.Lang.isNumber(page)) {
@@ -24,13 +62,14 @@ Faust.DocumentView.prototype = {
 		}
 		this.renderPage();	
 	},
-	renderPageNavigation: function() {
-		var gallery = Y.one("#page-gallery");
-		gallery.setContent("Loading ...");
+	renderPageBrowser: function() {
+		if (this.browseView) return;
+		
+		var browser = Y.one("#transcript-browser .yui3-widget-bd");
 
-		var scrollView = new Y.ScrollView({ 
-			srcNode: gallery, 
-			width: 900,
+		this.browseView = new Y.ScrollView({ 
+			srcNode: browser, 
+			width: 780,
 			flick: { 
 				preventDefault: function(e) { return (Y.UA.gecko); },
 				minDistance: 10,
@@ -44,7 +83,10 @@ Faust.DocumentView.prototype = {
 			var img = Y.Node.create("<img>");
 			img.set("src", iip + "?FIF=" + page.transcript.facsimiles[0].encodedPath() + ".tif" + "&JTL=1,0");
 			img.set("alt", page.order);
-			Y.on("dblclick", function(e, page) { this.setPage(page.order); }, img, this, page);
+			Y.on("dblclick", function(e, page) {
+				this.setPage(page.order);
+				this.browserOverlay.hide();				
+			}, img, this, page);
 
 			var li = Y.Node.create("<li>");
 			li.append(page.order);
@@ -53,13 +95,39 @@ Faust.DocumentView.prototype = {
 			list.append(li);
 		}
 		
-		gallery.setContent(list);	
-		scrollView.render();	
+		browser.setContent(list);
+		this.browseView.render();
+
+		this.browserOverlay.render();		
+		Y.one("#transcript-browser").removeClass("hidden");
 	},
 	renderPage: function() {
-		if (this.pages.length <= this.currentPage) return;	
+		if (this.pages.length <= this.currentPage) return;
+		window.location.hash = ("#" + this.pages[this.currentPage].order);
+		
+		this.updateNavigation();
 		this.renderFacsimiles();
 		this.renderTranscript();
+	},
+	updateNavigation: function() {
+		var browsePages = Y.one("#transcript-browse");
+		if (this.pages.length > 1) 
+			browsePages.removeClass("disabled");
+		else
+			browsePages.addClass("disabled");
+			
+		var prevPage = Y.one("#transcript-prev-page");
+		if (this.pages.length > 0 && this.currentPage > 0)
+			prevPage.removeClass("disabled");
+		else
+			prevPage.addClass("disabled");
+		
+		var nextPage = Y.one("#transcript-next-page");
+		if ((this.currentPage + 1) < this.pages.length)
+			nextPage.removeClass("disabled");
+		else
+			nextPage.addClass("disabled");
+		
 	},
 	renderFacsimiles: function() {
 		Y.one("#transcript-facsimile").setContent("");
@@ -78,7 +146,9 @@ Faust.DocumentView.prototype = {
 			});	
 	},
 	renderTranscript: function() {
-		Y.one("#transcript-document").scrollIntoView();	
+		var container = Y.one("#transcript-document");
+		container.scrollIntoView();
+		
 		this.pages[this.currentPage].transcription(function(t) { transcript = t; });
 	}
 };

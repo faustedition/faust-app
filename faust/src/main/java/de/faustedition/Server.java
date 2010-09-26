@@ -40,7 +40,6 @@ import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.security.SecurityConstants;
 import de.faustedition.template.TemplateRenderingResource;
 import de.faustedition.transcript.TranscriptFinder;
-import de.faustedition.transcript.TranscriptResource;
 
 public class Server extends MainBase implements Runnable {
 
@@ -65,8 +64,6 @@ public class Server extends MainBase implements Runnable {
             final Component component = new Component();
             ClientList clients = component.getClients();
             clients.add(Protocol.FILE);
-            clients.add(Protocol.HTTP);
-            clients.add(Protocol.HTTPS);
 
             switch (mode) {
             case PRODUCTION:
@@ -106,7 +103,7 @@ public class Server extends MainBase implements Runnable {
             router.attach("document/", authorized(injector.getInstance(DocumentFinder.class)), MODE_STARTS_WITH);
 
             router.attach("genesis/", authorized(new GuiceFinder(Key.get(GenesisSampleResource.class))));
-            router.attach("genesis/chart.png", authorized(router.createFinder(GenesisSampleChartResource.class)));
+            router.attach("genesis/chart.png", authorized(new GuiceFinder(Key.get(GenesisSampleChartResource.class))));
 
             router.attach("project/about", new GuiceFinder(Key.get(TemplateRenderingResource.class)));
             router.attach("project/imprint", new GuiceFinder(Key.get(TemplateRenderingResource.class)));

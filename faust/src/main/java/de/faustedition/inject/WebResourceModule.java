@@ -8,6 +8,8 @@ import com.google.inject.Provider;
 import de.faustedition.document.ArchiveResource;
 import de.faustedition.document.DocumentFinder;
 import de.faustedition.document.DocumentResource;
+import de.faustedition.genesis.GenesisSampleChart;
+import de.faustedition.genesis.GenesisSampleChartResource;
 import de.faustedition.genesis.GenesisSampleResource;
 import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.template.TemplateConfiguration;
@@ -34,7 +36,9 @@ public class WebResourceModule extends AbstractModule {
         bind(DocumentFinder.class);
         bind(DocumentResource.class);
 
+        bind(GenesisSampleChart.class);
         bind(GenesisSampleResource.class);
+        bind(GenesisSampleChartResource.class);
         
         bind(TranscriptFinder.class);   
         bind(TranscriptResource.class);        

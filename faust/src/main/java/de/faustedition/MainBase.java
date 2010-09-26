@@ -18,6 +18,7 @@ import com.google.inject.Stage;
 
 public abstract class MainBase {
     protected DeploymentMode mode = DeploymentMode.DEVELOPMENT;
+    protected boolean debug = false;
     protected Injector injector;
 
     protected void init(String[] args) {
@@ -31,20 +32,14 @@ public abstract class MainBase {
             if ("-production".equalsIgnoreCase(arg)) {
                 mode = DeploymentMode.PRODUCTION;
             }
+            if ("-debug".equalsIgnoreCase(arg)) {
+                debug = true;
+            }
         }
     }
 
     protected void configureLogger() {
-        Level level = null;
-        switch (mode) {
-        case DEVELOPMENT:
-            level = Level.ALL;
-            break;
-        case PRODUCTION:
-            level = Level.WARNING;
-            break;
-        }
-
+        final Level level = (debug ? Level.ALL : Level.INFO);
         final ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleLogFormatter());
         handler.setLevel(level);
