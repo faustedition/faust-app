@@ -29,8 +29,8 @@ public class XMLStorage implements Iterable<FaustURI> {
     private final String storagePath;
 
     @Inject
-    public XMLStorage(@Named("db.home") String dbDirectory) {
-        this.storageDirectory = new File(dbDirectory, "xml");
+    public XMLStorage(@Named("xml.home") String dbDirectory) {
+        this.storageDirectory = new File(dbDirectory);
         Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getAbsolutePath() + " is a directory");
         this.storagePath = storageDirectory.getAbsolutePath();
     }
