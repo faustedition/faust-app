@@ -76,7 +76,7 @@ public class Server extends MainBase implements Runnable {
 
             String contextPath = injector.getInstance(Key.get(String.class, Names.named("ctx.path")));
             logger.info("Mounting application under '/" + contextPath + "'");
-            component.getDefaultHost().attach("/" + contextPath, app);
+            component.getDefaultHost().attach("/" + contextPath, app, MODE_STARTS_WITH);
             component.getLogService().setEnabled(false);
             component.start();
         } catch (Exception e) {
