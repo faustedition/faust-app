@@ -39,7 +39,7 @@ public abstract class MainBase {
     }
 
     protected void configureLogger() {
-        final Level level = (debug ? Level.ALL : Level.INFO);
+        final Level level = (debug ? Level.ALL : Level.WARNING);
         final ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleLogFormatter());
         handler.setLevel(level);
@@ -51,9 +51,9 @@ public abstract class MainBase {
         rootLogger.addHandler(handler);
 
         Log.setLog(new JettyRedirectingLogger());
-        for (String loggerName : new String[] { "de.faustedition", "com.google.inject", "org.restlet", "org.eclipse.jetty",
+        for (String interestingLogger : new String[] { "de.faustedition", "com.google.inject", "org.restlet", "org.eclipse.jetty",
                 "freemarker" }) {
-            Logger.getLogger(loggerName).setLevel(level);
+            Logger.getLogger(interestingLogger).setLevel(level);
         }
     }
 

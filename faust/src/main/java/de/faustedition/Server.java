@@ -77,6 +77,7 @@ public class Server extends MainBase implements Runnable {
             String contextPath = injector.getInstance(Key.get(String.class, Names.named("ctx.path")));
             logger.info("Mounting application under '/" + contextPath + "'");
             component.getDefaultHost().attach("/" + contextPath, app);
+            component.getLogService().setEnabled(false);
             component.start();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Unexpected error while starting server", e);
@@ -93,7 +94,7 @@ public class Server extends MainBase implements Runnable {
             router.attach("", EntryPageRedirectionResource.class);
 
             final String staticResourceDirectory = injector.getInstance(Key.get(String.class, Names.named("static.home")));
-            router.attach("static", new Directory(getContext(), "file://" + staticResourceDirectory));
+            router.attach("static", new Directory(getContext().createChildContext(), "file://" + staticResourceDirectory));
 
             Restlet archiveResource = authorized(new GuiceFinder(Key.get(ArchiveResource.class)));
             router.attach("archive/", archiveResource);
