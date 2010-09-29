@@ -15,7 +15,9 @@
 	#transcript-browser .yui3-widget-hd { padding: 0.5em 1em }
 	#transcript-browser .yui3-widget-hd a { color: #ccc; }	
 	#transcript-browser .yui3-widget-bd { white-space: nowrap; }
-	#transcript-browser .yui3-widget-bd li { width: 150px; text-align: center }	
+	#transcript-browser .yui3-widget-bd li { width: 150px; text-align: center }
+	
+	.zone { border: 1px dashed #ccc; margin: 3em 0; padding: 1em}	
 </#assign>
 <#assign header>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
@@ -35,7 +37,21 @@
 			<h3>${message("transcript.title")}</h3>
 			
 			<div id="transcript-document">
-				<div id="transcript-placeholder">n/a</div>
+				<div class="zone">
+					Text <span style="text-decoration: line-through">Text Text Text Text Text Text<lb>
+					Text Text Text Text Text Text Text<lb>
+					Text Text Text</span> Text Text Text Text
+				</div>
+				<div class="zone" style="color: #8B4513; text-align: right">
+					Text Text Text<lb>
+					Text Text Text<lb>
+					Text Text Text Text Text
+				</div>
+				<div class="zone" style="color: #339">
+					Text Text Text Text Text Text Text<lb>
+					Text Text Text<sup>Text Text</sup> Text Text<lb>
+					Text Text Text Text <sub>Text Text</sub> Text
+				</div>
 			</div>
 		</div>
 		<div class="yui3-u">
