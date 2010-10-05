@@ -36,6 +36,8 @@ for xml_file in faust.xml_files():
 					if candidate in change_str: status = candidate
 	except IOError:
 		sys.stderr.write("I/O error while extracting status from " + xml_file + "\n")
+	except lxml.etree.XMLSyntaxError:
+		sys.stderr.write("XML error while extracting status from " + xml_file + "\n")
 				
 	if status is None:
 		# no status given
