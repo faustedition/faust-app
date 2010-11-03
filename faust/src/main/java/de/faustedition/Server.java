@@ -10,7 +10,7 @@ import org.restlet.util.ClientList;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class Server extends MainBase implements Runnable {
+public class Server extends Runtime implements Runnable {
     private final String contextPath;
     private final FaustApplication application;
     private final Logger logger;

@@ -1,11 +1,11 @@
 package de.faustedition.dataimport;
 
-import de.faustedition.MainBase;
+import de.faustedition.Runtime;
 
-public class GeneticRelationScaffolder extends MainBase {
+public class GeneticRelationScaffolder extends Runtime {
 
     public static void main(String[] args) throws Exception {
-        MainBase.main(GeneticRelationScaffolder.class, args);
+        Runtime.main(GeneticRelationScaffolder.class, args);
     }
 
     @Override

@@ -16,7 +16,7 @@ import de.faustedition.text.TextManager;
 import de.faustedition.transcript.TranscriptManager;
 import de.faustedition.xml.XMLStorage;
 
-public class DataImport extends MainBase implements Runnable {
+public class DataImport extends Runtime implements Runnable {
 
     private final ArchiveManager archiveManager;
     private final TranscriptManager transcriptManager;

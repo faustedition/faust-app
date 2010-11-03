@@ -1,5 +1,6 @@
 package de.faustedition;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.ConsoleHandler;
@@ -20,25 +21,30 @@ import de.faustedition.inject.ConfigurationModule;
 import de.faustedition.inject.DataAccessModule;
 import de.faustedition.inject.WebResourceModule;
 
-public abstract class MainBase implements Runnable {
-    protected static DeploymentMode mode = DeploymentMode.DEVELOPMENT;
-    protected static boolean debug = false;
+public abstract class Runtime implements Runnable {
+    public static RuntimeMode mode = RuntimeMode.DEVELOPMENT;
+    public static boolean debug = false;
 
 
     protected static void main(Class<? extends Runnable> clazz, String[] args) throws Exception {
+        ConfigurationModule configurationModule = new ConfigurationModule();
+        
         for (String arg : args) {
             if ("-production".equalsIgnoreCase(arg)) {
-                mode = DeploymentMode.PRODUCTION;
+                mode = RuntimeMode.PRODUCTION;
             }
             if ("-debug".equalsIgnoreCase(arg)) {
                 debug = true;
+            }
+            if (arg.endsWith(".properties")) {
+                configurationModule.setConfigurationFile(new File(arg));
             }
         }
         
         configureLogger();
 
-        Stage stage = (mode == DeploymentMode.PRODUCTION ? Stage.PRODUCTION : Stage.DEVELOPMENT);
-        Injector injector = Guice.createInjector(stage, new Module[] { new ConfigurationModule(), new DataAccessModule(), new WebResourceModule() });
+        Stage stage = (mode == RuntimeMode.PRODUCTION ? Stage.PRODUCTION : Stage.DEVELOPMENT);
+        Injector injector = Guice.createInjector(stage, new Module[] { configurationModule, new DataAccessModule(), new WebResourceModule() });
         injector.getInstance(clazz).run();
     }
 

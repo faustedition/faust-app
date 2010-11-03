@@ -5,3 +5,4 @@ target
 .classpath
 META-INF
 local.ini
+faust/custom-config.properties

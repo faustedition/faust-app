@@ -1,15 +1,24 @@
 package de.faustedition.inject;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
 public class ConfigurationModule extends AbstractModule {
+    private static final Logger logger = Logger.getLogger(ConfigurationModule.class.getName());
+    
+    private File configurationFile = null;
+
+    public void setConfigurationFile(File configurationFile) {
+        this.configurationFile = configurationFile;
+    }
 
     @Override
     protected void configure() {
@@ -30,10 +39,9 @@ public class ConfigurationModule extends AbstractModule {
                 configReader.close();
             }
 
-            final String hostName = InetAddress.getLocalHost().getHostName();
-            configStream = getClass().getResourceAsStream("/config-" + hostName + ".properties");
-            if (configStream != null) {
-                configReader = new InputStreamReader(configStream, "UTF-8");
+            if (configurationFile != null) {
+                logger.info("Loading custom configuration from " + configurationFile.getAbsolutePath());
+                configReader = new InputStreamReader(new FileInputStream(configurationFile), "UTF-8");
                 try {
                     configuration = new Properties(configuration);
                     configuration.load(configReader);
