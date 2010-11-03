@@ -16,18 +16,16 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 
-public abstract class MainBase {
-    protected DeploymentMode mode = DeploymentMode.DEVELOPMENT;
-    protected boolean debug = false;
-    protected Injector injector;
+import de.faustedition.inject.ConfigurationModule;
+import de.faustedition.inject.DataAccessModule;
+import de.faustedition.inject.WebResourceModule;
 
-    protected void init(String[] args) {
-        setDeploymentMode(args);
-        configureLogger();
-        createInjector();
-    }
+public abstract class MainBase implements Runnable {
+    protected static DeploymentMode mode = DeploymentMode.DEVELOPMENT;
+    protected static boolean debug = false;
 
-    protected void setDeploymentMode(String[] args) {
+
+    protected static void main(Class<? extends Runnable> clazz, String[] args) throws Exception {
         for (String arg : args) {
             if ("-production".equalsIgnoreCase(arg)) {
                 mode = DeploymentMode.PRODUCTION;
@@ -36,9 +34,15 @@ public abstract class MainBase {
                 debug = true;
             }
         }
+        
+        configureLogger();
+
+        Stage stage = (mode == DeploymentMode.PRODUCTION ? Stage.PRODUCTION : Stage.DEVELOPMENT);
+        Injector injector = Guice.createInjector(stage, new Module[] { new ConfigurationModule(), new DataAccessModule(), new WebResourceModule() });
+        injector.getInstance(clazz).run();
     }
 
-    protected void configureLogger() {
+    protected static void configureLogger() {
         final Level level = (debug ? Level.ALL : Level.WARNING);
         final ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleLogFormatter());
@@ -56,13 +60,6 @@ public abstract class MainBase {
             Logger.getLogger(interestingLogger).setLevel(level);
         }
     }
-
-    protected void createInjector() {
-        Stage stage = (mode == DeploymentMode.PRODUCTION ? Stage.PRODUCTION : Stage.DEVELOPMENT);
-        injector = Guice.createInjector(stage, createModules());
-    }
-
-    protected abstract Module[] createModules();
 
     private static class SimpleLogFormatter extends Formatter {
 

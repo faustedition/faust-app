@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.faustedition</groupId>
 	<artifactId>faust-schema</artifactId>
@@ -23,13 +24,23 @@
 			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+			<id>faustedition-releases</id>
+			<url>https://faustedition.uni-wuerzburg.de/nexus/content/repositories/releases</url>
+		</repository>
+	</repositories>
 	<distributionManagement>
 		<repository>
-			<id>faustedition.net</id>
-			<url>scp://faustedition.uni-wuerzburg.de/mnt/data/htdocs/maven/</url>
+			<id>faustedition-releases</id>
+			<url>https://faustedition.uni-wuerzburg.de/nexus/content/repositories/releases</url>
 		</repository>
+		<snapshotRepository>
+			<id>faustedition-snapshots</id>
+			<url>https://faustedition.uni-wuerzburg.de/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
 		<site>
-			<id>faustedition.net</id>
+			<id>faustedition-schema</id>
 			<url>scp://faustedition.uni-wuerzburg.de/mnt/data/htdocs/schema/${project.version}</url>
 		</site>
 	</distributionManagement>

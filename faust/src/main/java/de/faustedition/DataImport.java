@@ -8,44 +8,47 @@ import java.util.logging.Logger;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Joiner;
-import com.google.inject.Module;
+import com.google.inject.Inject;
 
 import de.faustedition.document.ArchiveManager;
 import de.faustedition.document.MaterialUnitManager;
-import de.faustedition.inject.ConfigurationModule;
-import de.faustedition.inject.DataAccessModule;
+import de.faustedition.text.TextManager;
 import de.faustedition.transcript.TranscriptManager;
 import de.faustedition.xml.XMLStorage;
 
 public class DataImport extends MainBase implements Runnable {
 
-    public static void main(String[] args) {
-        DataImport dataImport = new DataImport();
-        dataImport.init(args);
-        dataImport.run();
+    private final ArchiveManager archiveManager;
+    private final TranscriptManager transcriptManager;
+    private final MaterialUnitManager documentManager;
+    private final TextManager textManager;
+    private final XMLStorage xml;
+    private final Logger logger;
+
+    @Inject
+    public DataImport(ArchiveManager archiveManager, TranscriptManager transcriptManager, MaterialUnitManager documentManager,
+            TextManager textManager, XMLStorage xml, Logger logger) {
+        this.archiveManager = archiveManager;
+        this.transcriptManager = transcriptManager;
+        this.documentManager = documentManager;
+        this.textManager = textManager;
+        this.xml = xml;
+        this.logger = logger;
     }
 
-    @Override
-    protected Module[] createModules() {
-        return new Module[] { new ConfigurationModule(), new DataAccessModule() };
+    public static void main(String[] args) throws Exception {
+        main(DataImport.class, args);
     }
 
     @Override
     public void run() {
-        final Logger logger = Logger.getLogger(getClass().getName());
         final SortedSet<FaustURI> failed = new TreeSet<FaustURI>();
         final long startTime = System.currentTimeMillis();
         try {
-            final ArchiveManager archiveManager = injector.getInstance(ArchiveManager.class);
-            final TranscriptManager transcriptManager = injector.getInstance(TranscriptManager.class);
-            final MaterialUnitManager documentManager = injector.getInstance(MaterialUnitManager.class);
-            final XMLStorage xml = injector.getInstance(XMLStorage.class);
-
             logger.info("Importing archives");
             archiveManager.synchronize();
 
             logger.info("Importing sample transcriptions");
-            // "/transcript/gsa/390883"
             for (FaustURI transcript : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
                 try {
                     logger.info("Importing transcript " + transcript);
@@ -67,9 +70,20 @@ public class DataImport extends MainBase implements Runnable {
                 }
             }
 
+            logger.info("Importing texts");
+            for (FaustURI textSource : xml.iterate(new FaustURI(FaustAuthority.XML, "/text"))) {
+                try {
+                    logger.info("Importing text " + textSource);
+                    textManager.add(textSource);
+                } catch (SAXException e) {
+                    logger.log(Level.SEVERE, "XML error while adding text " + textSource, e);
+                    failed.add(textSource);
+                }
+            }
+
             logger.info(String.format("Import finished in %.3f seconds", (System.currentTimeMillis() - startTime) / 1000.0f));
             if (!failed.isEmpty()) {
-                logger.info("\nFailed imports:\n" + Joiner.on("\n").join(failed));
+                logger.severe("\nFailed imports:\n" + Joiner.on("\n").join(failed));
             }
             System.exit(0);
         } catch (Exception e) {

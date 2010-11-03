@@ -17,6 +17,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
@@ -30,6 +31,7 @@ import de.faustedition.xml.XMLBaseTracker;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 
+@Singleton
 public class MaterialUnitManager {
     public static final FaustURI DOCUMENT_BASE_URI = new FaustURI(FaustAuthority.XML, "/document");
 

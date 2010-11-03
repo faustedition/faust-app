@@ -10,6 +10,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
@@ -19,6 +20,7 @@ import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 
+@Singleton
 public class ArchiveManager {
     public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
     

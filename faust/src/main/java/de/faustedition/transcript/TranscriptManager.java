@@ -25,6 +25,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import de.faustedition.FaustURI;
 import de.faustedition.graph.GraphDatabaseTransactional;
@@ -35,6 +36,7 @@ import de.faustedition.xml.MultiplexingContentHandler;
 import de.faustedition.xml.XMLFragmentFilter;
 import de.faustedition.xml.XMLStorage;
 
+@Singleton
 public class TranscriptManager {
     private final ApparatusExtractor apparatusExtractor = new ApparatusExtractor();
     private final GraphReference graph;
