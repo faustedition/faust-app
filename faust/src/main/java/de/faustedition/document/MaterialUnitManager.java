@@ -23,7 +23,7 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit.Type;
 import de.faustedition.graph.GraphDatabaseTransactional;
-import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.Transcript;
 import de.faustedition.transcript.TranscriptManager;
 import de.faustedition.xml.CustomNamespaceMap;
@@ -35,14 +35,14 @@ import de.faustedition.xml.XMLUtil;
 public class MaterialUnitManager {
     public static final FaustURI DOCUMENT_BASE_URI = new FaustURI(FaustAuthority.XML, "/document");
 
-    private final GraphReference graph;
+    private final FaustGraph graph;
     private final XMLStorage xml;
     private final TranscriptManager transcriptManager;
     private final GraphDatabaseService db;
     private final IndexService indexService;
 
     @Inject
-    public MaterialUnitManager(GraphReference graph, XMLStorage xml, TranscriptManager transcriptManager) {
+    public MaterialUnitManager(FaustGraph graph, XMLStorage xml, TranscriptManager transcriptManager) {
         this.graph = graph;
         this.xml = xml;
         this.transcriptManager = transcriptManager;

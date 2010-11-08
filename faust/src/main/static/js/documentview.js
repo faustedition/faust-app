@@ -1,3 +1,27 @@
+Faust.DocumentTranscriptCanvas = function(transcript) {
+	this.transcript = transcript;
+	this.model = this.build(this, this.transcript.root("ge:document"));	
+};
+
+Faust.DocumentTranscriptCanvas.prototype = {
+	render: function(iframeName) {
+		var document = window.frames[iframeName].document;
+		var svg = document.documentElement
+		var SVG_NS = svg.namespaceURI;
+		while (svg.hasChildNodes()) svg.removeChild(svg.firstChild);
+		
+		var text = document.createElementNS(SVG_NS, "text");
+		text.setAttribute("x", "50");
+		text.setAttribute("y", "50");
+		text.setAttribute("onclick", "alert(\"Clicked!!!\")");
+		text.appendChild(document.createTextNode("Faust, der Tragödie ..."));
+		svg.appendChild(text);
+	},
+	build: function(container, tree) {
+		if (tree == null) return;		
+	}
+};
+
 Faust.DocumentView = function(fd) {
 	this.fd = fd;
 	
@@ -146,9 +170,10 @@ Faust.DocumentView.prototype = {
 			});	
 	},
 	renderTranscript: function() {
-		var container = Y.one("#transcript-document");
-		container.scrollIntoView();
-		
-		this.pages[this.currentPage].transcription(function(t) { transcript = t; });
+		this.pages[this.currentPage].transcription(function(t) {
+			transcript = t; 
+			var canvas = new Faust.DocumentTranscriptCanvas(t);
+			canvas.render("transcript-canvas");
+		});
 	}
 };

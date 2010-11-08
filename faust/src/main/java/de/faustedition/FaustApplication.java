@@ -79,7 +79,7 @@ public class FaustApplication extends Application {
         router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
         router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
 
-        switch (Server.mode) {
+        switch (Runtime.mode) {
         case DEVELOPMENT:
             final Filter dummyAuthenticator = new Filter() {
                 @Override

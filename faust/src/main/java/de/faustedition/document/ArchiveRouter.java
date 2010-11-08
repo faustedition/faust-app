@@ -25,9 +25,9 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
-import de.faustedition.InjectorFinder;
 import de.faustedition.graph.GraphDatabaseTransactional;
-import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.inject.InjectorFinder;
 import de.faustedition.template.TemplateRepresentationFactory;
 import de.faustedition.xml.NodeListWrapper;
 import de.faustedition.xml.XMLStorage;
@@ -48,10 +48,10 @@ public class ArchiveRouter extends Router {
 
         private final XMLStorage xmlStorage;
         private final TemplateRepresentationFactory viewFactory;
-        private final GraphReference graph;
+        private final FaustGraph graph;
 
         @Inject
-        public ArchiveResource(XMLStorage xmlStorage, GraphReference graph, TemplateRepresentationFactory viewFactory) {
+        public ArchiveResource(XMLStorage xmlStorage, FaustGraph graph, TemplateRepresentationFactory viewFactory) {
             this.xmlStorage = xmlStorage;
             this.graph = graph;
             this.viewFactory = viewFactory;

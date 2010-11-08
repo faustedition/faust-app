@@ -17,6 +17,7 @@
 	#transcript-browser .yui3-widget-bd { white-space: nowrap; }
 	#transcript-browser .yui3-widget-bd li { width: 150px; text-align: center }
 	
+	#transcript-canvas { border: 0; width: 400px; height: 400px }
 	.zone { border: 1px dashed #ccc; margin: 3em 0; padding: 1em}	
 </#assign>
 <#assign header>
@@ -35,24 +36,8 @@
 			</div>
 			
 			<h3>${message("transcript.title")}</h3>
-			
-			<div id="transcript-document">
-				<div class="zone">
-					Text <span style="text-decoration: line-through">Text Text Text Text Text Text<lb>
-					Text Text Text Text Text Text Text<lb>
-					Text Text Text</span> Text Text Text Text
-				</div>
-				<div class="zone" style="color: #8B4513; text-align: right">
-					Text Text Text<lb>
-					Text Text Text<lb>
-					Text Text Text Text Text
-				</div>
-				<div class="zone" style="color: #339">
-					Text Text Text Text Text Text Text<lb>
-					Text Text Text<sup>Text Text</sup> Text Text<lb>
-					Text Text Text Text <sub>Text Text</sub> Text
-				</div>
-			</div>
+
+			<iframe name="transcript-canvas" id="transcript-canvas" src="${cp}/static/empty.svg"></iframe>
 		</div>
 		<div class="yui3-u">
 			<div id="transcript-facsimile"></div>

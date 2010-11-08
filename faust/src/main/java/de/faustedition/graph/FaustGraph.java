@@ -19,7 +19,7 @@ import de.faustedition.text.TextCollection;
 import de.faustedition.transcript.TranscriptCollection;
 
 @Singleton
-public class GraphReference extends NodeWrapperImpl {
+public class FaustGraph extends NodeWrapperImpl {
     public static final String PREFIX = "faust";
 
     private static final RelationshipType ROOT_RT = new FaustRelationshipType("root");
@@ -33,7 +33,7 @@ public class GraphReference extends NodeWrapperImpl {
     private final IndexService indexService;
 
     @Inject
-    public GraphReference(GraphDatabaseLifecycle db) {
+    public FaustGraph(GraphDatabaseLifecycle db) {
         super(db.graphDb().getReferenceNode());
         this.indexService = db.indexService();
     }

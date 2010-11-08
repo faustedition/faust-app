@@ -18,7 +18,7 @@ import com.google.inject.Singleton;
 
 import de.faustedition.FaustURI;
 import de.faustedition.graph.GraphDatabaseTransactional;
-import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.FaustGraph;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLFragmentFilter;
 import de.faustedition.xml.XMLStorage;
@@ -27,12 +27,12 @@ import de.faustedition.xml.XMLStorage;
 public class TextManager {
 
     private final Logger logger;
-    private final GraphReference graph;
+    private final FaustGraph graph;
     private final GraphDatabaseService db;
     private final XMLStorage xml;
 
     @Inject
-    public TextManager(GraphReference graph, XMLStorage xml, Logger logger) {
+    public TextManager(FaustGraph graph, XMLStorage xml, Logger logger) {
         this.graph = graph;
         this.xml = xml;
         this.db = graph.getGraphDatabaseService();

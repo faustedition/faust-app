@@ -29,7 +29,7 @@ import com.google.inject.Singleton;
 
 import de.faustedition.FaustURI;
 import de.faustedition.graph.GraphDatabaseTransactional;
-import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.Transcript.Type;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.MultiplexingContentHandler;
@@ -39,14 +39,14 @@ import de.faustedition.xml.XMLStorage;
 @Singleton
 public class TranscriptManager {
     private final ApparatusExtractor apparatusExtractor = new ApparatusExtractor();
-    private final GraphReference graph;
+    private final FaustGraph graph;
     private final XMLStorage xml;
     private final Logger logger;
     private final GraphDatabaseService db;
     private final IndexService indexService;
 
     @Inject
-    public TranscriptManager(GraphReference graph, XMLStorage xml, Logger logger) {
+    public TranscriptManager(FaustGraph graph, XMLStorage xml, Logger logger) {
         this.graph = graph;
         this.xml = xml;
         this.logger = logger;
@@ -84,7 +84,7 @@ public class TranscriptManager {
             dt.addRoot(documentRoot);
             apparatusExtractor.extract(dt, TEI_SIG_GE_PREFIX, "document");
         }
-        new DocumentaryTranscriptPostProcessor(dt).run();
+        dt.postprocess();
         register(dt, source);
         transcripts.add(dt);
 
@@ -96,7 +96,6 @@ public class TranscriptManager {
             final TextualTranscript tt = new TextualTranscript(db.createNode(), source);
             tt.addRoot(textRoot);
             apparatusExtractor.extract(tt, TEI_NS_PREFIX, "text");
-            new TextualTranscriptPostProcessor(tt).run();
             register(tt, source);
             transcripts.add(tt);
         }

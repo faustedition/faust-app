@@ -3,10 +3,10 @@ package de.faustedition.document;
 import org.neo4j.graphdb.Node;
 
 import de.faustedition.FaustURI;
-import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.FaustGraph;
 
 public class Document extends MaterialUnit {
-    private static final String PREFIX = GraphReference.PREFIX + ".document";
+    private static final String PREFIX = FaustGraph.PREFIX + ".document";
 
     public static final String SOURCE_KEY = PREFIX + ".uri";
 

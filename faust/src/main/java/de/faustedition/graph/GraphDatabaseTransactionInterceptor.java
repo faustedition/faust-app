@@ -18,7 +18,7 @@ public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
     private Logger logger;
 
     @Inject
-    public void setGraphDatabaseRoot(GraphReference graph) {
+    public void setGraph(FaustGraph graph) {
         this.db = graph.getGraphDatabaseService();
     }
 

@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
-import de.faustedition.InjectorFinder;
+import de.faustedition.inject.InjectorFinder;
 
 @Singleton
 public class GenesisRouter extends Router {

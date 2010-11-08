@@ -1,4 +1,4 @@
-package de.faustedition;
+package de.faustedition.dataimport;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -10,6 +10,9 @@ import org.xml.sax.SAXException;
 import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.Runtime;
 import de.faustedition.document.ArchiveManager;
 import de.faustedition.document.MaterialUnitManager;
 import de.faustedition.text.TextManager;
@@ -37,7 +40,7 @@ public class DataImport extends Runtime implements Runnable {
     }
 
     public static void main(String[] args) throws Exception {
-        main(DataImport.class, args);
+        Runtime.main(DataImport.class, args);
     }
 
     @Override

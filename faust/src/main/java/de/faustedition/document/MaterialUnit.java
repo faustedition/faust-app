@@ -12,7 +12,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.util.NodeWrapperImpl;
 
 import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.transcript.Transcript;
 
@@ -21,7 +21,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
         ARCHIVAL_UNIT, DOCUMENT, QUIRE, SHEET, FOLIO, PAGE, SURFACE
     }
 
-    private static final String PREFIX = GraphReference.PREFIX + ".material-unit";
+    private static final String PREFIX = FaustGraph.PREFIX + ".material-unit";
     private static final String METADATA_PREFIX = PREFIX + ".metadata.";
 
     private static final FaustRelationshipType MATERIAL_PART_OF_RT = new FaustRelationshipType("is-material-part-of");

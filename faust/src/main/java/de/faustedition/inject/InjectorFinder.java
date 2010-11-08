@@ -1,4 +1,4 @@
-package de.faustedition;
+package de.faustedition.inject;
 
 import org.restlet.Request;
 import org.restlet.Response;

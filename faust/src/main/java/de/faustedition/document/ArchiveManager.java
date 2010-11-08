@@ -14,7 +14,7 @@ import com.google.inject.Singleton;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.graph.GraphReference;
+import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLStorage;
@@ -24,12 +24,12 @@ import de.faustedition.xml.XMLUtil;
 public class ArchiveManager {
     public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
     
-    private final GraphReference graph;
+    private final FaustGraph graph;
     private final XMLStorage xml;
     private final GraphDatabaseService db;
 
     @Inject
-    public ArchiveManager(GraphReference graph, XMLStorage xml) {
+    public ArchiveManager(FaustGraph graph, XMLStorage xml) {
         this.graph = graph;
         this.xml = xml;
         this.db = graph.getGraphDatabaseService();

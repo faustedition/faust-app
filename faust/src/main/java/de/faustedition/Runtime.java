@@ -22,16 +22,19 @@ import de.faustedition.inject.DataAccessModule;
 import de.faustedition.inject.WebResourceModule;
 
 public abstract class Runtime implements Runnable {
-    public static RuntimeMode mode = RuntimeMode.DEVELOPMENT;
-    public static boolean debug = false;
+    public enum Mode {
+        PRODUCTION, DEVELOPMENT
+    }
 
+    public static Mode mode = Mode.DEVELOPMENT;
+    public static boolean debug = false;
 
     protected static void main(Class<? extends Runnable> clazz, String[] args) throws Exception {
         ConfigurationModule configurationModule = new ConfigurationModule();
-        
+
         for (String arg : args) {
             if ("-production".equalsIgnoreCase(arg)) {
-                mode = RuntimeMode.PRODUCTION;
+                mode = Mode.PRODUCTION;
             }
             if ("-debug".equalsIgnoreCase(arg)) {
                 debug = true;
@@ -40,11 +43,12 @@ public abstract class Runtime implements Runnable {
                 configurationModule.setConfigurationFile(new File(arg));
             }
         }
-        
+
         configureLogger();
 
-        Stage stage = (mode == RuntimeMode.PRODUCTION ? Stage.PRODUCTION : Stage.DEVELOPMENT);
-        Injector injector = Guice.createInjector(stage, new Module[] { configurationModule, new DataAccessModule(), new WebResourceModule() });
+        Stage stage = (mode == Mode.PRODUCTION ? Stage.PRODUCTION : Stage.DEVELOPMENT);
+        Injector injector = Guice.createInjector(stage, new Module[] { configurationModule, new DataAccessModule(),
+                new WebResourceModule() });
         injector.getInstance(clazz).run();
     }
 
@@ -55,7 +59,7 @@ public abstract class Runtime implements Runnable {
         handler.setLevel(level);
 
         Logger rootLogger = Logger.getLogger("");
-        for (Handler prevHandler : rootLogger.getHandlers()) {
+        for (Handler prevHandler : rootLogger.getHandlers()) {  
             rootLogger.removeHandler(prevHandler);
         }
         rootLogger.addHandler(handler);

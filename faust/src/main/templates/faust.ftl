@@ -5,11 +5,11 @@
 <html>
 <head>
 	<title>Digitale Faust-Edition: ${title}</title>
-	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssreset/reset-min.css">
-	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssfonts/fonts-min.css">
-	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssgrids/grids-min.css">
-	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssbase/base-min.css"> 
-	<link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css">
+	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssreset/reset-min.css" />
+	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssfonts/fonts-min.css" />
+	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssgrids/grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssbase/base-min.css" /> 
+	<link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css" />
 	<script type="text/javascript">
 		var cp = "${cp}"; 
 		var iip = "${config['facsimile.iip.url']}"; 
@@ -17,13 +17,13 @@
 	</script>
 	<script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-min.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
-	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
-	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/">
-	<meta name="DC.format" scheme="DCTERMS.IMT" content="text/html">
-	<meta name="DC.type" scheme="DCTERMS.DCMIType" content="Text">
-	<meta name="DC.publisher" content="Digitale Faust-Edition">
-	<meta name="DC.creator" content="Digitale Faust-Edition">
-	<meta name="DC.subject" content="Faust, Johann Wolfgang von Goethe, Historisch-kritische Edition, digital humanities">
+	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
+	<meta name="DC.format" scheme="DCTERMS.IMT" content="text/html" />
+	<meta name="DC.type" scheme="DCTERMS.DCMIType" content="Text" />
+	<meta name="DC.publisher" content="Digitale Faust-Edition" />
+	<meta name="DC.creator" content="Digitale Faust-Edition" />
+	<meta name="DC.subject" content="Faust, Johann Wolfgang von Goethe, Historisch-kritische Edition, digital humanities" />
 	<!-- 
 	<meta name="DCTERMS.license"  scheme="DCTERMS.URI" content="http://www.gnu.org/copyleft/fdl.html">
 	<meta name="DCTERMS.rightsHolder" content="Wikimedia Foundation Inc.">
