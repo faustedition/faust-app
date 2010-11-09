@@ -8,9 +8,12 @@
 	#archival-units th { text-align: left }
 </#assign>
 <#assign header>
+	<script type="text/javascript">
+		var archiveLat = parseFloat('${archive.geolocation.@lat?js_string}');
+		var archiveLng = parseFloat('${archive.geolocation.@lng?js_string}');
+	</script>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
-	<script type="text/javascript"></script>
 </#assign>
 <@faust.page title=(archive.name?html) header=header css=css>
 	<div class="yui3-g">
@@ -54,11 +57,5 @@
 			</#list>
 		</table>
 	</div>
-	</#if>
-	
-	<script type="text/javascript">
-		var Y = Faust.YUI().use("node", "dom", "event", function(Y) { 
-			archiveLocation('${archive.geolocation.@lat?js_string}', '${archive.geolocation.@lng?js_string}');
- 		});
-	</script>
+	</#if>	
 </@faust.page>

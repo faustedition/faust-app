@@ -24,7 +24,4 @@
 			<#if ((a_index % 3) == 2) || !a_has_next></div></#if>
 		</#list>		
 	</div>
-	<script type="text/javascript">
-		var Y = Faust.YUI().use("node", "dom", "event", function(Y) { archiveOverviewMap(); });
-	</script>	
 </@faust.page>

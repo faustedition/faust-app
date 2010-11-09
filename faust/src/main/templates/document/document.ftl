@@ -17,12 +17,14 @@
 	#transcript-browser .yui3-widget-bd { white-space: nowrap; }
 	#transcript-browser .yui3-widget-bd li { width: 150px; text-align: center }
 	
-	#transcript-canvas { border: 0; width: 400px; height: 400px }
+	#transcript-canvas { border: 0;width: 400px; height: 800px }
 	.zone { border: 1px dashed #ccc; margin: 3em 0; padding: 1em}	
 </#assign>
 <#assign header>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/goddag.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/textmodel.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/svgsupport.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/documentview.js"></script>
 </#assign>
