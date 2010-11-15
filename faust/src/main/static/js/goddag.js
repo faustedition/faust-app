@@ -61,7 +61,8 @@ Faust.YUI().use("oop", function(Y) {
 	Goddag.Element = function(data) {
 		Goddag.Element.superclass.constructor.call(this, data);
 		this.name = data[1];
-		this.attributes = data[2];
+		this.attrs = {};
+		Y.each(data[2], function(a) { this.attrs[a[0]] = a[1]; }, this);
 	};
 	Y.extend(Goddag.Element, Goddag.Node);
 

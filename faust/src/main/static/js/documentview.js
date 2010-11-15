@@ -1,60 +1,50 @@
 Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", function(Y) {
-	Faust.DocumentTranscriptCanvas = function(transcript) {
+	Faust.DocumentTranscriptCanvas = function(transcript, svg) {
 		this.transcript = transcript;
-		this.viewModel = this.buildView(null, this.transcript.root("ge:document"));
-		viewModel = this.viewModel;	
+		this.svg = svg;
+		this.view = this.build(null, transcript.root("ge:document"));
+		view = this.view;
 	};
 
 	Faust.DocumentTranscriptCanvas.prototype = {
-		render: function(iframeName) {
-			var document = window.frames[iframeName].document;
-			var svg = document.documentElement;
-
-			y = 20;
-			while (svg.hasChildNodes()) svg.removeChild(svg.firstChild);
-			if (this.viewModel) this.viewModel.render(svg);
-			
-			/*
-			var text = document.createElementNS(SVG_NS, "text");
-			text.setAttribute("x", "50");
-			text.setAttribute("y", "50");
-			text.setAttribute("onclick", "alert(\"Clicked!!!\")");
-			text.appendChild(document.createTextNode("Faust, der Tragödie ..."));
-			svg.appendChild(text);
-			*/
+		render: function() {
+			var root = this.svg.documentElement;
+			while (root.hasChildNodes()) root.removeChild(root.firstChild);			
+			if (this.view) this.view.render();
 		},
-		buildView: function(parent, tree) {
-			if (tree == null) return null;
-			Y.log("Building view model for " + ("name" in tree.node ? tree.node.name : "'" + tree.node.text() + "'"));
-			
+		build: function(parent, tree) {
+			if (tree == null) return null;			
 			var vc = null;
 			var node = tree.node;
 			
-			if (node instanceof Goddag.Text) {
-				vc = new Faust.Text(node);
+			if ((node instanceof Goddag.Text) && (parent != null) && (parent instanceof Faust.Line)) {
+				vc = new Faust.Text();
 			} else if (node instanceof Goddag.Element) {
 				if (node.name == "ge:document") {
-					vc = new Faust.Surface(node);
+					vc = new Faust.Surface();
 				} else if (node.name == "tei:surface") {
-					vc = new Faust.Surface(node);
+					vc = new Faust.Surface();
 				} else if (node.name == "tei:zone")	{
-					vc = new Faust.Zone(node);
+					vc = new Faust.Zone();
 				} else if (node.name == "ge:line") {
-					vc = new Faust.Line(node);
-				}				
+					vc = new Faust.Line();
+				} else if (node.name == "f:grLine") {
+					vc = new Faust.GLine();
+				} else if (node.name == "f:grBrace") {
+					vc = new Faust.GBrace();
+				}
 			}
 			
-			if (parent != null && vc != null) {
-				parent.add(vc);
+			if (vc != null) {
+				vc.initViewComponent(node);
+				vc.svg = this.svg;
+				
+				if (parent != null) parent.add(vc);
+				parent = vc;
 			}
 			
-			parent = (vc == null ? parent : vc);			
-			for (var cc = 0; cc < tree.children.length; cc++) {
-				this.buildView(parent, tree.children[cc]);
-			}
-			
+			Y.each(tree.children, function(c) { this.build(parent, c); }, this);
 			return vc;
-			
 		}
 	};
 
@@ -206,9 +196,8 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 		},
 		renderTranscript: function() {
 			this.pages[this.currentPage].transcription(function(t) {
-				transcript = t; 
-				var canvas = new Faust.DocumentTranscriptCanvas(t);
-				canvas.render("transcript-canvas");
+				var canvas = new Faust.DocumentTranscriptCanvas(t, window.frames["transcript-canvas"].document);
+				canvas.render();
 			});
 		}
 	};
