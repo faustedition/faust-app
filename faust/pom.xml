@@ -59,12 +59,6 @@
 			<version>${neo4j.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<!-- <dependency> <groupId>cglib</groupId> <artifactId>cglib</artifactId> <version>2.2</version> </dependency> -->
-		<dependency>
 			<groupId>thaiopensource</groupId>
 			<artifactId>jing</artifactId>
 			<version>20030619</version>
@@ -151,6 +145,14 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>maven-scala-plugin</artifactId>
+				<configuration>
+					<scalaVersion>2.8.1</scalaVersion>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 	<repositories>
@@ -172,7 +174,19 @@
 			<name>Public online Restlet repository</name>
 			<url>http://maven.restlet.org</url>
 		</repository>
+		<repository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</pluginRepository>
+	</pluginRepositories>
 	<distributionManagement>
 		<repository>
 			<id>faustedition-releases</id>

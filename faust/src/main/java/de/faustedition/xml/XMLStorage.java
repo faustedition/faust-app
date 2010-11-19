@@ -1,17 +1,13 @@
 package de.faustedition.xml;
 
-import static org.apache.commons.io.FileUtils.listFiles;
-import static org.apache.commons.io.filefilter.FileFilterUtils.andFileFilter;
-import static org.apache.commons.io.filefilter.FileFilterUtils.fileFileFilter;
-import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
-import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Pattern;
 
-import org.apache.commons.io.filefilter.IOFileFilter;
 import org.neo4j.helpers.collection.IterableWrapper;
 import org.xml.sax.InputSource;
 
@@ -25,6 +21,7 @@ import de.faustedition.FaustURI;
 
 @Singleton
 public class XMLStorage implements Iterable<FaustURI> {
+    private final Pattern xmlFilenamePattern = Pattern.compile("[^\\.]+\\.[xX][mM][lL]$");
     private final File storageDirectory;
     private final String storagePath;
 
@@ -46,9 +43,20 @@ public class XMLStorage implements Iterable<FaustURI> {
         return iterate(baseFile);
     }
 
-    @SuppressWarnings("unchecked")
     protected Iterable<FaustURI> iterate(File base) {
-        return new FileToUriWrapper(listFiles(base, XML_FILE_FILTER, trueFileFilter()));
+        final List<File> files = new LinkedList<File>();
+        listRecursively(files, base);
+        return new FileToUriWrapper(files);
+    }
+
+    private void listRecursively(List<File> contents, File base) {
+        for (File contained : base.listFiles()) {
+            if (contained.isDirectory()) {
+                listRecursively(contents, contained);
+            } else if (contained.isFile() && xmlFilenamePattern.matcher(contained.getName()).matches()) {
+                contents.add(contained);
+            }
+        }
     }
 
     public InputSource getInputSource(FaustURI uri) throws IOException {
@@ -58,24 +66,31 @@ public class XMLStorage implements Iterable<FaustURI> {
     }
 
     public boolean isDirectory(FaustURI uri) {
-        return toFile(uri).isDirectory();
+        final File file = toFile(uri);
+        return file.isDirectory() && isInStore(file);
     }
 
     public boolean isResource(FaustURI uri) {
-        return XML_FILE_FILTER.accept(toFile(uri));
+        final File file = toFile(uri);
+        return file.isFile() && isInStore(file) && xmlFilenamePattern.matcher(file.getName()).matches();
     }
 
     protected File toFile(FaustURI uri) {
         Preconditions.checkArgument(FaustAuthority.XML == uri.getAuthority(), uri + " not valid");
         final File file = new File(storageDirectory, uri.getPath());
-        Preconditions.checkArgument(IN_STORE_FILTER.accept(file), file.getAbsolutePath() + " is not in XML storage");
+        final String filePath = file.getAbsolutePath();
+        Preconditions.checkArgument(filePath.startsWith(storagePath), filePath + " is not in XML storage");
         return file;
     }
 
     protected FaustURI toUri(File file) {
         final String filePath = file.getAbsolutePath();
-        Preconditions.checkArgument(filePath.startsWith(storagePath), filePath + " not in XML store");
+        Preconditions.checkArgument(isInStore(file), filePath + " not in XML store");
         return new FaustURI(FaustAuthority.XML, filePath.substring(storagePath.length()));
+    }
+
+    protected boolean isInStore(File file) {
+        return file.getAbsolutePath().startsWith(storagePath);
     }
 
     private class FileToUriWrapper extends IterableWrapper<FaustURI, File> {
@@ -89,20 +104,4 @@ public class XMLStorage implements Iterable<FaustURI> {
             return toUri(file);
         }
     }
-
-    private final IOFileFilter IN_STORE_FILTER = new IOFileFilter() {
-
-        @Override
-        public boolean accept(File dir, String name) {
-            return accept(new File(dir, name));
-        }
-
-        @Override
-        public boolean accept(File file) {
-            return file.getAbsolutePath().startsWith(storagePath);
-        }
-    };
-    private final IOFileFilter XML_FILE_FILTER = andFileFilter(IN_STORE_FILTER,
-            andFileFilter(fileFileFilter(), suffixFileFilter(".xml")));
-
 }

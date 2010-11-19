@@ -43,15 +43,18 @@ public class FaustApplication extends Application {
     private final GenesisRouter genesisRouter;
     private final TranscriptFinder transcriptFinder;
     private final LdapSecurityStore ldapSecurityStore;
+    private final RuntimeMode runtimeMode;
 
     @Inject
-    public FaustApplication(@Named("static.home") String staticResourcePath,//
+    public FaustApplication(RuntimeMode runtimeMode,//
+            @Named("static.home") String staticResourcePath,//
             ArchiveRouter archiveRouter,//
             DocumentRouter documentRouter,//
             GenesisRouter genesisRouter,//
             TranscriptFinder transcriptFinder,//
             TemplateFinder templateFinder,//
             LdapSecurityStore ldapSecurityStore) {
+        this.runtimeMode = runtimeMode;
         this.staticResourcePath = staticResourcePath;
         this.archiveRouter = archiveRouter;
         this.documentRouter = documentRouter;
@@ -79,7 +82,7 @@ public class FaustApplication extends Application {
         router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
         router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
 
-        switch (Runtime.mode) {
+        switch (runtimeMode) {
         case DEVELOPMENT:
             final Filter dummyAuthenticator = new Filter() {
                 @Override

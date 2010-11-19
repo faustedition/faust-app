@@ -10,13 +10,16 @@ import org.restlet.util.ClientList;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+
 public class Server extends Runtime implements Runnable {
+    private final RuntimeMode runtimeMode;
     private final String contextPath;
     private final FaustApplication application;
     private final Logger logger;
 
     @Inject
-    public Server(@Named("ctx.path") String contextPath, FaustApplication application, Logger logger) {
+    public Server(RuntimeMode runtimeMode, @Named("ctx.path") String contextPath, FaustApplication application, Logger logger) {
+        this.runtimeMode = runtimeMode;
         this.contextPath = contextPath;
         this.application = application;
         this.logger = logger;
@@ -29,13 +32,13 @@ public class Server extends Runtime implements Runnable {
     @Override
     public void run() {
         try {
-            logger.info("Starting Faust-Edition in " + mode + " mode");
+            logger.info("Starting Faust-Edition in " + runtimeMode + " mode");
 
             final Component component = new Component();
             ClientList clients = component.getClients();
             clients.add(Protocol.FILE);
 
-            switch (mode) {
+            switch (runtimeMode) {
             case PRODUCTION:
                 component.getServers().add(Protocol.AJP, 8089);
                 break;

@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.commons.io.FilenameUtils;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.ext.xml.DomRepresentation;
 import org.restlet.resource.ClientResource;
@@ -125,31 +124,44 @@ public class XMLDatabase implements Iterable<URI> {
     }
 
     protected URI relativize(URI uri) {
-        Preconditions.checkArgument(!uri.isAbsolute() && (uri.getPath() == null || uri.getPath().length() == 0 || !uri.getPath().startsWith("/")));
+        Preconditions.checkArgument(!uri.isAbsolute()
+                && (uri.getPath() == null || uri.getPath().length() == 0 || !uri.getPath().startsWith("/")));
         return base.resolve(uri);
     }
 
     public boolean isWitnessEncodingDocument(URI uri) {
-        return uri.getPath().startsWith(WITNESS_BASE.getPath()) && "xml".equals(FilenameUtils.getExtension(uri.getPath()));
+        final String path = uri.getPath();
+        final int extensionIndex = path.lastIndexOf(".");
+        return extensionIndex >= 0 && path.startsWith(WITNESS_BASE.getPath()) && "xml".equals(path.substring(extensionIndex));
     }
 
     public boolean isDocumentEncodingDocument(URI uri) {
-        if (!isWitnessEncodingDocument(uri)) {
-            return false;
-        }
-        String uriPath = uri.getPath();
-        String path = FilenameUtils.getPathNoEndSeparator(uriPath);
-        String basename = FilenameUtils.getBaseName(uriPath);
-        return !basename.equals(FilenameUtils.getName(path));
+        return isWitnessEncodingDocument(uri) && !isTextEncodingDocument(uri);
     }
 
     public boolean isTextEncodingDocument(URI uri) {
         if (!isWitnessEncodingDocument(uri)) {
             return false;
         }
-        String uriPath = uri.getPath();
-        String path = FilenameUtils.getPathNoEndSeparator(uriPath);
-        String basename = FilenameUtils.getBaseName(uriPath);
-        return basename.equals(FilenameUtils.getName(path));
+        final String uriPath = uri.getPath().replaceAll("/+", "/");
+
+        final int basenameStart = uriPath.lastIndexOf("/");
+        if (basenameStart < 0) {
+            return false;
+        }
+
+        final int folderNameStart = uriPath.lastIndexOf("/", basenameStart);
+        if (folderNameStart < 0) {
+            return false;
+        }
+
+        final int basenameEnd = uriPath.lastIndexOf(".");
+        if (basenameEnd < 0 || basenameEnd < basenameStart || !uriPath.substring(basenameEnd).equalsIgnoreCase(".xml")) {
+            return false;
+        }
+
+        final String basename = uriPath.substring(basenameStart + 1, basenameEnd);
+        final String folderName = uriPath.substring(folderNameStart + 1, basenameStart);
+        return basename.equalsIgnoreCase(folderName);
     }
 }

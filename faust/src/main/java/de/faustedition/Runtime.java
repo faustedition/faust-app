@@ -1,6 +1,5 @@
 package de.faustedition;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.ConsoleHandler;
@@ -12,61 +11,33 @@ import java.util.logging.Logger;
 
 import org.eclipse.jetty.util.log.Log;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.Stage;
-
-import de.faustedition.inject.ConfigurationModule;
-import de.faustedition.inject.DataAccessModule;
-import de.faustedition.inject.WebResourceModule;
+import de.faustedition.inject.FaustInjector;
 
 public abstract class Runtime implements Runnable {
-    public enum Mode {
-        PRODUCTION, DEVELOPMENT
-    }
-
-    public static Mode mode = Mode.DEVELOPMENT;
-    public static boolean debug = false;
-
-    protected static void main(Class<? extends Runnable> clazz, String[] args) throws Exception {
-        ConfigurationModule configurationModule = new ConfigurationModule();
-
+    public static void main(Class<? extends Runnable> clazz, String[] args) throws Exception {
+        Level logLevel = Level.WARNING;
         for (String arg : args) {
-            if ("-production".equalsIgnoreCase(arg)) {
-                mode = Mode.PRODUCTION;
-            }
             if ("-debug".equalsIgnoreCase(arg)) {
-                debug = true;
-            }
-            if (arg.endsWith(".properties")) {
-                configurationModule.setConfigurationFile(new File(arg));
+                logLevel = Level.ALL;
             }
         }
-
-        configureLogger();
-
-        Stage stage = (mode == Mode.PRODUCTION ? Stage.PRODUCTION : Stage.DEVELOPMENT);
-        Injector injector = Guice.createInjector(stage, new Module[] { configurationModule, new DataAccessModule(),
-                new WebResourceModule() });
-        injector.getInstance(clazz).run();
+        configureLogger(logLevel);
+        FaustInjector.getInstance().getInstance(clazz).run();
     }
 
-    protected static void configureLogger() {
-        final Level level = (debug ? Level.ALL : Level.WARNING);
+    public static void configureLogger(Level level) {
         final ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleLogFormatter());
         handler.setLevel(level);
 
         Logger rootLogger = Logger.getLogger("");
-        for (Handler prevHandler : rootLogger.getHandlers()) {  
+        for (Handler prevHandler : rootLogger.getHandlers()) {
             rootLogger.removeHandler(prevHandler);
         }
         rootLogger.addHandler(handler);
 
         Log.setLog(new JettyRedirectingLogger());
-        for (String interestingLogger : new String[] { "de.faustedition", "com.google.inject", "org.restlet", "org.eclipse.jetty",
-                "freemarker" }) {
+        for (String interestingLogger : new String[] { "de.faustedition", "com.google.inject", "org.restlet", "freemarker" }) {
             Logger.getLogger(interestingLogger).setLevel(level);
         }
     }
