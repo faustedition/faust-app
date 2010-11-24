@@ -2,6 +2,9 @@ package de.faustedition;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
 
 import com.google.common.base.Preconditions;
 
@@ -65,5 +68,9 @@ public class FaustURI implements Comparable<FaustURI> {
 
 	public FaustURI resolve(String relative) {
 		return new FaustURI(this.uri.resolve(relative));
+	}
+	
+	public static Deque<String> toPathDeque(String path) {
+		return new ArrayDeque<String>(Arrays.asList(path.replaceAll("^/+", "").replaceAll("/+$", "").split("/+")));
 	}
 }

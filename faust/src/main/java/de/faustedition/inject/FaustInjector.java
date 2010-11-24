@@ -11,7 +11,7 @@ public class FaustInjector {
 
 	private static Injector injector = null;
 
-	public static Injector getInstance() {
+	public static Injector get() {
 		synchronized (FaustInjector.class) {
 			if (injector == null) {
 				ConfigurationModule configurationModule = new ConfigurationModule();

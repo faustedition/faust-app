@@ -2,10 +2,14 @@ package de.faustedition;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Enumeration;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -14,31 +18,59 @@ import org.eclipse.jetty.util.log.Log;
 import de.faustedition.inject.FaustInjector;
 
 public abstract class Runtime implements Runnable {
+	private static Logger log = Logger.getLogger(Runtime.class.getName());
+	private static Level logLevel = Level.WARNING;
+
 	public static void main(Class<? extends Runnable> clazz, String[] args) throws Exception {
-		Level logLevel = Level.WARNING;
 		for (String arg : args) {
 			if ("-debug".equalsIgnoreCase(arg)) {
 				logLevel = Level.ALL;
 			}
 		}
-		configureLogger(logLevel);
-		FaustInjector.getInstance().getInstance(clazz).run();
+		configureLogging();
+		final Runnable main = FaustInjector.get().getInstance(clazz);
+		
+		// FIXME: this is a hack; Guice seems to reset the logging config somehow
+		configureLogging();
+		dumpLogConfig();
+		
+		main.run();
 	}
 
-	public static void configureLogger(Level level) {
-		final ConsoleHandler handler = new ConsoleHandler();
+	public static void configureLogging() {
+		ConsoleHandler handler = new ConsoleHandler();
 		handler.setFormatter(new SimpleLogFormatter());
-		handler.setLevel(level);
+		handler.setLevel(logLevel);
 
-		Logger rootLogger = Logger.getLogger("");
-		for (Handler prevHandler : rootLogger.getHandlers()) {
-			rootLogger.removeHandler(prevHandler);
+		final Logger root = Logger.getLogger("");
+		for (Handler rootHandler : root.getHandlers()) {
+			root.removeHandler(rootHandler);
 		}
-		rootLogger.addHandler(handler);
+		root.addHandler(handler);
 
+		for (String interesting : new String[] { "de.faustedition", "com.google.inject", "org.neo4j", "freemarker" }) {
+			final Logger logger = Logger.getLogger(interesting);
+			logger.setLevel(logLevel);
+
+		}
+		for (String uninteresting : new String[] { "org.restlet.FaustApplication", "org.eclipse.jetty" }) {
+			final Logger logger = Logger.getLogger(uninteresting);
+			logger.setLevel(Level.WARNING);
+
+		}
 		Log.setLog(new JettyRedirectingLogger());
-		for (String interestingLogger : new String[] { "de.faustedition", "com.google.inject", "org.restlet", "freemarker" }) {
-			Logger.getLogger(interestingLogger).setLevel(level);
+	}
+
+	public static void dumpLogConfig() {
+		final SortedSet<String> configuredLoggers = new TreeSet<String>();
+		for (Enumeration<String> loggerNames = LogManager.getLogManager().getLoggerNames(); loggerNames.hasMoreElements();) {
+			configuredLoggers.add(loggerNames.nextElement());
+		}
+		for (String logger : configuredLoggers) {
+			Logger instance = Logger.getLogger(logger);
+			log.info("Logger config: '" + logger + "' :: " + instance.getLevel() + " [ delegate: "
+					+ instance.getUseParentHandlers() + " ] [ #handlers: " + instance.getHandlers().length
+					+ " ]");
 		}
 	}
 
@@ -68,11 +100,7 @@ public abstract class Runtime implements Runnable {
 		private final Logger logger;
 
 		private JettyRedirectingLogger() {
-			this(Logger.getLogger("org.eclipse.jetty"));
-		}
-
-		private JettyRedirectingLogger(Logger logger) {
-			this.logger = logger;
+			this.logger = Logger.getLogger("org.eclipse.jetty");
 		}
 
 		@Override
@@ -127,7 +155,7 @@ public abstract class Runtime implements Runnable {
 
 		@Override
 		public org.eclipse.jetty.util.log.Logger getLogger(String name) {
-			return new JettyRedirectingLogger(Logger.getLogger(logger.getName() + "." + name));
+			return new JettyRedirectingLogger();
 		}
 
 		@Override
