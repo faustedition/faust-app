@@ -57,7 +57,6 @@ public class GeneticRelationScaffolder extends Runtime {
 				final Document text = XMLUtil.parse(xml.getInputSource(textSource));
 				final Number refCount = (Number) existingGeneticRefsXP.evaluate(text, XPathConstants.NUMBER);
 				if (refCount.intValue() > 0) {
-					System.out.println("Skipping " + source);
 					continue;
 				}
 
@@ -104,9 +103,8 @@ public class GeneticRelationScaffolder extends Runtime {
 						parent.appendChild(lineElement);
 					}
 				}
-				System.out.printf("%s(%s) ==> %s\n", source, Joiner.on(", ").join(intervals), textSource);
+				System.out.printf("%s ==> %s\n", Joiner.on(", ").join(intervals), textSource);
 				xml.put(textSource, text);
-				System.out.println();
 			}
 			System.exit(0);
 		} catch (Exception e) {
