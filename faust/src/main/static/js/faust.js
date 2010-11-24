@@ -34,3 +34,18 @@ Faust.io = function(uri, callback, reviver) {
 		});
 	});
 };
+
+Faust.xml = function(uri, callback) {
+	Faust.YUI().use("io", function(Y) {
+		Y.io(uri, {
+			method: "GET",
+			on: { 
+				success: function(id, o, a) {
+					callback(o.responseXML);
+				}, 
+				failure: function(id, o, a) { 
+					Y.log("ERROR " + id + " " + a, "info", "Faust") }
+				}
+		});
+	});
+};
