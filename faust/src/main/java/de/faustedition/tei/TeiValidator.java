@@ -1,15 +1,22 @@
 package de.faustedition.tei;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 
+import org.apache.commons.mail.EmailException;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -17,7 +24,9 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.thaiopensource.util.PropertyMapBuilder;
@@ -28,20 +37,27 @@ import com.thaiopensource.validate.Validator;
 import com.thaiopensource.validate.rng.SAXSchemaReader;
 import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
 
+import de.faustedition.EmailReporter;
+import de.faustedition.EmailReporter.ReportCreator;
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
+import de.faustedition.Runtime;
 import de.faustedition.xml.XMLStorage;
 
 @Singleton
-public class TeiValidator {
+public class TeiValidator extends Runtime {
 	private static final URL SCHEMA_RESOURCE = TeiValidator.class.getResource("/faust-tei.rng");
 
 	private final XMLStorage xml;
 	private final Logger logger;
 	private final Schema schema;
+	private final EmailReporter reporter;
 
 	@Inject
-	public TeiValidator(XMLStorage xml, Logger logger) throws IOException, SAXException, IncorrectSchemaException {
+	public TeiValidator(XMLStorage xml, EmailReporter reporter, Logger logger) throws IOException, SAXException,
+			IncorrectSchemaException {
 		this.xml = xml;
+		this.reporter = reporter;
 		this.logger = logger;
 
 		final CustomErrorHandler errorHandler = new CustomErrorHandler();
@@ -72,6 +88,63 @@ public class TeiValidator {
 
 	public boolean isValid(FaustURI uri) throws SAXException, IOException {
 		return validate(uri).isEmpty();
+	}
+
+	public static void main(String[] args) throws Exception {
+		main(TeiValidator.class, args);
+	}
+
+	@Override
+	public void run() {
+		try {
+			final SortedSet<FaustURI> xmlErrors = new TreeSet<FaustURI>();
+			final SortedMap<FaustURI, String> teiErrors = new TreeMap<FaustURI, String>();
+			for (FaustURI source : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
+				try {
+					final List<String> errors = validate(source);
+					if (!errors.isEmpty()) {
+						teiErrors.put(source, Joiner.on("\n").join(errors));
+					}
+				} catch (SAXException e) {
+					logger.log(Level.FINE, "XML error while validating transcript: " + source, e);
+					xmlErrors.add(source);
+				} catch (IOException e) {
+					logger.log(Level.WARNING, "I/O error while validating transcript: " + source, e);
+				}
+			}
+
+			if (xmlErrors.isEmpty() && teiErrors.isEmpty()) {
+				System.exit(0);
+			}
+
+			reporter.send("TEI validation report", new ReportCreator() {
+
+				public void create(PrintWriter body) {
+					if (!xmlErrors.isEmpty()) {
+						body.println(Strings.padStart(" XML errors", 79, '='));
+						body.println();
+						body.println(Joiner.on("\n").join(xmlErrors));
+						body.println();
+					}
+					if (!teiErrors.isEmpty()) {
+						body.println(Strings.padStart(" TEI errors", 79, '='));
+						body.println();
+
+						for (Map.Entry<FaustURI, String> teiError : teiErrors.entrySet()) {
+							body.println(Strings.padStart(" " + teiError.getKey(), 79, '-'));
+							body.println();
+							body.println(teiError.getValue());
+							body.println();
+							body.println();
+						}
+					}
+				}
+			});
+			System.exit(0);
+		} catch (EmailException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 	private static class CustomErrorHandler implements ErrorHandler {
