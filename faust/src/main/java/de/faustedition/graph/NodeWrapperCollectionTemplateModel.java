@@ -11,44 +11,44 @@ import freemarker.template.TemplateModelIterator;
 
 public class NodeWrapperCollectionTemplateModel implements TemplateCollectionModel, TemplateHashModel {
 
-    private final NodeWrapperCollection<?> collection;
-    private TemplateCollectionModel collectionModel;
-    private BeanModel beanModel;
+	private final NodeWrapperCollection<?> collection;
+	private TemplateCollectionModel collectionModel;
+	private BeanModel beanModel;
 
-    public NodeWrapperCollectionTemplateModel(NodeWrapperCollection<?> collection) {
-        this.collection = collection;
-    }
+	public NodeWrapperCollectionTemplateModel(NodeWrapperCollection<?> collection) {
+		this.collection = collection;
+	}
 
-    public NodeWrapperCollection<?> getCollection() {
-        return collection;
-    }
+	public NodeWrapperCollection<?> getCollection() {
+		return collection;
+	}
 
-    @Override
-    public TemplateModel get(String key) throws TemplateModelException {
-        return beanModel().get(key);
-    }
+	@Override
+	public TemplateModel get(String key) throws TemplateModelException {
+		return beanModel().get(key);
+	}
 
-    @Override
-    public boolean isEmpty() throws TemplateModelException {
-        return beanModel().isEmpty();
-    }
+	@Override
+	public boolean isEmpty() throws TemplateModelException {
+		return beanModel().isEmpty();
+	}
 
-    @Override
-    public TemplateModelIterator iterator() throws TemplateModelException {
-        return collectionModel().iterator();
-    }
+	@Override
+	public TemplateModelIterator iterator() throws TemplateModelException {
+		return collectionModel().iterator();
+	}
 
-    protected TemplateCollectionModel collectionModel() {
-        if (collectionModel == null) {
-            collectionModel = new SimpleCollection(collection);
-        }
-        return collectionModel;
-    }
+	protected TemplateCollectionModel collectionModel() {
+		if (collectionModel == null) {
+			collectionModel = new SimpleCollection(collection);
+		}
+		return collectionModel;
+	}
 
-    protected BeanModel beanModel() throws TemplateModelException {
-        if (beanModel == null) {
-            beanModel = new BeanModel(collection, BeansWrapper.getDefaultInstance());
-        }
-        return beanModel;
-    }
+	protected BeanModel beanModel() throws TemplateModelException {
+		if (beanModel == null) {
+			beanModel = new BeanModel(collection, BeansWrapper.getDefaultInstance());
+		}
+		return beanModel;
+	}
 }

@@ -7,21 +7,21 @@ import com.google.inject.Stage;
 
 import de.faustedition.RuntimeMode;
 
-
 public class FaustInjector {
 
-    private static Injector injector = null;
+	private static Injector injector = null;
 
-    public static Injector getInstance() {
-        synchronized (FaustInjector.class) {
-            if (injector == null) {
-                ConfigurationModule configurationModule = new ConfigurationModule();
-                Stage stage = (configurationModule.mode == RuntimeMode.PRODUCTION ? Stage.PRODUCTION : Stage.DEVELOPMENT);
-                injector = Guice.createInjector(stage, new Module[] { configurationModule, new DataAccessModule(),
-                        new WebResourceModule() });
+	public static Injector getInstance() {
+		synchronized (FaustInjector.class) {
+			if (injector == null) {
+				ConfigurationModule configurationModule = new ConfigurationModule();
+				Stage stage = (configurationModule.mode == RuntimeMode.PRODUCTION ? Stage.PRODUCTION
+						: Stage.DEVELOPMENT);
+				injector = Guice.createInjector(stage, new Module[] { configurationModule, new DataAccessModule(),
+						new WebResourceModule() });
 
-            }
-        }
-        return injector;
-    }
+			}
+		}
+		return injector;
+	}
 }

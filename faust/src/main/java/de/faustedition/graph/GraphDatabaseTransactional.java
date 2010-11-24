@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.TYPE })
 public @interface GraphDatabaseTransactional {
-    Class<? extends Throwable>[] successfulExceptions() default {};
+	Class<? extends Throwable>[] successfulExceptions() default {};
 }

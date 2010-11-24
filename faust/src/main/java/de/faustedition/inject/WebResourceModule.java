@@ -10,20 +10,20 @@ import freemarker.template.Configuration;
 
 public class WebResourceModule extends AbstractModule {
 
-    @Override
-    protected void configure() {
-        bind(Configuration.class).to(TemplateConfiguration.class);
-        bind(Context.class).toProvider(newContextProvider());
-    }
+	@Override
+	protected void configure() {
+		bind(Configuration.class).to(TemplateConfiguration.class);
+		bind(Context.class).toProvider(newContextProvider());
+	}
 
-    protected Provider<Context> newContextProvider() {
-        return new Provider<Context>() {
+	protected Provider<Context> newContextProvider() {
+		return new Provider<Context>() {
 
-            @Override
-            public Context get() {
-                return Context.getCurrent();
-            }
-        };
-    }
+			@Override
+			public Context get() {
+				return Context.getCurrent();
+			}
+		};
+	}
 
 }

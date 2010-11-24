@@ -19,25 +19,25 @@ import freemarker.template.TemplateModelException;
 @Singleton
 public class TemplateConfiguration extends Configuration {
 
-    @Inject
-    public TemplateConfiguration(@Named("config") Properties configProps, @Named("template.home") String templateDirectory)
-            throws TemplateModelException, IOException {
-        super();
-        setTemplateLoader(new FileTemplateLoader(new File(templateDirectory)));
-        setAutoIncludes(Collections.singletonList("/header.ftl"));
-        setDefaultEncoding("UTF-8");
-        setOutputEncoding("UTF-8");
-        setURLEscapingCharset("UTF-8");
-        setStrictSyntaxMode(true);
-        setWhitespaceStripping(true);
-        setObjectWrapper(new TemplateObjectWrapper());
+	@Inject
+	public TemplateConfiguration(@Named("config") Properties configProps, @Named("template.home") String templateDirectory)
+			throws TemplateModelException, IOException {
+		super();
+		setTemplateLoader(new FileTemplateLoader(new File(templateDirectory)));
+		setAutoIncludes(Collections.singletonList("/header.ftl"));
+		setDefaultEncoding("UTF-8");
+		setOutputEncoding("UTF-8");
+		setURLEscapingCharset("UTF-8");
+		setStrictSyntaxMode(true);
+		setWhitespaceStripping(true);
+		setObjectWrapper(new TemplateObjectWrapper());
 
-        final Map<String, String> configuration = new HashMap<String, String>();
-        for (Enumeration<?> properties = configProps.propertyNames(); properties.hasMoreElements(); ) {
-            final String propertyName = (String) properties.nextElement();
-            configuration.put(propertyName, configProps.getProperty(propertyName));
-        }
-        setSharedVariable("config", configuration);
+		final Map<String, String> configuration = new HashMap<String, String>();
+		for (Enumeration<?> properties = configProps.propertyNames(); properties.hasMoreElements();) {
+			final String propertyName = (String) properties.nextElement();
+			configuration.put(propertyName, configProps.getProperty(propertyName));
+		}
+		setSharedVariable("config", configuration);
 
-    }
+	}
 }

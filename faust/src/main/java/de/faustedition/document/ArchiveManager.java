@@ -22,49 +22,50 @@ import de.faustedition.xml.XMLUtil;
 
 @Singleton
 public class ArchiveManager {
-    public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
-    
-    private final FaustGraph graph;
-    private final XMLStorage xml;
-    private final GraphDatabaseService db;
+	public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
 
-    @Inject
-    public ArchiveManager(FaustGraph graph, XMLStorage xml) {
-        this.graph = graph;
-        this.xml = xml;
-        this.db = graph.getGraphDatabaseService();
-    }
-    
-    @GraphDatabaseTransactional
-    public void synchronize() throws SAXException, IOException {
-        final ArchiveCollection archives = graph.getArchives();
-        final List<Archive> archivesList = archives.asList();
-        XMLUtil.saxParser().parse(xml.getInputSource(ARCHIVE_DESCRIPTOR_URI), new DefaultHandler() {
-            @Override
-            public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                if ("archive".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
-                    String id = attributes.getValue("id");
-                    if (id == null) {
-                        throw new SAXException("<f:archive/> without @id");
-                    }
-                    boolean found = false;
-                    for (Iterator<Archive> it = archivesList.iterator(); it.hasNext(); ) {
-                        if (id.equals(it.next().getId())) {
-                            found = true;
-                            it.remove();
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        archives.add(new Archive(db.createNode(), id));
-                    }
-                }
-            }
-        });
-        
-        for (Archive a : archivesList) {
-            archives.remove(a);
-            a.delete();
-        }
-    }
+	private final FaustGraph graph;
+	private final XMLStorage xml;
+	private final GraphDatabaseService db;
+
+	@Inject
+	public ArchiveManager(FaustGraph graph, XMLStorage xml) {
+		this.graph = graph;
+		this.xml = xml;
+		this.db = graph.getGraphDatabaseService();
+	}
+
+	@GraphDatabaseTransactional
+	public void synchronize() throws SAXException, IOException {
+		final ArchiveCollection archives = graph.getArchives();
+		final List<Archive> archivesList = archives.asList();
+		XMLUtil.saxParser().parse(xml.getInputSource(ARCHIVE_DESCRIPTOR_URI), new DefaultHandler() {
+			@Override
+			public void startElement(String uri, String localName, String qName, Attributes attributes)
+					throws SAXException {
+				if ("archive".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+					String id = attributes.getValue("id");
+					if (id == null) {
+						throw new SAXException("<f:archive/> without @id");
+					}
+					boolean found = false;
+					for (Iterator<Archive> it = archivesList.iterator(); it.hasNext();) {
+						if (id.equals(it.next().getId())) {
+							found = true;
+							it.remove();
+							break;
+						}
+					}
+					if (!found) {
+						archives.add(new Archive(db.createNode(), id));
+					}
+				}
+			}
+		});
+
+		for (Archive a : archivesList) {
+			archives.remove(a);
+			a.delete();
+		}
+	}
 }

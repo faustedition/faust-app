@@ -33,83 +33,84 @@ import de.faustedition.xml.XMLStorage;
 
 @Singleton
 public class TeiValidator {
-    private static final URL SCHEMA_RESOURCE = TeiValidator.class.getResource("/faust-tei.rng");
+	private static final URL SCHEMA_RESOURCE = TeiValidator.class.getResource("/faust-tei.rng");
 
-    private final XMLStorage xml;
-    private final Logger logger;
-    private final Schema schema;
+	private final XMLStorage xml;
+	private final Logger logger;
+	private final Schema schema;
 
-    @Inject
-    public TeiValidator(XMLStorage xml, Logger logger) throws IOException, SAXException, IncorrectSchemaException {
-        this.xml = xml;
-        this.logger = logger;
+	@Inject
+	public TeiValidator(XMLStorage xml, Logger logger) throws IOException, SAXException, IncorrectSchemaException {
+		this.xml = xml;
+		this.logger = logger;
 
-        final CustomErrorHandler errorHandler = new CustomErrorHandler();
+		final CustomErrorHandler errorHandler = new CustomErrorHandler();
 
-        final PropertyMapBuilder builder = errorHandler.configurationWithErrorHandler();
-        builder.put(ValidateProperty.XML_READER_CREATOR, new Sax2XMLReaderCreator());
+		final PropertyMapBuilder builder = errorHandler.configurationWithErrorHandler();
+		builder.put(ValidateProperty.XML_READER_CREATOR, new Sax2XMLReaderCreator());
 
-        this.schema = SAXSchemaReader.getInstance().createSchema(new InputSource(SCHEMA_RESOURCE.toString()),
-                builder.toPropertyMap());
-        Preconditions.checkState(errorHandler.getErrors().isEmpty(), "No errors in schema");
+		this.schema = SAXSchemaReader.getInstance().createSchema(new InputSource(SCHEMA_RESOURCE.toString()),
+				builder.toPropertyMap());
+		Preconditions.checkState(errorHandler.getErrors().isEmpty(), "No errors in schema");
 
-        logger.info("Initialized RelaxNG-based TEI validator from " + SCHEMA_RESOURCE);
-    }
+		logger.info("Initialized RelaxNG-based TEI validator from " + SCHEMA_RESOURCE);
+	}
 
-    public List<String> validate(FaustURI uri) throws SAXException, IOException {
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Validating via RelaxNG: " + uri);
-        }
-        final CustomErrorHandler errorHandler = new CustomErrorHandler();
-        final Validator validator = schema.createValidator(errorHandler.configurationWithErrorHandler().toPropertyMap());
+	public List<String> validate(FaustURI uri) throws SAXException, IOException {
+		if (logger.isLoggable(Level.FINE)) {
+			logger.fine("Validating via RelaxNG: " + uri);
+		}
+		final CustomErrorHandler errorHandler = new CustomErrorHandler();
+		final Validator validator = schema.createValidator(errorHandler.configurationWithErrorHandler().toPropertyMap());
 
-        final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-        xmlReader.setContentHandler(validator.getContentHandler());
-        xmlReader.parse(xml.getInputSource(uri));
+		final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+		xmlReader.setContentHandler(validator.getContentHandler());
+		xmlReader.parse(xml.getInputSource(uri));
 
-        return errorHandler.getErrors();
-    }
+		return errorHandler.getErrors();
+	}
 
-    public boolean isValid(FaustURI uri) throws SAXException, IOException {
-        return validate(uri).isEmpty();
-    }
+	public boolean isValid(FaustURI uri) throws SAXException, IOException {
+		return validate(uri).isEmpty();
+	}
 
-    private static class CustomErrorHandler implements ErrorHandler {
-        private static final Pattern XMLNS_ATTR_URI_PATTERN = Pattern.compile(Pattern.quote(XMLConstants.XMLNS_ATTRIBUTE_NS_URI));
+	private static class CustomErrorHandler implements ErrorHandler {
+		private static final Pattern XMLNS_ATTR_URI_PATTERN = Pattern.compile(Pattern
+				.quote(XMLConstants.XMLNS_ATTRIBUTE_NS_URI));
 
-        private List<String> errors = new ArrayList<String>();
+		private List<String> errors = new ArrayList<String>();
 
-        private List<String> getErrors() {
-            return errors;
-        }
+		private List<String> getErrors() {
+			return errors;
+		}
 
-        private PropertyMapBuilder configurationWithErrorHandler() {
-            PropertyMapBuilder builder = new PropertyMapBuilder();
-            builder.put(ValidateProperty.ERROR_HANDLER, this);
-            return builder;
-        }
+		private PropertyMapBuilder configurationWithErrorHandler() {
+			PropertyMapBuilder builder = new PropertyMapBuilder();
+			builder.put(ValidateProperty.ERROR_HANDLER, this);
+			return builder;
+		}
 
-        /**
-         * Filters namespace declaration related errors.
-         * 
-         * @param e
-         */
-        private void register(SAXParseException e) {
-            if (!XMLNS_ATTR_URI_PATTERN.matcher(e.getMessage()).find()) {
-                errors.add(String.format("[%d:%d] %s", e.getLineNumber(), e.getColumnNumber(), e.getMessage()));
-            }
-        }
+		/**
+		 * Filters namespace declaration related errors.
+		 * 
+		 * @param e
+		 */
+		private void register(SAXParseException e) {
+			if (!XMLNS_ATTR_URI_PATTERN.matcher(e.getMessage()).find()) {
+				errors.add(String.format("[%d:%d] %s", e.getLineNumber(), e.getColumnNumber(), e.getMessage()));
+			}
+		}
 
-        public void error(SAXParseException exception) throws SAXException {
-            register(exception);
-        }
+		public void error(SAXParseException exception) throws SAXException {
+			register(exception);
+		}
 
-        public void fatalError(SAXParseException exception) throws SAXException {
-            register(exception);
-        }
+		public void fatalError(SAXParseException exception) throws SAXException {
+			register(exception);
+		}
 
-        public void warning(SAXParseException exception) throws SAXException {
-            register(exception);
-        }
-    };
+		public void warning(SAXParseException exception) throws SAXException {
+			register(exception);
+		}
+	};
 }

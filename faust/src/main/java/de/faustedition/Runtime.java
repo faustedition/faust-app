@@ -14,124 +14,125 @@ import org.eclipse.jetty.util.log.Log;
 import de.faustedition.inject.FaustInjector;
 
 public abstract class Runtime implements Runnable {
-    public static void main(Class<? extends Runnable> clazz, String[] args) throws Exception {
-        Level logLevel = Level.WARNING;
-        for (String arg : args) {
-            if ("-debug".equalsIgnoreCase(arg)) {
-                logLevel = Level.ALL;
-            }
-        }
-        configureLogger(logLevel);
-        FaustInjector.getInstance().getInstance(clazz).run();
-    }
+	public static void main(Class<? extends Runnable> clazz, String[] args) throws Exception {
+		Level logLevel = Level.WARNING;
+		for (String arg : args) {
+			if ("-debug".equalsIgnoreCase(arg)) {
+				logLevel = Level.ALL;
+			}
+		}
+		configureLogger(logLevel);
+		FaustInjector.getInstance().getInstance(clazz).run();
+	}
 
-    public static void configureLogger(Level level) {
-        final ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleLogFormatter());
-        handler.setLevel(level);
+	public static void configureLogger(Level level) {
+		final ConsoleHandler handler = new ConsoleHandler();
+		handler.setFormatter(new SimpleLogFormatter());
+		handler.setLevel(level);
 
-        Logger rootLogger = Logger.getLogger("");
-        for (Handler prevHandler : rootLogger.getHandlers()) {
-            rootLogger.removeHandler(prevHandler);
-        }
-        rootLogger.addHandler(handler);
+		Logger rootLogger = Logger.getLogger("");
+		for (Handler prevHandler : rootLogger.getHandlers()) {
+			rootLogger.removeHandler(prevHandler);
+		}
+		rootLogger.addHandler(handler);
 
-        Log.setLog(new JettyRedirectingLogger());
-        for (String interestingLogger : new String[] { "de.faustedition", "com.google.inject", "org.restlet", "freemarker" }) {
-            Logger.getLogger(interestingLogger).setLevel(level);
-        }
-    }
+		Log.setLog(new JettyRedirectingLogger());
+		for (String interestingLogger : new String[] { "de.faustedition", "com.google.inject", "org.restlet", "freemarker" }) {
+			Logger.getLogger(interestingLogger).setLevel(level);
+		}
+	}
 
-    private static class SimpleLogFormatter extends Formatter {
+	private static class SimpleLogFormatter extends Formatter {
 
-        @Override
-        public String format(LogRecord record) {
-            StringBuilder msg = new StringBuilder();
-            msg.append(String.format("[%40.40s][%7s]: %s\n", record.getLoggerName(), record.getLevel(), record.getMessage()));
-            if (record.getThrown() != null) {
-                try {
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    record.getThrown().printStackTrace(pw);
-                    pw.close();
-                    msg.append(sw.toString());
-                } catch (Exception ex) {
-                }
-            }
-            return msg.toString();
-        }
+		@Override
+		public String format(LogRecord record) {
+			StringBuilder msg = new StringBuilder();
+			msg.append(String.format("[%40.40s][%7s]: %s\n", record.getLoggerName(), record.getLevel(),
+					record.getMessage()));
+			if (record.getThrown() != null) {
+				try {
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					record.getThrown().printStackTrace(pw);
+					pw.close();
+					msg.append(sw.toString());
+				} catch (Exception ex) {
+				}
+			}
+			return msg.toString();
+		}
 
-    }
+	}
 
-    private static class JettyRedirectingLogger implements org.eclipse.jetty.util.log.Logger {
-        private final Logger logger;
+	private static class JettyRedirectingLogger implements org.eclipse.jetty.util.log.Logger {
+		private final Logger logger;
 
-        private JettyRedirectingLogger() {
-            this(Logger.getLogger("org.eclipse.jetty"));
-        }
+		private JettyRedirectingLogger() {
+			this(Logger.getLogger("org.eclipse.jetty"));
+		}
 
-        private JettyRedirectingLogger(Logger logger) {
-            this.logger = logger;
-        }
+		private JettyRedirectingLogger(Logger logger) {
+			this.logger = logger;
+		}
 
-        @Override
-        public boolean isDebugEnabled() {
-            return logger.isLoggable(Level.FINE);
-        }
+		@Override
+		public boolean isDebugEnabled() {
+			return logger.isLoggable(Level.FINE);
+		}
 
-        @Override
-        public void setDebugEnabled(boolean enabled) {
-        }
+		@Override
+		public void setDebugEnabled(boolean enabled) {
+		}
 
-        @Override
-        public void info(String msg) {
-            logger.info(msg);
-        }
+		@Override
+		public void info(String msg) {
+			logger.info(msg);
+		}
 
-        @Override
-        public void info(String msg, Object arg0, Object arg1) {
-            logger.log(Level.INFO, msg, new Object[] { arg0, arg1 });
-        }
+		@Override
+		public void info(String msg, Object arg0, Object arg1) {
+			logger.log(Level.INFO, msg, new Object[] { arg0, arg1 });
+		}
 
-        @Override
-        public void debug(String msg) {
-            logger.fine(msg);
-        }
+		@Override
+		public void debug(String msg) {
+			logger.fine(msg);
+		}
 
-        @Override
-        public void debug(String msg, Throwable th) {
-            logger.log(Level.FINE, msg, th);
+		@Override
+		public void debug(String msg, Throwable th) {
+			logger.log(Level.FINE, msg, th);
 
-        }
+		}
 
-        @Override
-        public void debug(String msg, Object arg0, Object arg1) {
-            logger.log(Level.FINE, msg, new Object[] { arg0, arg1 });
-        }
+		@Override
+		public void debug(String msg, Object arg0, Object arg1) {
+			logger.log(Level.FINE, msg, new Object[] { arg0, arg1 });
+		}
 
-        @Override
-        public void warn(String msg) {
-            logger.warning(msg);
-        }
+		@Override
+		public void warn(String msg) {
+			logger.warning(msg);
+		}
 
-        @Override
-        public void warn(String msg, Object arg0, Object arg1) {
-            logger.log(Level.WARNING, msg, new Object[] { arg0, arg1 });
-        }
+		@Override
+		public void warn(String msg, Object arg0, Object arg1) {
+			logger.log(Level.WARNING, msg, new Object[] { arg0, arg1 });
+		}
 
-        @Override
-        public void warn(String msg, Throwable th) {
-            logger.log(Level.WARNING, msg, th);
-        }
+		@Override
+		public void warn(String msg, Throwable th) {
+			logger.log(Level.WARNING, msg, th);
+		}
 
-        @Override
-        public org.eclipse.jetty.util.log.Logger getLogger(String name) {
-            return new JettyRedirectingLogger(Logger.getLogger(logger.getName() + "." + name));
-        }
+		@Override
+		public org.eclipse.jetty.util.log.Logger getLogger(String name) {
+			return new JettyRedirectingLogger(Logger.getLogger(logger.getName() + "." + name));
+		}
 
-        @Override
-        public String getName() {
-            return logger.getName();
-        }
-    }
+		@Override
+		public String getName() {
+			return logger.getName();
+		}
+	}
 }

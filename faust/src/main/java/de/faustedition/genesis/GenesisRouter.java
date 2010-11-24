@@ -11,10 +11,10 @@ import de.faustedition.inject.InjectorFinder;
 @Singleton
 public class GenesisRouter extends Router {
 
-    @Inject
-    public GenesisRouter(Injector injector) {
-        attach("chart.png", new InjectorFinder(injector, GenesisSampleChartResource.class));
-        attach("", new InjectorFinder(injector, GenesisSampleResource.class));
-    }
+	@Inject
+	public GenesisRouter(Injector injector) {
+		attach("chart.png", new InjectorFinder(injector, GenesisSampleChartResource.class));
+		attach("", new InjectorFinder(injector, GenesisSampleResource.class));
+	}
 
 }

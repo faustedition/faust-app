@@ -11,9 +11,9 @@ import de.faustedition.template.TemplateFinder;
 @Singleton
 public class DocumentRouter extends Router {
 
-    @Inject
-    public DocumentRouter(TemplateFinder templateFinder, DocumentFinder documentFinder) {
-        attach("styles", templateFinder);
-        attach(documentFinder, Template.MODE_STARTS_WITH);
-    }
+	@Inject
+	public DocumentRouter(TemplateFinder templateFinder, DocumentFinder documentFinder) {
+		attach("styles", templateFinder);
+		attach(documentFinder, Template.MODE_STARTS_WITH);
+	}
 }

@@ -24,144 +24,146 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 public class XMLDatabase implements Iterable<URI> {
-    public static final String EXIST_NS_URI = "http://exist.sourceforge.net/NS/exist";
-    private static final URI WITNESS_BASE = URI.create("Witness/");
+	public static final String EXIST_NS_URI = "http://exist.sourceforge.net/NS/exist";
+	private static final URI WITNESS_BASE = URI.create("Witness/");
 
-    private final URI base;
-    private final String dbUser;
-    private final String dbPassword;
-    private final Logger logger;
-    public static final String EXIST_NS_PREFIX = "exist";
+	private final URI base;
+	private final String dbUser;
+	private final String dbPassword;
+	private final Logger logger;
+	public static final String EXIST_NS_PREFIX = "exist";
 
-    @Inject
-    public XMLDatabase(@Named("xmldb.base") String baseUri, @Named("xmldb.user") String dbUser,
-            @Named("xmldb.password") String dbPassword, Logger logger) {
-        this.base = URI.create(baseUri);
-        this.dbUser = dbUser;
-        this.dbPassword = dbPassword;
-        this.logger = logger;
-    }
+	@Inject
+	public XMLDatabase(@Named("xmldb.base") String baseUri, @Named("xmldb.user") String dbUser,
+			@Named("xmldb.password") String dbPassword, Logger logger) {
+		this.base = URI.create(baseUri);
+		this.dbUser = dbUser;
+		this.dbPassword = dbPassword;
+		this.logger = logger;
+	}
 
-    public Document get(URI uri) throws IOException {
-        logger.fine(String.format("Getting XML resource from XML-DB: %s", uri.toString()));
-        DomRepresentation representation = createClientResource(uri).get(DomRepresentation.class);
-        representation.setNamespaceAware(true);
-        return representation.getDocument();
-    }
+	public Document get(URI uri) throws IOException {
+		logger.fine(String.format("Getting XML resource from XML-DB: %s", uri.toString()));
+		DomRepresentation representation = createClientResource(uri).get(DomRepresentation.class);
+		representation.setNamespaceAware(true);
+		return representation.getDocument();
+	}
 
-    public void put(URI uri, Document document) {
-        logger.fine(String.format("Putting XML document to XML-DB: %s", uri.toString()));
-        createClientResource(uri).put(document);
-    }
+	public void put(URI uri, Document document) {
+		logger.fine(String.format("Putting XML document to XML-DB: %s", uri.toString()));
+		createClientResource(uri).put(document);
+	}
 
-    public void delete(URI uri) {
-        logger.fine(String.format("Deleting URI in XML-DB: %s", uri.toString()));
-        createClientResource(uri).delete();
-    }
+	public void delete(URI uri) {
+		logger.fine(String.format("Deleting URI in XML-DB: %s", uri.toString()));
+		createClientResource(uri).delete();
+	}
 
-    public SortedSet<URI> list(URI uri) throws IOException {
-        try {
-            SortedSet<URI> contents = new TreeSet<URI>();
-            if (!isCollection(uri)) {
-                return contents;
-            }
+	public SortedSet<URI> list(URI uri) throws IOException {
+		try {
+			SortedSet<URI> contents = new TreeSet<URI>();
+			if (!isCollection(uri)) {
+				return contents;
+			}
 
-            XPathExpression contentXP = xpath("//exist:result/exist:collection/*", CustomNamespaceContext.INSTANCE);
-            for (Element content : new NodeListWrapper<Element>(contentXP, get(uri))) {
-                if (!EXIST_NS_URI.equals(content.getNamespaceURI())) {
-                    continue;
-                }
+			XPathExpression contentXP = xpath("//exist:result/exist:collection/*", CustomNamespaceContext.INSTANCE);
+			for (Element content : new NodeListWrapper<Element>(contentXP, get(uri))) {
+				if (!EXIST_NS_URI.equals(content.getNamespaceURI())) {
+					continue;
+				}
 
-                String localName = content.getLocalName();
-                if ("collection".equals(localName)) {
-                    contents.add(uri.resolve(content.getAttribute("name") + "/"));
-                } else if ("resource".equals(localName)) {
-                    contents.add(uri.resolve(content.getAttribute("name")));
-                }
-            }
-            return contents;
-        } catch (XPathExpressionException e) {
-            throw new RuntimeException(e);
-        }
-    }
+				String localName = content.getLocalName();
+				if ("collection".equals(localName)) {
+					contents.add(uri.resolve(content.getAttribute("name") + "/"));
+				} else if ("resource".equals(localName)) {
+					contents.add(uri.resolve(content.getAttribute("name")));
+				}
+			}
+			return contents;
+		} catch (XPathExpressionException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    public Iterator<URI> iterator() {
-        try {
-            SortedSet<URI> contents = new TreeSet<URI>();
-            for (Element resource : new NodeListWrapper<Element>(xpath("//f:resource"), get(URI.create("Query/Resources.xq")))) {
-                contents.add(URI.create(resource.getTextContent()));
-            }
-            return contents.iterator();
-        } catch (XPathExpressionException e) {
-            throw new RuntimeException(e);
-        } catch (DOMException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	public Iterator<URI> iterator() {
+		try {
+			SortedSet<URI> contents = new TreeSet<URI>();
+			for (Element resource : new NodeListWrapper<Element>(xpath("//f:resource"),
+					get(URI.create("Query/Resources.xq")))) {
+				contents.add(URI.create(resource.getTextContent()));
+			}
+			return contents.iterator();
+		} catch (XPathExpressionException e) {
+			throw new RuntimeException(e);
+		} catch (DOMException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    public Document facsimileReferences() throws IOException {
-        return get(URI.create("Query/FacsimileRefs.xq"));
-    }
+	public Document facsimileReferences() throws IOException {
+		return get(URI.create("Query/FacsimileRefs.xq"));
+	}
 
-    public Document encodingStati() throws IOException {
-        return get(URI.create("Query/EncodingStati.xq"));
-    }
+	public Document encodingStati() throws IOException {
+		return get(URI.create("Query/EncodingStati.xq"));
+	}
 
-    public Document identifiers() throws IOException {
-        return get(URI.create("Query/Identifiers.xq"));
-    }
+	public Document identifiers() throws IOException {
+		return get(URI.create("Query/Identifiers.xq"));
+	}
 
-    protected ClientResource createClientResource(URI uri) {
-        ClientResource resource = new ClientResource(relativize(uri));
-        resource.setChallengeResponse(ChallengeScheme.HTTP_BASIC, dbUser, dbPassword);
-        return resource;
-    }
+	protected ClientResource createClientResource(URI uri) {
+		ClientResource resource = new ClientResource(relativize(uri));
+		resource.setChallengeResponse(ChallengeScheme.HTTP_BASIC, dbUser, dbPassword);
+		return resource;
+	}
 
-    protected boolean isCollection(URI uri) {
-        return (uri.getPath() == null || uri.getPath().length() == 0) || uri.getPath().endsWith("/");
-    }
+	protected boolean isCollection(URI uri) {
+		return (uri.getPath() == null || uri.getPath().length() == 0) || uri.getPath().endsWith("/");
+	}
 
-    protected URI relativize(URI uri) {
-        Preconditions.checkArgument(!uri.isAbsolute()
-                && (uri.getPath() == null || uri.getPath().length() == 0 || !uri.getPath().startsWith("/")));
-        return base.resolve(uri);
-    }
+	protected URI relativize(URI uri) {
+		Preconditions.checkArgument(!uri.isAbsolute()
+				&& (uri.getPath() == null || uri.getPath().length() == 0 || !uri.getPath().startsWith("/")));
+		return base.resolve(uri);
+	}
 
-    public boolean isWitnessEncodingDocument(URI uri) {
-        final String path = uri.getPath();
-        final int extensionIndex = path.lastIndexOf(".");
-        return extensionIndex >= 0 && path.startsWith(WITNESS_BASE.getPath()) && "xml".equals(path.substring(extensionIndex));
-    }
+	public boolean isWitnessEncodingDocument(URI uri) {
+		final String path = uri.getPath();
+		final int extensionIndex = path.lastIndexOf(".");
+		return extensionIndex >= 0 && path.startsWith(WITNESS_BASE.getPath())
+				&& "xml".equals(path.substring(extensionIndex));
+	}
 
-    public boolean isDocumentEncodingDocument(URI uri) {
-        return isWitnessEncodingDocument(uri) && !isTextEncodingDocument(uri);
-    }
+	public boolean isDocumentEncodingDocument(URI uri) {
+		return isWitnessEncodingDocument(uri) && !isTextEncodingDocument(uri);
+	}
 
-    public boolean isTextEncodingDocument(URI uri) {
-        if (!isWitnessEncodingDocument(uri)) {
-            return false;
-        }
-        final String uriPath = uri.getPath().replaceAll("/+", "/");
+	public boolean isTextEncodingDocument(URI uri) {
+		if (!isWitnessEncodingDocument(uri)) {
+			return false;
+		}
+		final String uriPath = uri.getPath().replaceAll("/+", "/");
 
-        final int basenameStart = uriPath.lastIndexOf("/");
-        if (basenameStart < 0) {
-            return false;
-        }
+		final int basenameStart = uriPath.lastIndexOf("/");
+		if (basenameStart < 0) {
+			return false;
+		}
 
-        final int folderNameStart = uriPath.lastIndexOf("/", basenameStart);
-        if (folderNameStart < 0) {
-            return false;
-        }
+		final int folderNameStart = uriPath.lastIndexOf("/", basenameStart);
+		if (folderNameStart < 0) {
+			return false;
+		}
 
-        final int basenameEnd = uriPath.lastIndexOf(".");
-        if (basenameEnd < 0 || basenameEnd < basenameStart || !uriPath.substring(basenameEnd).equalsIgnoreCase(".xml")) {
-            return false;
-        }
+		final int basenameEnd = uriPath.lastIndexOf(".");
+		if (basenameEnd < 0 || basenameEnd < basenameStart || !uriPath.substring(basenameEnd).equalsIgnoreCase(".xml")) {
+			return false;
+		}
 
-        final String basename = uriPath.substring(basenameStart + 1, basenameEnd);
-        final String folderName = uriPath.substring(folderNameStart + 1, basenameStart);
-        return basename.equalsIgnoreCase(folderName);
-    }
+		final String basename = uriPath.substring(basenameStart + 1, basenameEnd);
+		final String folderName = uriPath.substring(folderNameStart + 1, basenameStart);
+		return basename.equalsIgnoreCase(folderName);
+	}
 }

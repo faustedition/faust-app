@@ -8,20 +8,20 @@ import freemarker.template.TemplateModelException;
 
 public class TemplateObjectWrapper extends DefaultObjectWrapper {
 
-    @Override
-    public TemplateModel wrap(Object obj) throws TemplateModelException {
-        if (obj instanceof NodeWrapperCollection) {
-            return new NodeWrapperCollectionTemplateModel((NodeWrapperCollection<?>) obj);
-        }
-        return super.wrap(obj);
-    }
+	@Override
+	public TemplateModel wrap(Object obj) throws TemplateModelException {
+		if (obj instanceof NodeWrapperCollection) {
+			return new NodeWrapperCollectionTemplateModel((NodeWrapperCollection<?>) obj);
+		}
+		return super.wrap(obj);
+	}
 
-    @SuppressWarnings("rawtypes")
-    @Override
-    public Object unwrap(TemplateModel model, Class hint) throws TemplateModelException {
-        if (model instanceof NodeWrapperCollectionTemplateModel) {
-            return ((NodeWrapperCollectionTemplateModel) model).getCollection();
-        }
-        return super.unwrap(model, hint);
-    }
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Object unwrap(TemplateModel model, Class hint) throws TemplateModelException {
+		if (model instanceof NodeWrapperCollectionTemplateModel) {
+			return ((NodeWrapperCollectionTemplateModel) model).getCollection();
+		}
+		return super.unwrap(model, hint);
+	}
 }

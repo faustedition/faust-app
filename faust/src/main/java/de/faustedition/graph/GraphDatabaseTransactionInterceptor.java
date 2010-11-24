@@ -12,53 +12,54 @@ import com.google.inject.Inject;
 
 public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
 
-    private GraphDatabaseService db;
+	private GraphDatabaseService db;
 
-    @Inject
-    private Logger logger;
+	@Inject
+	private Logger logger;
 
-    @Inject
-    public void setGraph(FaustGraph graph) {
-        this.db = graph.getGraphDatabaseService();
-    }
+	@Inject
+	public void setGraph(FaustGraph graph) {
+		this.db = graph.getGraphDatabaseService();
+	}
 
-    @Override
-    public Object invoke(MethodInvocation invocation) throws Throwable {
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Starting graph database transaction");
-        }
-        Transaction tx = db.beginTx();
-        try {
-            Object returnValue = invocation.proceed();
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Commiting graph database transaction");
-            }
-            tx.success();
-            return returnValue;
-        } catch (Throwable e) {
-            final GraphDatabaseTransactional txAnnotation = invocation.getMethod().getAnnotation(GraphDatabaseTransactional.class);
-            boolean successfulException = false;
-            final Class<? extends Throwable> thrownType = e.getClass();
-            for (Class<? extends Throwable> successfulType : txAnnotation.successfulExceptions()) {
-                if (successfulType.isAssignableFrom(thrownType)) {
-                    successfulException = true;
-                    break;
-                }
-            }
-            if (successfulException) {
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Commiting graph database transaction");
-                }
-                tx.success();
-            } else {
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.fine("Rolling back graph database transaction after exception throw of " + e);
-                }
-                tx.failure();
-            }
-            throw e;
-        } finally {
-            tx.finish();
-        }
-    }
+	@Override
+	public Object invoke(MethodInvocation invocation) throws Throwable {
+		if (logger.isLoggable(Level.FINE)) {
+			logger.fine("Starting graph database transaction");
+		}
+		Transaction tx = db.beginTx();
+		try {
+			Object returnValue = invocation.proceed();
+			if (logger.isLoggable(Level.FINE)) {
+				logger.fine("Commiting graph database transaction");
+			}
+			tx.success();
+			return returnValue;
+		} catch (Throwable e) {
+			final GraphDatabaseTransactional txAnnotation = invocation.getMethod().getAnnotation(
+					GraphDatabaseTransactional.class);
+			boolean successfulException = false;
+			final Class<? extends Throwable> thrownType = e.getClass();
+			for (Class<? extends Throwable> successfulType : txAnnotation.successfulExceptions()) {
+				if (successfulType.isAssignableFrom(thrownType)) {
+					successfulException = true;
+					break;
+				}
+			}
+			if (successfulException) {
+				if (logger.isLoggable(Level.FINE)) {
+					logger.fine("Commiting graph database transaction");
+				}
+				tx.success();
+			} else {
+				if (logger.isLoggable(Level.FINE)) {
+					logger.fine("Rolling back graph database transaction after exception throw of " + e);
+				}
+				tx.failure();
+			}
+			throw e;
+		} finally {
+			tx.finish();
+		}
+	}
 }
