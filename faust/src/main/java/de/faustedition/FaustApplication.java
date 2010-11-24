@@ -33,6 +33,7 @@ import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.security.SecurityConstants;
 import de.faustedition.template.TemplateFinder;
 import de.faustedition.transcript.TranscriptFinder;
+import de.faustedition.xml.XMLFinder;
 
 @Singleton
 public class FaustApplication extends Application {
@@ -42,6 +43,7 @@ public class FaustApplication extends Application {
 	private final DocumentRouter documentRouter;
 	private final GenesisRouter genesisRouter;
 	private final TranscriptFinder transcriptFinder;
+	private final XMLFinder xmlFinder;
 	private final LdapSecurityStore ldapSecurityStore;
 	private final RuntimeMode runtimeMode;
 
@@ -52,6 +54,7 @@ public class FaustApplication extends Application {
 			DocumentRouter documentRouter,//
 			GenesisRouter genesisRouter,//
 			TranscriptFinder transcriptFinder,//
+			XMLFinder xmlFinder,//
 			TemplateFinder templateFinder,//
 			LdapSecurityStore ldapSecurityStore) {
 		this.runtimeMode = runtimeMode;
@@ -60,6 +63,7 @@ public class FaustApplication extends Application {
 		this.documentRouter = documentRouter;
 		this.genesisRouter = genesisRouter;
 		this.transcriptFinder = transcriptFinder;
+		this.xmlFinder = xmlFinder;
 		this.templateFinder = templateFinder;
 		this.ldapSecurityStore = ldapSecurityStore;
 	}
@@ -78,6 +82,7 @@ public class FaustApplication extends Application {
 		router.attach("genesis/", secured(genesisRouter));
 		router.attach("text/", secured(templateFinder));
 		router.attach("transcript/", secured(transcriptFinder));
+		router.attach("xml/", secured(xmlFinder));
 
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
