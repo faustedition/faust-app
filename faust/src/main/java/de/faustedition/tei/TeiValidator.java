@@ -92,6 +92,7 @@ public class TeiValidator extends Runtime {
 
 	public static void main(String[] args) throws Exception {
 		main(TeiValidator.class, args);
+		System.exit(0);
 	}
 
 	@Override
@@ -140,10 +141,8 @@ public class TeiValidator extends Runtime {
 					}
 				}
 			});
-			System.exit(0);
 		} catch (EmailException e) {
 			e.printStackTrace();
-			System.exit(1);
 		}
 	}
 
