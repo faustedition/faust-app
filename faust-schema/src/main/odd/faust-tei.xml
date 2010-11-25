@@ -45,6 +45,7 @@
 					<moduleRef key="gaiji"/>
 					<moduleRef key="namesdates"/>
 					<moduleRef key="figures"/>
+					<moduleRef key="corpus"/>
 					<moduleRef url="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/svg11.rng">
 						<content>
 							<rng:define name="tei_model.graphicLike" combine="choice">
@@ -87,29 +88,57 @@
 						<desc>Definiert die Ausdehnung eines graphischen Elements.</desc>
 						<attList>
 							<attDef ident="left" ns="http://www.faustedition.net/ns" usage="opt">
-								<desc>Zeiger auf ein Element, mit dem die linke Kante des attribuierten Elements aligniert werden
-									soll.</desc>
+								<desc>Zeiger auf ein Element, mit dessen linker Kante die linke Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="left-right" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen rechte Kante die linke Kante des attribuierten Elements
+									aligniert werden soll.</desc>
 								<datatype minOccurs="1" maxOccurs="1">
 									<rng:ref name="data.pointer"/>
 								</datatype>
 							</attDef>
 							<attDef ident="right" ns="http://www.faustedition.net/ns" usage="opt">
-								<desc>Zeiger auf ein Element, mit dem die rechte Kante des attribuierten Elements aligniert werden
-									soll.</desc>
+								<desc>Zeiger auf ein Element, mit dessen rechter Kante die rechte Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="right-left" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen linker Kante die rechte Kante des attribuierten Elements
+									aligniert werden soll.</desc>
 								<datatype minOccurs="1" maxOccurs="1">
 									<rng:ref name="data.pointer"/>
 								</datatype>
 							</attDef>
 							<attDef ident="top" ns="http://www.faustedition.net/ns" usage="opt">
-								<desc>Zeiger auf ein Element, mit dem die obere Kante des attribuierten Elements aligniert werden
-									soll.</desc>
+								<desc>Zeiger auf ein Element, mit dessen oberer Kante die obere Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="top-bottom" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen unterer Kante die obere Kante des attribuierten Elements
+									aligniert werden soll.</desc>
 								<datatype minOccurs="1" maxOccurs="1">
 									<rng:ref name="data.pointer"/>
 								</datatype>
 							</attDef>
 							<attDef ident="bottom" ns="http://www.faustedition.net/ns" usage="opt">
-								<desc>Zeiger auf ein Element, mit dem die untere Kante des attribuierten Elements aligniert werden
-									soll.</desc>
+								<desc>Zeiger auf ein Element, mit dessen unterer Kante die untere Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="bottom-top" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen oberer Kante die untere Kante des attribuierten Elements
+									aligniert werden soll.</desc>
 								<datatype minOccurs="1" maxOccurs="1">
 									<rng:ref name="data.pointer"/>
 								</datatype>
@@ -200,7 +229,7 @@
 									<valItem ident="right">
 										<gloss>rechtsbündige Ausrichtung</gloss>
 									</valItem>
-									<valItem ident="center">
+									<valItem ident="centered">
 										<gloss>zentrierte Ausrichtung</gloss>
 									</valItem>
 									<valItem ident="inline">
@@ -209,8 +238,14 @@
 									<valItem ident="underline">
 										<gloss>unterstrichen</gloss>
 									</valItem>
+									<valItem ident="underdots">
+										<gloss>unterpungiert</gloss>
+									</valItem>
 									<valItem ident="double">
-										<gloss>doppelte/mehrfach, z. B. bei Streichungen</gloss>
+										<gloss>doppelt, z. B. bei Streichungen</gloss>
+									</valItem>
+									<valItem ident="multiple">
+										<gloss>mehrfach, z. B. bei Streichungen</gloss>
 									</valItem>
 									<valItem ident="vertical">
 										<gloss>vertikal, z. B. vertikal durchgestrichen</gloss>
@@ -218,11 +253,45 @@
 									<valItem ident="erase">
 										<gloss>Rasur</gloss>
 									</valItem>
+									<valItem ident="sub">
+										<gloss>hochgestellt</gloss>
+									</valItem>
+									<valItem ident="sup">
+										<gloss>tiefgestellt</gloss>
+									</valItem>
+									<valItem ident="font-big">
+										<gloss>große Schrift</gloss>
+									</valItem>
+									<valItem ident="font-small">
+										<gloss>kleine Schrift</gloss>
+									</valItem>
+									<valItem ident="indent-10">
+										<gloss>10% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-20">
+										<gloss>20% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-30">
+										<gloss>30% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-40">
+										<gloss>40% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-50">
+										<gloss>50% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-60">
+										<gloss>60% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-70">
+										<gloss>70% eingerückt</gloss>
+									</valItem>
+
 								</valList>
 							</attDef>
-						</attList>						
+						</attList>
 					</classSpec>
-										
+
 					<!-- =============== Content models for the documentary view =============== -->
 
 					<classSpec ident="model.zonePart" type="model" mode="add">
@@ -272,6 +341,28 @@
 							<memberOf key="att.transcriptional"/>
 							<memberOf key="att.graphicOrientation"/>
 							<memberOf key="att.graphicStyle"/>
+						</classes>
+					</elementSpec>
+
+					<elementSpec ident="hspace" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Kodiert horizontales Spatium</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.dimensions"/>
+						</classes>
+					</elementSpec>
+
+					<elementSpec ident="vspace" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Kodiert vertikales Spatium</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.dimensions"/>
 						</classes>
 					</elementSpec>
 
@@ -592,8 +683,12 @@
 							<memberOf key="att.global"/>
 						</classes>
 						<content>
+							<!-- MODIFIED for Faust -->
 							<rng:oneOrMore>
-								<rng:ref name="transpose"/>
+								<rng:choice>
+									<rng:ref name="transpose"/>
+									<rng:ref name="undo"/>
+								</rng:choice>
 							</rng:oneOrMore>
 						</content>
 					</elementSpec>
