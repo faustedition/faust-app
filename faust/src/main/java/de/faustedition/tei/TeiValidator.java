@@ -90,7 +90,7 @@ public class TeiValidator extends Runtime {
 		return validate(uri).isEmpty();
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		main(TeiValidator.class, args);
 		System.exit(0);
 	}

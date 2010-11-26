@@ -21,7 +21,7 @@ public abstract class Runtime implements Runnable {
 	private static Logger log = Logger.getLogger(Runtime.class.getName());
 	private static Level logLevel = Level.WARNING;
 
-	public static void main(Class<? extends Runnable> clazz, String[] args) throws Exception {
+	public static void main(Class<? extends Runnable> clazz, String[] args) {
 		for (String arg : args) {
 			if ("-debug".equalsIgnoreCase(arg)) {
 				logLevel = Level.ALL;

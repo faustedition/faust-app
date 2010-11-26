@@ -15,6 +15,7 @@ import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.SAXException;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
@@ -25,6 +26,7 @@ import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
 
+@Singleton
 public class TeiTemplater extends Runtime {
 	private static final FaustURI TEMPLATE_SOURCE = new FaustURI(FaustAuthority.XML, "/template/tei.xml");
 	private final XMLStorage xml;
@@ -85,16 +87,16 @@ public class TeiTemplater extends Runtime {
 					logger.log(Level.FINE, "XML error while templating " + source, e);
 				} catch (IOException e) {
 					logger.log(Level.FINE, "I/O error while templating " + source, e);
+				} catch (TransformerException e) {
+					logger.log(Level.SEVERE, "XML serialization error while templating " + source, e);
 				}
 			}
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "I/O error while initializing TEI template " + TEMPLATE_SOURCE);
+			logger.log(Level.SEVERE, "I/O error while initializing TEI template " + TEMPLATE_SOURCE, e);
 		} catch (SAXException e) {
-			logger.log(Level.SEVERE, "XML error while initializing TEI template " + TEMPLATE_SOURCE);
+			logger.log(Level.SEVERE, "XML error while initializing TEI template " + TEMPLATE_SOURCE, e);
 		} catch (XPathExpressionException e) {
-			throw new RuntimeException(e);
-		} catch (TransformerException e) {
-			throw new RuntimeException(e);
+			logger.log(Level.SEVERE, "XPath error while templating TEI documents", e);
 		}
 
 	}
