@@ -115,7 +115,7 @@ public class TeiValidator extends Runtime {
 			}
 
 			if (xmlErrors.isEmpty() && teiErrors.isEmpty()) {
-				System.exit(0);
+				return;
 			}
 
 			reporter.send("TEI validation report", new ReportCreator() {
