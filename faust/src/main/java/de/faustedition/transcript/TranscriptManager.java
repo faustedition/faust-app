@@ -13,15 +13,18 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -29,11 +32,13 @@ import com.google.inject.Singleton;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.GraphDatabaseTransactional;
+import de.faustedition.tei.WhitespaceUtil;
 import de.faustedition.transcript.Transcript.Type;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.MultiplexingContentHandler;
 import de.faustedition.xml.XMLFragmentFilter;
 import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 
 @Singleton
 public class TranscriptManager {
@@ -52,7 +57,7 @@ public class TranscriptManager {
 	}
 
 	@GraphDatabaseTransactional
-	public Iterable<Transcript> add(FaustURI source) throws SAXException, IOException {
+	public Iterable<Transcript> add(FaustURI source) throws SAXException, IOException, TransformerException {
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Adding transcripts for " + source);
 		}
@@ -65,12 +70,13 @@ public class TranscriptManager {
 
 		final FacsimileReferenceExtractionHandler facsRefHandler = new FacsimileReferenceExtractionHandler(source);
 
-		XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-		xmlReader.setFeature("http://xml.org/sax/features/namespaces", true);
-		xmlReader.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
-		xmlReader.setContentHandler(new MultiplexingContentHandler(docFragmentFilter, textFragmentFilter, facsRefHandler));
-		xmlReader.parse(xml.getInputSource(source));
-
+		final Document document = XMLUtil.parse(xml.getInputSource(source));
+		WhitespaceUtil.normalize(document);
+		document.normalizeDocument();
+		
+		final SAXResult pipeline = new SAXResult(new MultiplexingContentHandler(docFragmentFilter, textFragmentFilter, facsRefHandler));
+		XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), pipeline);
+		
 		Set<Transcript> transcripts = new HashSet<Transcript>();
 		final Element documentRoot = documentHandler.result();
 		if (logger.isLoggable(Level.FINE)) {

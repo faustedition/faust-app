@@ -113,13 +113,26 @@ public class XMLUtil {
 	public static void serialize(Node node, File file) throws TransformerException {
 		transformerFactory().newTransformer().transform(new DOMSource(node), new StreamResult(file));
 	}
-	
+
 	public static String toString(Node node) throws TransformerException {
 		StringWriter out = new StringWriter();
 		serialize(node, out);
 		return out.toString();
 	}
 
+	public static boolean isSpacePreserved(Node node) {
+		if (node == null) {
+			return false;
+		}
+		if (node.getNodeType() == Node.ELEMENT_NODE) {
+			final String spaceAttr = ((Element)node).getAttributeNS(XMLConstants.XML_NS_URI, "space");
+			if (spaceAttr != null) {
+				return ("preserve".equals(spaceAttr));
+			}
+		}
+		return isSpacePreserved(node.getParentNode());
+	}
+	
 	public static Document parse(InputStream inputStream) throws SAXException, IOException {
 		return documentBuilder().parse(inputStream);
 	}

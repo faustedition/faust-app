@@ -5,6 +5,8 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.transform.TransformerException;
+
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Joiner;
@@ -51,7 +53,7 @@ public class DataImport extends Runtime implements Runnable {
 			logger.info("Importing archives");
 			archiveManager.synchronize();
 
-			logger.info("Importing sample transcriptions");
+			logger.info("Importing transcriptions");
 			for (FaustURI transcript : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
 				try {
 					logger.info("Importing transcript " + transcript);
@@ -59,6 +61,9 @@ public class DataImport extends Runtime implements Runnable {
 				} catch (SAXException e) {
 					logger.log(Level.SEVERE, "XML error while adding transcript " + transcript, e);
 					failed.add(transcript);
+				} catch (TransformerException e) {
+					logger.log(Level.SEVERE, "XML error while adding transcript " + transcript, e);
+					failed.add(transcript);					
 				}
 			}
 
