@@ -1,11 +1,21 @@
 package de.faustedition.transcript;
 
+import org.goddag4j.Element;
+import org.goddag4j.GoddagNode;
+import org.goddag4j.GoddagTreeNode;
 import org.goddag4j.MultiRootedTree;
+import org.goddag4j.Text;
+import org.goddag4j.token.WhitespaceTokenMarkupGenerator;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.helpers.Predicate;
+import org.neo4j.helpers.collection.FilteringIterable;
+import org.neo4j.helpers.collection.IterableWrapper;
 
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.graph.NodeWrapper;
 
 public abstract class Transcript extends NodeWrapper {
@@ -26,10 +36,11 @@ public abstract class Transcript extends NodeWrapper {
 		this.trees = new MultiRootedTree(node, MARKUP_VIEW_RT);
 	}
 
-	protected Transcript(Node node, Type type, FaustURI source) {
-		this(node);
+	protected Transcript(GraphDatabaseService db, Type type, FaustURI source, Element root) {
+		this(db.createNode());
 		setType(type);
 		setSource(source);
+		this.trees.addRoot(root);
 	}
 
 	public MultiRootedTree getTrees() {
@@ -66,4 +77,32 @@ public abstract class Transcript extends NodeWrapper {
 	public FaustURI getSource() {
 		return FaustURI.parse((String) node.getProperty(SOURCE_KEY));
 	}
+	
+	@GraphDatabaseTransactional
+	public abstract void tokenize();
+	
+	protected void tokenize(Element root) {
+
+		final Element tokens = new Element(node.getGraphDatabase(), "f", "tokens");
+		getTrees().addRoot(tokens);
+
+		final WhitespaceTokenMarkupGenerator tokenGenerator = new WhitespaceTokenMarkupGenerator();
+		final Iterable<GoddagTreeNode> textNodes = new FilteringIterable<GoddagTreeNode>(root.getDescendants(root),
+				new Predicate<GoddagTreeNode>() {
+
+					@Override
+					public boolean accept(GoddagTreeNode item) {
+						return (item.getNodeType() == GoddagNode.NodeType.TEXT);
+					}
+				});
+		tokenGenerator.generate(new IterableWrapper<Text, GoddagTreeNode>(textNodes) {
+
+			@Override
+			protected Text underlyingObjectToObject(GoddagTreeNode object) {
+				return (Text) object;
+			}
+		}, tokens);
+
+	}
+
 }

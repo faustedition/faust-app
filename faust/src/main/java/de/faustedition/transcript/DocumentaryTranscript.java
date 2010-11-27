@@ -23,8 +23,8 @@ public class DocumentaryTranscript extends Transcript {
 		super(node);
 	}
 
-	public DocumentaryTranscript(Node node, FaustURI source, SortedSet<FaustURI> facsimileReferences) {
-		super(node, Type.DOCUMENTARY, source);
+	public DocumentaryTranscript(GraphDatabaseService db, FaustURI source, Element root, SortedSet<FaustURI> facsimileReferences) {
+		super(db, Type.DOCUMENTARY, source, root);
 		setFacsimileReferences(facsimileReferences);
 	}
 
@@ -100,5 +100,10 @@ public class DocumentaryTranscript extends Transcript {
 			}
 
 		}.visit(documentRoot, documentRoot);
+	}
+
+	@Override
+	public void tokenize() {
+		tokenize(getTrees().getRoot(CustomNamespaceMap.TEI_SIG_GE_PREFIX, "document"));
 	}
 }

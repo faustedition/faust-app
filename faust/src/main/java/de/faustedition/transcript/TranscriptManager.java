@@ -78,27 +78,27 @@ public class TranscriptManager {
 		XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), pipeline);
 		
 		Set<Transcript> transcripts = new HashSet<Transcript>();
-		final Element documentRoot = documentHandler.result();
-		if (logger.isLoggable(Level.FINE)) {
-			logger.fine("Adding documentary transcript for " + source);
-		}
-		final DocumentaryTranscript dt = new DocumentaryTranscript(db.createNode(), source, facsRefHandler.references);
+
+		final Element documentRoot = documentHandler.result();		
 		if (documentRoot != null) {
-			dt.getTrees().addRoot(documentRoot);
+			if (logger.isLoggable(Level.FINE)) {
+				logger.fine("Adding documentary transcript for " + source);
+			}
+			final DocumentaryTranscript dt = new DocumentaryTranscript(db, source, documentRoot, facsRefHandler.references);
 			apparatusExtractor.extract(dt, TEI_SIG_GE_PREFIX, "document");
+			dt.postprocess();
+			register(dt, source);
+			transcripts.add(dt);
 		}
-		dt.postprocess();
-		register(dt, source);
-		transcripts.add(dt);
 
 		final Element textRoot = textHandler.result();
 		if (textRoot != null) {
 			if (logger.isLoggable(Level.FINE)) {
 				logger.fine("Adding textual transcript for " + source);
 			}
-			final TextualTranscript tt = new TextualTranscript(db.createNode(), source);
-			tt.getTrees().addRoot(textRoot);
+			final TextualTranscript tt = new TextualTranscript(db, source, textRoot);
 			apparatusExtractor.extract(tt, TEI_NS_PREFIX, "text");
+			tt.postprocess();
 			register(tt, source);
 			transcripts.add(tt);
 		}

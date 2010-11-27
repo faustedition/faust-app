@@ -63,7 +63,7 @@ public class DataImport extends Runtime implements Runnable {
 					failed.add(transcript);
 				} catch (TransformerException e) {
 					logger.log(Level.SEVERE, "XML error while adding transcript " + transcript, e);
-					failed.add(transcript);					
+					failed.add(transcript);
 				}
 			}
 
