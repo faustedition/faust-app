@@ -53,11 +53,13 @@ public class DataImport extends Runtime implements Runnable {
 			logger.info("Importing archives");
 			archiveManager.synchronize();
 
-			logger.info("Importing transcriptions");
+			logger.info("Importing transcripts");
 			for (FaustURI transcript : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
 				try {
 					logger.info("Importing transcript " + transcript);
 					transcriptManager.add(transcript);
+					logger.info("Tokenizing transcript " + transcript);
+					transcriptManager.tokenize(transcript);
 				} catch (SAXException e) {
 					logger.log(Level.SEVERE, "XML error while adding transcript " + transcript, e);
 					failed.add(transcript);

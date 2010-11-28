@@ -27,7 +27,7 @@ import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
 
 @Singleton
-public class TeiTemplater extends Runtime {
+public class TeiTemplater extends Runtime implements Runnable {
 	private static final FaustURI TEMPLATE_SOURCE = new FaustURI(FaustAuthority.XML, "/template/tei.xml");
 	private final XMLStorage xml;
 	private final Logger logger;

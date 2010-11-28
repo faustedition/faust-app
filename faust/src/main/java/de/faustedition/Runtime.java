@@ -2,6 +2,7 @@ package de.faustedition;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -17,9 +18,9 @@ import org.eclipse.jetty.util.log.Log;
 
 import de.faustedition.inject.FaustInjector;
 
-public abstract class Runtime implements Runnable {
-	private static Logger log = Logger.getLogger(Runtime.class.getName());
-	private static Level logLevel = Level.WARNING;
+public abstract class Runtime {
+	protected static Logger log = Logger.getLogger(Runtime.class.getName());
+	protected static Level logLevel = Level.WARNING;
 
 	public static void main(Class<? extends Runnable> clazz, String[] args) {
 		for (String arg : args) {
@@ -29,11 +30,12 @@ public abstract class Runtime implements Runnable {
 		}
 		configureLogging();
 		final Runnable main = FaustInjector.get().getInstance(clazz);
-		
-		// FIXME: this is a hack; Guice seems to reset the logging config somehow
+
+		// FIXME: this is a hack; Guice seems to reset the logging
+		// config somehow
 		configureLogging();
 		dumpLogConfig();
-		
+
 		main.run();
 	}
 
@@ -48,7 +50,8 @@ public abstract class Runtime implements Runnable {
 		}
 		root.addHandler(handler);
 
-		for (String interesting : new String[] { "de.faustedition", "com.google.inject", "org.neo4j", "freemarker" }) {
+		for (String interesting : new String[] { "de.faustedition", "com.google.inject", "org.neo4j", "org.goddag4j",
+				"freemarker" }) {
 			final Logger logger = Logger.getLogger(interesting);
 			logger.setLevel(logLevel);
 
@@ -78,9 +81,10 @@ public abstract class Runtime implements Runnable {
 
 		@Override
 		public String format(LogRecord record) {
+			final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 			StringBuilder msg = new StringBuilder();
-			msg.append(String.format("[%40.40s][%7s]: %s\n", record.getLoggerName(), record.getLevel(),
-					record.getMessage()));
+			msg.append(String.format("[%s][%40.40s][%7s]: %s\n", df.format(record.getMillis()), record.getLoggerName(),
+					record.getLevel(), record.getMessage()));
 			if (record.getThrown() != null) {
 				try {
 					StringWriter sw = new StringWriter();

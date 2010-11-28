@@ -25,7 +25,7 @@ import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
 
-public class GeneticRelationScaffolder extends Runtime {
+public class GeneticRelationScaffolder extends Runtime implements Runnable {
 
 	private final XMLStorage xml;
 

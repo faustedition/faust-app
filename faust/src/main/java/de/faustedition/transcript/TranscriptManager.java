@@ -21,6 +21,7 @@ import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.helpers.collection.IterableWrapper;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -73,18 +74,20 @@ public class TranscriptManager {
 		final Document document = XMLUtil.parse(xml.getInputSource(source));
 		WhitespaceUtil.normalize(document);
 		document.normalizeDocument();
-		
-		final SAXResult pipeline = new SAXResult(new MultiplexingContentHandler(docFragmentFilter, textFragmentFilter, facsRefHandler));
+
+		final SAXResult pipeline = new SAXResult(new MultiplexingContentHandler(docFragmentFilter, textFragmentFilter,
+				facsRefHandler));
 		XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), pipeline);
-		
+
 		Set<Transcript> transcripts = new HashSet<Transcript>();
 
-		final Element documentRoot = documentHandler.result();		
+		final Element documentRoot = documentHandler.result();
 		if (documentRoot != null) {
 			if (logger.isLoggable(Level.FINE)) {
 				logger.fine("Adding documentary transcript for " + source);
 			}
-			final DocumentaryTranscript dt = new DocumentaryTranscript(db, source, documentRoot, facsRefHandler.references);
+			final DocumentaryTranscript dt = new DocumentaryTranscript(db, source, documentRoot,
+					facsRefHandler.references);
 			apparatusExtractor.extract(dt, TEI_SIG_GE_PREFIX, "document");
 			dt.postprocess();
 			register(dt, source);
@@ -102,7 +105,17 @@ public class TranscriptManager {
 			register(tt, source);
 			transcripts.add(tt);
 		}
+
 		return transcripts;
+	}
+
+	public void tokenize(FaustURI source) {
+		for (Transcript t : find(source)) {
+			if (logger.isLoggable(Level.FINE)) {
+				logger.fine("Tokenizing " + t);
+			}
+			t.tokenize();
+		}
 	}
 
 	protected void register(Transcript transcript, FaustURI source) {
@@ -110,12 +123,24 @@ public class TranscriptManager {
 		db.index().forNodes(Transcript.SOURCE_KEY).add(transcript.node, Transcript.SOURCE_KEY, source.toString());
 	}
 
+	public Iterable<Transcript> find(FaustURI source) {
+		return new IterableWrapper<Transcript, Node>(db.index().forNodes(Transcript.SOURCE_KEY)
+				.get(Transcript.SOURCE_KEY, source.toString())) {
+
+			@Override
+			protected Transcript underlyingObjectToObject(Node object) {
+				return Transcript.forNode(object);
+			}
+		};
+	}
+
 	public Transcript find(FaustURI source, Type type) {
-		for (Node transcriptNode : db.index().forNodes(Transcript.SOURCE_KEY).get(Transcript.SOURCE_KEY, source.toString())) {
-			if (type == null || Transcript.getType(transcriptNode) == type) {
-				return Transcript.forNode(transcriptNode);
+		for (Transcript t : find(source)) {
+			if (t.getType() == type) {
+				return t;
 			}
 		}
+
 		return null;
 	}
 

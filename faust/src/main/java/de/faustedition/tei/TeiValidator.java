@@ -45,7 +45,7 @@ import de.faustedition.Runtime;
 import de.faustedition.xml.XMLStorage;
 
 @Singleton
-public class TeiValidator extends Runtime {
+public class TeiValidator extends Runtime implements Runnable {
 	private static final URL SCHEMA_RESOURCE = TeiValidator.class.getResource("/faust-tei.rng");
 
 	private final XMLStorage xml;

@@ -1,6 +1,8 @@
 package de.faustedition.graph;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -25,7 +27,11 @@ public class GraphDatabaseServiceProvider implements Provider<GraphDatabaseServi
 	public GraphDatabaseService get() {
 		final String dbPath = graphHome.getAbsolutePath();
 		logger.info("Opening graph database in '" + dbPath + "'");
-		final EmbeddedGraphDatabase db = new EmbeddedGraphDatabase(dbPath);
+		
+		final Map<String, String> config = new HashMap<String, String>();
+		config.put("cache_typ", "weak");
+		
+		final EmbeddedGraphDatabase db = new EmbeddedGraphDatabase(dbPath, config);
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 
 			@Override

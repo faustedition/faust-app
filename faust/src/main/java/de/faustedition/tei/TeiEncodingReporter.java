@@ -32,7 +32,7 @@ import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
 
 @Singleton
-public class TeiEncodingReporter extends Runtime {
+public class TeiEncodingReporter extends Runtime implements Runnable {
 	private static final String[] STATI = new String[] { "encoded", "proof-read", "published", "n/a" };
 	private final XMLStorage xml;
 	private final EmailReporter reporter;

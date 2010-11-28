@@ -1,5 +1,8 @@
 package de.faustedition.transcript;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.goddag4j.Element;
 import org.goddag4j.GoddagNode;
 import org.goddag4j.GoddagTreeNode;
@@ -8,14 +11,13 @@ import org.goddag4j.Text;
 import org.goddag4j.token.WhitespaceTokenMarkupGenerator;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.Predicate;
-import org.neo4j.helpers.collection.FilteringIterable;
-import org.neo4j.helpers.collection.IterableWrapper;
+import org.neo4j.graphdb.Transaction;
+
+import com.google.common.base.Objects;
 
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.graph.NodeWrapper;
 
 public abstract class Transcript extends NodeWrapper {
@@ -77,32 +79,38 @@ public abstract class Transcript extends NodeWrapper {
 	public FaustURI getSource() {
 		return FaustURI.parse((String) node.getProperty(SOURCE_KEY));
 	}
-	
-	@GraphDatabaseTransactional
+
 	public abstract void tokenize();
-	
+
 	protected void tokenize(Element root) {
 
-		final Element tokens = new Element(node.getGraphDatabase(), "f", "tokens");
-		getTrees().addRoot(tokens);
-
 		final WhitespaceTokenMarkupGenerator tokenGenerator = new WhitespaceTokenMarkupGenerator();
-		final Iterable<GoddagTreeNode> textNodes = new FilteringIterable<GoddagTreeNode>(root.getDescendants(root),
-				new Predicate<GoddagTreeNode>() {
+		final GraphDatabaseService db = node.getGraphDatabase();
 
-					@Override
-					public boolean accept(GoddagTreeNode item) {
-						return (item.getNodeType() == GoddagNode.NodeType.TEXT);
-					}
-				});
-		tokenGenerator.generate(new IterableWrapper<Text, GoddagTreeNode>(textNodes) {
+		Element tokens = null;
+		List<Text> textNodes = new LinkedList<Text>();
+		Transaction tx = db.beginTx();
+		try {
 
-			@Override
-			protected Text underlyingObjectToObject(GoddagTreeNode object) {
-				return (Text) object;
+			tokens = new Element(db, "f", "tokens");
+			getTrees().addRoot(tokens);
+
+			for (GoddagTreeNode node : root.getDescendants(root)) {
+				if (node.getNodeType() == GoddagNode.NodeType.TEXT) {
+					textNodes.add((Text) node);
+				}
 			}
-		}, tokens);
+			tx.success();
+		} finally {
+			tx.finish();
+		}
+		
+		tokenGenerator.generate(textNodes, tokens);
 
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this).add("type", getType()).add("source", getSource()).toString();
+	}
 }
