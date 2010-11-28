@@ -13,6 +13,7 @@ import org.goddag4j.Text;
 import org.goddag4j.visit.GoddagVisitor;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 import de.faustedition.FaustURI;
 import de.faustedition.xml.CustomNamespaceMap;
@@ -45,65 +46,67 @@ public class DocumentaryTranscript extends Transcript {
 		return facsimileReferences;
 	}
 
+	@Override
+	public Element getDefaultRoot() {
+		return getTrees().getRoot(CustomNamespaceMap.TEI_SIG_GE_PREFIX, "document");
+	}
+
 	public void postprocess() {
-		final Element documentRoot = getTrees().getRoot(CustomNamespaceMap.TEI_SIG_GE_PREFIX, "document");
-		if (documentRoot == null) {
-			return;
-		}
-
 		final GraphDatabaseService db = node.getGraphDatabase();
-		new GoddagVisitor() {
+		final Transaction tx = db.beginTx();
+		try {
+			final Element root = getDefaultRoot();
+			new GoddagVisitor() {
 
-			private Element hand = null;
-			private String handId = null;
-			private Element hands = getTrees().getRoot(FAUST_NS_PREFIX, "hands");
-			private Set<Element> handShifts = new HashSet<Element>();
+				private Element hand = null;
+				private String handId = null;
+				private Element hands = getTrees().getRoot(FAUST_NS_PREFIX, "hands");
+				private Set<Element> handShifts = new HashSet<Element>();
 
-			@Override
-			public void text(Element root, Text text) {
-				if (hand != null) {
-					hand.insert(hands, text, null);
+				@Override
+				public void text(Element root, Text text) {
+					if (hand != null) {
+						hand.insert(hands, text, null);
+					}
 				}
-			}
 
-			@Override
-			public void startElement(Element root, Element element) {
-				if ("handShift".equals(element.getName()) && TEI_NS_PREFIX.equals(element.getPrefix())) {
-					handShifts.add(element);
-					String newHandId = element.getAttributeValue(TEI_NS_PREFIX, "new");
-					if (newHandId != null) {
-						newHandId = newHandId.replaceAll("^#", "");
-						if (handId == null || !newHandId.equals(handId)) {
-							insertHand();
-							handId = newHandId;
-							hand = new Element(db, FAUST_NS_PREFIX, "hand");
-							hand.setAttribute(FAUST_NS_PREFIX, "id", handId);
+				@Override
+				public void startElement(Element root, Element element) {
+					if ("handShift".equals(element.getName()) && TEI_NS_PREFIX.equals(element.getPrefix())) {
+						handShifts.add(element);
+						String newHandId = element.getAttributeValue(TEI_NS_PREFIX, "new");
+						if (newHandId != null) {
+							newHandId = newHandId.replaceAll("^#", "");
+							if (handId == null || !newHandId.equals(handId)) {
+								insertHand();
+								handId = newHandId;
+								hand = new Element(db, FAUST_NS_PREFIX, "hand");
+								hand.setAttribute(FAUST_NS_PREFIX, "id", handId);
+							}
 						}
 					}
 				}
-			}
 
-			@Override
-			public void endElement(Element root, Element element) {
-				if (element.equals(documentRoot)) {
-					insertHand();
-					for (Element handShift : handShifts) {
-						handShift.getParent(root).remove(root, handShift, true);
+				@Override
+				public void endElement(Element root, Element element) {
+					if (element.equals(root)) {
+						insertHand();
+						for (Element handShift : handShifts) {
+							handShift.getParent(root).remove(root, handShift, true);
+						}
 					}
 				}
-			}
 
-			protected void insertHand() {
-				if (hand != null && hand.hasChildren(hands)) {
-					hands.insert(hands, hand, null);
+				protected void insertHand() {
+					if (hand != null && hand.hasChildren(hands)) {
+						hands.insert(hands, hand, null);
+					}
 				}
-			}
 
-		}.visit(documentRoot, documentRoot);
-	}
-
-	@Override
-	public void tokenize() {
-		tokenize(getTrees().getRoot(CustomNamespaceMap.TEI_SIG_GE_PREFIX, "document"));
+			}.visit(root, root);
+			tx.success();
+		} finally {
+			tx.finish();
+		}
 	}
 }

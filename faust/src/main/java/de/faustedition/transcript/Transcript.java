@@ -80,10 +80,11 @@ public abstract class Transcript extends NodeWrapper {
 		return FaustURI.parse((String) node.getProperty(SOURCE_KEY));
 	}
 
-	public abstract void tokenize();
+	public abstract Element getDefaultRoot();
 
-	protected void tokenize(Element root) {
-
+	public abstract void postprocess();
+	
+	public void tokenize() {
 		final WhitespaceTokenMarkupGenerator tokenGenerator = new WhitespaceTokenMarkupGenerator();
 		final GraphDatabaseService db = node.getGraphDatabase();
 
@@ -95,6 +96,7 @@ public abstract class Transcript extends NodeWrapper {
 			tokens = new Element(db, "f", "tokens");
 			getTrees().addRoot(tokens);
 
+			final Element root = getDefaultRoot();
 			for (GoddagTreeNode node : root.getDescendants(root)) {
 				if (node.getNodeType() == GoddagNode.NodeType.TEXT) {
 					textNodes.add((Text) node);
@@ -105,8 +107,7 @@ public abstract class Transcript extends NodeWrapper {
 			tx.finish();
 		}
 		
-		tokenGenerator.generate(textNodes, tokens);
-
+		tokenGenerator.generate(textNodes, tokens);		
 	}
 
 	@Override

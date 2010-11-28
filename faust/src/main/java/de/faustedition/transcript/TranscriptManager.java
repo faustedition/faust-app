@@ -1,8 +1,6 @@
 package de.faustedition.transcript;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_PREFIX;
 import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
-import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_PREFIX;
 import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_URI;
 
 import java.io.IOException;
@@ -21,6 +19,7 @@ import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.IterableWrapper;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
@@ -32,7 +31,6 @@ import com.google.inject.Singleton;
 
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.tei.WhitespaceUtil;
 import de.faustedition.transcript.Transcript.Type;
 import de.faustedition.xml.CustomNamespaceMap;
@@ -57,11 +55,14 @@ public class TranscriptManager {
 		this.db = graph.getGraphDatabaseService();
 	}
 
-	@GraphDatabaseTransactional
 	public Iterable<Transcript> add(FaustURI source) throws SAXException, IOException, TransformerException {
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Adding transcripts for " + source);
 		}
+
+		final Document document = XMLUtil.parse(xml.getInputSource(source));
+		WhitespaceUtil.normalize(document);
+		document.normalizeDocument();
 
 		final GoddagXMLReader documentHandler = new GoddagXMLReader(db, CustomNamespaceMap.INSTANCE);
 		final XMLFragmentFilter docFragmentFilter = new XMLFragmentFilter(documentHandler, TEI_SIG_GE_URI, "document");
@@ -71,51 +72,46 @@ public class TranscriptManager {
 
 		final FacsimileReferenceExtractionHandler facsRefHandler = new FacsimileReferenceExtractionHandler(source);
 
-		final Document document = XMLUtil.parse(xml.getInputSource(source));
-		WhitespaceUtil.normalize(document);
-		document.normalizeDocument();
+		final Set<Transcript> transcripts = new HashSet<Transcript>();
+		Transaction tx = db.beginTx();
+		try {
+			final SAXResult pipeline = new SAXResult(new MultiplexingContentHandler(docFragmentFilter,
+					textFragmentFilter, facsRefHandler));
+			XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), pipeline);
 
-		final SAXResult pipeline = new SAXResult(new MultiplexingContentHandler(docFragmentFilter, textFragmentFilter,
-				facsRefHandler));
-		XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), pipeline);
-
-		Set<Transcript> transcripts = new HashSet<Transcript>();
-
-		final Element documentRoot = documentHandler.result();
-		if (documentRoot != null) {
-			if (logger.isLoggable(Level.FINE)) {
+			final Element documentRoot = documentHandler.result();
+			if (documentRoot != null) {
 				logger.fine("Adding documentary transcript for " + source);
+				Transcript transcript = new DocumentaryTranscript(db, source, documentRoot,
+						facsRefHandler.references);
+				transcripts.add(transcript);
+				register(transcript, source);
 			}
-			final DocumentaryTranscript dt = new DocumentaryTranscript(db, source, documentRoot,
-					facsRefHandler.references);
-			apparatusExtractor.extract(dt, TEI_SIG_GE_PREFIX, "document");
-			dt.postprocess();
-			register(dt, source);
-			transcripts.add(dt);
-		}
 
-		final Element textRoot = textHandler.result();
-		if (textRoot != null) {
-			if (logger.isLoggable(Level.FINE)) {
+			final Element textRoot = textHandler.result();
+			if (textRoot != null) {
 				logger.fine("Adding textual transcript for " + source);
+				Transcript transcript = new TextualTranscript(db, source, textRoot);
+				transcripts.add(transcript);
+				register(transcript, source);
 			}
-			final TextualTranscript tt = new TextualTranscript(db, source, textRoot);
-			apparatusExtractor.extract(tt, TEI_NS_PREFIX, "text");
-			tt.postprocess();
-			register(tt, source);
-			transcripts.add(tt);
+
+			tx.success();
+		} finally {
+			tx.finish();
 		}
 
-		return transcripts;
-	}
-
-	public void tokenize(FaustURI source) {
-		for (Transcript t : find(source)) {
-			if (logger.isLoggable(Level.FINE)) {
-				logger.fine("Tokenizing " + t);
-			}
+		for (Transcript t : transcripts) {
+			logger.fine("Extracting apparatus of  " + t);
+			apparatusExtractor.extract(t);
+			
+			logger.fine("Postprocess  " + t);
+			t.postprocess();
+			
+			logger.fine("Tokenize " + t);
 			t.tokenize();
 		}
+		return transcripts;
 	}
 
 	protected void register(Transcript transcript, FaustURI source) {
@@ -136,7 +132,7 @@ public class TranscriptManager {
 
 	public Transcript find(FaustURI source, Type type) {
 		for (Transcript t : find(source)) {
-			if (t.getType() == type) {
+			if (type == null || t.getType() == type) {
 				return t;
 			}
 		}

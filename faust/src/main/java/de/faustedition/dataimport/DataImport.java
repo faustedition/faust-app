@@ -58,8 +58,6 @@ public class DataImport extends Runtime implements Runnable {
 				try {
 					logger.info("Importing transcript " + transcript);
 					transcriptManager.add(transcript);
-					logger.info("Tokenizing transcript " + transcript);
-					transcriptManager.tokenize(transcript);
 				} catch (SAXException e) {
 					logger.log(Level.SEVERE, "XML error while adding transcript " + transcript, e);
 					failed.add(transcript);
