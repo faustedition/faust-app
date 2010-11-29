@@ -76,8 +76,9 @@ public class FaustApplication extends Application {
 
 		router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
 		router.attach("project/", templateFinder);
-
+		
 		router.attach("archive/", secured(archiveRouter));
+		router.attach("demo/", secured(templateFinder));
 		router.attach("document/", secured(documentRouter));
 		router.attach("genesis/", secured(genesisRouter));
 		router.attach("text/", secured(templateFinder));

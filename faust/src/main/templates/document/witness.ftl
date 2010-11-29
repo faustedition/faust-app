@@ -1,6 +1,6 @@
 <#assign title><@faust.nameOf path /></#assign>
 <#assign header>
-	<link rel="stylesheet" type="text/css" href="${cp}/css/iip.css">
+	<link rel="stylesheet" type="text/css" href="${cp}/css/facsimile.css">
 	<script type="text/javascript" src="${cp}/js/mootools-1.2-core-compressed.js"></script>
 	<script type="text/javascript" src="${cp}/js/mootools-1.2-more-compressed.js"></script>
 	<script type="text/javascript" src="${cp}/js/iipmooviewer-1.1.js"></script>

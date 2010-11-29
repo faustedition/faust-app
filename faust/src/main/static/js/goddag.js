@@ -1,5 +1,5 @@
 Faust.YUI().use("oop", function(Y) {
-	Goddag = function() {};
+	Goddag = {};
 	Goddag.NT_TEXT = "0";
 	Goddag.NT_ELEMENT = "1";
 	Goddag.NT_COMMENT = "2";

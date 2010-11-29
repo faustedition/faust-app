@@ -1,10 +1,10 @@
-div#facsimile {
+div.facsimile {
   font-family: Verdana, sans-serif;
   margin: 0px;
+  position: relative;
   left: 0px;
   top: 0px;
   background: black;
-  position: absolute;
   overflow: hidden;
   padding: 0px;
   border: 2px inset grey;
@@ -19,7 +19,7 @@ div#navcontainer {
 }
 div#navcontainer div#toolbar {
   height: 10px;
-  background: url( "../img/iip/toolbar.png" ) repeat-x;
+  background: url( "../img/facsimile/toolbar.png" ) repeat-x;
   cursor: move;
 }
 div#navwin {
@@ -170,4 +170,4 @@ div#navbuttons img#shiftLeft, div#navbuttons img#shiftRight { top: 18px; margin-
 div#navbuttons img#shiftUp { margin-left: 0px; margin-right: 0px; }
 div#navbuttons img#shiftDown { margin-top: 10px; }
 
-img#info, div.tip img, div#navbuttons img { behavior: url(../img/iip/iepngfix.htc) } /*Fix IE PNG transparency */
+img#info, div.tip img, div#navbuttons img { behavior: url(../img/facsimile/iepngfix.htc) } /*Fix IE PNG transparency */

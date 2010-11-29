@@ -1,26 +1,28 @@
-Faust = function() {};
+if (typeof Faust === "undefined") Faust = {};
+
+Faust.encodePath = function(path) {
+	var encoded = "";
+	var pathComponents = path.split("/");
+	for (var pc = 0; pc < pathComponents.length; pc++)
+		encoded += (encoded.length == 0 ? "" : "/") + encodeURI(pathComponents[pc]);
+	return encoded;		
+}
 
 Faust.URI = function(uri) { 
 	this.components = uri.match(/^faust:\/\/([^\/]+)\/(.*)/);
 };
 
 Faust.URI.prototype = {
-	encodedPath: function() {
-		var encoded = "";
-		var pathComponents = this.components[2].split("/");
-		for (var pc = 0; pc < pathComponents.length; pc++)
-			encoded += (encoded.length == 0 ? "" : "/") + encodeURI(pathComponents[pc]);
-		return encoded;	
-	}
+	encodedPath: function() { return Faust.encodePath(this.components[2]); }
 };
 
 Faust.YUI = function() { 
-	return YUI({ base: cp + "/static/yui3/build/", combine: false }); 
+	return YUI({ base: Faust.contextPath + "/static/yui3/build/", combine: false }); 
 };
 
 Faust.io = function(uri, callback, reviver) {
 	Faust.YUI().use("io", "json", function(Y) {
-		Y.io(uri, {
+		Y.io(Faust.contextPath + "/" + uri, {
 			method: "GET",
 			xdr: { responseXML: false },
 			headers: { "Accept": "application/json" },
@@ -37,7 +39,7 @@ Faust.io = function(uri, callback, reviver) {
 
 Faust.xml = function(uri, callback) {
 	Faust.YUI().use("io", function(Y) {
-		Y.io(uri, {
+		Y.io(Faust.contextPath + "/" + uri, {
 			method: "GET",
 			on: { 
 				success: function(id, o, a) {

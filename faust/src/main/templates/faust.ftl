@@ -11,8 +11,9 @@
 	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssbase/base-min.css" /> 
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css" />
 	<script type="text/javascript">
-		var cp = "${cp}"; 
-		var iip = "${config['facsimile.iip.url']}"; 
+		var Faust = {};
+		Faust.contextPath = "${cp}";
+		Faust.FacsimileServer = "${config['facsimile.iip.url']}";
 		document.documentElement.className = "yui3-loading";
 	</script>
 	<script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-min.js"></script>
@@ -68,6 +69,16 @@
 	<div class="yui3-menu-content">
 		<ul class="first-of-type">
 			<#if roles?seq_contains("editor")>							
+			<li>
+				<a href="#demo" class="yui3-menu-label"><em>${message("menu.demo")}</em></a>
+				<div id="demo" class="yui3-menu">
+				<div class="yui3-menu-content">
+				<ul>
+					<li class="yui3-menuitem"><a href="${cp}/demo/diplomatic-transcript" class="yui3-menuitem-content">${message("menu.demo.diplomatic-transcript")}</a></li>
+				</ul>
+				</div>
+				</div>
+			</li>
 			<li>
 				<a href="#documents" class="yui3-menu-label"><em>${message("menu.document")}</em></a>
 				<div id="documents" class="yui3-menu">

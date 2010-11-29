@@ -131,7 +131,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 			for (var pc = 0; pc < this.pages.length; pc++) {
 				var page = this.pages[pc];
 				var img = Y.Node.create("<img>");
-				img.set("src", iip + "?FIF=" + page.transcript.facsimiles[0].encodedPath() + ".tif" + "&JTL=1,0");
+				img.set("src", Faust.FacsimileServer + "?FIF=" + page.transcript.facsimiles[0].encodedPath() + ".tif" + "&JTL=1,0");
 				img.set("alt", page.order);
 				Y.on("dblclick", function(e, page) {
 					this.setPage(page.order);
@@ -180,10 +180,10 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 		},
 		renderFacsimiles: function() {
 			Y.one("#transcript-facsimile").setContent("");
-			swfobject.embedSWF(cp + "/static/swf/IIPZoom.swf", 
+			swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
 				"transcript-facsimile", "450px", "600px", 
-				"9.0.0", cp + "/static/swf/expressInstall.swf", {
-					server: iip,
+				"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
+					server: Faust.FacsimileServer,
 					image: this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif",
 					navigation: true,
 					credit: "Copyright Digitale Faust-Edition"

@@ -12,7 +12,7 @@ Faust.YUI().use("oop", function(Y) {
 		},
 		transcription: function(callback) {
 			if (this.transcript == null) { callback(); return; }
-			Faust.io(cp + "/" + this.transcript.source.encodedPath(), function(data) {
+			Faust.io(this.transcript.source.encodedPath(), function(data) {
 				callback(new Goddag.Graph(data));
 			});
 		}
@@ -20,7 +20,7 @@ Faust.YUI().use("oop", function(Y) {
 
 	Faust.Document = function() {};
 	Faust.Document.load = function(uri, callback) {
-		Faust.io(cp + "/" + uri.encodedPath() + "/descriptor.json", callback, function(key, value) {
+		Faust.io(uri.encodedPath() + "/descriptor.json", callback, function(key, value) {
 			if (key === "order") {
 				Y.augment(this, Faust.MaterialUnit);
 			}
