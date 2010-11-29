@@ -33,7 +33,7 @@ import de.faustedition.xml.XPathUtil;
 
 @Singleton
 public class TeiEncodingReporter extends Runtime implements Runnable {
-	private static final String[] STATI = new String[] { "encoded", "proof-read", "published", "n/a" };
+	private static final String[] STATI = new String[] { "kodiert", "encoded", "proof-read", "published", "n/a" };
 	private final XMLStorage xml;
 	private final EmailReporter reporter;
 	private final Logger logger;
@@ -48,11 +48,14 @@ public class TeiEncodingReporter extends Runtime implements Runnable {
 	@Override
 	public void run() {
 		try {
-			final XPathExpression changeXP = XPathUtil.xpath("//tei:teiHeader//tei:revisionDesc/tei:change");
-			final Map<String, Integer> statusMap = new HashMap<String, Integer>();
+			final Map<String, Integer> documentStatusMap = new HashMap<String, Integer>();
+			final Map<String, Integer> textStatusMap = new HashMap<String, Integer>();
 			for (String status : STATI) {
-				statusMap.put(status, 0);
+				documentStatusMap.put(status, 0);
+				textStatusMap.put(status, 0);
 			}
+			
+			final XPathExpression changeXP = XPathUtil.xpath("//tei:teiHeader//tei:revisionDesc/tei:change");
 			for (FaustURI source : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
 				try {
 					final Document document = XMLUtil.parse(xml.getInputSource(source));
@@ -62,23 +65,22 @@ public class TeiEncodingReporter extends Runtime implements Runnable {
 						continue;
 					}
 
-					boolean statusFound = false;
+					String status = null;
 					for (Element change : new NodeListWrapper<Element>(changeXP, document)) {
 						final String changeStr = change.getTextContent().toLowerCase();
-						for (String status : STATI) {
-							if (changeStr.contains(status)) {
-								statusMap.put(status, statusMap.get(status) + 1);
-								statusFound = true;
-								break;
+						for (String statusCandidate : STATI) {
+							if (changeStr.contains(statusCandidate)) {
+								status = statusCandidate;
 							}
 						}
-						if (statusFound) {
-							break;
-						}
 					}
-					if (!statusFound) {
-						statusMap.put("n/a", statusMap.get("n/a") + 1);
+					
+					if (status == null) {
+						status = "n/a";
 					}
+					
+					Map<String, Integer> target = (source.isTextEncodingDocument() ? textStatusMap : documentStatusMap);
+					target.put(status, target.get(status) + 1);
 				} catch (SAXException e) {
 					logger.log(Level.FINE, "XML error while checking encoding status of " + source, e);
 				} catch (IOException e) {
@@ -90,17 +92,29 @@ public class TeiEncodingReporter extends Runtime implements Runnable {
 
 				@Override
 				public void create(PrintWriter body) {
-					body.println(Strings.repeat("=", 40));
-					boolean firstLine = true;
-					for (String status : STATI) {
-						if (!firstLine) {
-							body.println(Strings.repeat("-", 40));							
+					for (Map<String, Integer> map : new Map[] { documentStatusMap, textStatusMap }) {
+						if (documentStatusMap == map) {
+							body.println("Documentary transcripts:");
+							body.println();
+						} else {
+							body.println();							
+							body.println("Textual transcripts:");
+							body.println();
 						}
-						firstLine = false;
-						String count = Integer.toString(statusMap.get(status));
-						body.println(status + Strings.padStart(count, (40 - status.length()), ' '));
+						
+						body.println(Strings.repeat("=", 40));
+						boolean firstLine = true;
+						for (String status : STATI) {
+							if (!firstLine) {
+								body.println(Strings.repeat("-", 40));							
+							}
+							firstLine = false;
+							String count = Integer.toString(map.get(status));
+							body.println(status + Strings.padStart(count, (40 - status.length()), ' '));
+						}
+						body.println(Strings.repeat("=", 40));
+						
 					}
-					body.println(Strings.repeat("=", 40));
 				}
 			});
 		} catch (XPathExpressionException e) {

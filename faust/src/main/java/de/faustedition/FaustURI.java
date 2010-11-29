@@ -69,7 +69,43 @@ public class FaustURI implements Comparable<FaustURI> {
 	public FaustURI resolve(String relative) {
 		return new FaustURI(this.uri.resolve(relative));
 	}
-	
+
+	public boolean isWitnessEncodingDocument() {
+		final String path = uri.getPath();
+		final int extensionIndex = path.lastIndexOf(".");
+		return extensionIndex >= 0 && path.startsWith("/transcript/") && "xml".equals(path.substring(extensionIndex + 1));
+	}
+
+	public boolean isDocumentEncodingDocument() {
+		return isWitnessEncodingDocument() && !isTextEncodingDocument();
+	}
+
+	public boolean isTextEncodingDocument() {
+		if (!isWitnessEncodingDocument()) {
+			return false;
+		}
+		final String uriPath = uri.getPath().replaceAll("/+", "/");
+
+		final int basenameStart = uriPath.lastIndexOf("/");
+		if (basenameStart < 0) {
+			return false;
+		}
+
+		final int folderNameStart = uriPath.lastIndexOf("/", basenameStart - 1);
+		if (folderNameStart < 0) {
+			return false;
+		}
+
+		final int basenameEnd = uriPath.lastIndexOf(".");
+		if (basenameEnd < 0 || basenameEnd < basenameStart || !uriPath.substring(basenameEnd).equalsIgnoreCase(".xml")) {
+			return false;
+		}
+
+		final String basename = uriPath.substring(basenameStart + 1, basenameEnd);
+		final String folderName = uriPath.substring(folderNameStart + 1, basenameStart);
+		return basename.equalsIgnoreCase(folderName);
+	}
+
 	public static Deque<String> toPathDeque(String path) {
 		return new ArrayDeque<String>(Arrays.asList(path.replaceAll("^/+", "").replaceAll("/+$", "").split("/+")));
 	}

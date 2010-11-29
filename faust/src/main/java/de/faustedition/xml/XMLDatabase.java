@@ -25,7 +25,6 @@ import com.google.inject.name.Named;
 
 public class XMLDatabase implements Iterable<URI> {
 	public static final String EXIST_NS_URI = "http://exist.sourceforge.net/NS/exist";
-	private static final URI WITNESS_BASE = URI.create("Witness/");
 
 	private final URI base;
 	private final String dbUser;
@@ -128,42 +127,5 @@ public class XMLDatabase implements Iterable<URI> {
 		Preconditions.checkArgument(!uri.isAbsolute()
 				&& (uri.getPath() == null || uri.getPath().length() == 0 || !uri.getPath().startsWith("/")));
 		return base.resolve(uri);
-	}
-
-	public boolean isWitnessEncodingDocument(URI uri) {
-		final String path = uri.getPath();
-		final int extensionIndex = path.lastIndexOf(".");
-		return extensionIndex >= 0 && path.startsWith(WITNESS_BASE.getPath())
-				&& "xml".equals(path.substring(extensionIndex));
-	}
-
-	public boolean isDocumentEncodingDocument(URI uri) {
-		return isWitnessEncodingDocument(uri) && !isTextEncodingDocument(uri);
-	}
-
-	public boolean isTextEncodingDocument(URI uri) {
-		if (!isWitnessEncodingDocument(uri)) {
-			return false;
-		}
-		final String uriPath = uri.getPath().replaceAll("/+", "/");
-
-		final int basenameStart = uriPath.lastIndexOf("/");
-		if (basenameStart < 0) {
-			return false;
-		}
-
-		final int folderNameStart = uriPath.lastIndexOf("/", basenameStart);
-		if (folderNameStart < 0) {
-			return false;
-		}
-
-		final int basenameEnd = uriPath.lastIndexOf(".");
-		if (basenameEnd < 0 || basenameEnd < basenameStart || !uriPath.substring(basenameEnd).equalsIgnoreCase(".xml")) {
-			return false;
-		}
-
-		final String basename = uriPath.substring(basenameStart + 1, basenameEnd);
-		final String folderName = uriPath.substring(folderNameStart + 1, basenameStart);
-		return basename.equalsIgnoreCase(folderName);
 	}
 }
