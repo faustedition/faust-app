@@ -18,7 +18,7 @@ FaustStructure.load = function(uri) {
 	paper = Raphael(document.getElementById('canvas'), x = 800, y = 600,
 			r = 100);
 
-	stripped = "/xml/" + (new Faust.URI(uri).encodedPath());
+	stripped = "xml/" + (new Faust.URI(uri).encodedPath());
 	Faust.xml(stripped, function (xml) {
 
 		//FaustStructure.test();
