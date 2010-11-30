@@ -3,6 +3,7 @@ package de.faustedition.xml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,7 +71,28 @@ public class XMLStorage implements Iterable<FaustURI> {
 	}
 
 	public void put(FaustURI uri, Document xml) throws TransformerException {
-		XMLUtil.serialize(xml, toFile(uri));		
+		XMLUtil.serialize(xml, toFile(uri));
+	}
+
+	public FaustURI walk(Deque<String> path) throws IllegalArgumentException {
+		if (path.size() == 0) {
+			return null;
+		}
+
+		FaustURI uri = new FaustURI(FaustAuthority.XML, "/");
+		while (path.size() > 0) {
+			final FaustURI next = uri.resolve(path.pop());
+			if (isDirectory(next)) {
+				uri = FaustURI.parse(next.toString() + "/");
+				continue;
+			} else if (isResource(next)) {
+				uri = next;
+				break;
+			} else {
+				return null;
+			}
+		}
+		return (isResource(uri) ? uri : null);
 	}
 
 	public boolean isDirectory(FaustURI uri) {

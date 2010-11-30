@@ -142,7 +142,7 @@ public class XMLUtil {
 	}
 
 	public static boolean hasText(Element element) throws XPathExpressionException, DOMException {
-		for (Node textNode : new NodeListWrapper<Node>(XPathUtil.xpath(".//text()", null), element)) {
+		for (Node textNode : new NodeListWrapper<Node>(XPathUtil.xpath(".//text()"), element)) {
 			String textContent = textNode.getTextContent();
 			if (textContent != null && textContent.trim().length() > 0) {
 				return true;
