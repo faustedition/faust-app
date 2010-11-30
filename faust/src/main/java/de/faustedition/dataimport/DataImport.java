@@ -42,7 +42,7 @@ public class DataImport extends Runtime implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		main(DataImport.class, args);
+		Runtime.main(DataImport.class, args);
 	}
 
 	@Override

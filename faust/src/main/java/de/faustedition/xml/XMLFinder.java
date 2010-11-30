@@ -2,7 +2,8 @@ package de.faustedition.xml;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Deque;
+import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,6 +24,7 @@ import org.xml.sax.InputSource;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 
 @Singleton
@@ -39,20 +41,35 @@ public class XMLFinder extends Finder {
 
 	@Override
 	public ServerResource find(Request request, Response response) {
-		final Deque<String> path = FaustURI.toPathDeque(request.getResourceRef().getRelativeRef().getPath());
-		logger.fine("Finding XML resource for " + path);
-		
-		try {
-			final FaustURI uri = xml.walk(path);
-			if (uri == null) {
-				return null;
-			}
-			logger.fine("Delivering XML for " + uri);
-			return new XMLResource(uri);
-		} catch (IllegalArgumentException e) {
-			logger.log(Level.FINE, "Parse error while resolving XML resource for " + path, e);
+		final String path = request.getResourceRef().getRelativeRef().getPath().replaceAll("^/+", "").replaceAll("/+$", "");
+
+		logger.fine("Finding XML resource for '" + path + "'");
+		final ArrayDeque<String> pathDeque = new ArrayDeque<String>(Arrays.asList(path.split("/+")));
+		if (pathDeque.size() == 0) {
 			return null;
 		}
+
+		FaustURI uri = new FaustURI(FaustAuthority.XML, "/");
+		try {
+			while (pathDeque.size() > 0) {
+				FaustURI next = uri.resolve(pathDeque.pop());
+				if (xml.isDirectory(next)) {
+					uri = FaustURI.parse(next.toString() + "/");
+					continue;
+				}
+				if (xml.isResource(next)) {
+					uri = next;
+					break;
+				}
+				return null;
+			}
+		} catch (IllegalArgumentException e) {
+			logger.log(Level.FINE, "Parse error while resolving XML resource for '" + path + "'", e);
+			return null;
+		}
+
+		logger.fine("Finding XML for " + uri);
+		return (xml.isResource(uri) ? new XMLResource(uri) : null);
 	}
 
 	protected class XMLResource extends ServerResource {
