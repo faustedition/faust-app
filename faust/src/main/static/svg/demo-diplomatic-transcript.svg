@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet href="demo-diplomatic-transcript.css" type="text/css"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+   version="1.1" baseProfile="full" width="1000" height="1500">
+   <g>
+      <line x1="100" y1="100" x2="500" y2="950" stroke="#999" opacity="0.7"/>
+      <!-- <ge:used hand="#g" spanTo="#used"/>  -->
+      <g transform="translate(75)">
+         <text x="100" y="100">
+            <tspan dx="300" dy="20" class="pencil latin">i.</tspan>
+            <tspan x="230" dy="20" class="goethe small pencil unclear">gewaltig</tspan>
+            <tspan x="150" dy="20" class="goethe ink">Dringet es&#xa0;</tspan><tspan class="goethe ink strikethrough">auf uns&#xa0;</tspan><tspan class="goethe ink">ein</tspan>
+            <tspan x="150" dy="20" class="goethe ink">Müſſe</tspan><tspan class="goethe ink strikethrough">n</tspan><tspan class="goethe ink">&#xa0;wir tüchtig ſeyn;</tspan>
+            <tspan x="150" dy="20" class="goethe ink">Liebe nur Liebende</tspan>
+            <tspan x="150" dy="20" class="goethe ink">Führet herein</tspan>            
+            <tspan x="300" dy="20" class="goethe ink underline center">Mephiſtopheles</tspan><tspan>.</tspan>
+            <tspan x="125" dy="20" class="scribe ink">Mir bren̄t der Kopf, das Herz, die Leber brennt,</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Ein überteuflich Element!</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Weit ſpitziger als Höllenfeuer.–</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Drum jammert ihr ſo ungeheuer</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Unglückliche Verliebte! die verſchmäht,</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Verdrehten Halſes nach der Liebſten ſpäht.</tspan>
+            <tspan x="125" dy="30" class="scribe ink">Auch mir! Was zieht den Kopf auf jene Seite?</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Bin ich mir ihr doch in geſchwornem Streite?</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Der Anblick war mir ſonſt ſo feindlich ſcharf.</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Hat mich ein Fremdes durch und durch gedrungen,</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Ich mag ſie gerne ſehn die hübſchen Jungen;</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Was hält mich ab daß ich nicht fluchen darf?–</tspan>
+            <tspan x="125" dy="30" class="scribe ink">Und wenn ich mich bethören laſſe</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Wer heißt denn künftighin der Thor?</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Die Wetterbuben die ich haſſe</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Sie kom̄en mir doch gar zu lieblich vor.</tspan><tspan class="goethe pencil">–</tspan>
+            <tspan x="125" dy="30" class="scribe ink">Ihr ſchönen Kinder laßt mich wiſſen:</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Seyd ihr nicht auch von Lucifers Geſchlecht?</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Ihr ſeyd ſo hübſch, fürwahr ich möcht euch küßen</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Mir iſts als k</tspan><tspan class="unclear scribe ink">o</tspan><tspan class="scribe ink">mt ihr eben recht</tspan><tspan class="goethe pencil">.</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Es iſt mir ſo behaglich</tspan><tspan class="goethe pencil">,</tspan>&#xa0;<tspan class="scribe ink">ſo natürlich</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Als hätt’ ich euch ſchon tauſendmal geſehn</tspan><tspan class="goethe pencil">,</tspan>
+            <tspan x="100" dy="20" class="scribe ink">So heimlich Kätzchenhaft begierlich</tspan><tspan class="goethe pencil">;</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Mit jedem Blick aufs neue ſchöner ſchön.</tspan>
+            <tspan x="100" dy="20" class="scribe ink">O nähert euch! O gönnt mir einen Blick</tspan><tspan class="goethe pencil">.</tspan>
+            <tspan x="300" dy="20" class="scribe ink underline center">Engel</tspan>
+            <tspan x="225" dy="20" class="goethe ink small strikethrough">was&#xa0;</tspan><tspan class="goethe ink small strikethrough">denn? So bleib!</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Wir kom̄en ſchon</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots">warum</tspan>&#xa0;<tspan class="scribe ink"> weichſt</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots">du zurück?</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Wir nähern uns und wenn du kannſt ſo bleib.</tspan>
+            <tspan x="300" dy="20" class="center goethe ink">☝<!-- <g ref="#g_transp_1"/> --></tspan>
+            <tspan x="125" dy="20" class="scribe ink">Mephiſt.</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Ihr ſcheltet uns verdammte Geiſter;</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Und ſeyd die wahren Hexenmeiſter</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Denn ihr verführet Mann und Weib.</tspan>
+            <tspan dx="100" class="unknown">11</tspan>
+         </text>
+      </g>
+      <g transform="rotate(90, 100, 400)" id="margin">
+         <text x="100" y="400">
+            <tspan dx="-40" dy="20" class="center goethe ink">☝<!-- <g ref="#g_transp_1"/> --></tspan>
+            <tspan x="100" class="goethe ink">(Die Engel nehmen umherziehend den ganzen Raum ein)</tspan>
+            <tspan x="100" dy="20" class="goethe ink">Mephiſtopheles (der in’s Proſcenium gedrängt wird)</tspan>
+         </text>
+         
+      </g>
+      <g transform="translate(75)" class="goethe" id="patch">
+         <rect x="100" y="100" width="400" height="120" style="fill: #eee; opacity: 0.8" />
+         <text x="100" y="100" class="goethe" opacity="1">
+            <tspan dx="300" dy="20" class="pencil latin right">i.</tspan>
+            <tspan class="ink" x="100" dy="20">Dringt es gewaltig ein</tspan>
+            <tspan class="ink" x="100" dy="20">Müſſen wir tüchtig ſeyn.</tspan>
+            <tspan class="ink" x="100" dy="20">Liebe nur Liebende</tspan>
+            <tspan class="ink" x="100" dy="20">Führet herein.</tspan>
+         </text>
+      </g>      
+   </g>
+</svg>

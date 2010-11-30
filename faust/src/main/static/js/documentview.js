@@ -1,16 +1,21 @@
 Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", function(Y) {
-	Faust.DocumentTranscriptCanvas = function(transcript, svg) {
-		this.transcript = transcript;
-		this.svg = svg;
-		this.view = this.build(null, transcript.root("ge:document"));
-		view = this.view;
+	Faust.DocumentTranscriptCanvas = function(frame) {
+		this.frame = window.frames[frame];
+		this.svg = this.frame.document;		
 	};
 
 	Faust.DocumentTranscriptCanvas.prototype = {
+		init: function(transcript) {
+			this.view = this.build(null, transcript.root("ge:document"));	
+		},
 		render: function() {
 			var root = this.svg.documentElement;
-			while (root.hasChildNodes()) root.removeChild(root.firstChild);			
-			if (this.view) this.view.render();
+			while (root.hasChildNodes()) root.removeChild(root.firstChild);
+			this.frame.scrollTo(0, 0);			
+			if (this.view) {
+				this.view.layout();
+				this.view.render();
+			}
 		},
 		build: function(parent, tree) {
 			if (tree == null) return null;			
@@ -18,27 +23,37 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 			var node = tree.node;
 			
 			if ((node instanceof Goddag.Text) && (parent != null) && (parent instanceof Faust.Line)) {
-				vc = new Faust.Text();
+				var textAttrs = {};
+				Y.each(node.ancestors(), function(a) {
+					var elem = a.node;
+					if (elem.name == "f:hand") {
+						textAttrs.hand = elem.attrs["f:id"];
+					} else if (elem.name == "ge:rewrite") {
+						textAttrs.rewrite = elem.attrs["tei:hand"];
+					} else if (elem.name == "f:under") {
+						textAttrs.under = true;
+					} else if (elem.name == "f:over") {
+						textAttrs.over = true;
+					}
+				});				
+				vc = new Faust.Text(this.svg, node.text(), textAttrs);
 			} else if (node instanceof Goddag.Element) {
 				if (node.name == "ge:document") {
-					vc = new Faust.Surface();
+					vc = new Faust.Surface(this.svg);
 				} else if (node.name == "tei:surface") {
-					vc = new Faust.Surface();
+					vc = new Faust.Surface(this.svg);
 				} else if (node.name == "tei:zone")	{
-					vc = new Faust.Zone();
+					vc = new Faust.Zone(this.svg);
 				} else if (node.name == "ge:line") {
-					vc = new Faust.Line();
+					vc = new Faust.Line(this.svg);
 				} else if (node.name == "f:grLine") {
-					vc = new Faust.GLine();
+					vc = new Faust.GLine(this.svg);
 				} else if (node.name == "f:grBrace") {
-					vc = new Faust.GBrace();
+					vc = new Faust.GBrace(this.svg);
 				}
 			}
 			
 			if (vc != null) {
-				vc.initViewComponent(node);
-				vc.svg = this.svg;
-				
 				if (parent != null) parent.add(vc);
 				parent = vc;
 			}
@@ -196,7 +211,8 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 		},
 		renderTranscript: function() {
 			this.pages[this.currentPage].transcription(function(t) {
-				var canvas = new Faust.DocumentTranscriptCanvas(t, window.frames["transcript-canvas"].document);
+				var canvas = new Faust.DocumentTranscriptCanvas("transcript-canvas");
+				canvas.init(t);
 				canvas.render();
 			});
 		}
