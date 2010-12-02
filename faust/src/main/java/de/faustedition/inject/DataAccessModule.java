@@ -18,7 +18,7 @@ public class DataAccessModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(GraphDatabaseService.class).toProvider(GraphDatabaseServiceProvider.class);
+		bind(GraphDatabaseService.class).toProvider(GraphDatabaseServiceProvider.class).asEagerSingleton();
 		try {
 			final GraphDatabaseTransactionInterceptor txInterceptor = new GraphDatabaseTransactionInterceptor();
 			requestInjection(txInterceptor);

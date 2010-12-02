@@ -33,6 +33,7 @@ import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.security.SecurityConstants;
 import de.faustedition.structure.StructureFinder;
 import de.faustedition.template.TemplateFinder;
+import de.faustedition.text.TextFinder;
 import de.faustedition.transcript.TranscriptFinder;
 import de.faustedition.xml.XMLFinder;
 
@@ -44,6 +45,7 @@ public class FaustApplication extends Application {
 	private final DocumentRouter documentRouter;
 	private final GenesisRouter genesisRouter;
 	private final TranscriptFinder transcriptFinder;
+	private final TextFinder textFinder;
 	private final XMLFinder xmlFinder;
 	private final StructureFinder structureFinder;
 	private final LdapSecurityStore ldapSecurityStore;
@@ -56,6 +58,7 @@ public class FaustApplication extends Application {
 			DocumentRouter documentRouter,//
 			GenesisRouter genesisRouter,//
 			TranscriptFinder transcriptFinder,//
+			TextFinder textFinder,//
 			XMLFinder xmlFinder,//
 			StructureFinder structureFinder,//
 			TemplateFinder templateFinder,//
@@ -66,6 +69,7 @@ public class FaustApplication extends Application {
 		this.documentRouter = documentRouter;
 		this.genesisRouter = genesisRouter;
 		this.transcriptFinder = transcriptFinder;
+		this.textFinder = textFinder;
 		this.xmlFinder = xmlFinder;
 		this.structureFinder = structureFinder;
 		this.templateFinder = templateFinder;
@@ -85,7 +89,7 @@ public class FaustApplication extends Application {
 		router.attach("demo/", secured(templateFinder));
 		router.attach("document/", secured(documentRouter));
 		router.attach("genesis/", secured(genesisRouter));
-		router.attach("text/", secured(templateFinder));
+		router.attach("text/", secured(textFinder));
 		router.attach("transcript/", secured(transcriptFinder));
 		router.attach("xml/", secured(xmlFinder));
 		router.attach("structure/", secured(structureFinder));

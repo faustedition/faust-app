@@ -1,17 +1,10 @@
 package de.faustedition.transcript;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.goddag4j.Element;
-import org.goddag4j.GoddagNode;
-import org.goddag4j.GoddagTreeNode;
 import org.goddag4j.MultiRootedTree;
-import org.goddag4j.Text;
 import org.goddag4j.token.WhitespaceTokenMarkupGenerator;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 
 import com.google.common.base.Objects;
 
@@ -19,6 +12,7 @@ import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapper;
+import de.faustedition.graph.TokenizerUtil;
 
 public abstract class Transcript extends NodeWrapper {
 	public enum Type {
@@ -83,33 +77,11 @@ public abstract class Transcript extends NodeWrapper {
 	public abstract Element getDefaultRoot();
 
 	public abstract void postprocess();
-	
+
 	public void tokenize() {
-		final WhitespaceTokenMarkupGenerator tokenGenerator = new WhitespaceTokenMarkupGenerator();
-		final GraphDatabaseService db = node.getGraphDatabase();
-
-		Element tokens = null;
-		List<Text> textNodes = new LinkedList<Text>();
-		Transaction tx = db.beginTx();
-		try {
-
-			tokens = new Element(db, "f", "tokens");
-			getTrees().addRoot(tokens);
-
-			final Element root = getDefaultRoot();
-			for (GoddagTreeNode node : root.getDescendants(root)) {
-				if (node.getNodeType() == GoddagNode.NodeType.TEXT) {
-					textNodes.add((Text) node);
-				}
-			}
-			tx.success();
-		} finally {
-			tx.finish();
-		}
-		
-		tokenGenerator.generate(textNodes, tokens);		
+		TokenizerUtil.tokenize(getTrees(), getDefaultRoot(), new WhitespaceTokenMarkupGenerator(), "f", "words");
 	}
-
+	
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("type", getType()).add("source", getSource()).toString();

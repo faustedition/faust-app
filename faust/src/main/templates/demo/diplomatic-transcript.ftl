@@ -13,7 +13,7 @@
 	#transcript-browser .yui3-widget-bd { white-space: nowrap; }
 	#transcript-browser .yui3-widget-bd li { width: 150px; text-align: center }
 	
-	#transcript-canvas { border: 0;width: 450px; height: 500px }
+	#transcript-canvas { border: 2px inset grey; width: 450px; height: 600px }
 	.zone { border: 1px dashed #ccc; margin: 3em 0; padding: 1em}	
 </#assign>
 <#assign header>
@@ -31,10 +31,10 @@
 <@faust.page title=message('demo.diplomatic_transcript.title') css=css header=header>
 	<div id="transcript" class="yui3-g">
 		<div class="yui3-u-1-2">
-			<iframe name="transcript-canvas" id="transcript-canvas" src="${cp}/static/svg/demo-diplomatic-transcript.svg"></iframe>
+			<div id="transcript-facsimile" class="facsimile" style="width: 450px; height: 600px"></div>
 		</div>
 		<div class="yui3-u">
-			<div id="transcript-facsimile" class="facsimile" style="width: 450px; height: 600px"></div>
+			<iframe name="transcript-canvas" id="transcript-canvas" src="${cp}/static/svg/demo-diplomatic-transcript.svg"></iframe>
 		</div>
 	</div>
 </@faust.page>

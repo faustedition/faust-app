@@ -1,21 +1,19 @@
 Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", function(Y) {
-	Faust.DocumentTranscriptCanvas = function(frame) {
-		this.frame = window.frames[frame];
-		this.svg = this.frame.document;		
+	Faust.DocumentTranscriptCanvas = function(node) {
+		this.svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		this.svgNode.setAttribute("width", "1000");
+		this.svgNode.setAttribute("height", "1500");
+		Y.Node.getDOMNode(node).appendChild(this.svgNode);
 	};
 
 	Faust.DocumentTranscriptCanvas.prototype = {
-		init: function(transcript) {
-			this.view = this.build(null, transcript.root("ge:document"));	
-		},
-		render: function() {
-			var root = this.svg.documentElement;
-			while (root.hasChildNodes()) root.removeChild(root.firstChild);
-			this.frame.scrollTo(0, 0);			
+		render: function(transcript) {
+			this.view = this.build(this, transcript.root("ge:document"));	
+			while (this.svgNode.hasChildNodes()) this.svgNode.removeChild(this.svgNode.firstChild);
 			if (this.view) {
 				this.view.layout();
 				this.view.render();
-			}
+			}				
 		},
 		build: function(parent, tree) {
 			if (tree == null) return null;			
@@ -34,27 +32,41 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 						textAttrs.under = true;
 					} else if (elem.name == "f:over") {
 						textAttrs.over = true;
+					} else if (elem.name == "f:st") {
+						textAttrs.strikethrough = true;
+					} else if (elem.name == "tei:hi" && elem.attrs["tei:rend"].indexOf("underline") >= 0) {
+						textAttrs.underline = true;
+					} else if (elem.name == "ge:line") {
+						textAttrs.fontsize = ((elem.attrs["ge:type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
 					}
 				});				
-				vc = new Faust.Text(this.svg, node.text(), textAttrs);
+				vc = new Faust.Text(node.text(), textAttrs);
 			} else if (node instanceof Goddag.Element) {
 				if (node.name == "ge:document") {
-					vc = new Faust.Surface(this.svg);
+					vc = new Faust.Surface();
 				} else if (node.name == "tei:surface") {
-					vc = new Faust.Surface(this.svg);
+					vc = new Faust.Surface();
 				} else if (node.name == "tei:zone")	{
-					vc = new Faust.Zone(this.svg);
+					vc = new Faust.Zone();
 				} else if (node.name == "ge:line") {
-					vc = new Faust.Line(this.svg);
+					var lineAttrs = {};
+					var rendition = node.attrs["ge:rend"] || "";
+					if (rendition.indexOf("center") >= 0) {
+						lineAttrs.center = true;
+					} else if (rendition.indexOf("indent") >= 0) {
+						var start = rendition.indexOf("indent-");
+						lineAttrs.indent = parseInt(rendition.substring(start + 7, start + 9)) / 100.0;
+					}
+					vc = new Faust.Line(lineAttrs);
 				} else if (node.name == "f:grLine") {
-					vc = new Faust.GLine(this.svg);
+					//vc = new Faust.GLine();
 				} else if (node.name == "f:grBrace") {
-					vc = new Faust.GBrace(this.svg);
+					//vc = new Faust.GBrace();
 				}
 			}
 			
 			if (vc != null) {
-				if (parent != null) parent.add(vc);
+				if (parent != null && parent !== this) parent.add(vc);
 				parent = vc;
 			}
 			
@@ -74,6 +86,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 
 		this.pages = pages;
 		this.currentPage = 0;
+		this.viewMode = "text-facsimile";
 		this.initUI();
 		this.setPage(parseInt(window.location.hash.substring(1)));	
 	};
@@ -113,7 +126,31 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 					this.currentPage = this.currentPage + 1;
 					this.renderPage();	
 				}		
-			}, "#transcript-next-page", this);		
+			}, "#transcript-next-page", this);
+			
+			var viewModeSelector = Y.get("#transcript-view-mode");
+			viewModeSelector.get("options").each(function(o) {
+				if (this.viewMode == o.get("value")) {
+					o.set("selected", "selected");
+				} else {
+					o.set("selected", null);
+				}
+			}, this);
+			Y.on("change", function(e) {
+				viewModeSelector.get("options").each(function(o) {
+					if (o.get("selected")) {
+						this.changeViewMode(o.get("value"));
+					}
+				}, this);
+			}, viewModeSelector, this);		
+		},
+		changeViewMode: function(mode) {
+			if ("text" == mode || "facsimile" == mode) {
+				this.viewMode = mode;
+			} else {
+				this.viewMode = "text-facsimile";
+			}
+			this.renderPage();
 		},
 		setPage: function(page) {
 			this.currentPage = 0;
@@ -170,12 +207,31 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 			window.location.hash = ("#" + this.pages[this.currentPage].order);
 
 			this.updateNavigation();
-			this.renderFacsimiles();
+			
+			var navigation = Y.get("#transcript-navigation");
+			var transcript = Y.get("#transcript");
+			if (transcript != null) {
+				transcript.remove();
+				transcript.destroy();
+			} 
+			transcript = Y.Node.create('<div id="transcript"></div>');
+			if (this.viewMode == 'text') {
+				transcript.append('<div id="transcript-text" style="width: 900px"></div>');
+			} else if (this.viewMode == 'facsimile') {
+				transcript.append('<div id="transcript-facsimile" style="width: 900px"></div>');				
+			} else {
+				transcript.addClass("yui3-g");
+				transcript.append('<div class="yui3-u-1-2" id="transcript-facsimile"></div>');				
+				transcript.append('<div class="yui3-u-1-2" id="transcript-text"></div>');
+			}
+			
+			navigation.insert(transcript, "after");
 			this.renderTranscript();
+			this.renderFacsimiles();				
 		},
 		updateNavigation: function() {
 			var browsePages = Y.one("#transcript-browse");
-			if (this.pages.length > 1) 
+			if (this.pages.length > 1 && this.pages.length < 40) 
 				browsePages.removeClass("disabled");
 			else
 				browsePages.addClass("disabled");
@@ -194,9 +250,12 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 
 		},
 		renderFacsimiles: function() {
-			Y.one("#transcript-facsimile").setContent("");
+			var container = Y.get("#transcript-facsimile");
+			if (container == null) return;
+			container.append('<div id="transcript-swf"></div>')
 			swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
-				"transcript-facsimile", "450px", "600px", 
+				"transcript-swf",
+				(container.get("offsetWidth") - 20) + "px", "600px",
 				"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
 					server: Faust.FacsimileServer,
 					image: this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif",
@@ -210,10 +269,11 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 				});	
 		},
 		renderTranscript: function() {
-			this.pages[this.currentPage].transcription(function(t) {
-				var canvas = new Faust.DocumentTranscriptCanvas("transcript-canvas");
-				canvas.init(t);
-				canvas.render();
+			var container = Y.get("#transcript-text");
+			if (container == null) return;
+			this.pages[this.currentPage].transcription(function(t) {				
+				var canvas = new Faust.DocumentTranscriptCanvas(container);
+				canvas.render(t);
 			});
 		}
 	};
