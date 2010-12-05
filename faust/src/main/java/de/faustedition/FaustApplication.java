@@ -28,7 +28,6 @@ import com.google.inject.name.Named;
 
 import de.faustedition.document.ArchiveRouter;
 import de.faustedition.document.DocumentRouter;
-import de.faustedition.genesis.GenesisRouter;
 import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.security.SecurityConstants;
 import de.faustedition.structure.StructureFinder;
@@ -43,7 +42,6 @@ public class FaustApplication extends Application {
 	private final TemplateFinder templateFinder;
 	private final ArchiveRouter archiveRouter;
 	private final DocumentRouter documentRouter;
-	private final GenesisRouter genesisRouter;
 	private final GoddagFinder goddagFinder;
 	private final TextFinder textFinder;
 	private final XMLFinder xmlFinder;
@@ -56,7 +54,6 @@ public class FaustApplication extends Application {
 			@Named("static.home") String staticResourcePath,//
 			ArchiveRouter archiveRouter,//
 			DocumentRouter documentRouter,//
-			GenesisRouter genesisRouter,//
 			GoddagFinder goddagFinder,//
 			TextFinder textFinder,//
 			XMLFinder xmlFinder,//
@@ -67,7 +64,6 @@ public class FaustApplication extends Application {
 		this.staticResourcePath = staticResourcePath;
 		this.archiveRouter = archiveRouter;
 		this.documentRouter = documentRouter;
-		this.genesisRouter = genesisRouter;
 		this.goddagFinder = goddagFinder;
 		this.textFinder = textFinder;
 		this.xmlFinder = xmlFinder;
@@ -88,7 +84,6 @@ public class FaustApplication extends Application {
 		router.attach("archive/", secured(archiveRouter));
 		router.attach("demo/", secured(templateFinder));
 		router.attach("document/", secured(documentRouter));
-		router.attach("genesis/", secured(genesisRouter));
 		router.attach("goddag/", secured(goddagFinder));
 		router.attach("text/", secured(textFinder));
 		router.attach("structure/", secured(structureFinder));

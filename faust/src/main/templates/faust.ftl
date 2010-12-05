@@ -75,6 +75,7 @@
 				<div class="yui3-menu-content">
 				<ul>
 					<li class="yui3-menuitem"><a href="${cp}/demo/diplomatic-transcript" class="yui3-menuitem-content">${message("menu.demo.diplomatic-transcript")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/demo/genesis" class="yui3-menuitem-content">${message("menu.genesis")}</a></li>
 				</ul>
 				</div>
 				</div>
@@ -102,8 +103,7 @@
 				</ul>
 				</div>
 				</div>
-			</li>
-			<li class="yui3-menuitem"><a href="${cp}/genesis/" class="yui3-menuitem-content">${message("menu.genesis")}</a></li>
+			</li>			
 			</#if>
 			<li><a class="yui3-menu-label" href="${cp}/project/about"><em>${message("menu.project")}</em></a>
 				<div id="project" class="yui3-menu">
