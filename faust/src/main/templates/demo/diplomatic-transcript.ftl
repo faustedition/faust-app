@@ -20,12 +20,12 @@
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/facsimile.css">
 	<script type="text/javascript" src="${cp}/static/js/mootools-1.2-core-compressed.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/mootools-1.2-more-compressed.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/facsimile.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/goddag.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/textmodel.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/document.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/documentview.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/document/facsimile.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/document/materialunit.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/document/model.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/document/view.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/demo/diplomatic-transcript.js"></script>
 </#assign>
 <@faust.page title=message('demo.diplomatic_transcript.title') css=css header=header>

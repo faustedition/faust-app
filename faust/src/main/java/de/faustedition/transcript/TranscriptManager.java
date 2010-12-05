@@ -29,6 +29,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.tei.WhitespaceUtil;
@@ -53,6 +54,27 @@ public class TranscriptManager {
 		this.xml = xml;
 		this.logger = logger;
 		this.db = graph.getGraphDatabaseService();
+	}
+
+	public Set<FaustURI> feedGraph() {
+		logger.info("Feeding transcripts into graph");
+		Set<FaustURI> failed = new HashSet<FaustURI>();
+		for (FaustURI transcript : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
+			try {
+				logger.fine("Importing transcript " + transcript);
+				add(transcript);
+			} catch (SAXException e) {
+				logger.log(Level.SEVERE, "XML error while adding transcript " + transcript, e);
+				failed.add(transcript);
+			} catch (TransformerException e) {
+				logger.log(Level.SEVERE, "XML error while adding transcript " + transcript, e);
+				failed.add(transcript);
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, "I/O error while adding transcript " + transcript, e);
+				failed.add(transcript);
+			}
+		}
+		return failed;
 	}
 
 	public Iterable<Transcript> add(FaustURI source) throws SAXException, IOException, TransformerException {

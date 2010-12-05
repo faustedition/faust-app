@@ -3,6 +3,10 @@ package de.faustedition.text;
 import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +29,9 @@ import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
+import de.faustedition.Runtime;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.tei.WhitespaceUtil;
 import de.faustedition.xml.CustomNamespaceMap;
@@ -35,12 +41,13 @@ import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 
 @Singleton
-public class TextManager {
+public class TextManager extends Runtime implements Runnable {
 
 	private final Logger logger;
 	private final FaustGraph graph;
 	private final GraphDatabaseService db;
 	private final XMLStorage xml;
+	private SortedMap<FaustURI, String> tableOfContents;
 
 	@Inject
 	public TextManager(FaustGraph graph, XMLStorage xml, Logger logger) {
@@ -48,6 +55,32 @@ public class TextManager {
 		this.xml = xml;
 		this.db = graph.getGraphDatabaseService();
 		this.logger = logger;
+	}
+
+	public Set<FaustURI> feedGraph() {
+		final Set<FaustURI> failed = new HashSet<FaustURI>();
+		logger.info("Importing texts");
+		for (FaustURI textSource : xml.iterate(new FaustURI(FaustAuthority.XML, "/text"))) {
+			try {
+				logger.info("Importing text " + textSource);
+				add(textSource);
+			} catch (SAXException e) {
+				logger.log(Level.SEVERE, "XML error while adding text " + textSource, e);
+				failed.add(textSource);
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, "I/O error while adding text " + textSource, e);
+				failed.add(textSource);
+			} catch (TransformerException e) {
+				logger.log(Level.SEVERE, "XML error while adding text " + textSource, e);
+				failed.add(textSource);
+			}
+		}
+		return failed;
+	}
+
+	@Override
+	public void run() {
+		feedGraph();
 	}
 
 	public Text add(FaustURI source) throws SAXException, IOException, TransformerException {
@@ -60,14 +93,15 @@ public class TextManager {
 		document.normalizeDocument();
 
 		final GoddagXMLReader textHandler = new GoddagXMLReader(db, CustomNamespaceMap.INSTANCE);
-		final XMLFragmentFilter textFragmentFilter = new XMLFragmentFilter(textHandler, TEI_NS_URI, "text");
 		final TextTitleCollector titleCollector = new TextTitleCollector();
-		final ContentHandler contentHandler = new MultiplexingContentHandler(textFragmentFilter, titleCollector);
+		final ContentHandler multiplexer = new MultiplexingContentHandler(textHandler, titleCollector);
+		
+		final XMLFragmentFilter textFragmentFilter = new XMLFragmentFilter(multiplexer, TEI_NS_URI, "text");
 
 		Text text = null;
 		final Transaction tx = db.beginTx();
 		try {
-			XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), new SAXResult(contentHandler));
+			XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), new SAXResult(textFragmentFilter));
 
 			final Element textRoot = textHandler.result();
 			if (textRoot != null) {
@@ -83,6 +117,10 @@ public class TextManager {
 			text.tokenize();
 		}
 		
+		synchronized (this) {
+			tableOfContents = null;
+		}
+		
 		return text;
 	}
 
@@ -96,8 +134,23 @@ public class TextManager {
 		return node == null ? null : new Text(node);
 	}
 
+	public synchronized SortedMap<FaustURI, String> tableOfContents() {
+		if (tableOfContents == null) {
+			tableOfContents = new TreeMap<FaustURI, String>();
+			Transaction tx = db.beginTx();
+			try {
+				for (Text t : graph.getTexts()) {
+					tableOfContents.put(t.getSource(), t.getTitle());
+				}
+				tx.success();
+			} finally {
+				tx.finish();
+			}
+		}
+		return tableOfContents;
+	}
+
 	private static class TextTitleCollector extends DefaultHandler {
-		private boolean inText = false;
 		private StringBuilder titleBuf;
 		private String title;
 
@@ -107,14 +160,7 @@ public class TextManager {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-			super.startElement(uri, localName, qName, attributes);
 			if (title != null) {
-				return;
-			}
-			if (!inText) {
-				if ("text".equals(localName) && TEI_NS_URI.equals(uri)) {
-					inText = true;
-				}
 				return;
 			}
 			if ("head".equals(localName) && TEI_NS_URI.equals(uri)) {
@@ -128,12 +174,6 @@ public class TextManager {
 			if (title != null) {
 				return;
 			}
-			if (inText) {
-				if ("text".equals(localName) && TEI_NS_URI.equals(uri)) {
-					inText = false;
-				}
-				return;
-			}
 			if ("head".equals(localName) && TEI_NS_URI.equals(uri)) {
 				this.title = titleBuf.toString().replaceAll("\\s+", " ").trim();
 				titleBuf = null;
@@ -142,10 +182,17 @@ public class TextManager {
 
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
-			if (titleBuf == null) {
-				return;
+			if (titleBuf != null) {
+				titleBuf.append(ch, start, length);
 			}
-			titleBuf.append(ch, start, length);
+		}
+	}
+	
+	public static void main(String[] args) {
+		try {
+			main(TextManager.class, args);
+		} finally {
+			System.exit(0);
 		}
 	}
 }

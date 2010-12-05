@@ -8,7 +8,6 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 public class GraphDatabaseServiceProvider implements Provider<GraphDatabaseService> {

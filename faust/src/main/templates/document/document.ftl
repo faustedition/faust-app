@@ -25,9 +25,9 @@
 <#assign header>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/goddag.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/textmodel.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/document.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/documentview.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/document/materialunit.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/document/model.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/document/view.js"></script>
 </#assign>
 <@faust.page title=title css=css header=header>
 	<div id="transcript-navigation">

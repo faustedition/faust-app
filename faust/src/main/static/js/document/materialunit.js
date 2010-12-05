@@ -12,7 +12,7 @@ Faust.YUI().use("oop", function(Y) {
 		},
 		transcription: function(callback) {
 			if (this.transcript == null) { callback(); return; }
-			Faust.io(this.transcript.source.encodedPath(), function(data) {
+			Faust.io("goddag/" + this.transcript.source.encodedPath(), function(data) {
 				callback(new Goddag.Graph(data));
 			});
 		}

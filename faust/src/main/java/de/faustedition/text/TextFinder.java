@@ -28,15 +28,15 @@ public class TextFinder extends Finder {
 	public TextFinder(XMLStorage xml, TextManager textManager, Provider<TextResource> textResources, Logger logger) {
 		this.xml = xml;
 		this.textManager = textManager;
-		this.textResources = textResources;		
-		this.logger = logger;		
+		this.textResources = textResources;
+		this.logger = logger;
 	}
-	
+
 	@Override
 	public ServerResource find(Request request, Response response) {
 		final Deque<String> path = FaustURI.toPathDeque(request.getResourceRef().getRelativeRef().getPath());
 		path.addFirst("text");
-		
+
 		logger.fine("Finding text resource for " + path);
 
 		try {
@@ -44,7 +44,7 @@ public class TextFinder extends Finder {
 			if (uri == null) {
 				return null;
 			}
-			
+
 			logger.fine("Finding text for " + uri);
 			final Text text = textManager.find(uri);
 			if (text == null) {

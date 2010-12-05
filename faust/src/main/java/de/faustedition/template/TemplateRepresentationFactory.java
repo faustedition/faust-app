@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.restlet.data.ClientInfo;
 import org.restlet.data.Language;
@@ -22,6 +24,8 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import de.faustedition.FaustURI;
+import de.faustedition.text.TextManager;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -31,10 +35,12 @@ public class TemplateRepresentationFactory {
 			Lists.newArrayList(new Language("de"), new Language("en")));
 
 	private final Configuration configuration;
+	private final TextManager textManager;
 
 	@Inject
-	public TemplateRepresentationFactory(Configuration configuration) {
+	public TemplateRepresentationFactory(Configuration configuration, TextManager textManager) {
 		this.configuration = configuration;
+		this.textManager = textManager;
 	}
 
 	public TemplateRepresentation create(String path, ClientInfo client) throws IOException {
@@ -51,10 +57,36 @@ public class TemplateRepresentationFactory {
 		model.put("roles", Lists.transform(client.getRoles(), Functions.toStringFunction()));
 		model.put("message", ResourceBundle.getBundle("messages", locale));
 
+		final SortedMap<String, String> textTableOfContents = new TreeMap<String, String>();
+		for (Map.Entry<FaustURI, String> tocEntry : textManager.tableOfContents().entrySet()) {
+			final String textUriPath = tocEntry.getKey().getPath();
+			final String textName = textUriPath.substring("/text/".length(), textUriPath.length() - ".xml".length());
+			textTableOfContents.put(textName, tocEntry.getValue());
+		}
+		model.put("textToc", textTableOfContents);
+
 		TemplateRepresentation representation = new TemplateRepresentation(template, model, MediaType.TEXT_HTML);
 		representation.setLanguages(Collections.singletonList(language));
 
 		return representation;
+	}
+
+	public static class TextTableOfContentsEntry {
+		private final String path;
+		private final String title;
+
+		public TextTableOfContentsEntry(String path, String title) {
+			this.path = path;
+			this.title = title;
+		}
+
+		public String getPath() {
+			return path;
+		}
+
+		public String getTitle() {
+			return title;
+		}
 	}
 
 	/**

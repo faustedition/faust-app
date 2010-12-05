@@ -5,8 +5,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -39,12 +43,33 @@ public class MaterialUnitManager {
 	private final TranscriptManager transcriptManager;
 	private final GraphDatabaseService db;
 
+	private final Logger logger;
+
 	@Inject
-	public MaterialUnitManager(FaustGraph graph, XMLStorage xml, TranscriptManager transcriptManager) {
+	public MaterialUnitManager(FaustGraph graph, GraphDatabaseService db, XMLStorage xml, TranscriptManager transcriptManager, Logger logger) {
 		this.graph = graph;
+		this.db = db;
 		this.xml = xml;
 		this.transcriptManager = transcriptManager;
-		this.db = graph.getGraphDatabaseService();
+		this.logger = logger;		
+	}
+
+	public Set<FaustURI> feedGraph() {
+		final Set<FaustURI> failed = new HashSet<FaustURI>();
+		logger.info("Feeding material units into graph");
+		for (FaustURI documentDescriptor : xml.iterate(MaterialUnitManager.DOCUMENT_BASE_URI)) {
+			try {
+				logger.fine("Importing document " + documentDescriptor);
+				add(documentDescriptor);
+			} catch (SAXException e) {
+				logger.log(Level.SEVERE, "XML error while adding document " + documentDescriptor, e);
+				failed.add(documentDescriptor);
+			} catch (IOException e) {
+				logger.log(Level.SEVERE, "I/O error while adding document " + documentDescriptor, e);
+				failed.add(documentDescriptor);
+			}
+		}
+		return failed;
 	}
 
 	@GraphDatabaseTransactional

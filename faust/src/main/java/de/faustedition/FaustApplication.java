@@ -32,9 +32,9 @@ import de.faustedition.genesis.GenesisRouter;
 import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.security.SecurityConstants;
 import de.faustedition.structure.StructureFinder;
+import de.faustedition.tei.GoddagFinder;
 import de.faustedition.template.TemplateFinder;
 import de.faustedition.text.TextFinder;
-import de.faustedition.transcript.TranscriptFinder;
 import de.faustedition.xml.XMLFinder;
 
 @Singleton
@@ -44,7 +44,7 @@ public class FaustApplication extends Application {
 	private final ArchiveRouter archiveRouter;
 	private final DocumentRouter documentRouter;
 	private final GenesisRouter genesisRouter;
-	private final TranscriptFinder transcriptFinder;
+	private final GoddagFinder goddagFinder;
 	private final TextFinder textFinder;
 	private final XMLFinder xmlFinder;
 	private final StructureFinder structureFinder;
@@ -57,7 +57,7 @@ public class FaustApplication extends Application {
 			ArchiveRouter archiveRouter,//
 			DocumentRouter documentRouter,//
 			GenesisRouter genesisRouter,//
-			TranscriptFinder transcriptFinder,//
+			GoddagFinder goddagFinder,//
 			TextFinder textFinder,//
 			XMLFinder xmlFinder,//
 			StructureFinder structureFinder,//
@@ -68,7 +68,7 @@ public class FaustApplication extends Application {
 		this.archiveRouter = archiveRouter;
 		this.documentRouter = documentRouter;
 		this.genesisRouter = genesisRouter;
-		this.transcriptFinder = transcriptFinder;
+		this.goddagFinder = goddagFinder;
 		this.textFinder = textFinder;
 		this.xmlFinder = xmlFinder;
 		this.structureFinder = structureFinder;
@@ -89,10 +89,10 @@ public class FaustApplication extends Application {
 		router.attach("demo/", secured(templateFinder));
 		router.attach("document/", secured(documentRouter));
 		router.attach("genesis/", secured(genesisRouter));
+		router.attach("goddag/", secured(goddagFinder));
 		router.attach("text/", secured(textFinder));
-		router.attach("transcript/", secured(transcriptFinder));
-		router.attach("xml/", secured(xmlFinder));
 		router.attach("structure/", secured(structureFinder));
+		router.attach("xml/", secured(xmlFinder));
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
 

@@ -22,7 +22,7 @@
             <tspan x="100" dy="20" class="scribe ink">Unglückliche Verliebte! die verſchmäht,</tspan>
             <tspan x="100" dy="20" class="scribe ink">Verdrehten Halſes nach der Liebſten ſpäht.</tspan>
             <tspan x="125" dy="30" class="scribe ink">Auch mir! Was zieht den Kopf auf jene Seite?</tspan>
-            <tspan x="100" dy="20" class="scribe ink">Bin ich mir ihr doch in geſchwornem Streite?</tspan>
+            <tspan x="100" dy="20" class="scribe ink">Bin ich mit ihr doch in geſchwornem Streite?</tspan>
             <tspan x="100" dy="20" class="scribe ink">Der Anblick war mir ſonſt ſo feindlich ſcharf.</tspan>
             <tspan x="100" dy="20" class="scribe ink">Hat mich ein Fremdes durch und durch gedrungen,</tspan>
             <tspan x="100" dy="20" class="scribe ink">Ich mag ſie gerne ſehn die hübſchen Jungen;</tspan>
@@ -44,11 +44,11 @@
             <tspan x="225" dy="20" class="goethe ink small strikethrough">was&#xa0;</tspan><tspan x="333" class="goethe ink small strikethrough">denn?&#xa0;</tspan><tspan class="goethe ink small strikethrough">So bleib!</tspan>
             <tspan x="100" dy="20" class="scribe ink">Wir kom̄en ſchon</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots">warum</tspan>&#xa0;<tspan class="scribe ink"> weichſt</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots">du zurück?</tspan>
             <tspan x="100" dy="20" class="scribe ink">Wir nähern uns und wenn du kannſt ſo bleib.</tspan>
-            <tspan x="300" dy="20" class="center goethe ink">☝<!-- <g ref="#g_transp_1"/> --></tspan>
-            <tspan x="125" dy="20" class="scribe ink">Mephiſt.</tspan>
-            <tspan x="100" dy="20" class="scribe ink">Ihr ſcheltet uns verdammte Geiſter;</tspan>
-            <tspan x="100" dy="20" class="scribe ink">Und ſeyd die wahren Hexenmeiſter</tspan>
-            <tspan x="100" dy="20" class="scribe ink">Denn ihr verführet Mann und Weib.</tspan>
+            <tspan x="300" dy="20" class="center goethe ink small">☝<!-- <g ref="#g_transp_1"/> --></tspan>
+            <tspan x="125" dy="20" class="scribe ink small">Mephiſt.</tspan>
+            <tspan x="100" dy="20" class="scribe ink small">Ihr ſcheltet uns verdammte Geiſter;</tspan>
+            <tspan x="100" dy="20" class="scribe ink small">Und ſeyd die wahren Hexenmeiſter</tspan>
+            <tspan x="100" dy="20" class="scribe ink small">Denn ihr verführet Mann und Weib.</tspan>
             <tspan dx="100" class="unknown">11</tspan>
          </text>
       </g>

@@ -1,4 +1,4 @@
-package de.faustedition.transcript;
+package de.faustedition.tei;
 
 import static org.restlet.data.MediaType.APPLICATION_XML;
 
@@ -12,6 +12,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
 import org.goddag4j.Element;
+import org.goddag4j.MultiRootedTree;
 import org.goddag4j.io.GoddagJSONWriter;
 import org.goddag4j.io.GoddagXMLWriter;
 import org.restlet.data.Form;
@@ -20,33 +21,25 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
-import com.google.inject.Inject;
-
 import de.faustedition.JsonRespresentation;
-import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLUtil;
 
-@GraphDatabaseTransactional
-public class TranscriptResource extends ServerResource {
-	private Transcript transcript;
+public class GoddagResource extends ServerResource {
 
-	@Inject
-	public TranscriptResource() {
-		super();
+	private MultiRootedTree trees;
+	
+	public void setTrees(MultiRootedTree trees) {
+		this.trees = trees;
 	}
-
-	public void setTranscript(Transcript transcript) {
-		this.transcript = transcript;
-	}
-
+	
 	@Get("json")
 	public Representation streamJson() {
 		return new JsonRespresentation() {
 
 			@Override
 			protected void generate() throws IOException {
-				new GoddagJSONWriter(CustomNamespaceMap.INSTANCE).write(transcript.getTrees(), generator);
+				new GoddagJSONWriter(CustomNamespaceMap.INSTANCE).write(trees, generator);
 			}
 		};
 	}
@@ -66,9 +59,9 @@ public class TranscriptResource extends ServerResource {
 
 		Element rootCandidate = null;
 		if (rootPrefix != null && rootLocalName != null) {
-			rootCandidate = transcript.getTrees().findRoot(rootPrefix, rootLocalName);
+			rootCandidate = trees.findRoot(rootPrefix, rootLocalName);
 		} else {
-			final Iterator<Element> rootIt = transcript.getTrees().iterator();
+			final Iterator<Element> rootIt = trees.iterator();
 			rootCandidate = (rootIt.hasNext() ? rootIt.next() : null);
 		}
 
@@ -93,4 +86,5 @@ public class TranscriptResource extends ServerResource {
 			}
 		};
 	}
+
 }
