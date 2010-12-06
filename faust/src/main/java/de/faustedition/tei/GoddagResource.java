@@ -15,6 +15,7 @@ import org.goddag4j.Element;
 import org.goddag4j.MultiRootedTree;
 import org.goddag4j.io.GoddagJSONWriter;
 import org.goddag4j.io.GoddagXMLWriter;
+import org.goddag4j.io.GoddagJSONWriter.GoddagJSONEnhancer;
 import org.restlet.data.Form;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
@@ -28,9 +29,14 @@ import de.faustedition.xml.XMLUtil;
 public class GoddagResource extends ServerResource {
 
 	private MultiRootedTree trees;
+	private GoddagJSONEnhancer enhancer = GoddagJSONWriter.NOOP_ENHANCER;
 	
 	public void setTrees(MultiRootedTree trees) {
 		this.trees = trees;
+	}
+	
+	public void setEnhancer(GoddagJSONEnhancer enhancer) {
+		this.enhancer = enhancer;
 	}
 	
 	@Get("json")
@@ -39,7 +45,7 @@ public class GoddagResource extends ServerResource {
 
 			@Override
 			protected void generate() throws IOException {
-				new GoddagJSONWriter(CustomNamespaceMap.INSTANCE).write(trees, generator);
+				new GoddagJSONWriter(CustomNamespaceMap.INSTANCE, enhancer).write(trees, generator);
 			}
 		};
 	}

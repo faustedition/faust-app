@@ -99,6 +99,13 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		return (r == null ? null : Transcript.forNode(r.getStartNode()));
 	}
 
+	public static MaterialUnit find(Transcript t) {
+		for (Relationship r : t.node.getRelationships(TRANSCRIPT_RT, OUTGOING)) {
+			return forNode(r.getEndNode());
+		}
+		return null;
+	}
+	
 	public void setTranscript(Transcript transcript) {
 		final Relationship r = node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
 		if (r != null) {

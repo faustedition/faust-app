@@ -74,8 +74,11 @@
 				<div id="demo" class="yui3-menu">
 				<div class="yui3-menu-content">
 				<ul>
-					<li class="yui3-menuitem"><a href="${cp}/demo/diplomatic-transcript" class="yui3-menuitem-content">${message("menu.demo.diplomatic-transcript")}</a></li>
-					<li class="yui3-menuitem"><a href="${cp}/demo/genesis" class="yui3-menuitem-content">${message("menu.genesis")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/demo/diplomatic-transcript" class="yui3-menuitem-content">${message("menu.demo.diplomatic-transcript_1")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/document/faust/2.5/gsa_390883.xml" class="yui3-menuitem-content">${message("menu.demo.diplomatic-transcript_2")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/structure/" class="yui3-menuitem-content">${message("menu.demo.manuscript_description")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/demo/genesis" class="yui3-menuitem-content">${message("menu.demo.genesis_1")}</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/text/2-5-4.xml" class="yui3-menuitem-content">${message("menu.demo.genesis_2")}</a></li>
 				</ul>
 				</div>
 				</div>

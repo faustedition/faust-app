@@ -4,7 +4,6 @@ import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.goddag4j.MultiRootedTree;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Form;
@@ -17,7 +16,9 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 import de.faustedition.FaustURI;
+import de.faustedition.genesis.GeneticRelationManager;
 import de.faustedition.text.Text;
+import de.faustedition.text.TextGeneticJSONEnhancer;
 import de.faustedition.text.TextManager;
 import de.faustedition.transcript.Transcript;
 import de.faustedition.transcript.Transcript.Type;
@@ -32,14 +33,16 @@ public class GoddagFinder extends Finder {
 	private final TranscriptManager transcriptManager;
 	private final TextManager textManager;
 	private final Provider<GoddagResource> goddagResources;
+	private final Provider<TextGeneticJSONEnhancer> textGeneticEnhancers;
 
 	@Inject
 	public GoddagFinder(XMLStorage xml, Provider<GoddagResource> goddagResources, TranscriptManager transcriptManager,
-			TextManager textManager, Logger logger) {
+			TextManager textManager, Provider<TextGeneticJSONEnhancer> textGeneticEnhancers, Logger logger) {
 		this.xml = xml;
 		this.goddagResources = goddagResources;
 		this.transcriptManager = transcriptManager;
 		this.textManager = textManager;
+		this.textGeneticEnhancers = textGeneticEnhancers;
 		this.logger = logger;
 	}
 
@@ -61,12 +64,16 @@ public class GoddagFinder extends Finder {
 		}
 
 		final String uriPath = uri.getPath();
-		MultiRootedTree trees = null;
+		GoddagResource resource = null;
 
 		if (uriPath.startsWith("/text")) {
 			logger.fine("Finding text for " + uri);
 			final Text text = textManager.find(uri);
-			trees = (text == null ? null : text.getTrees());
+			if (text != null) {
+				resource = goddagResources.get();
+				resource.setTrees(text.getTrees());
+				resource.setEnhancer(textGeneticEnhancers.get());
+			}
 		} else if (uriPath.startsWith("/transcript")) {
 			final Form parameters = resourceRef.getQueryAsForm();
 			Type transcriptType = null;
@@ -77,14 +84,12 @@ public class GoddagFinder extends Finder {
 
 			logger.fine("Finding transcript for " + uri + (transcriptType == null ? "" : "[" + transcriptType + "]"));
 			Transcript transcript = transcriptManager.find(uri, transcriptType);
-			trees = (transcript == null ? null : transcript.getTrees());
+			if (transcript != null) {
+				resource = goddagResources.get();
+				resource.setTrees(transcript.getTrees());
+			}
 		}
 
-		if (trees == null) {
-			return null;
-		}
-		final GoddagResource resource = goddagResources.get();
-		resource.setTrees(trees);
 		return resource;
 
 	}

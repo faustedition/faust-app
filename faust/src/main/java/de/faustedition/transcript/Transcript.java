@@ -1,12 +1,16 @@
 package de.faustedition.transcript;
 
 import org.goddag4j.Element;
+import org.goddag4j.GoddagTreeNode;
 import org.goddag4j.MultiRootedTree;
 import org.goddag4j.token.WhitespaceTokenMarkupGenerator;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
 
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
@@ -81,9 +85,21 @@ public abstract class Transcript extends NodeWrapper {
 	public void tokenize() {
 		TokenizerUtil.tokenize(getTrees(), getDefaultRoot(), new WhitespaceTokenMarkupGenerator(), "f", "words");
 	}
-	
+
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("type", getType()).add("source", getSource()).toString();
+	}
+
+	public static Transcript find(GoddagTreeNode node) {
+		Element root = Iterables.getFirst(node.getRoots(), null);
+		if (root == null) {
+			return null;
+		}
+		for (Relationship r : root.node.getRelationships(MARKUP_VIEW_RT, Direction.INCOMING)) {
+			return forNode(r.getStartNode());
+		}
+		return null;
+
 	}
 }

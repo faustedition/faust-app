@@ -17,4 +17,17 @@ public abstract class NodeWrapper {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof NodeWrapper) {
+			return node.equals(((NodeWrapper) obj).node);
+		}
+		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return node.hashCode();
+	}
 }

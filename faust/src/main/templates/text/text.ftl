@@ -34,6 +34,7 @@
 	.current-page { font-size: 123.1%; font-weight: bold }
 </#assign>
 <#assign header>
+	<script type="text/javascript" src="${cp}/static/js/protovis-r3.2.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/goddag.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/text/model.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/text/view.js"></script>

@@ -3,14 +3,21 @@ package de.faustedition.genesis;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.goddag4j.Element;
+import org.goddag4j.GoddagNode;
+import org.goddag4j.GoddagTreeNode;
 import org.goddag4j.visit.GoddagVisitor;
 import org.joda.time.LocalDate;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -20,14 +27,17 @@ import com.google.inject.Singleton;
 
 import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
+import de.faustedition.document.Document;
+import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.text.Text;
 import de.faustedition.transcript.Transcript;
 import de.faustedition.transcript.Transcript.Type;
 
 @Singleton
 public class GeneticRelationManager extends Runtime implements Runnable {
-
+	private static final FaustRelationshipType GENETIC_REL = new FaustRelationshipType("is-genetically-related"); 
 	private final FaustGraph graph;
 	private final GraphDatabaseService db;
 	private final Logger logger;
@@ -41,6 +51,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 
 	@Override
 	public void run() {
+		final Pattern numbers = Pattern.compile("\\d+");
 		Transaction tx = db.beginTx();
 		try {
 			final SortedMap<Integer, Element> textLineIndex = textLineIndex();
@@ -49,14 +60,21 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 					continue;
 				}
 
-				System.out.println(t);
+				logger.info(t.toString());
 				final Element root = t.getDefaultRoot();
 				new GoddagVisitor() {
 					public void startElement(Element root, Element element) {
 						if ("tei:l".equals(element.getQName())) {
 							String lineNumbers = element.getAttributeValue("tei", "n");
 							if (lineNumbers != null) {
-								System.out.printf("\t'%s'\n", lineNumbers);
+								Matcher lnMatcher = numbers.matcher(lineNumbers);
+								while (lnMatcher.find()) {									
+									final Integer lineNumber = Integer.valueOf(lnMatcher.group());
+									final Element target = textLineIndex.get(lineNumber);
+									if (target != null) {
+										element.node.createRelationshipTo(target.node, GENETIC_REL);
+									}
+								}
 							}
 						}
 					};
@@ -82,6 +100,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 				texts.put(text.getSource(), text);
 			}
 			for (Text text : texts.values()) {
+				logger.info(text.getSource().toString());
 				final Element root = text.getDefaultRoot();
 				new GoddagVisitor() {
 					public void startElement(Element root, Element element) {
@@ -151,5 +170,27 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 		} finally {
 			System.exit(0);
 		}
+	}
+
+	public Set<Document> findRelatedDocuments(Element l) {
+		Set<Document> related = new HashSet<Document>();
+		for (Relationship r : l.node.getRelationships(GENETIC_REL)) {
+			final Transcript transcript = Transcript.find((GoddagTreeNode) GoddagNode.wrap(r.getOtherNode(l.node)));
+			if (transcript == null) {
+				continue;
+			}
+			
+			MaterialUnit transcribed = MaterialUnit.find(transcript);
+			MaterialUnit parent = transcribed.getParent();
+			while (parent != null) {
+				transcribed = parent;
+				parent = parent.getParent();
+			}
+			
+			if (transcribed instanceof Document) {
+				related.add((Document) transcribed);
+			}
+		}
+		return related;
 	}
 }
