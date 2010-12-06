@@ -1,7 +1,9 @@
 FaustStructure = function(){};
 
-var minD = 10;
-var minLength = 150;
+// ***** global *****
+
+var minD = 15;
+var minLength = 180;
 var buttonTop = 0;
 var buttonLeft = 0;
 var buttonTopBlatt;
@@ -11,6 +13,8 @@ var facsLefthand;
 var facsRighthand;
 var envWidth;
 var initPic;
+var lockButton;
+
 
 //***** main *****
 
@@ -43,6 +47,7 @@ FaustStructure.load = function(uri) {
 		buttonLeft = envelope.width + minD;		
 				
 		envelope.draw(envelope.width + minD, facsHeight + minD * 3);
+
 	})
 };
 
@@ -62,6 +67,12 @@ FaustStructure.structureFromXML  = function(element, node){
 		    childElement = new FaustStructure.Blatt();
 		if (childNode.nodeName== "Lage"	) 
 			childElement = new FaustStructure.Lage();
+
+		
+		if (childElement) {
+			element.children.push(childElement);
+			FaustStructure.structureFromXML(childElement, childNode);
+		}
 
 
 		if (childNode.nodeName == "Bogenblatt")
@@ -86,17 +97,9 @@ FaustStructure.structureFromXML  = function(element, node){
 			} else throw "Art must be recto or verso!";
 		
 		if (childNode.nodeName == "Metadaten") {
-			element.metadata = {};
+			//element.metadata = {};
 			FaustStructure.metadataFromXML(element.metadata, childNode);
 		}
-		
-
-		if (childElement) {
-			element.children.push(childElement);
-			FaustStructure.structureFromXML(childElement, childNode);
-		}
-
-		
 
 	}
 
@@ -105,11 +108,8 @@ FaustStructure.structureFromXML  = function(element, node){
 
 FaustStructure.metadataFromXML  = function(element, node){
 
-
 	for ( var i = 0; i < node.childNodes.length; i++) {
 		var childNode = node.childNodes[i];
-
-		var childElement = null;
 
 		if (childNode.nodeName== "Digitalisat")  {
 			var fausturi = new Faust.URI(childNode.childNodes[0].textContent);
@@ -119,23 +119,24 @@ FaustStructure.metadataFromXML  = function(element, node){
 			// fixme
 			if (!initPic)
 				initPic = fausturi;
-			
-
 		}
-		
 	}
-
 };
 
 
 FaustStructure.setSrc = function(pageDisplay, uri) {
-	if (uri)
+
+	//first, set blank until image is loaded.
+	pageDisplay.attr("src", "");
+
+	
+	// fixme: a better way to validate uris
+	if (uri && uri.components)
 	pageDisplay.attr("src", "https://faustedition.uni-wuerzburg.de/images/iipsrv.fcgi?FIF=" +  uri.encodedPath()
 			+ ".tif&SDS=0,90&CNT=1.0&WID="+ envWidth + "&QLT=99&CVT=jpeg");
 	else
 		pageDisplay.attr("src", "https://faustedition.uni-wuerzburg.de/dev/static/img/emblem.jpg");
 		
-
 }
 
 FaustStructure.test = function() {
@@ -185,6 +186,74 @@ FaustStructure.test = function() {
 
 };
 
+//***** button *****
+
+FaustStructure.Button = function(x, y, width, height, topblatt, bottomblatt) {
+	
+	var button = paper.rect(x, y, width, height);
+	button.attr("stroke", "none");
+	button.attr("fill", "gray");
+	button.attr("fill-opacity", 0);
+	button.toFront();
+	button.topblatt = topblatt;
+	button.bottomblatt = bottomblatt;
+
+	button.toBack();
+	button.hover(function (event) {
+		
+		this.animate({"fill-opacity": .7}, 300, ">");
+		this.toFront();
+		if (this.topblatt) {
+			FaustStructure.setSrc(facsLefthand, this.topblatt.verso.metadata.digitalisat);
+			facsLefthand.show();
+		} else 
+			facsLefthand.hide();
+		
+		if (this.bottomblatt) {
+			FaustStructure.setSrc(facsRighthand, this.bottomblatt.recto.metadata.digitalisat);
+			facsRighthand.show();
+		} else 
+			facsRighthand.hide();
+		
+	}, function (event) {
+		this.animate({"fill-opacity": 0}, 300, ">");
+
+		if (lockButton.topblatt) {
+			FaustStructure.setSrc(facsLefthand, lockButton.topblatt.verso.metadata.digitalisat);
+			facsLefthand.show();
+		} else 
+			facsLefthand.hide();
+		
+		if (lockButton.bottomblatt) {
+			FaustStructure.setSrc(facsRighthand, lockButton.bottomblatt.recto.metadata.digitalisat);
+			facsRighthand.show();
+		} else 
+			facsRighthand.hide();
+
+		
+	});
+
+	button.click(function (event) {
+		
+		var x = this.attrs.x;
+		var y = this.attrs.y;
+		var width = this.attrs.width;
+		var height = this.attrs.height;
+		
+		lockButton.animate({"fill-opacity": .7,
+			                "x": x,
+			                "y": y,
+			                "width": width,
+			                "height": height,
+			                }, 0, ">");
+		lockButton.toFront();
+		lockButton.topblatt = this.topblatt;
+		lockButton.bottomblatt = this.bottomblatt;
+	});
+
+	
+}
+
 //***** envelope *****
 
 FaustStructure.Envelope = function() {
@@ -193,6 +262,7 @@ FaustStructure.Envelope = function() {
 	this.path.attr("stroke-width", "1");
 	this.path.attr("stroke-linecap", "round");
 	this.children = [];
+	this.metadata = {};
 	this.x = 0;
 	this.y = 0;
 
@@ -202,7 +272,7 @@ FaustStructure.Envelope = function() {
 FaustStructure.Envelope.prototype = {
 
 		toString : function() {return "Envelope"},
-
+		
 		layout : function() {
 			// if I contain sth.
 			// layout that first
@@ -234,6 +304,13 @@ FaustStructure.Envelope.prototype = {
 
 		draw : function(x, y) {
 
+			//draw lockButton
+			lockButton = paper.rect(0,0,0,0);
+ 			lockButton.attr("stroke", "none");
+			lockButton.attr("fill", "red");
+			lockButton.attr("fill-opacity", 0);
+			lockButton.toFront();
+
 			var abs_x = this.x + x;
 			var abs_y = this.y + y;
 
@@ -250,6 +327,11 @@ FaustStructure.Envelope.prototype = {
 					child.draw(abs_x, abs_y);
 				}
 
+			//draw the last button
+			
+			new FaustStructure.Button(abs_x, buttonTop, this.width , (abs_y+this.height - buttonTop) +  minD, buttonTopBlatt, null);
+
+
 		}
 
 };
@@ -265,6 +347,8 @@ FaustStructure.Doppelblatt = function() {
 	this.path.attr("stroke-width", "3");
 	this.path.attr("stroke-linecap", "round");
 	this.children = [];
+	this.metadata = {};
+	
 	this.x = 0;
 	this.y = 0;
 
@@ -367,6 +451,7 @@ FaustStructure.Blatt = function() {
 	this.lengthmod = 0;
 	this.recto = new FaustStructure.RSeite();
 	this.verso = new FaustStructure.VSeite();
+	this.metadata = {};
 	
 	// doubly linked list
 	this.pBlatt = prevBlatt;
@@ -380,7 +465,7 @@ FaustStructure.Blatt = function() {
 FaustStructure.Blatt.prototype = {
 
 		toString : function() {return "Blatt"},
-		
+
 		layout : function() {
 
 			this.width = minLength;
@@ -423,33 +508,13 @@ FaustStructure.Blatt.prototype = {
 			//this.path.rotate(-5, lx, ly);
 
 			//draw a new button from the last vseite to this rseite
-			var button = paper.rect(buttonLeft, buttonTop, (abs_x + this.width - buttonLeft), (abs_y+this.recto.height - buttonTop));
-			button.attr("stroke", "none");
-			button.attr("fill", "white");
+			
+			new FaustStructure.Button(buttonLeft, buttonTop, (abs_x + this.width - buttonLeft), (abs_y+this.recto.height - buttonTop), buttonTopBlatt, this);
+
 			//set corner for next button
 			buttonTop = abs_y + this.recto.height;
 			buttonLeft = abs_x;
-			button.topblatt = buttonTopBlatt;
-			button.bottomblatt = this;
 			buttonTopBlatt = this;
-			button.toBack();
-			button.hover(function (event) {
-				this.attr({fill: "gray"});
-				if (this.topblatt) {
-					FaustStructure.setSrc(facsLefthand, this.topblatt.verso.metadata.digitalisat);
-					facsLefthand.show();
-				} else 
-					facsLefthand.hide();
-				
-				if (this.bottomblatt) {
-					FaustStructure.setSrc(facsRighthand, this.bottomblatt.recto.metadata.digitalisat);
-					facsRighthand.show();
-				} else 
-					facsRighthand.hide();
-				
-			}, function (event) {
-				this.attr({fill: "white"});
-			});
 
 			if (this.verso)
 				this.verso.draw(abs_x, abs_y + this.recto.height);
@@ -464,7 +529,7 @@ FaustStructure.RSeite = function(paper) {
 	this.x = 0;
 	this.y = 0;
 	this.children = [];
-
+	this.metadata= {};
 };
 
 
@@ -518,13 +583,13 @@ FaustStructure.VSeite = function() {
 	this.x = 0;
 	this.y = 0;
 	this.children = [];
-
+	this.metadata = {};
 };
 
 FaustStructure.VSeite.prototype = {
 
 		toString : function() {return "VSeite"},
-		
+
 		layout : function() {
 
 			this.width = minLength;
@@ -570,7 +635,7 @@ FaustStructure.Anbringung = function() {
 		this.path.attr("stroke-width", "3");
 		this.x = 0;
 		this.y = 0;
-
+		this.metadata = {};
 };
 
 FaustStructure.Anbringung.prototype = {
@@ -612,7 +677,7 @@ FaustStructure.Lage =  function() {
 	this.children = [];
 	this.x = 0;
 	this.y = 0;
-
+	this.metadata = {};
 };
 
 FaustStructure.Lage.prototype = {
@@ -678,4 +743,6 @@ FaustStructure.Lage.prototype = {
 		}
 
 };
-//window.onload = load;
+
+
+
