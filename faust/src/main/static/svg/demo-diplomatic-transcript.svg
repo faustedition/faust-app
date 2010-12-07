@@ -39,12 +39,12 @@
             <tspan x="100" dy="20" class="scribe ink">So heimlich Kätzchenhaft begierlich</tspan><tspan class="goethe pencil">;</tspan>
             <tspan x="100" dy="20" class="scribe ink">Mit jedem Blick aufs neue ſchöner ſchön.</tspan>
             <tspan x="100" dy="20" class="scribe ink">O nähert euch! O gönnt mir einen Blick</tspan><tspan class="goethe pencil">.</tspan>
-            <tspan x="300" dy="20" class="scribe ink underline center">Engel</tspan>
-            <tspan x="225" dy="20" class="goethe ink small strikethrough">was&#xa0;</tspan><tspan x="333" class="goethe ink small strikethrough">denn?&#xa0;</tspan><tspan class="goethe ink small strikethrough">So bleib!</tspan>
+            <tspan x="250" dy="20" class="scribe ink underline center">Engel</tspan>
+            <tspan x="200" dy="20" class="goethe ink small strikethrough">was&#xa0;</tspan><tspan x="300" class="goethe ink small strikethrough">denn?&#xa0;</tspan><tspan class="goethe ink small strikethrough">So bleib!</tspan>
             <tspan x="100" dy="20" class="scribe ink small">Wir kom̄en ſchon</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots small">warum</tspan>&#xa0;<tspan class="scribe ink small"> weichſt</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots small">du zurück?</tspan>
             <tspan x="100" dy="20" class="scribe ink small">Wir nähern uns und wenn du kannſt ſo bleib.</tspan>
-            <tspan x="300" dy="20" class="center goethe ink small">☝<!-- <g ref="#g_transp_1"/> --></tspan>
-            <tspan x="125" dy="20" class="scribe ink small">Mephiſt.</tspan>
+            <tspan x="250" dy="20" class="center goethe ink small">┏</tspan>
+            <tspan x="250" dy="20" class="center scribe ink small">Mephiſt.</tspan>
             <tspan x="100" dy="20" class="scribe ink small">Ihr ſcheltet uns verdammte Geiſter;</tspan>
             <tspan x="100" dy="20" class="scribe ink small">Und ſeyd die wahren Hexenmeiſter</tspan>
             <tspan x="100" dy="20" class="scribe ink small">Denn ihr verführet Mann und Weib.</tspan>
@@ -53,20 +53,20 @@
       </g>
       <g transform="rotate(90, 100, 400)" id="margin">
          <text x="100" y="400">
-            <tspan dx="-40" dy="20" class="center goethe ink">☝<!-- <g ref="#g_transp_1"/> --></tspan>
+            <tspan dx="-40" dy="20" class="center goethe ink">┏<!-- <g ref="#g_transp_1"/> --></tspan>
             <tspan x="100" class="goethe ink">(Die Engel nehmen umherziehend den ganzen Raum ein)</tspan>
             <tspan x="100" dy="20" class="goethe ink">Mephiſtopheles (der in’s Proſcenium gedrängt wird)</tspan>
          </text>
          
       </g>
       <g transform="translate(75)" class="goethe" id="patch">
-         <rect x="100" y="100" width="400" height="120" style="fill: #eee; opacity: 0.8" />
+         <rect x="0" y="100" width="600" height="120" style="fill: #eee; opacity: 0.8" />
          <text x="100" y="100" class="goethe" opacity="1">
             <tspan dx="300" dy="20" class="pencil latin right">i.</tspan>
-            <tspan class="ink" x="100" dy="20">Dringt es gewaltig ein</tspan>
-            <tspan class="ink" x="100" dy="20">Müſſen wir tüchtig ſeyn.</tspan>
-            <tspan class="ink" x="100" dy="20">Liebe nur Liebende</tspan>
-            <tspan class="ink" x="100" dy="20">Führet herein.</tspan>
+            <tspan class="ink" x="200" dy="20">Dringt es gewaltig ein</tspan>
+            <tspan class="ink" x="200" dy="20">Müſſen wir tüchtig ſeyn.</tspan>
+            <tspan class="ink" x="200" dy="20">Liebe nur Liebende</tspan>
+            <tspan class="ink" x="200" dy="20">Führet herein.</tspan>
          </text>
       </g>      
    </g>

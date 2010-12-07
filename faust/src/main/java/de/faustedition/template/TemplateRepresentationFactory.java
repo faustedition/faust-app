@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import org.restlet.data.ClientInfo;
 import org.restlet.data.Language;
@@ -36,11 +37,13 @@ public class TemplateRepresentationFactory {
 
 	private final Configuration configuration;
 	private final TextManager textManager;
+	private final Logger logger;
 
 	@Inject
-	public TemplateRepresentationFactory(Configuration configuration, TextManager textManager) {
+	public TemplateRepresentationFactory(Configuration configuration, TextManager textManager, Logger logger) {
 		this.configuration = configuration;
 		this.textManager = textManager;
+		this.logger = logger;
 	}
 
 	public TemplateRepresentation create(String path, ClientInfo client) throws IOException {
@@ -51,11 +54,15 @@ public class TemplateRepresentationFactory {
 		final Language language = getPreferredMetadata(SUPPORTED_LANGUAGES, client.getAcceptedLanguages());
 		final Locale locale = (language == null ? Locale.GERMAN : new Locale(language.getName()));
 
+		logger.fine("Getting template for " + path + " with locale " + locale);
 		Template template = configuration.getTemplate(path + ".ftl", locale);
 		Preconditions.checkNotNull(template, "Cannot find template for " + path);
 
 		model.put("roles", Lists.transform(client.getRoles(), Functions.toStringFunction()));
-		model.put("message", ResourceBundle.getBundle("messages", locale));
+		
+		final ResourceBundle messages = ResourceBundle.getBundle("messages", locale);
+		logger.fine("Putting message resource bundle '" + messages.getLocale() + "' into model (requested locale " + locale + ")");
+		model.put("message", messages);
 
 		final SortedMap<String, String> textTableOfContents = new TreeMap<String, String>();
 		for (Map.Entry<FaustURI, String> tocEntry : textManager.tableOfContents().entrySet()) {

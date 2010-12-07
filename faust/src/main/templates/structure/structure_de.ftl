@@ -24,7 +24,7 @@
 </#assign>
 <@faust.page title=title css=css header=header>
 	<div class="demo-note">
-		<p>This view shows the manuscript structure on the left-hand side. Move the mouse cursor to any position in the manuscript to see the facsimiles belonging to that particular position. A click locks the view; the  manuscript now  lays before  you as if  were opened  at the particular  position. A click on the facsimile leads you to the transcription.</p>
+		<p>In dieser Ansicht ist die Konvolutstruktur auf der linken Seite schematisch dargestellt. Bewegen Sie den Mauszeiger an eine beliebige Stelle im Konvolut, um die zu dieser Stelle gehörigen Faksimiles anzuzeigen. Ein Klick fixiert die Ansicht. Das Konvolut liegt nun vor Ihnen,  als wäre es auf der entsprechenden Seite aufgeschlagen. Ein Klick auf ein Faksimile führt zur Umschrift.</p>
 	</div>
 	<div id="canvas" class="yui3-g">
 		

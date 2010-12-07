@@ -63,6 +63,7 @@ table, td, th, tr { border: 0 }
 /* System */
 
 .system-note { background: #404D80; color: white; padding: 2em; text-align: center; }
+.demo-note { margin: 0.5em 1em; padding: 0.5em 1em; background: #408051; color: white; border: 1px solid #fff; }
 
 /* Text */
 

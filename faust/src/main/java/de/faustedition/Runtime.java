@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.ConsoleHandler;
@@ -23,6 +24,8 @@ public abstract class Runtime {
 	protected static Level logLevel = Level.WARNING;
 
 	public static void main(Class<? extends Runnable> clazz, String[] args) {
+		Locale.setDefault(new Locale("en", "us"));
+		
 		for (String arg : args) {
 			if ("-debug".equalsIgnoreCase(arg)) {
 				logLevel = Level.ALL;

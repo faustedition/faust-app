@@ -31,12 +31,15 @@
 <@faust.page title=message('demo.diplomatic_transcript.title') css=css header=header>
 	<div class="demo-note">
 		<p>
-		This view shows a diplomatic transcript in the graphical quality we aim for in our publication.
-		It is not computed based on an encoded transcript but handcrafted to showcase some features like arbitrary placement and orientation of text segments, free usage of graphic strokes and shapes as well as interactivity.
+		In dieser Ansicht sehen Sie eine diplomatische Umschrift, hergestellt in der graphischen Qualität, die wir letztlich für unsere Ausgabe anstreben.
+		Die Umschrift ist nicht auf Basis eines kodierten Transkripts berechnet worden, sondern wurde von Hand erstellt, um einige besondere Funktionen hervorheben zu können.
+		So können Textsegmente frei platziert, orientiert und graphische Markierung können möglichst genau nachgebildet werden.
+		Zudem interagiert die Darstellung mit dem Benutzer.
 		</p>
 		
 		<p>
-		For example, in the transcript, please click on the superimposed text segment on the top to change its visibility or click on rotated marginal note on the left to focus the facsimile display on the corresponding region.
+		Zum Beispiel können Sie auf den überblendeten Text oben in der Umschrift klicken, um diesen ein- oder auszublenden;
+		ein Klick auf die gedreht dargestellte Marginalie am linken Rand fokussiert die Faksimileanzeige im ihr entsprechenden Bildbereich.
 		</p>
 	</div>
 	<#include "diplomatic-transcript-contents.ftl"/>

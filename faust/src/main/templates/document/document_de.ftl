@@ -31,13 +31,14 @@
 </#assign>
 <@faust.page title=title css=css header=header>
 	<div class="demo-note">
-		<p>This view shows the diplomatic transcript of a sample manuscript as it is currently computed from encoded sources.</p>
+		<p>Diese Ansicht zeigt die diplomatische Umschrift einer Beispielhandschrift, wie sie automatisch aus kodierten Quellen abgeleitet wird.</p>
 		
-		<p>The rendering is not very accurate yet, but you can already get an idea, how we envision the navigation in multi-page manuscripts or the usage of different view modes.</p>
+		<p>Der Umschrift mangelt es zwar noch an Genauigkeit; demgegenüber kann man hier jedoch bereits die Navigation in mehrseitigen Handschriften sowie die Nutzung verschiedener Darstellungsmodi ausprobieren.</p>
 		
 		<p>
-		Please feel free to use the navigation on top of the content area to move page-by-page in the manuscript or to browse the manuscript as a whole.
-		For the latter option, click on “Browse” and drag the mouse over the facsimile images to skim the portfolio. A double-click on a thumbnail image jumps to the corresponding page.
+		Nutzen Sie bitte die Navigationsleiste im oberen Bereich der Umschrift, um das Manuskript durchzublättern, entweder seitenweise oder im Überblick.
+		Für die Überblicksdarstellung klicken Sie bitten auf „Blättern” und ziehen Sie ihre Maus über die Seitenleiste, um größere Bereiche der Handschrift zu überfliegen.
+		Ein Doppelklick auf eine verkleinerte Seitendarstellung springt zur entsprechenden Umschrift. 
 		</p>
 	</div>
 	<#include "document-contents.ftl"/>
