@@ -3,9 +3,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
    version="1.1" baseProfile="full" width="1000" height="1500">
-   <g>
+   <g transform="translate(0, -50)">
       <line x1="100" y1="100" x2="500" y2="950" stroke="#999" opacity="0.7"/>
-      <!-- <ge:used hand="#g" spanTo="#used"/>  -->
       <g transform="translate(75)">
          <text x="100" y="100">
             <tspan dx="300" dy="20" class="pencil latin">i.</tspan>
@@ -42,8 +41,8 @@
             <tspan x="100" dy="20" class="scribe ink">O nähert euch! O gönnt mir einen Blick</tspan><tspan class="goethe pencil">.</tspan>
             <tspan x="300" dy="20" class="scribe ink underline center">Engel</tspan>
             <tspan x="225" dy="20" class="goethe ink small strikethrough">was&#xa0;</tspan><tspan x="333" class="goethe ink small strikethrough">denn?&#xa0;</tspan><tspan class="goethe ink small strikethrough">So bleib!</tspan>
-            <tspan x="100" dy="20" class="scribe ink">Wir kom̄en ſchon</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots">warum</tspan>&#xa0;<tspan class="scribe ink"> weichſt</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots">du zurück?</tspan>
-            <tspan x="100" dy="20" class="scribe ink">Wir nähern uns und wenn du kannſt ſo bleib.</tspan>
+            <tspan x="100" dy="20" class="scribe ink small">Wir kom̄en ſchon</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots small">warum</tspan>&#xa0;<tspan class="scribe ink small"> weichſt</tspan>&#xa0;<tspan class="scribe ink strikethrough underdots small">du zurück?</tspan>
+            <tspan x="100" dy="20" class="scribe ink small">Wir nähern uns und wenn du kannſt ſo bleib.</tspan>
             <tspan x="300" dy="20" class="center goethe ink small">☝<!-- <g ref="#g_transp_1"/> --></tspan>
             <tspan x="125" dy="20" class="scribe ink small">Mephiſt.</tspan>
             <tspan x="100" dy="20" class="scribe ink small">Ihr ſcheltet uns verdammte Geiſter;</tspan>

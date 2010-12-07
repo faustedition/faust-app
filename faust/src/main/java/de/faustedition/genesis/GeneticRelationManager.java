@@ -51,6 +51,10 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 
 	@Override
 	public void run() {
+		feedGraph();
+	}
+	
+	public void feedGraph() {
 		final Pattern numbers = Pattern.compile("\\d+");
 		Transaction tx = db.beginTx();
 		try {
@@ -60,7 +64,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 					continue;
 				}
 
-				logger.info(t.toString());
+				logger.fine(t.toString());
 				final Element root = t.getDefaultRoot();
 				new GoddagVisitor() {
 					public void startElement(Element root, Element element) {
@@ -100,7 +104,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 				texts.put(text.getSource(), text);
 			}
 			for (Text text : texts.values()) {
-				logger.info(text.getSource().toString());
+				logger.fine(text.getSource().toString());
 				final Element root = text.getDefaultRoot();
 				new GoddagVisitor() {
 					public void startElement(Element root, Element element) {
