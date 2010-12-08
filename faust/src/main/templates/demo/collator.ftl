@@ -7,8 +7,17 @@
 <@faust.page title="Collation" css=css>
 	<table class="alignment">
 		<tr>
-			<th colspan="2">Text</th>
-			<th colspan="2">Document</th>
+			<th colspan="2">
+				Text<br>
+				<a href="${cp}/goddag/transcript/gsa/390883/390883.xml?root=tei:text&amp;textnodes=true"
+					title="Source">Source</a>
+				
+			</th>
+			<th colspan="2">
+				Document<br>
+				<a href="${cp}/goddag/transcript/gsa/390883/0002.xml?root=ge:document&amp;textnodes=true"
+					title="Source">Source</a>
+			</th>
 		</tr>
 	<#list alignment as a>
 		<tr>
