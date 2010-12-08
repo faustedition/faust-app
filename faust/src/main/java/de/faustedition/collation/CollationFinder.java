@@ -32,6 +32,7 @@ import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.document.MaterialUnitManager;
 import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.transcript.Transcript;
 
 @Singleton
 public class CollationFinder extends Finder {
@@ -75,7 +76,11 @@ public class CollationFinder extends Finder {
 				final SortedSet<MaterialUnit> pages = document.getSortedContents();
 				List<Iterable<Token>> pageTokens = new ArrayList<Iterable<Token>>(pages.size());
 				for (MaterialUnit page : pages) {
-					final Element documentRoot = page.getTranscript().getTrees().getRoot("f", "words");
+					final Transcript transcript = page.getTranscript();
+					if (transcript == null) {
+						continue;
+					}
+					final Element documentRoot = transcript.getTrees().getRoot("f", "words");
 					pageTokens.add(Iterables.transform(documentRoot.getChildren(documentRoot),
 							new Function<GoddagTreeNode, Token>() {
 
