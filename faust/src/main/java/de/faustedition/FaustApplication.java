@@ -26,6 +26,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import de.faustedition.collation.CollationFinder;
 import de.faustedition.document.ArchiveRouter;
 import de.faustedition.document.DocumentRouter;
 import de.faustedition.security.LdapSecurityStore;
@@ -48,6 +49,7 @@ public class FaustApplication extends Application {
 	private final StructureFinder structureFinder;
 	private final LdapSecurityStore ldapSecurityStore;
 	private final RuntimeMode runtimeMode;
+	private final CollationFinder collationFinder;
 
 	@Inject
 	public FaustApplication(RuntimeMode runtimeMode,//
@@ -58,7 +60,8 @@ public class FaustApplication extends Application {
 			TextFinder textFinder,//
 			XMLFinder xmlFinder,//
 			StructureFinder structureFinder,//
-			TemplateFinder templateFinder,//
+			CollationFinder collationFinder,//
+			TemplateFinder templateFinder,//			
 			LdapSecurityStore ldapSecurityStore) {
 		this.runtimeMode = runtimeMode;
 		this.staticResourcePath = staticResourcePath;
@@ -68,6 +71,7 @@ public class FaustApplication extends Application {
 		this.textFinder = textFinder;
 		this.xmlFinder = xmlFinder;
 		this.structureFinder = structureFinder;
+		this.collationFinder = collationFinder;
 		this.templateFinder = templateFinder;
 		this.ldapSecurityStore = ldapSecurityStore;
 	}
@@ -82,6 +86,7 @@ public class FaustApplication extends Application {
 		router.attach("project/", templateFinder);
 		
 		router.attach("archive/", secured(archiveRouter));
+		router.attach("collation/", secured(collationFinder));
 		router.attach("demo/", secured(templateFinder));
 		router.attach("document/", secured(documentRouter));
 		router.attach("goddag/", secured(goddagFinder));
