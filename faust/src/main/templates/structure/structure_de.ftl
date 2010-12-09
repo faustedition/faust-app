@@ -26,9 +26,14 @@
 	<div class="demo-note">
 		<p>In dieser Ansicht ist die Konvolutstruktur auf der linken Seite schematisch dargestellt. Bewegen Sie den Mauszeiger an eine beliebige Stelle im Konvolut, um die zu dieser Stelle gehörigen Faksimiles anzuzeigen. Ein Klick fixiert die Ansicht. Das Konvolut liegt nun vor Ihnen,  als wäre es auf der entsprechenden Seite aufgeschlagen. Ein Klick auf ein Faksimile führt zur Umschrift.</p>
 	</div>
-	<div id="canvas" class="yui3-g">
-		
-	</div>
+
+	<div id="structure" class="yui3-g">
+		<div id="canvas" class="yui3-u-1-2"></div>
+		<div id="padding" class="yui3-u-1-8"></div>		
+		<div id="metadata" class="yui3-u-3-8"></div>	
+	</div>	
+	
+	
 	<div id="transcript-browser" class="hidden">
 		<div class="yui3-widget-hd"><a id="transcript-hide-browser" href="" title="...">[X]</a></div>
 		<div class="yui3-widget-bd">&nbsp;</div>

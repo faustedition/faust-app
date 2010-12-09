@@ -26,9 +26,14 @@
 	<div class="demo-note">
 		<p>This view shows the manuscript structure on the left-hand side. Move the mouse cursor to any position in the manuscript to see the facsimiles belonging to that particular position. A click locks the view; the  manuscript now  lays before  you as if  were opened  at the particular  position. A click on the facsimile leads you to the transcription.</p>
 	</div>
-	<div id="canvas" class="yui3-g">
-		
-	</div>
+	
+	<div id="structure" class="yui3-g">
+		<div id="canvas" class="yui3-u-1-2"></div>
+		<div id="padding" class="yui3-u-1-8"></div>		
+		<div id="metadata" class="yui3-u-3-8"></div>	
+	</div>	
+	
+	
 	<div id="transcript-browser" class="hidden">
 		<div class="yui3-widget-hd"><a id="transcript-hide-browser" href="" title="...">[X]</a></div>
 		<div class="yui3-widget-bd">&nbsp;</div>

@@ -1,6 +1,6 @@
 FaustStructure = function(){};
 
-// ***** global *****
+//***** global *****
 
 var minD = 15;
 var minLength = 180;
@@ -8,11 +8,10 @@ var buttonTop = 0;
 var buttonLeft = 0;
 var buttonTopBlatt;
 var paper;
-var prevBlatt = null;
 var facsLefthand;
 var facsRighthand;
 var envWidth;
-var initPic;
+//var initPic;
 var lockButton;
 
 
@@ -25,27 +24,30 @@ FaustStructure.load = function(uri) {
 	stripped = "xml/" + (new Faust.URI(uri).encodedPath());
 	Faust.xml(stripped, function (xml) {
 
-		//FaustStructure.test();
+		// FaustStructure.test();
 		var envelope = new FaustStructure.Envelope();
-		
+
 		FaustStructure.structureFromXML(envelope, xml.documentElement);
-		
-		
+
+
 		envelope.layout();
 		envWidth = envelope.width;
-		
+
 		facsHeight = envelope.width * 1.5;
 
 		facsLefthand =  paper.image("", minD, minD, envelope.width, facsHeight);
 		facsLefthand.hide();
-		
+
 		facsRighthand = paper.image("", envelope.width + minD, minD, envelope.width, facsHeight);
-		FaustStructure.setSrc (facsRighthand, initPic);
-		
-		
+		//FaustStructure.setSrc (facsRighthand, initPic);
+		facsRighthand.hide();
+
+
 		buttonTop = facsHeight + minD;
 		buttonLeft = envelope.width + minD;		
-				
+
+		FaustStructure.displayMetadata(document.getElementById("metadata"), envelope.metadata);
+		
 		envelope.draw(envelope.width + minD, facsHeight + minD * 3);
 
 	})
@@ -64,11 +66,11 @@ FaustStructure.structureFromXML  = function(element, node){
 		if (childNode.nodeName== "Doppelblatt") 
 			childElement = new FaustStructure.Doppelblatt();
 		if (childNode.nodeName== "Einzelblatt") 
-		    childElement = new FaustStructure.Blatt();
+			childElement = new FaustStructure.Blatt();
 		if (childNode.nodeName== "Lage"	) 
 			childElement = new FaustStructure.Lage();
 
-		
+
 		if (childElement) {
 			element.children.push(childElement);
 			FaustStructure.structureFromXML(childElement, childNode);
@@ -85,19 +87,18 @@ FaustStructure.structureFromXML  = function(element, node){
 				element.second.lengthmod = minD;
 				FaustStructure.structureFromXML(element.second, childNode);				
 			}
-		
+
 		if (childNode.nodeName == "Seite")
 			if (childNode.attributes.getNamedItem("Art").nodeValue == "recto") {
 				element.recto = new FaustStructure.RSeite();
 				FaustStructure.structureFromXML(element.recto, childNode);
-				
+
 			} else if (childNode.attributes.getNamedItem("Art").nodeValue == "verso") {
 				element.verso = new FaustStructure.VSeite();
 				FaustStructure.structureFromXML(element.verso, childNode);				
 			} else throw "Art must be recto or verso!";
-		
+
 		if (childNode.nodeName == "Metadaten") {
-			//element.metadata = {};
 			FaustStructure.metadataFromXML(element.metadata, childNode);
 		}
 
@@ -109,34 +110,123 @@ FaustStructure.structureFromXML  = function(element, node){
 FaustStructure.metadataFromXML  = function(element, node){
 
 	for ( var i = 0; i < node.childNodes.length; i++) {
+		
 		var childNode = node.childNodes[i];
+		
+		if (childNode.nodeType != childNode.ELEMENT_NODE)
+			continue;
 
 		if (childNode.nodeName== "Digitalisat")  {
 			var fausturi = new Faust.URI(childNode.childNodes[0].textContent);
 			if (!element.digitalisat)
 				element.digitalisat = fausturi;
-			//first page?
+			// first page?
 			// fixme
-			if (!initPic)
-				initPic = fausturi;
+			//if (!initPic)
+				//initPic = fausturi;
 		}
+
+		
+		if (childNode.nodeName == "Foliierung")  {
+			element.foliierung = {};
+			FaustStructure.metadataFromXML(element.foliierung, childNode);
+			continue;
+		}
+
+		if (childNode.nodeName == "Blattnummer")  {
+			var z = childNode.attributes.getNamedItem("ZŠhlung");
+			element[z.value] = childNode.textContent;
+			continue;
+		}
+		
+		//attach everything to the element
+		//element[childNode.nodeName] = childNode.textContent.replace(/^\s*|\s(?=\s)|\s*$/g, "");
+		element[childNode.nodeName] = FaustStructure.linearizeMetadata(childNode);
+		
 	}
 };
+
+FaustStructure.linearizeMetadata = function (node) {
+
+	var txt = "";
+	
+	for ( var i = 0; i < node.childNodes.length; i++) {
+				
+		var childNode = node.childNodes[i];
+		if (childNode.nodeType == childNode.ELEMENT_NODE)
+			txt += childNode.nodeName + ": ";
+		if (childNode.nodeType == childNode.TEXT_NODE)
+			txt += childNode.textContent.replace(/^\s*|\s(?=\s)|\s*$/g, "");
+
+		txt += FaustStructure.linearizeMetadata(childNode);
+
+		if (childNode.nodeType == childNode.ELEMENT_NODE)
+			txt += ". ";
+
+	}	
+	
+	return txt;
+}
 
 
 FaustStructure.setSrc = function(pageDisplay, uri) {
 
-	//first, set blank until image is loaded.
+	// first, set blank until image is loaded.
 	pageDisplay.attr("src", "");
 
-	
 	// fixme: a better way to validate uris
-	if (uri && uri.components)
-	pageDisplay.attr("src", "https://faustedition.uni-wuerzburg.de/images/iipsrv.fcgi?FIF=" +  uri.encodedPath()
-			+ ".tif&SDS=0,90&CNT=1.0&WID="+ envWidth + "&QLT=99&CVT=jpeg");
-	else
+	if (uri && uri.components) {
+		pageDisplay.attr("src", "https://faustedition.uni-wuerzburg.de/images/iipsrv.fcgi?FIF=" +  uri.encodedPath()
+				+ ".tif&SDS=0,90&CNT=1.0&WID="+ envWidth + "&QLT=99&CVT=jpeg");
+
+		// link to transcript
+
+		var transcriptPath = uriMap[uri.components[2]];
+		if (transcriptPath) {
+			pageDisplay.attr({
+				cursor:"pointer",
+				href: Faust.contextPath + transcriptPath,
+			});
+
+		}
+		else {
+			pageDisplay.attr({
+				cursor: "not-allowed",
+				href: null,
+			});
+
+
+		}
+
+
+	}
+	else {
 		pageDisplay.attr("src", "https://faustedition.uni-wuerzburg.de/dev/static/img/emblem.jpg");
+		pageDisplay.href = null;
+	}
+
+	
+	
+
+
+}
+
+FaustStructure.displayMetadata = function(metadataDisplay, metadata) {
+	
+	metadataDisplay.appendChild(document.createElement("br"));
+	for (var i in metadata) {
 		
+		var header = document.createElement("b");
+		var title = document.createTextNode(i + ": ");
+		var br = document.createElement("br");
+		header.appendChild(title);
+		metadataDisplay.appendChild(header);
+		metadataDisplay.appendChild(document.createTextNode(metadata[i]));
+		metadataDisplay.appendChild(br);
+		
+		
+
+	}
 }
 
 FaustStructure.test = function() {
@@ -189,7 +279,7 @@ FaustStructure.test = function() {
 //***** button *****
 
 FaustStructure.Button = function(x, y, width, height, topblatt, bottomblatt) {
-	
+
 	var button = paper.rect(x, y, width, height);
 	button.attr("stroke", "none");
 	button.attr("fill", "gray");
@@ -200,7 +290,7 @@ FaustStructure.Button = function(x, y, width, height, topblatt, bottomblatt) {
 
 	button.toBack();
 	button.hover(function (event) {
-		
+
 		this.animate({"fill-opacity": .7}, 300, ">");
 		this.toFront();
 		if (this.topblatt) {
@@ -208,13 +298,13 @@ FaustStructure.Button = function(x, y, width, height, topblatt, bottomblatt) {
 			facsLefthand.show();
 		} else 
 			facsLefthand.hide();
-		
+
 		if (this.bottomblatt) {
 			FaustStructure.setSrc(facsRighthand, this.bottomblatt.recto.metadata.digitalisat);
 			facsRighthand.show();
 		} else 
 			facsRighthand.hide();
-		
+
 	}, function (event) {
 		this.animate({"fill-opacity": 0}, 300, ">");
 
@@ -223,35 +313,35 @@ FaustStructure.Button = function(x, y, width, height, topblatt, bottomblatt) {
 			facsLefthand.show();
 		} else 
 			facsLefthand.hide();
-		
+
 		if (lockButton.bottomblatt) {
 			FaustStructure.setSrc(facsRighthand, lockButton.bottomblatt.recto.metadata.digitalisat);
 			facsRighthand.show();
 		} else 
 			facsRighthand.hide();
 
-		
+
 	});
 
 	button.click(function (event) {
-		
+
 		var x = this.attrs.x;
 		var y = this.attrs.y;
 		var width = this.attrs.width;
 		var height = this.attrs.height;
-		
+
 		lockButton.animate({"fill-opacity": .7,
-			                "x": x,
-			                "y": y,
-			                "width": width,
-			                "height": height,
-			                }, 0, ">");
+			"x": x,
+			"y": y,
+			"width": width,
+			"height": height,
+		}, 0, ">");
 		lockButton.toFront();
 		lockButton.topblatt = this.topblatt;
 		lockButton.bottomblatt = this.bottomblatt;
 	});
 
-	
+
 }
 
 //***** envelope *****
@@ -272,7 +362,7 @@ FaustStructure.Envelope = function() {
 FaustStructure.Envelope.prototype = {
 
 		toString : function() {return "Envelope"},
-		
+
 		layout : function() {
 			// if I contain sth.
 			// layout that first
@@ -290,7 +380,7 @@ FaustStructure.Envelope.prototype = {
 				child.x = this.x + minD;
 			}
 			this.height -= minD;
-			
+
 
 			// I now know how wide all of my children are;
 			// make every child as wide as the widest one
@@ -304,9 +394,9 @@ FaustStructure.Envelope.prototype = {
 
 		draw : function(x, y) {
 
-			//draw lockButton
+			// draw lockButton
 			lockButton = paper.rect(0,0,0,0);
- 			lockButton.attr("stroke", "none");
+			lockButton.attr("stroke", "none");
 			lockButton.attr("fill", "red");
 			lockButton.attr("fill-opacity", 0);
 			lockButton.toFront();
@@ -327,8 +417,8 @@ FaustStructure.Envelope.prototype = {
 					child.draw(abs_x, abs_y);
 				}
 
-			//draw the last button
-			
+			// draw the last button
+
 			new FaustStructure.Button(abs_x, buttonTop, this.width , (abs_y+this.height - buttonTop) +  minD, buttonTopBlatt, null);
 
 
@@ -348,16 +438,16 @@ FaustStructure.Doppelblatt = function() {
 	this.path.attr("stroke-linecap", "round");
 	this.children = [];
 	this.metadata = {};
-	
+
 	this.x = 0;
 	this.y = 0;
 
-	//this.first = new FaustStructure.Blatt();
-	//this.second = new FaustStructure.Blatt();
+	// this.first = new FaustStructure.Blatt();
+	// this.second = new FaustStructure.Blatt();
 
 	// draw a little longer, to show attachment
-	//this.first.lengthmod = minD;
-	//this.second.lengthmod = minD;
+	// this.first.lengthmod = minD;
+	// this.second.lengthmod = minD;
 };
 
 
@@ -452,12 +542,7 @@ FaustStructure.Blatt = function() {
 	this.recto = new FaustStructure.RSeite();
 	this.verso = new FaustStructure.VSeite();
 	this.metadata = {};
-	
-	// doubly linked list
-	this.pBlatt = prevBlatt;
-	if (prevBlatt)
-		prevBlatt.nBlatt = this;
-	prevBlatt = this;
+
 
 };
 
@@ -492,9 +577,9 @@ FaustStructure.Blatt.prototype = {
 				this.recto.draw(abs_x, abs_y);
 
 
-			//var debug = paper.rect(abs_x,abs_y, this.width, this.height);
-			//debug.attr("stroke", "yellow");
-			//debug.attr("stroke-width", 2);
+			// var debug = paper.rect(abs_x,abs_y, this.width, this.height);
+			// debug.attr("stroke", "yellow");
+			// debug.attr("stroke-width", 2);
 
 
 			var lx = (abs_x - this.lengthmod);
@@ -505,20 +590,30 @@ FaustStructure.Blatt.prototype = {
 
 			var pathstr = "M" + right + "L" + left;
 			this.path.attr("path", pathstr);
-			//this.path.rotate(-5, lx, ly);
+			// this.path.rotate(-5, lx, ly);
 
-			//draw a new button from the last vseite to this rseite
-			
+			// draw a new button from the last vseite to this rseite
+
 			new FaustStructure.Button(buttonLeft, buttonTop, (abs_x + this.width - buttonLeft), (abs_y+this.recto.height - buttonTop), buttonTopBlatt, this);
 
-			//set corner for next button
+			// set corner for next button
 			buttonTop = abs_y + this.recto.height;
 			buttonLeft = abs_x;
 			buttonTopBlatt = this;
 
 			if (this.verso)
 				this.verso.draw(abs_x, abs_y + this.recto.height);
-
+			
+			if (this.metadata.foliierung)
+				var i = 0;
+				for (var z in this.metadata.foliierung) {
+					i++;
+				    if (this.metadata.foliierung[z] != "keine") {
+				    	var txt = paper.text (abs_x + this.width + i * minD, ly, this.metadata.foliierung[z]);
+				    	txt.attr("font-size", 12);
+				    	txt.attr("title", z);
+				    }
+				}
 		}	
 };
 
@@ -553,7 +648,7 @@ FaustStructure.RSeite.prototype = {
 				child.x = this.x;
 			}
 
-			//this.height += minD / 2;
+			// this.height += minD / 2;
 
 			// I now know how wide all of my children are;
 			// make every child as wide as the widest one
@@ -579,7 +674,7 @@ FaustStructure.RSeite.prototype = {
 //***** vseite ******
 
 FaustStructure.VSeite = function() {
-	
+
 	this.x = 0;
 	this.y = 0;
 	this.children = [];
@@ -606,7 +701,7 @@ FaustStructure.VSeite.prototype = {
 				child.x = this.x;
 			}
 
-			//this.height += minD / 2;
+			// this.height += minD / 2;
 
 			// I now know how wide all of my children are;
 			// make every child as wide as the widest one
@@ -631,11 +726,11 @@ FaustStructure.VSeite.prototype = {
 
 FaustStructure.Anbringung = function() {
 
-		this.path = paper.path();
-		this.path.attr("stroke-width", "3");
-		this.x = 0;
-		this.y = 0;
-		this.metadata = {};
+	this.path = paper.path();
+	this.path.attr("stroke-width", "3");
+	this.x = 0;
+	this.y = 0;
+	this.metadata = {};
 };
 
 FaustStructure.Anbringung.prototype = {
@@ -745,4 +840,68 @@ FaustStructure.Lage.prototype = {
 };
 
 
+var uriMap = {
+		//IH.32
+		"GSA/391282/391282_0002":"/document/faust/2.1/gsa_391282.xml#1",
+		"GSA/391282/391282_0003":"/document/faust/2.1/gsa_391282.xml#2",
+		"GSA/391282/391282_0004":"/document/faust/2.1/gsa_391282.xml#2",
+		"GSA/391282/391282_0005":"/document/faust/2.1/gsa_391282.xml#4",
+		"GSA/391282/391282_0006":"/document/faust/2.1/gsa_391282.xml#6",
+		"GSA/391282/391282_0007":"/document/faust/2.1/gsa_391282.xml#6",
+		"GSA/391282/391282_0008":"/document/faust/2.1/gsa_391282.xml#6",
+		"GSA/391282/391282_0009":"/document/faust/2.1/gsa_391282.xml#9",
+		"GSA/391282/391282_0010":"/document/faust/2.1/gsa_391282.xml#9",
+		"GSA/391282/391282_0011":"/document/faust/2.1/gsa_391282.xml#9",
+		"GSA/391282/391282_0012":"/document/faust/2.1/gsa_391282.xml#11",
+		"GSA/391282/391282_0013":"/document/faust/2.1/gsa_391282.xml#12",
+		"GSA/391282/391282_0014":"/document/faust/2.1/gsa_391282.xml#13",
+		"GSA/391282/391282_0015":"/document/faust/2.1/gsa_391282.xml#15",
+		"GSA/391282/391282_0016":"/document/faust/2.1/gsa_391282.xml#15",
+		"GSA/391282/391282_0017":"/document/faust/2.1/gsa_391282.xml#16",
+		"GSA/391282/391282_00F":"/document/faust/2.1/gsa_391282.xml#17",
+		
+		//VH.2
+		"GSA/390883/390883_0002":"/document/faust/2.5/gsa_390883.xml#1",
+		"GSA/390883/390883_0003":"/document/faust/2.5/gsa_390883.xml#2",
+		"GSA/390883/390883_0004":"/document/faust/2.5/gsa_390883.xml#3",
+		"GSA/390883/390883_0005":"/document/faust/2.5/gsa_390883.xml#4",
+		"GSA/390883/390883_0006":"/document/faust/2.5/gsa_390883.xml#5",
+		"GSA/390883/390883_0008":"/document/faust/2.5/gsa_390883.xml#6",
+		"GSA/390883/390883_0007":"/document/faust/2.5/gsa_390883.xml#7",
+		"GSA/390883/390883_0009":"/document/faust/2.5/gsa_390883.xml#8",
+		"GSA/390883/390883_0010":"/document/faust/2.5/gsa_390883.xml#8",
+		"GSA/390883/390883_0011":"/document/faust/2.5/gsa_390883.xml#9",
+		"GSA/390883/390883_0012":"/document/faust/2.5/gsa_390883.xml#9",
+		"GSA/390883/390883_0013":"/document/faust/2.5/gsa_390883.xml#10",
+		"GSA/390883/FA_124_0002":"/document/faust/2.5/gsa_390883.xml#11",				
+		"GSA/390883/390883_0014":"/document/faust/2.5/gsa_390883.xml#12",
+		"GSA/390883/390883_0015":"/document/faust/2.5/gsa_390883.xml#13",
+		"GSA/390883/390883_0016":"/document/faust/2.5/gsa_390883.xml#13",
+		"GSA/390883/390883_0017":"/document/faust/2.5/gsa_390883.xml#14",
+		"GSA/390883/390883_0018":"/document/faust/2.5/gsa_390883.xml#15",
+		"GSA/390883/390883_0019":"/document/faust/2.5/gsa_390883.xml#15",
+		"GSA/390883/390883_0025":"/document/faust/2.5/gsa_390883.xml#16",
+		"GSA/390883/390883_0026":"/document/faust/2.5/gsa_390883.xml#16",
+		"GSA/390883/FA_124_0005":"/document/faust/2.5/gsa_390883.xml#17",
+		"GSA/390883/390883_0023":"/document/faust/2.5/gsa_390883.xml#18",
+		"GSA/390883/390883_0024":"/document/faust/2.5/gsa_390883.xml#18",
+		"GSA/390883/390883_0020":"/document/faust/2.5/gsa_390883.xml#19",
+		"GSA/390883/390883_0027":"/document/faust/2.5/gsa_390883.xml#20",
+		"GSA/390883/390883_0028":"/document/faust/2.5/gsa_390883.xml#20",
+		"GSA/390883/390883_0029":"/document/faust/2.5/gsa_390883.xml#21",
+		"GSA/390883/390883_0030":"/document/faust/2.5/gsa_390883.xml#21",
+		"GSA/390883/390883_0021":"/document/faust/2.5/gsa_390883.xml#22",
+		"GSA/390883/390883_0022":"/document/faust/2.5/gsa_390883.xml#22",
+		"GSA/390883/390883_0031":"/document/faust/2.5/gsa_390883.xml#22",
+		"GSA/390883/390883_0032":"/document/faust/2.5/gsa_390883.xml#22",
+		"GSA/390883/390883_0033":"/document/faust/2.5/gsa_390883.xml#23",
+		"GSA/390883/390883_0034":"/document/faust/2.5/gsa_390883.xml#23",
+		"GSA/390883/390883_0035":"/document/faust/2.5/gsa_390883.xml#24",
+		"GSA/390883/390883_0036":"/document/faust/2.5/gsa_390883.xml#25",
+		"GSA/390883/390883_0037":"/document/faust/2.5/gsa_390883.xml#25",
+		"GSA/390883/390883_0038":"/document/faust/2.5/gsa_390883.xml#26",
+		"GSA/390883/390883_0039":"/document/faust/2.5/gsa_390883.xml#26",
+		"GSA/390883/390883_0040":"/document/faust/2.5/gsa_390883.xml#26",
+		"GSA/390883/390883_0041":"/document/faust/2.5/gsa_390883.xml#27",
 
+}

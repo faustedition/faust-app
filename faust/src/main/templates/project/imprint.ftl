@@ -9,7 +9,7 @@
 	60311 Frankfurt am Main<br />
 	Tel.: +49 (0)69 / 138 80 243<br />
 	Fax: +49 (0)69 / 138 80 222<br />
-	<a href="mailto:a.bohnenkamp@goethehaus-frankfurt.de" title="E-Mail">a.bohnenkamp@goethehaus-frankfurt.de</a></p>
+	<a href="mailto:abohnenkamp@goethehaus-frankfurt.de" title="E-Mail">abohnenkamp@goethehaus-frankfurt.de</a></p>
 
 	<h2>Rechtliche Hinweise</h2>
 
