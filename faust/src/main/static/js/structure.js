@@ -134,7 +134,7 @@ FaustStructure.metadataFromXML  = function(element, node){
 		}
 
 		if (childNode.nodeName == "Blattnummer")  {
-			var z = childNode.attributes.getNamedItem("ZŠhlung");
+			var z = childNode.attributes.getNamedItem("ZÃ¤hlung");
 			element[z.value] = childNode.textContent;
 			continue;
 		}
