@@ -41,3 +41,5 @@ for xml_file in faust.xml_files():
 			faust.tei_serialize(xml).write(xml_file, encoding="UTF-8")
 	except IOError:
 		sys.stderr.write("I/O error while updating " + xml_file + "\n")
+	except lxml.etree.XMLSyntaxError:
+		sys.stderr.write("XML syntax error while updating " + xml_file + "\n")
