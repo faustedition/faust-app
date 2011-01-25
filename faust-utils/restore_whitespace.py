@@ -133,10 +133,19 @@ def compare_dirs(one, two):
 					print ("not in dir2", end='')
 				print()
 
+
 def replace(node, with_node):
 	'''Replaces a node with a deep copy of a node (from another document)'''
 	node.getparent().replace(node, copy.deepcopy(with_node))
 
+
+
+def canonicalize_dir(directory):
+	'''Canonicalize all XML files in a directory'''
+
+	for dir in os.walk(directory):
+		for file in dir[2]:
+			if file.endswith('.xml'):
 
 
 # compare_dirs(
