@@ -95,7 +95,7 @@ namespaces = {
         "f": "http://www.faustedition.net/ns",
         "svg": "http://www.w3.org/2000/svg",
         #"exist": "http://exist.sourceforge.net/NS/exist",
-	"xml": "http://www.w3.org/XML/1998/namespace"
+	"xml": "http://www.w3.org/XML/1998/namespace",
 }
 
 ns = lambda prefix: "{" + namespaces[prefix] + "}"
