@@ -1,7 +1,7 @@
 Faust.YUI().use("node", "dom", "dump", "io", "json", "event", "overlay", "scrollview", function(Y) {
 	Y.on("domready", function() {
 		iip = new Faust.FacsimileViewer("transcript-facsimile", {
-				image: "GSA/390883/390883_0031.tif",
+				image: "gsa/390883/390883_0031.tif",
 				zoom: 4,
 				showNavButtons: true
 				});
