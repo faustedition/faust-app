@@ -8,3 +8,4 @@ local.ini
 faust/custom-config.properties
 faust/src/main/resources/config-development.properties
 local.ini
+.git
