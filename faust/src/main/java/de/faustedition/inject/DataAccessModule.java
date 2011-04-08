@@ -7,6 +7,7 @@ import static com.google.inject.matcher.Matchers.subclassesOf;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.resource.ServerResource;
+import org.restlet.resource.UniformResource;
 
 import com.google.inject.AbstractModule;
 
@@ -24,7 +25,7 @@ public class DataAccessModule extends AbstractModule {
 			requestInjection(txInterceptor);
 
 			bindInterceptor(any(), annotatedWith(GraphDatabaseTransactional.class), txInterceptor);
-			bindInterceptor(subclassesOf(ServerResource.class).and(annotatedWith(GraphDatabaseTransactional.class)),
+			bindInterceptor(subclassesOf(UniformResource.class).and(annotatedWith(GraphDatabaseTransactional.class)),
 					only(ServerResource.class.getMethod("handle")), txInterceptor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
