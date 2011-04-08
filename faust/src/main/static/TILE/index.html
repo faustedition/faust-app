@@ -43,6 +43,12 @@
 	<script type="text/javascript" src="importWidgets/exportJSONXML.js"></script>
 	<script type="text/javascript" src="lib/Plugins/AutoLoad/autoload.js"></script>
 	<script type="text/javascript" src="lib/Plugins/Dashboard/dashboard.js"></script>
+    
+    
+    
+    <link rel="stylesheet" href="lib/Plugins/Rotation/css/rotationPlugin.css" type="text/css" />	
+    <script type="text/javascript" src="lib/Plugins/Rotation/rotation.js"></script>
+    
 </head>
 <body>
 	<div class="az header"><div class="az logo"><img src="skins/columns/images/tile.gif" alt="TILE: Text-Image Linking Environment" /></div>
@@ -98,24 +104,27 @@
 			engine=new TILE_ENGINE({});
 			// add plugins
 			
+			// add Mode
+			engine.insertMode('Image Annotation');
+			
 			// Image tagger
-			engine.insertPlugin(IT);
+			engine.insertModePlugin('Image Annotation',IT);
 			// Auto recognizer
-			engine.insertPlugin(AR);
+			// engine.insertPlugin(AR);
 			// transcript lines
-			engine.insertPlugin(Trans);
+			engine.insertModePlugin('Image Annotation',Trans);
 			// text selection
-			engine.insertPlugin(TS);
+			engine.insertModePlugin('Image Annotation',TS);
 			// labels
-			engine.insertPlugin(LB);
+			engine.insertModePlugin('Image Annotation',LB);
 			// autoload
-			engine.insertPlugin(AutoLoad);
+			engine.insertModePlugin('Image Annotation',AutoLoad);
 			// load dialog
 			engine.insertPlugin(LoadDialog);
 			// Export dialog
 			 engine.insertPlugin(ExportDialog);
 			// dashboard
-			engine.insertPlugin(Dashboard);
+			// engine.insertPlugin(Dashboard);
 			
 			
 			if(!(/^http:\/\/localhost/.test(document.URL))){
@@ -123,6 +132,8 @@
 				engine.insertPlugin(WelcomeDialog);
 			}
 			// Done adding plugins
+			$("a:contains(Image Annotation)").trigger('click');
+			
 		});
 	
 	</script>

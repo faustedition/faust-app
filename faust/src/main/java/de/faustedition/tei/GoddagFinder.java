@@ -16,7 +16,6 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 import de.faustedition.FaustURI;
-import de.faustedition.genesis.GeneticRelationManager;
 import de.faustedition.text.Text;
 import de.faustedition.text.TextGeneticJSONEnhancer;
 import de.faustedition.text.TextManager;

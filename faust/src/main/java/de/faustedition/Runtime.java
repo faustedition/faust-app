@@ -1,5 +1,6 @@
 package de.faustedition;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -26,13 +27,16 @@ public abstract class Runtime {
 	public static void main(Class<? extends Runnable> clazz, String[] args) {
 		Locale.setDefault(new Locale("en", "us"));
 		
+		File configFile = null;
 		for (String arg : args) {
 			if ("-debug".equalsIgnoreCase(arg)) {
 				logLevel = Level.ALL;
+			} else if (configFile == null) {
+				configFile = new File(arg);
 			}
 		}
 		configureLogging();
-		final Runnable main = FaustInjector.get().getInstance(clazz);
+		final Runnable main = FaustInjector.get(configFile).getInstance(clazz);
 
 		// FIXME: this is a hack; Guice seems to reset the logging
 		// config somehow
