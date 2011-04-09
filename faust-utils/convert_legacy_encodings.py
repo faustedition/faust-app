@@ -429,6 +429,8 @@ def queries():
 	
 	print "to convert: ", len(to_convert_unencoded())
 	print "of: ", len(static_to_convert())
+	for f in to_convert_unencoded():
+		print f
 
 	## print "***** values for rend attribute *****"
 	## values = query.unique_values(to_convert_unencoded(), "//@rend")
@@ -852,10 +854,10 @@ def static_to_convert():
 	'transcript/gsa/391525/0003.xml',
 	'transcript/gsa/391525/0004.xml',
 	'transcript/gsa/391525/0005.xml',
-	'transcript/ub_basel/G_H_2301.xml',
-	'transcript/ub_leipzig/Sammlung_Hirzel/b497.xml'	
+	'transcript/ub_basel/G_H_2301/G_H_2301.xml',
+	'transcript/ub_leipzig/Slg_Hirzel_b497/b497.xml'	
 	]
 	
 if __name__ == "__main__":
 	queries()
-	convert()
+#	convert()

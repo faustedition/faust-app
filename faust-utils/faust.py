@@ -16,6 +16,8 @@ config = ConfigParser.ConfigParser()
 config.read(['faust.ini', "local.ini"])
 
 xml_dir = config.get("xml", "dir")
+facs_dir = os.path.join(config.get("facsimile", "dir"))
+faust_scheme = "faust"
 report_sender = "Faust-Edition <noreply@faustedition.net>"
 report_recipients = [
 	"Katrin Henzel <henzel@faustedition.de>",
@@ -49,11 +51,26 @@ def xml_files():
 def transcript_files():
 	return [f for f in xml_files() if relative_path(f).startswith("transcript/")]
 
+def document_files():
+	return [f for f in xml_files() if relative_path(f).startswith("document/")]
+
 def is_tei_document(xml_file):
 	"""Determines whether a XML file is a TEI document by checking the namespace of the first element encountered"""
 	for event, element in lxml.etree.iterparse(xml_file):
 		if element is None: continue
 		return element.tag.startswith("{http://www.tei-c.org/ns/1.0}")
+
+def facsimiles():
+	"""Returns a list of all faust facsimile URIs"""
+	result = []
+	tif_dir = os.path.join(facs_dir, "tif/")
+	for root, dirs, files in os.walk(tif_dir):
+		for f in files:
+			path = os.path.join(root,f)
+			uri = faust_scheme + "://facsimile/" + path[len(tif_dir) : - len(".tif")]
+			result.append(uri)
+	return result
+	
 
 def send_report(subject, msg):
 	if config.getboolean("mail", "enabled"):

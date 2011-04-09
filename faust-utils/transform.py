@@ -32,4 +32,4 @@ def transform_stages_to_changes():
 	changes_to_stages = lambda t: tei_transform(t, xslt_trans)
 	transform_all(faust.transcript_files(), changes_to_stages)
 
-transform_stages_to_changes()
+

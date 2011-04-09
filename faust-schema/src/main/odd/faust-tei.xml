@@ -549,6 +549,8 @@
 					<elementSpec ident="zone" module="physdesc" mode="change">
 						<classes mode="change">
 							<memberOf key="att.coordinated" mode="add"/>
+							<!--  modification of SIG schema: allow @type in zones -->
+							<memberOf key="att.typed" mode="add"/>
 							<memberOf key="model.zonePart" mode="add"/>
 						</classes>
 						<content>

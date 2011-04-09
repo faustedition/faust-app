@@ -140,16 +140,16 @@ def replace(node, with_node):
 
 
 
-def canonicalize_dir(directory):
-	'''Canonicalize all XML files in a directory'''
+# def canonicalize_dir(directory):
+# 	'''Canonicalize all XML files in a directory'''
 
-	for dir in os.walk(directory):
-		for file in dir[2]:
-			if file.endswith('.xml'):
+# 	for dir in os.walk(directory):
+# 		for file in dir[2]:
+# 			if file.endswith('.xml'):
 
 
-# compare_dirs(
-# 	"/Users/moz/d/faustedition/xml/transcript",
-# 	"/Users/moz/d/faustedition/whitespace/2010-11-02_pre_whitespace_convert/transcript"
-# 	)
+compare_dirs(
+	"/Users/moz/d/faustedition/xml/transcript",
+	"/Users/moz/d/faustedition/whitespace/2010-09-28/transcript"
+	)
 

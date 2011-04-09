@@ -7,11 +7,25 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 	};
 
 	Faust.DocumentTranscriptCanvas.prototype = {
+			
+		idMap: {},
+		
+		postBuildDeferred: [],
+		
 		render: function(transcript) {
-			this.view = this.build(this, transcript.root("ge:document"));	
-			while (this.svgNode.hasChildNodes()) this.svgNode.removeChild(this.svgNode.firstChild);
+			this.idMap = {};
+			this.postBuildDeferred = [];
+			this.view = this.build(this, transcript.root("ge:document"));
+			var rootElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			rootElement.setAttribute("transform", "translate(200,200)");
+			this.svgNode.appendChild(rootElement);
+			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
+			while (rootElement.hasChildNodes()) this.rootElement.removeChild(rootElement.firstChild);
 			if (this.view) {
 				this.view.layout();
+				this.view.layout();
+				var dims = this.view.layout();
+				console.log(dims);
 				this.view.render();
 			}				
 		},
@@ -62,12 +76,43 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 					//vc = new Faust.GLine();
 				} else if (node.name == "f:grBrace") {
 					//vc = new Faust.GBrace();
+				} else if (node.name == "tei:anchor") {
+					//use empty text element as an anchor
+					vc = new Faust.Text("", {});
+				} else {
+					//vc = new Faust.DefaultVC();
+				}
+				if ("f:at" in node.attrs) {
+					if (!vc) {
+						vc = new Faust.DefaultVC();
+					}
+					//vc.setAlign("hAlign", new Faust.Align(vc, ))
+					//var hAlign = new Faust.Align(true, node, "left", node.attrs["f:at"], "left");
+					//FIXML hash hack; real resolution of links
+					var anchorId = node.attrs["f:at"].substring(1);
+					var idMap = this.idMap;
+					this.postBuildDeferred.push(
+							function(){
+								var anchor = idMap[anchorId];
+								vc.setAlign("hAlign", new Faust.Align(vc, anchor, "x", "width", true, true, 10));
+								console.log("deferred");	
+							});
+					console.log("alignx")
+					//console.log(alignx);
 				}
 			}
 			
 			if (vc != null) {
 				if (parent != null && parent !== this) parent.add(vc);
 				parent = vc;
+			}
+
+ 			if (node instanceof Goddag.Element) {
+ 				xmlId = node.attrs["xml:id"];
+ 				if (xmlId) {
+ 					this.idMap[xmlId] = vc;
+ 					console.log("XML ID: ", xmlId);
+ 				}
 			}
 			
 			Y.each(tree.children, function(c) { this.build(parent, c); }, this);

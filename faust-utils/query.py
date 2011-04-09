@@ -11,7 +11,7 @@ import lxml.etree
 kodiert_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='kodiert']"
 encoded_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='encoded']"
 kodiert_and_encoded_xp = kodiert_xp + " and " + encoded_xp
-
+deleatur_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='deleatur']"
 
 def matches (files, xpath):
 	''' List files that have matches for xpath.'''
@@ -55,12 +55,35 @@ def print_statistics():
 	print "encoded: ", len(encoded)
 	print "kodiert und encoded: ", len(kodiert_and_encoded)
 
-# for f in non_wellformed(faust.transcript_files()): print f
-# print_statistics()
+def invalid_facsimile_links():
+	''' Print all files with invalid facsimile links'''
+	faust_facsimiles = faust.facsimiles()
+	def facs_invalid(file):
+		xml = lxml.etree.parse(file)
+		urls = faust.xpath("//tei:facsimile/tei:graphic/@url")(xml)
+		for url in urls:
+			if url in faust_facsimiles: return True
+		return False
+	return filter(facs_invalid, faust.transcript_files())
 
-# find all manuscripts with red ink
-# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, '_tr')] | //*[contains(@hand,'_tr')]"):
-# 	print f
+
+if __name__ == "__main__":
+
+	# for f in non_wellformed(faust.transcript_files()):
+	# 	print f
+
+	# print_statistics()
+
+	# find all manuscripts with red ink
+	# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, '_tr')] | //*[contains(@hand,'_tr')]"):
+	# 	print f
+	# for f in matches(faust.transcript_files(), "//ge:undo"):	print f
+	# for val in unique_values (faust.transcript_files(), "//tei:facsimile/tei:graphic/@url"): print val
+	# for f in matches(faust.transcript_files(), "count(//tei:facsimile/tei:graphic/@url) > 1"): print f
+	# not_available_xp = "not (" + kodiert_xp + " or " + encoded_xp + " or " + deleatur_xp +  " )"
+	# for f in matches(faust.transcript_files(), not_available_xp):	print f
+	unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
+	for f in unencoded: print f
 
 
 
