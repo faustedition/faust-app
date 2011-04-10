@@ -1,0 +1,471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>Liveboard</title>
+<link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css" />
+<script type="text/javascript" language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"><!--jQuery--></script>
+<script type="text/javascript" language="javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"><!--jQuery_UI--></script>
+<script type="text/javascript" language="javascript" src="raphael.js"><!--Raphael_Library--></script>
+<script type="text/javascript" language="javascript">
+        $(document).ready(function() {
+		
+		
+		
+			/*********************************************************/
+			 var src = $("#showgun").attr("src"), 
+			 	angle = 0, 
+				imgWidth = $('#showgun').width(), 
+				imgHeight = $('#showgun').height(),
+				imgCenter = 0, 
+				wPixelsIn = 0, 
+				hPixelsIn = 0;
+			/*********************************************************/
+		
+		
+			// FROM http://www.liveboard.fm/
+            var R = Raphael('whiteboard', imgWidth, imgHeight),
+				line = null,
+				path = null,
+				color = null,
+				size = null,
+				selectedColor = 'mosaic',
+				selectedSize = 4,
+				selectedTool = 'pencil',
+				offset = $('#whiteboard').offset();
+            
+			
+			
+					
+		
+		
+			/*************************************************/
+			
+			 var s = R.set(); //tdb create a Raphael SET
+
+             $("#showgun").remove(); // get rid of HTML inside
+
+
+
+			 s.push(R.image(src, wPixelsIn, hPixelsIn, imgWidth, imgHeight)); // add image to canvas   var img =
+			 
+			 imgCenter = {
+			 	width: (wPixelsIn + imgWidth) / 2,
+				height: (hPixelsIn + imgHeight) / 2
+			 
+			 };
+			 	
+				//R.image PARAMETERS
+				//1. src string URI of the source image
+				//2. x number X coordinate position
+				//3. y number Y coordinate position
+				//4. width number Width of the image
+				//5. height number Height of the image
+
+
+
+				/****************************
+				TEST SET
+				****************************
+				var s = R.set();
+				s.push(R.rect(10, 50, 30, 30, 10).attr({fill:'#FF0000'}));
+				s.push(R.rect(50, 50, 30, 30, 5).attr({fill:'#0000FF'}));
+				s.push(R.rect(90, 50, 30, 30).attr({fill:'#FF4040'}));
+				****************************/
+				
+			/**************************************************/
+
+
+
+
+
+
+
+
+
+
+		
+						
+			
+			
+            var position = function(e) {
+                return {
+                    x: e.pageX - offset.left,
+                    y: e.pageY - offset.top
+                };
+            };
+            
+            var mouseMove = function(e) {
+                var pos = position(e),
+					x = path[0][1],
+					y = path[0][2],
+					dx = (pos.x - x),
+					dy = (pos.y - y);
+				
+				//console.log(x);
+				//console.log(dx);
+				
+				
+                switch(selectedTool){
+                    case 'pencil':
+                        path.push(['L', pos.x, pos.y]);
+                        break;
+                    case 'rectangle':
+                        path[1] = ['L', x + dx, y     ];
+                        path[2] = ['L', x + dx, y + dy];
+                        path[3] = ['L', x     , y + dy];
+                        path[4] = ['L', x     , y     ];
+                        path[5] = ['L', x,      y     ];
+                        break;
+                    case 'line':
+                        path[1] = ['L', pos.x, pos.y];
+                        break;                        
+                    case 'circle':
+                        path[1] = ['A', (dx / 2), (dy / 2), 0, 1, 0, pos.x, pos.y];
+                        path[2] = ['A', (dx / 2), (dy / 2), 0, 0, 0, x, y];
+                        break;
+                    case 'eraser':
+                        path.push(['L',pos.x, pos.y]);
+                        break;
+                };
+				
+				
+                line.attr({ path: path });
+				
+				
+				/**********************************************/
+				s.push(line); // add to set
+				/**********************************************/				
+			};
+            
+
+			
+            // stupid chrome has a repaint bug
+            var forcePaint = function(){
+                window.setTimeout(function(){
+                    var rect = R.rect(-99, -99, R.width + 99, R.height + 99).attr({stroke: "none"});
+                    setTimeout(function() {rect.remove();});
+                },1);
+            };
+            
+            var draw = function(path, color, size) {
+                
+				var result = R.path(path);
+                result.attr({ stroke: color, 'stroke-width': size, 'stroke-linecap': 'round' });
+                forcePaint();
+                return result;
+            };
+            
+            var clear = function() {
+                return R.clear();
+            };
+            
+            $('#whiteboard').mousedown(function(e) {
+                var pos = position(e);
+                path = [['M', pos.x, pos.y]];
+                color = (selectedTool == 'eraser' ? '#000' : (selectedColor == 'mosaic') ? Raphael.getColor() : selectedColor);
+                size = selectedSize;
+                line = draw(path, color, size);
+                $('#whiteboard').bind('mousemove', mouseMove);
+            });
+            
+            $('#whiteboard').mouseup(function() {
+                $('#whiteboard').unbind('mousemove', mouseMove);
+                if (line) {
+
+                    line = null;
+                }
+            });
+            
+			
+            $.each([
+                '#000', // black (eraser)
+                '#fff', // white
+                '#f00', // red
+                '#0f0', // lime
+                '#00f', // blue
+                '#ff0', // yellow
+                '#f0f', // fuschia
+                '#0ff', // cyan
+                '#800000', // maroon
+                '#008000', // green
+                '#000080', // navy
+                '#808000', // olive
+                '#800080', // purple
+                '#008080',  // teal
+                'mosaic'
+            ], function() {
+                if(this == 'mosaic'){
+                    $('<td><div class="color selected" style="background-image: url(/images/mosaic.png);" title="' + this + '">&nbsp;</div></td>').appendTo('.picker tr').click(function() {
+                        selectedColor = $(this).find('.color').attr('title');
+                    });
+                }else{
+                    $('<td><div class="color" style="background-color: ' + this + '" title="' + this + '">&nbsp;</div></td>').appendTo('.picker tr').click(function() {
+                        selectedColor = $(this).find('.color').attr('title');
+                    });
+                }
+            });
+			
+			
+						
+            $('<td class="divider"></td>').appendTo('.picker tr');
+            
+			
+			
+            for (var i = 2; i <= 12; i+=2) {
+                var percent = Math.round(((i - 1) / 11) * 100);
+                var td = '<td align="center"><div class="size' + (selectedSize == i ? ' selected' : '') + '" title="' + i + '"><div style="background-color: #000; width: ' + percent + '%; height: ' + percent + '%"></div></div></td>';
+                $(td).appendTo('.picker tr').click(function() {
+                    $('#whiteboard').removeClass("size-" + selectedSize);
+                    selectedSize = $(this).find('.size').attr('title');
+                    $('#whiteboard').addClass("size-" + selectedSize);
+                });
+            }
+			
+			
+            
+            $.each([
+                'eraser',
+                'circle',
+                'rectangle',
+                'line',
+                'pencil',
+				'layer-rotate-left', //tdb
+				'layer-rotate' // tdb
+            ], function(){
+                $('<tr><td><div title="' + this + '" style="background-image:url(images/' + this + '.png);background-position:center;" class="tool' + (this == 'pencil' ? ' selected' : '') + '">&nbsp;</div></td></tr>').appendTo('.tools').click(function(){
+                    $('#whiteboard').removeClass(selectedTool);
+                    selectedTool = $(this).find('.tool').attr('title');
+                    $('#whiteboard').addClass(selectedTool);
+                });
+            });
+			
+			
+			
+            
+            $('.clear').click(function() {
+                if(confirm('This will clear the LiveBoard. Are you sure?')){
+                    clear();
+                }
+            });
+			
+			
+            $('.color').click(function() {
+                $(this).closest('table').find('.color').removeClass('selected');
+                $(this).addClass('selected');
+            });
+			
+			
+            $('.size').click(function() {
+                $(this).closest('table').find('.size').removeClass('selected');
+                $(this).addClass('selected');
+            });
+            
+			
+            $('.tool').click(function() {
+                $(this).closest('table').find('.tool').removeClass('selected');
+                $(this).addClass('selected');
+            });
+           
+		   
+		   
+		   
+			/*********************************************************/		   
+		    $("div[title='layer-rotate-left']").click(function() {
+				
+				if(angle == 0) {
+					angle = 360;
+				}
+                angle -= 15;
+				s.animate({rotation: angle+","+imgCenter.width+","+imgCenter.height}, 1000, "<>");
+				$("#amount").val( angle );
+				$( "#slider" ).slider({value: angle});
+				//img.animate({rotation: angle+","+imgCenter.width+","+imgCenter.height}, 1000, "<>");
+            });
+			
+		    $("div[title='layer-rotate']").click(function() {
+
+				if(angle >= 360) {
+					angle = 0;
+				}
+                angle += 15;
+				s.animate({rotation: angle+","+imgCenter.width+","+imgCenter.height}, 1000, "<>");
+				$("#amount").val( angle );
+				$( "#slider" ).slider({value: angle});
+				//img.animate({rotation: angle+","+imgCenter.width+","+imgCenter.height}, 1000, "<>");
+				
+            });	
+			
+			$( "#slider" ).slider({
+					value:0,
+					min: 0,
+					max: 360,
+					step: 1,
+					slide: function( event, ui ) {
+						s.animate({rotation: ui.value+","+imgCenter.width+","+imgCenter.height}, 1000, "<>");
+						//img.animate({rotation: angle+","+imgCenter.width+","+imgCenter.height}, 1000, "<>");
+						$("#amount").val( ui.value );
+					}
+				});
+
+				
+			$("#rotateMe").click(function() {
+				var val = $('#amount').val();
+				s.animate({rotation: val+","+imgCenter.width+","+imgCenter.height}, 1000, "<>");
+				//img.animate({rotation: angle+","+imgCenter.width+","+imgCenter.height}, 1000, "<>");				
+				
+				
+			});
+				
+					
+			/*********************************************************/		   
+		
+		
+			
+            $('#whiteboard').addClass(selectedTool + ' size-' + selectedSize);
+            
+            // fix for chrome's text cusor dealy
+            document.onselectstart = function () { return false; }
+			setTimeout(function () {R.safari();});
+
+
+
+
+			
+        });
+    </script>
+
+
+
+<style type="text/css">
+#amountHolder {
+	display: block;
+	float: right;
+	width: 150px;
+}
+#rotateMe {
+	width: 40px;
+	font-size: 0.7em;
+}
+
+/* Overwrite jQuery UI theme */
+div#slider {
+	background: none !important;
+	background-color: #8CA1D9 !important;
+}
+
+
+</style>
+
+
+
+
+<style type="text/css">
+/* from liveboard.fm */
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #fff;
+	color: #000;
+	font-size: 76%;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+#wrapper {
+	margin: auto;
+	width: 600px;
+	position:relative;
+}
+#whiteboard {
+	/*border: solid 3px #999;
+	background-color: #000;*/
+	min-height: 400px;
+	cursor: default;
+	overflow:hidden;
+}
+#whiteboard.eraser.size-2 {
+	cursor:url(images/eraser_2x2.cur), auto;
+}
+#whiteboard.eraser.size-4 {
+	cursor:url(images/eraser_5x5.cur), auto;
+}
+#whiteboard.eraser.size-6 {
+	cursor:url(images/eraser_7x7.cur), auto;
+}
+#whiteboard.eraser.size-8 {
+	cursor:url(images/eraser_9x9.cur), auto;
+}
+#whiteboard.eraser.size-10 {
+	cursor:url(images/eraser_11x11.cur), auto;
+}
+#whiteboard.eraser.size-12 {
+	cursor:url(images/eraser_12x12.cur), auto;
+}
+.light {
+	color: #000;
+}
+.dark {
+	color: #fff;
+}
+.color, .size, .tool {
+	width: 12px;
+	height: 12px;
+	border: solid 1px #aaa;
+	cursor: pointer;
+	padding: 1px;
+	margin:3px;
+	background-repeat:no-repeat;
+}
+.tool {
+	width:16px;
+	height:16px;
+}
+.divider {
+	width: 1.0em;
+	height: 1.0em;
+	margin: 0.25em;
+}
+.selected {
+	border:1px solid black;
+}
+.picker {
+	/* margin: auto; */
+}
+.tools {
+	position:absolute;
+	left: -2.5em;
+}
+</style>
+<!--[if IE 6]>
+    <style type="text/css">
+    
+    </style>
+    <![endif]-->
+
+</head>
+<body>
+<div id="wrapper">
+  <h3>LiveBoard (http://www.liveboard.fm/)</h3>
+  <p>Select a tool from the selections on the left, and start drawing. Your doodles will be synced up instantly with
+    all other participants.</p>
+    <br />
+
+  <table class="tools" cellpadding="0" cellspacing="0">
+  </table>
+  <div id="whiteboard"><img src="showgunWarrior.jpg" id="showgun" /></div>
+  <table class="picker" cellpadding="0" cellspacing="0">
+    <tr></tr>
+  </table>
+  <br />
+  <div id="amountHolder">
+    <input type="text" id="amount" value="" size="3" />&deg; <button id="rotateMe">Rotate</button>
+  </div>
+  <div id="slider" style="width:360px;"></div>
+  <br />
+
+  <div style="text-align:center;width:100%;">
+    <button class="clear">Clear</button>
+  </div>
+  <br>
+</div>
+</body>
+</html>

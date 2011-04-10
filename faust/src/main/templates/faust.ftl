@@ -130,7 +130,7 @@
 			</li>
 			<li class="yui3-menuitem"><a href="${cp}/project/contact" class="yui3-menuitem-content">${message("menu.contact")}</a></li>
 			<li class="yui3-menuitem"><a href="${cp}/project/imprint" class="yui3-menuitem-content">${message("menu.imprint")}</a></li>
-			<li class="yui3-menuitem"><a href="https://faustedition.uni-wuerzburg.de/" class="yui3-menuitem-content">${message("menu.restricted")}</a></li>
+			<li class="yui3-menuitem"><a href="/intern/" class="yui3-menuitem-content">${message("menu.restricted")}</a></li>
 			<#if !roles?seq_contains("editor")>
 			<li class="yui3-menuitem"><a href="${cp}/login" class="yui3-menuitem-content">Login</a></li>
 			</#if>

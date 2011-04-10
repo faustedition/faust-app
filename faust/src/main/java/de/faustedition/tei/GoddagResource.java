@@ -8,44 +8,84 @@ import java.util.Iterator;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
 import org.goddag4j.Element;
 import org.goddag4j.MultiRootedTree;
 import org.goddag4j.io.GoddagJSONWriter;
-import org.goddag4j.io.GoddagXMLWriter;
 import org.goddag4j.io.GoddagJSONWriter.GoddagJSONEnhancer;
+import org.goddag4j.io.GoddagXMLWriter;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.restlet.data.Form;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
+import com.google.common.base.Throwables;
+import com.google.inject.Inject;
+
+import de.faustedition.FaustURI;
 import de.faustedition.JsonRespresentation;
+import de.faustedition.transcript.Transcript;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLUtil;
 
 public class GoddagResource extends ServerResource {
 
-	private MultiRootedTree trees;
-	private GoddagJSONEnhancer enhancer = GoddagJSONWriter.NOOP_ENHANCER;
-	
+	protected final GraphDatabaseService db;
+
+	protected FaustURI source;
+	protected Transcript.Type transcriptType;
+	protected MultiRootedTree trees;
+	protected GoddagJSONEnhancer enhancer = GoddagJSONWriter.NOOP_ENHANCER;
+
+	@Inject
+	public GoddagResource(GraphDatabaseService db) {
+		this.db = db;
+
+	}
+
+	public void setSource(FaustURI source) {
+		this.source = source;
+	}
+
+	public void setTranscriptType(Transcript.Type transcriptType) {
+		this.transcriptType = transcriptType;
+	}
+
 	public void setTrees(MultiRootedTree trees) {
 		this.trees = trees;
 	}
-	
+
 	public void setEnhancer(GoddagJSONEnhancer enhancer) {
 		this.enhancer = enhancer;
 	}
-	
+
+	public MultiRootedTree trees() {
+		return trees;
+	}
+
 	@Get("json")
 	public Representation streamJson() {
 		return new JsonRespresentation() {
 
 			@Override
 			protected void generate() throws IOException {
-				new GoddagJSONWriter(CustomNamespaceMap.INSTANCE, enhancer).write(trees, generator);
+				try {
+					inTransaction(new InTransactionCallback() {
+
+						@Override
+						public void inTransaction() throws Exception {
+							new GoddagJSONWriter(CustomNamespaceMap.INSTANCE, enhancer).write(trees(),
+									generator);
+						}
+					});
+				} catch (Exception e) {
+					Throwables.propagateIfInstanceOf(e, IOException.class);
+					throw Throwables.propagate(e);
+				}
 			}
 		};
 	}
@@ -54,6 +94,7 @@ public class GoddagResource extends ServerResource {
 	public Representation streamXML() {
 		final Form parameters = getRequest().getResourceRef().getQueryAsForm();
 		final String rootQName = parameters.getFirstValue("root");
+		final MultiRootedTree trees = trees();
 
 		String rootPrefix = null;
 		String rootLocalName = null;
@@ -80,17 +121,37 @@ public class GoddagResource extends ServerResource {
 		return new OutputRepresentation(APPLICATION_XML) {
 
 			@Override
-			public void write(OutputStream outputStream) throws IOException {
+			public void write(final OutputStream outputStream) throws IOException {
 				try {
-					Transformer transformer = XMLUtil.transformerFactory().newTransformer();
-					final Source source = new GoddagXMLWriter(root, CustomNamespaceMap.INSTANCE, showTextNodes)
-							.toSAXSource();
-					transformer.transform(source, new StreamResult(outputStream));
-				} catch (TransformerException e) {
-					throw new IOException(e);
+					inTransaction(new InTransactionCallback() {
+
+						@Override
+						public void inTransaction() throws Exception {
+							Transformer transformer = XMLUtil.transformerFactory().newTransformer();
+							final Source source = new GoddagXMLWriter(root,
+									CustomNamespaceMap.INSTANCE, showTextNodes).toSAXSource();
+							transformer.transform(source, new StreamResult(outputStream));
+						}
+					});
+				} catch (Exception e) {
+					Throwables.propagateIfInstanceOf(e, IOException.class);
+					throw Throwables.propagate(e);
 				}
 			}
 		};
 	}
 
+	protected void inTransaction(InTransactionCallback callback) throws Exception {
+		Transaction tx = db.beginTx();
+		try {
+			callback.inTransaction();
+			tx.success();
+		} finally {
+			tx.finish();
+		}
+	}
+
+	protected interface InTransactionCallback {
+		void inTransaction() throws Exception;
+	}
 }

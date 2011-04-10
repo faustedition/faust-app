@@ -1,5 +1,7 @@
 package de.faustedition.inject;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,9 +20,16 @@ public class ConfigurationModule extends AbstractModule {
 
 	protected RuntimeMode mode = RuntimeMode.PRODUCTION;
 
+	private final File configFile;
+
+	public ConfigurationModule(File configFile) {
+		this.configFile = configFile;
+	}
+
 	@Override
 	protected void configure() {
 		final Properties configuration = loadConfiguration();
+		mode = RuntimeMode.valueOf(configuration.getProperty("runtime.mode", "PRODUCTION").toUpperCase());
 		Names.bindProperties(binder(), configuration);
 		bind(RuntimeMode.class).toInstance(mode);
 		bind(Properties.class).annotatedWith(Names.named("config")).toInstance(configuration);
@@ -28,30 +37,33 @@ public class ConfigurationModule extends AbstractModule {
 
 	protected Properties loadConfiguration() {
 		try {
-			Properties configuration = new Properties();
-			InputStream configStream = getClass().getResourceAsStream("/config-default.properties");
+			final URL defaultConfig = getClass().getResource("/config-default.properties");
+			Properties config = new Properties();
+			
+			InputStream configStream = defaultConfig.openStream();
 			InputStreamReader configReader = new InputStreamReader(configStream, "UTF-8");
 			try {
-				configuration.load(configReader);
+				config.load(configReader);
 			} finally {
 				Closeables.closeQuietly(configReader);
 				Closeables.closeQuietly(configStream);
 			}
 
-			final URL developmentConfig = getClass().getResource("/config-development.properties");
-			if (developmentConfig != null) {
-				mode = RuntimeMode.DEVELOPMENT;
-				logger.info("Loading development configuration from " + developmentConfig);
-				configReader = new InputStreamReader(configStream = developmentConfig.openStream(), "UTF-8");
-				try {
-					configuration = new Properties(configuration);
-					configuration.load(configReader);
-				} finally {
-					Closeables.closeQuietly(configReader);
-					Closeables.closeQuietly(configStream);
-				}
+			if (configFile == null) {
+				logger.info("Using default configuration from " + defaultConfig.toString());
+				return config;
 			}
-			return configuration;
+
+			logger.info("Loading configuration from " + configFile);
+			configReader = new InputStreamReader(configStream = new FileInputStream(configFile), "UTF-8");
+			try {
+				config = new Properties(config);
+				config.load(configReader);
+			} finally {
+				Closeables.closeQuietly(configReader);
+				Closeables.closeQuietly(configStream);
+			}
+			return config;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

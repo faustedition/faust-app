@@ -47,6 +47,7 @@ public class EmailReporter {
 		email.setHostName("localhost");
 		email.setFrom("noreply@faustedition.net", "Digitale Faust-Edition");
 		email.addTo("gregor@middell.net", "Gregor Middell");
+		email.addTo("m.wissenbach@gmx.de", "Moritz Wissenbach");
 		email.setSubject(subject);		
 		email.setMsg(body);
 		email.send();

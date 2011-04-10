@@ -11,7 +11,7 @@ import org.goddag4j.visit.GoddagVisitor;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
-import com.google.inject.internal.Lists;
+import com.google.common.collect.Lists;
 
 import de.faustedition.xml.CustomNamespaceMap;
 

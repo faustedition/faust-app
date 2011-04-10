@@ -1,5 +1,6 @@
 package de.faustedition.graph;
 
+import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -8,6 +9,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
 public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
@@ -27,6 +29,9 @@ public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
 		if (logger.isLoggable(Level.FINE)) {
 			logger.fine("Starting graph database transaction");
 		}
+
+		GraphDatabaseTransactional txAnnotation = Preconditions.checkNotNull(readTransactionMetadata(invocation));
+
 		Transaction tx = db.beginTx();
 		try {
 			Object returnValue = invocation.proceed();
@@ -36,8 +41,6 @@ public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
 			tx.success();
 			return returnValue;
 		} catch (Throwable e) {
-			final GraphDatabaseTransactional txAnnotation = invocation.getMethod().getAnnotation(
-					GraphDatabaseTransactional.class);
 			boolean successfulException = false;
 			final Class<? extends Throwable> thrownType = e.getClass();
 			for (Class<? extends Throwable> successfulType : txAnnotation.successfulExceptions()) {
@@ -62,4 +65,20 @@ public class GraphDatabaseTransactionInterceptor implements MethodInterceptor {
 			tx.finish();
 		}
 	}
+
+	private GraphDatabaseTransactional readTransactionMetadata(MethodInvocation methodInvocation) {
+		final Method method = methodInvocation.getMethod();
+		// try the class if there's nothing on the method (only go up
+		// one level in the hierarchy, to skip the proxy)
+		final Class<?> targetClass = methodInvocation.getThis().getClass().getSuperclass();
+
+		if (method.isAnnotationPresent(GraphDatabaseTransactional.class)) {
+			return method.getAnnotation(GraphDatabaseTransactional.class);
+		} else if (targetClass.isAnnotationPresent(GraphDatabaseTransactional.class)) {
+			return targetClass.getAnnotation(GraphDatabaseTransactional.class);
+		} else {
+			return null;
+		}
+	}
+
 }

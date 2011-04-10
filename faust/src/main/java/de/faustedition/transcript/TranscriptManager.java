@@ -26,6 +26,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -82,6 +83,30 @@ public class TranscriptManager {
 			logger.fine("Adding transcripts for " + source);
 		}
 
+		final Set<Transcript> transcripts = new HashSet<Transcript>();
+		Transaction tx = db.beginTx();
+		try {
+		    
+			Iterables.addAll(transcripts, parse(source));
+			tx.success();
+		} finally {
+			tx.finish();
+		}
+
+		for (Transcript t : transcripts) {
+			logger.fine("Extracting apparatus of  " + t);
+			apparatusExtractor.extract(t);
+
+			logger.fine("Postprocess  " + t);
+			t.postprocess();
+
+			logger.fine("Tokenize " + t);
+			t.tokenize();
+		}
+		return transcripts;
+	}
+
+	public Iterable<Transcript> parse(FaustURI source) throws SAXException, IOException, TransformerException  {
 		final Document document = XMLUtil.parse(xml.getInputSource(source));
 		WhitespaceUtil.normalize(document);
 		document.normalizeDocument();
@@ -95,44 +120,26 @@ public class TranscriptManager {
 		final FacsimileReferenceExtractionHandler facsRefHandler = new FacsimileReferenceExtractionHandler(source);
 
 		final Set<Transcript> transcripts = new HashSet<Transcript>();
-		Transaction tx = db.beginTx();
-		try {
-			final SAXResult pipeline = new SAXResult(new MultiplexingContentHandler(docFragmentFilter,
-					textFragmentFilter, facsRefHandler));
-			XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), pipeline);
+		final SAXResult pipeline = new SAXResult(new MultiplexingContentHandler(docFragmentFilter, textFragmentFilter,
+				facsRefHandler));
+		XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), pipeline);
 
-			final Element documentRoot = documentHandler.result();
-			if (documentRoot != null) {
-				logger.fine("Adding documentary transcript for " + source);
-				Transcript transcript = new DocumentaryTranscript(db, source, documentRoot,
-						facsRefHandler.references);
-				transcripts.add(transcript);
-				register(transcript, source);
-			}
-
-			final Element textRoot = textHandler.result();
-			if (textRoot != null) {
-				logger.fine("Adding textual transcript for " + source);
-				Transcript transcript = new TextualTranscript(db, source, textRoot);
-				transcripts.add(transcript);
-				register(transcript, source);
-			}
-
-			tx.success();
-		} finally {
-			tx.finish();
+		final Element documentRoot = documentHandler.result();
+		if (documentRoot != null) {
+			logger.fine("Adding documentary transcript for " + source);
+			Transcript transcript = new DocumentaryTranscript(db, source, documentRoot, facsRefHandler.references);
+			transcripts.add(transcript);
+			register(transcript, source);
 		}
 
-		for (Transcript t : transcripts) {
-			logger.fine("Extracting apparatus of  " + t);
-			apparatusExtractor.extract(t);
-			
-			logger.fine("Postprocess  " + t);
-			t.postprocess();
-			
-			logger.fine("Tokenize " + t);
-			t.tokenize();
+		final Element textRoot = textHandler.result();
+		if (textRoot != null) {
+			logger.fine("Adding textual transcript for " + source);
+			Transcript transcript = new TextualTranscript(db, source, textRoot);
+			transcripts.add(transcript);
+			register(transcript, source);
 		}
+		
 		return transcripts;
 	}
 

@@ -3,7 +3,8 @@
 		<a id="transcript-prev-page" class="disabled" href="" class="disabled" title="${message('transcript.prev_page')}">${message('transcript.prev_page')}</a> |
 		<a id="transcript-browse" class="disabled" href="" title="${message('transcript.browse')}">${message('transcript.browse')}</a> |
 		<a id="transcript-structure" class="disabled" href="" title="${message('transcript.structure')}">${message('transcript.structure')}</a> |
-		<a id="transcript-next-page" class="disabled" href="" class="disabled" title="${message('transcript.next_page')}">${message('transcript.next_page')}</a>
+		<a id="transcript-next-page" class="disabled" href="" class="disabled" title="${message('transcript.next_page')}">${message('transcript.next_page')}</a> |
+		<a id="image-link" href="${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}">Text-Image-Linking</a>
 	</p>
 	<form>
 		<select name="transcript-view-mode" id="transcript-view-mode">
