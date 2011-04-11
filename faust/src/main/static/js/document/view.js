@@ -17,15 +17,14 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 			this.postBuildDeferred = [];
 			this.view = this.build(this, transcript.root("ge:document"));
 			var rootElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
-			rootElement.setAttribute("transform", "translate(200,200)");
+			rootElement.setAttribute("transform", "translate(100,100)");
 			this.svgNode.appendChild(rootElement);
 			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
 			while (rootElement.hasChildNodes()) this.rootElement.removeChild(rootElement.firstChild);
 			if (this.view) {
-				this.view.layout();
-				this.view.layout();
-				var dims = this.view.layout();
-				console.log(dims);
+				//FIXME calculate the required number of iterations
+				for (var i=0; i < 6; i++)
+					this.view.layout();
 				this.view.render();
 			}				
 		},
@@ -33,8 +32,9 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 			if (tree == null) return null;			
 			var vc = null;
 			var node = tree.node;
+			var nodeIsInvisible = false;
 			
-			if ((node instanceof Goddag.Text) && (parent != null) && (parent instanceof Faust.Line)) {
+			if ((node instanceof Goddag.Text) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
 				var textAttrs = {};
 				Y.each(node.ancestors(), function(a) {
 					var elem = a.node;
@@ -72,6 +72,14 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 						lineAttrs.indent = parseInt(rendition.substring(start + 7, start + 9)) / 100.0;
 					}
 					vc = new Faust.Line(lineAttrs);
+				} else if (node.name == "f:vspace") {
+					if (node.attrs["f:unit"]=="lines")
+						{
+							vc = new Faust.BreakingVC();
+							var quantity = node.attrs["f:quantity"];
+							for (var ins_spc = 0; ins_spc < quantity; ins_spc++)
+								vc.add(new Faust.Line({}));
+						}
 				} else if (node.name == "f:grLine") {
 					//vc = new Faust.GLine();
 				} else if (node.name == "f:grBrace") {
@@ -79,27 +87,42 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 				} else if (node.name == "tei:anchor") {
 					//use empty text element as an anchor
 					vc = new Faust.Text("", {});
-				} else {
-					//vc = new Faust.DefaultVC();
+				//Invisible elements				
+				} else if (node.name in {"tei:rdg":1}){
+					nodeIsInvisible = true;
+				// Default Elements
+				} else if (node.name in {"f:ins":1}) {
+					vc = new Faust.DefaultVC();
+
 				}
-				if ("f:at" in node.attrs) {
-					if (!vc) {
-						vc = new Faust.DefaultVC();
-					}
-					//vc.setAlign("hAlign", new Faust.Align(vc, ))
-					//var hAlign = new Faust.Align(true, node, "left", node.attrs["f:at"], "left");
-					//FIXML hash hack; real resolution of links
-					var anchorId = node.attrs["f:at"].substring(1);
-					var idMap = this.idMap;
-					this.postBuildDeferred.push(
-							function(){
-								var anchor = idMap[anchorId];
-								vc.setAlign("hAlign", new Faust.Align(vc, anchor, "x", "width", true, true, 10));
-								console.log("deferred");	
-							});
-					console.log("alignx")
-					//console.log(alignx);
-				}
+				
+				aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left", "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
+				
+				var idMap = this.idMap;
+				var postBuildDeferred = this.postBuildDeferred;
+				Y.each(aligningAttributes, function(a){
+					if (a in node.attrs) {
+						if (!vc) {
+							vc = new Faust.DefaultVC();
+						}
+						//FIXME id hash hack; do real resolution of references
+						var anchorId = node.attrs[a].substring(1);
+						var coordName = a in {"f:at":1, "f:left":1, "f:left-right":1, "f:right":1, "f:right-left":1}? "x" : "y";
+						var extName = coordName == "x" ? "width" : "height";
+						var alignName = coordName == "x" ? "hAlign" : "vAlign";
+						var myJoint = a in {"f:left":1, "f:left-right":1, "f:top":1, "f:top-bottom":1}? 0 : 1;
+						var yourJoint = a in {"f:at":1, "f:left":1, "f:right-left":1, "f:top":1, "f:bottom-top":1}? 0 : 1;
+						
+						if ("f:orient" in node.attrs)
+							myJoint = node.attrs["f:orient"] == "left" ? 0 : 1;
+						
+						postBuildDeferred.push(
+								function(){
+									var anchor = idMap[anchorId];
+									vc.setAlign(alignName, new Faust.Align(vc, anchor, coordName, extName, myJoint, yourJoint, Faust.Align.EXPLICIT));
+								});
+					}						
+				});
 			}
 			
 			if (vc != null) {
@@ -111,11 +134,12 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
  				xmlId = node.attrs["xml:id"];
  				if (xmlId) {
  					this.idMap[xmlId] = vc;
- 					console.log("XML ID: ", xmlId);
  				}
 			}
-			
-			Y.each(tree.children, function(c) { this.build(parent, c); }, this);
+
+ 			if (!nodeIsInvisible)
+ 				Y.each(tree.children, function(c) { this.build(parent, c); }, this);
+ 			
 			return vc;
 		}
 	};

@@ -29,7 +29,7 @@ Faust.YUI().use("oop", "dump", function(Y) {
 			return (this.parent == null || (this.pos + 1) >= this.parent.children.length) ? null : this.parent.children[this.pos + 1];			
 		},
 		svgContainer: function() {
-		return this.parent == null ? this.svgDocument().getElementsByTagName("svg")[0].firstChild : this.parent.svgNode;
+		return this.parent == null ? this.svgDocument().getElementsByTagName("svg")[0].firstChild : this.parent.svgContainer();
 		},
 		svgDocument: function() {
 			return document;
@@ -103,13 +103,14 @@ Faust.YUI().use("oop", "dump", function(Y) {
 			}			
 		},
  		defaultAligns: function () {
-			
-			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", true, true, 0));
-			
-			if (this.previous())
-				this.setAlign("vAlign", new Faust.Align(this, this.previous(), "y", "height", true, false, 0));
-			else
-				this.setAlign("vAlign", new Faust.Align(this, this.parent, "y", "height", true, true, 0));
+ 			
+ 			this.setAlign("vAlign", new Faust.Align(this, this.parent, "y", "height", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 			
+ 			if (this.previous())
+ 				this.setAlign("hAlign", new Faust.Align(this, this.previous(), "x", "width", 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 			else
+ 				this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+
 		},
 		setAlign: function (name, align) {
 			if (this[name]) {
@@ -124,15 +125,32 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	};
 	
 	Faust.DefaultVC = function() {
-		this.isdefaultvc = true;
 		this.initViewComponent();		
 	};
 	Faust.DefaultVC.prototype.render = function() {
-			console.log("defaultvc rendering")
 			Y.each(this.children, function(c) { c.render(); });
 	};
-
 	Y.augment (Faust.DefaultVC, Faust.ViewComponent);
+
+	Faust.BreakingVC = function() {
+		this.initViewComponent();		
+	};
+	
+	Faust.BreakingVC.prototype.render = function() {
+
+			Y.each(this.children, function(c) { c.render(); });
+	};
+ 	
+	Faust.BreakingVC.prototype.defaultAligns = function () {
+		
+			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		
+		if (this.previous())
+			this.setAlign("vAlign", new Faust.Align(this, this.previous(), "y", "height", 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		else
+			this.setAlign("vAlign", new Faust.Align(this, this.parent, "y", "height", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 	};
+	Y.augment (Faust.BreakingVC, Faust.ViewComponent);
 	
 	Faust.Surface = function() {
 		this.initViewComponent();
@@ -169,6 +187,21 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		var line = this.svgDocument().createElementNS(SVG_NS, "g");
 		return line;
 	};
+ 	Faust.Line.prototype.defaultAligns = function () {
+			
+ 		if ("center" in this.lineAttrs) 
+ 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0.5, 0.5, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 		else if ("indent" in this.lineAttrs) 
+ 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, this.lineAttrs["indent"], Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		else
+ 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+
+ 		
+		if (this.previous())
+			this.setAlign("vAlign", new Faust.Align(this, this.previous(), "y", "height", 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		else
+			this.setAlign("vAlign", new Faust.Align(this, this.parent, "y", "height", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+	};
 	Y.augment(Faust.Line, Faust.ViewComponent);
 	
 	Faust.Text = function(text, textAttrs) {
@@ -181,15 +214,9 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		this.width = measured.width;
 		this.height = measured.height;		
 	};
-	Faust.Text.prototype.defaultAligns = function () {
-		
-		this.setAlign("vAlign", new Faust.Align(this, this.parent, "y", "height", true, true, 0));
-		
-		if (this.previous())
-			this.setAlign("hAlign", new Faust.Align(this, this.previous(), "x", "width", true, false, 0));
-		else
-			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", true, true, 0));
-	};
+//	Faust.Text.prototype.defaultAligns = function () {
+//		
+//	};
 
 	Faust.Text.measure = function(text) {
 		var measureText = text.svgDocument().createElementNS(SVG_NS, "text");
@@ -283,21 +310,21 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		this.width = 40;
 		this.height = 20;
 	};
-	Faust.GLine.prototype.position = function() {
-		var prev = this.previous();
-		if (prev) {
-			if (prev instanceof Faust.Text) {
-				this.x = prev.x + prev.width;
-				this.y = prev.y;				
-			} else {
-				this.x = prev.x;
-				this.y = prev.y + prev.height;
-			}
-		} else {
-			this.x = this.parent.x;
-			this.y = this.parent.y;			
-		}
-	};
+//	Faust.GLine.prototype.position = function() {
+//		var prev = this.previous();
+//		if (prev) {
+//			if (prev instanceof Faust.Text) {
+//				this.x = prev.x + prev.width;
+//				this.y = prev.y;				
+//			} else {
+//				this.x = prev.x;
+//				this.y = prev.y + prev.height;
+//			}
+//		} else {
+//			this.x = this.parent.x;
+//			this.y = this.parent.y;			
+//		}
+//	};
 	Faust.GLine.prototype.createSvgNode = function() {
 		var line = this.svgDocument().createElementNS(SVG_NS, "line");
 		line.setAttribute("x1", this.x);
@@ -317,21 +344,21 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		this.width = 40;
 		this.height = 20;
 	};
-	Faust.GBrace.prototype.position = function() {
-		var prev = this.previous();
-		if (prev) {
-			if (prev instanceof Faust.Text) {
-				this.x = prev.x + prev.width;
-				this.y = prev.y;				
-			} else {
-				this.x = prev.x;
-				this.y = prev.y + prev.height;
-			}
-		} else {
-			this.x = this.parent.x;
-			this.y = this.parent.y;			
-		}
-	};
+//	Faust.GBrace.prototype.position = function() {
+//		var prev = this.previous();
+//		if (prev) {
+//			if (prev instanceof Faust.Text) {
+//				this.x = prev.x + prev.width;
+//				this.y = prev.y;				
+//			} else {
+//				this.x = prev.x;
+//				this.y = prev.y + prev.height;
+//			}
+//		} else {
+//			this.x = this.parent.x;
+//			this.y = this.parent.y;			
+//		}
+//	};
 	Faust.GBrace.prototype.createSvgNode = function() {
 		var path = this.svgDocument().createElementNS(SVG_NS, "path");
 		path.setAttribute("d", "M " + (this.x) + " " + (this.y) + " q 5,-10 20,-5 q 5,0 10,-10 q -5,0 10,10 q 10,-5 20,5");
@@ -342,29 +369,24 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	};
 	Y.augment(Faust.GBrace, Faust.ViewComponent);
 
-	Faust.Align = function(me, you, coordName, extName, myOrigin, yourOrigin, priority) {
+	Faust.Align = function(me, you, coordName, extName, myJoint, yourJoint, priority) {
 		this.me = me;
 		this.you = you;
 		this.coordName = coordName;
 		this.extName = extName;
-		this.myOrigin = myOrigin;
-		this.yourOrigin = yourOrigin;
+		this.myJoint = myJoint;
+		this.yourJoint = yourJoint;
 		this.priority = priority;
-
 	};
 	
-	Faust.Align.prototype = function() {
-	};
+	Faust.Align.IMPLICIT_BY_DOC_ORDER = 0;
+	Faust.Align.EXPLICIT = 10;
 	
 	Faust.Align.prototype.align = function() {
 		this.me[this.coordName] = this.you[this.coordName];
-		if (!this.myOrigin)
-			this.me[this.coordName] -= this.me[this.extName];
-		if (!this.yourOrigin)
-			this.me[this.coordName] += this.you[this.extName];
-		return null;
+		this.me[this.coordName] -= this.myJoint * this.me[this.extName];
+		this.me[this.coordName] += this.yourJoint * this.you[this.extName];
 	}
-	
 
 	Faust.Dimensions = function() {};
 
