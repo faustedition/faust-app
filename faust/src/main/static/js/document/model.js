@@ -190,9 +190,9 @@ Faust.YUI().use("oop", "dump", function(Y) {
  	Faust.Line.prototype.defaultAligns = function () {
 			
  		if ("center" in this.lineAttrs) 
- 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0.5, 0.5, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0.5, 0.5, Faust.Align.REND_ATTR));
  		else if ("indent" in this.lineAttrs) 
- 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, this.lineAttrs["indent"], Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, this.lineAttrs["indent"], Faust.Align.INDENT_ATTR));
 		else
  			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 
@@ -380,6 +380,8 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	};
 	
 	Faust.Align.IMPLICIT_BY_DOC_ORDER = 0;
+	Faust.Align.INDENT_ATTR = 7;
+	Faust.Align.REND_ATTR = 5;
 	Faust.Align.EXPLICIT = 10;
 	
 	Faust.Align.prototype.align = function() {

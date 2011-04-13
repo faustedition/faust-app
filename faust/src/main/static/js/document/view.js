@@ -23,7 +23,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 			while (rootElement.hasChildNodes()) this.rootElement.removeChild(rootElement.firstChild);
 			if (this.view) {
 				//FIXME calculate the required number of iterations
-				for (var i=0; i < 6; i++)
+				for (var i=0; i < 7; i++)
 					this.view.layout();
 				this.view.render();
 			}				
@@ -69,7 +69,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 						lineAttrs.center = true;
 					} else if (rendition.indexOf("indent") >= 0) {
 						var start = rendition.indexOf("indent-");
-						lineAttrs.indent = parseInt(rendition.substring(start + 7, start + 9)) / 100.0;
+						lineAttrs.indent = parseInt(rendition.substring(start + 7, rendition.length)) / 100.0;
 					}
 					vc = new Faust.Line(lineAttrs);
 				} else if (node.name == "f:vspace") {
@@ -87,15 +87,17 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 				} else if (node.name == "tei:anchor") {
 					//use empty text element as an anchor
 					vc = new Faust.Text("", {});
+				} else if (node.name == "f:ins" && node.attrs["f:orient"] == "right") {
+					vc = new Faust.DefaultVC();
+					//Einweisungszeichen
+					vc.add (new Faust.Text("\u2308", {}));
+				// Default Elements
+				} else if (node.name in {}) {
+					vc = new Faust.DefaultVC();
 				//Invisible elements				
 				} else if (node.name in {"tei:rdg":1}){
 					nodeIsInvisible = true;
-				// Default Elements
-				} else if (node.name in {"f:ins":1}) {
-					vc = new Faust.DefaultVC();
-
 				}
-				
 				aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left", "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
 				
 				var idMap = this.idMap;
@@ -114,7 +116,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 						var yourJoint = a in {"f:at":1, "f:left":1, "f:right-left":1, "f:top":1, "f:bottom-top":1}? 0 : 1;
 						
 						if ("f:orient" in node.attrs)
-							myJoint = node.attrs["f:orient"] == "left" ? 0 : 1;
+							myJoint = node.attrs["f:orient"] == "left" ? 1 : 0;
 						
 						postBuildDeferred.push(
 								function(){
@@ -123,6 +125,20 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 								});
 					}						
 				});
+				
+				// TODO redundant with line properties
+				// TODO special treatment of zones
+				if ("ge:rend" in node.attrs) {
+					if (node.attrs["ge:rend"] == "right") {
+			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, "x", "width", 1, 1, Faust.Align.REND_ATTR));
+					} else if (node.attrs["ge:rend"] == "left") {
+			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, "x", "width", 0, 0, Faust.Align.REND_ATTR));
+					} else if (node.attrs["ge:rend"] == "center") {
+			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, "x", "width", 0.5, 0.5, Faust.Align.REND_ATTR));
+					}
+
+
+				}
 			}
 			
 			if (vc != null) {
@@ -140,6 +156,11 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
  			if (!nodeIsInvisible)
  				Y.each(tree.children, function(c) { this.build(parent, c); }, this);
  			
+ 			// After all children, TODO move this into appropriate classes
+ 			if (node.name == "f:ins" && node.attrs["f:orient"] == "left") {
+ 				// Einweisungszeichen
+ 				vc.add (new Faust.Text("\u2309", {}));
+ 			}
 			return vc;
 		}
 	};

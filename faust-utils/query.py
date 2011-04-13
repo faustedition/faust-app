@@ -7,6 +7,7 @@
 import sys
 import faust
 import lxml.etree
+import re
 
 kodiert_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='kodiert']"
 encoded_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='encoded']"
@@ -66,6 +67,13 @@ def invalid_facsimile_links():
 		return False
 	return filter(facs_invalid, faust.transcript_files())
 
+def documentary_by_name():
+	textual = re.compile(r"transcript/.*/(.*)/\1.xml")
+	def d_b_n(file):
+		rel = faust.relative_path(file)
+		return not textual.match(rel)
+	return filter(d_b_n, faust.transcript_files())
+
 
 if __name__ == "__main__":
 
@@ -82,8 +90,9 @@ if __name__ == "__main__":
 	# for f in matches(faust.transcript_files(), "count(//tei:facsimile/tei:graphic/@url) > 1"): print f
 	# not_available_xp = "not (" + kodiert_xp + " or " + encoded_xp + " or " + deleatur_xp +  " )"
 	# for f in matches(faust.transcript_files(), not_available_xp):	print f
-	unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
-	for f in unencoded: print f
+	#unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
+	#for f in unencoded: print f
+	for f in documentary_by_name(): print f
 
 
 
