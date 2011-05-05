@@ -29,7 +29,13 @@ Faust.YUI().use("oop", "dump", function(Y) {
 			return (this.parent == null || (this.pos + 1) >= this.parent.children.length) ? null : this.parent.children[this.pos + 1];			
 		},
 		svgContainer: function() {
-		return this.parent == null ? this.svgDocument().getElementsByTagName("svg")[0].firstChild : this.parent.svgContainer();
+			if (this.parent)
+				if (this.parent.svgNode)
+					return this.parent.svgNode;
+				else
+					return this.parent.svgContainer();
+			else
+				return this.svgDocument().getElementsByTagName("svg")[0].firstChild;
 		},
 		svgDocument: function() {
 			return document;
@@ -168,10 +174,22 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	Faust.Zone = function() {
 		this.initViewComponent();
 	};
+	
+	Faust.Zone.prototype.rotation = 0;
 
 	Faust.Zone.prototype.createSvgNode = function() {
-		return this.svgDocument().createElementNS(SVG_NS, "g");
+		var result = this.svgDocument().createElementNS(SVG_NS, "g");
+		result.setAttribute("transform", "rotate(" + this.rotation + ")");
+		//this.svgElement = result;
+		return result;
+		
 	};
+
+	//Faust.Zone.prototype.svgContainer = function() {
+		//return this.svgNode == null ? this.parent.svgContainer() : this.svgNode;
+	//};
+
+	
 	Y.augment(Faust.Zone, Faust.ViewComponent);
 	
 	Faust.Line = function(lineAttrs) {

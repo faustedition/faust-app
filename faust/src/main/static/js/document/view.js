@@ -1,8 +1,6 @@
 Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", function(Y) {
 	Faust.DocumentTranscriptCanvas = function(node) {
 		this.svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		this.svgNode.setAttribute("width", "1000");
-		this.svgNode.setAttribute("height", "1500");
 		Y.Node.getDOMNode(node).appendChild(this.svgNode);
 	};
 
@@ -17,8 +15,9 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 			this.postBuildDeferred = [];
 			this.view = this.build(this, transcript.root("ge:document"));
 			var rootElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
-			rootElement.setAttribute("transform", "translate(100,100)");
 			this.svgNode.appendChild(rootElement);
+
+//			this.svgNode.heigth = this.svgNode.getBBox().height;
 			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
 			while (rootElement.hasChildNodes()) this.rootElement.removeChild(rootElement.firstChild);
 			if (this.view) {
@@ -26,7 +25,12 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 				for (var i=0; i < 7; i++)
 					this.view.layout();
 				this.view.render();
-			}				
+			}
+			var rootBBox = rootElement.getBBox(); 
+			rootElement.setAttribute("transform", "translate(" +  - rootBBox.x + "," + - rootBBox.y + ")");
+			this.svgNode.setAttribute("width", rootElement.getBBox().width);
+			this.svgNode.setAttribute("height", rootElement.getBBox().height);
+
 		},
 		build: function(parent, tree) {
 			if (tree == null) return null;			
@@ -62,6 +66,9 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 					vc = new Faust.Surface();
 				} else if (node.name == "tei:zone")	{
 					vc = new Faust.Zone();
+					if ("tei:rotate" in node.attrs) 
+						vc.rotation = parseInt(node.attrs["tei:rotate"]);
+
 				} else if (node.name == "ge:line") {
 					var lineAttrs = {};
 					var rendition = node.attrs["ge:rend"] || "";
@@ -142,7 +149,10 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 			}
 			
 			if (vc != null) {
-				if (parent != null && parent !== this) parent.add(vc);
+				if (parent != null && parent !== this) {
+					parent.add(vc);
+					vc.parent = parent;
+				}
 				parent = vc;
 			}
 
