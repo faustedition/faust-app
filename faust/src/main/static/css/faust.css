@@ -72,3 +72,14 @@ p.head { margin: 1em 0; font-weight: bold; font-size: 123.1%; }
 p.para-start { margin-top: 1em; }
 .speaker { color: #805F40; }
 .stage { font-style: italic; }
+
+/* Diplomatic transcript */
+
+@font-face {
+  font-family: EB Garamond Regular;
+  src: url(../fonts/EBGaramond-Regular.ttf) format("truetype");
+}
+
+svg.diplomatic {
+  font-family: EB Garamond Regular, sans-serif; 
+}

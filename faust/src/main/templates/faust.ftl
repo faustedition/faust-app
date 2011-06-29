@@ -16,7 +16,7 @@
 		Faust.FacsimileServer = "${config['facsimile.iip.url']}";
 		document.documentElement.className = "yui3-loading";
 	</script>
-	<script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-debug.js"></script>
+	<script type="text/javascript" src="${cp}/static/yui3/build/yui/yui.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />

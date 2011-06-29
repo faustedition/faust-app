@@ -29,8 +29,10 @@
 </div>
 <script type="text/javascript">
 	var Y = Faust.YUI().use("node", "dom", "dump", "io", "json", "event", "overlay", "scrollview", function(Y) {
-		Faust.Document.load(new Faust.URI("${document.source?js_string}"), function(fd) {
-			documentView = new Faust.DocumentView(fd);				
+		Y.on("domready", function() {
+			Faust.Document.load(new Faust.URI("${document.source?js_string}"), function(fd) {
+			documentView = new Faust.DocumentView(fd);
+			});
 		});
 	});
 </script>

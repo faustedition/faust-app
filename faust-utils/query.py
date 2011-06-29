@@ -79,20 +79,16 @@ if __name__ == "__main__":
 
 	# for f in non_wellformed(faust.transcript_files()):
 	# 	print f
-
 	# print_statistics()
-
 	# find all manuscripts with red ink
 	# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, '_tr')] | //*[contains(@hand,'_tr')]"):
-	# 	print f
+		# print f
 	# for f in matches(faust.transcript_files(), "//ge:undo"):	print f
+	for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, 'go_')]  | //*[contains(@hand,'go_')]"):	print f
 	# for val in unique_values (faust.transcript_files(), "//tei:facsimile/tei:graphic/@url"): print val
 	# for f in matches(faust.transcript_files(), "count(//tei:facsimile/tei:graphic/@url) > 1"): print f
 	# not_available_xp = "not (" + kodiert_xp + " or " + encoded_xp + " or " + deleatur_xp +  " )"
 	# for f in matches(faust.transcript_files(), not_available_xp):	print f
 	#unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
 	#for f in unencoded: print f
-	for f in documentary_by_name(): print f
-
-
-
+	#for f in documentary_by_name(): print f

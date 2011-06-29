@@ -1,8 +1,14 @@
-Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", function(Y) {
-	Faust.DocumentTranscriptCanvas = function(node) {
-		this.svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		Y.Node.getDOMNode(node).appendChild(this.svgNode);
+SVG_NS = "http://www.w3.org/2000/svg";
+
+Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-queue", "dragdrop", function(Y) {
+		
+	
+	Faust.DocumentTranscriptCanvas =  function(node) {
+		this.svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		this.svgContainer.setAttribute("class", "diplomatic");
+		Y.Node.getDOMNode(node).appendChild(this.svgContainer);
 	};
+
 
 	Faust.DocumentTranscriptCanvas.prototype = {
 			
@@ -13,23 +19,45 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 		render: function(transcript) {
 			this.idMap = {};
 			this.postBuildDeferred = [];
-			this.view = this.build(this, transcript.root("ge:document"));
+			this.viewComp = this.build(this, transcript.root("ge:document"));
 			var rootElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
-			this.svgNode.appendChild(rootElement);
+			this.svgContainer.appendChild(rootElement);
 
-//			this.svgNode.heigth = this.svgNode.getBBox().height;
 			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
 			while (rootElement.hasChildNodes()) this.rootElement.removeChild(rootElement.firstChild);
-			if (this.view) {
-				//FIXME calculate the required number of iterations
-				for (var i=0; i < 7; i++)
-					this.view.layout();
-				this.view.render();
+
+			that = this;
+			function intoView() {
+				var rootBBox = rootElement.getBBox();
+				rootElement.setAttribute("transform", "translate(" + (- rootBBox.x) + "," + (- rootBBox.y) + ")");
+				that.svgContainer.setAttribute("width", rootBBox.width);
+				that.svgContainer.setAttribute("height", rootBBox.height);
 			}
-			var rootBBox = rootElement.getBBox(); 
-			rootElement.setAttribute("transform", "translate(" +  - rootBBox.x + "," + - rootBBox.y + ")");
-			this.svgNode.setAttribute("width", rootElement.getBBox().width);
-			this.svgNode.setAttribute("height", rootElement.getBBox().height);
+			
+			if (this.viewComp) {
+				//FIXME calculate the required number of iterations
+				this.viewComp.render();
+				
+				view = this.viewComp;
+				that = this;
+				aq = new Y.AsyncQueue();
+				aq.add({
+						fn : view.layout,
+						timeout: 0,
+						iterations: 7,
+						context: view
+					},
+					{
+						fn : intoView,
+						timeout: 0,
+						iterations: 1,
+						context: view						
+					});
+				aq.run();
+				
+			}
+			
+			intoView();
 
 		},
 		build: function(parent, tree) {
@@ -68,6 +96,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 					vc = new Faust.Zone();
 					if ("tei:rotate" in node.attrs) 
 						vc.rotation = parseInt(node.attrs["tei:rotate"]);
+					    //vc.rotate(parseInt(node.attrs["tei:rotate"]));
 
 				} else if (node.name == "ge:line") {
 					var lineAttrs = {};
@@ -94,6 +123,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", functio
 				} else if (node.name == "tei:anchor") {
 					//use empty text element as an anchor
 					vc = new Faust.Text("", {});
+					//vc = new Faust.Line([]);
 				} else if (node.name == "f:ins" && node.attrs["f:orient"] == "right") {
 					vc = new Faust.DefaultVC();
 					//Einweisungszeichen

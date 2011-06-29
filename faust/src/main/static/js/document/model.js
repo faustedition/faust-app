@@ -1,8 +1,8 @@
-SVG_NS = "http://www.w3.org/2000/svg";
 
 Faust.YUI().use("oop", "dump", function(Y) {
 	Faust.ViewComponent = function() {};
 	Faust.ViewComponent.prototype = {
+		rotation: 0,
 		initViewComponent: function() {
 			this.parent = null;
 			this.pos = -1;
@@ -28,18 +28,6 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		next: function() {
 			return (this.parent == null || (this.pos + 1) >= this.parent.children.length) ? null : this.parent.children[this.pos + 1];			
 		},
-		svgContainer: function() {
-			if (this.parent)
-				if (this.parent.svgNode)
-					return this.parent.svgNode;
-				else
-					return this.parent.svgContainer();
-			else
-				return this.svgDocument().getElementsByTagName("svg")[0].firstChild;
-		},
-		svgDocument: function() {
-			return document;
-		},
 		layout: function() {
 			this.computeDimension();			
 			this.computePosition();
@@ -55,12 +43,10 @@ Faust.YUI().use("oop", "dump", function(Y) {
 					//}
 				});	
 			}
+			
+			this.onRelayout();
+
 			return dimensions;
-		},
-		render: function() {
-			this.svgNode = this.createSvgNode();
-			this.svgContainer().appendChild(this.svgNode);
-			Y.each(this.children, function(c) { c.render(); });
 		},
 		checkLayoutDiff: function(old, nu) {
 			var epsilon = 0.01;
@@ -98,14 +84,14 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		computeStyles: function() { 
 			return {}; 
 		},
-		setStyles: function(svgNode) {
+		setStyles: function(view) {
 			var styles = this.computeStyles();
 			if (styles) {
 				var stylesStr = "";
 				for (style in styles) {
 					stylesStr += (stylesStr.length == 0 ? "" : "; ") + (style + ": " + styles[style]);
 				}
-				svgNode.setAttribute("style", stylesStr);
+				view.setAttribute("style", stylesStr);
 			}			
 		},
  		defaultAligns: function () {
@@ -143,7 +129,6 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	};
 	
 	Faust.BreakingVC.prototype.render = function() {
-
 			Y.each(this.children, function(c) { c.render(); });
 	};
  	
@@ -166,30 +151,15 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		this.y = 0;
 		// TODO: surface-specific layout
 	};
-	Faust.Surface.prototype.createSvgNode = function() {
-		return this.svgDocument().createElementNS(SVG_NS, "g");
-	};
+
 	Y.augment(Faust.Surface, Faust.ViewComponent);
 			
 	Faust.Zone = function() {
 		this.initViewComponent();
 	};
 	
-	Faust.Zone.prototype.rotation = 0;
 
-	Faust.Zone.prototype.createSvgNode = function() {
-		var result = this.svgDocument().createElementNS(SVG_NS, "g");
-		result.setAttribute("transform", "rotate(" + this.rotation + ")");
-		//this.svgElement = result;
-		return result;
-		
-	};
 
-	//Faust.Zone.prototype.svgContainer = function() {
-		//return this.svgNode == null ? this.parent.svgContainer() : this.svgNode;
-	//};
-
-	
 	Y.augment(Faust.Zone, Faust.ViewComponent);
 	
 	Faust.Line = function(lineAttrs) {
@@ -200,10 +170,6 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		this.height = 20;
 		this.width = 0;
 		Y.each(this.children, function(c) { this.width += c.width; }, this);
-	};
-	Faust.Line.prototype.createSvgNode = function() {
-		var line = this.svgDocument().createElementNS(SVG_NS, "g");
-		return line;
 	};
  	Faust.Line.prototype.defaultAligns = function () {
 			
@@ -228,60 +194,9 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		this.textAttrs = textAttrs;
 	};
 	Faust.Text.prototype.dimension = function() {		
-		var measured = Faust.Text.measure(this);
+		var measured = this.measure();
 		this.width = measured.width;
 		this.height = measured.height;		
-	};
-//	Faust.Text.prototype.defaultAligns = function () {
-//		
-//	};
-
-	Faust.Text.measure = function(text) {
-		var measureText = text.svgDocument().createElementNS(SVG_NS, "text");
-		text.setStyles(measureText);
-		measureText.setAttribute("x", "-10000");
-		measureText.setAttribute("y", "-10000");
-		measureText.appendChild(text.svgDocument().createTextNode(text.text));
-		
-		var svgRoot = text.svgDocument().getElementsByTagName("svg")[0];
-		svgRoot.appendChild(measureText);
-		var bbox = measureText.getBBox();
-		svgRoot.removeChild(measureText);
-		return { width: Math.round(bbox.width), height: Math.round(bbox.height)};		
-	};
-
-	Faust.Text.prototype.createSvgNode = function() {
-		var text = this.svgDocument().createElementNS(SVG_NS, "text");
-		this.setStyles(text);
-		text.setAttribute("x", this.x.toString());
-		text.setAttribute("y", this.y.toString());
-		text.appendChild(this.svgDocument().createTextNode(this.text));
-		return text;
-	};
-	Faust.Text.prototype.render = function() {
-		this.svgNode = this.createSvgNode();
-		this.svgContainer().appendChild(this.svgNode);
-		var textBox = this.svgNode.getBBox();
-		if ("strikethrough" in this.textAttrs) {
-			var st = this.svgDocument().createElementNS(SVG_NS, "line");
-			st.setAttribute("x1", textBox.x);
-			st.setAttribute("x2", textBox.x + textBox.width);
-			st.setAttribute("y1", textBox.y + textBox.height / 2);
-			st.setAttribute("y2", textBox.y + textBox.height / 2);
-			st.setAttribute("stroke", "#333");
-			this.svgContainer().appendChild(st);
-		}
-		if ("underline" in this.textAttrs) {
-			var st = this.svgDocument().createElementNS(SVG_NS, "line");
-			st.setAttribute("x1", textBox.x);
-			st.setAttribute("x2", textBox.x + textBox.width);
-			st.setAttribute("y1", textBox.y + textBox.height);
-			st.setAttribute("y2", textBox.y + textBox.height);
-			st.setAttribute("stroke", this.handColor());
-			this.svgContainer().appendChild(st);
-		}
-		
-		Y.each(this.children, function(c) { c.render(); });		
 	};
 	Faust.Text.prototype.handColor = function() {
 		var hand = this.textAttrs["hand"];
@@ -343,16 +258,6 @@ Faust.YUI().use("oop", "dump", function(Y) {
 //			this.y = this.parent.y;			
 //		}
 //	};
-	Faust.GLine.prototype.createSvgNode = function() {
-		var line = this.svgDocument().createElementNS(SVG_NS, "line");
-		line.setAttribute("x1", this.x);
-		line.setAttribute("y1", this.y - 10);
-		line.setAttribute("x2", this.x + 40);
-		line.setAttribute("y2", this.y - 10);
-		line.setAttribute("stroke-width", 1);
-		line.setAttribute("stroke", "black");
-		return line;
-	};
 	Y.augment(Faust.GLine, Faust.ViewComponent);
 
 	Faust.GBrace = function() {
@@ -377,14 +282,6 @@ Faust.YUI().use("oop", "dump", function(Y) {
 //			this.y = this.parent.y;			
 //		}
 //	};
-	Faust.GBrace.prototype.createSvgNode = function() {
-		var path = this.svgDocument().createElementNS(SVG_NS, "path");
-		path.setAttribute("d", "M " + (this.x) + " " + (this.y) + " q 5,-10 20,-5 q 5,0 10,-10 q -5,0 10,10 q 10,-5 20,5");
-		path.setAttribute("stroke-width", 1);
-		path.setAttribute("stroke", "black");
-		path.setAttribute("fill", "transparent");
-		return path;
-	};
 	Y.augment(Faust.GBrace, Faust.ViewComponent);
 
 	Faust.Align = function(me, you, coordName, extName, myJoint, yourJoint, priority) {
@@ -398,8 +295,8 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	};
 	
 	Faust.Align.IMPLICIT_BY_DOC_ORDER = 0;
-	Faust.Align.INDENT_ATTR = 7;
 	Faust.Align.REND_ATTR = 5;
+	Faust.Align.INDENT_ATTR = 7;
 	Faust.Align.EXPLICIT = 10;
 	
 	Faust.Align.prototype.align = function() {
