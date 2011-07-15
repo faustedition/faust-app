@@ -3,6 +3,16 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	Faust.ViewComponent = function() {};
 	Faust.ViewComponent.prototype = {
 		rotation: 0,
+		globalRotation: function () {
+			var e = this;
+			var result = 0;
+			while (e.parent) {
+				result += e.rotation;
+				e = e.parent;
+			}
+			result += e.rotation;
+			return result;
+		},
 		initViewComponent: function() {
 			this.parent = null;
 			this.pos = -1;
@@ -94,20 +104,28 @@ Faust.YUI().use("oop", "dump", function(Y) {
 				view.setAttribute("style", stylesStr);
 			}			
 		},
+		rotX: function() {return 0 + this.globalRotation()},
+		rotY: function() {return 90 + this.globalRotation()},
+		
  		defaultAligns: function () {
- 			
- 			this.setAlign("vAlign", new Faust.Align(this, this.parent, "y", "height", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 		
+ 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
  			
  			if (this.previous())
- 				this.setAlign("hAlign", new Faust.Align(this, this.previous(), "x", "width", 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 				this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
  			else
- 				this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 				this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 
 		},
 		setAlign: function (name, align) {
 			if (this[name]) {
-				if (align.priority === this[name].priority)
-					throw("Conflicting alignment instructions");
+				
+				if (align.priority === this[name].priority){
+					var xmlId = this.xmlId ? this.xmlId : '';
+					throw("Conflicting alignment instructions for element " 
+							+ this.elementName + " #" + xmlId + " (" + name + ", " 
+							+ Faust.Align[align.priority] + " )"); 
+				}
 				else if (align.priority > this[name].priority)
 					this[name] = align;
 			}
@@ -119,27 +137,26 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	Faust.DefaultVC = function() {
 		this.initViewComponent();		
 	};
-	Faust.DefaultVC.prototype.render = function() {
-			Y.each(this.children, function(c) { c.render(); });
-	};
+
 	Y.augment (Faust.DefaultVC, Faust.ViewComponent);
 
 	Faust.BreakingVC = function() {
 		this.initViewComponent();		
 	};
 	
-	Faust.BreakingVC.prototype.render = function() {
-			Y.each(this.children, function(c) { c.render(); });
-	};
+//	Faust.BreakingVC.prototype.render = function() {
+			
+	//	Y.each(this.children, function(c) { c.render(); });
+	//};
  	
 	Faust.BreakingVC.prototype.defaultAligns = function () {
 		
-			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 		
 		if (this.previous())
-			this.setAlign("vAlign", new Faust.Align(this, this.previous(), "y", "height", 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Faust.Align(this, this.previous(), this.rotY(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 		else
-			this.setAlign("vAlign", new Faust.Align(this, this.parent, "y", "height", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
  	};
 	Y.augment (Faust.BreakingVC, Faust.ViewComponent);
 	
@@ -158,8 +175,6 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		this.initViewComponent();
 	};
 	
-
-
 	Y.augment(Faust.Zone, Faust.ViewComponent);
 	
 	Faust.Line = function(lineAttrs) {
@@ -174,17 +189,17 @@ Faust.YUI().use("oop", "dump", function(Y) {
  	Faust.Line.prototype.defaultAligns = function () {
 			
  		if ("center" in this.lineAttrs) 
- 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0.5, 0.5, Faust.Align.REND_ATTR));
+ 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0.5, 0.5, Faust.Align.REND_ATTR));
  		else if ("indent" in this.lineAttrs) 
- 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, this.lineAttrs["indent"], Faust.Align.INDENT_ATTR));
+ 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, this.lineAttrs["indent"], Faust.Align.INDENT_ATTR));
 		else
- 			this.setAlign("hAlign", new Faust.Align(this, this.parent, "x", "width", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 
  		
 		if (this.previous())
-			this.setAlign("vAlign", new Faust.Align(this, this.previous(), "y", "height", 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Faust.Align(this, this.previous(), this.rotY(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 		else
-			this.setAlign("vAlign", new Faust.Align(this, this.parent, "y", "height", 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 	};
 	Y.augment(Faust.Line, Faust.ViewComponent);
 	
@@ -284,25 +299,33 @@ Faust.YUI().use("oop", "dump", function(Y) {
 //	};
 	Y.augment(Faust.GBrace, Faust.ViewComponent);
 
-	Faust.Align = function(me, you, coordName, extName, myJoint, yourJoint, priority) {
+	Faust.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
 		this.me = me;
 		this.you = you;
-		this.coordName = coordName;
-		this.extName = extName;
+		this.coordRotation = coordRotation;
 		this.myJoint = myJoint;
 		this.yourJoint = yourJoint;
 		this.priority = priority;
 	};
 	
 	Faust.Align.IMPLICIT_BY_DOC_ORDER = 0;
+	Faust.Align['0'] = 'IMPLICIT_BY_DOC_ORDER';
 	Faust.Align.REND_ATTR = 5;
+	Faust.Align['5'] = 'REND_ATTR';
 	Faust.Align.INDENT_ATTR = 7;
-	Faust.Align.EXPLICIT = 10;
+	Faust.Align['7'] = 'INDENT_ATTR';
+	Faust.Align.EXPLICIT = 10;	
+	Faust.Align['10'] = 'EXPLICIT';
+
 	
 	Faust.Align.prototype.align = function() {
-		this.me[this.coordName] = this.you[this.coordName];
-		this.me[this.coordName] -= this.myJoint * this.me[this.extName];
-		this.me[this.coordName] += this.yourJoint * this.you[this.extName];
+		//this.me[this.coordName] = this.you[this.coordName];
+		//this.me[this.coordName] -= this.myJoint * this.me[this.extName];
+		//this.me[this.coordName] += this.yourJoint * this.you[this.extName];
+		var value = this.you.getCoord(this.coordRotation);
+		value -= this.myJoint * this.me.getExt(this.coordRotation);
+		value += this.yourJoint * this.you.getExt(this.coordRotation);
+		this.me.setCoord(value, this.coordRotation);
 	}
 
 	Faust.Dimensions = function() {};

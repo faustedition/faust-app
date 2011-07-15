@@ -9,30 +9,30 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 		Y.Node.getDOMNode(node).appendChild(this.svgContainer);
 	};
 
-
 	Faust.DocumentTranscriptCanvas.prototype = {
 			
 		idMap: {},
 		
 		postBuildDeferred: [],
+
+		intoView : function (containerElement, svgContainer) {
+			var rootBBox = containerElement.getBBox();
+			containerElement.setAttribute("transform", "translate(" + (- rootBBox.x) + "," + (- rootBBox.y) + ")");
+			svgContainer.setAttribute("width", rootBBox.width);
+			svgContainer.setAttribute("height", rootBBox.height);
+		},
+
 		
 		render: function(transcript) {
 			this.idMap = {};
 			this.postBuildDeferred = [];
 			this.viewComp = this.build(this, transcript.root("ge:document"));
-			var rootElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
-			this.svgContainer.appendChild(rootElement);
+			var containerElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			containerElement.setAttribute("id", "transcript_container");
+			this.svgContainer.appendChild(containerElement);
 
 			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
-			while (rootElement.hasChildNodes()) this.rootElement.removeChild(rootElement.firstChild);
-
-			that = this;
-			function intoView() {
-				var rootBBox = rootElement.getBBox();
-				rootElement.setAttribute("transform", "translate(" + (- rootBBox.x) + "," + (- rootBBox.y) + ")");
-				that.svgContainer.setAttribute("width", rootBBox.width);
-				that.svgContainer.setAttribute("height", rootBBox.height);
-			}
+			while (containerElement.hasChildNodes()) this.rootElement.removeChild(containerElement.firstChild);
 			
 			if (this.viewComp) {
 				//FIXME calculate the required number of iterations
@@ -48,7 +48,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 						context: view
 					},
 					{
-						fn : intoView,
+						fn : function() {Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, that.svgContainer)},
 						timeout: 0,
 						iterations: 1,
 						context: view						
@@ -57,7 +57,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				
 			}
 			
-			intoView();
+			Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, this.svgContainer);
 
 		},
 		build: function(parent, tree) {
@@ -146,9 +146,8 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 						}
 						//FIXME id hash hack; do real resolution of references
 						var anchorId = node.attrs[a].substring(1);
-						var coordName = a in {"f:at":1, "f:left":1, "f:left-right":1, "f:right":1, "f:right-left":1}? "x" : "y";
-						var extName = coordName == "x" ? "width" : "height";
-						var alignName = coordName == "x" ? "hAlign" : "vAlign";
+						var coordRot = a in {"f:at":1, "f:left":1, "f:left-right":1, "f:right":1, "f:right-left":1}? 0 : 90;
+						var alignName = coordRot == 0 ? "hAlign" : "vAlign";
 						var myJoint = a in {"f:left":1, "f:left-right":1, "f:top":1, "f:top-bottom":1}? 0 : 1;
 						var yourJoint = a in {"f:at":1, "f:left":1, "f:right-left":1, "f:top":1, "f:bottom-top":1}? 0 : 1;
 						
@@ -158,7 +157,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 						postBuildDeferred.push(
 								function(){
 									var anchor = idMap[anchorId];
-									vc.setAlign(alignName, new Faust.Align(vc, anchor, coordName, extName, myJoint, yourJoint, Faust.Align.EXPLICIT));
+									vc.setAlign(alignName, new Faust.Align(vc, anchor, coordRot, myJoint, yourJoint, Faust.Align.EXPLICIT));
 								});
 					}						
 				});
@@ -167,11 +166,11 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				// TODO special treatment of zones
 				if ("ge:rend" in node.attrs) {
 					if (node.attrs["ge:rend"] == "right") {
-			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, "x", "width", 1, 1, Faust.Align.REND_ATTR));
+			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, 0, 1, 1, Faust.Align.REND_ATTR));
 					} else if (node.attrs["ge:rend"] == "left") {
-			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, "x", "width", 0, 0, Faust.Align.REND_ATTR));
+			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, 0, 0, 0, Faust.Align.REND_ATTR));
 					} else if (node.attrs["ge:rend"] == "center") {
-			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, "x", "width", 0.5, 0.5, Faust.Align.REND_ATTR));
+			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, 0, 0.5, 0.5, Faust.Align.REND_ATTR));
 					}
 
 
@@ -179,6 +178,10 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 			}
 			
 			if (vc != null) {
+
+				// annotate the vc with the original element name
+	 			vc.elementName = node.name;
+								
 				if (parent != null && parent !== this) {
 					parent.add(vc);
 					vc.parent = parent;
@@ -190,6 +193,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
  				xmlId = node.attrs["xml:id"];
  				if (xmlId) {
  					this.idMap[xmlId] = vc;
+ 					vc.xmlId = xmlId;
  				}
 			}
 
@@ -201,7 +205,10 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
  				// Einweisungszeichen
  				vc.add (new Faust.Text("\u2309", {}));
  			}
-			return vc;
+ 			
+
+			
+ 			return vc;
 		}
 	};
 

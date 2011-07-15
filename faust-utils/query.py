@@ -84,7 +84,7 @@ if __name__ == "__main__":
 	# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, '_tr')] | //*[contains(@hand,'_tr')]"):
 		# print f
 	# for f in matches(faust.transcript_files(), "//ge:undo"):	print f
-	for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, 'go_')]  | //*[contains(@hand,'go_')]"):	print f
+	# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, 'go_')]  | //*[contains(@hand,'go_')]"):	print f
 	# for val in unique_values (faust.transcript_files(), "//tei:facsimile/tei:graphic/@url"): print val
 	# for f in matches(faust.transcript_files(), "count(//tei:facsimile/tei:graphic/@url) > 1"): print f
 	# not_available_xp = "not (" + kodiert_xp + " or " + encoded_xp + " or " + deleatur_xp +  " )"
@@ -92,3 +92,21 @@ if __name__ == "__main__":
 	#unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
 	#for f in unencoded: print f
 	#for f in documentary_by_name(): print f
+
+	#	for f in matches(faust.transcript_files(), "//tei:change[(contains(@when, '2011-06-') or contains(@when, '2011-05-')) and contains(@who, 'bruening')]"):	print f
+
+	encoded_transcripts = matches(faust.transcript_files(), encoded_xp)
+	deleatur_transcripts = matches(faust.transcript_files(), deleatur_xp)
+	
+	for phrase in ['I ', 'II ', 'III ', 'IV ', 'V ']:
+		print
+		print 'Akt ', phrase
+		print
+		for f in matches(faust.transcript_files(),
+						 "//tei:altIdentifier[contains(@type, 'edition')]/tei:idno[starts-with(.,'"
+						 + phrase + "')]"):
+			if (f in encoded_transcripts): print ' E',
+			else: print '  ',
+			if (f in deleatur_transcripts): print ' D',
+			else: print '  ',
+			print f

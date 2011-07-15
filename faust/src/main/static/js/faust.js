@@ -17,7 +17,7 @@ Faust.URI.prototype = {
 };
 
 Faust.YUI = function() { 
-	return YUI({ base: Faust.contextPath + "/static/yui3/build/", combine: false, gallery: "gallery-2011.06.15-19-18" }); 
+	return YUI({ base: Faust.contextPath + "/static/yui3/build/", combine: false}); 
 };
 
 Faust.io = function(uri, callback, reviver) {
