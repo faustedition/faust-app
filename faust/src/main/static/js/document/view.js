@@ -21,7 +21,6 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 			svgContainer.setAttribute("width", rootBBox.width);
 			svgContainer.setAttribute("height", rootBBox.height);
 		},
-
 		
 		render: function(transcript) {
 			this.idMap = {};
@@ -43,7 +42,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				aq = new Y.AsyncQueue();
 				aq.add({
 						fn : view.layout,
-						timeout: 0,
+						timeout: 100,
 						iterations: 7,
 						context: view
 					},
@@ -122,8 +121,13 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 					//vc = new Faust.GBrace();
 				} else if (node.name == "tei:anchor") {
 					//use empty text element as an anchor
-					vc = new Faust.Text("", {});
-					//vc = new Faust.Line([]);
+					// FIXME make proper phrase/block context differentiation
+					if (parent.elementName === "tei:zone")
+						vc = new Faust.Line([]);
+					else
+						vc = new Faust.Text("", {});
+					
+				
 				} else if (node.name == "f:ins" && node.attrs["f:orient"] == "right") {
 					vc = new Faust.DefaultVC();
 					//Einweisungszeichen
@@ -205,9 +209,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
  				// Einweisungszeichen
  				vc.add (new Faust.Text("\u2309", {}));
  			}
- 			
 
-			
  			return vc;
 		}
 	};
