@@ -6,6 +6,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 	Faust.DocumentTranscriptCanvas =  function(node) {
 		this.svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		this.svgContainer.setAttribute("class", "diplomatic");
+
 		Y.Node.getDOMNode(node).appendChild(this.svgContainer);
 	};
 
@@ -15,22 +16,33 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 		
 		postBuildDeferred: [],
 
-		intoView : function (containerElement, svgContainer) {
+		intoView: function (containerElement, svgContainer) {
 			var rootBBox = containerElement.getBBox();
 			containerElement.setAttribute("transform", "translate(" + (- rootBBox.x) + "," + (- rootBBox.y) + ")");
 			svgContainer.setAttribute("width", rootBBox.width);
 			svgContainer.setAttribute("height", rootBBox.height);
 		},
+
+		alignMainZone: function() {
+			if (!this.mainZone)
+				throw ("No main zone specified!");
+			//position absolutely
+			this.mainZone.setAlign("hAlign", new Faust.AbsoluteAlign(this.mainZone, 0, 0,Faust.Align.EXPLICIT));
+			this.mainZone.setAlign("vAlign", new Faust.AbsoluteAlign(this.mainZone, 90, 0, Faust.Align.EXPLICIT));
+		},
 		
 		render: function(transcript) {
 			this.idMap = {};
 			this.postBuildDeferred = [];
+			this.mainZone = null;
 			this.viewComp = this.build(this, transcript.root("ge:document"));
 			var containerElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
 			containerElement.setAttribute("id", "transcript_container");
 			this.svgContainer.appendChild(containerElement);
-
 			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
+			
+			this.alignMainZone();
+			
 			while (containerElement.hasChildNodes()) this.rootElement.removeChild(containerElement.firstChild);
 			
 			if (this.viewComp) {
@@ -58,7 +70,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 			
 			Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, this.svgContainer);
 
-		},
+		},	
 		build: function(parent, tree) {
 			if (tree == null) return null;			
 			var vc = null;
@@ -95,7 +107,13 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 					vc = new Faust.Zone();
 					if ("tei:rotate" in node.attrs) 
 						vc.rotation = parseInt(node.attrs["tei:rotate"]);
-					    //vc.rotate(parseInt(node.attrs["tei:rotate"]));
+					if ("tei:type" in node.attrs && node.attrs["tei:type"] == "main") {
+						if (this.mainZone != null)
+							throw ("More than one main zone specified!");
+						else
+							this.mainZone = vc;
+					} 
+						
 
 				} else if (node.name == "ge:line") {
 					var lineAttrs = {};

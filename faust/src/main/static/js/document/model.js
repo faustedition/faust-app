@@ -319,15 +319,25 @@ Faust.YUI().use("oop", "dump", function(Y) {
 
 	
 	Faust.Align.prototype.align = function() {
-		//this.me[this.coordName] = this.you[this.coordName];
-		//this.me[this.coordName] -= this.myJoint * this.me[this.extName];
-		//this.me[this.coordName] += this.yourJoint * this.you[this.extName];
 		var value = this.you.getCoord(this.coordRotation);
 		value -= this.myJoint * this.me.getExt(this.coordRotation);
 		value += this.yourJoint * this.you.getExt(this.coordRotation);
 		this.me.setCoord(value, this.coordRotation);
-	}
+	};
 
+	Faust.AbsoluteAlign = function (me, coordRotation, coordinate, priority) {
+		this.me = me;
+		this.coordRotation = coordRotation;
+		this.coordinate = coordinate;
+		this.priority = priority;
+	};
+	
+	Faust.AbsoluteAlign.prototype.align = function() {
+		this.me.setCoord(this.coordinate, this.coordRotation);
+	}
+	
+	
+	
 	Faust.Dimensions = function() {};
 
 	Faust.Dimensions.prototype = function() {};
