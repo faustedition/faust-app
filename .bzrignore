@@ -10,3 +10,7 @@ faust/src/main/resources/config-development.properties
 local.ini
 .git
 config.properties
+data-import.properties
+faust/bin
+faust-utils/.pydevproject
+faust-utils/.ropeproject

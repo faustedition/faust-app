@@ -198,6 +198,8 @@ Faust.YUI().use("node", "dom", "event", function(Y) {
 			this.strikethrough.setAttribute("y1", this.y - this.measure().height / 6);
 			this.strikethrough.setAttribute("y2", this.y - this.measure().height / 6);
 			this.strikethrough.setAttribute("stroke", "#333");
+			//this.strikethrough.transform.baseVal = this.view.transform.baseVal;
+			this.strikethrough.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
 		
 		if (this.underline) {
@@ -206,6 +208,7 @@ Faust.YUI().use("node", "dom", "event", function(Y) {
 			this.underline.setAttribute("y1", this.y);
 			this.underline.setAttribute("y2", this.y);
 			this.underline.setAttribute("stroke", this.handColor());
+			this.underline.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
 	};
 

@@ -54,8 +54,8 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				aq = new Y.AsyncQueue();
 				aq.add({
 						fn : view.layout,
-						timeout: 100,
-						iterations: 7,
+						timeout: 10,
+						iterations: 5,
 						context: view
 					},
 					{
