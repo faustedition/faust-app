@@ -31,17 +31,28 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 			this.mainZone.setAlign("vAlign", new Faust.AbsoluteAlign(this.mainZone, 90, 0, Faust.Align.EXPLICIT));
 		},
 		
+		displayError: function(error) {
+			var msg = Y.Node.create('<p/>');
+			msg.append(error.toString());
+			var errorDisplay = Y.one('#error-display');
+			errorDisplay.append(msg);
+			errorDisplay.show();
+			
+		},
 		render: function(transcript) {
 			this.idMap = {};
 			this.postBuildDeferred = [];
 			this.mainZone = null;
-			this.viewComp = this.build(this, transcript.root("ge:document"));
-			var containerElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
-			containerElement.setAttribute("id", "transcript_container");
-			this.svgContainer.appendChild(containerElement);
-			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
-			
-			this.alignMainZone();
+			try {
+				this.viewComp = this.build(this, transcript.root("ge:document"));
+				var containerElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
+				containerElement.setAttribute("id", "transcript_container");
+				this.svgContainer.appendChild(containerElement);
+				Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
+				this.alignMainZone();
+			} catch(error) {
+				this.displayError(error);
+			}
 			
 			while (containerElement.hasChildNodes()) this.rootElement.removeChild(containerElement.firstChild);
 			
@@ -285,7 +296,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				}		
 			}, "#transcript-next-page", this);
 			
-			var viewModeSelector = Y.get("#transcript-view-mode");
+			var viewModeSelector = Y.one("#transcript-view-mode");
 			viewModeSelector.get("options").each(function(o) {
 				if (this.viewMode == o.get("value")) {
 					o.set("selected", "selected");
@@ -357,16 +368,17 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 			browser.setContent(list);
 			this.browseView.render();
 			this.browserOverlay.render();		
-			Y.one("#transcript-browser").removeClass("hidden");
+			Y.one("#transcript-browser").show();
 		},
 		renderPage: function() {
 			if (this.pages.length <= this.currentPage) return;
 			window.location.hash = ("#" + this.pages[this.currentPage].order);
 
 			this.updateNavigation();
+			this.clearMessages();
 			
-			var navigation = Y.get("#transcript-navigation");
-			var transcript = Y.get("#transcript");
+			var navigation = Y.one("#transcript-navigation");
+			var transcript = Y.one("#transcript");
 			if (transcript != null) {
 				transcript.remove();
 				transcript.destroy();
@@ -406,8 +418,14 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				nextPage.addClass("disabled");
 
 		},
+		clearMessages: function(){
+			var errorDisplay = Y.one("#error-display");
+			errorDisplay.empty();
+			errorDisplay.hide();
+			
+		},
 		renderFacsimiles: function() {
-			var container = Y.get("#transcript-facsimile");
+			var container = Y.one("#transcript-facsimile");
 			if (container == null) return;
 			container.append('<div id="transcript-swf"></div>')
 			swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
@@ -426,7 +444,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				});	
 		},
 		renderTranscript: function() {
-			var container = Y.get("#transcript-text");
+			var container = Y.one("#transcript-text");
 			if (container == null) return;
 			this.pages[this.currentPage].transcription(function(t) {				
 				var canvas = new Faust.DocumentTranscriptCanvas(container);

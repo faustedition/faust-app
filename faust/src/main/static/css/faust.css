@@ -83,3 +83,8 @@ p.para-start { margin-top: 1em; }
 svg.diplomatic {
   font-family: EB Garamond Regular, sans-serif; 
 }
+
+#error-display {
+  background-color: red;
+  color: white; 
+}

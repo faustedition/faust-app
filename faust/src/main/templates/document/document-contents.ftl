@@ -6,6 +6,8 @@
 		<a id="transcript-next-page" class="disabled" href="" class="disabled" title="${message('transcript.next_page')}">${message('transcript.next_page')}</a> |
 		<a id="image-link" href="${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}">Text-Image-Linking</a>
 	</p>
+	<div id="error-display">	
+	</div>
 	<form>
 		<select name="transcript-view-mode" id="transcript-view-mode">
 			<option value="text-facsimile">Text/Faksimile</option>
