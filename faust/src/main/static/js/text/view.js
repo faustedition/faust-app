@@ -1,5 +1,5 @@
 Faust.YUI().use("node", "dom", "event", "overlay", "dump", function(Y) {
-	Faust.ReadingTextPanel = function(container, graph) {
+	Faust.ReadingTextPanel = function(container, graph){
 		this.container = Y.one(container);
 		this.graph = graph;
 	};
