@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('datasource-get', function(Y) {
 
@@ -63,6 +63,7 @@ Y.DataSource.Get = Y.extend(DSGet, Y.DataSource.Local, {
         this._last = guid;
 
         // Dynamically add handler function with a closure to the callback stack
+        // for access to guid
         YUI.Env.DataSource.callbacks[guid] = Y.bind(function(response) {
             delete YUI.Env.DataSource.callbacks[guid];
             delete Y.DataSource.Local.transactions[e.tId];
@@ -206,4 +207,4 @@ YUI.namespace("Env.DataSource.callbacks");
 
 
 
-}, '3.2.0' ,{requires:['datasource-local', 'get']});
+}, '3.3.0' ,{requires:['datasource-local', 'get']});

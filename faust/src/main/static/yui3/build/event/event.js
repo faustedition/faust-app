@@ -2,86 +2,29 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
-/*
- * DOM event listener abstraction layer
- * @module event
- * @submodule event-base
- */
-
-(function() {
-
-// Unlike most of the library, this code has to be executed as soon as it is
-// introduced into the page -- and it should only be executed one time
-// regardless of the number of instances that use it.
-
-var stateChangeListener,
-    GLOBAL_ENV   = YUI.Env, 
-    config       = YUI.config, 
-    doc          = config.doc, 
-    docElement   = doc && doc.documentElement, 
-    doScrollCap  = docElement && docElement.doScroll,
-    add          = YUI.Env.add,
-    remove       = YUI.Env.remove,
-    targetEvent  = (doScrollCap) ? 'onreadystatechange' : 'DOMContentLoaded',
-    pollInterval = config.pollInterval || 40,
-    _ready       = function(e) {
-                     GLOBAL_ENV._ready();
-                 };
+var GLOBAL_ENV = YUI.Env;
 
 if (!GLOBAL_ENV._ready) {
     GLOBAL_ENV._ready = function() {
-        if (!GLOBAL_ENV.DOMReady) {
-            GLOBAL_ENV.DOMReady = true;
-            remove(doc, targetEvent, _ready); // remove DOMContentLoaded listener
-        }
+        GLOBAL_ENV.DOMReady = true;
+        GLOBAL_ENV.remove(YUI.config.doc, 'DOMContentLoaded', GLOBAL_ENV._ready);
     };
 
-/*! DOMReady: based on work by: Dean Edwards/John Resig/Matthias Miller/Diego Perini */
-// Internet Explorer: use the doScroll() method on the root element.  This isolates what 
-// appears to be a safe moment to manipulate the DOM prior to when the document's readyState 
-// suggests it is safe to do so.
-    if (doScrollCap) {
-        if (self !== self.top) {
-            stateChangeListener = function() {
-                if (doc.readyState == 'complete') {
-                    remove(doc, targetEvent, stateChangeListener); // remove onreadystatechange listener
-                    _ready();
-                }
-            };
-            add(doc, targetEvent, stateChangeListener); // add onreadystatechange listener
-        } else {
-            GLOBAL_ENV._dri = setInterval(function() {
-                try {
-                    docElement.doScroll('left');
-                    clearInterval(GLOBAL_ENV._dri);
-                    GLOBAL_ENV._dri = null;
-                    _ready();
-                } catch (domNotReady) { }
-            }, pollInterval); 
-        }
-    } else { // FireFox, Opera, Safari 3+ provide an event for this moment.
-        add(doc, targetEvent, _ready); // add DOMContentLoaded listener
-    }
+    // if (!YUI.UA.ie) {
+        GLOBAL_ENV.add(YUI.config.doc, 'DOMContentLoaded', GLOBAL_ENV._ready);
+    // }
 }
 
-})();
 YUI.add('event-base', function(Y) {
 
-(function() {
 /*
  * DOM event listener abstraction layer
  * @module event
  * @submodule event-base
  */
-
-var GLOBAL_ENV = YUI.Env,
-    
-    yready = function() {
-        Y.fire('domready');
-    };
 
 /**
  * The domready event fires at the moment the browser's DOM is
@@ -99,7 +42,7 @@ var GLOBAL_ENV = YUI.Env,
  * it to true if the yui.js script is not included inline.
  *
  * This method is part of the 'event-ready' module, which is a
- * submodule of 'event'.  
+ * submodule of 'event'.
  *
  * @event domready
  * @for YUI
@@ -110,19 +53,13 @@ Y.publish('domready', {
 });
 
 if (GLOBAL_ENV.DOMReady) {
-    // console.log('DOMReady already fired', 'info', 'event');
-    yready();
+    Y.fire('domready');
 } else {
-    // console.log('setting up before listener', 'info', 'event');
-    // console.log('env: ' + YUI.Env.windowLoaded, 'info', 'event');
-    Y.before(yready, GLOBAL_ENV, "_ready");
+    Y.Do.before(function() { Y.fire('domready'); }, YUI.Env, '_ready');
 }
 
-})();
-(function() {
-
 /**
- * Custom event engine, DOM event listener abstraction layer, synthetic DOM 
+ * Custom event engine, DOM event listener abstraction layer, synthetic DOM
  * events.
  * @module event
  * @submodule event-base
@@ -137,59 +74,9 @@ if (GLOBAL_ENV.DOMReady) {
  * @param wrapper {Event.Custom} the custom event wrapper for this DOM event
  */
 
-/*
- * @TODO constants? LEFTBUTTON, MIDDLEBUTTON, RIGHTBUTTON, keys
- */
-
-/*
-
-var whitelist = {
-    altKey          : 1,
-    // "button"          : 1, // we supply
-    // "bubbles"         : 1, // needed?
-    // "cancelable"      : 1, // needed? 
-    // "charCode"        : 1, // we supply
-    cancelBubble    : 1,
-    // "currentTarget"   : 1, // we supply
-    ctrlKey         : 1,
-    clientX         : 1, // needed?
-    clientY         : 1, // needed?
-    detail          : 1, // not fully implemented
-    // "fromElement"     : 1,
-    keyCode         : 1,
-    // "height"          : 1, // needed?
-    // "initEvent"       : 1, // need the init events?
-    // "initMouseEvent"  : 1,
-    // "initUIEvent"     : 1,
-    // "layerX"          : 1, // needed?
-    // "layerY"          : 1, // needed?
-    metaKey         : 1,
-    // "modifiers"       : 1, // needed?
-    // "offsetX"         : 1, // needed?
-    // "offsetY"         : 1, // needed?
-    // "preventDefault"  : 1, // we supply
-    // "reason"          : 1, // IE proprietary
-    // "relatedTarget"   : 1,
-    // "returnValue"     : 1, // needed?
-    shiftKey        : 1,
-    // "srcUrn"          : 1, // IE proprietary
-    // "srcElement"      : 1,
-    // "srcFilter"       : 1, IE proprietary
-    // "stopPropagation" : 1, // we supply
-    // "target"          : 1,
-    // "timeStamp"       : 1, // needed?
-    // "toElement"       : 1,
-    type            : 1,
-    // "view"            : 1,
-    // "which"           : 1, // we supply
-    // "width"           : 1, // needed?
-    x               : 1,
-    y               : 1
-},
-
-*/
-
     var ua = Y.UA,
+
+    EMPTY = {},
 
     /**
      * webkit key remapping required for Safari < 3.1
@@ -227,144 +114,175 @@ var whitelist = {
      * @private
      */
     resolve = function(n) {
+        if (!n) {
+            return n;
+        }
         try {
             if (n && 3 == n.nodeType) {
                 n = n.parentNode;
             }
-        } catch(e) { 
+        } catch(e) {
             return null;
         }
 
         return Y.one(n);
+    },
+
+    DOMEventFacade = function(ev, currentTarget, wrapper) {
+        this._event = ev;
+        this._currentTarget = currentTarget;
+        this._wrapper = wrapper || EMPTY;
+
+        // if not lazy init
+        this.init();
     };
 
+Y.extend(DOMEventFacade, Object, {
 
-// provide a single event with browser abstractions resolved
-//
-// include all properties for both browers?
-// include only DOM2 spec properties?
-// provide browser-specific facade?
+    init: function() {
 
-Y.DOMEventFacade = function(ev, currentTarget, wrapper) {
+        var e = this._event,
+            overrides = this._wrapper.overrides,
+            x = e.pageX,
+            y = e.pageY,
+            c,
+            currentTarget = this._currentTarget;
 
-    wrapper = wrapper || {};
+        this.altKey   = e.altKey;
+        this.ctrlKey  = e.ctrlKey;
+        this.metaKey  = e.metaKey;
+        this.shiftKey = e.shiftKey;
+        this.type     = (overrides && overrides.type) || e.type;
+        this.clientX  = e.clientX;
+        this.clientY  = e.clientY;
 
-    var e = ev, ot = currentTarget, d = Y.config.doc, b = d.body,
-        x = e.pageX, y = e.pageY, c, t, de = d.documentElement,
-        overrides = wrapper.overrides || {};
+        this.pageX = x;
+        this.pageY = y;
 
-    this.altKey   = e.altKey;
-    this.ctrlKey  = e.ctrlKey;
-    this.metaKey  = e.metaKey;
-    this.shiftKey = e.shiftKey;
-    this.type     = overrides.type || e.type;
-    this.clientX  = e.clientX;
-    this.clientY  = e.clientY;
+        c = e.keyCode || e.charCode;
 
-    //////////////////////////////////////////////////////
-
-    if (('clientX' in e) && (!x) && (0 !== x)) {
-        x = e.clientX; 
-        y = e.clientY;
-
-        if (ua.ie) {
-            x += (de.scrollLeft || b.scrollLeft || 0);
-            y += (de.scrollTop  || b.scrollTop  || 0);
+        if (ua.webkit && (c in webkitKeymap)) {
+            c = webkitKeymap[c];
         }
+
+        this.keyCode = c;
+        this.charCode = c;
+        this.which = e.which || e.charCode || c;
+        // this.button = e.button;
+        this.button = this.which;
+
+        this.target = resolve(e.target);
+        this.currentTarget = resolve(currentTarget);
+        this.relatedTarget = resolve(e.relatedTarget);
+
+        if (e.type == "mousewheel" || e.type == "DOMMouseScroll") {
+            this.wheelDelta = (e.detail) ? (e.detail * -1) : Math.round(e.wheelDelta / 80) || ((e.wheelDelta < 0) ? -1 : 1);
+        }
+
+        if (this._touch) {
+            this._touch(e, currentTarget, this._wrapper);
+        }
+    },
+
+    stopPropagation: function() {
+        this._event.stopPropagation();
+        this._wrapper.stopped = 1;
+        this.stopped = 1;
+    },
+
+    stopImmediatePropagation: function() {
+        var e = this._event;
+        if (e.stopImmediatePropagation) {
+            e.stopImmediatePropagation();
+        } else {
+            this.stopPropagation();
+        }
+        this._wrapper.stopped = 2;
+        this.stopped = 2;
+    },
+
+    preventDefault: function(returnValue) {
+        var e = this._event;
+        e.preventDefault();
+        e.returnValue = returnValue || false;
+        this._wrapper.prevented = 1;
+        this.prevented = 1;
+    },
+
+    halt: function(immediate) {
+        if (immediate) {
+            this.stopImmediatePropagation();
+        } else {
+            this.stopPropagation();
+        }
+
+        this.preventDefault();
     }
 
-    this._yuifacade = true;
+});
+
+DOMEventFacade.resolve = resolve;
+Y.DOM2EventFacade = DOMEventFacade;
+Y.DOMEventFacade = DOMEventFacade;
 
     /**
      * The native event
      * @property _event
      */
-    this._event = e;
 
     /**
      * The X location of the event on the page (including scroll)
      * @property pageX
      * @type int
      */
-    this.pageX = x;
 
     /**
      * The Y location of the event on the page (including scroll)
      * @property pageY
      * @type int
      */
-    this.pageY = y;
-
-    //////////////////////////////////////////////////////
-
-    c = e.keyCode || e.charCode || 0;
-
-    if (ua.webkit && (c in webkitKeymap)) {
-        c = webkitKeymap[c];
-    }
 
     /**
      * The keyCode for key events.  Uses charCode if keyCode is not available
      * @property keyCode
      * @type int
      */
-    this.keyCode = c;
 
     /**
      * The charCode for key events.  Same as keyCode
      * @property charCode
      * @type int
      */
-    this.charCode = c;
-
-    //////////////////////////////////////////////////////
 
     /**
      * The button that was pushed.
      * @property button
      * @type int
      */
-    this.button = e.which || e.button;
 
     /**
      * The button that was pushed.  Same as button.
      * @property which
      * @type int
      */
-    this.which = this.button;
-
-    //////////////////////////////////////////////////////
 
     /**
      * Node reference for the targeted element
      * @propery target
      * @type Node
      */
-    this.target = resolve(e.target || e.srcElement);
 
     /**
      * Node reference for the element that the listener was attached to.
      * @propery currentTarget
      * @type Node
      */
-    this.currentTarget = resolve(ot);
-
-    t = e.relatedTarget;
-
-    if (!t) {
-        if (e.type == "mouseout") {
-            t = e.toElement;
-        } else if (e.type == "mouseover") {
-            t = e.fromElement;
-        }
-    }
 
     /**
      * Node reference to the relatedTarget
      * @propery relatedTarget
      * @type Node
      */
-    this.relatedTarget = resolve(t);
 
     /**
      * Number representing the direction and velocity of the movement of the mousewheel.
@@ -372,26 +290,11 @@ Y.DOMEventFacade = function(ev, currentTarget, wrapper) {
      * @property wheelDelta
      * @type int
      */
-    if (e.type == "mousewheel" || e.type == "DOMMouseScroll") {
-        this.wheelDelta = (e.detail) ? (e.detail * -1) : Math.round(e.wheelDelta / 80) || ((e.wheelDelta < 0) ? -1 : 1);
-    }
-
-    //////////////////////////////////////////////////////
-    // methods
 
     /**
      * Stops the propagation to the next bubble target
      * @method stopPropagation
      */
-    this.stopPropagation = function() {
-        if (e.stopPropagation) {
-            e.stopPropagation();
-        } else {
-            e.cancelBubble = true;
-        }
-        wrapper.stopped = 1;
-        this.stopped = 1;
-    };
 
     /**
      * Stops the propagation to the next bubble target and
@@ -399,31 +302,14 @@ Y.DOMEventFacade = function(ev, currentTarget, wrapper) {
      * on the current target.
      * @method stopImmediatePropagation
      */
-    this.stopImmediatePropagation = function() {
-        if (e.stopImmediatePropagation) {
-            e.stopImmediatePropagation();
-        } else {
-            this.stopPropagation();
-        }
-        wrapper.stopped = 2;
-        this.stopped = 2;
-    };
 
     /**
      * Prevents the event's default behavior
      * @method preventDefault
      * @param returnValue {string} sets the returnValue of the event to this value
-     * (rather than the default false value).  This can be used to add a customized 
+     * (rather than the default false value).  This can be used to add a customized
      * confirmation query to the beforeunload event).
      */
-    this.preventDefault = function(returnValue) {
-        if (e.preventDefault) {
-            e.preventDefault();
-        }
-        e.returnValue = returnValue || false;
-        wrapper.prevented = 1;
-        this.prevented = 1;
-    };
 
     /**
      * Stops the event propagation and prevents the default
@@ -432,23 +318,6 @@ Y.DOMEventFacade = function(ev, currentTarget, wrapper) {
      * @param immediate {boolean} if true additional listeners
      * on the current target will not be executed
      */
-    this.halt = function(immediate) {
-        if (immediate) {
-            this.stopImmediatePropagation();
-        } else {
-            this.stopPropagation();
-        }
-
-        this.preventDefault();
-    };
-
-    if (this._touch) {
-        this._touch(e, currentTarget, wrapper);
-    }
-
-};
-
-})();
 (function() {
 /**
  * DOM event listener abstraction layer
@@ -469,34 +338,34 @@ Y.Env.evt.dom_wrappers = {};
 Y.Env.evt.dom_map = {};
 
 var _eventenv = Y.Env.evt,
-config = Y.config,
-win = config.win,
-add = YUI.Env.add,
-remove = YUI.Env.remove,
+    config = Y.config,
+    win = config.win,
+    add = YUI.Env.add,
+    remove = YUI.Env.remove,
 
-onLoad = function() {
-    YUI.Env.windowLoaded = true;
-    Y.Event._load();
-    remove(win, "load", onLoad);
-},
+    onLoad = function() {
+        YUI.Env.windowLoaded = true;
+        Y.Event._load();
+        remove(win, "load", onLoad);
+    },
 
-onUnload = function() {
-    Y.Event._unload();
-    remove(win, "unload", onUnload);
-},
+    onUnload = function() {
+        Y.Event._unload();
+    },
 
-EVENT_READY = 'domready',
+    EVENT_READY = 'domready',
 
-COMPAT_ARG = '~yui|2|compat~',
+    COMPAT_ARG = '~yui|2|compat~',
 
-shouldIterate = function(o) {
-    try {
-        return (o && typeof o !== "string" && Y.Lang.isNumber(o.length) && !o.tagName && !o.alert);
-    } catch(ex) {
-        return false;
-    }
+    shouldIterate = function(o) {
+        try {
+            return (o && typeof o !== "string" && Y.Lang.isNumber(o.length) &&
+                    !o.tagName && !o.alert);
+        } catch(ex) {
+            return false;
+        }
 
-},
+    },
 
 Event = function() {
 
@@ -528,7 +397,7 @@ Event = function() {
     _avail = [],
 
     /**
-     * Custom event wrappers for DOM events.  Key is 
+     * Custom event wrappers for DOM events.  Key is
      * 'event:' + Element uid stamp + event type
      * @property _wrappers
      * @type Y.Event.Custom
@@ -540,7 +409,7 @@ Event = function() {
     _windowLoadKey = null,
 
     /**
-     * Custom event wrapper map DOM events.  Key is 
+     * Custom event wrapper map DOM events.  Key is
      * Element uid stamp.  Each item is a hash of custom event
      * wrappers as provided in the _wrappers collection.  This
      * provides the infrastructure for getListeners.
@@ -616,7 +485,7 @@ Event = function() {
          */
         startInterval: function() {
             if (!Event._interval) {
-Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
+Event._interval = setInterval(Event._poll, Event.POLL_INTERVAL);
             }
         },
 
@@ -652,19 +521,19 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
 
 
             for (i=0; i<a.length; i=i+1) {
-                _avail.push({ 
-                    id:         a[i], 
-                    fn:         fn, 
-                    obj:        p_obj, 
-                    override:   p_override, 
+                _avail.push({
+                    id:         a[i],
+                    fn:         fn,
+                    obj:        p_obj,
+                    override:   p_override,
                     checkReady: checkContent,
-                    compat:     compat 
+                    compat:     compat
                 });
             }
             _retryCount = this.POLL_RETRYS;
 
             // We want the first test to be immediate, but async
-            setTimeout(Y.bind(Event._poll, Event), 0);
+            setTimeout(Event._poll, 0);
 
             availHandle = new Y.EventHandle({
 
@@ -704,9 +573,9 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
          *
          * @param {string}   id the id of the element to look for.
          * @param {function} fn what to execute when the element is ready.
-         * @param {object}   p_obj an optional object to be passed back as
+         * @param {object}   obj an optional object to be passed back as
          *                   a parameter to fn.
-         * @param {boolean|object}  p_override If set to true, fn will execute
+         * @param {boolean|object}  override If set to true, fn will execute
          *                   in the context of p_obj.  If an object, fn will
          *                   exectute in the context of that object
          *
@@ -714,8 +583,8 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
          * @deprecated Use Y.on("contentready")
          */
         // @TODO fix arguments
-        onContentReady: function(id, fn, p_obj, p_override, compat) {
-            return this.onAvailable(id, fn, p_obj, p_override, true, compat);
+        onContentReady: function(id, fn, obj, override, compat) {
+            return Event.onAvailable(id, fn, obj, override, true, compat);
         },
 
         /**
@@ -725,13 +594,13 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
          *
          * @param {String}   type     The type of event to append
          * @param {Function} fn        The method the event invokes
-         * @param {String|HTMLElement|Array|NodeList} el An id, an element 
-         *  reference, or a collection of ids and/or elements to assign the 
+         * @param {String|HTMLElement|Array|NodeList} el An id, an element
+         *  reference, or a collection of ids and/or elements to assign the
          *  listener to.
          * @param {Object}   context optional context object
          * @param {Boolean|object}  args 0..n arguments to pass to the callback
          * @return {EventHandle} an object to that can be used to detach the listener
-         *                     
+         *
          * @static
          */
 
@@ -754,7 +623,7 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
 
 
             cewrapper = _wrappers[key];
-            
+
 
             if (!cewrapper) {
                 // create CE wrapper
@@ -772,7 +641,7 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
                 });
 
                 cewrapper.overrides = {};
-            
+
                 // for later removeListener calls
                 cewrapper.el = el;
                 cewrapper.key = key;
@@ -782,35 +651,35 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
                     cewrapper.fire(Event.getEvent(e, el, (compat || (false === facade))));
                 };
                 cewrapper.capture = capture;
-            
+
                 if (el == win && type == "load") {
                     // window load happens once
                     cewrapper.fireOnce = true;
                     _windowLoadKey = key;
                 }
-            
+
                 _wrappers[key] = cewrapper;
                 _el_events[ek] = _el_events[ek] || {};
                 _el_events[ek][key] = cewrapper;
-            
+
                 add(el, type, cewrapper.fn, capture);
             }
 
             return cewrapper;
-            
+
         },
 
         _attach: function(args, conf) {
 
-            var compat, 
-                handles, oEl, cewrapper, context, 
+            var compat,
+                handles, oEl, cewrapper, context,
                 fireNow = false, ret,
                 type = args[0],
                 fn = args[1],
                 el = args[2] || win,
                 facade = conf && conf.facade,
                 capture = conf && conf.capture,
-                overrides = conf && conf.overrides; 
+                overrides = conf && conf.overrides;
 
             if (args[args.length-1] === COMPAT_ARG) {
                 compat = true;
@@ -826,7 +695,7 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
             if (shouldIterate(el)) {
 
                 handles=[];
-                
+
                 Y.each(el, function(v, k) {
                     args[2] = v;
                     handles.push(Event._attach(args, conf));
@@ -835,9 +704,9 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
                 // return (handles.length === 1) ? handles[0] : handles;
                 return new Y.EventHandle(handles);
 
-            // If the el argument is a string, we assume it is 
+            // If the el argument is a string, we assume it is
             // actually the id of the element.  If the page is loaded
-            // we convert el to the actual element, otherwise we 
+            // we convert el to the actual element, otherwise we
             // defer attaching the event until the element is
             // ready
             } else if (Y.Lang.isString(el)) {
@@ -870,8 +739,8 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
                 // Not found = defer adding the event until the element is available
                 } else {
 
-                    ret = this.onAvailable(el, function() {
-                        
+                    ret = Event.onAvailable(el, function() {
+
                         ret.handle = Event._attach(args, conf);
 
                     }, Event, true, false, compat);
@@ -886,11 +755,11 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
                 return false;
             }
 
-            if (Y.Node && el instanceof Y.Node) {
+            if (Y.Node && Y.instanceOf(el, Y.Node)) {
                 el = Y.Node.getDOMNode(el);
             }
 
-            cewrapper = this._createWrapper(el, type, capture, compat, facade);
+            cewrapper = Event._createWrapper(el, type, capture, compat, facade);
             if (overrides) {
                 Y.mix(cewrapper.overrides, overrides);
             }
@@ -932,10 +801,10 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
          *
          * @param {String} type the type of event to remove.
          * @param {Function} fn the method the event invokes.  If fn is
-         * undefined, then all event handlers for the type of event are 
+         * undefined, then all event handlers for the type of event are
          * removed.
-         * @param {String|HTMLElement|Array|NodeList|EventHandle} el An 
-         * event handle, an id, an element reference, or a collection 
+         * @param {String|HTMLElement|Array|NodeList|EventHandle} el An
+         * event handle, an id, an element reference, or a collection
          * of ids and/or elements to remove the listener from.
          * @return {boolean} true if the unbind was successful, false otherwise.
          * @static
@@ -970,8 +839,8 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
                     }
                 }
                 // return Event.detach.apply(Event, args);
-            } 
-            
+            }
+
             if (!el) {
                 return false;
             }
@@ -991,7 +860,7 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
             }
 
             if (!type || !fn || !fn.call) {
-                return this.purgeElement(el, false, type);
+                return Event.purgeElement(el, false, type);
             }
 
             id = 'event:' + Y.stamp(el) + type;
@@ -1014,18 +883,18 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
          * @method getEvent
          * @param {Event} e the event parameter from the handler
          * @param {HTMLElement} el the element the listener was attached to
-         * @return {Event} the event 
+         * @return {Event} the event
          * @static
          */
         getEvent: function(e, el, noFacade) {
             var ev = e || win.event;
 
-            return (noFacade) ? ev : 
+            return (noFacade) ? ev :
                 new Y.DOMEventFacade(ev, el, _wrappers['event:' + Y.stamp(el) + e.type]);
         },
 
         /**
-         * Generates an unique ID for the element if it does not already 
+         * Generates an unique ID for the element if it does not already
          * have one.
          * @method generateId
          * @param el the element to create the id for
@@ -1033,21 +902,14 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
          * @static
          */
         generateId: function(el) {
-            var id = el.id;
-
-            if (!id) {
-                id = Y.stamp(el);
-                el.id = id;
-            }
-
-            return id;
+            return Y.DOM.generateID(el);
         },
 
         /**
          * We want to be able to use getElementsByTagName as a collection
-         * to attach a group of events to.  Unfortunately, different 
+         * to attach a group of events to.  Unfortunately, different
          * browsers return different types of collections.  This function
-         * tests to determine if the object is array-like.  It will also 
+         * tests to determine if the object is array-like.  It will also
          * fail if the object is an array, but is empty.
          * @method _isValidCollection
          * @param o the object to test
@@ -1083,15 +945,15 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
         },
 
         /**
-         * Polling function that runs before the onload event fires, 
-         * attempting to attach to DOM Nodes as soon as they are 
+         * Polling function that runs before the onload event fires,
+         * attempting to attach to DOM Nodes as soon as they are
          * available
          * @method _poll
          * @static
          * @private
          */
         _poll: function() {
-            if (this.locked) {
+            if (Event.locked) {
                 return;
             }
 
@@ -1099,15 +961,15 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
                 // Hold off if DOMReady has not fired and check current
                 // readyState to protect against the IE operation aborted
                 // issue.
-                this.startInterval();
+                Event.startInterval();
                 return;
             }
 
-            this.locked = true;
+            Event.locked = true;
 
-            // keep trying until after the page is loaded.  We need to 
-            // check the page load state prior to trying to bind the 
-            // elements so that we can be certain all elements have been 
+            // keep trying until after the page is loaded.  We need to
+            // check the page load state prior to trying to bind the
+            // elements so that we can be certain all elements have been
             // tested appropriately
             var i, len, item, el, notAvail, executeItem,
                 tryAgain = !_loadComplete;
@@ -1180,13 +1042,13 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
 
             if (tryAgain) {
                 // we may need to strip the nulled out items here
-                this.startInterval();
+                Event.startInterval();
             } else {
-                clearInterval(this._interval);
-                this._interval = null;
+                clearInterval(Event._interval);
+                Event._interval = null;
             }
 
-            this.locked = false;
+            Event.locked = false;
 
             return;
 
@@ -1207,7 +1069,7 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
         purgeElement: function(el, recurse, type) {
             // var oEl = (Y.Lang.isString(el)) ? Y.one(el) : el,
             var oEl = (Y.Lang.isString(el)) ?  Y.Selector.query(el, null, true) : el,
-                lis = this.getListeners(oEl, type), i, len, props, children, child;
+                lis = Event.getListeners(oEl, type), i, len, props, children, child;
 
             if (recurse && oEl) {
                 lis = lis || [];
@@ -1215,7 +1077,7 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
                 i = 0;
                 len = children.length;
                 for (; i < len; ++i) {
-                    child = this.getListeners(children[i], type);
+                    child = Event.getListeners(children[i], type);
                     if (child) {
                         lis = lis.concat(child);
                     }
@@ -1241,12 +1103,12 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
          * Returns all listeners attached to the given element via addListener.
          * Optionally, you can specify a specific type of event to return.
          * @method getListeners
-         * @param el {HTMLElement|string} the element or element id to inspect 
+         * @param el {HTMLElement|string} the element or element id to inspect
          * @param type {string} optional type of listener to return. If
          * left out, all listeners will be returned
          * @return {Y.Custom.Event} the custom event wrapper for the DOM event(s)
          * @static
-         */           
+         */
         getListeners: function(el, type) {
             var ek = Y.stamp(el, true), evts = _el_events[ek],
                 results=[] , key = (type) ? 'event:' + ek + type : null,
@@ -1282,7 +1144,7 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
         },
 
         /**
-         * Removes all listeners registered by pe.event.  Called 
+         * Removes all listeners registered by pe.event.  Called
          * automatically during the unload event.
          * @method _unload
          * @static
@@ -1295,9 +1157,9 @@ Event._interval = setInterval(Y.bind(Event._poll, Event), Event.POLL_INTERVAL);
                 delete _wrappers[k];
                 delete _el_events[v.domkey][k];
             });
+            remove(win, "unload", onUnload);
         },
 
-        
         /**
          * Adds a DOM event directly without the caching, cleanup, context adj, etc
          *
@@ -1337,10 +1199,10 @@ if (config.injected || YUI.Env.windowLoaded) {
 
 // Process onAvailable/onContentReady items when when the DOM is ready in IE
 if (Y.UA.ie) {
-    Y.on(EVENT_READY, Event._poll, Event, true);
+    Y.on(EVENT_READY, Event._poll);
 }
 
-Y.on("unload", onUnload);
+add(win, "unload", onUnload);
 
 Event.Custom = Y.CustomEvent;
 Event.Subscriber = Y.Subscriber;
@@ -1359,12 +1221,14 @@ Event._poll();
  */
 
 /**
- * Executes the callback as soon as the specified element 
- * is detected in the DOM.
+ * Executes the callback as soon as the specified element
+ * is detected in the DOM.  This function expects a selector
+ * string for the element(s) to detect.  If you already have
+ * an element reference, you don't need this event.
  * @event available
  * @param type {string} 'available'
  * @param fn {function} the callback function to execute.
- * @param el {string|HTMLElement|collection} the element(s) to attach
+ * @param el {string} an selector for the element(s) to attach
  * @param context optional argument that specifies what 'this' refers to.
  * @param args* 0..n additional arguments to pass on to the callback function.
  * These arguments will be added after the event object.
@@ -1373,19 +1237,22 @@ Event._poll();
  */
 Y.Env.evt.plugins.available = {
     on: function(type, fn, id, o) {
-        var a = arguments.length > 4 ?  Y.Array(arguments, 4, true) : [];
+        var a = arguments.length > 4 ?  Y.Array(arguments, 4, true) : null;
         return Y.Event.onAvailable.call(Y.Event, id, fn, o, a);
     }
 };
 
 /**
- * Executes the callback as soon as the specified element 
+ * Executes the callback as soon as the specified element
  * is detected in the DOM with a nextSibling property
- * (indicating that the element's children are available)
+ * (indicating that the element's children are available).
+ * This function expects a selector
+ * string for the element(s) to detect.  If you already have
+ * an element reference, you don't need this event.
  * @event contentready
  * @param type {string} 'contentready'
  * @param fn {function} the callback function to execute.
- * @param el {string|HTMLElement|collection} the element(s) to attach
+ * @param el {string} an selector for the element(s) to attach.
  * @param context optional argument that specifies what 'this' refers to.
  * @param args* 0..n additional arguments to pass on to the callback function.
  * These arguments will be added after the event object.
@@ -1394,13 +1261,13 @@ Y.Env.evt.plugins.available = {
  */
 Y.Env.evt.plugins.contentready = {
     on: function(type, fn, id, o) {
-        var a = arguments.length > 4 ?  Y.Array(arguments, 4, true) : [];
+        var a = arguments.length > 4 ? Y.Array(arguments, 4, true) : null;
         return Y.Event.onContentReady.call(Y.Event, id, fn, o, a);
     }
 };
 
 
-}, '3.2.0' ,{requires:['event-custom-base']});
+}, '3.3.0' ,{requires:['event-custom-base']});
 YUI.add('event-delegate', function(Y) {
 
 /**
@@ -1413,6 +1280,8 @@ YUI.add('event-delegate', function(Y) {
 var toArray          = Y.Array,
     YLang            = Y.Lang,
     isString         = YLang.isString,
+    isObject         = YLang.isObject,
+    isArray          = YLang.isArray,
     selectorTest     = Y.Selector.test,
     detachCategories = Y.Env.evt.handles;
 
@@ -1454,8 +1323,36 @@ var toArray          = Y.Array,
 function delegate(type, fn, el, filter) {
     var args     = toArray(arguments, 0, true),
         query    = isString(el) ? el : null,
-        typeBits = type.split(/\|/),
-        synth, container, categories, cat, handle;
+        typeBits, synth, container, categories, cat, i, len, handles, handle;
+
+    // Support Y.delegate({ click: fnA, key: fnB }, context, filter, ...);
+    // and Y.delegate(['click', 'key'], fn, context, filter, ...);
+    if (isObject(type)) {
+        handles = [];
+
+        if (isArray(type)) {
+            for (i = 0, len = type.length; i < len; ++i) {
+                args[0] = type[i];
+                handles.push(Y.delegate.apply(Y, args));
+            }
+        } else {
+            // Y.delegate({'click', fn}, context, filter) =>
+            // Y.delegate('click', fn, context, filter)
+            args.unshift(null); // one arg becomes two; need to make space
+
+            for (i in type) {
+                if (type.hasOwnProperty(i)) {
+                    args[0] = i;
+                    args[1] = type[i];
+                    handles.push(Y.delegate.apply(Y, args));
+                }
+            }
+        }
+
+        return new Y.EventHandle(handles);
+    }
+
+    typeBits = type.split(/\|/);
 
     if (typeBits.length > 1) {
         cat  = typeBits.shift();
@@ -1464,7 +1361,7 @@ function delegate(type, fn, el, filter) {
 
     synth = Y.Node.DOM_EVENTS[type];
 
-    if (YLang.isObject(synth) && synth.delegate) {
+    if (isObject(synth) && synth.delegate) {
         handle = synth.delegate.apply(synth, arguments);
     }
 
@@ -1484,11 +1381,7 @@ function delegate(type, fn, el, filter) {
         if (!handle && container) {
             args.splice(2, 2, container); // remove the filter
 
-            if (isString(filter)) {
-                filter = Y.delegate.compileFilter(filter);
-            }
-
-            handle = Y.on.apply(Y, args);
+            handle = Y.Event._attach(args, { facade: false });
             handle.sub.filter  = filter;
             handle.sub._notify = delegate.notifySub;
         }
@@ -1504,7 +1397,8 @@ function delegate(type, fn, el, filter) {
 }
 
 /**
- * Overrides the <code>_notify</code> method on the normal DOM subscription to inject the filtering logic and only proceed in the case of a match.
+ * Overrides the <code>_notify</code> method on the normal DOM subscription to
+ * inject the filtering logic and only proceed in the case of a match.
  * 
  * @method delegate.notifySub
  * @param thisObj {Object} default 'this' object for the callback
@@ -1524,26 +1418,25 @@ delegate.notifySub = function (thisObj, args, ce) {
     }
 
     // Only notify subs if the event occurred on a targeted element
-    var e             = args[0],
-        currentTarget = delegate._applyFilter(this.filter, args),
-        container     = e.currentTarget,
-        i, ret, target;
+    var currentTarget = delegate._applyFilter(this.filter, args, ce),
+        //container     = e.currentTarget,
+        e, i, len, ret;
 
     if (currentTarget) {
         // Support multiple matches up the the container subtree
         currentTarget = toArray(currentTarget);
 
-        for (i = currentTarget.length - 1; i >= 0; --i) {
-            target = currentTarget[i];
+        // The second arg is the currentTarget, but we'll be reusing this
+        // facade, replacing the currentTarget for each use, so it doesn't
+        // matter what element we seed it with.
+        e = args[0] = new Y.DOMEventFacade(args[0], ce.el, ce);
 
-            // New facade to avoid corrupting facade sent to direct subs
-            args[0] = new Y.DOMEventFacade(e, target, ce);
+        e.container = Y.one(ce.el);
+    
+        for (i = 0, len = currentTarget.length; i < len && !e.stopped; ++i) {
+            e.currentTarget = Y.one(currentTarget[i]);
 
-            args[0].container = container;
-        
-            thisObj = this.context || target;
-
-            ret = this.fn.apply(thisObj, args);
+            ret = this.fn.apply(this.context || e.currentTarget, args);
 
             if (ret === false) { // stop further notifications
                 break;
@@ -1579,33 +1472,66 @@ delegate.compileFilter = Y.cached(function (selector) {
 
 /**
  * Walks up the parent axis of an event's target, and tests each element
- * against a supplied filter function.  If any Nodes satisfy the filter, the
- * delegated callback will be triggered for each.
+ * against a supplied filter function.  If any Nodes, including the container,
+ * satisfy the filter, the delegated callback will be triggered for each.
  *
  * @method delegate._applyFilter
  * @param filter {Function} boolean function to test for inclusion in event
  *                  notification
  * @param args {Array} the arguments that would be passed to subscribers
+ * @param ce   {CustomEvent} the DOM event wrapper
  * @return {Node|Node[]|undefined} The Node or Nodes that satisfy the filter
  * @protected
  */
-delegate._applyFilter = function (filter, args) {
+delegate._applyFilter = function (filter, args, ce) {
     var e         = args[0],
-        container = e.currentTarget,
-        target    = e.target,
-        match     = [];
+        container = ce.el, // facadeless events in IE, have no e.currentTarget
+        target    = e.target || e.srcElement,
+        match     = [],
+        isContainer = false;
+
+    // Resolve text nodes to their containing element
+    if (target.nodeType === 3) {
+        target = target.parentNode;
+    }
 
     // passing target as the first arg rather than leaving well enough alone
     // making 'this' in the filter function refer to the target.  This is to
     // support bound filter functions.
     args.unshift(target);
 
-    while (target && target !== container) {
-        // filter(target, e, extra args...) - this === target
-        if (filter.apply(target, args)) {
-            match.push(target);
+    if (isString(filter)) {
+        while (target) {
+            isContainer = (target === container);
+            if (selectorTest(target, filter, (isContainer ?null: container))) {
+                match.push(target);
+            }
+
+            if (isContainer) {
+                break;
+            }
+
+            target = target.parentNode;
         }
-        args[0] = target = target.get('parentNode');
+    } else {
+        // filter functions are implementer code and should receive wrappers
+        args[0] = Y.one(target);
+        args[1] = new Y.DOMEventFacade(e, container, ce);
+
+        while (target) {
+            // filter(target, e, extra args...) - this === target
+            if (filter.apply(args[0], args)) {
+                match.push(target);
+            }
+
+            if (target === container) {
+                break;
+            }
+
+            target = target.parentNode;
+            args[0] = Y.one(target);
+        }
+        args[1] = e; // restore the raw DOM event
     }
 
     if (match.length <= 1) {
@@ -1653,7 +1579,7 @@ delegate._applyFilter = function (filter, args) {
 Y.delegate = Y.Event.delegate = delegate;
 
 
-}, '3.2.0' ,{requires:['node-base']});
+}, '3.3.0' ,{requires:['node-base']});
 YUI.add('event-synthetic', function(Y) {
 
 /**
@@ -2012,6 +1938,7 @@ Y.mix(SyntheticEvent, {
          */
         _on: function (args, delegate) {
             var handles  = [],
+                extra    = this.processArgs(args, delegate),
                 selector = args[2],
                 method   = delegate ? 'delegate' : 'on',
                 nodes, handle;
@@ -2027,15 +1954,13 @@ Y.mix(SyntheticEvent, {
                 return handle;
             }
 
-            Y.each(nodes, function (node) {
+            Y.Array.each(nodes, function (node) {
                 var subArgs = args.slice(),
-                    extra, filter;
+                    filter;
 
                 node = Y.one(node);
 
                 if (node) {
-                    extra = this.processArgs(subArgs, delegate);
-
                     if (delegate) {
                         filter = subArgs.splice(3, 1)[0];
                     }
@@ -2088,7 +2013,9 @@ Y.mix(SyntheticEvent, {
 
             sub.node   = node;
             sub.filter = filter;
-            sub._extra = extra;
+            if (extra) {
+                this.applyArgExtras(extra, sub);
+            }
 
             Y.mix(dispatcher, {
                 eventDef     : this,
@@ -2107,6 +2034,28 @@ Y.mix(SyntheticEvent, {
         },
 
         /**
+         * <p>Implementers MAY provide this method definition.</p>
+         *
+         * <p>Implement this function if you want extra data extracted during
+         * processArgs to be propagated to subscriptions on a per-node basis.
+         * That is to say, if you call <code>Y.on('xyz', fn, xtra, 'div')</code>
+         * the data returned from processArgs will be shared
+         * across the subscription objects for all the divs.  If you want each
+         * subscription to receive unique information, do that processing
+         * here.</p>
+         *
+         * <p>The default implementation adds the data extracted by processArgs
+         * to the subscription object as <code>sub._extra</code>.</p>
+         *
+         * @method applyArgExtras
+         * @param extra {any} Any extra data extracted from processArgs
+         * @param sub {Subscription} the individual subscription
+         */
+        applyArgExtras: function (extra, sub) {
+            sub._extra = extra;
+        },
+
+        /**
          * Removes the subscription from the Notifier registry.
          *
          * @method _unregisterSub
@@ -2117,7 +2066,7 @@ Y.mix(SyntheticEvent, {
         _unregisterSub: function (sub) {
             var notifiers = SyntheticEvent.getRegistry(sub.node, this.type),
                 i;
-                
+
             if (notifiers) {
                 for (i = notifiers.length - 1; i >= 0; --i) {
                     if (notifiers[i].sub === sub) {
@@ -2145,7 +2094,7 @@ Y.mix(SyntheticEvent, {
                 els    = (isString(target)) ?
                             query(target) : toArray(target),
                 node, i, len, handles, j;
-            
+
             // (type, fn, el, context, filter?) => (type, fn, context, filter?)
             args.splice(2, 1);
 
@@ -2381,7 +2330,7 @@ Y.Event.define = function (type, config, force) {
 };
 
 
-}, '3.2.0' ,{requires:['node-base', 'event-custom']});
+}, '3.3.0' ,{requires:['node-base', 'event-custom']});
 YUI.add('event-mousewheel', function(Y) {
 
 /**
@@ -2431,7 +2380,7 @@ Y.Env.evt.plugins.mousewheel = {
 };
 
 
-}, '3.2.0' ,{requires:['node-base']});
+}, '3.3.0' ,{requires:['node-base']});
 YUI.add('event-mouseenter', function(Y) {
 
 /**
@@ -2493,7 +2442,7 @@ Y.Event.define("mouseenter", config, true);
 Y.Event.define("mouseleave", Y.merge(config, { proxyType: "mouseout" }), true);
 
 
-}, '3.2.0' ,{requires:['event-synthetic']});
+}, '3.3.0' ,{requires:['event-synthetic']});
 YUI.add('event-key', function(Y) {
 
 /**
@@ -2592,7 +2541,7 @@ Y.Env.evt.plugins.key = {
 };
 
 
-}, '3.2.0' ,{requires:['node-base']});
+}, '3.3.0' ,{requires:['node-base']});
 YUI.add('event-focus', function(Y) {
 
 /**
@@ -2605,7 +2554,7 @@ var Event    = Y.Event,
     YLang    = Y.Lang,
     isString = YLang.isString,
     useActivate = YLang.isFunction(
-        Y.DOM.create('<p onbeforeactivate=";">').onbeforeactivate);
+        Y.DOM.create('<p onbeforeactivate=";"/>').onbeforeactivate);
 
 function define(type, proxy, directEvent) {
     var nodeDataKey = '_' + type + 'Notifiers';
@@ -2740,7 +2689,7 @@ if (useActivate) {
 }
 
 
-}, '3.2.0' ,{requires:['event-synthetic']});
+}, '3.3.0' ,{requires:['event-synthetic']});
 YUI.add('event-resize', function(Y) {
 
 /**
@@ -2804,8 +2753,63 @@ Y.Env.evt.plugins.windowresize = {
 })();
 
 
-}, '3.2.0' ,{requires:['node-base']});
+}, '3.3.0' ,{requires:['node-base']});
+YUI.add('event-hover', function(Y) {
+
+/**
+ * Adds support for a "hover" event.  The event provides a convenience wrapper
+ * for subscribing separately to mouseenter and mouseleave.  The signature for
+ * subscribing to the event is</p>
+ *
+ * <pre><code>node.on("hover", overFn, outFn);
+ * node.delegate("hover", overFn, outFn, ".filterSelector");
+ * Y.on("hover", overFn, outFn, ".targetSelector");
+ * Y.delegate("hover", overFn, outFn, "#container", ".filterSelector");
+ * </code></pre>
+ *
+ * <p>Additionally, for compatibility with a more typical subscription
+ * signature, the following are also supported:</p>
+ *
+ * <pre><code>Y.on("hover", overFn, ".targetSelector", outFn);
+ * Y.delegate("hover", overFn, "#container", outFn, ".filterSelector");
+ * </code></pre>
+ *
+ * @module event
+ * @submodule event-hover
+ */
+var isFunction = Y.Lang.isFunction,
+    noop = function () {},
+    conf = {
+        processArgs: function (args) {
+            // Y.delegate('hover', over, out, '#container', '.filter')
+            // comes in as ['hover', over, out, '#container', '.filter'], but
+            // node.delegate('hover', over, out, '.filter')
+            // comes in as ['hover', over, containerEl, out, '.filter']
+            var i = isFunction(args[2]) ? 2 : 3;
+
+            return (isFunction(args[i])) ? args.splice(i,1)[0] : noop;
+        },
+
+        on: function (node, sub, notifier, filter) {
+            sub._detach = node[(filter) ? "delegate" : "on"]({
+                mouseenter: Y.bind(notifier.fire, notifier),
+                mouseleave: sub._extra
+            }, filter);
+        },
+
+        detach: function (node, sub, notifier) {
+            sub._detacher.detach();
+        }
+    };
+
+conf.delegate = conf.on;
+conf.detachDelegate = conf.detach;
+
+Y.Event.define("hover", conf);
 
 
-YUI.add('event', function(Y){}, '3.2.0' ,{use:['event-base', 'event-delegate', 'event-synthetic', 'event-mousewheel', 'event-mouseenter', 'event-key', 'event-focus', 'event-resize']});
+}, '3.3.0' ,{requires:['event-mouseenter']});
+
+
+YUI.add('event', function(Y){}, '3.3.0' ,{use:['event-base', 'event-delegate', 'event-synthetic', 'event-mousewheel', 'event-mouseenter', 'event-key', 'event-focus', 'event-resize', 'event-hover']});
 

@@ -66,7 +66,7 @@ body {
 <button type="button" id="make">Add More</button>
 <script>
 
-YUI().use('dd-delegate', function(Y) {
+YUI({ filter: 'raw' }).use('dd-delegate', function(Y) {
     var del = new Y.DD.Delegate({
         container: '#demo',
         nodes: 'li'

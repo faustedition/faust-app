@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('event-flick', function(Y) {
 
@@ -213,7 +213,12 @@ Y.Event.define('flick', {
                     endEvent.pageY - start.pageY
                 ];
 
-                axis = params.axis || (Math.abs(xyDistance[0]) >= Math.abs(xyDistance[1])) ? 'x' : 'y';
+                if (params.axis) {
+                    axis = params.axis;
+                } else {
+                    axis = (Math.abs(xyDistance[0]) >= Math.abs(xyDistance[1])) ? 'x' : 'y';
+                }
+
                 distance = xyDistance[(axis === 'x') ? 0 : 1];
                 velocity = (time !== 0) ? distance/time : 0;
 
@@ -243,4 +248,4 @@ Y.Event.define('flick', {
 });
 
 
-}, '3.2.0' ,{requires:['node-base','event-touch','event-synthetic']});
+}, '3.3.0' ,{requires:['node-base','event-touch','event-synthetic']});

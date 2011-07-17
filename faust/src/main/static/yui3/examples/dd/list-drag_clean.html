@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>List reorder w/Bubbling</title>
+<title>List Reorder w/Bubbling</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -26,7 +26,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>List reorder w/Bubbling</h1>
+<h1>List Reorder w/Bubbling</h1>
 
 <div class="exampleIntro">
 	<p>This example shows how to make a sortable list using Custom Event Bubbling.</p>
@@ -94,7 +94,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', function(Y) {
+YUI({ filter: 'raw' }).use('dd-constrain', 'dd-proxy', 'dd-drop', function(Y) {
     //Listen for all drop:over events
     Y.DD.DDM.on('drop:over', function(e) {
         //Get a reference to our drag and drop nodes

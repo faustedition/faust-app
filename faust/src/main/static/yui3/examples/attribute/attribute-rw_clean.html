@@ -104,7 +104,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("node", "attribute", function(Y) {
+YUI({ filter: 'raw' }).use("node", "attribute", function(Y) {
 
     // Setup a custom class with attribute support
     function MyClass(cfg) {

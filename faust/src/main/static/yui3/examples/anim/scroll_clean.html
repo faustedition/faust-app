@@ -60,7 +60,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("anim", function(Y) {
+YUI({ filter: 'raw' }).use("anim", function(Y) {
     var node = Y.one('#demo .yui3-bd');
     var anim = new Y.Anim({
         node: node,

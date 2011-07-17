@@ -874,7 +874,7 @@ index</a></div>
 </div>
 <script src="../../build/yui/yui-min.js"></script>
 <script>
-YUI().use("stylesheet", "overlay", "slider", "dd-plugin", function (Y) {
+YUI({ filter: 'raw' }).use("stylesheet", "overlay", "slider", "dd-plugin", function (Y) {
 
     var myStyleSheet = new Y.StyleSheet(),
         overlayContent = Y.one('#form_container'),

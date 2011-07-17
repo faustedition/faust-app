@@ -66,8 +66,9 @@
 		<form action="http://search.yahoo.com/search" id="sitesearchform">
             <input name="vs" type="hidden" value="developer.yahoo.com">
             <input name="vs" type="hidden" value="yuiblog.com">
+			<input name="vs" type="hidden" value="yuilibrary.com">
 		    <div id="sitesearch">
-		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+		    	<label for="searchinput">Site Search (YDN, YUILibrary &amp; YUIBlog): </label>
 			    <input type="text" id="searchinput" name="p">
 			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
 		    </div>
@@ -90,7 +91,7 @@
 	<div class="example-intro">
 	<p>This example shows how you can use Widget's plugin infrastructure to add additional features to an existing widget.</p>
 <p>We create an IO plugin class for <code>Overlay</code> called <code>StdModIOPlugin</code>. The plugin adds IO capabilities to the Overlay, bound to one of its standard module sections <em>(header, body or footer)</em>.</p>
-	</div>	
+	</div>
 
 	<div class="module example-container ">
 			<div class="hd exampleHd">
@@ -99,17 +100,18 @@
             </p>
 		</div>		<div id="example-canvas" class="bd">
 
-		
-	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
 	
+	<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
 	<button type="button" id="show">Show Overlay</button>
 <button type="button" id="hide">Hide Overlay</button>
 
 <script type="text/javascript">
-YUI().use("overlay", "substitute", "json", "gallery-widget-io", function(Y) {
+YUI({ filter: 'raw' }).use("overlay", "substitute", "json", "gallery-widget-io", function(Y) {
 
     /* Setup local variable for Y.WidgetStdMod, since we use it multiple times */
     var StdMod = Y.WidgetStdMod,
+        transportAvailable = false;
 
     StdModIO = function(config) {
         StdModIO.superclass.constructor.apply(this, arguments);
@@ -117,6 +119,10 @@ YUI().use("overlay", "substitute", "json", "gallery-widget-io", function(Y) {
 
     Y.extend(StdModIO, Y.Plugin.WidgetIO, {
         initializer: function() {
+            Y.on('io:xdrReady', function() {
+                transportAvailable = true;
+            });
+            
             Y.io.transport({
                 id:'flash',
                 yid: Y.id,
@@ -249,9 +255,13 @@ YUI().use("overlay", "substitute", "json", "gallery-widget-io", function(Y) {
 
     Y.on("change", function(e) {
         var val = this.get("value");
-        if (val != -1) {
-            overlay.io.set("uri", pipes.baseUri + pipes.feeds[val].uri);
-            overlay.io.refresh();
+        if (transportAvailable) {
+            if (val != -1) {
+                overlay.io.set("uri", pipes.baseUri + pipes.feeds[val].uri);
+                overlay.io.refresh();
+            }
+        } else {
+            overlay.io.setContent("Flash doesn't appear to be available. Cross-domain requests to pipes cannot be made without it.");
         }
     }, "#feedSelector");
 
@@ -265,14 +275,14 @@ YUI().use("overlay", "substitute", "json", "gallery-widget-io", function(Y) {
 
 });
 </script>
-	
+
 	<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+
 	
-		
 		</div>
-	</div>			
 	</div>
-		
+	</div>
+
 	<h3>Creating an IO Plugin For Overlay</h3>
 
 <h4>Setting Up The YUI Instance</h4>
@@ -393,13 +403,27 @@ plugin is able to dispatch both in-domain and cross-domain requests
 (the transport used for any particular uri is controlled through the plugin's
 <code>cfg</code> attribute).</p>
 
-<div id="syntax-5b593c047ace3786958cbd8859a26f67" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">initializer<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    Y.<span class="me1">io</span>.<span class="me1">transport</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        id<span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        yid<span class="sy0">:</span> Y.<span class="me1">id</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        src<span class="sy0">:</span><span class="st0">'../../build/io/io.swf?stamp='</span> <span class="sy0">+</span> <span class="br0">&#40;</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>.<span class="me1">getTime</span><span class="br0">&#40;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">initializer<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+<div id="syntax-71346e5d6f7302076b25f5d7b943aca5" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">initializer<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// We setup a flag, so that we know if </span></div></li><li class="li1"><div class="de1">    <span class="co1">// flash is available to make the </span></div></li><li class="li1"><div class="de1">    <span class="co1">// XDR request.</span></div></li><li class="li2"><div class="de2">    Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:xdrReady'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        transportAvailable <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    Y.<span class="me1">io</span>.<span class="me1">transport</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        id<span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        yid<span class="sy0">:</span> Y.<span class="me1">id</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        src<span class="sy0">:</span><span class="st0">'../../build/io/io.swf?stamp='</span> <span class="sy0">+</span> <span class="br0">&#40;</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>.<span class="me1">getTime</span><span class="br0">&#40;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">initializer<span class="sy0">:</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">// We setup a flag, so that we know if </span>
+    <span class="co1">// flash is available to make the </span>
+    <span class="co1">// XDR request.</span>
+    Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">'io:xdrReady'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        transportAvailable <span class="sy0">=</span> <span class="kw2">true</span><span class="sy0">;</span>
+    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+&nbsp;
     Y.<span class="me1">io</span>.<span class="me1">transport</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
         id<span class="sy0">:</span><span class="st0">'flash'</span><span class="sy0">,</span>
         yid<span class="sy0">:</span> Y.<span class="me1">id</span><span class="sy0">,</span>
         src<span class="sy0">:</span><span class="st0">'../../build/io/io.swf?stamp='</span> <span class="sy0">+</span> <span class="br0">&#40;</span><span class="kw2">new</span> Date<span class="br0">&#40;</span><span class="br0">&#41;</span><span class="br0">&#41;</span>.<span class="me1">getTime</span><span class="br0">&#40;</span><span class="br0">&#41;</span>
     <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
-<span class="br0">&#125;</span></pre></div><textarea id="syntax-5b593c047ace3786958cbd8859a26f67-plain">initializer: function() {
+<span class="br0">&#125;</span></pre></div><textarea id="syntax-71346e5d6f7302076b25f5d7b943aca5-plain">initializer: function() {
+    // We setup a flag, so that we know if 
+    // flash is available to make the 
+    // XDR request.
+    Y.on('io:xdrReady', function() {
+        transportAvailable = true;
+    });
+
     Y.io.transport({
         id:'flash',
         yid: Y.id,
@@ -585,30 +609,31 @@ formatter : function (val) {
 }</textarea></div>
 <p>The <code>change</code> handler for the select dropdown binds everything together, taking the currently selected feed, constructing the URI for the feed, setting it on the plugin, and sending out the request:</p>
 
-<div id="syntax-fce522c2e651289def254997d46c2cf0" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/* Handle select change */</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;change&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> val <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>val <span class="sy0">!=</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="co1">// Set the new URI value on the io plugin</span></div></li><li class="li1"><div class="de1">        overlay.<span class="me1">io</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;uri&quot;</span><span class="sy0">,</span> pipes.<span class="me1">baseUri</span> <span class="sy0">+</span> pipes.<span class="me1">feeds</span><span class="br0">&#91;</span>val<span class="br0">&#93;</span>.<span class="me1">uri</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">        <span class="co1">// Send out a request to refresh the current section's contents</span></div></li><li class="li1"><div class="de1">        overlay.<span class="me1">io</span>.<span class="me1">refresh</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#feedSelector&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/* Handle select change */</span>
+<div id="syntax-8253bdcae93fcd2f1f7acc07dc5da4fd" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="coMULTI">/* Handle select change */</span></div></li><li class="li1"><div class="de1">Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;change&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> val <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="kw1">if</span> <span class="br0">&#40;</span>transportAvailable<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        <span class="kw1">if</span> <span class="br0">&#40;</span>val <span class="sy0">!=</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            overlay.<span class="me1">io</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;uri&quot;</span><span class="sy0">,</span> pipes.<span class="me1">baseUri</span> <span class="sy0">+</span> pipes.<span class="me1">feeds</span><span class="br0">&#91;</span>val<span class="br0">&#93;</span>.<span class="me1">uri</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">            overlay.<span class="me1">io</span>.<span class="me1">refresh</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span></div></li><li class="li2"><div class="de2">        overlay.<span class="me1">io</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="st0">&quot;Flash doesn't appear to be available. Cross-domain requests to pipes cannot be made without it.&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#feedSelector&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="coMULTI">/* Handle select change */</span>
 Y.<span class="me1">on</span><span class="br0">&#40;</span><span class="st0">&quot;change&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
     <span class="kw2">var</span> val <span class="sy0">=</span> <span class="kw1">this</span>.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;value&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
-    <span class="kw1">if</span> <span class="br0">&#40;</span>val <span class="sy0">!=</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
-        <span class="co1">// Set the new URI value on the io plugin</span>
-        overlay.<span class="me1">io</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;uri&quot;</span><span class="sy0">,</span> pipes.<span class="me1">baseUri</span> <span class="sy0">+</span> pipes.<span class="me1">feeds</span><span class="br0">&#91;</span>val<span class="br0">&#93;</span>.<span class="me1">uri</span><span class="br0">&#41;</span><span class="sy0">;</span>
-&nbsp;
-        <span class="co1">// Send out a request to refresh the current section's contents</span>
-        overlay.<span class="me1">io</span>.<span class="me1">refresh</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>transportAvailable<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        <span class="kw1">if</span> <span class="br0">&#40;</span>val <span class="sy0">!=</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+            overlay.<span class="me1">io</span>.<span class="me1">set</span><span class="br0">&#40;</span><span class="st0">&quot;uri&quot;</span><span class="sy0">,</span> pipes.<span class="me1">baseUri</span> <span class="sy0">+</span> pipes.<span class="me1">feeds</span><span class="br0">&#91;</span>val<span class="br0">&#93;</span>.<span class="me1">uri</span><span class="br0">&#41;</span><span class="sy0">;</span>
+            overlay.<span class="me1">io</span>.<span class="me1">refresh</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        <span class="br0">&#125;</span>
+    <span class="br0">&#125;</span> <span class="kw1">else</span> <span class="br0">&#123;</span>
+        overlay.<span class="me1">io</span>.<span class="me1">setContent</span><span class="br0">&#40;</span><span class="st0">&quot;Flash doesn't appear to be available. Cross-domain requests to pipes cannot be made without it.&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span>
     <span class="br0">&#125;</span>
-<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#feedSelector&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-fce522c2e651289def254997d46c2cf0-plain">/* Handle select change */
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;#feedSelector&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-8253bdcae93fcd2f1f7acc07dc5da4fd-plain">/* Handle select change */
 Y.on("change", function(e) {
     var val = this.get("value");
-    if (val != -1) {
-        // Set the new URI value on the io plugin
-        overlay.io.set("uri", pipes.baseUri + pipes.feeds[val].uri);
-
-        // Send out a request to refresh the current section's contents
-        overlay.io.refresh();
+    if (transportAvailable) {
+        if (val != -1) {
+            overlay.io.set("uri", pipes.baseUri + pipes.feeds[val].uri);
+            overlay.io.refresh();
+        }
+    } else {
+        overlay.io.setContent("Flash doesn't appear to be available. Cross-domain requests to pipes cannot be made without it.");
     }
 }, "#feedSelector");</textarea></div>				</div>
 				<div class="yui-u sidebar">
-					
-				
+	
 					<div id="examples" class="mod box4">
                         <div class="hd">
 						<h4>
@@ -616,10 +641,10 @@ Y.on("change", function(e) {
                         </div>
 						<div class="bd">
 							<ul>
-								<li><a href='../overlay/overlay-xy.html'>Basic XY Positioning</a></li><li><a href='../overlay/overlay-align.html'>Alignment Support</a></li><li><a href='../overlay/overlay-stack.html'>Stack Support</a></li><li><a href='../overlay/overlay-stdmod.html'>Standard Module Support</a></li><li><a href='../overlay/overlay-constrain.html'>Constrain Support</a></li><li class='selected'><a href='../overlay/overlay-io-plugin.html'>IO Plugin</a></li><li><a href='../overlay/overlay-anim-plugin.html'>Animation Plugin</a></li><li><a href='../node-focusmanager/node-focusmanager-3.html'>Accessible Menu Button (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../stylesheet/stylesheet_theme.html'>Adjusting a page theme on the fly (included with examples for StyleSheet)</a></li>							</ul>
+								<li><a href='../overlay/overlay-xy.html'>Basic XY Positioning</a></li><li><a href='../overlay/overlay-align.html'>Alignment Support</a></li><li><a href='../overlay/overlay-stack.html'>Stack Support</a></li><li><a href='../overlay/overlay-stdmod.html'>Standard Module Support</a></li><li><a href='../overlay/overlay-constrain.html'>Constrain Support</a></li><li class='selected'><a href='../overlay/overlay-io-plugin.html'>IO Plugin</a></li><li><a href='../overlay/overlay-anim-plugin.html'>Animation Plugin</a></li><li><a href='../node-focusmanager/node-focusmanager-3.html'>Accessible Menu Button (included with examples for Focus Manager Node Plugin)</a></li><li><a href='../stylesheet/stylesheet_theme.html'>Adjusting a Page Theme on the Fly (included with examples for StyleSheet)</a></li>							</ul>
 						</div>
 					</div>
-					
+
 					<div class="mod box4">
                         <div class="hd">
 						<h4>More Overlay Resources:</h4>
@@ -632,7 +657,7 @@ Y.on("change", function(e) {
 					</div>
 			  </div>
 		</div>
-		
+
 		</div>
 	</div>
 
@@ -642,13 +667,13 @@ Y.on("change", function(e) {
 <div id="toc">
 	
 <ul>
-<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="selected "><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization</a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Recordset - Functional Examples" href="../../examples/recordset/index.html">Recordset <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Resize - Functional Examples" href="../../examples/resize/index.html">Resize <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="AutoComplete - Functional Examples" href="../../examples/autocomplete/index.html">AutoComplete <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Charts - Functional Examples" href="../../examples/charts/index.html">Charts <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataTable - Functional Examples" href="../../examples/datatable/index.html">DataTable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Dial - Functional Examples" href="../../examples/dial/index.html">Dial <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="TabView - Functional Examples" href="../../examples/tabview/index.html">TabView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
 </div>
 </div>
 	</div><!--closes bd-->
 
 	<div id="ft">
-        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p class="first">Copyright &copy; 2011 Yahoo! Inc. All rights reserved.</p>
         <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
             <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
             <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
@@ -656,7 +681,7 @@ Y.on("change", function(e) {
 	</div>
 </div>
 <script language="javascript"> 
-var yuiConfig = {};
+var yuiConfig = { filter: 'raw' };
 </script>
 <script src="../../assets/syntax.js"></script>
 <script src="../../assets/dpSyntaxHighlighter.js"></script>

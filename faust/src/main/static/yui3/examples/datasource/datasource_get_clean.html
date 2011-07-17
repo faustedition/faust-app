@@ -93,12 +93,12 @@ body {
     </pre>
 
     <h6>Normalized data</h6>
-    <input type="button" id="demo_json" value="Retrieve data =>">
+    <input type="button" id="demo_json" value="Retrieve data">
     <div id="demo_output_json" class="output"></div>
 </form>
 
 <script type="text/javascript">
-YUI().use("dump", "node", "datasource-get", "datasource-jsonschema", "datasource-xmlschema", function (Y) {
+YUI({ filter: 'raw' }).use("dump", "node", "datasource-get", "datasource-jsonschema", "datasource-xmlschema", function (Y) {
     var myDataSource = new Y.DataSource.Get({source:"http://query.yahooapis.com/v1/public/yql?format=json&"}),
         myCallback = {
             success: function(e){

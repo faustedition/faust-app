@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('array-invoke', function(Y) {
 
@@ -27,20 +27,20 @@ YUI.add('array-invoke', function(Y) {
  *
  * @method invoke
  * @static
- * @param items { Array } Array of objects supporting the named method
- * @param name { String } the name of the method to execute on each item
- * @param args* { mixed } Any number of additional args are passed as
+ * @param { Array } items Array of objects supporting the named method.
+ * @param { String } name the name of the method to execute on each item.
+ * @param { mixed } args* Any number of additional args are passed as
  *                        parameters to the execution of the named method.
  * @return { Array } All return values, indexed according to item index.
  */
-Y.Array.invoke = function ( items, name ) {
-    var args       = Y.Array( arguments, 2, true ),
+Y.Array.invoke = function(items, name) {
+    var args = Y.Array(arguments, 2, true),
         isFunction = Y.Lang.isFunction,
-        ret        = [];
+        ret = [];
 
-    Y.Array.each( Y.Array( items ), function ( item, i ) {
-        if ( isFunction( item[ name ] ) ) {
-            ret[i] = item[ name ].apply( item, args );
+    Y.Array.each(Y.Array(items), function(item, i) {
+        if (isFunction(item[name])) {
+            ret[i] = item[name].apply(item, args);
         }
     });
 
@@ -48,4 +48,4 @@ Y.Array.invoke = function ( items, name ) {
 };
 
 
-}, '3.2.0' );
+}, '3.3.0' );

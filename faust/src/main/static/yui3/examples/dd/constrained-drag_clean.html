@@ -102,7 +102,7 @@ body {
 </div>
 
 <script>
-YUI().use('dd-constrain', function(Y) {
+YUI({ filter: 'raw' }).use('dd-constrain', function(Y) {
     var dd1 = new Y.DD.Drag({
         node: '#dd-demo-1'
     }).plug(Y.Plugin.DDConstrained, {

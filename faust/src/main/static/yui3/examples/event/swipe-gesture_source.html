@@ -4,12 +4,10 @@
     <head>
         <title>Swipe to Delete</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
-
         <link rel="stylesheet" href="../../build//cssreset/reset-min.css" type="text/css" charset="utf-8">
         <link rel="stylesheet" href="../../build//cssfonts/fonts-min.css" type="text/css" charset="utf-8">
-
         <link rel="stylesheet" href="assets/examples.css" type="text/css" charset="utf-8">
-        <link media="handheld, only screen and (max-device-width: 480px)" href="assets/examples-smallscreen.css" type= "text/css" rel="stylesheet" charset="utf-8">
+        <link media="handheld, only screen and (max-width: 800px)" href="assets/examples-smallscreen.css" type= "text/css" rel="stylesheet" charset="utf-8">
 
         <script src="../../build/yui/yui.js" type="text/javascript" charset="utf-8"></script>
         
@@ -36,9 +34,7 @@
         <script type="text/javascript" charset="utf-8">
             YUI().use("node-base", "node-event-delegate", "transition", "event-move", function(Y) {
         
-                var DELETE = "myapp-delete",
-                    HIDDEN = "myapp-hidden",
-                    MIN_SWIPE = 10;
+                var MIN_SWIPE = 10;
 
                 Y.Node.all(".myexample-hidden").removeClass("myexample-hidden");
 
@@ -47,7 +43,7 @@
                     var item = e.currentTarget,
                         target = e.target,
                         container = e.container,
-                        isDeleteButton = target.hasClass(DELETE);
+                        isDeleteButton = target.hasClass("myapp-delete");
 
                     // Prevent Text Selection in IE
                     item.once("selectstart", function(e) {
@@ -56,7 +52,7 @@
 
                     if (!isDeleteButton) {
 
-                        container.all("." + DELETE).addClass(HIDDEN);
+                        container.all(".myapp-delete").addClass("myapp-hidden");
         
                         item.setData("swipeStart", e.pageX);
         
@@ -67,7 +63,7 @@
                                 isSwipeLeft = (swipeStart - swipeEnd) > MIN_SWIPE;
         
                             if (isSwipeLeft) {
-                                item.one("." + DELETE).removeClass(HIDDEN);    
+                                item.one(".myapp-delete").removeClass("myapp-hidden");    
                             }
             
                         });

@@ -79,7 +79,7 @@ body {
 </form>
 
 <script type="text/javascript">
-YUI().use("dump", "node", "datatype", "dataschema", function (Y) {
+YUI({ filter: 'raw' }).use("dump", "node", "datatype", "dataschema", function (Y) {
     Y.on("click", function(e){
         var data_in = {
                 "results":[

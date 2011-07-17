@@ -98,7 +98,7 @@ body {
 <h1>Building a UI with AsyncQueue</h1>
 
 <div class="exampleIntro">
-	<p>This example illustrates how to break up the initial rendering of an application UI into queued code chunks, yielding back to the browser regularly to draw portions of the UI as they are ready.</p>
+	<p>This example illustrates how to break up the initial rendering of an application UI into queued code chunks, yielding back to the browser regularly to draw portions of the UI as they become ready.</p>
 <p><em>Note</em>: This method should be reserved for apps constructing complex DOM structures.  While the DOM structure contained in this example is not complex, some artificial delays are injected to simulate process-intensive operations that would normally cause such delays.</p>
 			
 </div>
@@ -112,7 +112,7 @@ body {
 <button id="init">Initialize Application</button>
 
 <script type="text/javascript">
-YUI().use("anim", "async-queue",function (Y) {
+YUI({ filter: 'raw' }).use("node", "transition", "async-queue",function (Y) {
 
 var MyApp = {
     NAME : 'Asynchronous Queue Demo',
@@ -179,32 +179,28 @@ var MyApp = {
 
     _renderNav : function () {
         var nav = MyApp.nodes.nav;
-        nav.appendChild(Y.Node.create(
+        nav.append(
             '<ul>'+
                 '<li><a href="#">Nav Lorem</a></li>'+
                 '<li><a href="#">Nav Ipsum</a></li>'+
                 '<li><a href="#">Nav Dolor</a></li>'+
                 '<li><a href="#">Nav Sit</a></li>'+
-            '</ul>'));
+            '</ul>');
 
-        new Y.Anim({
-            node : nav,
-            to :   { top : 0 },
-            duration : .3
-        }).run();
+        nav.transition({
+            top: 0,
+            duration: .3
+        });
     },
 
     _renderContent : function () {
         var content = MyApp.nodes.content;
 
-        content.appendChild(Y.Node.create(
-            '<p>[ App content here ]</p>'));
-
-        new Y.Anim({
-            node : content,
-            to :   { opacity : 1 },
-            duration : .8
-        }).run();
+        content.append('<p>[ App content here ]</p>')
+               .transition({
+                   opacity: 1,
+                   duration: .8
+               });
 
         MyApp.setStatus('App initialized',false);
     }

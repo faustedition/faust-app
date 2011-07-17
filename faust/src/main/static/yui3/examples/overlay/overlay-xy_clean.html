@@ -125,7 +125,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("overlay", function(Y) {
+YUI({ filter: 'raw' }).use("overlay", function(Y) {
 
     var xy = Y.one("#overlay-position").getXY();
 

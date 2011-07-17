@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('slider-base', function(Y) {
 
@@ -396,10 +396,12 @@ Y.SliderBase = Y.extend( SliderBase, Y.Widget, {
     },
 
     /** 
-     * Ensures the stored length value is a string with a quantity and unit.
+     * <p>Ensures the stored length value is a string with a quantity and unit.
      * Unit will be defaulted to &quot;px&quot; if not included.  Rejects
      * values less than or equal to 0 and those that don't at least start with
-     * a number.
+     * a number.</p>
+     *
+     * <p>Currently only pixel lengths are supported.</p>
      *
      * @method _setLength
      * @param v {String} proposed value for the length attribute
@@ -427,14 +429,20 @@ Y.SliderBase = Y.extend( SliderBase, Y.Widget, {
      * @protected
      */
     _initThumbUrl: function () {
-        var url     = this.get( 'thumbUrl' ),
-            skin    = this.getSkinName() || 'sam',
-            skinDir = Y.config.base + 'slider/assets/skins/' + skin;
+        if (!this.get('thumbUrl')) {
+            var skin = this.getSkinName() || 'sam',
+                base = Y.config.base;
 
-        if ( !url ) {
+            // Unfortunate hack to avoid requesting image resources from the
+            // combo service.  The combo service does not serve images.
+            if (base.indexOf('http://yui.yahooapis.com/combo') === 0) {
+                base = 'http://yui.yahooapis.com/' + Y.version + '/build/';
+            }
+
             // <img src="/path/to/build/slider/assets/skins/sam/thumb-x.png">
-            url = skinDir + '/thumb-' + this.axis + '.png';
-            this.set( 'thumbUrl', url );
+            this.set('thumbUrl', base + 'slider/assets/skins/' +
+                                 skin + '/thumb-' + this.axis + '.png');
+
         }
     },
 
@@ -535,7 +543,7 @@ Y.SliderBase = Y.extend( SliderBase, Y.Widget, {
          * CSS).  This corresponds to the movable range of the thumb.
          *
          * @attribute length
-         * @type {String | Number} e.g. "200px", "6em", or 200 (defaults to px)
+         * @type {String | Number} e.g. "200px" or 200
          * @default 150px
          */
         length: {
@@ -561,7 +569,7 @@ Y.SliderBase = Y.extend( SliderBase, Y.Widget, {
 });
 
 
-}, '3.2.0' ,{requires:['widget', 'substitute', 'dd-constrain']});
+}, '3.3.0' ,{requires:['widget', 'substitute', 'dd-constrain']});
 YUI.add('slider-value-range', function(Y) {
 
 /**
@@ -952,7 +960,7 @@ Y.SliderValueRange = Y.mix( SliderValueRange, {
 }, true );
 
 
-}, '3.2.0' ,{requires:['slider-base']});
+}, '3.3.0' ,{requires:['slider-base']});
 YUI.add('clickable-rail', function(Y) {
 
 /**
@@ -1085,8 +1093,20 @@ Y.ClickableRail = Y.mix(ClickableRail, {
 
                 this._uiMoveThumb(xy);
 
+                // Set e.target for DD's IE9 patch which calls
+                // e.target._node.setCapture() to allow imgs to be dragged.
+                // Without this, setCapture is called from the rail and rail
+                // clicks on other Sliders may have their thumb movements
+                // overridden by a different Slider (the thumb on the wrong
+                // Slider moves).
+                e.target = this.thumb.one('img') || this.thumb;
+
                 // Delegate to DD's natural behavior
                 dd._handleMouseDownEvent(e);
+
+                // TODO: this won't trigger a slideEnd if the rail is clicked
+                // check if dd._move(e); dd._dragThreshMet = true; dd.start();
+                // will do the trick.  Is that even a good idea?
             }
         },
 
@@ -1151,7 +1171,7 @@ Y.ClickableRail = Y.mix(ClickableRail, {
 }, true);
 
 
-}, '3.2.0' ,{requires:['slider-base']});
+}, '3.3.0' ,{requires:['slider-base']});
 YUI.add('range-slider', function(Y) {
 
 /**
@@ -1178,8 +1198,8 @@ Y.Slider = Y.Base.build( 'slider', Y.SliderBase,
     [ Y.SliderValueRange, Y.ClickableRail ] );
 
 
-}, '3.2.0' ,{requires:['slider-base', 'clickable-rail', 'slider-value-range']});
+}, '3.3.0' ,{requires:['slider-base', 'clickable-rail', 'slider-value-range']});
 
 
-YUI.add('slider', function(Y){}, '3.2.0' ,{use:['slider-base', 'slider-value-range', 'clickable-rail', 'range-slider']});
+YUI.add('slider', function(Y){}, '3.3.0' ,{use:['slider-base', 'slider-value-range', 'clickable-rail', 'range-slider']});
 

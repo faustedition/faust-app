@@ -144,7 +144,7 @@ Focus Manager Node Plugin and Node's support for the
 		//	(<div id="toolbar">) and call the "plug" method 
 		//	passing in a reference to the Focus Manager Node Plugin.
 
-		var toolbar = Y.Node.get("#toolbar-1");
+		var toolbar = Y.one("#toolbar-1");
 
 		toolbar.plug(Y.Plugin.NodeFocusManager, { 
 
@@ -169,7 +169,7 @@ Focus Manager Node Plugin and Node's support for the
 
 		toolbar.delegate("click", function (event) {
 
-			alert("You clicked " + this.query("input").get("value"));
+			alert("You clicked " + this.one("input").get("value"));
 
 		}, ".yui3-toolbar-button");
 

@@ -22,7 +22,7 @@ body {
 
 
 <!--begin custom header content for this example-->
-<style>
+<style id="yui3-style-overrides">
 #demo {
     width: 50em;
 }
@@ -31,8 +31,11 @@ body {
     background: #fff url(http://developer.yahoo.com/yui/3/examples/overlay/assets/img/ajax-loader.gif) no-repeat center center;
     height:40px;
 }
-</style>
 
+#main #example-canvas .yui3-tabview .yui3-tab-selected a {
+	color:white;
+}
+</style>
 <!--end custom header content for this example-->
 
 </head>
@@ -51,7 +54,7 @@ that data can be loaded remotely.
 
 <div id="demo"></div>
 <script type="text/javascript">
-YUI().use("yui", "tabview", "gallery-widget-io", function(Y) {
+YUI({ filter: 'raw' }).use("yui", "tabview", "gallery-widget-io", function(Y) {
     var feeds = {
         Chrome: 'assets/news.php?query=chrome+browser',
         Firefox: 'assets/news.php?query=firefox+browser',

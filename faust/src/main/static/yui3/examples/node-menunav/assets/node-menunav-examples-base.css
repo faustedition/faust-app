@@ -10,6 +10,7 @@ body {
 
 #side {
     margin-left: -170px;
+    position: relative; /* workaround for IE9 not firing mouse events on #side due to negative margin */
     width: 170px;
 }
 

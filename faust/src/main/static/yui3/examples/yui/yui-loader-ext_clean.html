@@ -119,12 +119,15 @@ YUI({insertBefore: 'styleoverrides', groups: { yui2: { combine: true, base: 'htt
                 var cal1 = new YAHOO.widget.Calendar('cal1', 'cal1Cont');
 
                 // Once the 2.x calendar renders, we will add 3.x drag
-                // functionality to it.
-                cal1.renderEvent.subscribe(function() {
+                // functionality to it and remove the listener after render.
+                var fn = function() {
+                    //Only create the 
                     var dd = new Y.DD.Drag({
                         node: '#cal1Cont'
                     }).addHandle('div.calheader');
-                });
+                    cal1.renderEvent.unsubscribe(fn);
+                };
+                cal1.renderEvent.subscribe(fn);
                 cal1.render();
             });
 

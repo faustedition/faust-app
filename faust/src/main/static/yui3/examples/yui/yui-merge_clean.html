@@ -69,7 +69,7 @@ object.
 <pre id="demo_result">click Merge or Copy</pre>
 <script type="text/javascript">
 
-YUI({filter:"debug", logInclude: {example:true}}).use("node", "dump",
+YUI({filter:"debug", logInclude: {"example":true}}).use("node", "dump",
 // This method is in the core of the library, so we don't have to use() any
 // additional modules to access it.  However, this example requires 'node'
 // and 'dump'.
@@ -91,8 +91,7 @@ function(Y) {
         var merged = Y.merge(set1, set2, set3);
         Y.log('merged = ' + Y.dump(merged));
 
-        // result.set('innerHTML', '<p>' + stringifyObj(merged) + '</p>');
-        result.set('innerHTML', '<p>' + Y.dump(merged) + '</p>');
+        result.setContent('<p>' + Y.dump(merged) + '</p>');
     };
 
     Y.on('click', doMerge, '#demo_btn1');
@@ -121,7 +120,7 @@ function(Y) {
                 (copy.obj.addedToCopy === set4.obj.addedToCopy);
 
         Y.log(msg);
-        result.set('innerHTML', '<p>' + msg + '</p>');
+        result.setContent('<p>' + msg + '</p>');
     };
 
     Y.on('click', doCopy, '#demo_btn2');

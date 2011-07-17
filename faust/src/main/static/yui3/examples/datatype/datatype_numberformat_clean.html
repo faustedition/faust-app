@@ -67,7 +67,7 @@ body {
 
 
 <script type="text/javascript">
-YUI().use("node", "datatype-number", function (Y) {
+YUI({ filter: 'raw' }).use("node", "datatype-number", function (Y) {
     Y.on("click", function(e){
         var number = Y.DataType.Number.parse(Y.one("#demo_number").get("value")),
             output = Y.DataType.Number.format(number, {

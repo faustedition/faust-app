@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('querystring-stringify-simple', function(Y) {
 
@@ -32,6 +32,7 @@ var QueryString = Y.namespace("QueryString"),
  *
  * @method stringify
  * @for QueryString
+ * @public
  * @submodule querystring-stringify-simple
  * @param obj {Object} A single-level object to convert to a querystring.
  * @param cfg {Object} (optional) Configuration object.  In the simple
@@ -64,4 +65,5 @@ QueryString.stringify = function (obj, c) {
 };
 
 
-}, '3.2.0' );
+
+}, '3.3.0' );

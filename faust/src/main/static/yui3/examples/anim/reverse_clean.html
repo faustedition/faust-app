@@ -53,11 +53,11 @@ body {
 </div>
 <p>This is placeholder text used to demonstrate how the above animation affects subsequent content.</p> 
 <script type="text/javascript">
-YUI({filter: 'raw'}).use("node", "anim", function(Y) {
+YUI({ filter: 'raw' }).use("node", "anim", function(Y) {
     var module = Y.one('#demo');
 
     // add fx plugin to module body
-    var content = module.query('.yui3-bd').plug(Y.Plugin.NodeFX, {
+    var content = module.one('.yui3-bd').plug(Y.Plugin.NodeFX, {
         from: { height: 1 },
         to: {
             height: function(node) { // dynamic in case of change
@@ -83,7 +83,7 @@ YUI({filter: 'raw'}).use("node", "anim", function(Y) {
     );
 
     // append dynamic control to header section
-    module.query('.yui3-hd').appendChild(control);
+    module.one('.yui3-hd').appendChild(control);
     control.on('click', onClick);
 
 });

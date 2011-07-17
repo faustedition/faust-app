@@ -84,7 +84,7 @@ body {
     </pre>
 
     <h6>Normalized data</h6>
-    <input type="button" id="demo_json" value="Retrieve data =>">
+    <input type="button" id="demo_json" value="Retrieve data">
     <div id="demo_output_json" class="output"></div>
 
     <h4>XML</h4>
@@ -144,12 +144,12 @@ body {
     </pre>
 
     <h6>Normalized data</h6>
-    <input type="button" id="demo_xml" value="Retrieve data =>">
+    <input type="button" id="demo_xml" value="Retrieve data">
     <div id="demo_output_xml" class="output"></div>
 </form>
 
 <script type="text/javascript">
-YUI().use("dump", "node", "datasource-io", "datasource-jsonschema", "datasource-xmlschema", function (Y) {
+YUI({ filter: 'raw' }).use("dump", "node", "datasource-io", "datasource-jsonschema", "datasource-xmlschema", function (Y) {
     var myDataSourceJSON = new Y.DataSource.IO({source:"assets/php/ysearch_json_madonna.php"}),
         myCallbackJSON = {
             success: function(e){

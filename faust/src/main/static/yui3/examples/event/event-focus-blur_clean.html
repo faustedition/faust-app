@@ -23,21 +23,12 @@ body {
 
 <!--begin custom header content for this example-->
 <style type="text/css">
-
-	.yui3-checkboxes-loading #checkboxes {
-		display: none;
+	
+    .yui3-js-enabled .yui3-checkboxes-loading {
+		display: none;	
 	}
 
 </style>
-
-<script type="text/javascript">
-
-	//	Hide the checkboxes if JavaScript is enabled to prevent 
-	//	the user from seeing a flash of unstyled content while
-	//	the JavaScript for the checkboxes is being loaded.
-	document.documentElement.className = "yui-checkboxes-loading";
-
-</script>
 <!--end custom header content for this example-->
 
 </head>
@@ -58,7 +49,7 @@ and the Event Utility's <code>focus</code> and <code>blur</code> events and the
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
 
-<div id="checkboxes">
+<div id="checkboxes" class="yui3-checkboxes-loading">
 	<div>
 		<label for="field-1">Field 1: </label>
 		<span>
@@ -110,26 +101,7 @@ and the Event Utility's <code>focus</code> and <code>blur</code> events and the
 
 		}
 
-	}).use("checkboxjs", function(Y, result) {
-
-	    //	The callback supplied to use() will be executed regardless of
-	    //	whether the operation was successful or not.  The second parameter
-	    //	is a result object that has the status of the operation.  We can
-	    //	use this to try to recover from failures or timeouts.
-
-	    if (!result.success) {
-
-	        Y.log("Load failure: " + result.msg, "warn", "Example");
-
-			//	Show the checkboxes if the loader failed that way the original 
-			//	unskinned checkboxes will be visible so that the user can
-			//	interact with them either way.
-
-			document.documentElement.className = "";
-
-	    }
-
-	});
+	}).use("checkboxjs");
 
 </script>
 

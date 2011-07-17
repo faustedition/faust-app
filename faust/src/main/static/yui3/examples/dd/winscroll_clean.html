@@ -29,7 +29,7 @@ body {
 <h1>Window Scrolling</h1>
 
 <div class="exampleIntro">
-	<p>Using the Window Scroll DD Plugin</p>
+	<p>This example shows how you can use the DD Scroll plugin to scroll the browser window as you drag.</p>
 			
 </div>
 
@@ -60,7 +60,7 @@ body {
 <div id="demo"><h2>x</h2>Drag Me</div>
 
 <script>
-YUI().use('dd-drag', 'dd-scroll', 'dd', function(Y) {
+YUI({ filter: 'raw' }).use('dd-drag', 'dd-scroll', 'dd', function(Y) {
     var dd = new Y.DD.Drag({
         node: '#demo'
     }).addHandle('h2').plug(Y.Plugin.DDWinScroll);

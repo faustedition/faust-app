@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Using Drag plugins with Delegate</title>
+<title>Using Drag Plugins with Delegate</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -26,7 +26,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>Using Drag plugins with Delegate</h1>
+<h1>Using Drag Plugins with Delegate</h1>
 
 <div class="exampleIntro">
 	<p>This example is the same as the <code>Drag Delegation with Drop Target</code> example except we add some plugins.</p>
@@ -94,7 +94,7 @@ body {
 
 <script>
 
-YUI().use('dd-delegate', 'dd-drop-plugin', 'dd-constrain', 'dd-proxy', function(Y) {
+YUI({ filter: 'raw' }).use('dd-delegate', 'dd-drop-plugin', 'dd-constrain', 'dd-proxy', function(Y) {
     var del = new Y.DD.Delegate({
         container: '#demo',
         nodes: 'li'

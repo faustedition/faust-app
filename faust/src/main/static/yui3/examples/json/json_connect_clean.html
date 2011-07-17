@@ -29,9 +29,9 @@ body {
 <h1>JSON with Y.io</h1>
 
 <div class="exampleIntro">
-	<p>A natural fit for JSON is working with the <a href="http://developer.yahoo.com/yui/io/">IO module</a> to parse messages received via XMLHttpRequest (XHR).  In this example, we'll request JSON data from the server using the <code>Y.io</code> method and parse the resulting JSON string data for processing.</p>
+	<p>A natural fit for the JSON module is to work with <a href="http://developer.yahoo.com/yui/io/">IO</a> to parse <a href="http://json.org/" title="JSON">JSON</a> messages received via XMLHttpRequest (XHR).  In this example, we'll request JSON data from the server using the <code>Y.io</code> method and parse the resulting JSON string data.</p>
 
-<p>Click the Get Messages button to send the request to the server.</p>
+<p>Click the <em>Get Messages</em> button to send the request to the server; the response will be displayed below the button.</p>
 			
 </div>
 
@@ -43,9 +43,9 @@ body {
     <div id="demo_msg"></div>
 </div>
 <script type="text/javascript">
-YUI().use("node", "io", "dump", "json-parse",function (Y) {
+YUI({ filter: 'raw' }).use("node", "io", "dump", "json-parse",function (Y) {
 
-    var target = Y.Node.get('#demo_msg');
+    var target = Y.one('#demo_msg');
 
     var callback = {
 
@@ -77,7 +77,7 @@ YUI().use("node", "io", "dump", "json-parse",function (Y) {
                 }
 
                 // Use the Node API to apply the new innerHTML to the target
-                target.set('innerHTML',html);
+                target.setContent(html);
             },
 
             failure : function (x,o) {
@@ -85,12 +85,12 @@ YUI().use("node", "io", "dump", "json-parse",function (Y) {
             }
 
         }
-    }
+    };
 
     // Attach a click event listener to the button #demo_btn to send the request
     Y.on('click',function (e) {
         // Make the call to the server for JSON data
-        transaction = Y.io("assets/jsonConnect.php", callback);
+        Y.io("assets/jsonConnect.php", callback);
     },'#demo_btn');
 
 });

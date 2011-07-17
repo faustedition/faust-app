@@ -43,7 +43,7 @@ body {
 <span id="demo"></span>
 
 <script type="text/javascript">
-YUI().use("anim", function(Y) {
+YUI({ filter: 'raw' }).use("anim", function(Y) {
     var anim = new Y.Anim({
         node: '#demo',
         duration: 0.5,

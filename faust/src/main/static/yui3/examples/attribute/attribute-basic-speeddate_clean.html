@@ -144,7 +144,7 @@ in this example for you, in addition to making it easier for users to extend you
 // Get a new instance of YUI and 
 // load it with the required set of modules
 
-YUI().use("node", "attribute", "substitute", function(Y) {
+YUI({ filter: 'raw' }).use("node", "attribute", "substitute", function(Y) {
 
     // Setup custom class which we want to 
     // add managed attribute support to

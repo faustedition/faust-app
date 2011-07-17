@@ -276,7 +276,7 @@
 			//	script and CSS for the MenuNav Node Plugin and all of the required 
 			//	dependencies.
 
-			YUI().use("node-menunav", function(Y) {
+			YUI({ filter: 'raw' }).use("node-menunav", function(Y) {
 
 				//	Retrieve the Node instance representing the root menu
 				//	(<div id="productsandservices">)

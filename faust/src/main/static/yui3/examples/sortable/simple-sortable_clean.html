@@ -63,7 +63,7 @@ body {
 
 <script>
 
-YUI().use('sortable', function(Y) {
+YUI({ filter: 'raw' }).use('sortable', function(Y) {
     var sortable = new Y.Sortable({
         container: '#demo',
         nodes: 'li',

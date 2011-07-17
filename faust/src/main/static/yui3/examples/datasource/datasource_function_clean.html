@@ -61,7 +61,7 @@ body {
     </pre>
 
     <h6>Normalized data</h6>
-    <input type="button" id="demo_array" value="Retrieve data =>">
+    <input type="button" id="demo_array" value="Retrieve data">
     <div id="demo_output_array" class="output"></div>
 
     <h4>JSON</h4>
@@ -130,12 +130,12 @@ body {
     </pre>
 
     <h6>Normalized data</h6>
-    <input type="button" id="demo_json" value="Retrieve data =>">
+    <input type="button" id="demo_json" value="Retrieve data">
     <div id="demo_output_json" class="output"></div>
 </form>
 
 <script type="text/javascript">
-YUI().use("dump", "node", "datasource-function", "datasource-arrayschema", "datasource-jsonschema", function (Y) {
+YUI({ filter: 'raw' }).use("dump", "node", "datasource-function", "datasource-arrayschema", "datasource-jsonschema", function (Y) {
     var myFunctionArray = function(request) {
         return [
             {name:"abc",id:123},

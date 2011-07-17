@@ -58,3 +58,7 @@ span#demo {
     width:10px;
 }
 
+.yui3-data-win, .yui3-data-doc {
+	cursor:pointer;
+}
+}

@@ -53,7 +53,7 @@ body {
 </div>
 <script>
 
-YUI({filter:"debug", logInclude: {event:true, example:true}}).use('anim', function(Y) {
+YUI({filter:"debug", logInclude: {"event":true, "example":true}}).use('anim', function(Y) {
     var anim = new Y.Anim({
         node: '#demo',
         to: {
@@ -71,7 +71,7 @@ YUI({filter:"debug", logInclude: {event:true, example:true}}).use('anim', functi
     anim.run();
 });
 
-YUI({filter:"debug", logInclude: {event:true, example:true}}).use('dd-drag', function(Y) {
+YUI({filter:"debug", logInclude: {"event":true, "example":true}}).use('dd-drag', function(Y) {
     var dd = new Y.DD.Drag({
         node: '#demo'
     });

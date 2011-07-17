@@ -8,7 +8,7 @@
         <style>
             /* Avoid resource latency for these, since they hide unenhanced content */
             .yui3-js-enabled .yui3-scrollview-loading {
-                display:none;
+                visibility:hidden;
             }
             
             #additional-content {
@@ -16,24 +16,29 @@
             }
         </style>
 
-        <link rel="stylesheet" href="assets/examples.css" type="text/css" charset="utf-8">
-        <link media="handheld, only screen and (max-device-width: 480px)" href="assets/examples-smallscreen.css" type="text/css" rel="stylesheet" charset="utf-8">
+        <link rel="stylesheet" href="../../build/cssreset/reset-min.css" type="text/css" charset="utf-8">
 
-        <script src="../../build/yui/yui.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="assets/horizontal.css" type="text/css" charset="utf-8">
+        <link media="handheld, only screen and (max-device-width: 480px)" href="assets/horizontal-smallscreen.css" type="text/css" rel="stylesheet" charset="utf-8">
+
+        <script src="../../build/yui/yui-min.js" type="text/javascript" charset="utf-8"></script>
     </head>
     
-    <body class="yui-skin-sam">
-        <div id="scrollheader" class="horiz">
-            <h1>Horizontal ScrollView</h1>
-        </div>
+    <body class="yui3-skin-sam">
 
-        <div id="scrollable" style="" class="yui3-scrollview-loading horiz">
-            <ul>
-                <li><img src="http://farm5.static.flickr.com/4136/4802088086_c621e0b501.jpg" alt="Above The City II"></li>
-                <li><img src="http://farm5.static.flickr.com/4114/4801461321_1373a0ef89.jpg" alt="Walls and Canyon"></li>
-                <li><img src="http://farm5.static.flickr.com/4100/4801614015_4303e8eaea.jpg" alt="Stairs Using In Situ Stone"></li>
-                <li><img src="http://farm5.static.flickr.com/4076/4801368583_854e8c0ef3.jpg" alt="Tree Silhouette"></li>
-            </ul>
+        <div id="scrollview-container">
+            <div id="scrollview-header">
+                <h1>Horizontal ScrollView</h1>
+            </div>
+
+            <div id="scrollview-content" class="yui3-scrollview-loading">
+                <ul>
+                    <li><img src="http://farm5.static.flickr.com/4136/4802088086_c621e0b501.jpg" alt="Above The City II"></li>
+                    <li><img src="http://farm5.static.flickr.com/4114/4801461321_1373a0ef89.jpg" alt="Walls and Canyon"></li>
+                    <li><img src="http://farm5.static.flickr.com/4100/4801614015_4303e8eaea.jpg" alt="Stairs Using In Situ Stone"></li>
+                    <li><img src="http://farm5.static.flickr.com/4076/4801368583_854e8c0ef3.jpg" alt="Tree Silhouette"></li>
+                </ul>
+            </div>
         </div>
 
         <div id="additional-content">
@@ -45,20 +50,22 @@
             YUI().use('scrollview', function(Y) {
 
                 var scrollView = new Y.ScrollView({
-                    srcNode: '#scrollable',
+                    id: 'scrollview',
+                    srcNode: '#scrollview-content',
                     width: 320,
-                    flick : {
-                        preventDefault:function(e) {
-                            // Prevent image drag in gecko (assuming non-touch for this example).
-                            return (Y.UA.gecko);
-                        },
+                    flick: {
                         minDistance:10,
-                        minVelocity:0.3
+                        minVelocity:0.3,
+                        axis: "x"
                     }
                 });
 
                 scrollView.render();
 
+                // Prevent default image drag behavior
+                scrollView.get("contentBox").delegate("mousedown", function(e) {
+                    e.preventDefault();
+                }, "img");
             });
         </script>
     </body>

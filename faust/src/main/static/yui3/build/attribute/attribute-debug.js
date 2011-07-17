@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('attribute-base', function(Y) {
 
@@ -227,7 +227,7 @@ YUI.add('attribute-base', function(Y) {
         host._requireAddAttr = host._requireAddAttr || false;
 
         // ATTRS support for Node, which is not Base based
-        if ( attrs && !(Base && host instanceof Base)) {
+        if ( attrs && !(Base && Y.instanceOf(host, Base))) {
             host.addAttrs(this._protectAttrs(attrs));
         }
     }
@@ -767,13 +767,17 @@ YUI.add('attribute-base', function(Y) {
 
             facade = (opts) ? Y.merge(opts) : host._ATTR_E_FACADE;
 
-            facade.type = eventName;
+            // Not using the single object signature for fire({type:..., newVal:...}), since 
+            // we don't want to override type. Changed to the fire(type, {newVal:...}) signature.
+
+            // facade.type = eventName;
             facade.attrName = attrName;
             facade.subAttrName = subAttrName;
             facade.prevVal = currVal;
             facade.newVal = newVal;
 
-            host.fire(facade);
+            // host.fire(facade);
+            host.fire(eventName, facade);
         },
 
         /**
@@ -1175,7 +1179,7 @@ YUI.add('attribute-base', function(Y) {
     Y.Attribute = Attribute;
 
 
-}, '3.2.0' ,{requires:['event-custom']});
+}, '3.3.0' ,{requires:['event-custom']});
 YUI.add('attribute-complex', function(Y) {
 
     /**
@@ -1298,8 +1302,8 @@ YUI.add('attribute-complex', function(Y) {
     Y.mix(Y.Attribute, Y.Attribute.Complex, true, null, 1);
 
 
-}, '3.2.0' ,{requires:['attribute-base']});
+}, '3.3.0' ,{requires:['attribute-base']});
 
 
-YUI.add('attribute', function(Y){}, '3.2.0' ,{use:['attribute-base', 'attribute-complex']});
+YUI.add('attribute', function(Y){}, '3.3.0' ,{use:['attribute-base', 'attribute-complex']});
 

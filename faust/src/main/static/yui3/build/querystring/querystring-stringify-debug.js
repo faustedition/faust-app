@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('querystring-stringify', function(Y) {
 
@@ -39,9 +39,17 @@ QueryString.escape = encodeURIComponent;
  * <p>Objects with cyclical references will trigger an exception.</p>
  *
  * @method stringify
+ * @public
  * @param obj {Variant} any arbitrary value to convert to query string
- * @param sep {String} (optional) Character that should join param k=v pairs together. Default: "&"
- * @param eq  {String} (optional) Character that should join keys to their values. Default: "="
+ * @param cfg {Object} (optional) Configuration object.  The three
+ * supported configurations are:
+ * <ul><li>sep: When defined, the value will be used as the key-value
+ * separator.  The default value is "&".</li>
+ * <li>eq: When defined, the value will be used to join the key to
+ * the value.  The default value is "=".</li>
+ * <li>arrayKey: When set to true, the key of an array will have the
+ * '[]' notation appended to the key.  The default value is false.
+ * </li></ul>
  * @param name {String} (optional) Name of the current key, for handling children recursively.
  * @static
  */
@@ -109,4 +117,4 @@ QueryString.stringify = function (obj, c, name) {
 
 
 
-}, '3.2.0' );
+}, '3.3.0' );

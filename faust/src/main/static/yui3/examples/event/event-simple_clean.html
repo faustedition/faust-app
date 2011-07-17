@@ -23,8 +23,18 @@ body {
 
 <!--begin custom header content for this example-->
 <style type="text/css">
-#container {background-color:#00CCFF; border:1px dotted black; padding:1em; cursor:pointer;}
+#container {
+    background-color: #00CCFF;
+    border: 1px dotted black;
+    padding: 1em;
+    cursor: pointer;
+}
+#example-canvas #demo a {
+    color: #00c;
+    text-decoration: underline;
+}
 </style>
+
 <!--end custom header content for this example-->
 
 </head>
@@ -47,11 +57,8 @@ body {
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
 
-
-    
-<script language="javascript">
-
-YUI().use("node",
+<script>
+YUI({ filter: 'raw' }).use("node",
 function(Y) {
         
     //A function that pops up a "Hello World" alert:
@@ -85,12 +92,14 @@ function(Y) {
 
 </script>
 
-<div id="container">
-<p>Click for Hello World alert.</p>
-</div>
-	<p><a href="http://developer.yahoo.com/yui" id="firstA">The YUI Library. (Link navigates away from page.)</a></p>
+<div id="demo">
+    <div id="container">
+        <p>Click for Hello World alert.</p>
+    </div>
+    <p><a href="http://developer.yahoo.com/yui" id="firstA">The YUI Library. (Link navigates away from page.)</a></p>
 
-	<p><a href="http://developer.yahoo.com/yui" id="secondA">The YUI Library. (Link's default behavior is suppressed.)</a></p>
+    <p><a href="http://developer.yahoo.com/yui" id="secondA">The YUI Library. (Link's default behavior is suppressed.)</a></p>
+</div>
 
 <!--END SOURCE CODE FOR EXAMPLE =============================== -->
 

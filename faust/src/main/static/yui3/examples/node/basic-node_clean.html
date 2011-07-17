@@ -33,8 +33,8 @@ body {
 <h1>Node Basics</h1>
 
 <div class="exampleIntro">
-	<p>This example demonstrates how to get (<code>Y.one()</code>) and use a <code>Node</code> instance to access DOM properties.</p>
-<p>Click the box to update the content of with the <code>tagName</code> of the click target's <code>parentNode</code>.</p>
+	<p>This example demonstrates how to retrieve and use a <code>Node</code> instance to access DOM properties.</p>
+<p>Click the box to update the content with the <code>tagName</code> of the click target's <code>parentNode</code>.</p>
 			
 </div>
 
@@ -45,12 +45,15 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("node", function(Y) {
+YUI({ filter: 'raw' }).use("node", function(Y) {
     var node = Y.one('#demo p');
 
     var onClick = function(e) {
-        var tag = e.target.get('parentNode.tagName'); // e.target === node || #demo p em
-        e.currentTarget.one('em').setContent('I am a child of ' + tag + '.'); // e.currentTarget === node
+        // e.target === node || #demo p em
+        var tag = e.target.get('parentNode.tagName');
+
+        // e.currentTarget === node
+        e.currentTarget.one('em').setContent('I am a child of ' + tag + '.');
     };
 
     node.on('click', onClick);

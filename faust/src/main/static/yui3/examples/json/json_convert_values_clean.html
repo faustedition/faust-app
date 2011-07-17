@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Adding new object members during parsing</title>
+<title>Adding New Object Members During Parsing</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -26,7 +26,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>Adding new object members during parsing</h1>
+<h1>Adding New Object Members During Parsing</h1>
 
 <div class="exampleIntro">
 	<p>This example shows how to use the <code>reviver</code> parameter in <code>JSON.parse</code> to add new object members and format existing members during the parsing phase.</p>
@@ -95,7 +95,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("node", "io", "json-parse",function (Y) {
+YUI({ filter: 'raw' }).use("node", "io", "json-parse",function (Y) {
 
 // Safari 4.0.3's native JSON does not support adding members during parse,
 // so use JavaScript implementation for consistency
@@ -108,8 +108,8 @@ var example = {
 
     convert : function (k,v) {
         // 'this' will refer to the object containing the key:value pair,
-        // so this will add a new object member while leaving the original
-        // in tact (but formatted to two decimal places).  If the original
+        // so this step will add a new object member while leaving the original
+        // intact (but formatted to two decimal places).  If the original
         // is not needed, just return the converted value.
         if (k === 'Price') {
             var x = Math.round(v * example.rates[example.currency] * 100) / 100;
@@ -123,28 +123,22 @@ var example = {
         // Update the column header
         Y.one('#demo table th span').set('innerHTML',example.currency);
 
-        var tbl   = Y.one('#demo table'),
-            html  = ["<tbody>"],i,j = 1,l,item;
+        var tbody = Y.one('#demo table tbody'),
+            html  = ['<tbody>'],
+            rowTemplate = '<tr><td>{SKU}</td><td>{Item}</td><td>{Price}</td><td>{convertedPrice}</td></tr>',
+            i, len;
 
         if (inventory) {
-            for (i = 0, l = inventory.length; i < l; ++i) {
-                item = inventory[i];
-                html[j++] = '<tr><td>';
-                html[j++] = item.SKU;
-                html[j++] = '</td><td>';
-                html[j++] = item.Item;
-                html[j++] = '</td><td>';
-                html[j++] = item.Price;
-                html[j++] = '</td><td>';
-                html[j++] = item.convertedPrice;
-                html[j++] = '</td></tr>';
+            for (i = 0, len = inventory.length; i < len; ++i) {
+                html.push(Y.Lang.sub(rowTemplate, inventory[i]));
             }
         } else {
-            html[j++] = '<tr><td colspan="4">No Inventory data</td></tr>';
+            html.push('<tr><td colspan="4">No Inventory data</td></tr>');
         }
-        html[j] = "</tbody>";
 
-        tbl.replaceChild(Y.Node.create(html.join('')),tbl.query('tbody'));
+        html.push('</tbody>');
+
+        tbody.replace(html.join(''));
     }
 };
 

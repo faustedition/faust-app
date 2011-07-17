@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Creating a Console for debugging</title>
+<title>Creating a Console for Debugging</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -46,7 +46,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>Creating a Console for debugging</h1>
+<h1>Creating a Console for Debugging</h1>
 
 <div class="exampleIntro">
 	<p>This example walks through the basics of setting up and logging messages to a YUI Console instance.  Three Console instances are created with slightly different configurations.  All calls to <code>Y.log(..)</code> will be broadcast to every Console.</p>
@@ -90,7 +90,7 @@ body {
 </div>
 <script type="text/javascript">
 // Create a YUI instance and request the console module and its dependencies
-YUI().use("console", "console-filters", "dd-plugin", function (Y) {
+YUI({ filter: 'raw' }).use("console", "console-filters", "dd-plugin", function (Y) {
 
 // Create and render the three Console instances
 var basic, newOnBottom, customStrings;

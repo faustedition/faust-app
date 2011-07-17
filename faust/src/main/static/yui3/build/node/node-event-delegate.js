@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('node-event-delegate', function(Y) {
 
@@ -47,14 +47,15 @@ YUI.add('node-event-delegate', function(Y) {
  * @return {EventHandle} the detach handle
  * @for Node
  */
-Y.Node.prototype.delegate = function(type, fn, selector) {
+Y.Node.prototype.delegate = function(type) {
 
-    var args = Y.Array(arguments, 0, true);
+    var args = Y.Array(arguments, 0, true),
+        index = (Y.Lang.isObject(type) && !Y.Lang.isArray(type)) ? 1 : 2;
 
-    args.splice(2, 0, this._node);
+    args.splice(index, 0, this._node);
 
     return Y.delegate.apply(Y, args);
 };
 
 
-}, '3.2.0' ,{requires:['node-base', 'event-delegate']});
+}, '3.3.0' ,{requires:['node-base', 'event-delegate']});

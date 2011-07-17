@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('event-move', function(Y) {
 
@@ -78,8 +78,8 @@ var EVENT = ("ontouchstart" in Y.config.win && !Y.UA.chrome) ? {
         touchFacade.screenY = touch.screenY;
         touchFacade.clientX = touch.clientX;
         touchFacade.clientY = touch.clientY;
-        touchFacade[TARGET] = touch[TARGET] || touchFacade[TARGET];
-        touchFacade[CURRENT_TARGET] = touch[CURRENT_TARGET] || touchFacade[CURRENT_TARGET];
+        touchFacade[TARGET] = touchFacade[TARGET] || touch[TARGET];
+        touchFacade[CURRENT_TARGET] = touchFacade[CURRENT_TARGET] || touch[CURRENT_TARGET];
 
         touchFacade[BUTTON] = (params && params[BUTTON]) || 1; // default to left (left as per vendors, not W3C which is 0)
     },
@@ -511,4 +511,4 @@ define(GESTURE_MOVE_END, {
 });
 
 
-}, '3.2.0' ,{requires:['node-base','event-touch','event-synthetic']});
+}, '3.3.0' ,{requires:['node-base','event-touch','event-synthetic']});

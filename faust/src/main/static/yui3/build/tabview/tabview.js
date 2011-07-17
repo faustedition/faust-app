@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('tabview', function(Y) {
 
@@ -61,7 +61,7 @@ var _queries = Y.TabviewBase._queries,
         if (tablist) {
             tablist.setAttrs({
                 //'aria-labelledby': 
-                role: tablist
+                role: 'tablist'
             });
         }
     },
@@ -392,11 +392,13 @@ Y.Tab = Y.Base.create('tab', Y.Widget, [Y.WidgetChild], {
 
     HTML_PARSER: {
         selected: function(contentBox) {
-            return this.get('boundingBox').hasClass(_classNames.selectedTab);
+            var ret = (this.get('boundingBox').hasClass(_classNames.selectedTab)) ?
+                        1 : 0;
+            return ret;
         }
     }
 
 });
 
 
-}, '3.2.0' ,{requires:['substitute', 'node-pluginhost', 'node-focusmanager', 'tabview-base', 'widget', 'widget-parent', 'widget-child']});
+}, '3.3.0' ,{requires:['substitute', 'node-pluginhost', 'node-focusmanager', 'tabview-base', 'widget', 'widget-parent', 'widget-child']});

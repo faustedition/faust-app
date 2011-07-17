@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Rebuilding class instances from JSON data</title>
+<title>Rebuilding Class Instances from JSON Data</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -39,7 +39,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>Rebuilding class instances from JSON data</h1>
+<h1>Rebuilding Class Instances from JSON Data</h1>
 
 <div class="exampleIntro">
 	<p>This example illustrates one method of serializing and recreating class instances by using the <code>replacer</code> and <code>reviver</code> parameters to <code>JSON.stringify</code> and <code>JSON.parse</code> respectively.</p>
@@ -56,7 +56,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("node", "json", function(Y) {
+YUI({ filter: 'raw' }).use("node", "json", function(Y) {
 
 var example = {
     data       : null,

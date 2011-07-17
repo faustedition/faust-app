@@ -2,6 +2,7 @@ YUI({
     base: '../../../build/',
     //filter: 'DEBUG',
     filter: 'RAW',
+    allowRollup: false,
     logExclude: {
         'YUI': true,
         Event: true,
@@ -10,7 +11,7 @@ YUI({
         augment: true,
         useConsole: true
     }
-}).use('console', 'test', 'editor', 'node-event-simulate', function(Y) {
+}).use('console', 'test', 'editor-base', 'editor-para', 'editor-br', 'editor-bidi', 'node-event-simulate', function(Y) {
 
     var myConsole = new Y.Console({
         height: Y.one(window).get('winHeight') + 'px',
@@ -100,6 +101,74 @@ YUI({
         },
         test_doc: function() {
             Y.Assert.areEqual(Y.Node.getDOMNode(Y.one('#editor iframe').get('contentWindow.document')), Y.Node.getDOMNode(editor.getInstance().one('doc')), 'Document object is not right');
+        },
+        test_destroy: function() {
+            editor.destroy();
+            Y.Assert.areEqual(Y.one('#editor iframe'), null, 'Frame was not destroyed');
+        },
+        test_br_plugin: function() {
+            editor = new Y.EditorBase({
+                content: 'Hello <b>World</b>!!',
+                extracss: 'b { color: red; }'
+            });
+            Y.Assert.isInstanceOf(Y.EditorBase, editor, 'Second EditorBase instance can not be created');
+            editor.plug(Y.Plugin.EditorBR);
+            editor.render('#editor');
+            Y.Assert.isInstanceOf(Y.Plugin.EditorBR, editor.editorBR, 'EditorBR was not plugged..');
+            editor.destroy();
+            Y.Assert.areEqual(Y.one('#editor iframe'), null, 'Second Frame was not destroyed');
+        },
+        test_para_plugin: function() {
+            editor = new Y.EditorBase({
+                content: 'Hello <b>World</b>!!',
+                extracss: 'b { color: red; }'
+            });
+            Y.Assert.isInstanceOf(Y.EditorBase, editor, 'Third EditorBase instance can not be created');
+            editor.plug(Y.Plugin.EditorPara);
+            editor.render('#editor');
+            Y.Assert.isInstanceOf(Y.Plugin.EditorPara, editor.editorPara, 'EditorPara was not plugged..');
+            editor.destroy();
+            Y.Assert.areEqual(Y.one('#editor iframe'), null, 'Third Frame was not destroyed');
+        },
+        test_double_plug_setup: function() {
+            editor = new Y.EditorBase({
+                content: 'Hello <b>World</b>!!',
+                extracss: 'b { color: red; }'
+            });
+            Y.Assert.isInstanceOf(Y.EditorBase, editor, 'Forth EditorBase instance can not be created');
+        },
+        test_double_plug: function() {
+            editor.plug(Y.Plugin.EditorPara);
+            editor.plug(Y.Plugin.EditorBR);
+        },
+        test_double_down: function() {
+            Y.Assert.isInstanceOf(Y.Plugin.EditorPara, editor.editorPara, 'EditorPara was not plugged..');
+            editor.render('#editor');
+            editor.destroy();
+            Y.Assert.areEqual(Y.one('#editor frame'), null, 'Forth Frame was not destroyed');
+        },
+        test_double_plug_setup2: function() {
+            editor = new Y.EditorBase({
+                content: 'Hello <b>World</b>!!',
+                extracss: 'b { color: red; }'
+            });
+            Y.Assert.isInstanceOf(Y.EditorBase, editor, 'Forth EditorBase instance can not be created');
+        },
+        test_double_plug2: function() {
+            editor.plug(Y.Plugin.EditorBR);
+            editor.plug(Y.Plugin.EditorPara);
+        },
+        test_double_down2: function() {
+            Y.Assert.isInstanceOf(Y.Plugin.EditorBR, editor.editorBR, 'EditorBR was not plugged..');
+            editor.render('#editor');
+            editor.destroy();
+            Y.Assert.areEqual(Y.one('#editor frame'), null, 'Forth Frame was not destroyed');
+        },
+        _should: {
+            error: {
+                test_double_plug: true,
+                test_double_plug2: true
+            }
         }
     };
     

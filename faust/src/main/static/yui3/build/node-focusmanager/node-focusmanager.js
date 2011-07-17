@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('node-focusmanager', function(Y) {
 
@@ -833,12 +833,16 @@ Y.extend(NodeFocusManager, Y.Plugin.Base, {
 
 			oNode = this._descendants.item(nActiveDescendant);
 
-			if (oNode && oNode.get(DISABLED)) {
-				this._focusNext(event, nActiveDescendant);
-			}
-			else {
-				this.focus(nActiveDescendant);
-			}
+            if (oNode) {
+
+                if (oNode.get("disabled")) {
+                    this._focusNext(event, nActiveDescendant);
+                }
+                else {
+                    this.focus(nActiveDescendant);
+                }
+
+            }
 
 		}
 
@@ -869,14 +873,18 @@ Y.extend(NodeFocusManager, Y.Plugin.Base, {
 				nActiveDescendant = this._lastNodeIndex;
 			}
 
-			oNode = this._descendants.item(nActiveDescendant);
+            oNode = this._descendants.item(nActiveDescendant);
 
-			if (oNode && oNode.get(DISABLED)) {
-				this._focusPrevious(event, nActiveDescendant);
-			}
-			else {
-				this.focus(nActiveDescendant);
-			}
+            if (oNode) {
+
+                if (oNode.get("disabled")) {
+                    this._focusPrevious(event, nActiveDescendant);
+                }
+                else {
+                    this.focus(nActiveDescendant);
+                }
+
+            }
 
 		}
 
@@ -1061,4 +1069,4 @@ Y.namespace("Plugin");
 Y.Plugin.NodeFocusManager = NodeFocusManager;
 
 
-}, '3.2.0' ,{requires:['attribute', 'node', 'plugin', 'node-event-simulate', 'event-key', 'event-focus']});
+}, '3.3.0' ,{requires:['attribute', 'node', 'plugin', 'node-event-simulate', 'event-key', 'event-focus']});

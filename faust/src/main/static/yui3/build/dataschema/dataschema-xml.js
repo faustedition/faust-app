@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('dataschema-xml', function(Y) {
 
@@ -120,7 +120,7 @@ var LANG = Y.Lang,
                             subloc = location.slice(location.indexOf("[")+1, location.indexOf("]"));
                             //XPath is 1-based while DOM is 0-based
                             subloc--;
-                            context = context.childNodes[subloc];
+                            context = context.children[subloc];
                             isNth = true;
                         }
                         // grab attribute value @
@@ -245,7 +245,7 @@ var LANG = Y.Lang,
          *
          * @method _parseResults
          * @param schema {Object} Schema to parse against.
-         * @param context {Object} XML node document parse.
+         * @param context {Object} XML node or document to parse.
          * @param data_out {Object} In-progress schema-parsed data to update.
          * @return {Object} Schema-parsed data.
          * @static
@@ -291,4 +291,4 @@ Y.DataSchema.XML = Y.mix(SchemaXML, Y.DataSchema.Base);
 
 
 
-}, '3.2.0' ,{requires:['dataschema-base']});
+}, '3.3.0' ,{requires:['dataschema-base']});

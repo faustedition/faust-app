@@ -84,7 +84,7 @@ body {
 
 <script>
 
-YUI().use('dd-constrain', 'sortable', function(Y) {
+YUI({ filter: 'raw' }).use('dd-constrain', 'sortable', function(Y) {
     var list1 = new Y.Sortable({
         container: '#list1',
         nodes: 'li',

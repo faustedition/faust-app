@@ -61,7 +61,7 @@ body {
 
 <script>
 
-YUI().use('node', 'yql', function(Y) {
+YUI({ filter: 'raw' }).use('node', 'yql', function(Y) {
     
     var res = Y.one('#res'), count = 0,
         url = '<a href="http://flickr.com/photos/{owner}/{id}"><img src="http://static.flickr.com/{server}/{id}_{secret}_t.jpg"></a>';

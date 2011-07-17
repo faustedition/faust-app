@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('base-base', function(Y) {
 
@@ -80,6 +80,9 @@ YUI.add('base-base', function(Y) {
      */
     function Base() {
         Y.log('constructor called', 'life', 'base');
+
+        // So the object can be used as a hash key (as DD does)
+        Y.stamp(this);
 
         Attribute.call(this);
 
@@ -568,13 +571,13 @@ YUI.add('base-base', function(Y) {
 
         /**
          * Default toString implementation. Provides the constructor NAME
-         * and the instance ID.
+         * and the instance guid, if set.
          *
          * @method toString
          * @return {String} String representation for this object
          */
         toString: function() {
-            return this.constructor.NAME + "[" + Y.stamp(this) + "]";
+            return this.name + "[" + Y.stamp(this, true) + "]";
         }
 
     };
@@ -588,7 +591,7 @@ YUI.add('base-base', function(Y) {
     Y.Base = Base;
 
 
-}, '3.2.0' ,{requires:['attribute-base']});
+}, '3.3.0' ,{requires:['attribute-base']});
 YUI.add('base-pluginhost', function(Y) {
 
     /**
@@ -624,7 +627,7 @@ YUI.add('base-pluginhost', function(Y) {
     Base.unplug = PluginHost.unplug;
 
 
-}, '3.2.0' ,{requires:['base-base', 'pluginhost']});
+}, '3.3.0' ,{requires:['base-base', 'pluginhost']});
 YUI.add('base-build', function(Y) {
 
     /**
@@ -746,13 +749,16 @@ YUI.add('base-build', function(Y) {
         _ctor : function(main, cfg) {
 
            var dynamic = (cfg && false === cfg.dynamic) ? false : true,
-                builtClass = (dynamic) ? build._tmpl(main) : main;
+               builtClass = (dynamic) ? build._tmpl(main) : main,
+               buildCfg = builtClass._yuibuild;
 
-            builtClass._yuibuild = {
-                id: null,
-                exts : [],
-                dynamic: dynamic
-            };
+            if (!buildCfg) {
+                buildCfg = builtClass._yuibuild = {};
+            }
+
+            buildCfg.id = buildCfg.id || null;
+            buildCfg.exts = buildCfg.exts || [];
+            buildCfg.dynamic = dynamic;
 
             return builtClass;
         },
@@ -923,8 +929,8 @@ YUI.add('base-build', function(Y) {
     };
 
 
-}, '3.2.0' ,{requires:['base-base']});
+}, '3.3.0' ,{requires:['base-base']});
 
 
-YUI.add('base', function(Y){}, '3.2.0' ,{use:['base-base', 'base-pluginhost', 'base-build']});
+YUI.add('base', function(Y){}, '3.3.0' ,{after:['attribute-complex'], use:['base-base', 'base-pluginhost', 'base-build']});
 

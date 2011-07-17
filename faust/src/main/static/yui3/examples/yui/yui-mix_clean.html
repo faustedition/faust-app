@@ -46,7 +46,7 @@ class, then read the tutorial below for more information about using
 <input type="button" name="demo_btn" id="demo_btn" value="click"/>
 <div id="demo_logger"></div>
 <script type="text/javascript">
-YUI({filter:"debug", logInclude: {example:true}}).use("node", function(Y) {
+YUI({filter:"debug", logInclude: {"example":true}}).use("node", function(Y) {
     // This method is in the core of the library, so we don't have to use() any
     // additional modules to access it.  However, this example requires 'node'.
 
@@ -62,7 +62,7 @@ YUI({filter:"debug", logInclude: {example:true}}).use("node", function(Y) {
 
             log : function (message) {
                 if (logger) {
-                    logger.set('innerHTML', logger.get('innerHTML') + '<p>' + message + '</p>');
+                    logger.append('<p>' + message + '</p>');
                 }
             }
         }

@@ -108,7 +108,7 @@ body {
 
 
 <script type="text/javascript">
-YUI().use("dump", "node", "dataschema-array", function (Y) {
+YUI({ filter: 'raw' }).use("dump", "node", "dataschema-array", function (Y) {
     Y.on("click", function(e){
         var data_in = [{make:"Chevrolet",model:"Bel Air",year:1957},
                 {make:"Dodge",model:"Dart",year:1964},

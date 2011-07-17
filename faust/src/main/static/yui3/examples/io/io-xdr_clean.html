@@ -52,18 +52,18 @@ body {
 
 <script language="javascript">
 
-YUI().use("io", "substitute", "json-parse",
+YUI({ filter: 'raw' }).use("io-xdr", "substitute", "json-parse", "node",
 
 	function(Y) {
 
 		//Data fetched will be displayed in a UL in the
 		//element #output:
-		var output = Y.Node.get("#output ul");
+		var output = Y.one("#output ul");
 
 		//Configure the cross-domain protocol:
 		var xdrConfig = {
 			id:'flash', //We'll reference this id in the xdr configuration of our transaction.
-			src:'../../build/io/io.swf?stamp=' + new Date().valueOf().toString() //Relative path to the .swf file from the current page.
+			src:'../../build/io/io.swf' //Relative path to the .swf file from the current page.
 		};
 		Y.io.transport(xdrConfig);
 
@@ -139,7 +139,7 @@ YUI().use("io", "substitute", "json-parse",
 		//add the clickHandler as soon as the xdr Flash module has
 		//loaded:
 		Y.on('io:xdrReady', function() {
-			var fetch = Y.Node.get("#fetch");
+			var fetch = Y.one("#fetch");
 			fetch.set("disabled", false);
 			Y.on("click", handleClick, fetch);
 		});

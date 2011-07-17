@@ -256,11 +256,11 @@ YUI(yuiConfig).use('dd', 'anim', 'io', 'cookie', 'json', function(Y) {
         var id = Y.io(url, {
             method: 'GET',
             xdr: { 
-			    use:'flash'
-		    },
+                use:'flash'
+            },
             //XDR Listeners
-		    on: { 
-			    success: function(id, data) {
+            on: { 
+                success: function(id, data) {
                     //On success get the feed data
                     var d = feeds[trans[id]],
                     //Node reference
@@ -270,14 +270,14 @@ YUI(yuiConfig).use('dd', 'anim', 'io', 'cookie', 'json', function(Y) {
                     html = '';
                     
                     //Did we get data?
-		            if (oRSS && oRSS.count) {
+                    if (oRSS && oRSS.count) {
                         //Walk the list and create the news list
-			            Y.each(oRSS.value.items, function(v, k) {
+                        Y.each(oRSS.value.items, function(v, k) {
                             if (k < 5) {
                                 html += '<li><a href="' + v.link + '" target="_blank">' + v.title + '</a>';
                             }
                         });
-		            }
+                    }
                     //Set the innerHTML of the module
                     inner.set('innerHTML', '<ul>' + html + '</ul>');
                     if (Y.DD.DDM.activeDrag) {
@@ -287,11 +287,22 @@ YUI(yuiConfig).use('dd', 'anim', 'io', 'cookie', 'json', function(Y) {
                         
                     }
                 },
-			    failure: function(id, data) {
+                failure: function(id, data) {
                     //Something failed..
-                    alert('Feed failed to load..' + id + ' :: ' + data);
+                    var d = feeds[trans[id]],
+                    //Node reference
+                    inner = d.mod.one('div.inner'),
+                    html = '<ul><li>Feed failed to load..</li></ul>';
+
+                    inner.set('innerHTML', html);
+                    if (Y.DD.DDM.activeDrag) {
+                        //If we are still dragging, update the proxy element too..
+                        var proxy_inner = Y.DD.DDM.activeDrag.get('dragNode').one('div.inner');
+                        proxy_inner.set('innerHTML', html);
+                        
+                    }
                 }
-		    }
+            }
         });
         //Keep track of the transaction
         feeds[data.id].trans = id;

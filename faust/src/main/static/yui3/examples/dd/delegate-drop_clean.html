@@ -89,7 +89,7 @@ body {
 
 <script>
 
-YUI().use('dd-delegate', 'dd-drop-plugin', function(Y) {
+YUI({ filter: 'raw' }).use('dd-delegate', 'dd-drop-plugin', function(Y) {
     var del = new Y.DD.Delegate({
         container: '#demo',
         nodes: 'li'

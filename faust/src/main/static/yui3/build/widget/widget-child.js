@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('widget-child', function(Y) {
 
@@ -142,7 +142,7 @@ Child.ATTRS = {
                     criteria = parent;
 
                 if (FnRootType) {
-                    criteria = (parent && (parent instanceof FnRootType));
+                    criteria = (parent && Y.instanceOf(parent, FnRootType));
                 }
 
                 return (criteria ? getParent(parent) : child);
@@ -377,4 +377,4 @@ Child.prototype = {
 Y.WidgetChild = Child;
 
 
-}, '3.2.0' ,{requires:['base-build', 'widget']});
+}, '3.3.0' ,{requires:['base-build', 'widget']});

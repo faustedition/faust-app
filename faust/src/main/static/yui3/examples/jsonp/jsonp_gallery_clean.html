@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Reusing a JSONPRequest instance to poll a remote server</title>
+<title>Reusing a JSONPRequest Instance to Poll a Remote Server</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -37,7 +37,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>Reusing a JSONPRequest instance to poll a remote server</h1>
+<h1>Reusing a JSONPRequest Instance to Poll a Remote Server</h1>
 
 <div class="exampleIntro">
 	<p>This example shows how to create a reusable JSONPRequest for polling as well as how to configure success and failure callbacks.  See the API docs and user guide for a full listing of available configurations.</p>
@@ -55,7 +55,7 @@ body {
     </div>
 </div>
 <script>
-YUI().use("jsonp", "substitute", "transition",function (Y) {
+YUI({ filter: 'raw' }).use("jsonp", "transition",function (Y) {
 
     var url = "http://yuilibrary.com/gallery/api/random?callback={callback}",
         outputDiv = Y.one("#out"),
@@ -74,11 +74,11 @@ YUI().use("jsonp", "substitute", "transition",function (Y) {
                 }
 
                 // Format the author info and store as a property of the
-                // module object for use by Y.substitute
+                // module object for use by Y.Lang.sub
                 // ('this' refers to the JSONPRequest object by default)
-                module.authorHTML = Y.substitute(this.authorTemplate, author);
+                module.authorHTML = Y.Lang.sub(this.authorTemplate, author);
 
-                outputDiv.setContent(Y.substitute(this.moduleTemplate, module));
+                outputDiv.setContent(Y.Lang.sub(this.moduleTemplate, module));
 
                 // Add some flare to the poll interval by showing a "time left"
                 // indicator via the header's border

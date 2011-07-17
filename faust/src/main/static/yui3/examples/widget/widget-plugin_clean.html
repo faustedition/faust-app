@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Creating a widget plugin</title>
+<title>Creating a Widget Plugin</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -42,7 +42,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>Creating a widget plugin</h1>
+<h1>Creating a Widget Plugin</h1>
 
 <div class="exampleIntro">
 	<p>This example shows how you can use Widget's plugin infrastructure to add
@@ -57,7 +57,7 @@ which, by default, outputs to the <code>Widget</code>'s <code>contentBox</code>.
 
 <div id="demo"></div>
 <script type="text/javascript">
-YUI().use("widget", "gallery-widget-io", function(Y) {
+YUI({ filter: 'raw' }).use("widget", "gallery-widget-io", function(Y) {
     var widget = new Y.Widget();
 
     widget.plug(Y.Plugin.WidgetIO, {

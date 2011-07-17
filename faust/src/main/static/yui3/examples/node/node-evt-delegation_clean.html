@@ -48,7 +48,7 @@ body {
 </ul>
 
 <script type="text/javascript">
-YUI().use("selector-css3", "node", function(Y) {
+YUI({ filter: 'raw' }).use("selector-css3", "node", function(Y) {
     var nodes = Y.all('#demo li');
 
     var onClick = function(e) {

@@ -18,6 +18,13 @@ The YUI Global
         Array
         Core
 
+3.3.0
+* Added fast path for repeat calls to use() with the same arguments.
+* ES5 methods such as Object.create will be used instead of the corresponding YUI implementation when appropriate.
+* Added a destroy method
+* Added YUI.GlobalConfig -- three stage configuration (YUI.GlobalConfig --> YUI_Config --> instance configs)
+  is helpful in non-browser environments for supplying an overarching config for the YUI container.
+
 3.2.0
 
 * script errors in module and use callback functions are caught and routed through Y.error
@@ -85,7 +92,7 @@ The YUI Global
     - added numericSort to Array
     - The yui:log event broadcasts globally.
 
-    Lang: 
+    Lang:
     - Added Lang.type (typeof abstraction), and refactored some 'is' methods to use it.
 
     Get:

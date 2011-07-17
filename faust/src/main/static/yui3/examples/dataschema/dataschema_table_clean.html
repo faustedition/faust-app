@@ -167,7 +167,7 @@ body {
 
 
 <script type="text/javascript">
-YUI().use("dump", "node", "datatype-xml", "dataschema-xml", function (Y) {
+YUI({ filter: 'raw' }).use("dump", "node", "datatype-xml", "dataschema-xml", function (Y) {
     Y.on("click", function(e){
         var tableEl = Y.Node.getDOMNode(Y.one("#simple")),
             schema = {
@@ -187,7 +187,7 @@ YUI().use("dump", "node", "datatype-xml", "dataschema-xml", function (Y) {
                 // Each record is held in a TR
                 schema = {resultListLocator:"tr"},
                 // Each field name is held in a TH
-                thList = tableNode.queryAll("th");
+                thList = tableNode.all("th");
                 
             // Generate field definitions based on TH
             thList.each(function(thNode, i){

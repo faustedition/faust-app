@@ -52,7 +52,7 @@ body {
 
 <script>
 
-YUI().use('node', 'yql', function(Y) {
+YUI({ filter: 'raw' }).use('node', 'yql', function(Y) {
     
     var res = Y.one('#res'),
         zip = '90210';

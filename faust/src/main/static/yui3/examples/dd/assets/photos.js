@@ -5,7 +5,6 @@ YUI(yuiConfig).use('yql', 'node', 'anim', 'dd', 'dd-plugin', 'dd-drop-plugin', '
     wrapper.setStyle('height', (wrapper.get('winHeight') - 50 )+ 'px');
     Y.on('windowresize', function() { wrapper.setStyle('height', (wrapper.get('winHeight') - 50 )+ 'px'); });
     //Make the YQL query.
-    //new Y.yql('select * from flickr.photos.search(100) where text="openhacklondon" and safe_search = 1 and media = "photos" and extras = "o_dims" and ((o_width = "1600" and o_height = "1200") or (o_width = "1200" and o_height = "1600") or (o_width = "800" and o_height = "600") or (o_width = "600" and o_height = "800"))', function(e) {
     Y.YQL('SELECT * FROM flickr.photos.search(100) WHERE (text="yuiconf") AND (safe_search = 1) AND (media = "photos")', function(e) {
         if (e.query) {
             var photos = e.query.results.photo;
@@ -101,7 +100,7 @@ YUI(yuiConfig).use('yql', 'node', 'anim', 'dd', 'dd-plugin', 'dd-drop-plugin', '
     }, document, '#photoList li');
 
     //Stop the drag with the escape key
-    Y.one(document).on('keypress', function(e) {
+    Y.one(document).on('keyup', function(e) {
         //The escape key was pressed
         if ((e.keyCode === 27) || (e.charCode === 27)) {
             //We have an active Drag
@@ -113,11 +112,22 @@ YUI(yuiConfig).use('yql', 'node', 'anim', 'dd', 'dd-plugin', 'dd-drop-plugin', '
     });
     //On the drag:mouseDown add the selected class
     Y.DD.DDM.on('drag:mouseDown', function(e) {
-        e.target.get('node').all('img').addClass('selected');
+        var img = e.target.get('node').one('img');
+        //If it's a gesture event, then we need to act differently
+        if (Y.DD.Drag.START_EVENT.indexOf('gesture') === 0) {
+            if (img.hasClass('selected')) {
+                img.removeClass('selected');
+            } else {
+                img.addClass('selected');
+            }
+        } else {
+            img.removeClass('selected');
+        }
     });
     //On drag start, get all the selected elements
     //Add the count to the proxy element and offset it to the cursor.
     Y.DD.DDM.on('drag:start', function(e) {
+        var img = e.target.get('node').one('img').addClass('selected');
         //How many items are selected
         var count = wrapper.all('img.selected').size();
         //Set the style on the proxy node

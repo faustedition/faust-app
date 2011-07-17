@@ -52,7 +52,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("anim", function(Y) {
+YUI({ filter: 'raw' }).use("anim", function(Y) {
     var anim = new Y.Anim({
         node: '#demo',
         to: { opacity: 0 }

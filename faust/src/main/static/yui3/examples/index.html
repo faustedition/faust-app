@@ -28,8 +28,9 @@
 		<form action="http://search.yahoo.com/search" id="sitesearchform">
             <input name="vs" type="hidden" value="developer.yahoo.com">
             <input name="vs" type="hidden" value="yuiblog.com">
+			<input name="vs" type="hidden" value="yuilibrary.com">
 		    <div id="sitesearch">
-		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+		    	<label for="searchinput">Site Search (YDN, YUILibrary &amp; YUIBlog): </label>
 			    <input type="text" id="searchinput" name="p">
 			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
 		    </div>
@@ -45,7 +46,7 @@
 
 <h2>YUI 3: Index of Examples</h2>
 	
-<p>YUI 3 ships with a series of 177 examples that illustrate the implementation of its components. The examples can be starting points for your exploration, code snippets to jump-start your own programming, or simply inspiration as to how various interaction patterns can be enabled in the web browser via YUI.</p>
+<p>YUI 3 ships with a series of 220 examples that illustrate the implementation of its components. The examples can be starting points for your exploration, code snippets to jump-start your own programming, or simply inspiration as to how various interaction patterns can be enabled in the web browser via YUI.</p>
 
 <p>This page allow you to explore these examples component-by-component; on this page you'll find the full index of library examples with the link and short description of each.</p>
 
@@ -57,7 +58,7 @@
 <tr class='even'><td class='title'><a href='event/event-timing.html'>Using 'available', 'contentready', and 'domready'</a></td><td class='description'>Event Utility gives you control over when you execute your scripts.  In addition to the window's <code>load</code> event, Event Utility lets you know when an element is available, when its children are available, and when the page's full DOM is available.</td></tr>
 <tr class='odd'><td class='title'><a href='event/event-ce.html'>Using Custom Events</a></td><td class='description'>Use the Event Utility to create Custom Events that are bubbleable, preventable, cancelable and much more.</td></tr>
 <tr class='even'><td class='title'><a href='event/event-focus-blur.html'>Skinning via Progressive Enhancement using the Event Utility and the Loader</a></td><td class='description'>Using Progressive Enhancement to skin checkboxes with the help of the Loader and the Event Utility's "focus" and "blur" events and the "delegate" method.</td></tr>
-<tr class='odd'><td class='title'><a href='event/event-synth-hover.html'>Creating a hover event for DOM subscription</a></td><td class='description'>Using the new synthetic event API to simulate a new DOM event that handles the over and out moments of hovering in one subscription.</td></tr>
+<tr class='odd'><td class='title'><a href='event/event-synth-arrow.html'>Creating an Arrow Event for DOM Subscription</a></td><td class='description'>Using the synthetic event API to create a DOM event that fires in response to arrow keys being pressed.</td></tr>
 <tr class='even'><td class='title'><a href='event/swipe-gesture.html'>Supporting A Swipe Left Gesture</a></td><td class='description'>Supporting cross-device swipe gestures, using the event-move gesture events</td></tr>
 </tbody>
 </table>
@@ -74,6 +75,7 @@
 <tr class='odd'><td class='title'><a href='node/node-xy.html'>Node Positioning</a></td><td class='description'>This example demonstrates how to position an element in page coordinates.</td></tr>
 <tr class='even'><td class='title'><a href='node/node-style.html'>Node Styling</a></td><td class='description'>This example demonstrates how to set styles and get style information.</td></tr>
 <tr class='odd'><td class='title'><a href='node/node-insert.html'>Adding Node Content</a></td><td class='description'>This example demonstrates how to insert content into a Node.</td></tr>
+<tr class='even'><td class='title'><a href='node/node-view.html'>Showing and Hiding</a></td><td class='description'>This example demonstrates how to show and hide a Node.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -114,14 +116,21 @@
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h4>AsyncQueue</h4></th></tr></thead>
+<tr><th class='title' colspan='2'><h4>ArraySort</h4></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='async-queue/queue_app.html'>Building a UI with AsyncQueue</a></td><td class='description'>Using AsyncQueue to incrementally construct an application interface</td></tr>
+<tr class='odd'><td class='title'><a href='arraysort/arraysort_basic.html'>Case-insensitve array sorting</a></td><td class='description'>Case-insensitive sorting of strings.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h4>Cache Utility</h4></th></tr></thead>
+<tr><th class='title' colspan='2'><h4>AsyncQueue</h4></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='async-queue/queue_app.html'>Building a UI with AsyncQueue</a></td><td class='description'>This example employs AsyncQueue to incrementally construct an application interface; this illustrates the approach you'd take to allow chunked rendering of the UI in a process-intensive application.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h4>Cache</h4></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='cache/cache_basic.html'>Basic Caching</a></td><td class='description'>Basic caching functionality with the Cache Utility.</td></tr>
 <tr class='even'><td class='title'><a href='cache/cache_offline.html'>Offline Caching</a></td><td class='description'>Offline caching implements HTML 5 localStorage when
@@ -139,7 +148,7 @@
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h4>DataSchema Utility</h4></th></tr></thead>
+<tr><th class='title' colspan='2'><h4>DataSchema</h4></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='dataschema/dataschema_array.html'>DataSchema.Array</a></td><td class='description'>Schema parsing a JavaScript array.</td></tr>
 <tr class='even'><td class='title'><a href='dataschema/dataschema_json.html'>DataSchema.JSON</a></td><td class='description'>Schema parsing JSON data.</td></tr>
@@ -151,7 +160,7 @@
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h4>DataSource Utility</h4></th></tr></thead>
+<tr><th class='title' colspan='2'><h4>DataSource</h4></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='datasource/datasource_local.html'>DataSource.Local</a></td><td class='description'>The Local DataSource manages retrieval of in-page data, from JavaScript arrays and objects to DOM elements.</td></tr>
 <tr class='even'><td class='title'><a href='datasource/datasource_get.html'>DataSource.Get</a></td><td class='description'>The Get DataSource, which manages retrieval of data from remote sources via the Get Utility, can be useful for accessing data from cross-domain servers without the need for a proxy.</td></tr>
@@ -164,7 +173,7 @@
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h4>DataType Utility</h4></th></tr></thead>
+<tr><th class='title' colspan='2'><h4>DataType</h4></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='datatype/datatype_dateformat_lang.html'>Formatting Dates Using Language Resource Bundles</a></td><td class='description'>Formatting dates into strings using pre-packaged language resource bundles.</td></tr>
 <tr class='even'><td class='title'><a href='datatype/datatype_dateformat.html'>DataType.Date.format()</a></td><td class='description'>Formatting dates into strings.</td></tr>
@@ -180,21 +189,21 @@
 <tr><th class='title' colspan='2'><h4>Drag &amp; Drop</h4></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='dd/simple-drag.html'>Simple Drag</a></td><td class='description'>This example shows a simple drag interaction that doesn't require a drop interaction.</td></tr>
-<tr class='even'><td class='title'><a href='dd/drag-plugin.html'>Drag Node Plugin</a></td><td class='description'>This example shows using the Drag Node Plugin.</td></tr>
+<tr class='even'><td class='title'><a href='dd/drag-plugin.html'>Drag Node Plugin</a></td><td class='description'>This example shows how to apply the Drag Plugin to a node</td></tr>
 <tr class='odd'><td class='title'><a href='dd/proxy-drag.html'>Proxy Drag</a></td><td class='description'>This example shows a simple proxy drag interaction that doesn't require a drop interaction.</td></tr>
-<tr class='even'><td class='title'><a href='dd/constrained-drag.html'>Drag Constrained to a Region</a></td><td class='description'>This example shows how to constrain a draggable Node to another Nodes region.</td></tr>
+<tr class='even'><td class='title'><a href='dd/constrained-drag.html'>Drag Constrained to a Region</a></td><td class='description'>This example shows how to constrain a draggable Node to another Node's region.</td></tr>
 <tr class='odd'><td class='title'><a href='dd/groups-drag.html'>Interaction Groups</a></td><td class='description'>Using interaction groups, this example demonstrates how to tie into the Drag & Drop Utility's interesting moments to provide visual affordances for the current drag operation.</td></tr>
 <tr class='even'><td class='title'><a href='dd/shim-drag.html'>Using the Drag Shim</a></td><td class='description'>This example shows the use of the drag shim when dragging nodes over other troublesome nodes.</td></tr>
 <tr class='odd'><td class='title'><a href='dd/anim-drop.html'>Animated Drop Targets</a></td><td class='description'>This example will show you how to make an animated node a Drop target.</td></tr>
 <tr class='even'><td class='title'><a href='dd/drop-code.html'>Drop Based Coding</a></td><td class='description'>This example shows how to use the Drop Target events to code your application.</td></tr>
-<tr class='odd'><td class='title'><a href='dd/winscroll.html'>Window Scrolling</a></td><td class='description'>Using the Window Scroll plugin</td></tr>
-<tr class='even'><td class='title'><a href='dd/delegate.html'>Drag Delegation</a></td><td class='description'>Using DD.Delgate for multiple items</td></tr>
-<tr class='odd'><td class='title'><a href='dd/delegate-drop.html'>Drag Delegation with a Drop Target</a></td><td class='description'>Using DD.Delgate for dragging multiple items and dropping on a Drop Target.</td></tr>
-<tr class='even'><td class='title'><a href='dd/delegate-plugins.html'>Using Drag plugins with Delegate</a></td><td class='description'>Using Drag plugins with Delegate</td></tr>
-<tr class='odd'><td class='title'><a href='dd/list-drag.html'>List reorder w/Bubbling</a></td><td class='description'>This example shows how to make a sortable list using Custom Event Bubbling.</td></tr>
-<tr class='even'><td class='title'><a href='dd/scroll-list.html'>List reorder w/Scrolling</a></td><td class='description'>This example shows how to make a sortable list using Custom Event Bubbling and Node Scrolling.</td></tr>
+<tr class='odd'><td class='title'><a href='dd/winscroll.html'>Window Scrolling</a></td><td class='description'>This example shows how you can use the DD Scroll plugin to scroll the browser window as you drag.</td></tr>
+<tr class='even'><td class='title'><a href='dd/delegate.html'>Drag Delegation</a></td><td class='description'>This example shows how you can use DD.Delegate to create a scalable solution which supports multiple draggable items.</td></tr>
+<tr class='odd'><td class='title'><a href='dd/delegate-drop.html'>Drag Delegation with a Drop Target</a></td><td class='description'>This example uses DD.Delegate to support dragging multiple items and dropping them onto a Drop Target.</td></tr>
+<tr class='even'><td class='title'><a href='dd/delegate-plugins.html'>Using Drag Plugins with Delegate</a></td><td class='description'>This example show how you can use the Drag plugins with a DD Delegate based solution.</td></tr>
+<tr class='odd'><td class='title'><a href='dd/list-drag.html'>List Reorder w/Bubbling</a></td><td class='description'>This example shows how to make a sortable list using Custom Event Bubbling.</td></tr>
+<tr class='even'><td class='title'><a href='dd/scroll-list.html'>List Reorder w/Scrolling</a></td><td class='description'>This example shows how to make a sortable list using Custom Event Bubbling and Node Scrolling.</td></tr>
 <tr class='odd'><td class='title'><a href='dd/portal-drag.html'>Portal Style Example</a></td><td class='description'>Portal style example using Drag & Drop Event Bubbling and Animation.</td></tr>
-<tr class='even'><td class='title'><a href='dd/photo-browser.html'>Photo Browser</a></td><td class='description'>Example Photo Browser application.</td></tr>
+<tr class='even'><td class='title'><a href='dd/photo-browser.html'>Photo Browser</a></td><td class='description'>An example Photo Browser application.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -206,7 +215,7 @@
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h4>History Utility</h4></th></tr></thead>
+<tr><th class='title' colspan='2'><h4>History</h4></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='history/history_tabview.html'>History + TabView</a></td><td class='description'>This example demonstrates how to add browser history support to a TabView widget using the History Utility.</td></tr>
 </tbody>
@@ -241,22 +250,41 @@
 <thead>
 <tr><th class='title' colspan='2'><h4>JSON</h4></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='json/json_connect.html'>JSON with Y.io</a></td><td class='description'>Use JSON to parse data received from Y.io calls</td></tr>
-<tr class='even'><td class='title'><a href='json/json_freeze_thaw.html'>Rebuilding class instances from JSON data</a></td><td class='description'>Using the replacer and reviver parameters to reconstitute object instances</td></tr>
-<tr class='odd'><td class='title'><a href='json/json_convert_values.html'>Adding new object members during parsing</a></td><td class='description'>Using a currency conversion calculation to add a new price member to a JSON response</td></tr>
+<tr class='odd'><td class='title'><a href='json/json_connect.html'>JSON with Y.io</a></td><td class='description'>Use JSON to parse data received via XMLHttpRequest via <a href='http://developer.yahoo.com/yui/3/io/'>Y.io</a> calls — a simple JSON use case.</td></tr>
+<tr class='even'><td class='title'><a href='json/json_freeze_thaw.html'>Rebuilding Class Instances from JSON Data</a></td><td class='description'>Use the <em>replacer</em> and <em>reviver</em> parameters to reconstitute object instances that have been serialized to JSON.</td></tr>
+<tr class='odd'><td class='title'><a href='json/json_convert_values.html'>Adding New Object Members During Parsing</a></td><td class='description'>Use a currency conversion calculation to add a new price member to a JSON response, demonstrating how JSON data, once retrieved, can be transformed during parsing.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
 <thead>
 <tr><th class='title' colspan='2'><h4>JSONP</h4></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='jsonp/jsonp_github.html'>Getting cross domain JSON data using Y.jsonp()</a></td><td class='description'>Get basic <a href='http://github.com'>GitHub</a> user info using a <code>Y.jsonp(url, callback)</code>.</td></tr>
-<tr class='even'><td class='title'><a href='jsonp/jsonp_gallery.html'>Reusing a JSONPRequest instance to poll a remote server</a></td><td class='description'>Create a reusable JSONPRequest object to poll the YUILibrary.com Gallery web service, fetching info on a random Gallery module.</td></tr>
+<tr class='odd'><td class='title'><a href='jsonp/jsonp_github.html'>Getting Cross Domain JSON Data Using Y.jsonp()</a></td><td class='description'>Get basic <a href='http://github.com'>GitHub</a> user info using a <code>Y.jsonp(url, callback)</code>.</td></tr>
+<tr class='even'><td class='title'><a href='jsonp/jsonp_gallery.html'>Reusing a JSONPRequest Instance to Poll a Remote Server</a></td><td class='description'>Create a reusable JSONPRequest object to poll the YUILibrary.com Gallery web service, fetching info on a random Gallery module.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
 <thead>
-<tr><th class='title' colspan='2'><h4>Sortable List Utility</h4></th></tr></thead>
+<tr><th class='title' colspan='2'><h4>Recordset</h4></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='recordset/recordset_basic.html'>Basic Recordset</a></td><td class='description'>Shows how to instantiate and interact with a standard Recordset by adding, removing and updating records/objects. Explains the events that are fired, and shows how to access the built-in hash table that stores records by their YUIDs.</td></tr>
+<tr class='even'><td class='title'><a href='recordset/recordset_filter.html'>Recordset Filter Plugin</a></td><td class='description'>Shows how to use filtering methods to Recordset. Key-value filtering, and filtering by providing a custom function are covered.</td></tr>
+<tr class='odd'><td class='title'><a href='recordset/recordset_indexer.html'>Recordset Indexer Plugin</a></td><td class='description'>Shows how to create and access hash tables on Recordset. Tables are kept in sync through events fired by Recordset.</td></tr>
+<tr class='even'><td class='title'><a href='recordset/recordset_sort.html'>Recordset Sort Plugin</a></td><td class='description'>Shows how to sort a Recordset using the default sorter, or a custom sort function. Additionally, demonstrates how convenience attributes help in determining when Recordset is in a sorted state, and what the last sort parameters were.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h4>Resize</h4></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='resize/simple-resize.html'>Simple Resize</a></td><td class='description'>This example shows a simple resize implemenation.</td></tr>
+<tr class='even'><td class='title'><a href='resize/con-resize.html'>Simple Resize with Constrain Plugin</a></td><td class='description'>This example shows a simple resize implementation that utilizes the <code>ResizeConstrained</code> plugin to set min/max dimensions and to lock in the resized element's aspect ratio.</td></tr>
+<tr class='odd'><td class='title'><a href='resize/image-resize.html'>8-way Image Resize</a></td><td class='description'>This example shows an 8-way image resize, providing the CSS needed for a common image-resize visual treatment.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h4>Sortable</h4></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='sortable/simple-sortable.html'>Simple Sortable List</a></td><td class='description'>Simple Sortable list example</td></tr>
 <tr class='even'><td class='title'><a href='sortable/sortable-float.html'>Simple Sortable List - Floated Nodes</a></td><td class='description'>Simple Sortable list example with floated nodes.</td></tr>
@@ -270,7 +298,7 @@
 <thead>
 <tr><th class='title' colspan='2'><h4>StyleSheet</h4></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='stylesheet/stylesheet_theme.html'>Adjusting a page theme on the fly</a></td><td class='description'>Use StyleSheet to adjust the CSS rules applying a page theme from user input</td></tr>
+<tr class='odd'><td class='title'><a href='stylesheet/stylesheet_theme.html'>Adjusting a Page Theme on the Fly</a></td><td class='description'>Use StyleSheet to adjust the CSS rules applying a page theme from user input</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -279,6 +307,7 @@
 <tbody>
 <tr class='odd'><td class='title'><a href='transition/transition-basic.html'>Basic Node Transitions</a></td><td class='description'>Demonstrates the basic usage of Transitions.</td></tr>
 <tr class='even'><td class='title'><a href='transition/transition-usage.html'>Using Node Transitions</a></td><td class='description'>Demonstrates more advanced usage of Transitions.</td></tr>
+<tr class='odd'><td class='title'><a href='transition/transition-view.html'>Showing and Hiding with Transitions</a></td><td class='description'>Demonstrates how to animate Node's show and hide methods.</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -294,9 +323,9 @@
 <thead>
 <tr><th class='title' colspan='2'><h4>YQL Query</h4></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='yql/simple-yql.html'>Simple YQL Query</a></td><td class='description'>Simple YQL Query</td></tr>
-<tr class='even'><td class='title'><a href='yql/yql-flickr-requery.html'>YQL Flickr Requery</a></td><td class='description'>Querying Flickr for photos</td></tr>
-<tr class='odd'><td class='title'><a href='yql/yql-oauth.html'>YQL 2-Legged oAuth</a></td><td class='description'>YQL 2-Legged oAuth</td></tr>
+<tr class='odd'><td class='title'><a href='yql/simple-yql.html'>Simple YQL Query</a></td><td class='description'>Create a simple YQL Query to retrieve data from the Yahoo! Weather YQL table.</td></tr>
+<tr class='even'><td class='title'><a href='yql/yql-flickr-requery.html'>YQL Flickr Requery</a></td><td class='description'>Use the Flickr Recent Photos YQL table to pull in a small set of recent Flickr images every 8 seconds.</td></tr>
+<tr class='odd'><td class='title'><a href='yql/yql-oauth.html'>YQL 2-Legged oAuth</a></td><td class='description'>Use YQL Query and the oAuth YUI Gallery module to make an authenticated YQL request to the Yahoo! News Search web service</td></tr>
 </tbody>
 </table>
 
@@ -316,15 +345,72 @@
 <thead>
 <tr><th class='title' colspan='2'><h4>Widget</h4></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='widget/widget-extend.html'>Extending the base widget class</a></td><td class='description'>Shows how to extend the base widget class, to create your own Widgets.</td></tr>
-<tr class='even'><td class='title'><a href='widget/widget-build.html'>Creating custom widget classes</a></td><td class='description'>Shows how to use Base.build to create custom Widget classes.</td></tr>
-<tr class='odd'><td class='title'><a href='widget/widget-plugin.html'>Creating a widget plugin</a></td><td class='description'>Shows how to create an IO plugin for Widget</td></tr>
-<tr class='even'><td class='title'><a href='widget/widget-tooltip.html'>Creating a simple Tooltip widget</a></td><td class='description'>Shows how to extend the Widget class, and add WidgetPosition and WidgetStack to create a Tooltip widget class.</td></tr>
-<tr class='odd'><td class='title'><a href='widget/widget-parentchild-listbox.html'>Creating a hierarchical ListBox widget</a></td><td class='description'>Shows how to extend the Widget class, and add WidgetParent and WidgetChild to create a simple ListBox widget.</td></tr>
+<tr class='odd'><td class='title'><a href='widget/widget-extend.html'>Extending the Base Widget Class</a></td><td class='description'>Shows how to extend the base widget class, to create your own Widgets.</td></tr>
+<tr class='even'><td class='title'><a href='widget/widget-build.html'>Creating Custom Widget Classes</a></td><td class='description'>Shows how to use Base.build to create custom Widget classes.</td></tr>
+<tr class='odd'><td class='title'><a href='widget/widget-plugin.html'>Creating a Widget Plugin</a></td><td class='description'>Shows how to create an IO plugin for Widget</td></tr>
+<tr class='even'><td class='title'><a href='widget/widget-tooltip.html'>Creating a Simple Tooltip Widget</a></td><td class='description'>Shows how to extend the Widget class, and add WidgetPosition and WidgetStack to create a Tooltip widget class.</td></tr>
+<tr class='odd'><td class='title'><a href='widget/widget-parentchild-listbox.html'>Creating a Hierarchical ListBox Widget</a></td><td class='description'>Shows how to extend the Widget class, and add WidgetParent and WidgetChild to create a simple ListBox widget.</td></tr>
 </tbody>
 </table>
 
 <h3>YUI 3 Widgets</h3><table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h4>AutoComplete</h4></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_local.html'>Basic Local Data</a></td><td class='description'>How to provide autocomplete suggestions from a local array.</td></tr>
+<tr class='even'><td class='title'><a href='autocomplete/ac_jsonp.html'>Remote Data via JSONP</a></td><td class='description'>How to provide autocomplete suggestions using a remote JSONP source.</td></tr>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_yql.html'>Remote Data via YQL</a></td><td class='description'>How to provide autocomplete suggestions using a YQL query source.</td></tr>
+<tr class='even'><td class='title'><a href='autocomplete/ac_datasource.html'>Remote Data via DataSource</a></td><td class='description'>How to provide autocomplete suggestions using a DataSource instance.</td></tr>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_tagging.html'>Tag Completion using Query Delimiters</a></td><td class='description'>How to implement delimited tag completion.</td></tr>
+<tr class='even'><td class='title'><a href='autocomplete/ac_flickr.html'>Find Photos on Flickr (Custom Formatting, YQL Source)</a></td><td class='description'>How to find and select Flickr photos using a YQL source and a custom autocomplete result formatter.</td></tr>
+<tr class='odd'><td class='title'><a href='autocomplete/ac_filter.html'>Filter a Set of Existing Items on the Page</a></td><td class='description'>How to use autocomplete-base to filter a set of existing items on a page.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h4>Charts</h4></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='charts/charts-simple.html'>Basic Charts Implementation</a></td><td class='description'>Shows how to create a simple chart.</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-multiseries.html'>Chart with Multiple Series</a></td><td class='description'>Chart with multiple series.</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-column.html'>Specify Chart Type</a></td><td class='description'>Specify the type of chart.</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-stackedcolumn.html'>Create Stacked Chart</a></td><td class='description'>Creates a stacked column chart.</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-timeaxis.html'>Create a Chart with a Time Axis</a></td><td class='description'>Creates a chart with a Time Axis.</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-gridlines.html'>Add Gridlines to a Chart</a></td><td class='description'>Adds gridlines to a chart.</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-stackedarea.html'>Create Stacked Area Chart with Planar Based Events</a></td><td class='description'>Creates a stacked area chart with planar based events.</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-globalstyles.html'>Customize a Chart</a></td><td class='description'>Customize a chart with its global styles object.</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-customizedtooltip.html'>Customize a Chart's Tooltip</a></td><td class='description'>Customize a tooltip using the tooltip attribute.</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-objectstyles.html'>Define a Chart's Axes and Series</a></td><td class='description'>Specify axes and series in a chart.</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-pie.html'>Pie Chart</a></td><td class='description'>Shows how to create a pie chart.</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-dualaxes.html'>Dual Axes Chart</a></td><td class='description'>Shows how to create a chart with multiple axes.</td></tr>
+<tr class='odd'><td class='title'><a href='charts/charts-axisupdate.html'>Update Chart Axis</a></td><td class='description'>Shows how access and update a chart's axis.</td></tr>
+<tr class='even'><td class='title'><a href='charts/charts-seriesupdate.html'>Update Chart Series</a></td><td class='description'>Shows how access and update a chart's series.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h4>DataTable</h4></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='datatable/datatable_basic.html'>Basic DataTable</a></td><td class='description'>This example illustrates simple DataTable use cases.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/datatable_dsget.html'>DataTable + DataSource.Get + JSON Data</a></td><td class='description'>DataTable loaded with JSON data from a remote webservice via DataSource.Get</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/datatable_dsio.html'>DataTable + DataSource.IO + XML Data</a></td><td class='description'>DataTable loaded with XML data from a remote webservice via DataSource.IO.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/datatable_formatting.html'>Formatting Row Data for Display</a></td><td class='description'>Custom format data for display.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/datatable_nestedcols.html'>Nested Column Headers</a></td><td class='description'>DataTable with nested column headers.</td></tr>
+<tr class='even'><td class='title'><a href='datatable/datatable_sort.html'>Column Sorting</a></td><td class='description'>DataTable with column sorting.</td></tr>
+<tr class='odd'><td class='title'><a href='datatable/datatable_scroll.html'>Scrolling DataTable</a></td><td class='description'>DataTable with vertical and/or horizontal scrolling rows.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
+<thead>
+<tr><th class='title' colspan='2'><h4>Dial</h4></th></tr></thead>
+<tbody>
+<tr class='odd'><td class='title'><a href='dial/dial-basic.html'>Basic Dial</a></td><td class='description'>Create a Dial from existing markup on the page — a simple use case.</td></tr>
+<tr class='even'><td class='title'><a href='dial/dial-text-input.html'>Dial Linked With Text Input</a></td><td class='description'>Link a Dial with a text input field.</td></tr>
+<tr class='odd'><td class='title'><a href='dial/dial-image-background.html'>Dial With Image Background</a></td><td class='description'>Use image backgrounds to control the visual display of a Dial.</td></tr>
+<tr class='even'><td class='title'><a href='dial/dial-image-surrounding.html'>Dial With a Surrounding Image</a></td><td class='description'>Use images to surround a Dial instance and provide additional styling.</td></tr>
+<tr class='odd'><td class='title'><a href='dial/dial-interactive.html'>Dial With Interactive UI</a></td><td class='description'>This example employs Dial to drive an interactive UI.</td></tr>
+</tbody>
+</table>
+<table class='examplesTable'>
 <thead>
 <tr><th class='title' colspan='2'><h4>Overlay</h4></th></tr></thead>
 <tbody>
@@ -351,8 +437,8 @@
 <thead>
 <tr><th class='title' colspan='2'><h4>ScrollView</h4></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='scrollview/scrollview-base.html'>Basic ScrollView without a Scroll Indicator</a></td><td class='description'>ScrollView without a Scroll Indicator</td></tr>
-<tr class='even'><td class='title'><a href='scrollview/scrollview.html'>ScrollView with Scroll Indicator</a></td><td class='description'>ScrollView with a Scroll Indicator</td></tr>
+<tr class='odd'><td class='title'><a href='scrollview/scrollview-base.html'>Basic ScrollView Without a Scroll Indicator</a></td><td class='description'>ScrollView without a Scroll Indicator</td></tr>
+<tr class='even'><td class='title'><a href='scrollview/scrollview.html'>ScrollView with Scroll Indicator and Link Suppression Behavior.</a></td><td class='description'>This example shows the classic Scrollview implementation, including scroll indicators (bars) and including code to suppress link navigation while scrolling.</td></tr>
 <tr class='odd'><td class='title'><a href='scrollview/scrollview-horiz.html'>Horizontal ScrollView</a></td><td class='description'>Horizontal ScrollView</td></tr>
 <tr class='even'><td class='title'><a href='scrollview/scrollview-paging.html'>ScrollView Paginator Plugin</a></td><td class='description'>ScrollView Paginator Plugin</td></tr>
 </tbody>
@@ -362,8 +448,8 @@
 <tr><th class='title' colspan='2'><h4>Slider</h4></th></tr></thead>
 <tbody>
 <tr class='odd'><td class='title'><a href='slider/slider_basic.html'>Basic Sliders</a></td><td class='description'>The basics of setting up a horizontal and vertical Slider</td></tr>
-<tr class='even'><td class='title'><a href='slider/slider_from_markup.html'>Creating a Slider from existing markup</a></td><td class='description'>Creating a horizontal Slider from existing markup</td></tr>
-<tr class='odd'><td class='title'><a href='slider/slider_skin.html'>Alternate skins</a></td><td class='description'>Specifying an alternate skin for a Slider instance</td></tr>
+<tr class='even'><td class='title'><a href='slider/slider_from_markup.html'>Creating a Slider from Existing Markup</a></td><td class='description'>Creating a horizontal Slider from existing markup</td></tr>
+<tr class='odd'><td class='title'><a href='slider/slider_skin.html'>Alternate Skins</a></td><td class='description'>Specifying an alternate skin for a Slider instance</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -381,16 +467,16 @@
 <thead>
 <tr><th class='title' colspan='2'><h4>Console</h4></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='console/console_basic.html'>Creating a Console for debugging</a></td><td class='description'>The basics of setting up a Console</td></tr>
-<tr class='even'><td class='title'><a href='console/console_yui_config.html'>YUI configuration to filter log messages</a></td><td class='description'>Using your YUI instance configuration to filter which messages are reported in the Console</td></tr>
-<tr class='odd'><td class='title'><a href='console/console_global.html'>Creating a universal Console</a></td><td class='description'>Using the Console's logSource attribute to consolidate log messages from multiple YUI instances into one Console</td></tr>
+<tr class='odd'><td class='title'><a href='console/console_basic.html'>Creating a Console for Debugging</a></td><td class='description'>The basics of setting up a Console</td></tr>
+<tr class='even'><td class='title'><a href='console/console_yui_config.html'>YUI Configuration to Filter Log Messages</a></td><td class='description'>Using your YUI instance configuration to filter which messages are reported in the Console</td></tr>
+<tr class='odd'><td class='title'><a href='console/console_global.html'>Creating a Universal Console</a></td><td class='description'>Using the Console's logSource attribute to consolidate log messages from multiple YUI instances into one Console</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
 <thead>
 <tr><th class='title' colspan='2'><h4>Plugin.ConsoleFilters</h4></th></tr></thead>
 <tbody>
-<tr class='odd'><td class='title'><a href='console-filters/console-filters_intro.html'>Using the ConsoleFilters plugin</a></td><td class='description'>Adding the ConsoleFilters plugin to a Console instance for more granular run time log message filtering</td></tr>
+<tr class='odd'><td class='title'><a href='console-filters/console-filters_intro.html'>Using the ConsoleFilters Plugin</a></td><td class='description'>Adding the ConsoleFilters plugin to a Console instance for more granular run time log message filtering</td></tr>
 </tbody>
 </table>
 <table class='examplesTable'>
@@ -483,13 +569,13 @@
 <div id="toc">
 	
 <ul>
-<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="selected "><a title="Examples of every YUI utility and control in action" href="../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="selected "><a title="Examples of every YUI utility and control in action" href="../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Get - Functional Examples" href="../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../examples/intl/index.html">Internationalization</a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Recordset - Functional Examples" href="../examples/recordset/index.html">Recordset <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Resize - Functional Examples" href="../examples/resize/index.html">Resize <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Sortable - Functional Examples" href="../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Transition - Functional Examples" href="../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="AutoComplete - Functional Examples" href="../examples/autocomplete/index.html">AutoComplete <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Charts - Functional Examples" href="../examples/charts/index.html">Charts <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataTable - Functional Examples" href="../examples/datatable/index.html">DataTable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Dial - Functional Examples" href="../examples/dial/index.html">Dial <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Editor - Functional Examples" href="../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Overlay - Functional Examples" href="../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="ScrollView - Functional Examples" href="../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="TabView - Functional Examples" href="../examples/tabview/index.html">TabView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
 </div>
 </div>
 	</div><!--closes bd-->
 
 	<div id="ft">
-        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p class="first">Copyright &copy; 2011 Yahoo! Inc. All rights reserved.</p>
         <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
             <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
             <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 

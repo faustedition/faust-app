@@ -77,7 +77,7 @@ Percent uploaded:
 
 <script>
 
-YUI().use("uploader", function (Y) {
+YUI({ filter: 'raw' }).use("uploader", function (Y) {
 
 var uploader = new Y.Uploader({boundingBox:"#selectButton", 
 							   buttonSkin:"assets/selectFileButton.png",

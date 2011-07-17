@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Creating a simple Tooltip widget</title>
+<title>Creating a Simple Tooltip Widget</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -67,7 +67,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>Creating a simple Tooltip widget</h1>
+<h1>Creating a Simple Tooltip Widget</h1>
 
 <div class="exampleIntro">
 	This is an advanced example, in which we create a Tooltip widget, by extending the base <code>Widget</code> class, and adding <code>WidgetStack</code> and <code>WidgetPosition</code> extensions, through <code>Base.build</code>.			
@@ -84,7 +84,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("event-mouseenter", "widget", "widget-position", "widget-stack", function(Y) {
+YUI({ filter: 'raw' }).use("event-mouseenter", "widget", "widget-position", "widget-stack", function(Y) {
     var Lang = Y.Lang,
         Node = Y.Node,
         OX = -10000,

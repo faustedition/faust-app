@@ -39,9 +39,9 @@ body {
 
 <div class="exampleIntro">
 	OfflineCache stores data in HTML 5 localStorage when available so that data
-    persists across browser sessions. When localStorage is unavailable (i.e.,
-    IE6 and IE7) data is simply cached in local JavaScript memory and will not
-    persist across browser sessions.			
+    persists across browser sessions. When localStorage is disabled or
+    altogether unavailable (i.e., IE6 and IE7) data is simply cached in local
+    JavaScript memory and will not persist across browser sessions.			
 </div>
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
@@ -88,7 +88,7 @@ body {
 
 
 <script type="text/javascript">
-YUI().use("node", "datatype-number", "cache-offline" ,function (Y) {
+YUI({ filter: 'raw' }).use("node", "datatype-number", "cache-offline" ,function (Y) {
     var cache1 = new Y.CacheOffline({sandbox:"instance1"});
 
     Y.on("click", function(e){

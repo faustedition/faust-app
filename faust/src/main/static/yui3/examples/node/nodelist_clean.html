@@ -33,26 +33,29 @@ body {
 <h1>NodeList</h1>
 
 <div class="exampleIntro">
-	<p>This example demonstrates how to use a NodeList instance to work with multiple nodes.</p>
+	<p>This example demonstrates how to use a <code>NodeList</code> instance to work with multiple nodes.</p>
 			
 </div>
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
 
 <ul id="demo">
-    <li>lorem</li>
-    <li>ispum</li>
-    <li>dolor</li>
-    <li>sit</li>
+    <li>Click me</li>
+    <li>Click me</li>
+    <li>Click me</li>
+    <li>Click me</li>
 </ul>
 
 <script type="text/javascript">
-YUI().use("node", function(Y) {
+YUI({ filter: 'raw' }).use("node", function(Y) {
     var nodes = Y.all('#demo li');
 
     var onClick = function(e) {
-        this.setContent('thanks from all of us!'); // this === nodes
-        e.currentTarget.setStyle('backgroundColor', 'green'); // e.currentTarget === #demo li
+        // this === nodes
+        this.setContent('thanks from all of us!');
+
+        // e.currentTarget === #demo li
+        e.currentTarget.setStyle('backgroundColor', 'green');
     };
 
     nodes.on('click', onClick);

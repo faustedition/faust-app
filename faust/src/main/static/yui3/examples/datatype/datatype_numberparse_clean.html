@@ -55,7 +55,7 @@ body {
 
 
 <script type="text/javascript">
-YUI().use("node", "datatype-number", function (Y) {
+YUI({ filter: 'raw' }).use("node", "datatype-number", function (Y) {
     Y.on("submit", function(e){
         e.halt();
         

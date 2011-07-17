@@ -44,7 +44,7 @@ Click the X to run the animation.</p>
     <a href="#">x</a>
 </div>
 <script type="text/javascript">
-YUI(  {filter: 'raw'}).use("transition", function(Y) {
+YUI({ filter: 'raw' }).use("transition", function(Y) {
     var node = Y.one('#demo');
 
     node.one('a').on('click', function(e) {
@@ -59,7 +59,7 @@ YUI(  {filter: 'raw'}).use("transition", function(Y) {
             top: '100px',
             opacity: 0
         }, function() {
-            node.destroy(true); 
+            this.remove(); 
         });
     });
 });

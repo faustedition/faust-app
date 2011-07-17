@@ -69,7 +69,7 @@ function(Y) {
         used[used.length] = k;
     });
     used.sort();
-    node.set('innerHTML', '<strong>Modules Loaded:</strong> ' + used.join(', '));
+    node.setContent('<strong>Modules Loaded:</strong> ' + used.join(', '));
 });
 </script>
 

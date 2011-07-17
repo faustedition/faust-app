@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 .yui3-scrollview-scrollbar {
     opacity: 1;
@@ -18,7 +18,7 @@ build: 2676
 }
 
 .yui3-scrollview-scrollbar-horiz {
-    top:auto; 
+    top:auto;
     height: 8px;
     width: 20px;
     bottom: 1px;

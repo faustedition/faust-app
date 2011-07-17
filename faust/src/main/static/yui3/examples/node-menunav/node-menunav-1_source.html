@@ -11,7 +11,7 @@
 		<link rel="stylesheet" type="text/css" href="../../build/cssgrids/grids-min.css">
 		<link rel="stylesheet" type="text/css" href="../../build/cssbase/base-min.css">
 
-		<link rel="stylesheet" type="text/css" href="assets/node-menunav-examples-base.css">
+        <link rel="stylesheet" type="text/css" href="assets/node-menunav-examples-base.css">
 
 		<script type="text/javascript">
 
@@ -197,7 +197,7 @@
 			//	script and CSS for the MenuNav Node Plugin and all of the required 
 			//	dependencies.
 
-			YUI().use("node-menunav", function(Y) {
+			Y = YUI({ filter: 'raw' }).use("node-menunav", function(Y) {
 
 				//	Retrieve the Node instance representing the root menu
 				//	(<div id="productsandservices">) and call the "plug" method

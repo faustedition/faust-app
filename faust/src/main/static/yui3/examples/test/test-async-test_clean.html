@@ -64,7 +64,7 @@ body {
 
 <div id="testLogger"></div>
 <script type="text/javascript">
-YUI().use("node", "console", "test",function (Y) {
+YUI({ filter: 'raw' }).use("node", "console", "test",function (Y) {
 
     Y.namespace("example.test");
     

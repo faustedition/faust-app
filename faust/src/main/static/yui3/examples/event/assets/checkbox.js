@@ -2,9 +2,9 @@ YUI().use("*", function(Y) {
 
 	var UA = Y.UA,
 		getClassName = Y.ClassNameManager.getClassName,
-		sCheckboxFocusClass = getClassName("checkbox", "focus"),	// Create yui-checkbox-focus
-		sCheckboxCheckedClass = getClassName("checkbox", "checked"),	// Create yui-checkbox-checked
-		sCheckboxActiveClass = getClassName("checkbox", "active"),	// Create yui-checkbox-active
+		sCheckboxFocusClass = getClassName("checkbox", "focus"),	// Create yui3-checkbox-focus
+		sCheckboxCheckedClass = getClassName("checkbox", "checked"),	// Create yui3-checkbox-checked
+		sCheckboxActiveClass = getClassName("checkbox", "active"),	// Create yui3-checkbox-active
 		bKeyListenersInitialized = false,
 		bMouseListenersInitialized = false,
 		forAttr = (UA.ie && UA.ie < 8) ? "htmlFor" : "for",
@@ -38,7 +38,7 @@ YUI().use("*", function(Y) {
 
 	var getCheckbox = function (node) {
 
-		return (node.hasClass("yui-checkbox") ? node : node.ancestor(".yui3-checkbox"));
+		return (node.hasClass("yui3-checkbox") ? node : node.ancestor(".yui3-checkbox"));
 
 	};
 
@@ -289,12 +289,12 @@ YUI().use("*", function(Y) {
 
 	};
 
-	Y.all("#checkboxes>div>span").addClass("yui-checkbox");
+	Y.all("#checkboxes>div>span").addClass("yui3-checkbox");
 
-	//	Remove the "yui-checkboxes-loading" class used to hide the 
+	//	Remove the "yui3-checkboxes-loading" class used to hide the 
 	//	checkboxes now that the checkboxes have been skinned.
 
-	Y.one("#checkboxes").get("ownerDocument").get("documentElement").removeClass("yui-checkboxes-loading");
+	Y.one("#checkboxes").removeClass("yui3-checkboxes-loading");
 
 	//	Add the minimum number of event listeners needed to start, bind the 
 	//	rest when needed

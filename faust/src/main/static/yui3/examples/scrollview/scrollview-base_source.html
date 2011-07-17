@@ -8,70 +8,75 @@
         <style>
             /* Avoid resource latency for these, since they hide unenhanced content */
             .yui3-js-enabled .yui3-scrollview-loading {
-                display:none;
+                visibility:hidden;
             }
-            
+
             #additional-content {
                 display:none;
             }
         </style>
 
-        <link rel="stylesheet" href="assets/examples.css" type="text/css" charset="utf-8">
-        <link media="handheld, only screen and (max-device-width: 480px)" href="assets/examples-smallscreen.css" type="text/css" rel="stylesheet" charset="utf-8">
+        <link rel="stylesheet" href="../../build/cssreset/reset-min.css" type="text/css" charset="utf-8">
 
-        <script src="../../build/yui/yui.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="assets/vertical.css" type="text/css" charset="utf-8">
+        <link media="handheld, only screen and (max-device-width: 480px)" href="assets/vertical-smallscreen.css" type="text/css" rel="stylesheet" charset="utf-8">
+
+        <script src="../../build/yui/yui-min.js" type="text/javascript" charset="utf-8"></script>
     </head>
 
-    <body class="yui-skin-sam">
-        <div id="scrollheader">
-            <h1>Basic ScrollView</h1>
-        </div>
-        <div id="scrollable" class="yui3-scrollview-loading">
-            <ul>
-                <li><div>AC/DC</div></li>
-                <li><div>Aerosmith</div></li>
-                <li><div>Billy Joel</div></li>
-                <li><div>Bob Dylan</div></li>
-                <li><div>Bob Seger</div></li>
-                <li><div>Bon Jovi</div></li>
-                <li><div>Bruce Springsteen</div></li>
-                <li><div>Creed</div></li>
-                <li><div>Creedence Clearwater Revival</div></li>
-                <li><div>Dave Matthews Band</div></li>
-                <li><div>Def Leppard</div></li>
-                <li><div>Eagles</div></li>
-                <li><div>Eminem</div></li>
-                <li><div>Fleetwood Mac</div></li>
-                <li><div>Green Day</div></li>
-                <li><div>Guns N' Roses</div></li>
-                <li><div>James Taylor</div></li>
-                <li><div>Jay-Z</div></li>
-                <li><div>Jimi Hendrix</div></li>
-                <li><div>Led Zeppelin</div></li>
-                <li><div>Lynyrd Skynyrd</div></li>
-                <li><div>Metallica</div></li>
-                <li><div>Motley Crue</div></li>
-                <li><div>Neil Diamond</div></li>
-                <li><div>Nirvana</div></li>
-                <li><div>Ozzy Osbourne</div></li>
-                <li><div>Pearl Jam</div></li>
-                <li><div>Pink Floyd</div></li>
-                <li><div>Queen</div></li>
-                <li><div>Rod Stewart</div></li>
-                <li><div>Rush</div></li>
-                <li><div>Santana</div></li>
-                <li><div>Simon and Garfunkel</div></li>
-                <li><div>Steve Miller Band</div></li>
-                <li><div>The Beatles</div></li>
-                <li><div>The Doors</div></li>
-                <li><div>The Police</div></li>
-                <li><div>The Rolling Stones</div></li>
-                <li><div>Tom Petty</div></li>
-                <li><div>U2</div></li>
-                <li><div>Van Halen</div></li>
-                <li><div>Willie Nelson</div></li>
-                <li><div>ZZ Top</div></li>
-            </ul>
+    <body class="yui3-skin-sam">
+
+        <div id="scrollview-container">
+            <div id="scrollview-header">
+                <h1>Basic ScrollView</h1>
+            </div>
+            <div id="scrollview-content" class="yui3-scrollview-loading">
+                <ul>
+                    <li>AC/DC</li>
+                    <li>Aerosmith</li>
+                    <li>Billy Joel</li>
+                    <li>Bob Dylan</li>
+                    <li>Bob Seger</li>
+                    <li>Bon Jovi</li>
+                    <li>Bruce Springsteen</li>
+                    <li>Creed</li>
+                    <li>Creedence Clearwater Revival</li>
+                    <li>Dave Matthews Band</li>
+                    <li>Def Leppard</li>
+                    <li>Eagles</li>
+                    <li>Eminem</li>
+                    <li>Fleetwood Mac</li>
+                    <li>Green Day</li>
+                    <li>Guns N' Roses</li>
+                    <li>James Taylor</li>
+                    <li>Jay-Z</li>
+                    <li>Jimi Hendrix</li>
+                    <li>Led Zeppelin</li>
+                    <li>Lynyrd Skynyrd</li>
+                    <li>Metallica</li>
+                    <li>Motley Crue</li>
+                    <li>Neil Diamond</li>
+                    <li>Nirvana</li>
+                    <li>Ozzy Osbourne</li>
+                    <li>Pearl Jam</li>
+                    <li>Pink Floyd</li>
+                    <li>Queen</li>
+                    <li>Rod Stewart</li>
+                    <li>Rush</li>
+                    <li>Santana</li>
+                    <li>Simon and Garfunkel</li>
+                    <li>Steve Miller Band</li>
+                    <li>The Beatles</li>
+                    <li>The Doors</li>
+                    <li>The Police</li>
+                    <li>The Rolling Stones</li>
+                    <li>Tom Petty</li>
+                    <li>U2</li>
+                    <li>Van Halen</li>
+                    <li>Willie Nelson</li>
+                    <li>ZZ Top</li>
+                </ul>
+            </div>
         </div>
 
         <div id="additional-content">
@@ -83,11 +88,15 @@
 
             YUI().use('scrollview-base', function(Y) {
 
-                document.body.onselectstart = function() { return false; }
-
                 var scrollView = new Y.ScrollView({
-                    srcNode: '#scrollable',
-                    height: 310
+                    id:"scrollview",
+                    srcNode: '#scrollview-content',
+                    height: 310,
+                    flick: {
+                        minDistance:10,
+                        minVelocity:0.3,
+                        axis: "y"
+                    }
                 });
 
                 scrollView.render();

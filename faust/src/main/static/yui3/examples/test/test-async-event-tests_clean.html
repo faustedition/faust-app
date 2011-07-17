@@ -65,7 +65,7 @@ body {
 <div id="testLogger"></div>
 <div id="testDiv" style="left:0;position:absolute;width:10px;height:10px; background-color:red"></div>
 <script type="text/javascript">
-YUI().use("anim", "console", "test",function (Y) {
+YUI({ filter: 'raw' }).use("anim", "console", "test",function (Y) {
 
     Y.namespace("example.test");
     

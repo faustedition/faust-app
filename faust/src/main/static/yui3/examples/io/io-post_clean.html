@@ -51,13 +51,13 @@ body {
 
 <script>
 
-YUI().use("io",
+YUI({ filter: 'raw' }).use("io-base", "node",
 
 	function(Y) {
 
 		//Get a reference to the Node that we are using
 		//to report results:
-		var div = Y.Node.get('#container ul');
+		var div = Y.one('#container ul');
 
 		//A function handler to use for successful requests:
 		var handleSuccess = function(ioId, o){

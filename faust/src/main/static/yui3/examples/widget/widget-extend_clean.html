@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Extending the base widget class</title>
+<title>Extending the Base Widget Class</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -96,7 +96,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>Extending the base widget class</h1>
+<h1>Extending the Base Widget Class</h1>
 
 <div class="exampleIntro">
 	This example shows how to extend the base <code>Widget</code> class to create a simple, re-usable spinner control. The <code>Spinner</code> class created in the example is not intended to be a fully featured spinner. It is used here as a concrete example, to convey some of the key concepts to keep in mind when extending the <code>Widget</code> class.
@@ -111,7 +111,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("event-key", "widget", function(Y) {
+YUI({ filter: 'raw' }).use("event-key", "widget", function(Y) {
 
     var Lang = Y.Lang,
         Widget = Y.Widget,
@@ -161,6 +161,11 @@ YUI().use("event-key", "widget", function(Y) {
         // Amount to increment/decrement the spinner when the page up/down keys are pressed.
         majorStep : {
             value:10
+        },
+
+        // override default ("null"), required for focus()
+        tabIndex: {
+            value: 0
         },
 
         // The strings for the spinner UI. This attribute is 

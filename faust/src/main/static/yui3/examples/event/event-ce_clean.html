@@ -74,7 +74,7 @@ Bubble Target."></p>
 <script language="javascript">
 
 //Create a YUI instance:
-YUI().use("node", "event-custom-complex",
+YUI({ filter: 'raw' }).use("node", "event-custom-complex",
 
 function(Y) {
 
@@ -167,14 +167,13 @@ function(Y) {
     //button, for example.
     Y.on("click", function(e) {
         //clear out the logger:
-        logger.set("innerHTML", "");
+        logger.empty();
         p.fire("publisher:testEvent");
     }, "#fire");
 
     //write out log messages to the page:
     Y.on("yui:log", function(e) {
-        var s = logger.get("innerHTML");
-        logger.set("innerHTML", s + "<li>" + e.msg + "</li>");
+        logger.append("<li>" + e.msg + "</li>");
     });
 
 });

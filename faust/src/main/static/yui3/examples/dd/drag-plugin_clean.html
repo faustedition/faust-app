@@ -29,7 +29,7 @@ body {
 <h1>Drag Node Plugin</h1>
 
 <div class="exampleIntro">
-	<p>This example shows using the Drag Node Plugin.</p>
+	<p>This example shows how to apply the Drag Plugin to a node.</p>
 			
 </div>
 
@@ -61,7 +61,7 @@ body {
 
 <script>
 
-YUI().use('dd-plugin', function(Y) {
+YUI({ filter: 'raw' }).use('dd-plugin', function(Y) {
     var node = Y.one('#demo');
     node.plug(Y.Plugin.Drag);
     node.dd.addHandle('h2');

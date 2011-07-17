@@ -48,7 +48,7 @@ body {
 </dl>
 
 <script type="text/javascript">
-YUI().use("node", function(Y) {
+YUI({ filter: 'raw' }).use("node", function(Y) {
     var onClick = function(e) {
         var target = e.target,
             h, w;

@@ -46,7 +46,7 @@ body {
 
 
 <script type="text/javascript">
-YUI().use("node", function(Y) {
+YUI({ filter: 'raw' }).use("node", function(Y) {
     var onClick = function(e) {
         var node = e.currentTarget;
         if (!node.one('dl')) { // only create the DL once

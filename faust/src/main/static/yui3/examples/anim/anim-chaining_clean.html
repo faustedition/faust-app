@@ -54,7 +54,7 @@ body {
 </div>
 <p>This is placeholder text used to demonstrate how the above animation affects subsequent content.</p> 
 <script type="text/javascript">
-YUI().use("anim", function(Y) {
+YUI({ filter: 'raw' }).use("anim", function(Y) {
     var anim = new Y.Anim({
         node: '#demo',
         to: { opacity: 0 }

@@ -48,13 +48,13 @@ body {
 
 <script language="javascript">
 
-YUI().use("io",
+YUI({ filter: 'raw' }).use("io-base", "node",
 
 	function(Y) {
 
 		//Get a Node reference to the div we'll use for displaying
 		//results:
-		var div = Y.Node.get('#weatherModule');
+		var div = Y.one('#weatherModule');
 
 		//Define a function to handle a successful response from
 		//Yahoo! Weather.  The success handler will find the response
@@ -82,7 +82,7 @@ YUI().use("io",
 		//and compose/dispatch the IO request:
 		function getModule(){
 			//Get the input value:
-			var iZip = Y.Node.get('#zip').get("value");
+			var iZip = Y.one('#zip').get("value");
 
 			//Create a querystring from the input value:
 			var queryString = encodeURI('?p=' + iZip);

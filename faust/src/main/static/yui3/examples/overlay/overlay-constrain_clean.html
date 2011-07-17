@@ -110,7 +110,7 @@ body {
 </div>
 
 <script type="text/javascript">
-YUI().use("overlay", "slider", function(Y) {
+YUI({ filter: 'raw' }).use("overlay", "slider", function(Y) {
 
     /* Create Overlay from script */
     var overlay = new Y.Overlay({

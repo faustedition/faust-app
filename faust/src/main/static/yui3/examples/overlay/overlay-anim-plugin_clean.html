@@ -81,7 +81,7 @@ Clicking the "Unplug AnimPlugin" button, will restore the original non-Animated 
 <button type="button" id="plug">Plug AnimPlugin (duration:0.5)</button>
 
 <script type="text/javascript">
-YUI().use("overlay", "anim", "plugin", function(Y) {
+YUI({ filter: 'raw' }).use("overlay", "anim", "plugin", function(Y) {
 
     /* Animation Plugin Constructor */
     function AnimPlugin(config) {

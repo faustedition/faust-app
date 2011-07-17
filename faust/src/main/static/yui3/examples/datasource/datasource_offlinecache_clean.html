@@ -37,7 +37,8 @@ body {
 <h1>DataSource with Offline Cache</h1>
 
 <div class="exampleIntro">
-	<p>The DataSourceCache plugin enables caching on any DataSource to reduce high-latency calls to remote sources and to reduce server load.< The plugin can point to <code>Y.OfflineCache</code> to allow cached data to persist across browser sessions in browsers that support <a href="http://dev.w3.org/html5/webstorage/" title="Web Storage">HTML5 localStorage</a>.</p>			
+	<p>The DataSourceCache plugin enables caching on any DataSource to reduce high-latency calls to remote sources and to reduce server load. The plugin can point to <code>Y.OfflineCache</code> to allow cached data to persist across browser sessions in browsers that support <a href="http://dev.w3.org/html5/webstorage/" title="Web Storage">HTML5 localStorage</a>.</p>
+			
 </div>
 
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
@@ -46,14 +47,14 @@ body {
     <h6>Send request to Yahoo! Web Search Webservice:</h6>
     <input type="input" id="demo_input_query" name="p">
     <input type="submit" id="demo_query_retrieve" value="Retrieve data">
-    <input type="button" id="demo_cache_clear" value="Clear cache =>">
+    <input type="button" id="demo_cache_clear" value="Clear cache">
     <div id="demo_output_response" class="output"></div>
 </form>
 
 
 
 <script type="text/javascript">
-YUI().use("dump", "node", "datasource-get", "datasource-jsonschema", "datasource-cache", "cache-offline", "datatype-date" ,function (Y) {
+YUI({ filter: 'raw' }).use("dump", "node", "datasource-get", "datasource-jsonschema", "datasource-cache", "cache-offline", "datatype-date" ,function (Y) {
     var output = Y.one("#demo_output_response"),
         source = "remote source",
         myDataSource = new Y.DataSource.Get({source:"http://query.yahooapis.com/v1/public/yql?format=json&"}),

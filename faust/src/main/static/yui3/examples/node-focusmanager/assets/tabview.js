@@ -11,11 +11,10 @@ YUI().use("*", function (Y) {
 
 	tabView.addClass("yui3-tabview");
 
-	//	Remove the "yui3-loading" class from the documentElement
-	//	now that the necessary YUI dependencies are loaded and the 
+	//	Remove the "yui3-loading" class now that the necessary YUI dependencies are loaded and the 
 	//	tabview has been skinned.
 
-	tabView.get("ownerDocument").get("documentElement").removeClass("yui3-loading");
+	tabView.removeClass("yui3-tabview-loading");
 
 	//	Apply the ARIA roles, states and properties.
 

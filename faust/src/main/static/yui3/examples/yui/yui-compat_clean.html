@@ -82,7 +82,7 @@ We will make a 2.x Calendar Control draggable with 3.x Drag &amp; Drop and use 3
 
 <script>
 
-YUI({filter:"debug", logInclude: {example:true}}).use('dd-drag', 'yui2-calendar', 'yui2-logger', function(Y) {
+YUI({filter:"debug", logInclude: {"example":true}}).use('dd-drag', 'yui2-calendar', 'yui2-logger', function(Y) {
 
     //This will make your YUI 2 code run unmodified
     var YAHOO = Y.YUI2,
@@ -101,7 +101,7 @@ YUI({filter:"debug", logInclude: {example:true}}).use('dd-drag', 'yui2-calendar'
         var d = dates[0][0],
             dateStr = d[1] + '/' + d[2] + '/' + d[0];
 
-        Y.one('#results').set('innerHTML', 'You clicked on: ' + dateStr);
+        Y.one('#results').setContent('You clicked on: ' + dateStr);
     });
     cal1.render();
 });

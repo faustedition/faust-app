@@ -33,7 +33,7 @@ YUI().use("*", function (Y) {
 
 		boundingBox.setAttrs({
 			role: "menu",
-			"aria-labelledby": menuButton.get("id")
+			"aria-labelledby": menuLabelID
 		});
 
 		boundingBox.all("input").set("role", "menuitem");
@@ -144,7 +144,7 @@ YUI().use("*", function (Y) {
 
 		boundingBox.delegate("click", function (event) {
 
-			alert("You clicked " + this.query("input").get("value"));
+			alert("You clicked " + this.one("input").get("value"));
 
 			contentBox.focusManager.blur();
 			menu.hide();
@@ -160,7 +160,7 @@ YUI().use("*", function (Y) {
 			var focusManager = contentBox.focusManager;
 
 			if (focusManager.get("focused")) {
-				focusManager.focus(this.query("input"));
+				focusManager.focus(this.one("input"));
 			}
 
 		}, "li");
@@ -195,11 +195,11 @@ YUI().use("*", function (Y) {
 	Y.one("#menu-1").setStyle("display", "none");
 
 
-	//	Remove the "yui3-loading" class from the documentElement
+	//	Remove the "yui3-menubutton-loading" class from the parent container
 	//	now that the necessary YUI dependencies are loaded and the 
 	//	menu button has been skinned.
 
-	menuButton.get("ownerDocument").get("documentElement").removeClass("yui3-loading");
+	menuButton.ancestor(".yui3-menubutton-loading").removeClass("yui3-menubutton-loading");
 
 
 	//	Apply the ARIA roles, states and properties to the anchor.
@@ -242,6 +242,16 @@ YUI().use("*", function (Y) {
 
 	menuButton.set("tabIndex", 0);
 
+    //  Since there is some intermediary markup (<span>s) between the anchor element with the role 
+    //  of "button" applied and the text label for the anchor - we need to use the 
+    //  "aria-labelledby" attribute to ensure that screen readers announce the text label for the 
+    //  button.
+
+    var menuLabel = menuButton.one("span span"),
+        menuLabelID = Y.stamp(menuLabel);
+
+    menuLabel.set("id", menuLabelID);
+    menuButton.set("aria-labelledby", menuLabelID);
 
 	var showMenu = function (event) {
 

@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('dd-scroll', function(Y) {
 
@@ -402,7 +402,6 @@ YUI.add('dd-scroll', function(Y) {
                         Y.error('DDNodeScroll: Invalid Node Given: ' + node);
                     }
                 } else {
-                    n = n.item(0);
                     this.set(PARENT_SCROLL, n);
                 }
                 return n;
@@ -431,4 +430,4 @@ YUI.add('dd-scroll', function(Y) {
 
 
 
-}, '3.2.0' ,{requires:['dd-drag'], skinnable:false, optional:['dd-proxy']});
+}, '3.3.0' ,{requires:['dd-drag'], skinnable:false, optional:['dd-proxy']});

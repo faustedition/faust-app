@@ -52,7 +52,7 @@ body {
 </ul>
 
 <script type="text/javascript">
-YUI().use("node", function(Y) {
+YUI({ filter: 'raw' }).use("node", function(Y) {
     var onClick = function(e) {
         var node = Y.one('#demo2').appendChild(e.currentTarget);
         node.addClass('yui3-pass');

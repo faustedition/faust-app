@@ -71,7 +71,7 @@ the second using the shorter, method chaining style.</p>
 </div>
 <script type="text/javascript">
 // Create a YUI instance and request the slider module and its dependencies
-YUI().use("slider", function (Y) {
+YUI({ filter: 'raw' }).use("slider", function (Y) {
 
 var xInput,  // input tied to xSlider
     yInput,  // input tied to ySlider

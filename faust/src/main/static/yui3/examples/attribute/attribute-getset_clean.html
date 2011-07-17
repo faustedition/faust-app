@@ -147,7 +147,7 @@ body {
 
 <script type="text/javascript">
 // Get a new YUI instance 
-YUI().use("node", "attribute", function(Y) {
+YUI({ filter: 'raw' }).use("node", "attribute", function(Y) {
 
     var boxParent = Y.one("#boxParent");
 

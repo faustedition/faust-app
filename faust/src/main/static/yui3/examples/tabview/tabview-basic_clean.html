@@ -22,7 +22,13 @@ body {
 
 
 <!--begin custom header content for this example-->
+<style id="yui3-style-overrides">
 
+#main #example-canvas .yui3-tabview .yui3-tab-selected a {
+	color:white;
+}
+
+</style>
 <!--end custom header content for this example-->
 
 </head>
@@ -58,7 +64,7 @@ body {
     </div>
 </div>
 <script type="text/javascript">
-YUI({filter:'raw'}).use("yui", "tabview", function(Y) {
+YUI({ filter: 'raw' }).use("yui", "tabview", function(Y) {
     var tabview = new Y.TabView({srcNode:'#demo'});
     tabview.render();
 });

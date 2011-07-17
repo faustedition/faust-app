@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('io-base', function(Y) {
 
@@ -173,6 +173,7 @@ YUI.add('io-base', function(Y) {
         }
         else {
             o.c = {};
+			o.t = 'io:iframe';
         }
 
         return o;
@@ -180,12 +181,15 @@ YUI.add('io-base', function(Y) {
 
 
     function _destroy(o) {
-        // IE, when using XMLHttpRequest as an ActiveX Object, will throw
-        // a "Type Mismatch" error if the event handler is set to "null".
-        if (w && w.XMLHttpRequest) {
-            if (o.c) {
+        if (w) {
+            if (o.c && w.XMLHttpRequest) {
                 o.c.onreadystatechange = null;
             }
+			else if (Y.UA.ie === 6 && !o.t) {
+				// IE, when using XMLHttpRequest as an ActiveX Object, will throw
+				// a "Type Mismatch" error if the event handler is set to "null".
+				o.c.abort();
+			}
         }
 
         o.c = null;
@@ -444,21 +448,28 @@ YUI.add('io-base', function(Y) {
 
         for (p in _headers) {
             if (_headers.hasOwnProperty(p)) {
+				/*
                 if (h[p]) {
-                    // Configuration headers will supersede io preset headers,
+                    // Configuration headers will supersede preset io headers,
                     // if headers match.
                     continue;
                 }
                 else {
                     h[p] = _headers[p];
                 }
+				*/
+				if (!h[p]) {
+					h[p] = _headers[p];
+				}
             }
         }
 
         for (p in h) {
             if (h.hasOwnProperty(p)) {
-                o.setRequestHeader(p, h[p]);
-            }
+				if (h[p] !== 'disable') {
+                	o.setRequestHeader(p, h[p]);
+				}
+			}
         }
     }
 
@@ -526,12 +537,7 @@ YUI.add('io-base', function(Y) {
         var status;
 
         try {
-            if (o.c.status && o.c.status !== 0) {
-                status = o.c.status;
-            }
-            else {
-                status = 0;
-            }
+			status = (o.c.status && o.c.status !== 0) ? o.c.status : 0;
         }
         catch(e) {
             status = 0;
@@ -813,7 +819,7 @@ YUI.add('io-base', function(Y) {
 
 
 
-}, '3.2.0' ,{optional:['querystring-stringify-simple'], requires:['event-custom-base']});
+}, '3.3.0' ,{requires:['event-custom-base', 'querystring-stringify-simple']});
 
 YUI.add('io-form', function(Y) {
 
@@ -909,7 +915,7 @@ YUI.add('io-form', function(Y) {
 
 
 
-}, '3.2.0' ,{requires:['io-base','node-base']});
+}, '3.3.0' ,{requires:['io-base','node-base']});
 
 YUI.add('io-xdr', function(Y) {
 
@@ -950,12 +956,12 @@ YUI.add('io-xdr', function(Y) {
     */
     _rS = {},
 
-    ie = w && w.XDomainRequest,
-
     // Document reference
     d = Y.config.doc,
     // Window reference
-    w = Y.config.win;
+    w = Y.config.win,
+	// IE8 cross-origin request detection
+    ie = w && w.XDomainRequest;
 
    /**
     * @description Method that creates the Flash transport swf.
@@ -1032,7 +1038,7 @@ YUI.add('io-xdr', function(Y) {
             return { id: o.id, c: { responseText: s, responseXML: x } };
         }
         else {
-            return { id: o.id, status: o.e };
+            return { id: o.id, e: o.e };
         }
 
     }
@@ -1087,36 +1093,44 @@ YUI.add('io-xdr', function(Y) {
         * @param {object} c - configuration object for the transaction.
         */
         xdr: function(uri, o, c) {
-            if (c.on && c.xdr.use === 'flash') {
-                _cB[o.id] = {
-                    on: c.on,
-                    context: c.context,
-                    arguments: c.arguments
-                };
-                // These properties cannot be serialized across Flash's
-                // ExternalInterface.  Doing so will result in exceptions.
-                c.context = null;
-                c.form = null;
-                o.c.send(uri, c, o.id);
-            }
-            else if (ie) {
-                _evt(o, c);
-                o.c.open(c.method || 'GET', uri);
-                o.c.send(c.data);
-            }
-            else {
-                o.c.send(uri, o, c);
-            }
+			if (c.xdr.use === 'flash') {
+				_cB[o.id] = {
+					on: c.on,
+					context: c.context,
+					arguments: c.arguments
+				};
+				// These properties cannot be serialized across Flash's
+				// ExternalInterface.  Doing so will result in exceptions.
+				c.context = null;
+				c.form = null;
 
-            return {
-                id: o.id,
-                abort: function() {
-                    return o.c ? _abort(o, c) : false;
-                },
-                isInProgress: function() {
-                    return o.c ? _isInProgress(o.id) : false;
-                }
-            };
+				w.setTimeout(function() {
+					if (o.c && o.c.send) {
+						o.c.send(uri, c, o.id);
+					}
+					else {
+						Y.io.xdrResponse(o, c, 'transport error');
+					}
+				}, Y.io.xdr.delay);
+			}
+			else if (ie) {
+				_evt(o, c);
+				o.c.open(c.method || 'GET', uri);
+				o.c.send(c.data);
+			}
+			else {
+				o.c.send(uri, o, c);
+			}
+
+			return {
+				id: o.id,
+				abort: function() {
+					return o.c ? _abort(o, c) : false;
+				},
+				isInProgress: function() {
+					return o.c ? _isInProgress(o.id) : false;
+				}
+			};
         },
 
        /**
@@ -1147,7 +1161,7 @@ YUI.add('io-xdr', function(Y) {
                 }
             }
 
-            switch (e.toLowerCase()) {
+            switch (e) {
                 case 'start':
                     Y.io.start(o.id, c);
                     break;
@@ -1155,16 +1169,14 @@ YUI.add('io-xdr', function(Y) {
                     Y.io.complete(o, c);
                     break;
                 case 'success':
-                    Y.io.success(t || f ?  _data(o, f, t) : o, c);
+                    Y.io.success(t || f ? _data(o, f, t) : o, c);
                     delete m[o.id];
                     break;
                 case 'timeout':
                 case 'abort':
+				case 'transport error':
+					o.e = e;
                 case 'failure':
-                    if (e === ('abort' || 'timeout')) {
-                        o.e = e;
-                    }
-
                     Y.io.failure(t || f ? _data(o, f, t) : o, c);
                     delete m[o.id];
                     break;
@@ -1183,6 +1195,7 @@ YUI.add('io-xdr', function(Y) {
         * @return void
         */
         xdrReady: function(id) {
+			Y.io.xdr.delay = 0;
             Y.fire(E_XDR_READY, id);
         },
 
@@ -1196,22 +1209,36 @@ YUI.add('io-xdr', function(Y) {
         * @return void
         */
         transport: function(o) {
-            var id = o.yid ? o.yid : Y.id;
-                o.id = o.id || 'flash';
+            var yid = o.yid || Y.id,
+				oid = o.id || 'flash',
+				src = Y.UA.ie ? o.src + '?d=' + new Date().valueOf().toString() : o.src;
 
-            if (o.id === 'native' || o.id === 'flash') {
-                _swf(o.src, id);
+            if (oid === 'native' || oid === 'flash') {
+
+				_swf(src, yid);
                 this._transport.flash = d.getElementById('yuiIoSwf');
             }
-            else {
+            else if (oid) {
                 this._transport[o.id] = o.src;
             }
         }
     });
 
+   /**
+	* @description Delay value to calling the Flash transport, in the
+	* event io.swf has not finished loading.  Once the E_XDR_READY
+    * event is fired, this value will be set to 0.
+	*
+	* @property delay
+	* @public
+	* @static
+	* @type number
+	*/
+	Y.io.xdr.delay = 50;
 
 
-}, '3.2.0' ,{requires:['io-base','datatype-xml']});
+
+}, '3.3.0' ,{requires:['io-base','datatype-xml']});
 
 YUI.add('io-upload-iframe', function(Y) {
 
@@ -1224,7 +1251,8 @@ YUI.add('io-upload-iframe', function(Y) {
 
     var w = Y.config.win,
         d = Y.config.doc,
-        str = (d.documentMode && d.documentMode === 8);
+        _std = (d.documentMode && d.documentMode >= 8),
+		_d = decodeURIComponent;
    /**
     * @description Parses the POST data object and creates hidden form elements
     * for each key-value, and appends them to the HTML form object.
@@ -1243,8 +1271,8 @@ YUI.add('io-upload-iframe', function(Y) {
         for (i = 0, l = m.length - 1; i < l; i++) {
             o[i] = d.createElement('input');
             o[i].type = 'hidden';
-            o[i].name = m[i].substring(m[i].lastIndexOf('&') + 1);
-            o[i].value = (i + 1 === l) ? m[i + 1] : m[i + 1].substring(0, (m[i + 1].lastIndexOf('&')));
+            o[i].name = _d(m[i].substring(m[i].lastIndexOf('&') + 1));
+            o[i].value = (i + 1 === l) ? _d(m[i + 1]) : _d(m[i + 1].substring(0, (m[i + 1].lastIndexOf('&'))));
             f.appendChild(o[i]);
         }
 
@@ -1264,7 +1292,7 @@ YUI.add('io-upload-iframe', function(Y) {
     function _removeData(f, o) {
         var i, l;
 
-        for(i = 0, l = o.length; i < l; i++){
+        for (i = 0, l = o.length; i < l; i++) {
             f.removeChild(o[i]);
         }
     }
@@ -1284,12 +1312,11 @@ YUI.add('io-upload-iframe', function(Y) {
         f.setAttribute('action', uri);
         f.setAttribute('method', 'POST');
         f.setAttribute('target', 'ioupload' + id );
-        f.setAttribute(Y.UA.ie && !str ? 'encoding' : 'enctype', 'multipart/form-data');
+        f.setAttribute(Y.UA.ie && !_std ? 'encoding' : 'enctype', 'multipart/form-data');
     }
 
    /**
-    * @description Sets the appropriate attributes and values to the HTML
-    * form, in preparation of a file upload transaction.
+    * @description Reset the HTML form attributes to their original values.
     * @method _resetAttrs
     * @private
     * @static
@@ -1301,7 +1328,7 @@ YUI.add('io-upload-iframe', function(Y) {
         var p;
 
         for (p in a) {
-            if (a.hasOwnProperty(a, p)) {
+            if (a.hasOwnProperty(p)) {
                 if (a[p]) {
                     f.setAttribute(p, f[p]);
                 }
@@ -1383,7 +1410,7 @@ YUI.add('io-upload-iframe', function(Y) {
         if (b) {
             // When a response Content-Type of "text/plain" is used, Firefox and Safari
             // will wrap the response string with <pre></pre>.
-            p = b.query('pre:first-child');
+            p = b.one('pre:first-child');
             o.c.responseText = p ? p.get('text') : b.get('text');
         }
         else {
@@ -1491,7 +1518,7 @@ YUI.add('io-upload-iframe', function(Y) {
 
 
 
-}, '3.2.0' ,{requires:['io-base','node-base']});
+}, '3.3.0' ,{requires:['io-base','node-base']});
 
 YUI.add('io-queue', function(Y) {
 
@@ -1697,9 +1724,9 @@ YUI.add('io-queue', function(Y) {
 
 
 
-}, '3.2.0' ,{requires:['io-base','queue-promote']});
+}, '3.3.0' ,{requires:['io-base','queue-promote']});
 
 
 
-YUI.add('io', function(Y){}, '3.2.0' ,{use:['io-base', 'io-form', 'io-xdr', 'io-upload-iframe', 'io-queue']});
+YUI.add('io', function(Y){}, '3.3.0' ,{use:['io-base', 'io-form', 'io-xdr', 'io-upload-iframe', 'io-queue']});
 

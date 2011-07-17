@@ -34,7 +34,7 @@ body {
 
 <div class="exampleIntro">
 	<p>This example shows how to position an element based on the document XY coordinate system.</p>
-
+<p>Click anywhere on the page, and the little orange box will move to the click position.</p>
 			
 </div>
 
@@ -43,7 +43,7 @@ body {
 <span id="demo"></span>
 
 <script type="text/javascript">
-YUI().use("node", function(Y) {
+YUI({ filter: 'raw' }).use("node", function(Y) {
     var onClick = function(e) {
         Y.one('#demo').setXY([e.pageX, e.pageY]);
     };

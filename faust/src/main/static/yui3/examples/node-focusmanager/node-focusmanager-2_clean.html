@@ -77,21 +77,11 @@ body {
 
 	/*	Hide the list while it is being transformed into a tabview.	*/
 
-	.yui3-loading #tabview-1 {
+	.yui3-js-enabled .yui3-tabview-loading {
 		display: none;
 	}
 
 </style>
-<script type="text/javascript">
-
-	//	Add a class to the documentElement to prevent the user from seeing 
-	//	the unstyled tabview while the necessary CSS and JavaScript 
-	//	dependancies are being fetched.
-
-	document.documentElement.className = "yui3-loading";
-
-</script>
-
 <!--end custom header content for this example-->
 
 </head>
@@ -113,7 +103,7 @@ Node's support for the
 <!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
 
 <h3 id="tabview-heading">Today's News</h3>
-<div id="tabview-1">
+<div id="tabview-1" class="yui3-tabview-loading">
     <ul>
         <li class="yui3-tab yui3-tab-selected"><a href="#top-stories"><em>Top Stories</em></a></li>
         <li class="yui3-tab"><a href="#world-news"><em>World</em></a></li>
@@ -125,43 +115,43 @@ Node's support for the
         <div class="yui3-tabpanel yui3-tabpanel-selected" id="top-stories">
 			<h3>Top Stories</h3>
 			<ul>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/quran_burning"><q>US church to go ahead with Sept. 11 Quran burning 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_re_us/us_congresswoman_shot"><q>Officer stopped suspect on day of Ariz. shooting 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/us_house_stakes"><q>Grim outlook for Democrats puts House up for grabs 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_go_pr_wh/us_congresswoman_shot_obama"><q>Obama to be nation's consoler at memorial service 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/us_colorado_wildfires"><q>CO firefighters to step up attack on Boulder blaze 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_bi_ge/us_winter_weather"><q>Winter storm buries southern New England 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/iran_stoning"><q>EU decries 'barbaric' plans to stone Iranian woman 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_re_af/af_tunisia_riots"><q>Riots reach Tunisia's capital, curfew imposed 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_la_am_ca/cb_cuba_fidel_castro"><q>Report: Castro blasts Ahmadinejad as anti-Semitic 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_re_la_am_ca/lt_brazil_flood_deaths"><q>Torrential rain, mudslides in Brazil kill 140 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_re_mi_ea/ml_israel_palestinians"><q>Abbas asks US to step into settlement dispute 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_re_us/us_congresswoman_shot_palin"><q>Palin: Journalists incite hatred after AZ shooting 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_el_st_lo/us_chicago_mayor"><q>Chicago Mayor Daley won't run for re-election 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_re_us/us_us_afghanistan"><q>US military chief: Enemy in Afghanistan is losing 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_en_ot/us_chapman_parole"><q>John Lennon killer Chapman denied parole in NY 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_bi_ge/us_illinois_taxes"><q>Gov. Quinn promises to quickly sign Ill. tax hike 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_he_me/us_med_smoking_rates"><q>US smoking rate still stuck at 1 in 5 adults 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_en_mu/us_people_aretha_franklin"><q>Aretha Franklin says her health is 'superb' 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_co_ap_po/fbc_t25_college_fb_poll"><q>Boise State gains ground in AP Top 25 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/topstories/*http://news.yahoo.com/s/ap/20110112/ap_on_re_eu/eu_germany_animal_magnetism"><q>Latest German animal star a cross-eyed opossum 
     (AP)
 </q></a>
 				</li></ul>	        	
@@ -169,175 +159,175 @@ Node's support for the
         <div class="yui3-tabpanel" id="world-news">
 			<h3>World News</h3>
 			<ul>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_mi_ea/ml_iraq_us_casualties"><q>Iraqi soldier fires on US troops, kills 2 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/nm/20110112/wl_nm/us_lebanon_hariri_resignation"><q>Hezbollah and allies resign, toppling Lebanon government 
+    (Reuters)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_bi_ge/eu_europe_strikes"><q>Strikes in France, London foreshadow more protests 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/nm/20110112/wl_nm/us_haiti_quake_anniversary"><q>Haitians remember 2010 quake, seek way out of 'hell' 
+    (Reuters)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/iran_stoning"><q>EU decries 'barbaric' plans to stone Iranian woman 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/nm/20110112/wl_nm/us_brazil_rains"><q>At least 127 dead as rains pummel Brazil regions 
+    (Reuters)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_as/as_pakistan"><q>Women, kids among 17 dead in NW Pakistani bombing 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/nm/20110112/wl_nm/us_pakistan_bombing"><q>Suicide bomber kills 17 police and soldiers in Pakistan 
+    (Reuters)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_as/as_singapore_good_english"><q>Singapore prods locals to speak better English 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/nm/20110112/wl_nm/us_palestinians_israel_gaza"><q>Gaza militants say to halt rocket fire at Israel 
+    (Reuters)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/time/20100907/wl_time/08599201635900"><q>Europe's Sets Up New Banking Police 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/time/20110112/wl_time/08599204200300"><q>Lebanon Government Collapse: Hizballah Exits Cabinet 
     (Time.com)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/afp/20100907/wl_sthasia_afp/cricketengpakt20"><q>England cruise to T20 win after Pakistan collapse 
-    (AFP)
-</q></a>
-				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_mi_ea/ml_israel_palestinians"><q>Abbas asks US to step into settlement dispute 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20110112/ap_on_bi_st_ma_re/us_wall_street"><q>Stocks head higher as worries about Europe ease 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_la_am_ca/lt_colombia_farc_journalist"><q>Colombia orders arrest of reporter in rebel case 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20110112/ap_on_re_mi_ea/lebanon_hariri_tribunal"><q>Hezbollah and its allies topple Lebanon government 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20100907/ap_on_re_us/un_un_congo_rapes"><q>UN reports over 500 rapes in eastern Congo 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20110112/ap_on_re_la_am_ca/lt_brazil_flood_deaths"><q>Torrential rain, mudslides in Brazil kill 140 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/world/*http://news.yahoo.com/s/ap/20110112/ap_on_re_af/af_nigeria_election"><q>Religion and region at play in Nigerian election 
     (AP)
 </q></a>
 				</li></ul>        </div>
         <div class="yui3-tabpanel" id="entertainment-news">
 			<h3>Entertainment News</h3>
 			<ul>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ot/us_anna_nicole_smith"><q>Nanny: Bloody syringes in Anna Nicole's bathroom 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20110112/ap_en_mo/us_people_eddie_furlong"><q>`Green Hornet' actor Eddie Furlong arrested 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ot/us_tv_cnn_parker_spitzer"><q>CNN christens its new talk show 'Parker Spitzer' 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20110112/ap_en_mo/us_film_dga_documentary_nominations"><q>Oscar winners Gibney, Guggenheim earn DGA noms 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ce/us_tv_letterman_view"><q>Walters, Letterman compare notes on heart surgery 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20110112/ap_en_ot/us_theater_god_of_carnage"><q>Original cast of 'God of Carnage' are reuniting 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_photos4190/37482215/*http://omg.yahoo.com/photos/la-toya-jackson-milks-it/4190"><q>La Toya Jackson Milks It 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_news53913/39609831/*http://omg.yahoo.com/news/scream-mary-murphy-heads-back-to-so-you-think-you-can-dance/53913"><q>SCREAM! Mary Murphy Heads Back To 'So You Think You Can Dance'! 
     (omg!)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_ot/us_white_house_dance"><q>Michelle Obama hosts first White House dance event 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_news53957/39625590/*http://omg.yahoo.com/news/kevin-james-wife-expecting-baby-no-3/53957"><q>Kevin James, Wife Expecting Baby No. 3 
+    (omg!)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_mu/us_chapman_parole"><q>John Lennon killer Chapman denied parole in NY 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_news53955/39625591/*http://omg.yahoo.com/news/lady-gaga-britney-spears-who-is-or-isn-t-performing-at-the-grammy-awards/53955"><q>Lady Gaga? Britney Spears? Who Is (Or Isn't) Performing At The Grammy Awards? 
+    (omg!)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_tv/us_anna_nicole_smith"><q>Nanny: Bloody syringes in Anna Nicole's bathroom 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_news53956/39625592/*http://omg.yahoo.com/news/roll-call-kelly-clarkson-names-her-pet-goat-billy-joel/53956"><q>ROLL CALL: Kelly Clarkson Names Her Pet Goat Billy Joel 
+    (omg!)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/nm/20100907/film_nm/us_venice"><q>Venice film fest fights its corner as crisis bites 
-    (Reuters)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_news53954/39625413/*http://omg.yahoo.com/news/big-bang-theory-renewed-for-three-more-years/53954"><q>Big Bang Theory Renewed for Three More Years 
+    (omg!)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/ap/20100907/ap_en_mu/us_music_review_stone_sour"><q>Review: Stone Sour packs punch on `Audio Secrecy' 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_videos12842/39625171/*http://omg.yahoo.com/videos/national-board-of-review-attracts-oscar-hopefuls/12842"><q>National Board of Review attracts Oscar hopefuls 
+    (omg!)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://news.yahoo.com/s/nm/20100907/media_nm/us_venice"><q>Venice film fest fights its corner as crisis bites 
-    (Reuters)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/entertainment/*http://us.rd.yahoo.com/dailynews/external/omg_rss/rss_omg_en/http___omg_yahoo_com_news53946/39623686/*http://omg.yahoo.com/news/david-nelson-of-ozzie-and-harriet-tv-family-dies/53946"><q>David Nelson of "Ozzie and Harriet" TV family dies 
+    (omg!)
 </q></a>
 				</li></ul>	        	
         </div>
         <div class="yui3-tabpanel" id="sports-news">
 			<h3>Sports News</h3>
 			<ul>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_co_ap_po/fbc_t25_college_fb_poll"><q>Boise State gains ground in AP Top 25 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20110112/ap_on_sp_co_ne/fbc_michigan_hoke"><q>Michigan gets its man, hiring Brady Hoke 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_go_ne/glf_ryder_cup"><q>US Ryder Cup picks: Woods, Johnson, Cink, Fowler 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20110112/ap_on_sp_fo_ne/fbn_broncos_search"><q>Fox finally makes it to Denver for interview 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_te_ga_su/ten_us_open"><q>Youzhny slows Spain's US Open reign, beats Robredo 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20110112/ap_on_sp_ot/sof_us_team_defections"><q>Softball stars not playing for US team 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/afp/20100907/sp_soccer_afp/fbleuro2012gpbrussvk"><q>Slovakia down Advocaat's Russia 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/afp/20110112/wl_asia_afp/fblasia2011gpaqatchn"><q>Qatar restore pride with China victory 
     (AFP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_fo_ne/fbn_nfl_umpires"><q>NFL again tweaks positioning of umpires 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20110112/ap_on_sp_co_ne/fbc_lsu_miles"><q>Les Miles has a new 7-year contract at LSU 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_fo_ne/fbn_redskins_titans_haynesworth"><q>AP Sources: Redskins, Titans talking Haynesworth 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20110112/ap_on_sp_ba_ne/bbn_hoffman_retires"><q>Hoffman retires after 601 saves in 18 seasons 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100907/ap_on_sp_fo_ne/fbn_dolphins_parcells"><q>Parcells turns over control of Dolphins to Ireland 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20110112/ap_on_sp_bk_ga_su/bkn_cavaliers_lakers"><q>Lakers crush Cavs 112-57 in best defensive effort 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/nm/20100907/sp_nm/us_nfl_dolphins"><q>Parcells turns over control of Dolphins to GM Ireland 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20110112/ap_on_sp_fo_ne/fbn_panthers_rivera"><q>Panthers hire Chargers' Rivera as head coach 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20110112/ap_on_sp_ba_ne/bbn_cubs_hill"><q>Koyie Hill, Cubs agree to $850,000 contract 
+    (AP)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/nm/20110112/sp_nm/us_nba_cavaliers"><q>Cavaliers humiliated by 55-point loss to Lakers 
     (Reuters)
-</q></a>
-				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://us.rd.yahoo.com/dailynews/external/appolicious_rss/rss_appolicious_sp/http___www_appolicious_com_articles3032_playoff_baseball_is_around_the_corner_get_ready_with_these_iphone_apps/37479524/SIG=13o37jpm4/*http://www.appolicious.com/sports/articles/3032-playoff-baseball-is-around-the-corner-get-ready-with-these-iphone-apps"><q>Playoff baseball is around the corner, get ready with these iPhone apps 
-    (Appolicious)
-</q></a>
-				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/sports/*http://news.yahoo.com/s/ap/20100901/ap_on_sp_bk_ne/bkn_celtics_west"><q>Guard Delonte West returning to Celtics 
-    (AP)
 </q></a>
 				</li></ul>	        	
         </div>
         <div class="yui3-tabpanel" id="technology-news">
 			<h3>Technology News</h3>
 			<ul>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100907/ap_on_hi_te/us_oracle_hurd"><q>HP sues ex-CEO Hurd over new job at rival Oracle 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20110112/ap_on_sp_ot/us_tec_digital_life_tech_test_golf_gadgets"><q>Review: Technology helps golfers fine-tune game 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100906/ap_on_hi_te/as_apple_s_challenger"><q>Taiwan's HTC: iPhone's `quiet' challenger 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20110112/ap_on_hi_te/us_tec_verizon_iphone"><q>Verizon to start selling iPhone on Feb. 10 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100905/ap_on_bi_ge/us_craigslist_adult_services"><q>1 'censored' bar won't stop online prostitution 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20110111/ap_on_hi_te/us_tec_verizon_iphone_winners_and_losers"><q>Verizon big winner from having iPhone? Not so fast 
     (AP)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ytech_gadg/20100830/tc_ytech_gadg/ytech_gadg_tc3511"><q>Able to unplug from work while you’re on vacation? 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/yblog_technews/20110112/tc_yblog_technews/ces-2011-end-of-show-scrapbook"><q>CES 2011: End-of-show scrapbook 
     (Ben Patterson)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ytech_gadg/20100830/tc_ytech_gadg/ytech_gadg_tc3509"><q>Mobile users still wary of being found, survey says 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/yblog_technews/20110112/tc_yblog_technews/verizon-iphone-announcement-gets-daily-show-treatment"><q>Verizon iPhone announcement gets ‘Daily Show’ treatment 
     (Ben Patterson)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/macworld/20100907/tc_macworld/macworldintroducesmacworldinsider"><q>Macworld introduces Macworld Insider 
-    (Macworld.com)
-</q></a>
-				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100907/ap_on_hi_te/us_electronic_devices_searches"><q>NY lawsuit seeks to halt suspicionless searches 
-    (AP)
-</q></a>
-				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/nf/20100907/tc_nf/75061"><q>Yikes! Coming to TV This Fall -- Google And Its Ads 
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/nf/20110112/bs_nf/76870"><q>CES Tablets Jockey for Traction Against Apple's iPad 
     (NewsFactor)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/ap/20100907/ap_on_bi_ge/us_millicom_analyst_note"><q>Millicom downgraded at Stifel Nicolaus 
-    (AP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/pcworld/20110112/tc_pcworld/doamericanslovetheirelectronicsnielsensurveygivesusaglimpse"><q>Do Americans Love Their Electronics? Nielsen Survey Gives Us a Glimpse 
+    (PC World)
 </q></a>
 				</li>				<li>
-				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/afp/20100907/tc_afp/usitcompanypolicydiplomacyinternetgoogle"><q>Former State Department official to head 'Google Ideas' 
-    (AFP)
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/mashable/20110112/tc_mashable/treadmill_allows_you_to_take_a_virtual_run_anywhere_on_google_earth_video"><q>Treadmill Allows You to Take a Virtual Run Anywhere on Google Earth [VIDEO] 
+    (Mashable)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/digitaltrends/20110112/tc_digitaltrends/exrimemployeesaystheplaybookfaceschallenges"><q>Ex-RIM employee says the PlayBook faces challenges 
+    (Digital Trends)
+</q></a>
+				</li>				<li>
+				    <a href="http://us.rd.yahoo.com/dailynews/rss/tech/*http://news.yahoo.com/s/nm/20110112/wr_nm/us_ibm_samsung"><q>IBM, Samsung to jointly develop chip technology 
+    (Reuters)
 </q></a>
 				</li></ul>	        	
         </div>			
@@ -363,26 +353,7 @@ Node's support for the
 			},
 			timeout: 10000
 
-		}).use("tabviewjs", function(Y, result) {
-
-		    //	The callback supplied to use() will be executed regardless of
-		    //	whether the operation was successful or not.  The second parameter
-		    //	is a result object that has the status of the operation.  We can
-		    //	use this to try to recover from failures or timeouts.
-
-		    if (!result.success) {
-
-		        Y.log("Load failure: " + result.msg, "warn", "Example");
-
-				//	Show the tabview HTML if the loader failed that way the 
-				//	original unskinned tabview will be visible so that the 
-				//	user can interact with it either way.
-
-				document.documentElement.className = "";
-
-		    }
-
-	});
+    }).use("tabviewjs");
 
 </script>
 

@@ -79,10 +79,11 @@ body {
 <button type="button" id="hide">Hide Overlay</button>
 
 <script type="text/javascript">
-YUI().use("overlay", "substitute", "json", "gallery-widget-io", function(Y) {
+YUI({ filter: 'raw' }).use("overlay", "substitute", "json", "gallery-widget-io", function(Y) {
 
     /* Setup local variable for Y.WidgetStdMod, since we use it multiple times */
     var StdMod = Y.WidgetStdMod,
+        transportAvailable = false;
 
     StdModIO = function(config) {
         StdModIO.superclass.constructor.apply(this, arguments);
@@ -90,6 +91,10 @@ YUI().use("overlay", "substitute", "json", "gallery-widget-io", function(Y) {
 
     Y.extend(StdModIO, Y.Plugin.WidgetIO, {
         initializer: function() {
+            Y.on('io:xdrReady', function() {
+                transportAvailable = true;
+            });
+            
             Y.io.transport({
                 id:'flash',
                 yid: Y.id,
@@ -222,9 +227,13 @@ YUI().use("overlay", "substitute", "json", "gallery-widget-io", function(Y) {
 
     Y.on("change", function(e) {
         var val = this.get("value");
-        if (val != -1) {
-            overlay.io.set("uri", pipes.baseUri + pipes.feeds[val].uri);
-            overlay.io.refresh();
+        if (transportAvailable) {
+            if (val != -1) {
+                overlay.io.set("uri", pipes.baseUri + pipes.feeds[val].uri);
+                overlay.io.refresh();
+            }
+        } else {
+            overlay.io.setContent("Flash doesn't appear to be available. Cross-domain requests to pipes cannot be made without it.");
         }
     }, "#feedSelector");
 

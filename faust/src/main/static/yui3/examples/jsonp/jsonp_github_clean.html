@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>Getting cross domain JSON data using Y.jsonp()</title>
+<title>Getting Cross Domain JSON Data Using Y.jsonp()</title>
 
 <style type="text/css">
 /*margin and padding on body element
@@ -40,7 +40,7 @@ body {
 
 <body class="yui3-skin-sam  yui-skin-sam">
 
-<h1>Getting cross domain JSON data using Y.jsonp()</h1>
+<h1>Getting Cross Domain JSON Data Using Y.jsonp()</h1>
 
 <div class="exampleIntro">
 	<p>This example illustrates basic use of the <code>Y.jsonp( url, callback )</code> method, provided by the <code>jsonp</code> module.</p>
@@ -70,7 +70,7 @@ body {
     </div>
 </div>
 <script>
-YUI().use("jsonp", "node", "substitute",function (Y) {
+YUI({ filter: 'raw' }).use("jsonp", "node",function (Y) {
 
     var user      = Y.one("#github_user"),
         githubAPI = "http://github.com/api/v2/json/user/show/",
@@ -97,7 +97,7 @@ YUI().use("jsonp", "node", "substitute",function (Y) {
     '</table>';
 
     function handleJSONP(response) {
-        Y.one("#out").setContent(Y.substitute(template, response.user));
+        Y.one("#out").setContent(Y.Lang.sub(template, response.user));
     }
 
     Y.one("#demo_btn").on("click", function (e) {

@@ -33,7 +33,7 @@ body {
 <h1>Adding Node Content</h1>
 
 <div class="exampleIntro">
-	<p>This example demonstrates how insert content when working with NodeList instances.</p>
+	<p>This example demonstrates how insert content when working with <code>NodeList</code> instances.</p>
 <p>Clicking a box will update its content.</p>
 			
 </div>
@@ -46,7 +46,7 @@ body {
 </ul>
 
 <script type="text/javascript">
-YUI().use("node", function(Y) {
+YUI({ filter: 'raw' }).use("node", function(Y) {
     var onClick = function(e) {
         var node = e.currentTarget;
         node.prepend('<em>prepended</em> &nbsp;'); // added as firstChild 

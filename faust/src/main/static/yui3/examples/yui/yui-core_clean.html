@@ -49,13 +49,13 @@ body {
 
 <script>
 
-YUI().use("node",
+YUI({ filter: 'raw' }).use("node",
 
 function(Y) {
     var node = Y.one('#demo');
     Y.log('Found node.. Setting style');
     node.setStyle('backgroundColor', '#D00050');
-    node.set('innerHTML', '<strong>Changed!</strong>');
+    node.setContent('<strong>Changed!</strong>');
 });
 </script>
 

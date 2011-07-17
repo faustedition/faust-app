@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('base-base', function(Y) {
 
@@ -80,6 +80,9 @@ YUI.add('base-base', function(Y) {
      */
     function Base() {
         Y.log('constructor called', 'life', 'base');
+
+        // So the object can be used as a hash key (as DD does)
+        Y.stamp(this);
 
         Attribute.call(this);
 
@@ -568,13 +571,13 @@ YUI.add('base-base', function(Y) {
 
         /**
          * Default toString implementation. Provides the constructor NAME
-         * and the instance ID.
+         * and the instance guid, if set.
          *
          * @method toString
          * @return {String} String representation for this object
          */
         toString: function() {
-            return this.constructor.NAME + "[" + Y.stamp(this) + "]";
+            return this.name + "[" + Y.stamp(this, true) + "]";
         }
 
     };
@@ -588,4 +591,4 @@ YUI.add('base-base', function(Y) {
     Y.Base = Base;
 
 
-}, '3.2.0' ,{requires:['attribute-base']});
+}, '3.3.0' ,{requires:['attribute-base']});

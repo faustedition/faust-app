@@ -60,7 +60,7 @@ body {
 
 
 <script type="text/javascript">
-YUI().use("node", "datatype-date", function (Y) {
+YUI({ filter: 'raw' }).use("node", "datatype-date", function (Y) {
     Y.on("click", function(e){
         var date = new Date(),
             output = Y.DataType.Date.format(date, {format:Y.one("#demo_format").get("value"), locale:Y.one("#demo_locale").get("value")});

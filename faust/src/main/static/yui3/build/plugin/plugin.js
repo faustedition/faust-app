@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('plugin', function(Y) {
 
@@ -195,7 +195,7 @@ YUI.add('plugin', function(Y) {
          * The function will be detached when the plugin is unplugged.
          *
          * @method beforeHostMethod
-         * @param {String} The name of the method to inject the function before.
+         * @param {String} method The name of the method to inject the function before.
          * @param {Function} fn The function to inject.
          * @param {Object} context The execution context. Defaults to the plugin instance.
          * @return handle {EventHandle} The detach handle for the injected function. 
@@ -212,7 +212,7 @@ YUI.add('plugin', function(Y) {
          * The function will be detached when the plugin is unplugged.
          *
          * @method afterHostMethod
-         * @param {String} The name of the method to inject the function after.
+         * @param {String} method The name of the method to inject the function after.
          * @param {Function} fn The function to inject.
          * @param {Object} context The execution context. Defaults to the plugin instance.
          * @return handle {EventHandle} The detach handle for the injected function. 
@@ -231,4 +231,4 @@ YUI.add('plugin', function(Y) {
     Y.namespace("Plugin").Base = Plugin;
 
 
-}, '3.2.0' ,{requires:['base-base']});
+}, '3.3.0' ,{requires:['base-base']});

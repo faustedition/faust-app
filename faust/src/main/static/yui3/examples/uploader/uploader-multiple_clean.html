@@ -22,7 +22,7 @@ body {
 
 
 <!--begin custom header content for this example-->
-<style>
+<style type="text/css">
 
 .yui3-progressbar {
 	width:200px;
@@ -55,7 +55,13 @@ body {
 	z-index: 2;
 }
 
+#selectFilesLink #selectLink,
+#uploadFilesLink #uploadLink {
+    color: #00c;
+    text-decoration: underline;
+}
 </style>
+
 <!--end custom header content for this example-->
 
 </head>
@@ -88,7 +94,7 @@ body {
 <script>
 
 
-YUI({gallery: 'gallery-2010.06.30-19-54'}).use("uploader", 'gallery-progressbar', function(Y) {
+YUI({ filter: 'raw' },{gallery: 'gallery-2010.06.30-19-54'}).use("uploader", 'gallery-progressbar', function(Y) {
 	
 var uploader;
 

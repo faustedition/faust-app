@@ -129,14 +129,14 @@ body {
 <script>
 
 
-YUI({insertBefore: 'styleoverrides'}).use('node', 'gallery-storage-lite', 'yui2-editor', function(Y, result) {
+YUI({insertBefore: 'styleoverrides'}).use('node', 'event-delegate', 'yui2-editor', 'gallery-storage-lite', function(Y, result) {
 
     var YAHOO = Y.YUI2, res = Y.one('#wrapper .status'),
     defaultText = Y.one('#editor').get('value'),
     write = function(str) {
         var d = new Date();
         str += ' :: ' + d.toTimeString();
-        res.set('innerHTML', str);
+        res.setContent(str);
     },
     save = function() {
         Y.StorageLite.on('storage-lite:ready', function () {
@@ -208,15 +208,23 @@ YUI({insertBefore: 'styleoverrides'}).use('node', 'gallery-storage-lite', 'yui2-
             save();
         }
     }, {}, true);
-    Y.StorageLite.on('storage-lite:ready', function () {
-        var editorValue = Y.StorageLite.getItem('editorContent');
-        if (editorValue !== null) {
-            Y.one('#editor').set('value', editorValue);
-            write('Loaded editor content from Local Storage');
-        } else {
-            write('Loaded default editor content');
-        }
-        editor.render();
+
+    Y.on('domready', function() {
+
+        Y.StorageLite.on('storage-lite:ready', function () {
+            var editorValue;
+            try {
+                editorValue = Y.StorageLite.getItem('editorContent');
+            } catch(e) {}
+            if (!editorValue) {
+                Y.one('#editor').set('value', editorValue);
+                write('Loaded editor content from Local Storage');
+            } else {
+                write('Loaded default editor content');
+            }
+            editor.render();
+        });
+
     });
 
 

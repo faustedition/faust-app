@@ -2,7 +2,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-	<title>YUI Library Examples: ScrollView: ScrollView with Scroll Indicator</title>
+	<title>YUI Library Examples: ScrollView: ScrollView with Scroll Indicator and Link Suppression Behavior.</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     	<link rel="stylesheet" type="text/css" href="../../assets/yui.css" >
 
@@ -30,15 +30,16 @@
 		<form action="http://search.yahoo.com/search" id="sitesearchform">
             <input name="vs" type="hidden" value="developer.yahoo.com">
             <input name="vs" type="hidden" value="yuiblog.com">
+			<input name="vs" type="hidden" value="yuilibrary.com">
 		    <div id="sitesearch">
-		    	<label for="searchinput">Site Search (YDN &amp; YUIBlog): </label>
+		    	<label for="searchinput">Site Search (YDN, YUILibrary &amp; YUIBlog): </label>
 			    <input type="text" id="searchinput" name="p">
 			    <input type="submit" value="Search" id="searchsubmit" class="ygbt">
 		    </div>
 		</form>
     </div>
 	<div id="ygma"><a href="../../"><img src="../../assets/logo.gif"  border="0" width="200" height="93"></a></div>
-	<div id="pagetitle"><h1>YUI Library Examples: ScrollView: ScrollView with Scroll Indicator</h1></div>
+	<div id="pagetitle"><h1>YUI Library Examples: ScrollView: ScrollView with Scroll Indicator and Link Suppression Behavior.</h1></div>
 </div>
 <div id="bd">
 
@@ -48,11 +49,11 @@
 		  <div class="yui-ge">
 			  <div class="yui-u first example" id="main">
 
-	<h2>ScrollView: ScrollView with Scroll Indicator</h2>
+	<h2>ScrollView: ScrollView with Scroll Indicator and Link Suppression Behavior.</h2>
 
 	<div id="example" class="promo">
 	<div class="example-intro">
-	<p>This example shows how to create a ScrollView widget with a scrollbar indicator.</p>	</div>	
+	<p>This example shows how to create a ScrollView widget with a scrollbar indicator.  It also illustrates a technique for suppressing link behavior during a scroll &mdash; a technique you may require if you have a ScrollView instance heavily populated by links, as in this example.</p>	</div>
 
 	<div class="module example-container  newWindow">
 			<div id="example-canvas" class="bd">
@@ -62,14 +63,14 @@
             <span class="first-child">
                 <a href="scrollview_source.html" target="_blank">View example in new window.</a>
             </span>
-        </span>	
+        </span>
     </p>
+
 	
-		
 		</div>
-	</div>			
 	</div>
-		
+	</div>
+
 	<h2>The ScrollView Widget With A Scroll Indicator</h2>
 
 <p>In this example, we'll create a ScrollView instance, which also has a scrollbar indicator.</p>
@@ -100,43 +101,55 @@ YUI().use('scrollview', function(Y) {
 
 <p>As with the <a href="scrollview-base.html">Base ScrollView</a> example, we provide the markup for the ScrollView content on the page, as shown below:</p>
 
-<div id="syntax-ca9224700bfcca5903ac94bb12c89c88" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;scrollable&quot;</span> <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-scrollview-loading&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;</span>ul<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">&lt;</span>li<span class="sy0">&gt;&lt;</span>div<span class="sy0">&gt;</span>AC<span class="sy0">/</span>DC<span class="sy0">&lt;/</span>div<span class="sy0">&gt;&lt;/</span>li<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">&lt;</span>li<span class="sy0">&gt;&lt;</span>div<span class="sy0">&gt;</span>Aerosmith<span class="sy0">&lt;/</span>div<span class="sy0">&gt;&lt;/</span>li<span class="sy0">&gt;</span></div></li><li class="li2"><div class="de2">        <span class="sy0">&lt;</span>li<span class="sy0">&gt;&lt;</span>div<span class="sy0">&gt;</span>Billy Joel<span class="sy0">&lt;/</span>div<span class="sy0">&gt;&lt;/</span>li<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">&lt;</span>li<span class="sy0">&gt;&lt;</span>div<span class="sy0">&gt;</span>Bob Dylan<span class="sy0">&lt;/</span>div<span class="sy0">&gt;&lt;/</span>li<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        ...</div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;/</span>ul<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;scrollable&quot;</span> <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-scrollview-loading&quot;</span><span class="sy0">&gt;</span>
+<div id="syntax-95ab05b8cb08d374b3c7329d005601be" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;scrollview-content&quot;</span> <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-scrollview-loading&quot;</span><span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;</span>ul<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">&lt;</span>li<span class="sy0">&gt;</span>AC<span class="sy0">/</span>DC<span class="sy0">&lt;/</span>li<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">&lt;</span>li<span class="sy0">&gt;</span>Aerosmith<span class="sy0">&lt;/</span>li<span class="sy0">&gt;</span></div></li><li class="li2"><div class="de2">        <span class="sy0">&lt;</span>li<span class="sy0">&gt;</span>Billy Joel<span class="sy0">&lt;/</span>li<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        <span class="sy0">&lt;</span>li<span class="sy0">&gt;</span>Bob Dylan<span class="sy0">&lt;/</span>li<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1">        ...</div></li><li class="li1"><div class="de1">    <span class="sy0">&lt;/</span>ul<span class="sy0">&gt;</span></div></li><li class="li1"><div class="de1"><span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="sy0">&lt;</span>div id<span class="sy0">=</span><span class="st0">&quot;scrollview-content&quot;</span> <span class="kw2">class</span><span class="sy0">=</span><span class="st0">&quot;yui3-scrollview-loading&quot;</span><span class="sy0">&gt;</span>
     <span class="sy0">&lt;</span>ul<span class="sy0">&gt;</span>
-        <span class="sy0">&lt;</span>li<span class="sy0">&gt;&lt;</span>div<span class="sy0">&gt;</span>AC<span class="sy0">/</span>DC<span class="sy0">&lt;/</span>div<span class="sy0">&gt;&lt;/</span>li<span class="sy0">&gt;</span>
-        <span class="sy0">&lt;</span>li<span class="sy0">&gt;&lt;</span>div<span class="sy0">&gt;</span>Aerosmith<span class="sy0">&lt;/</span>div<span class="sy0">&gt;&lt;/</span>li<span class="sy0">&gt;</span>
-        <span class="sy0">&lt;</span>li<span class="sy0">&gt;&lt;</span>div<span class="sy0">&gt;</span>Billy Joel<span class="sy0">&lt;/</span>div<span class="sy0">&gt;&lt;/</span>li<span class="sy0">&gt;</span>
-        <span class="sy0">&lt;</span>li<span class="sy0">&gt;&lt;</span>div<span class="sy0">&gt;</span>Bob Dylan<span class="sy0">&lt;/</span>div<span class="sy0">&gt;&lt;/</span>li<span class="sy0">&gt;</span>
+        <span class="sy0">&lt;</span>li<span class="sy0">&gt;</span>AC<span class="sy0">/</span>DC<span class="sy0">&lt;/</span>li<span class="sy0">&gt;</span>
+        <span class="sy0">&lt;</span>li<span class="sy0">&gt;</span>Aerosmith<span class="sy0">&lt;/</span>li<span class="sy0">&gt;</span>
+        <span class="sy0">&lt;</span>li<span class="sy0">&gt;</span>Billy Joel<span class="sy0">&lt;/</span>li<span class="sy0">&gt;</span>
+        <span class="sy0">&lt;</span>li<span class="sy0">&gt;</span>Bob Dylan<span class="sy0">&lt;/</span>li<span class="sy0">&gt;</span>
         ...
     <span class="sy0">&lt;/</span>ul<span class="sy0">&gt;</span>
-<span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></pre></div><textarea id="syntax-ca9224700bfcca5903ac94bb12c89c88-plain"><div id="scrollable" class="yui3-scrollview-loading">
+<span class="sy0">&lt;/</span>div<span class="sy0">&gt;</span></pre></div><textarea id="syntax-95ab05b8cb08d374b3c7329d005601be-plain"><div id="scrollview-content" class="yui3-scrollview-loading">
     <ul>
-        <li><div>AC/DC</div></li>
-        <li><div>Aerosmith</div></li>
-        <li><div>Billy Joel</div></li>
-        <li><div>Bob Dylan</div></li>
+        <li>AC/DC</li>
+        <li>Aerosmith</li>
+        <li>Billy Joel</li>
+        <li>Bob Dylan</li>
         ...
     </ul>
 </div></textarea></div>
 <p>And we instantiate the ScrollView instance in the same way, providing the <code>srcNode</code> attribute during construction, so it uses the markup above for it's content:</p>
 
-<div id="syntax-5403ef036d2bdacde440e88f713681a2" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'scrollview-base'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> scrollView <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ScrollView</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        srcNode<span class="sy0">:</span> <span class="st0">'#scrollable'</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        height<span class="sy0">:</span> <span class="nu0">310</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    scrollView.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'scrollview-base'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+<div id="syntax-6393ac06f784e14d1e3ff1b299a57a4f" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'scrollview'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    <span class="kw2">var</span> scrollView <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ScrollView</span><span class="br0">&#40;</span><span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        id<span class="sy0">:</span> <span class="st0">&quot;scrollview&quot;</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">        srcNode<span class="sy0">:</span> <span class="st0">'#scrollview-content'</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        height<span class="sy0">:</span> <span class="nu0">310</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">        flick<span class="sy0">:</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">            minDistance<span class="sy0">:</span><span class="nu0">10</span><span class="sy0">,</span></div></li><li class="li1"><div class="de1">            minVelocity<span class="sy0">:</span><span class="nu0">0.3</span><span class="sy0">,</span></div></li><li class="li2"><div class="de2">            axis<span class="sy0">:</span> <span class="st0">&quot;y&quot;</span></div></li><li class="li1"><div class="de1">        <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">    scrollView.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">YUI<span class="br0">&#40;</span><span class="br0">&#41;</span>.<span class="kw2">use</span><span class="br0">&#40;</span><span class="st0">'scrollview'</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>Y<span class="br0">&#41;</span> <span class="br0">&#123;</span>
 &nbsp;
     <span class="kw2">var</span> scrollView <span class="sy0">=</span> <span class="kw2">new</span> Y.<span class="me1">ScrollView</span><span class="br0">&#40;</span><span class="br0">&#123;</span>
-        srcNode<span class="sy0">:</span> <span class="st0">'#scrollable'</span><span class="sy0">,</span>
-        height<span class="sy0">:</span> <span class="nu0">310</span>
+        id<span class="sy0">:</span> <span class="st0">&quot;scrollview&quot;</span><span class="sy0">,</span>
+        srcNode<span class="sy0">:</span> <span class="st0">'#scrollview-content'</span><span class="sy0">,</span>
+        height<span class="sy0">:</span> <span class="nu0">310</span><span class="sy0">,</span>
+        flick<span class="sy0">:</span> <span class="br0">&#123;</span>
+            minDistance<span class="sy0">:</span><span class="nu0">10</span><span class="sy0">,</span>
+            minVelocity<span class="sy0">:</span><span class="nu0">0.3</span><span class="sy0">,</span>
+            axis<span class="sy0">:</span> <span class="st0">&quot;y&quot;</span>
+        <span class="br0">&#125;</span>
     <span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span>
 &nbsp;
     scrollView.<span class="me1">render</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
-<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-5403ef036d2bdacde440e88f713681a2-plain">YUI().use('scrollview-base', function(Y) {
+<span class="br0">&#125;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-6393ac06f784e14d1e3ff1b299a57a4f-plain">YUI().use('scrollview', function(Y) {
 
     var scrollView = new Y.ScrollView({
-        srcNode: '#scrollable',
-        height: 310
+        id: "scrollview",
+        srcNode: '#scrollview-content',
+        height: 310,
+        flick: {
+            minDistance:10,
+            minVelocity:0.3,
+            axis: "y"
+        }
     });
 
     scrollView.render();
 });</textarea></div>
-<p>Again, for this example, since we want a vertically scrolling ScrollView widget, we also give it a height during construction.</p>
+<p>Again, for this example, since we want a vertically scrolling ScrollView widget, we also give it a height during construction and constrain flicks to the "y" axis.</p>
 
 <p>As the last step, to see the functional ScrollView on the page, we call <code>scrollView.render()</code>.</p>
 
@@ -158,10 +171,41 @@ YUI().use('scrollview', function(Y) {
     scrollView.scrollbars.hide();
     scrollView.scrollbars.show(); 
     scrollView.scrollbars.flash();
-});</textarea></div>				</div>
+});</textarea></div>
+<h3>Suppressing Default Link Behavior</h3>
+
+<p>In this example, the scrolling surface is populated with links. To prevent links' default action (page navigation) from taking place after a scroll, we look at the <code>lastScrolledAmt</code> property of our ScrollView instance; on a simple click, that number will be very close to zero, whereas after scroll that number will be much higher.  In this case, we're using a 2px threshold.</p>
+
+<div id="syntax-42195e4d33cfd4ec8cc7d8d834d2c628" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1"><span class="kw2">var</span> content <span class="sy0">=</span> scrollView.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;contentBox&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> </div></li><li class="li1"><div class="de1">&nbsp;</div></li><li class="li1"><div class="de1">content.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// Prevent links from navigating as part of a scroll gesture</span></div></li><li class="li2"><div class="de2">    <span class="kw1">if</span> <span class="br0">&#40;</span>Math.<span class="me1">abs</span><span class="br0">&#40;</span>scrollView.<span class="me1">lastScrolledAmt</span><span class="br0">&#41;</span> <span class="sy0">&gt;</span> <span class="nu0">2</span><span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">        e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li1"><div class="de1">        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Link behavior suppressed.&quot;</span><span class="br0">&#41;</span></div></li><li class="li1"><div class="de1">    <span class="br0">&#125;</span></div></li><li class="li1"><div class="de1"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;"><span class="kw2">var</span> content <span class="sy0">=</span> scrollView.<span class="me1">get</span><span class="br0">&#40;</span><span class="st0">&quot;contentBox&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> 
+&nbsp;
+content.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;click&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">// Prevent links from navigating as part of a scroll gesture</span>
+    <span class="kw1">if</span> <span class="br0">&#40;</span>Math.<span class="me1">abs</span><span class="br0">&#40;</span>scrollView.<span class="me1">lastScrolledAmt</span><span class="br0">&#41;</span> <span class="sy0">&gt;</span> <span class="nu0">2</span><span class="br0">&#41;</span> <span class="br0">&#123;</span>
+        e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+        Y.<span class="me1">log</span><span class="br0">&#40;</span><span class="st0">&quot;Link behavior suppressed.&quot;</span><span class="br0">&#41;</span>
+    <span class="br0">&#125;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-42195e4d33cfd4ec8cc7d8d834d2c628-plain">var content = scrollView.get("contentBox"); 
+
+content.delegate("click", function(e) {
+    // Prevent links from navigating as part of a scroll gesture
+    if (Math.abs(scrollView.lastScrolledAmt) > 2) {
+        e.preventDefault();
+        Y.log("Link behavior suppressed.")
+    }
+}, "a");</textarea></div>
+<p>We also prevent default on mousedown, to prevent the native "drag link to desktop" behavior on certain browsers.</p>
+
+<div id="syntax-4c7ea54136cb5547657573680a9d5c02" class="yui-syntax-highlight"><div class="numbers"><pre class="javascript" style="font-family:monospace;"><ol><li class="li1"><div class="de1">content.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span></div></li><li class="li1"><div class="de1">    <span class="co1">// Prevent default anchor drag behavior, on browsers </span></div></li><li class="li1"><div class="de1">    <span class="co1">// which let you drag anchors to the desktop</span></div></li><li class="li1"><div class="de1">    e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li><li class="li2"><div class="de2"><span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></div></li></ol></pre></div><div class="nonumbers"><pre class="javascript" style="font-family:monospace;">content.<span class="me1">delegate</span><span class="br0">&#40;</span><span class="st0">&quot;mousedown&quot;</span><span class="sy0">,</span> <span class="kw2">function</span><span class="br0">&#40;</span>e<span class="br0">&#41;</span> <span class="br0">&#123;</span>
+    <span class="co1">// Prevent default anchor drag behavior, on browsers </span>
+    <span class="co1">// which let you drag anchors to the desktop</span>
+    e.<span class="me1">preventDefault</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span>
+<span class="br0">&#125;</span><span class="sy0">,</span> <span class="st0">&quot;a&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span></pre></div><textarea id="syntax-4c7ea54136cb5547657573680a9d5c02-plain">content.delegate("mousedown", function(e) {
+    // Prevent default anchor drag behavior, on browsers 
+    // which let you drag anchors to the desktop
+    e.preventDefault();
+}, "a");</textarea></div>				</div>
 				<div class="yui-u sidebar">
-					
-				
+	
 					<div id="examples" class="mod box4">
                         <div class="hd">
 						<h4>
@@ -169,10 +213,10 @@ YUI().use('scrollview', function(Y) {
                         </div>
 						<div class="bd">
 							<ul>
-								<li><a href='../scrollview/scrollview-base.html'>Basic ScrollView without a Scroll Indicator</a></li><li class='selected'><a href='../scrollview/scrollview.html'>ScrollView with Scroll Indicator</a></li><li><a href='../scrollview/scrollview-horiz.html'>Horizontal ScrollView</a></li><li><a href='../scrollview/scrollview-paging.html'>ScrollView Paginator Plugin</a></li>							</ul>
+								<li><a href='../scrollview/scrollview-base.html'>Basic ScrollView Without a Scroll Indicator</a></li><li class='selected'><a href='../scrollview/scrollview.html'>ScrollView with Scroll Indicator and Link Suppression Behavior.</a></li><li><a href='../scrollview/scrollview-horiz.html'>Horizontal ScrollView</a></li><li><a href='../scrollview/scrollview-paging.html'>ScrollView Paginator Plugin</a></li>							</ul>
 						</div>
 					</div>
-					
+
 					<div class="mod box4">
                         <div class="hd">
 						<h4>More ScrollView Resources:</h4>
@@ -185,7 +229,7 @@ YUI().use('scrollview', function(Y) {
 					</div>
 			  </div>
 		</div>
-		
+
 		</div>
 	</div>
 
@@ -195,13 +239,13 @@ YUI().use('scrollview', function(Y) {
 <div id="toc">
 	
 <ul>
-<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Tabview - Functional Examples" href="../../examples/tabview/index.html">Tabview <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
+<li class="sect first">YUI 3 Resources</li><li class="item"><a title="YUI 3 -- Yahoo! User Interface (YUI) Library" href="http://developer.yahoo.com/yui/3/">YUI 3 Web Site</a></li><li class="item"><a title="Examples of every YUI utility and control in action" href="../../examples/">YUI 3 Examples</a></li><li class="item"><a title="Instantly searchable API documentation for the entire YUI library." href="../../api/">YUI 3 API Docs</a></li><li class="item"><a title="YUI 3 Dependency Configurator -- configure your custom YUI implementation" href="http://developer.yahoo.com/yui/3/configurator/index.html">YUI 3 Dependency Configurator</a></li><li class="item"><a title="The YUI 3 Forum on YUILibrary.com" href="http://yuilibrary.com/forum/viewforum.php?f=15">YUI 3 Forums (external)</a></li><li class="item"><a title="Found a bug or a missing feature? Let us know on YUILibrary.com." href="http://developer.yahoo.com/yui/articles/reportingbugs/">Bug Reports/Feature Requests</a></li><li class="item"><a title="YUI is free and open, offered under a BSD license." href="http://developer.yahoo.com/yui/license.html">YUI License</a></li><li class="item"><a title="Download and fork the YUI project on GitHub" href="http://github.com/yui">YUI on Github</a></li><li class="item"><a title="The Yahoo! User Interface Blog" href="http://yuiblog.com">YUI Blog (external)</a></li><li class="sect">YUI 3 Core - Examples</li><li class="item"><a title="YUI Global Object - Functional Examples" href="../../examples/yui/index.html">YUI Global Object</a></li><li class="item"><a title="Event - Functional Examples" href="../../examples/event/index.html">Event</a></li><li class="item"><a title="Node - Functional Examples" href="../../examples/node/index.html">Node</a></li><li class="sect">YUI 3 Component Infrastructure - Examples</li><li class="item"><a title="Attribute - Functional Examples" href="../../examples/attribute/index.html">Attribute</a></li><li class="item"><a title="Plugin - Functional Examples" href="../../examples/plugin/index.html">Plugin</a></li><li class="item"><a title="Widget - Functional Examples" href="../../examples/widget/index.html">Widget</a></li><li class="sect">YUI 3 Utilities - Examples</li><li class="item"><a title="Animation - Functional Examples" href="../../examples/anim/index.html">Animation</a></li><li class="item"><a title="AsyncQueue - Functional Examples" href="../../examples/async-queue/index.html">AsyncQueue</a></li><li class="item"><a title="Cache - Functional Examples" href="../../examples/cache/index.html">Cache</a></li><li class="item"><a title="Cookie - Functional Examples" href="../../examples/cookie/index.html">Cookie</a></li><li class="item"><a title="DataSchema - Functional Examples" href="../../examples/dataschema/index.html">DataSchema <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataSource - Functional Examples" href="../../examples/datasource/index.html">DataSource <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataType - Functional Examples" href="../../examples/datatype/index.html">DataType <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Drag &amp; Drop - Functional Examples" href="../../examples/dd/index.html">Drag &amp; Drop</a></li><li class="item"><a title="Get - Functional Examples" href="../../examples/get/index.html">Get</a></li><li class="item"><a title="History - Functional Examples" href="../../examples/history/index.html">History <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="IO - Functional Examples" href="../../examples/io/index.html">IO</a></li><li class="item"><a title="ImageLoader - Functional Examples" href="../../examples/imageloader/index.html">ImageLoader</a></li><li class="item"><a title="Internationalization - Functional Examples" href="../../examples/intl/index.html">Internationalization</a></li><li class="item"><a title="JSON (JavaScript Object Notation) - Functional Examples" href="../../examples/json/index.html">JSON</a></li><li class="item"><a title="JSONP (JSON with Padding) - Functional Examples" href="../../examples/jsonp/index.html">JSONP <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Recordset - Functional Examples" href="../../examples/recordset/index.html">Recordset <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Resize - Functional Examples" href="../../examples/resize/index.html">Resize <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Sortable - Functional Examples" href="../../examples/sortable/index.html">Sortable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Stylesheet - Functional Examples" href="../../examples/stylesheet/index.html">Stylesheet</a></li><li class="item"><a title="Transition - Functional Examples" href="../../examples/transition/index.html">Transition <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Uploader - Functional Examples" href="../../examples/uploader/index.html">Uploader <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YQL Query - Functional Examples" href="../../examples/yql/index.html">YQL Query <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Widgets - Examples</li><li class="item"><a title="AutoComplete - Functional Examples" href="../../examples/autocomplete/index.html">AutoComplete <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Charts - Functional Examples" href="../../examples/charts/index.html">Charts <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="DataTable - Functional Examples" href="../../examples/datatable/index.html">DataTable <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Dial - Functional Examples" href="../../examples/dial/index.html">Dial <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Editor - Functional Examples" href="../../examples/editor/index.html">Editor <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Overlay - Functional Examples" href="../../examples/overlay/index.html">Overlay <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="selected "><a title="ScrollView - Functional Examples" href="../../examples/scrollview/index.html">ScrollView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Slider - Functional Examples" href="../../examples/slider/index.html">Slider <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="TabView - Functional Examples" href="../../examples/tabview/index.html">TabView <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 Node Plugins - Examples</li><li class="item"><a title="FocusManager Node Plugin - Functional Examples" href="../../examples/node-focusmanager/index.html">FocusManager Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="MenuNav Node Plugin - Functional Examples" href="../../examples/node-menunav/index.html">MenuNav Node Plugin <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="sect">YUI 3 CSS - Examples</li><li class="item"><a title="YUI Base - Functional Examples" href="../../examples/cssbase/index.html">CSS Base</a></li><li class="item"><a title="YUI Fonts - Functional Examples" href="../../examples/cssfonts/index.html">CSS Fonts</a></li><li class="item"><a title="YUI Grids - Functional Examples" href="../../examples/cssgrids/index.html">CSS Grids <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="YUI CSS Reset - Functional Examples" href="../../examples/cssreset/index.html">CSS Reset</a></li><li class="sect">YUI 3 Developer Tools - Examples</li><li class="item"><a title="Console - Functional Examples" href="../../examples/console/index.html">Console <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Console Filters Plugin- Functional Examples" href="../../examples/console-filters/index.html">Plugin.ConsoleFilters <img alt='beta' src='http://l.yimg.com/a/i/not/beta_1.gif'></a></li><li class="item"><a title="Profiler - Functional Examples" href="../../examples/profiler/index.html">Profiler</a></li><li class="item"><a title="Test - Functional Examples" href="../../examples/test/index.html">Test</a></li><li class="sect">Other Useful YUI 3 Resources</li><li class="item"><a title="Answers to Frequently Asked Questions about the YUI Library" href="http://developer.yahoo.com/yui/articles/faq/">YUI FAQ (external)</a></li><li class="item"><a title="Yahoo!'s philosophy of Graded Browser Support" href="http://developer.yahoo.com/yui/articles/gbs/">Graded Browser Support (external)</a></li><li class="item"><a title="Videos and podcasts from the YUI Team and from the Yahoo! frontend engineering community." href="http://developer.yahoo.com/yui/theater/">YUI Theater (external)</a></li></ul>
 </div>
 </div>
 	</div><!--closes bd-->
 
 	<div id="ft">
-        <p class="first">Copyright &copy; 2010 Yahoo! Inc. All rights reserved.</p>
+        <p class="first">Copyright &copy; 2011 Yahoo! Inc. All rights reserved.</p>
         <p><a href="http://privacy.yahoo.com/privacy/us/devel/index.html">Privacy Policy</a> - 
             <a href="http://docs.yahoo.com/info/terms/">Terms of Service</a> - 
             <a href="http://docs.yahoo.com/info/copyright/copyright.html">Copyright Policy</a> - 
@@ -209,7 +253,7 @@ YUI().use('scrollview', function(Y) {
 	</div>
 </div>
 <script language="javascript"> 
-var yuiConfig = {};
+var yuiConfig = { filter: 'raw' };
 </script>
 <script src="../../assets/syntax.js"></script>
 <script src="../../assets/dpSyntaxHighlighter.js"></script>

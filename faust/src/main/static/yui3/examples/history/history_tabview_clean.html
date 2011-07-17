@@ -29,6 +29,8 @@ body {
     border: 1px solid #000;
     height: 150px;
   }
+
+  #demo .yui3-tab-selected .yui3-tab-label { color: #fff; }
 </style>
 
 <!--end custom header content for this example-->
@@ -82,7 +84,7 @@ to return to the current page with the same tab selected.
 </div>
 
 <script>
-YUI().use("history", "tabview", function (Y) {
+YUI({ filter: 'raw' }).use("history", "tabview", function (Y) {
   var history = new Y.HistoryHash(),
       tabview = new Y.TabView({srcNode: '#demo'});
 

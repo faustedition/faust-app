@@ -2,8 +2,8 @@
 Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.com/yui/license.html
-version: 3.2.0
-build: 2676
+version: 3.3.0
+build: 3167
 */
 YUI.add('datatype-xml-parse', function(Y) {
 
@@ -29,21 +29,21 @@ Y.mix(Y.namespace("DataType.XML"), {
         var xmlDoc = null;
         if(LANG.isString(data)) {
             try {
-                if(!LANG.isUndefined(DOMParser)) {
-                    xmlDoc = new DOMParser().parseFromString(data, "text/xml");
+                if(!LANG.isUndefined(ActiveXObject)) {
+                        xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+                        xmlDoc.async = false;
+                        xmlDoc.loadXML(data);
                 }
             }
-            catch(e) {
+            catch(ee) {
                 try {
-                    if(!LANG.isUndefined(ActiveXObject)) {
-                            xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-                            xmlDoc.async = false;
-                            xmlDoc.loadXML(data);
+                    if(!LANG.isUndefined(DOMParser)) {
+                        xmlDoc = new DOMParser().parseFromString(data, "text/xml");
                     }
                 }
-                catch(ee) {
-                    Y.log(ee.message + " (Could not parse data " + Y.dump(data) + " to type XML Document)", "warn", "datatype-xml");
+                catch(e) {
                 }
+                    Y.log(ee.message + " (Could not parse data " + Y.dump(data) + " to type XML Document)", "warn", "datatype-xml");
             }
         }
         
@@ -60,4 +60,4 @@ Y.namespace("Parsers").xml = Y.DataType.XML.parse;
 
 
 
-}, '3.2.0' );
+}, '3.3.0' ,{requires:['yui-base']});

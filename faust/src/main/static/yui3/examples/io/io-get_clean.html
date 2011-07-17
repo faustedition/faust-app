@@ -53,49 +53,64 @@ body {
 </form>
 
 <script>
-YUI().use("io",
+YUI({ filter: 'raw' }).use("io-base", "node",
 
 	function(Y) {
 
 		//Get a reference to the DIV that we are using
 		//to report results.
-		var d = document.getElementById('container');
+		var d = Y.one('#container'),
+			gStr = '',
+			tStr = '',
+			state;
 
 		/* global listener object */
 		var gH = {
-			write: function(str, args) {
-					 d.innerHTML += "ID: " + str;
+			write: function(s, args) {
+					 gStr += "ID: " + s;
 					 if (args) {
-					 	d.innerHTML += " " + "The arguments are: " + args;
+					 	gStr += " " + "The globally-defined arguments are: " + args;
 					 }
-					 d.innerHTML += "<br>";
-				   },
-			start: function(id, args) {
+					 gStr += "<br>";
+			},
+			start: function(id) {
+					 // When transaction listeners are handled, its user-defined arguments
+					 // are accessible in the arguments collection.  The following detection
+					 // logic determines whether the output should account for transaction
+					 // arguments.
+					 args = state === 'global' ? arguments[1] : arguments[2];
 					 this.write(id + ": Global Event Start.", args);
-				   },
-			complete: function(id, o, args) {
-						this.write(id + ": Global Event Complete.  The status code is: " + o.status + ".", args);
-				   },
-			success: function(id, o, args) {
-					   this.write(id + ": Global Event Success.  The response is: " + o.responseText + ".", args);
-					 },
-			failure: function(id, o, args) {
-					   this.write(o + ": Global Event Failure.  The status text is: " + o.statusText + ".", args);
-					 },
-			end: function(id, args) {
+			},
+			complete: function(id, o) {
+					 args = state === 'global' ? arguments[2] : arguments[3];
+					 this.write(id + ": Global Event Complete.  The status code is: " + o.status + ".", args);
+			},
+			success: function(id, o) {
+					  args = state === 'global' ? arguments[2] : arguments[3];
+					  this.write(id + ": Global Event Success.  The response is: " + o.responseText + ".", args);
+			},
+			failure: function(id, o) {
+					  args = state === 'global' ? arguments[2] : arguments[3];
+					  this.write(o + ": Global Event Failure.  The status text is: " + o.statusText + ".", args);
+			},
+			end: function(id) {
+					 args = state === 'global' ? arguments[1] : arguments[2];
 					 this.write(id + ": Global Event End.", args);
+					 if (state === 'global') {
+						 flush(gStr);
+					 }
 			}
-		}
+		};
 		/* end global listener object */
 
 		/* transaction event object */
 		var tH = {
-			write: function(str, args) {
-					 d.innerHTML += "ID: " + str;
+			write: function(s, args) {
+					 tStr += "ID: " + s;
 					 if (args) {
-					 	d.innerHTML += " " + "The arguments are: " + args;
+					 	tStr += " " + "The arguments are: " + args;
 					 }
-					 d.innerHTML += "<br>";
+					 tStr += "<br>";
 				   },
 			start: function(id, args) {
 					 this.write(id + ": Transaction Event Start.", args.start);
@@ -111,9 +126,22 @@ YUI().use("io",
 					 },
 			end: function(id, args) {
 					 this.write(id + ": Transaction Event End.", args.end);
+					 flush(gStr + tStr);
+			}
+		};
+		/* end transaction event object */
+
+		/* Output the results to the DIV container */
+		function flush(s) {
+			d.set("innerHTML", s);
+			if (state === 'global') {
+				gStr = '';
+			}
+			else {
+				gStr = '';
+				tStr = '';
 			}
 		}
-		/* end transaction event object */
 
 		/* attach global listeners */
 		Y.on('io:start', gH.start, gH, 'global foo');
@@ -146,9 +174,11 @@ YUI().use("io",
 
 		function call(e, b) {
 			if (b) {
+				state = 'all';
 				Y.io('assets/get.php?user=YDN&allListeners=1', cfg);
 			}
 			else {
+				state = 'global';
 				Y.io('assets/get.php?user=YDN&globalListeners=1');
 			}
 		}
@@ -157,6 +187,7 @@ YUI().use("io",
 		Y.on('click', call, "#get2", this, true);
 	});
 </script>
+
 <!--END SOURCE CODE FOR EXAMPLE =============================== -->
 
 </body>
