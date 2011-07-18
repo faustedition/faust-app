@@ -95,18 +95,22 @@ if __name__ == "__main__":
 
 	#	for f in matches(faust.transcript_files(), "//tei:change[(contains(@when, '2011-06-') or contains(@when, '2011-05-')) and contains(@who, 'bruening')]"):	print f
 
-	encoded_transcripts = matches(faust.transcript_files(), encoded_xp)
-	deleatur_transcripts = matches(faust.transcript_files(), deleatur_xp)
+	for f in matches(faust.transcript_files(), "//tei:zone[@type='main' and @rotate and @rotate != '180']"): print f
+
+#   ENCODING STATUS BY ACT
+	# encoded_transcripts = matches(faust.transcript_files(), encoded_xp)
+	# deleatur_transcripts = matches(faust.transcript_files(), deleatur_xp)
 	
-	for phrase in ['I ', 'II ', 'III ', 'IV ', 'V ']:
-		print
-		print 'Akt ', phrase
-		print
-		for f in matches(faust.transcript_files(),
-						 "//tei:altIdentifier[contains(@type, 'edition')]/tei:idno[starts-with(.,'"
-						 + phrase + "')]"):
-			if (f in encoded_transcripts): print ' E',
-			else: print '  ',
-			if (f in deleatur_transcripts): print ' D',
-			else: print '  ',
-			print f
+	# for phrase in ['I ', 'II ', 'III ', 'IV ', 'V ']:
+	# 	print
+	# 	print 'Akt ', phrase
+	# 	print
+	# 	for f in matches(faust.transcript_files(),
+	# 					 "//tei:altIdentifier[contains(@type, 'edition')]/tei:idno[starts-with(.,'"
+	# 					 + phrase + "')]"):
+	# 		if (f in encoded_transcripts): print ' E',
+	# 		else: print '  ',
+	# 		if (f in deleatur_transcripts): print ' D',
+	# 		else: print '  ',
+	# 		print f
+############

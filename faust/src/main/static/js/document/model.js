@@ -1,5 +1,7 @@
 
 Faust.YUI().use("oop", "dump", function(Y) {
+	Faust.ENC_EXC_PREF = "ENCODING ERROR: ";
+	
 	Faust.ViewComponent = function() {};
 	Faust.ViewComponent.prototype = {
 		rotation: 0,
@@ -122,7 +124,7 @@ Faust.YUI().use("oop", "dump", function(Y) {
 				
 				if (align.priority === this[name].priority){
 					var xmlId = this.xmlId ? this.xmlId : '';
-					throw("Conflicting alignment instructions for element " 
+					throw(Faust.ENC_EXC_PREF + "Conflicting alignment instructions for element " 
 							+ this.elementName + " #" + xmlId + " (" + name + ", " 
 							+ Faust.Align[align.priority] + " )"); 
 				}

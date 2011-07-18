@@ -25,7 +25,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 
 		alignMainZone: function() {
 			if (!this.mainZone)
-				throw ("No main zone specified!");
+				throw (Faust.ENC_EXC_PREF + "No main zone specified!");
 			//position absolutely
 			this.mainZone.setAlign("hAlign", new Faust.AbsoluteAlign(this.mainZone, 0, 0,Faust.Align.EXPLICIT));
 			this.mainZone.setAlign("vAlign", new Faust.AbsoluteAlign(this.mainZone, 90, 0, Faust.Align.EXPLICIT));
@@ -51,7 +51,10 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
 				this.alignMainZone();
 			} catch(error) {
-				this.displayError(error);
+				if (typeof error === 'string' && error.substring(0, Faust.ENC_EXC_PREF.length) === Faust.ENC_EXC_PREF)
+					this.displayError(error);
+				else
+					throw (error);
 			}
 			
 			while (containerElement.hasChildNodes()) this.rootElement.removeChild(containerElement.firstChild);
@@ -120,7 +123,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 						vc.rotation = parseInt(node.attrs["tei:rotate"]);
 					if ("tei:type" in node.attrs && node.attrs["tei:type"] == "main") {
 						if (this.mainZone != null)
-							throw ("More than one main zone specified!");
+							throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
 						else
 							this.mainZone = vc;
 					} 
@@ -190,7 +193,10 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 						postBuildDeferred.push(
 								function(){
 									var anchor = idMap[anchorId];
-									vc.setAlign(alignName, new Faust.Align(vc, anchor, coordRot, myJoint, yourJoint, Faust.Align.EXPLICIT));
+									if (!anchor)
+										throw (Faust.ENC_EXC_PREF + "Reference to #" + anchorId + " cannot be resolved!");
+									var globalCoordRot = coordRot + anchor.globalRotation();
+									vc.setAlign(alignName, new Faust.Align(vc, anchor, globalCoordRot, myJoint, yourJoint, Faust.Align.EXPLICIT));
 								});
 					}						
 				});
@@ -199,11 +205,11 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				// TODO special treatment of zones
 				if ("ge:rend" in node.attrs) {
 					if (node.attrs["ge:rend"] == "right") {
-			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, 0, 1, 1, Faust.Align.REND_ATTR));
+			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 1, 1, Faust.Align.REND_ATTR));
 					} else if (node.attrs["ge:rend"] == "left") {
-			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, 0, 0, 0, Faust.Align.REND_ATTR));
+			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0, 0, Faust.Align.REND_ATTR));
 					} else if (node.attrs["ge:rend"] == "center") {
-			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, 0, 0.5, 0.5, Faust.Align.REND_ATTR));
+			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0.5, 0.5, Faust.Align.REND_ATTR));
 					}
 
 
