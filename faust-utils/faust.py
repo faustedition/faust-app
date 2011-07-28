@@ -48,6 +48,9 @@ def xml_files():
 	xml_files.sort()
 	return xml_files
 
+def files_in(prefix):
+	return [f for f in xml_files() if relative_path(f).startswith(prefix)]
+
 def transcript_files():
 	return [f for f in xml_files() if relative_path(f).startswith("transcript/")]
 

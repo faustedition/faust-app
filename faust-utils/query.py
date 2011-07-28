@@ -24,6 +24,18 @@ def matches (files, xpath):
 			sys.stderr.write("XML syntax error: " + file + "\n")
 	return filter(does_match, files)
 
+def list_matches (files, xpath):
+	''' Lists tuples of the form [file, [match1, match2,...]]'''
+	def matches_in_file (file):
+		try:
+			xml = lxml.etree.parse(file)
+			return [file, faust.xpath(xpath)(xml)]
+		except lxml.etree.XMLSyntaxError:
+			sys.stderr.write("XML syntax error: " + file + "\n")
+	return map(matches_in_file, files)
+
+
+
 def non_wellformed (files):
 	''' List non-wellformed xml files. '''
 	def is_not_well (file):
@@ -95,7 +107,42 @@ if __name__ == "__main__":
 
 	#	for f in matches(faust.transcript_files(), "//tei:change[(contains(@when, '2011-06-') or contains(@when, '2011-05-')) and contains(@who, 'bruening')]"):	print f
 
-	for f in matches(faust.transcript_files(), "//tei:zone[@type='main' and @rotate and @rotate != '180']"): print f
+	# for f in matches(faust.transcript_files(), "//tei:zone[@type='main' and @rotate and @rotate != '180']"): print f
+
+	# for f in matches(faust.transcript_files(), "//tei:text[not(.//text() or //tei:div[@type='template' or .//comment()])]"): print f
+
+# encoding ordered by date
+	# for m in list_matches(faust.transcript_files(), "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='encoded']/@when"):
+	# 	if m and m[1]:
+	# 		print m[1][-1],
+	# 		print m[0]
+
+	eigenhaendig = 0
+	schreiber = 0
+	kA = 0
+	for m in list_matches(faust.files_in("document/"), "//f:materialUnit/f:metadataImport/f:archiveDatabase/f:schrift/text()"):
+		print m[0],
+		pages = list_matches([m[0]], "//f:materialUnit/f:materialUnit[@type='page']")[0][1]
+		if m[1]:
+			value = m[1][0].encode('utf8')
+			if ('egh' in value):
+				eigenhaendig = eigenhaendig + len(pages)
+				
+			else:
+				schreiber = schreiber + len(pages)
+			print value,
+		else:
+			kA = kA + len(pages)
+			print 'keine_Angabe',
+		print len(pages)
+
+	print
+	print '(u.A.) eigenhaendig: ', eigenhaendig
+	print 'nicht eigenhaendig: ', schreiber
+	print 'keine Angabe: ', kA
+	
+
+	# for f in faust.files_in("document/"): print f
 
 #   ENCODING STATUS BY ACT
 	# encoded_transcripts = matches(faust.transcript_files(), encoded_xp)

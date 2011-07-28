@@ -6,6 +6,7 @@
 import sys
 import lxml.etree
 import faust
+import query
 
 def transform_all(files, transform):
 	for f in files:
@@ -32,4 +33,12 @@ def transform_stages_to_changes():
 	changes_to_stages = lambda t: tei_transform(t, xslt_trans)
 	transform_all(faust.transcript_files(), changes_to_stages)
 
+def delete_empty_text_elements():
+	files = query.matches(faust.transcript_files(),
+						  "//tei:text[not(.//text() or //tei:div[@type='template' or .//comment()])]")
+	xslt_trans = lxml.etree.XSLT(lxml.etree.parse("xsl/delete_empty_text_elements.xsl"))
+	del_txt = lambda t: tei_transform(t, xslt_trans)
+	transform_all(files, del_txt)
 
+if __name__ == "__main__":
+	delete_empty_text_elements()
