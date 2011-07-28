@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.faustedition</groupId>
 	<artifactId>faust-schema</artifactId>
-	<version>1.2</version>
+	<version>1.3</version>
 	<name>Digitale Faust-Edition :: Faust TEI P5 schema</name>
 	<packaging>jar</packaging>
 	<build>

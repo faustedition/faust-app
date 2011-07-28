@@ -209,7 +209,8 @@
 						</attList>
 					</classSpec>
 
-					<!--  ================================ MODIFIED for Faust !!! -->
+					<!--  ================================ MODIFIED for Faust ================== -->
+					
 					<classSpec type="atts" ident="att.global" mode="change" module="tei">
 						<classes>
 							<!-- 
@@ -376,6 +377,10 @@
 							<memberOf key="att.transcriptional"/>
 							<memberOf key="att.graphicStyle"/>
 						</classes>
+						<content>
+							<rng:ref name="macro.lineContent"/>
+						</content>
+						
 						<attList>
 							<attDef ident="at" ns="http://www.faustedition.net/ns" usage="req">
 								<desc>Verweist auf die Stelle, an der etwas eingefügt wird.</desc>
