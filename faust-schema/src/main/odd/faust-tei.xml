@@ -81,6 +81,38 @@
 									</valItem>
 								</valList>
 							</attDef>
+							<!-- Uebergangsloesung, zu ersetzen -->
+							<attDef ident="correction" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Korrektur</desc>
+								<datatype>
+									<rng:ref name="boolean"/>
+								</datatype>
+							</attDef>
+							<attDef ident="proposedBy" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Vorgeschlagen</desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="acceptedBy" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Akzeptiert</desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="rejectedBy" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Verworfen oder fallengelassen </desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="questionedBy" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Monierung</desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							
 						</attList>
 					</classSpec>
 
@@ -1021,6 +1053,8 @@
 					<elementSpec ident="space" module="transcr" mode="change">
 						<classes mode="change">
 							<memberOf key="att.typed"/>
+							<!--  modified for faust -->
+							<memberOf key="att.metrical"/>
 						</classes>
 					</elementSpec>
 

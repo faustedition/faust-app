@@ -147,6 +147,19 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 							for (var ins_spc = 0; ins_spc < quantity; ins_spc++)
 								vc.add(new Faust.Line({}));
 						}
+				} else if (node.name == "tei:gap") {
+					switch (node.attrs["tei:unit"]) {
+					case "chars":
+						var representation = '';
+						for (var nrChars=0; nrChars <= node.attrs["tei:quantity"]; nrChars++) {
+							representation += 'X';
+						}
+						vc = new Faust.Text ("[XXX]",{});
+						break;
+					default: 
+						throw (Faust.ENC_EXC_PREF + "Invalid unit for gap element! Use 'chars'!");
+					}
+					
 				} else if (node.name == "f:grLine") {
 					//vc = new Faust.GLine();
 				} else if (node.name == "f:grBrace") {
