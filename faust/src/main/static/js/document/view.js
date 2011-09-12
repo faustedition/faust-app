@@ -82,13 +82,19 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 						
 			Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, this.svgContainer);
 			
-			var transcriptNavHeight =
-				parseInt(Y.one('#transcript-navigation').getComputedStyle('height')) +
-				parseInt(Y.one('#transcript-navigation').getComputedStyle('marginTop')) +
-				parseInt(Y.one('#transcript-navigation').getComputedStyle('marginBottom'));
-				
-			var transcriptHeight = Y.DOM.winHeight() - transcriptNavHeight;
-			Y.one('#transcript').setStyle('height', transcriptHeight + "px");
+			var setHeight = function() {
+				var transcriptNavHeight =
+					parseInt(Y.one('#transcript-navigation').getComputedStyle('height')) +
+					parseInt(Y.one('#transcript-navigation').getComputedStyle('marginTop')) +
+					parseInt(Y.one('#transcript-navigation').getComputedStyle('marginBottom'));
+
+				var transcriptHeight = Y.DOM.winHeight() - transcriptNavHeight;
+				Y.one('#transcript').setStyle('height', transcriptHeight + "px");
+			};
+			
+			setHeight();
+			Y.on('resize', setHeight);
+			
 			Y.one('#transcript-facsimile').scrollIntoView(); 
 		},	
 		build: function(parent, tree) {
