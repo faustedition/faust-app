@@ -158,13 +158,22 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 					}
 					vc = new Faust.Line(lineAttrs);
 				} else if (node.name == "f:vspace") {
-					if (node.attrs["f:unit"]=="lines")
-						{
-							vc = new Faust.BreakingVC();
-							var quantity = node.attrs["f:quantity"];
-							for (var ins_spc = 0; ins_spc < quantity; ins_spc++)
-								vc.add(new Faust.Line({}));
-						}
+					//TODO real implementation, non-integer values
+					switch (node.attrs["f:unit"]) {
+					case "lines":
+						if (node.attrs['f:quantity']) {
+							for (var nrLines=0; nrLines < node.attrs['f:quantity']; nrLines++) {
+								var line = new Faust.Line({center:true});
+								line.add(createText('\u00b7', node));
+								parent.add(line);
+							} 
+								
+						} else throw (Faust.ENC_EXC_PREF + "f:vspace: Please specify @qunatity");
+						break;
+					default: 
+						throw (Faust.ENC_EXC_PREF + "Invalid unit for vspace element! Use 'lines'!");
+					}
+					
 				} else if (node.name == "tei:gap") {
 					switch (node.attrs["tei:unit"]) {
 					case "chars":
@@ -188,8 +197,21 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 					default: 
 						throw (Faust.ENC_EXC_PREF + "Invalid unit for gap element! Use 'chars'!");
 					}
-					
-				} else if (node.name == "f:grLine") {
+				} else if (node.name == "f:hspace") {
+					// TODO: real implementation
+					var representation = '';
+					switch (node.attrs["f:unit"]) {
+					case "chars":
+						if (node.attrs['f:quantity']) {
+							for (var nrChars=0; nrChars < node.attrs['f:quantity']; nrChars++) 
+								representation += '\u00b7';
+						} else throw (Faust.ENC_EXC_PREF + "f:hspace: Please specify @qunatity");
+						break;
+					default: 
+						throw (Faust.ENC_EXC_PREF + "Invalid unit for hspace element! Use 'chars'!");
+					}
+					vc = createText (representation, node);
+				}  else if (node.name == "f:grLine") {
 					//vc = new Faust.GLine();
 				} else if (node.name == "f:grBrace") {
 					//vc = new Faust.GBrace();
@@ -453,7 +475,7 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 				var resize = new Y.Resize({
 					node: '#transcript-facsimile',
 					handles: 'r',
-					handlesWrapper: handle
+					autoHide: false
 				});
 				var transcript_text = Y.one('#transcript-text');
 				resize.on('resize:resize', function(ev){
