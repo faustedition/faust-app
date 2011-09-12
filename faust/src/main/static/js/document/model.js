@@ -232,6 +232,9 @@ Faust.YUI().use("oop", "dump", function(Y) {
 				styles["fill"] = this.handColor();
 				var hand = this.textAttrs["hand"];
 				if (hand.indexOf("g_") >= 0) {
+					// TODO temp solution, Firefox can only display italics,
+					// Webkit only small-caps
+					styles["font-variant"] = "small-caps";
 					styles["font-style"] = "italic";
 				} else {
 					styles["font-style"] = "normal";

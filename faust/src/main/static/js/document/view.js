@@ -1,8 +1,7 @@
 SVG_NS = "http://www.w3.org/2000/svg";
 
-Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-queue", "dragdrop", function(Y) {
+Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "dragdrop", "resize", function(Y) {
 		
-	
 	Faust.DocumentTranscriptCanvas =  function(node) {
 		this.svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		this.svgContainer.setAttribute("class", "diplomatic");
@@ -79,11 +78,18 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 						context: view						
 					});
 				aq.run();
-				
 			}
-			
+						
 			Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, this.svgContainer);
-
+			
+			var transcriptNavHeight =
+				parseInt(Y.one('#transcript-navigation').getComputedStyle('height')) +
+				parseInt(Y.one('#transcript-navigation').getComputedStyle('marginTop')) +
+				parseInt(Y.one('#transcript-navigation').getComputedStyle('marginBottom'));
+				
+			var transcriptHeight = Y.DOM.winHeight() - transcriptNavHeight;
+			Y.one('#transcript').setStyle('height', transcriptHeight + "px");
+			Y.one('#transcript-facsimile').scrollIntoView(); 
 		},	
 		build: function(parent, tree) {
 			if (tree == null) return null;			
@@ -91,7 +97,9 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 			var node = tree.node;
 			var nodeIsInvisible = false;
 			
-			if ((node instanceof Goddag.Text) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
+			// Text factory; the current model only delivers text nodes, some additional elements (gaps, insertion marks) need 
+			// to be delivered to know their tree context (hands...) for visualisation
+			var createText = function(content, node){
 				var textAttrs = {};
 				Y.each(node.ancestors(), function(a) {
 					var elem = a.node;
@@ -111,7 +119,11 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 						textAttrs.fontsize = ((elem.attrs["ge:type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
 					}
 				});				
-				vc = new Faust.Text(node.text(), textAttrs);
+				return new Faust.Text(content, textAttrs);				
+			};
+
+			if ((node instanceof Goddag.Text) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
+				vc = createText(node.content, node);
 			} else if (node instanceof Goddag.Element) {
 				if (node.name == "ge:document") {
 					vc = new Faust.Surface();
@@ -150,11 +162,22 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 				} else if (node.name == "tei:gap") {
 					switch (node.attrs["tei:unit"]) {
 					case "chars":
-						var representation = '';
-						for (var nrChars=0; nrChars <= node.attrs["tei:quantity"]; nrChars++) {
-							representation += 'X';
+						if (node.attrs['tei:quantity']) {
+							var representation = '[';
+							for (var nrChars=0; nrChars < node.attrs["tei:quantity"]; nrChars++) {
+								representation += '\u2715';
+							}
+							vc = createText (representation + "]", node);							
+						} else if(node.attrs['tei:atLeast']) {
+							var representation = '[';
+							for (var nrChars=0; nrChars < node.attrs["tei:atLeast"]; nrChars++) {
+								representation += '\u2715';
+							}
+							vc = createText (representation + "\u2026]", node);							
+
+						} else {
+							throw (Faust.ENC_EXC_PREF + "Please specify either @qunatity or @atLeast");
 						}
-						vc = new Faust.Text ("[XXX]",{});
 						break;
 					default: 
 						throw (Faust.ENC_EXC_PREF + "Invalid unit for gap element! Use 'chars'!");
@@ -170,13 +193,13 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 					if (parent.elementName === "tei:zone")
 						vc = new Faust.Line([]);
 					else
-						vc = new Faust.Text("", {});
+						vc = createText("", node);
 					
 				
 				} else if (node.name == "f:ins" && node.attrs["f:orient"] == "right") {
 					vc = new Faust.DefaultVC();
 					//Einweisungszeichen
-					vc.add (new Faust.Text("\u2308", {}));
+					vc.add (createText("\u2308", node));
 				// Default Elements
 				} else if (node.name in {}) {
 					vc = new Faust.DefaultVC();
@@ -255,7 +278,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
  			// After all children, TODO move this into appropriate classes
  			if (node.name == "f:ins" && node.attrs["f:orient"] == "left") {
  				// Einweisungszeichen
- 				vc.add (new Faust.Text("\u2309", {}));
+ 				vc.add (createText("\u2309", node));
  			}
 
  			return vc;
@@ -329,7 +352,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 						this.changeViewMode(o.get("value"));
 					}
 				}, this);
-			}, viewModeSelector, this);		
+			}, viewModeSelector, this);	
 		},
 		changeViewMode: function(mode) {
 			if ("text" == mode || "facsimile" == mode) {
@@ -404,18 +427,34 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 			} 
 			transcript = Y.Node.create('<div id="transcript"></div>');
 			if (this.viewMode == 'text') {
-				transcript.append('<div id="transcript-text" style="width: 900px"></div>');
+				transcript.append ('<div id="transcript-text" style="width: 100%"></div>');
 			} else if (this.viewMode == 'facsimile') {
-				transcript.append('<div id="transcript-facsimile" style="width: 900px"></div>');				
+				transcript.append('<div id="transcript-facsimile" style="width: 100%"></div>');				
 			} else {
-				transcript.addClass("yui3-g");
-				transcript.append('<div class="yui3-u-1-2" id="transcript-facsimile"></div>');				
-				transcript.append('<div class="yui3-u-1-2" id="transcript-text"></div>');
+				//transcript.addClass("yui3-g"); doesn't work with resize in firefox
+				transcript.setStyle("position", "relative");
+				transcript.append('<div id="transcript-facsimile" style="width: 50%; position: relative; left: 0px"></div>');				
+				transcript.append('<div id="transcript-text" style="width: 50%; position: absolute; top: 0px;right: 0px"></div>');
 			}
 			
 			navigation.insert(transcript, "after");
 			this.renderTranscript();
-			this.renderFacsimiles();				
+			this.renderFacsimiles();
+
+			// Make the view resizable
+			if (this.viewMode != 'text' && this.viewMode != 'facsimile') {
+				var handle = Y.Node.create('<div>HANDLE</div>');
+				var resize = new Y.Resize({
+					node: '#transcript-facsimile',
+					handles: 'r',
+					handlesWrapper: handle
+				});
+				var transcript_text = Y.one('#transcript-text');
+				resize.on('resize:resize', function(ev){
+					var width =	parseInt(Y.one("#transcript").getStyle('width'));
+					transcript_text.setStyle("width", (width - ev.info.offsetWidth) + "px");
+				})
+			}
 		},
 		updateNavigation: function() {
 			var browsePages = Y.one("#transcript-browse");
@@ -449,7 +488,8 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 			container.append('<div id="transcript-swf"></div>')
 			swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
 				"transcript-swf",
-				(container.get("offsetWidth") - 20) + "px", "600px",
+				//(container.get("offsetWidth") - 20) + "px", "600px",
+				"100%", "100%",
 				"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
 					server: Faust.FacsimileServer,
 					image: this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif",
@@ -459,7 +499,8 @@ Faust.YUI().use("node", "dom", "event", "overlay", "scrollview", "dump", "async-
 					scale: "noscale",
 					bgcolor: "#000000",
 					allowfullscreen: "true",
-					allowscriptaccess: "always"
+					allowscriptaccess: "always",
+					wmode: "opaque"
 				});	
 		},
 		renderTranscript: function() {

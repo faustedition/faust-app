@@ -1,6 +1,6 @@
 <#assign cp = config["ctx.path"]>
 
-<#macro page title css="" header="">
+<#macro page title css="" header="" layout="">
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,7 +32,7 @@
 	 <#if css?has_content><style type="text/css">${css}</style></#if>
 	 <#if header?has_content>${header}</#if>
 </head>
-<body class="yui3-skin-sam">
+<body class="yui3-skin-sam<#if layout?has_content> layout-${layout}</#if>">
 <div id="header">
 	<div class="yui3-g">
 		<div class="yui3-u-2-3"><h1><span class="color-1">Digitale Faustedition:&#160;</span>${title}</h1></div>
@@ -45,7 +45,7 @@
 	</div>
 	<@topNavigation />
 </div>
-<div id="main">
+<div id="main" class="<#if layout?has_content>layout-${layout}</#if>">
 	<#nested />
 </div>
 <div id="footer">

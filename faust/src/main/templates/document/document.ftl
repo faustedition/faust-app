@@ -16,9 +16,9 @@
 	#transcript-browser .yui3-widget-hd a { color: #ccc; }	
 	#transcript-browser .yui3-widget-bd { white-space: nowrap; }
 	#transcript-browser .yui3-widget-bd li { width: 150px; text-align: center }
-	
-	#transcript-facsimile, #transcript-text { height: 600px; }
-	#transcript-text { overflow: scroll }
+	#transcript {height: 800px}
+	#transcript-facsimile, #transcript-text {height: 100%}
+	#transcript-text { overflow: auto }
 	#transcript-swf { border: 1px inset grey; }
 	.zone { border: 1px dashed #ccc; margin: 3em 0; padding: 1em}	
 </#assign>
@@ -29,10 +29,8 @@
 	<script type="text/javascript" src="${cp}/static/js/document/model.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document/view-svg.js"></script>	
 	<script type="text/javascript" src="${cp}/static/js/document/view.js"></script>
-
-	
 </#assign>
-<@faust.page title=title css=css header=header>
+<@faust.page title=title css=css header=header layout="wide">
 	<div class="demo-note">
 		<p>This view shows the diplomatic transcript of a sample manuscript as it is currently computed from encoded sources.</p>
 		
