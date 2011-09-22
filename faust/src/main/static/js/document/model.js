@@ -24,8 +24,8 @@ Faust.YUI().use("oop", "dump", function(Y) {
 			this.y = null;
 			this.width = null;
 			this.height = null;
-			this.hAlign = null;
-			this.vAlign = null;
+			//this.hAlign = null;
+			//this.vAlign = null;
 		},
 		add: function(vc) {
 			vc.parent = this;
@@ -147,9 +147,9 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	};
 	
 //	Faust.BreakingVC.prototype.render = function() {
-			
-	//	Y.each(this.children, function(c) { c.render(); });
-	//};
+//
+//		Y.each(this.children, function(c) { c.render(); });
+//	};
  	
 	Faust.BreakingVC.prototype.defaultAligns = function () {
 		
@@ -161,6 +161,20 @@ Faust.YUI().use("oop", "dump", function(Y) {
 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
  	};
 	Y.augment (Faust.BreakingVC, Faust.ViewComponent);
+	
+	Faust.VSpace = function(height) {
+		this.initViewComponent();
+		this.vSpaceHeight = height;
+	};
+
+	Y.augment (Faust.VSpace, Faust.BreakingVC);
+
+	Faust.HSpace = function(width) {
+		this.initViewComponent();
+		this.hSpaceWidth = width;
+	};
+	
+	Y.augment (Faust.HSpace, Faust.ViewComponent);
 	
 	Faust.Surface = function() {
 		this.initViewComponent();
@@ -184,9 +198,9 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		this.lineAttrs = lineAttrs;
 	};
 	Faust.Line.prototype.dimension = function() {
-		this.height = 20;
-		this.width = 0;
-		Y.each(this.children, function(c) { this.width += c.width; }, this);
+		//this.height = 20;
+		//this.width = 0;
+		//Y.each(this.children, function(c) { this.width += c.width; }, this);
 	};
  	Faust.Line.prototype.defaultAligns = function () {
 			

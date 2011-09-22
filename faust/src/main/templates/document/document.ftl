@@ -28,7 +28,9 @@
 	<script type="text/javascript" src="${cp}/static/js/document/materialunit.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document/model.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document/view-svg.js"></script>	
+	<script type="text/javascript" src="${cp}/static/js/document/controller.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document/view.js"></script>
+	
 </#assign>
 <@faust.page title=title css=css header=header layout="wide">
 	<div class="demo-note">

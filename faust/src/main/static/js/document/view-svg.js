@@ -102,11 +102,40 @@ Faust.YUI().use("node", "dom", "event", function(Y) {
 
 	Y.augment (Faust.BreakingVC, Faust.ViewComponent);
 	
+	Faust.VSpace.prototype.createView = function() {
+		var result = this.svgDocument().createElementNS(SVG_NS, "rect");
+		result.setAttribute('class', 'VSpace');
+		result.setAttribute('width', '0.1em');
+		result.setAttribute('style', 'visibility: hidden;');
+		//TODO dynamically calculate from context line height
+		var height = String(this.vSpaceHeight * 2) + 'em';
+		result.setAttribute('height', height);
+		return result;
+	};
+	
+	Y.augment(Faust.VSpace, Faust.BreakingVC);
+
+	Faust.HSpace.prototype.createView = function() {
+		var result = this.svgDocument().createElementNS(SVG_NS, "rect");
+		result.setAttribute('class', 'HSpace');
+		result.setAttribute('height', '0.1em');
+		result.setAttribute('style', 'visibility: hidden;');
+		//TODO dynamically calculate from context ? 
+		var width = String(this.hSpaceWidth * 0.5) + 'em';
+		result.setAttribute('width', width);
+		return result;
+	};
+	
+	Y.augment(Faust.HSpace, Faust.ViewComponent);
+
+	
 	Faust.DefaultVC.prototype.createView = function() {
 		var view = this.svgDocument().createElementNS(SVG_NS, "g");
 		view.setAttribute('class', 'DefaultVC');
 		return view;
 	};
+	
+	
 	
 	//Faust.DefaultVC.prototype.render = function() {
 		//this.view = createView();

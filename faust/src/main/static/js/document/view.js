@@ -2,32 +2,30 @@ SVG_NS = "http://www.w3.org/2000/svg";
 
 Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "dragdrop", "resize", function(Y) {
 		
+	// TODO: cut dependencies to controller
+	
 	Faust.DocumentTranscriptCanvas =  function(node) {
-		this.svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		this.svgContainer.setAttribute("class", "diplomatic");
+		this.svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		this.svgRoot.setAttribute("class", "diplomatic");
 
-		Y.Node.getDOMNode(node).appendChild(this.svgContainer);
+		Y.Node.getDOMNode(node).appendChild(this.svgRoot);
 	};
 
 	Faust.DocumentTranscriptCanvas.prototype = {
 			
-		idMap: {},
-		
-		postBuildDeferred: [],
-
-		intoView: function (containerElement, svgContainer) {
+		intoView: function (containerElement, svgCont) {
 			var rootBBox = containerElement.getBBox();
 			containerElement.setAttribute("transform", "translate(" + (- rootBBox.x) + "," + (- rootBBox.y) + ")");
-			svgContainer.setAttribute("width", rootBBox.width);
-			svgContainer.setAttribute("height", rootBBox.height);
+			svgCont.setAttribute("width", rootBBox.width);
+			svgCont.setAttribute("height", rootBBox.height);
 		},
 
 		alignMainZone: function() {
-			if (!this.mainZone)
+			if (!Faust.DocumentController.mainZone)
 				throw (Faust.ENC_EXC_PREF + "No main zone specified!");
 			//position absolutely
-			this.mainZone.setAlign("hAlign", new Faust.AbsoluteAlign(this.mainZone, 0, 0,Faust.Align.EXPLICIT));
-			this.mainZone.setAlign("vAlign", new Faust.AbsoluteAlign(this.mainZone, 90, 0, Faust.Align.EXPLICIT));
+			Faust.DocumentController.mainZone.setAlign("hAlign", new Faust.AbsoluteAlign(Faust.DocumentController.mainZone, 0, 0,Faust.Align.EXPLICIT));
+			Faust.DocumentController.mainZone.setAlign("vAlign", new Faust.AbsoluteAlign(Faust.DocumentController.mainZone, 90, 0, Faust.Align.EXPLICIT));
 		},
 		
 		displayError: function(error) {
@@ -38,16 +36,18 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 			errorDisplay.show();
 			
 		},
+		add: function(vc) 
+		{},
 		render: function(transcript) {
-			this.idMap = {};
-			this.postBuildDeferred = [];
-			this.mainZone = null;
+			Faust.DocumentController.idMap = {};
+			Faust.DocumentController.postBuildDeferred = [];
+			Faust.DocumentController.mainZone = null;
 			try {
-				this.viewComp = this.build(this, transcript.root("ge:document"));
+				this.view = Faust.DocumentController.buildVC(null, transcript.root("ge:document"));
 				var containerElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
 				containerElement.setAttribute("id", "transcript_container");
-				this.svgContainer.appendChild(containerElement);
-				Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
+				this.svgRoot.appendChild(containerElement);
+				Y.each(Faust.DocumentController.postBuildDeferred, function(f) {f.apply(this)});
 				this.alignMainZone();
 			} catch(error) {
 				if (typeof error === 'string' && error.substring(0, Faust.ENC_EXC_PREF.length) === Faust.ENC_EXC_PREF)
@@ -56,13 +56,13 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 					throw (error);
 			}
 			
-			while (containerElement.hasChildNodes()) this.rootElement.removeChild(containerElement.firstChild);
+			while (containerElement.hasChildNodes()) this.containerElement.removeChild(containerElement.firstChild);
 			
-			if (this.viewComp) {
+			if (this.view) {
 				//FIXME calculate the required number of iterations
-				this.viewComp.render();
+				this.view.render();
 				
-				view = this.viewComp;
+				view = this.view;
 				that = this;
 				aq = new Y.AsyncQueue();
 				aq.add({
@@ -72,7 +72,7 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 						context: view
 					},
 					{
-						fn : function() {Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, that.svgContainer)},
+						fn : function() {Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, that.svgRoot)},
 						timeout: 0,
 						iterations: 1,
 						context: view						
@@ -80,7 +80,7 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 				aq.run();
 			}
 						
-			Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, this.svgContainer);
+			Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, this.svgRoot);
 			
 			var setHeight = function() {
 				var transcriptNavHeight =
@@ -96,221 +96,8 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 			Y.on('resize', setHeight);
 			
 			Y.one('#transcript-facsimile').scrollIntoView(); 
-		},	
-		build: function(parent, tree) {
-			if (tree == null) return null;			
-			var vc = null;
-			var node = tree.node;
-			var nodeIsInvisible = false;
-			
-			// Text factory; the current model only delivers text nodes, some additional elements (gaps, insertion marks) need 
-			// to be delivered to know their tree context (hands...) for visualisation
-			var createText = function(content, node){
-				var textAttrs = {};
-				Y.each(node.ancestors(), function(a) {
-					var elem = a.node;
-					if (elem.name == "f:hand") {
-						textAttrs.hand = elem.attrs["f:id"];
-					} else if (elem.name == "ge:rewrite") {
-						textAttrs.rewrite = elem.attrs["tei:hand"];
-					} else if (elem.name == "f:under") {
-						textAttrs.under = true;
-					} else if (elem.name == "f:over") {
-						textAttrs.over = true;
-					} else if (elem.name == "f:st") {
-						textAttrs.strikethrough = true;
-					} else if (elem.name == "tei:hi" && elem.attrs["tei:rend"].indexOf("underline") >= 0) {
-						textAttrs.underline = true;
-					} else if (elem.name == "ge:line") {
-						textAttrs.fontsize = ((elem.attrs["ge:type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
-					}
-				});				
-				return new Faust.Text(content, textAttrs);				
-			};
-
-			if ((node instanceof Goddag.Text) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
-				vc = createText(node.content, node);
-			} else if (node instanceof Goddag.Element) {
-				if (node.name == "ge:document") {
-					vc = new Faust.Surface();
-				} else if (node.name == "tei:surface") {
-					vc = new Faust.Surface();
-				} else if (node.name == "tei:zone")	{
-					vc = new Faust.Zone();
-					if ("tei:rotate" in node.attrs) 
-						vc.rotation = parseInt(node.attrs["tei:rotate"]);
-					if ("tei:type" in node.attrs && node.attrs["tei:type"] == "main") {
-						if (this.mainZone != null)
-							throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
-						else
-							this.mainZone = vc;
-					} 
-						
-
-				} else if (node.name == "ge:line") {
-					var lineAttrs = {};
-					var rendition = node.attrs["ge:rend"] || "";
-					if (rendition.indexOf("center") >= 0) {
-						lineAttrs.center = true;
-					} else if (rendition.indexOf("indent") >= 0) {
-						var start = rendition.indexOf("indent-");
-						lineAttrs.indent = parseInt(rendition.substring(start + 7, rendition.length)) / 100.0;
-					}
-					vc = new Faust.Line(lineAttrs);
-				} else if (node.name == "f:vspace") {
-					//TODO real implementation, non-integer values
-					switch (node.attrs["f:unit"]) {
-					case "lines":
-						if (node.attrs['f:quantity']) {
-							for (var nrLines=0; nrLines < node.attrs['f:quantity']; nrLines++) {
-								var line = new Faust.Line({center:true});
-								line.add(createText('\u00b7', node));
-								parent.add(line);
-							} 
-								
-						} else throw (Faust.ENC_EXC_PREF + "f:vspace: Please specify @qunatity");
-						break;
-					default: 
-						throw (Faust.ENC_EXC_PREF + "Invalid unit for vspace element! Use 'lines'!");
-					}
-					
-				} else if (node.name == "tei:gap") {
-					switch (node.attrs["tei:unit"]) {
-					case "chars":
-						if (node.attrs['tei:quantity']) {
-							var representation = '[';
-							for (var nrChars=0; nrChars < node.attrs["tei:quantity"]; nrChars++) {
-								representation += '\u2715';
-							}
-							vc = createText (representation + "]", node);							
-						} else if(node.attrs['tei:atLeast']) {
-							var representation = '[';
-							for (var nrChars=0; nrChars < node.attrs["tei:atLeast"]; nrChars++) {
-								representation += '\u2715';
-							}
-							vc = createText (representation + "\u2026]", node);							
-
-						} else {
-							throw (Faust.ENC_EXC_PREF + "Please specify either @qunatity or @atLeast");
-						}
-						break;
-					default: 
-						throw (Faust.ENC_EXC_PREF + "Invalid unit for gap element! Use 'chars'!");
-					}
-				} else if (node.name == "f:hspace") {
-					// TODO: real implementation
-					var representation = '';
-					switch (node.attrs["f:unit"]) {
-					case "chars":
-						if (node.attrs['f:quantity']) {
-							for (var nrChars=0; nrChars < node.attrs['f:quantity']; nrChars++) 
-								representation += '\u00b7';
-						} else throw (Faust.ENC_EXC_PREF + "f:hspace: Please specify @qunatity");
-						break;
-					default: 
-						throw (Faust.ENC_EXC_PREF + "Invalid unit for hspace element! Use 'chars'!");
-					}
-					vc = createText (representation, node);
-				}  else if (node.name == "f:grLine") {
-					//vc = new Faust.GLine();
-				} else if (node.name == "f:grBrace") {
-					//vc = new Faust.GBrace();
-				} else if (node.name == "tei:anchor") {
-					//use empty text element as an anchor
-					// FIXME make proper phrase/block context differentiation
-					if (parent.elementName === "tei:zone")
-						vc = new Faust.Line([]);
-					else
-						vc = createText("", node);
-					
-				
-				} else if (node.name == "f:ins" && node.attrs["f:orient"] == "right") {
-					vc = new Faust.DefaultVC();
-					//Einweisungszeichen
-					vc.add (createText("\u2308", node));
-				// Default Elements
-				} else if (node.name in {}) {
-					vc = new Faust.DefaultVC();
-				//Invisible elements				
-				} else if (node.name in {"tei:rdg":1}){
-					nodeIsInvisible = true;
-				}
-				aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left", "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
-				
-				var idMap = this.idMap;
-				var postBuildDeferred = this.postBuildDeferred;
-				Y.each(aligningAttributes, function(a){
-					if (a in node.attrs) {
-						if (!vc) {
-							vc = new Faust.DefaultVC();
-						}
-						//FIXME id hash hack; do real resolution of references
-						var anchorId = node.attrs[a].substring(1);
-						var coordRot = a in {"f:at":1, "f:left":1, "f:left-right":1, "f:right":1, "f:right-left":1}? 0 : 90;
-						var alignName = coordRot == 0 ? "hAlign" : "vAlign";
-						var myJoint = a in {"f:left":1, "f:left-right":1, "f:top":1, "f:top-bottom":1}? 0 : 1;
-						var yourJoint = a in {"f:at":1, "f:left":1, "f:right-left":1, "f:top":1, "f:bottom-top":1}? 0 : 1;
-						
-						if ("f:orient" in node.attrs)
-							myJoint = node.attrs["f:orient"] == "left" ? 1 : 0;
-						
-						postBuildDeferred.push(
-								function(){
-									var anchor = idMap[anchorId];
-									if (!anchor)
-										throw (Faust.ENC_EXC_PREF + "Reference to #" + anchorId + " cannot be resolved!");
-									var globalCoordRot = coordRot + anchor.globalRotation();
-									vc.setAlign(alignName, new Faust.Align(vc, anchor, globalCoordRot, myJoint, yourJoint, Faust.Align.EXPLICIT));
-								});
-					}						
-				});
-				
-				// TODO redundant with line properties
-				// TODO special treatment of zones
-				if ("ge:rend" in node.attrs) {
-					if (node.attrs["ge:rend"] == "right") {
-			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 1, 1, Faust.Align.REND_ATTR));
-					} else if (node.attrs["ge:rend"] == "left") {
-			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0, 0, Faust.Align.REND_ATTR));
-					} else if (node.attrs["ge:rend"] == "center") {
-			 			vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0.5, 0.5, Faust.Align.REND_ATTR));
-					}
-
-
-				}
-			}
-			
-			if (vc != null) {
-
-				// annotate the vc with the original element name
-	 			vc.elementName = node.name;
-								
-				if (parent != null && parent !== this) {
-					parent.add(vc);
-					vc.parent = parent;
-				}
-				parent = vc;
-			}
-
- 			if (node instanceof Goddag.Element) {
- 				xmlId = node.attrs["xml:id"];
- 				if (xmlId) {
- 					this.idMap[xmlId] = vc;
- 					vc.xmlId = xmlId;
- 				}
-			}
-
- 			if (!nodeIsInvisible)
- 				Y.each(tree.children, function(c) { this.build(parent, c); }, this);
- 			
- 			// After all children, TODO move this into appropriate classes
- 			if (node.name == "f:ins" && node.attrs["f:orient"] == "left") {
- 				// Einweisungszeichen
- 				vc.add (createText("\u2309", node));
- 			}
-
- 			return vc;
-		}
+		},
+		
 	};
 
 	Faust.DocumentView = function(fd) {
