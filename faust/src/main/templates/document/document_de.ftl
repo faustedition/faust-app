@@ -24,6 +24,7 @@
 </#assign>
 <#assign header>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/dragsvg.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/goddag.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document/materialunit.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document/model.js"></script>

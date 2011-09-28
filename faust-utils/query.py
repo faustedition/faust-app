@@ -95,14 +95,14 @@ if __name__ == "__main__":
 	# find all manuscripts with red ink
 	# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, '_tr')] | //*[contains(@hand,'_tr')]"):
 		# print f
-	for f in matches(faust.transcript_files(), "//tei:gap"):	print f
+	# for f in matches(faust.transcript_files(), "//tei:gap"):	print f
 	# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, 'go_')]  | //*[contains(@hand,'go_')]"):	print f
 	# for val in unique_values (faust.transcript_files(), "//tei:facsimile/tei:graphic/@url"): print val
 	# for f in matches(faust.transcript_files(), "count(//tei:facsimile/tei:graphic/@url) > 1"): print f
 	# not_available_xp = "not (" + kodiert_xp + " or " + encoded_xp + " or " + deleatur_xp +  " )"
 	# for f in matches(faust.transcript_files(), not_available_xp):	print f
-	#unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
-	#for f in unencoded: print f
+	unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
+	for f in unencoded: print f
 	#for f in documentary_by_name(): print f
 
 	#	for f in matches(faust.transcript_files(), "//tei:change[(contains(@when, '2011-06-') or contains(@when, '2011-05-')) and contains(@who, 'bruening')]"):	print f
@@ -112,6 +112,20 @@ if __name__ == "__main__":
 	# for f in matches(faust.transcript_files(), "//tei:text[not(.//text() or //tei:div[@type='template' or .//comment()])]"): print f
 
 	# for f in matches(faust.transcript_files(), "//ge:document//text()[normalize-space(.) != ''] and not(" + encoded_xp + ")"): print f
+	# for f in unique_values (faust.transcript_files(), "//tei:change/@who"): print f
+
+# === hilfskraefte ===
+
+	# names = ['mohr', 'sievert', 'badura', 'Sievert', 'arnold', 'blaschko', 'bethe']
+	# for f in matches (faust.transcript_files(), "//tei:change/@who"):
+	# 	xml = lxml.etree.parse(f)
+	# 	changes = faust.xpath('//tei:change[@who]')(xml)
+	# 	for change in changes:
+	# 		if change.get('who') in names:
+	# 			print change.get('when'), ' ', f
+
+
+
 
 # ==== encoding ordered by date ====
 	# for m in list_matches(faust.transcript_files(), "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='encoded']/@when"):

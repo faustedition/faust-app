@@ -91,3 +91,14 @@ svg.diplomatic {
   background-color: red;
   color: white; 
 }
+
+g.Zone {
+  cursor: move;
+  -moz-user-select: none;-webkit-user-select: none;
+}
+
+g.Zone:hover {
+  stroke: black;
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+}

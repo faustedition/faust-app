@@ -1,6 +1,6 @@
 SVG_NS = "http://www.w3.org/2000/svg";
 
-Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "dragdrop", "resize", function(Y) {
+Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "resize", function(Y) {
 
 	
 	Faust.DocumentController = {
@@ -118,7 +118,8 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 							throw (Faust.ENC_EXC_PREF + "Invalid unit for hspace element! Use 'chars'!");
 						}
 					}  else if (node.name == "f:grLine") {
-						//vc = new Faust.GLine();
+						if (node.attrs['f:style'] == 'curly')
+							vc = new Faust.GrLine();
 					} else if (node.name == "f:grBrace") {
 						//vc = new Faust.GBrace();
 					} else if (node.name == "tei:anchor") {

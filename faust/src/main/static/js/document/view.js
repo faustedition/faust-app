@@ -1,15 +1,25 @@
 SVG_NS = "http://www.w3.org/2000/svg";
+DRAG_NS = "http://www.codedread.com/dragsvg";
+var faust_svg_root = null;
 
-Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "dragdrop", "resize", function(Y) {
+Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "resize", function(Y) {
 		
 	// TODO: cut dependencies to controller
 	
 	Faust.DocumentTranscriptCanvas =  function(node) {
 		this.svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		faust_svg_root = this.svgRoot;
+		this.svgRoot.setAttribute("xmlns:drag", DRAG_NS);
+		var that = this;
+		addDragEventListener(DRAGMOVE, function(){
+			var containerElement = document.getElementById("transcript_container");
+			that.intoView(containerElement, that.svgRoot);
+		});
 		this.svgRoot.setAttribute("class", "diplomatic");
-
+		this.appendPatternDefs(this.svgRoot);
 		Y.Node.getDOMNode(node).appendChild(this.svgRoot);
 	};
+	
 
 	Faust.DocumentTranscriptCanvas.prototype = {
 			
@@ -44,7 +54,7 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 			Faust.DocumentController.mainZone = null;
 			try {
 				this.view = Faust.DocumentController.buildVC(null, transcript.root("ge:document"));
-				var containerElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
+				var containerElement = document.createElementNS(SVG_NS, "g");
 				containerElement.setAttribute("id", "transcript_container");
 				this.svgRoot.appendChild(containerElement);
 				Y.each(Faust.DocumentController.postBuildDeferred, function(f) {f.apply(this)});
@@ -78,6 +88,8 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 						context: view						
 					});
 				aq.run();
+				
+
 			}
 						
 			Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, this.svgRoot);
@@ -96,9 +108,29 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 			Y.on('resize', setHeight);
 			
 			Y.one('#transcript-facsimile').scrollIntoView(); 
-		},
+			initializeDraggableElements();
+		}
 		
 	};
+	
+	Faust.DocumentTranscriptCanvas.prototype.appendPatternDefs = function(svgRoot) {
+		var defs = document.createElementNS(SVG_NS, 'defs');
+			svgRoot.appendChild(defs);
+			var grLinePattern = document.createElementNS(SVG_NS, 'pattern');
+			grLinePattern.setAttribute('id', 'curlyLinePattern');
+			grLinePattern.setAttribute('x', '0');
+			grLinePattern.setAttribute('y', '0');
+			grLinePattern.setAttribute('width', '100');
+			grLinePattern.setAttribute('height', '80');
+			grLinePattern.setAttribute('patternUnits', 'userSpaceOnUse');
+			defs.appendChild(grLinePattern);
+			var grLinePath = document.createElementNS(SVG_NS, 'path');
+			grLinePath.setAttribute('d', 'M50,0 a40,20 0 0,1 0,40 a40,20, 0 0,0 0,40');
+			grLinePath.setAttribute('fill', 'none');
+			grLinePath.setAttribute('stroke', 'black');
+			grLinePattern.appendChild(grLinePath);
+	};
+
 
 	Faust.DocumentView = function(fd) {
 		this.fd = fd;

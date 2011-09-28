@@ -270,6 +270,12 @@ Faust.YUI().use("oop", "dump", function(Y) {
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 	
+	Faust.GrLine = function() {
+		this.initViewComponent();
+	};
+	
+	Y.augment (Faust.GrLine, Faust.ViewComponent);
+	
 	Faust.GLine = function() {
 		this.initViewComponent();
 	};

@@ -1,4 +1,5 @@
 SVG_NS = "http://www.w3.org/2000/svg";
+DRAG_NS = "http://www.codedread.com/dragsvg";
 
 Faust.YUI().use("node", "dom", "event", function(Y) {
 
@@ -158,42 +159,16 @@ Faust.YUI().use("node", "dom", "event", function(Y) {
 	Faust.Zone.prototype.createView = function() {
 		var svgContainer = this.svgContainer();
 		var result = this.svgDocument().createElementNS(SVG_NS, "g");
+		var box0 = this.svgDocument().createElementNS(SVG_NS, 'rect');
+		box0.setAttribute('width', '0.1em');
+		box0.setAttribute('height', '0.1em');
+		box0.setAttribute('x', '0');
+		box0.setAttribute('y', '0');
+		box0.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden')
+		result.appendChild(box0);
 		result.setAttribute('class', 'Zone');
+		result.setAttributeNS(DRAG_NS, 'drag:enable', 'true');
 		
-		// add drag n drop; YUI dnd doesn't work with SVG
-		var dragging = false;
-		var init_pos;
-		
-		function getMouse(e){
-			   var position = Y.Node.getDOMNode(Y.one("svg")).createSVGPoint();
-			   position.x = e.clientX;
-			   position.y = e.clientY;
-			   return position;
-			   }
-
-			function onMouseDown(e){
-			   dragging = true;
-			   init_pos = getMouse(e);
-			   }
-
-			function onMouseMove(e){
-			   if(dragging){
-				   position = getMouse(e);
-				   var delta_x = (position.x - init_pos.x);
-				   var delta_y = (position.y - init_pos.y);
-			       //result.setAttributeNS(null, "transform", "translate(" + delta_x + ", " + delta_y + ")");
-
-			       }
-			   }
-
-			function onMouseUp(evt){
-			   dragging = false;
-			}
-		
-			//Y.on('mousemove', onMouseMove, Y.one(result));
-			//Y.on('mousedown', onMouseDown, Y.one(result));
-			//Y.on('mouseup', onMouseUp, Y.one(result));
-			
 			return result;
 	};
 	Y.augment(Faust.Zone, Faust.ViewComponent);
@@ -258,6 +233,32 @@ Faust.YUI().use("node", "dom", "event", function(Y) {
 		Y.each(this.children, function(c) { c.render(); });		
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
+
+	Faust.GrLine.prototype.createView = function() {
+		this.zoneSpanning = this.svgDocument().createElementNS(SVG_NS, 'rect');
+		this.zoneSpanning.setAttribute('fill', 'url(#curlyLinePattern)');
+		this.zoneSpanning.setAttribute('width', '100');
+		this.svgContainer().appendChild(this.zoneSpanning);
+		
+		var block = this.svgDocument().createElementNS(SVG_NS, 'rect');
+		block.setAttribute('width', '0.1em');
+		block.setAttribute('height', '0.1em');
+		block.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden')
+		return block;
+		
+		
+	};
+	
+	Faust.GrLine.prototype.onRelayout = function() {
+		this.zoneSpanning.setAttribute('x', 0);
+		this.zoneSpanning.setAttribute('y', 0);
+		
+		
+		this.zoneSpanning.setAttribute('height', this.parent.getExt(this.parent.rotY()));
+	};
+	
+	Y.augment(Faust.GrLine, Faust.ViewComponent);
+	
 
 	
 	Faust.GLine.prototype.createView = function() {
