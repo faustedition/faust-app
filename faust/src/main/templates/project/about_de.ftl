@@ -6,14 +6,13 @@
 		<div class="yui3-u-2-3">
 			<h2>Historisch-kritische Edition von Goethes Faust</h2>
 
-			<p>Gegenstand des Projekts ist die Erarbeitung der historisch-kritischen Edition des Goetheschen Faust. Der „Faust” ist 
-			unbestritten das zentrale Werk des deutschsprachigen Kanons und ein wichtiges Werk der Weltliteratur.</p>
 
-			<p>Die Bereitstellung aller überlieferten Handschriften mittels Faksimiles und Transkriptionen sowie die darauf 
-			basierende Rekonstruktion und Darstellung genetischer Zusammenhänge im elektronischen Medium bilden den Schwerpunkt der
-			Ausgabe. Sie soll sowohl der Faust-Forschung erstmals eine gesicherte Grundlage bieten, als auch einer breiteren 
-			Öffentlichkeit einen detaillierten Einblick in die „Werkstatt” eines der wichtigsten Texte der deutschen Literatur
-			geben.</p>
+			<p>Ziel des Projekts ist eine historisch-kritische Edition von Goethes Faust. Die Bereitstellung aller überlieferten
+			Faust-Handschriften (mittels Faksimiles und Transkriptionen) sowie die darauf basierende Rekonstruktion und Darstellung 
+			genetischer Zusammenhänge im elektronischen Medium bilden den Schwerpunkt unserer Ausgabe. Sie soll sowohl der 
+			Faust-Forschung erstmals eine gesicherte Grundlage bieten als auch einer breiteren Öffentlichkeit einen detaillierten 
+			Einblick in die „Werkstatt” gewähren, in der eines der wichtigsten Werke der deutschen Literatur entstand.</p>
+
 
 			<p>Das Projekt wird geleitet von Prof.&#160;Dr.&#160;Anne Bohnenkamp-Renken
 			(<a href="http://www.goethehaus-frankfurt.de/" title="Homepage">Freies Deutsches Hochstift</a>), Dr.&#160;Silke Henke
@@ -21,6 +20,11 @@
 			Schiller-Archiv</a>) und Prof.&#160;Dr.&#160;Fotis Jannidis
 			(<a href="http://www.digital-humanities.de/" title="Homepage">Julius-Maximilians-Universität Würzburg</a>). Es wird
 			finanziert durch die <a href="http://www.dfg.de/" title="Homepage">Deutsche Forschungsgemeinschaft</a>.</p>
+
+			<p style="text-decoration:underline">Studenten, die an einem Praktikum
+			interessiert sind, werden gebeten, an <a href="mailto:praktikum@goethehaus-frankfurt.de" title="E-Mail">praktikum@goethehaus-frankfurt.de</a>
+			zu schreiben!</p>			
+
 		</div>
 	</div>
 </@faust.page>
