@@ -48,6 +48,26 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 		},
 		add: function(vc) 
 		{},
+		relayout: function() {
+
+			view = this.view;
+			that = this;
+			var containerElement = document.getElementById("transcript_container");
+			aq = new Y.AsyncQueue();
+			aq.add({
+					fn : view.layout,
+					timeout: 10,
+					iterations: 5,
+					context: view
+				},
+				{
+					fn : function() {Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, that.svgRoot)},
+					timeout: 0,
+					iterations: 1,
+					context: view						
+				});
+			aq.run();
+		},
 		render: function(transcript) {
 			Faust.DocumentController.idMap = {};
 			Faust.DocumentController.postBuildDeferred = [];
@@ -71,24 +91,7 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 			if (this.view) {
 				//FIXME calculate the required number of iterations
 				this.view.render();
-				
-				view = this.view;
-				that = this;
-				aq = new Y.AsyncQueue();
-				aq.add({
-						fn : view.layout,
-						timeout: 10,
-						iterations: 5,
-						context: view
-					},
-					{
-						fn : function() {Faust.DocumentTranscriptCanvas.prototype.intoView(containerElement, that.svgRoot)},
-						timeout: 0,
-						iterations: 1,
-						context: view						
-					});
-				aq.run();
-				
+				this.relayout();
 
 			}
 						
@@ -199,7 +202,26 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 						this.changeViewMode(o.get("value"));
 					}
 				}, this);
-			}, viewModeSelector, this);	
+			}, viewModeSelector, this);
+			
+			var overlaySelector = Y.one("#transcript-preference-overlay");
+			overlaySelector.get("options").each(function(o) {
+				if (Faust.LayoutPreferences.overlay == o.get("value")) {
+					o.set("selected", "selected");
+				} else {
+					o.set("selected", null);
+				}
+			}, this);
+			Y.on("change", function(e) {
+				overlaySelector.get("options").each(function(o) {
+					if (o.get("selected")) {
+						Faust.LayoutPreferences.overlay = o.get("value");
+					}
+				}, this);
+				//TODO just do a relayout
+				//this.canvas.relayout();
+				this.renderPage();
+			}, overlaySelector, this);	
 		},
 		changeViewMode: function(mode) {
 			if ("text" == mode || "facsimile" == mode) {
@@ -353,9 +375,10 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 		renderTranscript: function() {
 			var container = Y.one("#transcript-text");
 			if (container == null) return;
+			var that = this;
 			this.pages[this.currentPage].transcription(function(t) {				
-				var canvas = new Faust.DocumentTranscriptCanvas(container);
-				canvas.render(t);
+				that.canvas = new Faust.DocumentTranscriptCanvas(container);
+				that.canvas.render(t);
 			});
 		}
 	};

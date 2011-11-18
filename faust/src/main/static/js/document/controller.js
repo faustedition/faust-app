@@ -2,6 +2,12 @@ SVG_NS = "http://www.w3.org/2000/svg";
 
 Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "resize", function(Y) {
 
+	//FIXME: cleanup: put this in view or model, etc.
+	Faust.LayoutPreferences = {
+			
+			overlay : "overlay",
+			
+	};
 	
 	Faust.DocumentController = {
 			
@@ -25,7 +31,7 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 						if (elem.name == "f:hand") {
 							textAttrs.hand = elem.attrs["f:id"];
 						} else if (elem.name == "ge:rewrite") {
-							textAttrs.rewrite = elem.attrs["tei:hand"];
+							textAttrs.rewrite = elem.attrs["ge:hand"];
 						} else if (elem.name == "f:under") {
 							textAttrs.under = true;
 						} else if (elem.name == "f:over") {
@@ -69,6 +75,15 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 							var start = rendition.indexOf("indent-");
 							lineAttrs.indent = parseInt(rendition.substring(start + 7, rendition.length)) / 100.0;
 						}
+
+						var  position = node.attrs["f:pos"] || "";
+						if (position.indexOf("over") >= 0)
+							lineAttrs.over = true;
+
+						var  position = node.attrs["f:pos"] || "";
+						if (position.indexOf("between") >= 0)
+							lineAttrs.between = true;
+
 						vc = new Faust.Line(lineAttrs);
 					} else if (node.name == "f:vspace") {
 						//TODO real implementation, non-integer values

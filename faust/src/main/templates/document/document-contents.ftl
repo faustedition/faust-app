@@ -14,7 +14,11 @@
 			<option value="text">Text</option>
 			<option value="facsimile">Faksimile</option>
 		</select>
-	</form>
+		<select name="transcript-preference-overlay" id="transcript-preference-overlay">
+			<option value="overlay">Überblendung</option>
+			<option value="no-overlay">Entzerrung</option>
+		</select>
+	</form>	
 </div>
 <div id="transcript" class="yui3-g">
 	<div class="yui3-u-1-2">

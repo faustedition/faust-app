@@ -212,8 +212,19 @@ Faust.YUI().use("oop", "dump", function(Y) {
  			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 
  		
-		if (this.previous())
-			this.setAlign("vAlign", new Faust.Align(this, this.previous(), this.rotY(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		if (this.previous()) {
+			var yourJoint;
+			if (Faust.LayoutPreferences.overlay === "overlay") {
+				//yourJoint = ("between" in this.lineAttrs)? 1 : 1;				
+				yourJoint = ("over" in this.lineAttrs)? 0.1 : 1;
+			}
+			else {
+				yourJoint = ("between" in this.lineAttrs)? 0.7 : 1;
+				yourJoint = ("over" in this.lineAttrs)? 0.5 : yourJoint;
+			}
+									
+			this.setAlign("vAlign", new Faust.Align(this, this.previous(), this.rotY(), 0, yourJoint, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		}
 		else
 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 	};
@@ -229,8 +240,14 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		this.width = measured.width;
 		this.height = measured.height;		
 	};
+	Faust.Text.prototype.getHand = function() {
+		if (this.textAttrs.rewrite)
+			return this.textAttrs.rewrite;
+		else
+			return this.textAttrs["hand"];
+	};
 	Faust.Text.prototype.handColor = function() {
-		var hand = this.textAttrs["hand"];
+		var hand = this.getHand();
 		if (hand.indexOf("_bl") >= 0) {
 			return "darkgrey";
 		} else if (hand.indexOf("_t") >= 0) {
@@ -244,7 +261,7 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		for (attr in this.textAttrs) {
 			if (attr == "hand") {
 				styles["fill"] = this.handColor();
-				var hand = this.textAttrs["hand"];
+				var hand = this.getHand();
 				if (hand.indexOf("g_") >= 0) {
 					// TODO temp solution, Firefox can only display italics,
 					// Webkit only small-caps
