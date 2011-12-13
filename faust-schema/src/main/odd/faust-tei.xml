@@ -175,6 +175,17 @@
 									<rng:ref name="data.pointer"/>
 								</datatype>
 							</attDef>
+							<attDef ident="pos" ns="http://www.faustedition.net/ns" usage="opt">
+								<valList type="closed" mode="add">
+									<valItem ident="over">
+										<gloss>Daraufschreibung</gloss>
+									</valItem>
+									<valItem ident="between">
+										<gloss>Geringerer Abstand zur vorangehenden Zeile</gloss>
+									</valItem>
+								</valList>
+							</attDef>					
+							
 						</attList>
 					</classSpec>
 
@@ -1018,6 +1029,12 @@
 							</attDef>
 						</attList>
 					</elementSpec>
+
+					<elementSpec ident="line" ns="http://www.tei-c.org/ns/geneticEditions" mode="change">
+						<attList>
+						</attList>				
+					</elementSpec>
+
 
 					<elementSpec ident="add" mode="change">
 						<classes mode="change">

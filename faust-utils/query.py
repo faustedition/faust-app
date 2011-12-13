@@ -101,8 +101,8 @@ if __name__ == "__main__":
 	# for f in matches(faust.transcript_files(), "count(//tei:facsimile/tei:graphic/@url) > 1"): print f
 	# not_available_xp = "not (" + kodiert_xp + " or " + encoded_xp + " or " + deleatur_xp +  " )"
 	# for f in matches(faust.transcript_files(), not_available_xp):	print f
-	unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
-	for f in unencoded: print f
+	# unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
+	# for f in unencoded: print f
 	#for f in documentary_by_name(): print f
 
 	#	for f in matches(faust.transcript_files(), "//tei:change[(contains(@when, '2011-06-') or contains(@when, '2011-05-')) and contains(@who, 'bruening')]"):	print f
@@ -163,20 +163,36 @@ if __name__ == "__main__":
 
 
 # ==== ENCODING STATUS BY ACT ====
-	# encoded_transcripts = matches(faust.transcript_files(), encoded_xp)
-	# deleatur_transcripts = matches(faust.transcript_files(), deleatur_xp)
-	
-	# for phrase in ['I ', 'II ', 'III ', 'IV ', 'V ']:
-	# 	print
-	# 	print 'Akt ', phrase
-	# 	print
-	# 	for f in matches(faust.transcript_files(),
-	# 					 "//tei:altIdentifier[contains(@type, 'edition')]/tei:idno[starts-with(.,'"
-	# 					 + phrase + "')]"):
-	# 		if (f in encoded_transcripts): print ' E',
-	# 		else: print '  ',
-	# 		if (f in deleatur_transcripts): print ' D',
-	# 		else: print '  ',
-	# 		print f
+	encoded_transcripts = matches(faust.transcript_files(), encoded_xp)
+	deleatur_transcripts = matches(faust.transcript_files(), deleatur_xp)
+
+	assigned = []
+	mapping = {}
+	for phrase in ['I ', 'II ', 'III ', 'IV ', 'V ']:
+		for f in matches(faust.transcript_files(),
+						 "//tei:altIdentifier[contains(@type, 'edition')]/tei:idno[starts-with(.,'"
+						 + phrase + "')]"):
+			gsanumber = re.search(r'[0-9][0-9][0-9][0-9][0-9][0-9]', f)
+			if gsanumber:
+				mapping [f[gsanumber.start():gsanumber.end()]] = phrase
+		print
+		print 'Akt ', phrase
+		print
+		for f in faust.transcript_files():
+			gsanumber = re.search(r'[0-9][0-9][0-9][0-9][0-9][0-9]', f)
+			if gsanumber:
+				if mapping.get(f[gsanumber.start():gsanumber.end()], '') == phrase:
+					if (not f in encoded_transcripts) and (not f in deleatur_transcripts):
+						if not f in assigned:
+							print '   ',  f
+							assigned.append(f)
+	print
+	print 'Nicht zugeordnet'
+	print
+	for f in faust.transcript_files():
+			if not f in assigned:
+				if (not f in encoded_transcripts) and (not f in deleatur_transcripts): 
+					print '   ',  f
+			
 # =========
 

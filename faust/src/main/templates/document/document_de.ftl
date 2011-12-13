@@ -23,6 +23,12 @@
 	.zone { border: 1px dashed #ccc; margin: 3em 0; padding: 1em}	
 </#assign>
 <#assign header>
+	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
+
+	<script type="text/javascript" src="${cp}/static/js/imageviewer/javascript/mootools-core-1.3.2-full-nocompat.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/imageviewer/javascript/mootools-more-1.3.2.1.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/imageviewer/javascript/protocols.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/imageviewer/javascript/iipmooviewer-2.0.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/dragsvg.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/goddag.js"></script>

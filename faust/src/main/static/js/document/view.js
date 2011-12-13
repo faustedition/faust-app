@@ -354,23 +354,40 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 		renderFacsimiles: function() {
 			var container = Y.one("#transcript-facsimile");
 			if (container == null) return;
-			container.append('<div id="transcript-swf"></div>')
-			swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
-				"transcript-swf",
-				//(container.get("offsetWidth") - 20) + "px", "600px",
-				"100%", "100%",
-				"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
-					server: Faust.FacsimileServer,
-					image: this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif",
-					navigation: true,
-					credit: "Copyright Digitale Faust-Edition"
-				}, {
-					scale: "noscale",
-					bgcolor: "#000000",
-					allowfullscreen: "true",
-					allowscriptaccess: "always",
-					wmode: "opaque"
-				});	
+			
+//			container.append('<div id="transcript-swf"></div>');
+//			swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
+//				"transcript-swf",
+//				"100%", "100%",
+//				"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
+//					server: Faust.FacsimileServer,
+//					image: this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif",
+//					navigation: true,
+//					credit: "Copyright Digitale Faust-Edition"
+//				}, {
+//					scale: "noscale",
+//					bgcolor: "#000000",
+//					allowfullscreen: "true",
+//					allowscriptaccess: "always",
+//					wmode: "opaque"
+//				});
+			
+			container.append('<div id="transcript-ajax" style="width:100%; height: 100%;"></div>');
+		    var server = Faust.FacsimileServer;
+		    var images = this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif";
+		    var credit = "Copyright Digitale Faust-Edition";
+		    var iipmooviewer = new IIPMooViewer( "transcript-ajax", {
+				image: images,
+				server: server,
+				credit: credit, 
+				scale: 100.0,
+				showNavWindow: true,
+				showNavButtons: true,
+				winResize: true,
+				protocol: 'iip',
+				prefix: '../../../static/js/imageviewer/images/'
+		    });
+
 		},
 		renderTranscript: function() {
 			var container = Y.one("#transcript-text");
