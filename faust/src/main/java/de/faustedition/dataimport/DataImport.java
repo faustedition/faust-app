@@ -12,6 +12,7 @@ import de.faustedition.Runtime;
 import de.faustedition.document.ArchiveManager;
 import de.faustedition.document.MaterialUnitManager;
 import de.faustedition.genesis.GeneticRelationManager;
+import de.faustedition.genesis.MacrogeneticRelationManager;
 import de.faustedition.text.TextManager;
 import de.faustedition.transcript.TranscriptManager;
 
@@ -23,15 +24,17 @@ public class DataImport extends Runtime implements Runnable {
 	private final TextManager textManager;
 	private final Logger logger;
 	private final GeneticRelationManager geneticRelationManager;
+	private final MacrogeneticRelationManager macrogeneticRelationManager;
 
 	@Inject
 	public DataImport(ArchiveManager archiveManager, TranscriptManager transcriptManager, MaterialUnitManager documentManager,
-			TextManager textManager, GeneticRelationManager geneticRelationManager, Logger logger) {
+			TextManager textManager, GeneticRelationManager geneticRelationManager, MacrogeneticRelationManager macrogeneticRelationManager, Logger logger) {
 		this.archiveManager = archiveManager;
 		this.transcriptManager = transcriptManager;
 		this.documentManager = documentManager;
 		this.textManager = textManager;
 		this.geneticRelationManager = geneticRelationManager;
+		this.macrogeneticRelationManager = macrogeneticRelationManager;
 		this.logger = logger;
 	}
 
@@ -52,8 +55,10 @@ public class DataImport extends Runtime implements Runnable {
 		archiveManager.feedGraph();
 		failed.addAll(transcriptManager.feedGraph());
 		failed.addAll(documentManager.feedGraph());
+		failed.addAll(macrogeneticRelationManager.feedGraph());
 		failed.addAll(textManager.feedGraph());
 		geneticRelationManager.feedGraph();
+		
 
 		logger.info(String.format("Import finished in %.3f seconds", (System.currentTimeMillis() - startTime) / 1000.0f));
 		if (!failed.isEmpty()) {

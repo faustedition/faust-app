@@ -1,5 +1,5 @@
 package de.faustedition;
 
 public enum FaustAuthority {
-	XML, FACSIMILE
+	XML, FACSIMILE, EVENT
 }

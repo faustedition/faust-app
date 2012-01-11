@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
@@ -142,4 +143,5 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		final int o2 = o.getOrder();
 		return (o1 >= 0 && o2 >= 0) ? (o1 - o2) : 0;
 	}
+	
 }
