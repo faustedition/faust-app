@@ -1,5 +1,6 @@
 package de.faustedition.document;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,22 +12,30 @@ import java.nio.channels.WritableByteChannel;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.goddag4j.visit.GoddagVisitor;
+import org.restlet.Client;
 import org.restlet.representation.CharacterRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.WriterRepresentation;
+import org.restlet.resource.ClientResource;
 import org.restlet.resource.Get;
+import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import org.restlet.data.ChallengeResponse;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
+import org.restlet.data.Protocol;
 import org.restlet.ext.xml.DomRepresentation;
 import org.restlet.ext.xml.XmlRepresentation;
 import org.xml.sax.InputSource;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 import de.faustedition.FaustURI;
@@ -43,14 +52,18 @@ public class DocumentImageLinkResource extends ServerResource {
 	private Document document;
 	private int pageNum;
 	private final String imageUrlTemplate;
-	private Logger logger;
-
+	private final Logger logger;
+	private final IIPInfo iipInfo;
+	
 	@Inject
 	public DocumentImageLinkResource(TemplateRepresentationFactory viewFactory,
-			@Named("facsimile.iip.url") String imageServerUrl, Logger logger) {
+			@Named("facsimile.iip.url") String imageServerUrl, IIPInfo iipInfo, 
+			Logger logger) {
 		this.viewFactory = viewFactory;
 		this.logger = logger;
-		this.imageUrlTemplate = imageServerUrl + "?FIF=%s.tif&SDS=0,90&CNT=1.0&WID=800&QLT=90&CVT=jpeg";
+		this.imageUrlTemplate = imageServerUrl + "?FIF=%s.tif";
+		this.iipInfo = iipInfo;
+
 	}
 
 	public void setDocument(Document document, int page) {
@@ -63,13 +76,24 @@ public class DocumentImageLinkResource extends ServerResource {
 		Map<String, Object> viewModel = new HashMap<String, Object>();
 		viewModel.put("document", document);
 		viewModel.put("contents", document.getSortedContents());
+		viewModel.put("pageNum", pageNum);
+
+		String facsimileUrl = URLEncoder.encode(facsimileUrl() + "&SDS=0,90&CNT=1.0&WID=800&QLT=90&CVT=jpeg", "UTF-8");
+		viewModel.put("facsimileUrl", facsimileUrl);
+
+		return viewFactory.create("document/imagelink", getRequest().getClientInfo(), viewModel);
+	}
+
+	protected String facsimileUrl() {
+
 		Object[] contents = document.getSortedContents().toArray();
 		if (contents.length < pageNum) {
 			logger.log(Level.WARNING, "Request for page " + pageNum + ", but there are only " + contents.length + " pages.");
 			return null;
 		}
+
 		MaterialUnit mu = (MaterialUnit)contents[pageNum];
-		viewModel.put("pageNum", pageNum);
+
 
 		final Transcript transcript = mu.getTranscript();
 		if (transcript == null) {
@@ -84,35 +108,29 @@ public class DocumentImageLinkResource extends ServerResource {
 		}
 		final FaustURI facsimileURI = dt.getFacsimileReferences().first();
 
-
-		String facsimileUrl = URLEncoder.encode(String.format(
-				imageUrlTemplate, facsimileURI.getPath().replaceAll("^/", "")), "UTF-8");
-		
-		viewModel.put("facsimileUrl", facsimileUrl);
-
-
-		return viewFactory.create("document/imagelink", getRequest().getClientInfo(), viewModel);
-
-
+		return String.format(
+				imageUrlTemplate, facsimileURI.getPath().replaceAll("^/", ""));
 	}
 
+
 	@Get("svg")
-	public Representation graphic() {
-
+	public Representation graphic() throws ResourceException, IOException {
+		
+		iipInfo.retrieve(facsimileUrl());
+		final int width = iipInfo.getWidth();
+		final int height = iipInfo.getHeight();
+		
 		return new WriterRepresentation(MediaType.IMAGE_SVG) {
-
+			
 			@Override
 			public void write(Writer writer) throws IOException {
-				writer.write("<svg width=\"640\" height=\"480\" xmlns=\"http://www.w3.org/2000/svg\">");
+				writer.write("<svg width=\"" + width + "\" height=\"" + height + "\" xmlns=\"http://www.w3.org/2000/svg\">");
 				writer.write(" <g>");
 				writer.write("  <title>Layer 1</title>");
-				writer.write("  <rect id=\"svg_2\" height=\"118\" width=\"170\" y=\"141\" x=\"163\" fill-opacity=\"0.5\" stroke-opacity=\"0.5\" stroke=\"#000000\" fill=\"#FFFF00\"/>");
 				writer.write(" </g>");
 				writer.write("</svg>");
-
 			}
 		};
-
 	}
 
 

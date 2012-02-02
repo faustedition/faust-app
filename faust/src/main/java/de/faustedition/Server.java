@@ -64,6 +64,9 @@ public class Server extends Runtime implements Runnable {
 		final Component component = new Component();
 		ClientList clients = component.getClients();
 		clients.add(Protocol.FILE);
+		clients.add(Protocol.HTTP);
+		clients.add(Protocol.HTTPS);
+		
 
 		switch (runtimeMode) {
 		case PRODUCTION:
