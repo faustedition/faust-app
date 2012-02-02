@@ -2,6 +2,7 @@
 <#assign callnumber = document.getMetadataValue("callnumber")>
 <#assign waId = document.getMetadataValue('wa-id')!"">
 <#assign title>${archiveId?upper_case}/ ${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
+<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
 <#assign css>
 	#transcript { margin: 1em auto; text-align: center }
 	
@@ -37,6 +38,7 @@
 	<script type="text/javascript" src="${cp}/static/js/document/view-svg.js"></script>	
 	<script type="text/javascript" src="${cp}/static/js/document/controller.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document/view.js"></script>
+	<script type="text/javascript"> var imageLinkBase = "${imageLinkBase}" </script>
 	
 </#assign>
 <@faust.page title=title css=css header=header layout="wide">

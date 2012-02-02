@@ -15,6 +15,7 @@ public class DocumentRouter extends Router {
 	public DocumentRouter(TemplateFinder templateFinder, DocumentImageLinkFinder imageLinkFinder, DocumentFinder documentFinder) {
 		attach("styles", templateFinder);
 		attach("imagelink", imageLinkFinder, Template.MODE_STARTS_WITH);
+		//attach("imagelink/{path}", new DocumentImageLinkPageResource(), Template.MODE_STARTS_WITH);
 		attach(documentFinder, Template.MODE_STARTS_WITH);
 	}
 }

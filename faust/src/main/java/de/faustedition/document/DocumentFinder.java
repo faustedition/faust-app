@@ -1,5 +1,6 @@
 package de.faustedition.document;
 
+import java.util.Deque;
 import java.util.logging.Logger;
 
 import org.restlet.resource.ServerResource;
@@ -23,7 +24,10 @@ public class DocumentFinder extends AbstractDocumentFinder {
 	}
 
 	@Override
-	protected ServerResource getResource(Document document) {
+	protected ServerResource getResource(Document document, Deque<String> postfix) {
+		// Do not allow for arbitrary postfixes
+		if (postfix.size() > 0)
+			return null;
 		final DocumentResource resource = documentResources.get();
 		resource.setDocument(document);
 		return resource;

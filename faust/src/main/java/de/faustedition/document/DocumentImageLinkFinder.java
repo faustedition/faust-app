@@ -1,7 +1,10 @@
 package de.faustedition.document;
 
+import java.util.Deque;
 import java.util.logging.Logger;
 
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
@@ -20,9 +23,19 @@ public class DocumentImageLinkFinder extends AbstractDocumentFinder {
 	}
 
 	@Override
-	protected ServerResource getResource(Document document) {
+	protected ServerResource getResource(Document document, Deque<String> postfix) {
 		DocumentImageLinkResource resource = resources.get();
-		resource.setDocument(document);
+		if (postfix.size() != 1)
+			return null;
+		else {
+			int pageNum;
+			try {
+				pageNum = Integer.parseInt(postfix.getFirst());
+			} catch (NumberFormatException e) {
+				return null;
+			}
+			resource.setDocument(document, pageNum);
+		}
 		return resource;
 	}
 

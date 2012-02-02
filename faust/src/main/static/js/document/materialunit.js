@@ -20,7 +20,7 @@ Faust.YUI().use("oop", function(Y) {
 
 	Faust.Document = function() {};
 	Faust.Document.load = function(uri, callback) {
-		Faust.io(uri.encodedPath() + "/descriptor.json", callback, function(key, value) {
+		Faust.io(uri.encodedPath() /* + "/descriptor.json" */, callback, function(key, value) {
 			if (key === "order") {
 				Y.augment(this, Faust.MaterialUnit);
 			}

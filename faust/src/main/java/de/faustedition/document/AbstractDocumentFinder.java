@@ -24,32 +24,58 @@ public abstract class AbstractDocumentFinder extends Finder {
 		this.logger = logger;
 	}
 
+	protected class DocumentPath {
+		public DocumentPath(Document document, Deque<String> path) {
+			this.document = document; 
+			this.path = path;
+		}
+		public Document document;
+		public Deque<String> path;
+	}
+	
 	@Override
 	public ServerResource find(Request request, Response response) {
-		final Deque<String> path = FaustURI.toPathDeque(request.getResourceRef().getRelativeRef().getPath());
-		path.addFirst("document");
-
-		logger.fine("Finding document resource for " + path);
 
 		try {
-			final FaustURI uri = xml.walk(path);
-			if (uri == null) {
-				return null;
-			}
 			
-			logger.fine("Finding document for " + uri);
-			final Document document = documentManager.find(uri);
-			if (document == null) {
+			final DocumentPath docPath = getDocument(request);
+			final Document document = docPath.document;
+			final Deque<String> remainder = docPath.path;
+			
+		if (document == null) {
 				return null;
 			}
 
-			return getResource(document);
+
+		return getResource(document, remainder);
+
+
 		} catch (IllegalArgumentException e) {
-			logger.log(Level.FINE, "Parse error while resolving document resource for " + path, e);
+			logger.log(Level.FINE, "Parse error while resolving document resource for " + 
+					request.getResourceRef().getRelativeRef().getPath(), e);
 			return null;
 		}
 
 	}
+
+	protected DocumentPath getDocument(Request request) {
+		final Deque<String> path = FaustURI.toPathDeque(request.getResourceRef().getRelativeRef().getPath());
+		path.addFirst("document");
+
+		logger.fine("Finding document resource for " + path);
+		
+			final FaustURI uri = xml.walk(path);
+			Document document;
+			
+			if (uri == null) 
+				document = null;
+			
+			logger.fine("Finding document for " + uri);
+			document = documentManager.find(uri);
+			return new DocumentPath(document, path);
+	}
 	
-	protected abstract ServerResource getResource(Document document);
+	
+	protected abstract ServerResource getResource(Document document, Deque<String> postfix);
+	
 }

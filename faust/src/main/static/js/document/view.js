@@ -187,6 +187,12 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 					this.renderPage();	
 				}		
 			}, "#transcript-next-page", this);
+
+			Y.on("click", function(e) {
+				//e.preventDefault();
+				//alert(this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif");
+				//window.location = '/static/js/ext-imageannotation/svg-editor.html';
+			}, "#image-link", this);
 			
 			var viewModeSelector = Y.one("#transcript-view-mode");
 			viewModeSelector.get("options").each(function(o) {
@@ -343,6 +349,10 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 				nextPage.removeClass("disabled");
 			else
 				nextPage.addClass("disabled");
+			
+			//var imageLinkBase = Y.one('#image-link').get('href');
+			Y.one('#image-link').set('href', imageLinkBase + '/' + this.currentPage);
+
 
 		},
 		clearMessages: function(){
