@@ -79,12 +79,22 @@ p.para-start { margin-top: 1em; }
 /* Diplomatic transcript */
 
 @font-face {
-  font-family: EB Garamond Regular;
-  src: url(../fonts/EBGaramond-Regular.ttf) format("truetype");
+  font-family: faust-serif;
+  src: url(../fonts/GenBkBasR.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: faust-sans-serif;
+  src: url(../fonts/RopaSans-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: faust-monospace;
+  src: url(../fonts/UbuntuMono-Regular.ttf) format("truetype");
 }
 
 svg.diplomatic {
-  font-family: EB Garamond Regular, sans-serif; 
+  font-family: faust-serif, serif; 
 }
 
 #error-display {
@@ -101,4 +111,10 @@ g.Zone:hover {
   stroke: black;
   stroke-opacity: 0.3;
   stroke-width: 1;
+}
+
+a.edit-permissions {
+  background: url( "../img/wrench.png" ) no-repeat;
+  padding-left: 1.5em;
+  background-size: contain;  	
 }

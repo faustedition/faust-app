@@ -19,7 +19,7 @@ _IA_CSS_DIR = './';
 imageannotation = {
 	
 	/* the initial height of a new line */
-	lineHeight : 30,
+	lineHeight : 120,
 
 	text : [
 		{ 'id' : 'line1',
@@ -77,10 +77,10 @@ svgEditor.addExtension("Image Annotation", function() {
 
 	return {
 		name: "Image Annotation",
-		svgicons: "extensions/helloworld-icon.xml",
+		svgicons: "extensions/ext-imageannotation-icons.svg",
 		buttons: [{
 			// Must match the icon ID in icon xml
-			id: "hello_world", 
+			id: "ext_imageannotation_lines", 
 			// This indicates that the button will be added to the "mode"
 			// button panel on the left side
 			type: "mode", 
@@ -113,7 +113,7 @@ svgEditor.addExtension("Image Annotation", function() {
 
 			var opac_ani = $(svgCanvas.getRootElem()).find('animate').filter('(*[attributeName=opacity]')[0];
 
-			var ani_dur = .2, c_ani;
+			var ani_dur = 1, c_ani;
 			if(opac_ani.beginElement && element.getAttribute('opacity') != svgCanvas.getOpacity()) {
 				c_ani = $(opac_ani).clone().attr({
 					to: svgCanvas.getOpacity(),

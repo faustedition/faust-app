@@ -55,9 +55,9 @@
 		<a href="mailto:pravida@faustedition.de" title="E-Mail">pravida@faustedition.de</a></p>
 	
 		<p><strong>Moritz Wissenbach</strong><br />
-		(Technische Universität Darmstadt)<br />
+		(Julius-Maximilians-Universität Würzburg)<br />
 		Tel.: +49 (0)69 / 138 80 254<br />
-		<a href="mailto:m.wissenbach@gmx.de" title="E-Mail">m.wissenbach@gmx.de</a></p>
+		<a href="mailto:wissenbach@faustedition.de" title="E-Mail">m.wissenbach@gmx.de</a></p>
 	</div>
 	</div>
 </@faust.page>

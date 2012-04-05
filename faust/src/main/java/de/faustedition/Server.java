@@ -64,8 +64,8 @@ public class Server extends Runtime implements Runnable {
 		final Component component = new Component();
 		ClientList clients = component.getClients();
 		clients.add(Protocol.FILE);
-		clients.add(Protocol.HTTP);
-		clients.add(Protocol.HTTPS);
+		clients.add(Protocol.HTTP).setConnectTimeout(4000);
+		clients.add(Protocol.HTTPS).setConnectTimeout(4000);
 		
 
 		switch (runtimeMode) {

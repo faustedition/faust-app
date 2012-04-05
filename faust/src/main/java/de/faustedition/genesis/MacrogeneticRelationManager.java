@@ -154,8 +154,8 @@ public class MacrogeneticRelationManager {
 								relationships.add(relationship);
 								relationship = new MGRelationship(new FaustURI(new URI(itemURI)), null, relationship.type);						
 							}	
-						} catch (URISyntaxException e) {
-							throw new SAXException("URI syntax error", e);
+						} catch (Exception e) {
+							logger.warning("Invalid URI '" + itemURI);
 						}
 					}	
 				}

@@ -99,20 +99,30 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 						}
 						
 					} else if (node.name == "tei:gap") {
+						var gapChar = '\u00d7';
+						var gapUncertainChar = '\u00d7'; //'.';
 						switch (node.attrs["tei:unit"]) {
 						case "chars":
-							if (node.attrs['tei:quantity']) {
-								var representation = '[';
+							if (node.attrs['tei:quantity'] && node.attrs['tei:precision'] && 
+									node.attrs['tei:precision'] === 'medium') {
+								var representation = gapChar;
+								for (var nrChars=2; nrChars < node.attrs["tei:quantity"]; nrChars++) {
+									representation += gapUncertainChar;  
+								}
+								vc = createText (representation + gapChar, node);															
+							} else if (node.attrs['tei:quantity']) {
+								var representation = '';
 								for (var nrChars=0; nrChars < node.attrs["tei:quantity"]; nrChars++) {
-									representation += '\u2715';
+									//representation += '\u2715'; //capital X
+									representation += gapChar; // small X
 								}
-								vc = createText (representation + "]", node);							
+								vc = createText (representation, node);							
 							} else if(node.attrs['tei:atLeast']) {
-								var representation = '[';
-								for (var nrChars=0; nrChars < node.attrs["tei:atLeast"]; nrChars++) {
-									representation += '\u2715';
+								var representation = gapChar;
+								for (var nrChars=2; nrChars < node.attrs["tei:atLeast"]; nrChars++) {
+									representation += gapUncertainChar;  
 								}
-								vc = createText (representation + "\u2026]", node);							
+								vc = createText (representation + gapChar, node);							
 
 							} else {
 								throw (Faust.ENC_EXC_PREF + "Please specify either @qunatity or @atLeast");

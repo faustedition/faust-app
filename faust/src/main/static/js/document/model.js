@@ -213,13 +213,13 @@ Faust.YUI().use("oop", "dump", function(Y) {
 
  		
 		if (this.previous()) {
-			var yourJoint;
+			var yourJoint = 1.5;
 			if (Faust.LayoutPreferences.overlay === "overlay") {
 				//yourJoint = ("between" in this.lineAttrs)? 1 : 1;				
-				yourJoint = ("over" in this.lineAttrs)? 0.1 : 1;
+				yourJoint = ("over" in this.lineAttrs)? 0.1 : yourJoint;
 			}
 			else {
-				yourJoint = ("between" in this.lineAttrs)? 0.7 : 1;
+				yourJoint = ("between" in this.lineAttrs)? 0.7 : yourJoint;
 				yourJoint = ("over" in this.lineAttrs)? 0.5 : yourJoint;
 			}
 									
@@ -251,7 +251,7 @@ Faust.YUI().use("oop", "dump", function(Y) {
 		if (hand.indexOf("_bl") >= 0) {
 			return "darkgrey";
 		} else if (hand.indexOf("_t") >= 0) {
-			return "sienna";
+			return "black";
 		} else {
 			return "black";
 		}
@@ -265,10 +265,13 @@ Faust.YUI().use("oop", "dump", function(Y) {
 				if (hand.indexOf("g_") >= 0) {
 					// TODO temp solution, Firefox can only display italics,
 					// Webkit only small-caps
-					styles["font-variant"] = "small-caps";
-					styles["font-style"] = "italic";
+					//styles["font-variant"] = "small-caps";
+					//styles["font-style"] = "italic";
+					styles["font-family"] = "faust-serif";
+				} else if (hand.indexOf("xx_") >= 0) {
+					styles["font-family"] = "faust-monospace";
 				} else {
-					styles["font-style"] = "normal";
+					styles["font-family"] = "faust-sans-serif";
 				}
 			} else if (attr == "rewrite") {
 				styles["font-weight"] = "bold";

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.Conditions;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
@@ -32,7 +33,10 @@ public class IIPInfo {
 
 		ClientResource cr = new ClientResource(facsimileUrl + "&obj=IIP,1.0&obj=Max-size&obj=Tile-size&obj=Resolution-number");
 		cr.setChallengeResponse(new ChallengeResponse(ChallengeScheme.HTTP_BASIC, ident, secret));
+		cr.setRetryAttempts(4);
+		cr.setRetryOnError(true);
 		BufferedReader br = new BufferedReader(cr.get().getReader());
+
 
 		properties = new HashMap<String, String>();
 

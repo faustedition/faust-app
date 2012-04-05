@@ -16,16 +16,27 @@
  */
 
 
-YUI().use('model', 'model-list', 'view', 'node', function(Y) {
+/**
+ * This global variable holds an instance of Y.LineList and should be the 
+ * the interface for other plugins
+ **/
+
+var imageannotationLines;
+
+YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function(Y) {
 
 	// MODEL
 
 	Y.LineModel = Y.Base.create ('lineModel', Y.Model, [], {}, {
 		ATTRS:  {
+			
+			id: {value: null},
+
+			info:{value: null},
 
 			linkedWith: {value: null},
 			
-			content: {value: ' --- line ---'}
+			text: {value: ' --- line ---'}
 		}
 	});
 	
@@ -128,7 +139,7 @@ YUI().use('model', 'model-list', 'view', 'node', function(Y) {
 			var newLink = null;
 			if (!line.get('linkedWith')) {
 				var selection = svgCanvas.getSelectedElems();
-				if (selection && selection.length > 0 && selection[0].id) {	
+				if (selection && selection.length > 0 && selection[0] && selection[0].id) {	
 					newLink = selection[0].id;
 				}
 
@@ -137,9 +148,33 @@ YUI().use('model', 'model-list', 'view', 'node', function(Y) {
 		},
 
 		initializer: function (config) {
+
+
 			if (config && config.modelList) {
 				this.modelList = config.modelList;
 				this.modelList.after(['add', 'remove', 'reset', '*:change'], this.render, this);
+
+				// change model on loading a file
+				var that = this;
+				
+
+				svgEditor.addExtension("imageannotation-linking", function() {
+					return {
+						elementChanged: function(opts) {
+							if (opts.elems && opts.elems.length > 0 
+								&& opts.elems[0].getAttribute('id') == 'svgcontent')
+								$('#svgcontent').find('rect').each(function(index, elem){
+									var link = elem.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
+									if (link.charAt(0) === "#") {
+										var id = link.substr(1);
+										if (that.modelList.getById(id))
+											that.modelList.getById(id).set('linkedWith', elem.getAttribute('id'));
+									}
+								});
+
+						}
+					}
+				});
 			}
 		},
 
@@ -150,14 +185,15 @@ YUI().use('model', 'model-list', 'view', 'node', function(Y) {
 
 				var result = '';
 				var classes = $(e).attr('class');
+				//var classes = e.attributes['class'];
 				if (classes !== null) {
 					var split = classes.split(' ');
 					for (i=0; i < split.length; i++)
 						if (! (split[i] === remove || split[i] === add))
 							result += ' ' + split[i];
 					result += ' ' + add;
-				}
 				$(e).attr('class', result);
+				}
 			});
 		},
 
@@ -183,43 +219,27 @@ YUI().use('model', 'model-list', 'view', 'node', function(Y) {
 						return;						
 					} else {
 						that.modifyClasses(linkedWithShape, '', 'imageannotationLinked');
+						linkedWithShape.setAttributeNS('http://www.w3.org/1999/xlink', 'href', value);
 					}
 
 				}
 				var cssClass = linkedWith ? 'class="linked"' : '';
 				var prefix = linkedWith ? '\u2713 ' : '. ';
-				list.append('<option value="' + value + '" ' + cssClass + ' >' + prefix + lineModel.get('content') + '</option>');
+				list.append('<option value="' + value + '" ' + cssClass + ' >' + prefix + lineModel.get('text') + '</option>');
 			});
 			this.container.one('select').set('value', this.lastSelected);
 			this.adjustUI();
-		},
-
+		}
 	});
 
-	// TEST
-
-	var ll = new Y.LineList();
-	ll.add ({
-		id: 'one',
-		content: 'Test line 1',
-		linkedWith: 't1'
-	});
+	imageannotationLines = new Y.LineList();
 
 	var view = new Y.LinesView({
 		container: Y.one('#textpanel'),
-		modelList: ll
+		modelList: imageannotationLines
 	});
+	
 
-	var retrieved = ll.linkedWith('t1');
-	retrieved.set('linkedWith', 't2');
-
-	console.log(ll.linkedWith('t1'));
-	console.log(ll.linkedWith('t2'));
-
-	ll.add ({
-		id: 'two',
-		content: 'Test line 2',
-		linkedWith: null
-	});
+	
 
 });

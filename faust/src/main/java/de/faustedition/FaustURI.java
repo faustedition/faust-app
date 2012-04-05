@@ -9,7 +9,7 @@ import java.util.Deque;
 import com.google.common.base.Preconditions;
 
 public class FaustURI implements Comparable<FaustURI> {
-	private static final String FAUST_SCHEME = "faust";
+	public static final String FAUST_SCHEME = "faust";
 
 	private URI uri;
 

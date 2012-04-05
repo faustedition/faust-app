@@ -163,36 +163,50 @@ if __name__ == "__main__":
 
 
 # ==== ENCODING STATUS BY ACT ====
-	encoded_transcripts = matches(faust.transcript_files(), encoded_xp)
-	deleatur_transcripts = matches(faust.transcript_files(), deleatur_xp)
+	# encoded_transcripts = matches(faust.transcript_files(), encoded_xp)
+	# deleatur_transcripts = matches(faust.transcript_files(), deleatur_xp)
 
-	assigned = []
-	mapping = {}
-	for phrase in ['I ', 'II ', 'III ', 'IV ', 'V ']:
-		for f in matches(faust.transcript_files(),
-						 "//tei:altIdentifier[contains(@type, 'edition')]/tei:idno[starts-with(.,'"
-						 + phrase + "')]"):
-			gsanumber = re.search(r'[0-9][0-9][0-9][0-9][0-9][0-9]', f)
-			if gsanumber:
-				mapping [f[gsanumber.start():gsanumber.end()]] = phrase
-		print
-		print 'Akt ', phrase
-		print
-		for f in faust.transcript_files():
-			gsanumber = re.search(r'[0-9][0-9][0-9][0-9][0-9][0-9]', f)
-			if gsanumber:
-				if mapping.get(f[gsanumber.start():gsanumber.end()], '') == phrase:
-					if (not f in encoded_transcripts) and (not f in deleatur_transcripts):
-						if not f in assigned:
-							print '   ',  f
-							assigned.append(f)
-	print
-	print 'Nicht zugeordnet'
-	print
-	for f in faust.transcript_files():
-			if not f in assigned:
-				if (not f in encoded_transcripts) and (not f in deleatur_transcripts): 
-					print '   ',  f
+	# assigned = []
+	# mapping = {}
+	# for phrase in ['I ', 'II ', 'III ', 'IV ', 'V ']:
+	# 	for f in matches(faust.transcript_files(),
+	# 					 "//tei:altIdentifier[contains(@type, 'edition')]/tei:idno[starts-with(.,'"
+	# 					 + phrase + "')]"):
+	# 		gsanumber = re.search(r'[0-9][0-9][0-9][0-9][0-9][0-9]', f)
+	# 		if gsanumber:
+	# 			mapping [f[gsanumber.start():gsanumber.end()]] = phrase
+	# 	print
+	# 	print 'Akt ', phrase
+	# 	print
+	# 	for f in faust.transcript_files():
+	# 		gsanumber = re.search(r'[0-9][0-9][0-9][0-9][0-9][0-9]', f)
+	# 		if gsanumber:
+	# 			if mapping.get(f[gsanumber.start():gsanumber.end()], '') == phrase:
+	# 				if (not f in encoded_transcripts) and (not f in deleatur_transcripts):
+	# 					if not f in assigned:
+	# 						print '   ',  f
+	# 						assigned.append(f)
+	# print
+	# print 'Nicht zugeordnet'
+	# print
+	# for f in faust.transcript_files():
+	# 		if not f in assigned:
+	# 			if (not f in encoded_transcripts) and (not f in deleatur_transcripts): 
+	# 				print '   ',  f
 			
 # =========
 
+# ==== ARCHIVAL UNITS ====
+
+
+	arch_units = matches(faust.files_in('document/'), '//f:materialUnit[@type="archival_unit"]')
+	# xml = lxml.etree.parse(file)
+	# return faust.xpath(xpath)(xml)
+
+
+	pgs = matches(faust.files_in('document/'), '//f:materialUnit')
+	
+	print len(arch_units)
+	# print len(pgs)
+	
+# =========
