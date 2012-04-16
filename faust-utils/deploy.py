@@ -31,7 +31,7 @@ check_call(['mvn','clean','package'])
 
 print 'Copying new application...'
 os.chdir('target')
-check_call(['cp', NAME + '-app' + 'zip', APP_DIR])
+check_call(['cp', NAME + '-app' + '.zip', APP_DIR])
 
 print 'Stopping running application...'
 check_call(['killall', '-r', NAME + '-app'])
