@@ -39,7 +39,7 @@
 				dimensions: [640,480],
 				initFill: {
 					color: 'FFFF00',  // yellow
-					opacity: 0.5
+					opacity: 0.2
 				},
 				initStroke: {
 					width: 1,

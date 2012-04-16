@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import de.faustedition.document.DocumentImageLinker.IdGenerator;
+import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
 
@@ -105,7 +105,7 @@ public class DocumentImageLinkerTest {
 
 		javax.xml.xpath.XPathExpression lines = XPathUtil.xpath("//line");
 
-		DocumentImageLinker.link(xmlDoc, tmpIds, lines, svgDoc, newIds);
+		XMLDocumentImageLinker.link(xmlDoc, tmpIds, lines, svgDoc, newIds);
 
 		printXml(xmlDoc, System.out);
 		
@@ -119,7 +119,7 @@ public class DocumentImageLinkerTest {
 			Node line = xmlRoot.getChildNodes().item(i);
 			if (line.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
 				Attr id = (Attr) (line.getAttributes().getNamedItemNS(
-						DocumentImageLinker.XMLNS, "id"));
+						XMLDocumentImageLinker.XMLNS, "id"));
 
 				switch (index) {
 				case 0:
@@ -168,16 +168,16 @@ public class DocumentImageLinkerTest {
 					assertTrue(link == null);
 					break;
 				case 1:
-					assertEquals(id2, link.getValue());
+					assertEquals("#" + id2, link.getValue());
 					break;
 				case 2:
-					assertEquals(id0, link.getValue());
+					assertEquals("#" + id0, link.getValue());
 					break;
 				case 3:
-					assertEquals(id4, link.getValue());
+					assertEquals("#" + id4, link.getValue());
 					break;
 				case 4:
-					assertEquals("l2", link.getValue());
+					assertEquals("#l2", link.getValue());
 					break;
 				}
 				index++;

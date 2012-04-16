@@ -35,14 +35,12 @@ import de.faustedition.xml.XPathUtil;
  * 
  */
 
+// TODO Consider using SAX for a lower memory footprint
 
-
-// TODO Use SAX
-
-public class DocumentImageLinker {
+public class XMLDocumentImageLinker {
 
 	static String XMLNS = "http://www.w3.org/XML/1998/namespace";
-	static String XLINKNS = "http://www.w3.org/1999/xlink";
+	//static String XLINKNS = "http://www.w3.org/1999/xlink";
 	static String HREF_XP = "//@xlink:href";
 	
 	/** Get the URI of the link data **/
@@ -72,8 +70,8 @@ public class DocumentImageLinker {
 				facsimile = xml.createElementNS(CustomNamespaceMap.TEI_NS_URI, "facsimile");
 				teiHeader.getParentNode().insertBefore(teiHeader.getNextSibling(), facsimile);
 			}
-			Node secondGraphic = (Node)(XPathUtil.xpath("/tei:TEI/tei:facsimile/tei:graphic[2]")
-					.evaluate(xml, XPathConstants.NODE));
+//			Node lastGraphic = (Node)(XPathUtil.xpath("/tei:TEI/tei:facsimile/tei:graphic[last()]")
+//					.evaluate(xml, XPathConstants.NODE));
 			
 			final Node graphic = xml.createElementNS(CustomNamespaceMap.TEI_NS_URI, "graphic");
 			
@@ -85,8 +83,9 @@ public class DocumentImageLinker {
 			url.setNodeValue(linkDataURI.toString());
 			graphic.getAttributes().setNamedItem(url);
 			
-			facsimile.insertBefore(xml.createComment("Text-image links"), secondGraphic);
-			facsimile.insertBefore(graphic, secondGraphic);
+			facsimile.appendChild(xml.createComment("Text-image links"));
+			facsimile.appendChild(xml.createTextNode("\n"));
+			facsimile.appendChild(graphic);
 			
 		}
 	
@@ -102,7 +101,7 @@ public class DocumentImageLinker {
 	 * @param outputStream The stream to write the result to
 	 * @throws IOException
 	 */
-	public static void enumerateTarget(org.w3c.dom.Document xml, org.w3c.dom.Document svg,XPathExpression xp,
+	public static void enumerateTarget(org.w3c.dom.Document xml, org.w3c.dom.Document svg, XPathExpression xp,
 			IdGenerator tmpIds, OutputStream outputStream) throws IOException {
 
 		final JsonGenerator generator = new JsonFactory().createJsonGenerator(outputStream, JsonEncoding.UTF8);

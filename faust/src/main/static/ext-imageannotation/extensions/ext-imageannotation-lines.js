@@ -111,10 +111,20 @@ svgEditor.addExtension("Image Annotation", function() {
 			// 	fill: 'freeze'
 			// }).appendTo(svgroot);
 
-			var opac_ani = $(svgCanvas.getRootElem()).find('animate').filter('(*[attributeName=opacity]')[0];
+			// Filter doesn't work in Chrome
+			// var opac_ani = $(svgCanvas.getRootElem()).find('animate').filter('*[attributeName=opacity]')[0];
+
+			var animate_elems = $(svgCanvas.getRootElem()).find('animate');
+			for (var i = 0; i < animate_elems.length; i++) { 
+				var ae = animate_elems[i]; opac_ani = ae.hasAttribute('attributeName') 
+					&& ae.attributes.getNamedItem('attributeName').value === 'opacity' 
+			
+					? ae : null
+			}
 
 			var ani_dur = 1, c_ani;
-			if(opac_ani.beginElement && element.getAttribute('opacity') != svgCanvas.getOpacity()) {
+			if(opac_ani && opac_ani.beginElement 
+			   && element.getAttribute('opacity') != svgCanvas.getOpacity()) {
 				c_ani = $(opac_ani).clone().attr({
 					to: svgCanvas.getOpacity(),
 					dur: ani_dur
@@ -223,10 +233,24 @@ svgEditor.addExtension("Image Annotation", function() {
 
 					svgCanvas.clearSelection();
 					svgCanvas.addToSelection([lineShape], true);
-					
+
+					// tell the world
+					svgCanvas.runExtensions('imageannotation_shape_created', lineShape);
 				} 				
 			}
 		},
+
+		elementChanged: function(opts) {
+			
+			// has a line changed its height
+			if (opts.elems && opts.elems.length > 0 
+				&& opts.elems[0]) {					
+				if (opts.elems[0].className.baseVal.indexOf('imageannotationLine') >= 0) {
+					// save its heigth for the next line to be created
+					imageannotation.lineHeight = opts.elems[0].height.baseVal.value;
+				}
+			}
+		}
 	};
 });
 

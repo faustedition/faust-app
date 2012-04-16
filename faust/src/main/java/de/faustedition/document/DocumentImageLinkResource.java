@@ -33,7 +33,7 @@ import com.google.inject.name.Named;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.document.DocumentImageLinker.IdGenerator;
+import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
 import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.template.TemplateRepresentationFactory;
 import de.faustedition.transcript.DocumentaryTranscript;
@@ -63,7 +63,7 @@ public class DocumentImageLinkResource extends ServerResource {
 		}
 
 	
-	private class LineIdGenerator extends DocumentImageLinker.IdGenerator {
+	private class LineIdGenerator extends XMLDocumentImageLinker.IdGenerator {
 
 		private int index = 0;
 
@@ -108,25 +108,40 @@ public class DocumentImageLinkResource extends ServerResource {
 				.getInputSource(transcriptURI));
 		
 		IdGenerator newIds = new IdGenerator() {
+			
+			/**
+			 * Maps a number to a string of lowercase alphabetic characters, 
+			 * which act as digits to base 26. (a, b, c, ..., aa, ab, ac, ...) 
+			 * @param n 
+			 * @return 
+			 */
+			private String alphabetify(int n) {
+				if (n > 25) 
+					return  alphabetify(n / 26 - 1) + alphabetify(n % 26);
+				else
+					return "" + (char)(n + 97);
+					
+			}
+			
+			
 			private int index = 0;
 
 			@Override
 			public String next() {
-				return String.format("l%d", index++);
+				return String.format("l%s", alphabetify(index++));
 			}
 		};
 		
 		javax.xml.xpath.XPathExpression lines = XPathUtil.xpath(this.lineXP);
 		
-		boolean hasSourceChanged = DocumentImageLinker.link(source, new LineIdGenerator(), lines, svg, newIds);
+		boolean hasSourceChanged = XMLDocumentImageLinker.link(source, new LineIdGenerator(), lines, svg, newIds);
 		if (hasSourceChanged)
 			logger.log(Level.FINE, "Added new xml:ids to "
 					+ transcriptURI);
 			
 			
 		// Check if the transcript has image links attached
-		URI linkDataURI = DocumentImageLinker.linkDataURI(source);
-
+		URI linkDataURI = XMLDocumentImageLinker.linkDataURI(source);
 		
 		if (linkDataURI != null) {
 			// we already have a file, do nothing
@@ -136,13 +151,14 @@ public class DocumentImageLinkResource extends ServerResource {
 					+ transcriptURI);
 
 			// generate random URI
+			
 			String uuid = UUID.randomUUID().toString();
 			linkDataURI = new URI(FaustURI.FAUST_SCHEME, FaustAuthority.XML
 					.name().toLowerCase(),
 					"/image-text-links/" + uuid + ".svg", null);
 
 
-			DocumentImageLinker.insertLinkURI(source, linkDataURI);
+			XMLDocumentImageLinker.insertLinkURI(source, linkDataURI);
 			hasSourceChanged = true;
 		}
 		
@@ -228,7 +244,7 @@ public class DocumentImageLinkResource extends ServerResource {
 				.getInputSource(transcriptURI));
 
 		// Check if the transcript has image links attached
-		final URI linkDataURI = DocumentImageLinker.linkDataURI(source);
+		final URI linkDataURI = XMLDocumentImageLinker.linkDataURI(source);
 		if (linkDataURI != null) {
 			logger.log(Level.FINE, transcriptURI
 					+ " has image-text links, loading");
@@ -239,7 +255,7 @@ public class DocumentImageLinkResource extends ServerResource {
 			// adjust the links in the xp
 			final XPathExpression xp = XPathUtil.xpath(this.lineXP);
 
-			DocumentImageLinker.enumerateTarget(source, svg, xp, new LineIdGenerator(), new NullOutputStream());				
+			XMLDocumentImageLinker.enumerateTarget(source, svg, xp, new LineIdGenerator(), new NullOutputStream());				
 			
 			// FIXME what if the image size changes? Change the size of the SVG? 
 			// Scale it? Leave it alone?
@@ -278,7 +294,7 @@ public class DocumentImageLinkResource extends ServerResource {
 		return new OutputRepresentation(MediaType.APPLICATION_JSON) {
 			@Override
 			public void write(OutputStream outputStream) throws IOException {
-				DocumentImageLinker.enumerateTarget(source, null, xp, new LineIdGenerator(), outputStream);				
+				XMLDocumentImageLinker.enumerateTarget(source, null, xp, new LineIdGenerator(), outputStream);				
 			}
 		};
 	}

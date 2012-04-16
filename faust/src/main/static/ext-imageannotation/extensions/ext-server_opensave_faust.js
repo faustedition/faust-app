@@ -16,7 +16,7 @@ svgEditor.addExtension("server_opensave", {
 			save: function(win, data) {
 
 				var svg = "<?xml version=\"1.0\"?>\n" + data;
-
+				console.log('saving');
 				$.ajax({
 					'url': url,
 					// 'dataType': 'svg',

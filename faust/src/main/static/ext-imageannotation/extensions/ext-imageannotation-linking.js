@@ -22,6 +22,10 @@
  **/
 
 var imageannotationLines;
+var imageannotationView;
+var imageannotationNS = 'http://www.w3.org/1999/xlink';
+var imageannotationAttr = 'href';
+
 
 YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function(Y) {
 
@@ -117,13 +121,17 @@ YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function
 				var buttonCaption = 'Unlink';
 			else
 				var buttonCaption = 'Link';
-			
-			this.container.one('#toggleLink').set('text', buttonCaption);
+
+			var toggleLink = this.container.one('#toggleLink');
+			toggleLink.set('text', buttonCaption);
+			toggleLink.set('title', buttonCaption + ' the selected element with the selected shape.');
+
+
 		},
 
 		getSelectedLineModel : function() {
 			try {
-				var id = this.container.one('select').get('value');
+				var id = this.container.one('#linesView').get('value');
 			} catch (e) {
 				return null;
 			}
@@ -149,34 +157,30 @@ YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function
 
 		initializer: function (config) {
 
-
 			if (config && config.modelList) {
 				this.modelList = config.modelList;
 				this.modelList.after(['add', 'remove', 'reset', '*:change'], this.render, this);
-
-				// change model on loading a file
-				var that = this;
-				
-
-				svgEditor.addExtension("imageannotation-linking", function() {
-					return {
-						elementChanged: function(opts) {
-							if (opts.elems && opts.elems.length > 0 
-								&& opts.elems[0].getAttribute('id') == 'svgcontent')
-								$('#svgcontent').find('rect').each(function(index, elem){
-									var link = elem.getAttributeNS('http://www.w3.org/1999/xlink', 'href');
-									if (link.charAt(0) === "#") {
-										var id = link.substr(1);
-										if (that.modelList.getById(id))
-											that.modelList.getById(id).set('linkedWith', elem.getAttribute('id'));
-									}
-								});
-
-						}
-					}
-				});
 			}
+
+			// Build UI
+			var container = this.container;
+			container.empty();
+			container.append('<h3>Text</h3>');
+			container.append('<button id="toggleLink">Link</button>');
+			container.append('<select id="autoLink">' + 
+							 '<option title="Do not link new shapes on creation">Automatic linking off</option>' + 
+							 '<option title="Link new shapes on creation" style="background-color: yellow"'+
+							 '>Automatic linking on</option>' +
+							 '</select><br/>');
+
+			
+			var size = Math.max(this.modelList.size(), 10);
+			var list = Y.Node.create('<select id="linesView" size="' + parseInt(size) + '"></select>');
+			container.append(list);
+
 		},
+
+
 
 		// (YUI/jQuery can't process SVG elements)
 		// pass jQuery elements
@@ -198,17 +202,17 @@ YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function
 		},
 
 		render: function () {
-			var container = this.container;
-			container.empty();
-			container.append('<button id="toggleLink">Link</button><br/>');
-			
-			var size = Math.max(this.modelList.size(), 10);
-			var list = Y.Node.create('<select id="linesView" size="' + parseInt(size) + '"></select>');
-			container.append(list);
+
+			$('#svgcontent').find('rect').each(function(i, e) {
+				if (e.hasAttributeNS(imageannotationNS, imageannotationAttr))
+					e.removeAttributeNS(imageannotationNS, imageannotationAttr);
+			});
 
 			this.modifyClasses('.imageannotationLinked', 'imageannotationLinked', '');
 			
 			var that = this;
+			var list = this.container.one('#linesView');
+			list.empty();
 			this.modelList.each(function(lineModel) {
 				var value = lineModel.get('id');
 				var linkedWith = lineModel.get('linkedWith');
@@ -219,27 +223,71 @@ YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function
 						return;						
 					} else {
 						that.modifyClasses(linkedWithShape, '', 'imageannotationLinked');
-						linkedWithShape.setAttributeNS('http://www.w3.org/1999/xlink', 'href', value);
+						linkedWithShape.setAttributeNS(imageannotationNS, imageannotationAttr, value);
 					}
 
 				}
 				var cssClass = linkedWith ? 'class="linked"' : '';
 				var prefix = linkedWith ? '\u2713 ' : '. ';
-				list.append('<option value="' + value + '" ' + cssClass + ' >' + prefix + lineModel.get('text') + '</option>');
+				list.append('<option value="' + value + '" ' + cssClass + ' >' + prefix 
+							+ lineModel.get('text') + '</option>');
 			});
-			this.container.one('select').set('value', this.lastSelected);
+			this.container.one('#linesView').set('value', this.lastSelected);
 			this.adjustUI();
 		}
 	});
 
 	imageannotationLines = new Y.LineList();
+	
+ 	svgEditor.addExtension("imageannotation-linking", function() {
+		return {
+			elementChanged: function(opts) {
+				
+				// has a new SVG been loaded?
+				if (opts.elems && opts.elems.length > 0 
+					&& opts.elems[0].getAttribute('id') == 'svgcontent') {					
 
-	var view = new Y.LinesView({
-		container: Y.one('#textpanel'),
-		modelList: imageannotationLines
+					// transfer the link information from the SVG into the model first!
+					$('#svgcontent').find('rect').each(function(index, elem){
+						var link = elem.getAttributeNS(imageannotationNS, imageannotationAttr);
+						if (link.charAt(0) === "#") {
+							var id = link.substr(1);
+							if (imageannotationLines.getById(id))
+								imageannotationLines.getById(id).set('linkedWith', elem.getAttribute('id'));
+						}
+					});
+
+					// this will dispose of the links in the SVG
+					imageannotationView = new Y.LinesView({
+						container: Y.one('#textpanel'),
+						modelList: imageannotationLines
+					});
+					imageannotationView.render();
+										
+				}
+				// has an element been deleted?
+				else if (! opts.elems
+					.map(function(e){return Boolean(e && svgCanvas.getElem(e.id))})
+					.reduce(function(e,f){e && f}))
+					imageannotationView.render();
+			},
+			// if autolink mode is on, find the first unlinked line,
+			// counting from the selected one, and link it
+			imageannotation_shape_created: function(shape) {
+				if (imageannotationView.container.one('#autoLink').get('value') === 'Automatic linking on') {
+					var selected = imageannotationView.getSelectedLineModel();
+					var index = selected ? imageannotationLines.indexOf(selected) : 0;
+					var unlinkedLine;
+					for (var i=index; i < imageannotationLines.size() && !unlinkedLine; i++) {
+						if (!imageannotationLines.item(i).get('linkedWith'))
+							unlinkedLine = imageannotationLines.item(i);
+					}
+					if (unlinkedLine)
+						unlinkedLine.set('linkedWith', shape.getAttribute('id'));
+
+				}
+					
+			}
+		}
 	});
-	
-
-	
-
 });

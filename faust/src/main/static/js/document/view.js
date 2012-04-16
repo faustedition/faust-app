@@ -350,14 +350,16 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 			else
 				nextPage.addClass("disabled");
 			
-			Y.one('#image-link').set('href', imageLinkBase + '/' + this.currentPage);
+			if (Y.one('#image-link'))
+				Y.one('#image-link').set('href', imageLinkBase + '/' + this.currentPage);
 
 			var schemeAuth = location.href.slice(0, location.href.search(/[^\/]\/[^\/]/) + 1);
 			//var editxml = 'editxml://' + authority + '/xml/' + this.pages[this.currentPage].transcript.source.components[2];
 			
 			var sourceComponents = this.pages[this.currentPage].transcript.source.components;
 			var xmlsource = schemeAuth + '/' + sourceComponents[1] + '/' + sourceComponents[2]; 
-			Y.one('#edit-source').set('href', xmlsource);
+			if (Y.one('#edit-source'))
+				Y.one('#edit-source').set('href', xmlsource);
 			
 
 		},
