@@ -9,10 +9,10 @@ import sys
 from time import sleep
 from subprocess import check_call
 
-SRC_DIR = '/mnt/data/src/trunk/'
+SRC_DIR = '/mnt/data/src/app/'
 APP_DIR = '/mnt/data/'
 NAME = 'faust-1.3-SNAPSHOT'
-KILL_TIMEOUT = 20
+KILL_TIMEOUT = 20.0
 
 def is_alive (name):
 	contains = lambda x: x.find(name) >= 0
@@ -20,10 +20,12 @@ def is_alive (name):
 	psout = os.popen('ps xaww')
 	return reduce(logical_or, map(contains, psout))
 
+def pids (name):
+	return [int(l.split()[0]) for l in os.popen('ps xaww') if name in l.split()[4]]
 
 print 'Pulling source...'
 os.chdir(SRC_DIR)
-check_call(['bzr', 'pull'])
+check_call(['git', 'pull'])
 
 print 'Building application...'
 os.chdir('faust')
@@ -35,7 +37,12 @@ check_call(['cp', NAME + '-app' + '.zip', APP_DIR])
 
 print 'Stopping running application...'
 check_call(['killall', '-r', NAME + '-app'])
-sleep(KILL_TIMEOUT)
+
+for i in range(20):
+	sleep(KILL_TIMEOUT / 20.0)
+	if not is_alive(NAME):
+		break
+
 if is_alive(NAME):
 	print 'Process not dead, giving up!'
 	sys.exit(1)
