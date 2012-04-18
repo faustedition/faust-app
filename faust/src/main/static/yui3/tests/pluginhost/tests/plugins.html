@@ -37,7 +37,10 @@
     </style>
 
     <script type="text/javascript">
-        YUI({useBrowserConsole:false, filter:"raw"}).use("basebase", "base-pluginhost", "console", "plugin", "test", function(Y) {
+        YUI({
+            useBrowserConsole:false,
+            filter: (window.location.search.match(/[?&]filter=([^&]+)/) || [])[1] || 'min'
+        }).use("basebase", "base-pluginhost", "base-build", "console", "plugin", "test", function(Y) {
 
             function PluginOne() {
                 PluginOne.superclass.constructor.apply(this, arguments);
@@ -57,6 +60,8 @@
                 }
             });
 
+            // ---
+
             function PluginTwo() {
                 PluginTwo.superclass.constructor.apply(this, arguments);
             }
@@ -74,22 +79,23 @@
                 }
             });
 
-            function PluginThree() {
-                PluginThree.superclass.constructor.apply(this, arguments);
-            }
-            PluginThree.NS = "three";
-            PluginThree.NAME = "pluginThree";
-            PluginThree.ATTRS = {
-                c: {
-                    value:3
-                }
-            };
-            Y.extend(PluginThree, Y.Plugin.Base, {
+            // ---
+
+            var PluginThree = Y.Base.create("pluginThree", Y.Plugin.Base, [], {
                 initializer: function() {
                 },
                 method : function() {
                 }
+            }, {
+                NS : "three",
+                ATTRS : {
+                    c: {
+                        value:3
+                    }
+                }
             });
+
+            // ---
 
             function PluginFour() {
                 PluginFour.superclass.constructor.apply(this, arguments);
@@ -250,6 +256,34 @@
                     Y.Assert.isUndefined(h1.one);
                     Y.Assert.isUndefined(h1.two);
                 },
+                
+                testUnplugNonExistant : function() {
+                    var h1 = new Host();
+
+                    var NonExistant = function() {}
+                    NonExistant.NS = "foo";
+                    
+                    var SharedNS = function() {}
+                    SharedNS.NS = "one";
+
+                    try {
+                        h1.unplug("foo");
+                        h1.unplug(NonExistant);
+                    } catch (e) {
+                        Y.Assert.fail("Error unplugging a non-plugged in plugin");
+                    }
+
+                    h1.plug(PluginOne);
+                    
+                    try {
+                        // Unplugging a diff plugin with the same NS
+                        h1.unplug(SharedNS);                        
+                    } catch (e) {
+                        Y.Assert.fail("Error unplugging a plugin which shares a NS with a plugged in plugin");
+                    }
+
+                    Y.Assert.isTrue(h1.one instanceof PluginOne);
+                },
 
                 testUnplugPlug : function() {
 
@@ -336,6 +370,18 @@
                     Y.Assert.areEqual(20, h1.one.get("a"));
 
                     h1.unplug(PluginOne);
+                },
+                
+                testPluginHostReference : function() {
+
+                    var h1 = new Host();
+                    h1.plug(PluginOne);
+
+                    Y.Assert.areEqual(h1, h1.one.get("host"));
+
+                    h1.one.set("host", this);
+
+                    Y.Assert.areEqual(h1, h1.one.get("host"));    
                 },
 
                 testPluginEventListeners : function() {
