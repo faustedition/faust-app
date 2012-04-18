@@ -11,9 +11,9 @@
         "yui-3.3.0/build/cssreset/reset-min.css",
         "yui-3.3.0/build/cssgrids/grids-min.css",
         "yui-3.3.0/build/cssfonts/fonts-min.css",
-        "yui-3.3.0/build/cssbase/base-min.css"
+        "yui-3.3.0/build/cssbase/base-min.css",
+        "css/faust.css"
     ] />" />
-	<link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css" />
     <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui.js"></script>
     <script type="text/javascript">
         YUI.GlobalConfig = { debug: true, combine: true, comboBase: '${cp?js_string}/resources?', root: 'yui-3.3.0/build/' };
@@ -37,9 +37,6 @@
 	 <#if header?has_content>${header}</#if>
 </head>
 <body class="yui3-skin-sam<#if layout?has_content> layout-${layout}</#if>">
-<#list roles as r>
- ${r}
-</#list>
 <div id="header">
 	<div class="yui3-g">
 		<div class="yui3-u-2-3"><h1><span class="color-1">Digitale Faustedition:&#160;</span>${title}</h1></div>
@@ -75,7 +72,7 @@
 <div id="top-navigation" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav">
 	<div class="yui3-menu-content">
 		<ul class="first-of-type">
-			<#if (roles?seq_contains("editor") || roles?seq_contains("external"))>							
+			<#if roles?seq_contains("editor")>							
 			<li>
 				<a href="#demo" class="yui3-menu-label"><em>${message("menu.demo")}</em></a>
 				<div id="demo" class="yui3-menu">
@@ -138,7 +135,7 @@
 			<li class="yui3-menuitem"><a href="${cp}/project/contact" class="yui3-menuitem-content">${message("menu.contact")}</a></li>
 			<li class="yui3-menuitem"><a href="${cp}/project/imprint" class="yui3-menuitem-content">${message("menu.imprint")}</a></li>
 			<li class="yui3-menuitem"><a href="/intern/" class="yui3-menuitem-content">${message("menu.restricted")}</a></li>
-			<#if !roles?seq_contains("editor") && !roles?seq_contains("external")>
+			<#if !roles?seq_contains("editor")>
 			<li class="yui3-menuitem"><a href="${cp}/login" class="yui3-menuitem-content">Login</a></li>
 			</#if>
 		</ul>
