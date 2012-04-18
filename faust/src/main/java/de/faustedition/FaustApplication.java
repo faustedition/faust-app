@@ -43,6 +43,7 @@ public class FaustApplication extends Application {
 	private final String staticResourcePath;
 	private final TemplateFinder templateFinder;
 	private final GeneticGraphRouter geneticGraphRouter;
+	private final ComboResourceFinder comboResourceFinder;
 	private final ArchiveRouter archiveRouter;
 	private final DocumentRouter documentRouter;
 	private final GoddagFinder goddagFinder;
@@ -56,6 +57,7 @@ public class FaustApplication extends Application {
 	@Inject
 	public FaustApplication(RuntimeMode runtimeMode,//
 			@Named("static.home") String staticResourcePath,//
+			ComboResourceFinder comboResourceFinder,
 			ArchiveRouter archiveRouter,//
 			DocumentRouter documentRouter,//
 			GoddagFinder goddagFinder,//
@@ -68,6 +70,7 @@ public class FaustApplication extends Application {
 			LdapSecurityStore ldapSecurityStore) {
 		this.runtimeMode = runtimeMode;
 		this.staticResourcePath = staticResourcePath;
+		this.comboResourceFinder = comboResourceFinder;
 		this.archiveRouter = archiveRouter;
 		this.documentRouter = documentRouter;
 		this.goddagFinder = goddagFinder;
@@ -100,6 +103,7 @@ public class FaustApplication extends Application {
 		router.attach("xml/", secured(xmlFinder));
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
+		router.attach("resources", comboResourceFinder);
 
 		switch (runtimeMode) {
 		case DEVELOPMENT:

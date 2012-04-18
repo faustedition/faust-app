@@ -82,6 +82,11 @@
 		<!-- <dependency> <groupId>com.hp.hpl.jena</groupId> <artifactId>jena</artifactId> <version>2.6.3</version> </dependency> <dependency> 
 			<groupId>org.freemarker</groupId> <artifactId>freemarker</artifactId> <version>2.3.16</version> </dependency> -->
         <dependency>
+            <groupId>net.middell</groupId>
+            <artifactId>combo-resource</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
@@ -188,9 +193,12 @@
 			<id>dh-snapshots</id>
 			<url>http://maven.middell.com/nexus/content/repositories/dh-snapshots</url>
 		</repository>
+        <repository>
+            <id>gregor-middell-releases</id>
+            <url>http://gregor.middell.net/maven/content/repositories/releases</url>
+        </repository>
 		<repository>
-			<id>maven.restlet.org</id>
-			<name>Public online Restlet repository</name>
+			<id>restlet</id>
 			<url>http://maven.restlet.org</url>
 		</repository>
 	</repositories>

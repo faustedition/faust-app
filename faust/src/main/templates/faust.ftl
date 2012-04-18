@@ -1,23 +1,27 @@
 <#assign cp = config["ctx.path"]>
 
+<#macro resources paths>${cp}/resources?<#list paths as p>${p}<#if p_has_next>&amp;</#if></#list></#macro>
+
 <#macro page title css="" header="" layout="">
 <!DOCTYPE html>
 <html>
 <head>
 	<title>Digitale Faust-Edition: ${title}</title>
-	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssreset/reset-min.css" />
-	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssfonts/fonts-min.css" />
-	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssgrids/grids-min.css" />
-	<link rel="stylesheet" type="text/css" href="${cp}/static/yui3/build/cssbase/base-min.css" /> 
+	<link rel="stylesheet" type="text/css" href="<@resources [
+        "yui-3.3.0/build/cssreset/reset-min.css",
+        "yui-3.3.0/build/cssgrids/grids-min.css",
+        "yui-3.3.0/build/cssfonts/fonts-min.css",
+        "yui-3.3.0/build/cssbase/base-min.css"
+    ] />" />
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css" />
-	<script type="text/javascript">
-		var Faust = {};
-		Faust.contextPath = "${cp}";
-		Faust.FacsimileServer = "${config['facsimile.iip.url']}";
+    <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui.js"></script>
+    <script type="text/javascript">
+        YUI.GlobalConfig = { debug: true, combine: true, comboBase: '${cp?js_string}/resources?', root: 'yui-3.3.0/build/' };
+		var Faust = { contextPath: "${cp}", FacsimileServer: "${config['facsimile.iip.url']}" };
 		document.documentElement.className = "yui3-loading";
 	</script>
-	<script type="text/javascript" src="${cp}/static/yui3/build/yui/yui.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
+
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
 	<meta name="DC.format" scheme="DCTERMS.IMT" content="text/html" />
