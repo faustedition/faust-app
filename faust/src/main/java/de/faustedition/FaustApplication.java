@@ -111,8 +111,9 @@ public class FaustApplication extends Application {
 				@Override
 				protected int beforeHandle(Request request, Response response) {
 					final List<Role> roles = request.getClientInfo().getRoles();
-					roles.add(SecurityConstants.ADMIN_ROLE);
-					roles.add(SecurityConstants.EDITOR_ROLE);
+//					roles.add(SecurityConstants.ADMIN_ROLE);
+//					roles.add(SecurityConstants.EDITOR_ROLE);
+					roles.add(SecurityConstants.EXTERNAL_ROLE);
 					return super.beforeHandle(request, response);
 				}
 			};
@@ -131,6 +132,7 @@ public class FaustApplication extends Application {
 		final RoleAuthorizer authorizer = new RoleAuthorizer();
 		authorizer.getAuthorizedRoles().add(SecurityConstants.ADMIN_ROLE);
 		authorizer.getAuthorizedRoles().add(SecurityConstants.EDITOR_ROLE);
+		authorizer.getAuthorizedRoles().add(SecurityConstants.EXTERNAL_ROLE);
 		authorizer.setNext(resource);
 		return authorizer;
 	}

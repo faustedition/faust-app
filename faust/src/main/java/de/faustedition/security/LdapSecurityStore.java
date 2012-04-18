@@ -77,9 +77,12 @@ public class LdapSecurityStore extends SecretVerifier implements Enroler {
 				if ("admin".equals(cn)) {
 					roles.add(SecurityConstants.ADMIN_ROLE);
 					logger.fine("Giving role " + SecurityConstants.ADMIN_ROLE + " to " + identifier);
-				} else if ("staff".equals(cn) || "editors".equals(cn) || "external".equals(cn)) {
+				} else if ("staff".equals(cn) || "editors".equals(cn)) {
 					roles.add(SecurityConstants.EDITOR_ROLE);
 					logger.fine("Giving role " + SecurityConstants.EDITOR_ROLE + " to " + identifier);
+				} else if ("external".equals(cn)) {
+					roles.add(SecurityConstants.EXTERNAL_ROLE);
+					logger.fine("Giving role " + SecurityConstants.EXTERNAL_ROLE + " to " + identifier);					
 				}
 			}
 
