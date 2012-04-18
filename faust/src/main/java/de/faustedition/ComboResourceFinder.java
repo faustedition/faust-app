@@ -43,6 +43,8 @@ public class ComboResourceFinder extends Finder {
 	public ComboResourceFinder(@Named("static.home") String staticHome, @Named("ctx.path") String contextPath) {
 		resolver = new TextResourceResolver();
 		FileBasedTextResourceCollection.register(resolver, "yui-3.3.0/", new File(staticHome, "yui3"), contextPath + "/static/yui3", Charset.forName("UTF-8"), 86400);
+		FileBasedTextResourceCollection.register(resolver, "css/", new File(staticHome, "css"), contextPath + "/static/css/", Charset.forName("UTF-8"), 0);
+		FileBasedTextResourceCollection.register(resolver, "js/", new File(staticHome, "js"), contextPath + "/static/js/", Charset.forName("UTF-8"), 0);
 	}
 
 	@Override
@@ -77,6 +79,7 @@ public class ComboResourceFinder extends Finder {
 		private ComboRepresentation(TextResourceCombo combo) {
 			super(new MediaType(combo.getMediaType()));
 			setModificationDate(new Date(combo.lastModified()));
+			setExpirationDate(new Date(System.currentTimeMillis() + combo.maxAge()));
 			this.combo = combo;
 		}
 		@Override
