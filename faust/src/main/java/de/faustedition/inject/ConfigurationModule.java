@@ -7,16 +7,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import com.google.common.io.Closeables;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
 import de.faustedition.RuntimeMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfigurationModule extends AbstractModule {
-	private static final Logger logger = Logger.getLogger(ConfigurationModule.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ConfigurationModule.class.getName());
 
 	protected RuntimeMode mode = RuntimeMode.PRODUCTION;
 
