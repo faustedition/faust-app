@@ -111,8 +111,8 @@ public class FaustApplication extends Application {
 				@Override
 				protected int beforeHandle(Request request, Response response) {
 					final List<Role> roles = request.getClientInfo().getRoles();
-//					roles.add(SecurityConstants.ADMIN_ROLE);
-//					roles.add(SecurityConstants.EDITOR_ROLE);
+					roles.add(SecurityConstants.ADMIN_ROLE);
+					roles.add(SecurityConstants.EDITOR_ROLE);
 					roles.add(SecurityConstants.EXTERNAL_ROLE);
 					return super.beforeHandle(request, response);
 				}
