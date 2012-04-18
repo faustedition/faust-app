@@ -1,0 +1,1102 @@
+<?xml version="1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:lang="en" xmlns:rng="http://relaxng.org/ns/structure/1.0"
+	xmlns:ge="http://www.tei-c.org/ns/geneticEditions" xmlns:svg="http://www.w3.org/2000/svg"
+	xmlns:f="http://www.faustedition.net/ns">
+	<teiHeader>
+		<fileDesc>
+			<titleStmt>
+				<title>Digitale Faust-Edition – Faust TEI Schema</title>
+				<author>Moritz Wissenbach</author>
+				<author>Gregor Middell</author>
+			</titleStmt>
+			<publicationStmt>
+				<p>for internal use</p>
+			</publicationStmt>
+			<notesStmt>
+				<note type="ns">http://www.tei-c.org/ns/1.0</note>
+			</notesStmt>
+			<sourceDesc>
+				<p/>
+			</sourceDesc>
+		</fileDesc>
+	</teiHeader>
+	<text>
+		<front>
+			<divGen type="toc"/>
+		</front>
+		<body>
+			<div>
+				<p>TEI Extension for Faust&#xD; &#xD; preliminary version</p>
+				<schemaSpec ident="faust-tei" docLang="en" prefix="tei_" start="TEI teiCorpus" xml:lang="en" targetLang="en">
+					<moduleRef key="core"/>
+					<moduleRef key="tei"/>
+					<moduleRef key="header"/>
+					<moduleRef key="textstructure"/>
+					<moduleRef key="certainty"/>
+					<moduleRef key="analysis"/>
+					<moduleRef key="drama"/>
+					<moduleRef key="iso-fs"/>
+					<moduleRef key="linking"/>
+					<moduleRef key="msdescription"/>
+					<moduleRef key="nets"/>
+					<moduleRef key="textcrit"/>
+					<moduleRef key="transcr"/>
+					<moduleRef key="verse"/>
+					<moduleRef key="gaiji"/>
+					<moduleRef key="namesdates"/>
+					<moduleRef key="figures"/>
+					<moduleRef key="corpus"/>
+					<moduleRef url="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/svg11.rng">
+						<content>
+							<rng:define name="tei_model.graphicLike" combine="choice">
+								<rng:ref name="svg"/>
+							</rng:define>
+						</content>
+					</moduleRef>
+
+					<classSpec ident="att.changeRelated" type="atts" mode="add">
+						<attList>
+							<attDef ident="revType" ns="http://www.faustedition.net/ns" usage="rec" mode="add">
+								<valList type="closed">
+									<valItem ident="instant">
+										<gloss>Sofortrevision</gloss>
+									</valItem>
+									<valItem ident="instant-or-soon">
+										<gloss>Sofort- oder Baldrevision</gloss>
+									</valItem>
+									<valItem ident="soon">
+										<gloss>Baldrevision</gloss>
+									</valItem>
+									<valItem ident="soon-or-late">
+										<gloss>Bald- oder Spätrevision</gloss>
+									</valItem>
+									<valItem ident="late">
+										<gloss>Spätrevision</gloss>
+									</valItem>
+									<valItem ident="uncertain">
+										<gloss>nicht zuzuordnen</gloss>
+									</valItem>
+									<valItem ident="aborted">
+										<gloss>abgebrochene/vorgeschlagene Änderung</gloss>
+									</valItem>
+								</valList>
+							</attDef>
+							<!-- Uebergangsloesung, zu ersetzen -->
+							<attDef ident="correction" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Korrektur</desc>
+								<datatype>
+									<rng:ref name="boolean"/>
+								</datatype>
+							</attDef>
+							<attDef ident="proposedBy" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Vorgeschlagen</desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="acceptedBy" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Akzeptiert</desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="rejectedBy" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Verworfen oder fallengelassen </desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="questionedBy" ns="http://www.faustedition.net/ns" usage="opt" mode="add">
+								<desc>Monierung</desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							
+						</attList>
+					</classSpec>
+
+					<classSpec ident="att.layoutAlignment" type="atts" mode="add">
+						<desc>Definiert die Ausdehnung eines graphischen Elements.</desc>
+						<attList>
+							<attDef ident="left" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen linker Kante die linke Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="left-right" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen rechte Kante die linke Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="right" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen rechter Kante die rechte Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="right-left" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen linker Kante die rechte Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="top" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen oberer Kante die obere Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="top-bottom" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen unterer Kante die obere Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="bottom" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen unterer Kante die untere Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="bottom-top" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Zeiger auf ein Element, mit dessen oberer Kante die untere Kante des attribuierten Elements
+									aligniert werden soll.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="pos" ns="http://www.faustedition.net/ns" usage="opt">
+								<valList type="closed" mode="add">
+									<valItem ident="over">
+										<gloss>Daraufschreibung</gloss>
+									</valItem>
+									<valItem ident="between">
+										<gloss>Geringerer Abstand zur vorangehenden Zeile</gloss>
+									</valItem>
+								</valList>
+							</attDef>					
+							
+						</attList>
+					</classSpec>
+
+					<classSpec ident="att.graphicOrientation" type="atts" mode="add">
+						<desc>Definiert Attribute zur Orientierung graphischer Elemente.</desc>
+						<attList>
+							<attDef ident="orient" ns="http://www.faustedition.net/ns" usage="req">
+								<desc>Attribut zur Orientierung eines graphischen Elements.</desc>
+								<valList type="closed">
+									<valItem ident="horiz">
+										<gloss>horizontal</gloss>
+									</valItem>
+									<valItem ident="horiz-top">
+										<gloss>horizontal und nach oben</gloss>
+									</valItem>
+									<valItem ident="horiz-bottom">
+										<gloss>horizontal und nach unten</gloss>
+									</valItem>
+									<valItem ident="vert">
+										<gloss>vertikal</gloss>
+									</valItem>
+									<valItem ident="vert-left">
+										<gloss>vertikal und nach links</gloss>
+									</valItem>
+									<valItem ident="vert-right">
+										<gloss>vertikal und nach rechts</gloss>
+									</valItem>
+								</valList>
+							</attDef>
+						</attList>
+					</classSpec>
+
+					<classSpec ident="att.graphicStyle" type="atts" mode="add">
+						<desc>Definiert den Stil eines graphischen Elements.</desc>
+						<attList>
+							<attDef ident="style" ns="http://www.faustedition.net/ns" usage="opt">
+								<desc>Stil, in dem ein graphisches Element wiedergegeben werden soll.</desc>
+								<valList type="closed">
+									<valItem ident="linear">
+										<gloss>geradlinig</gloss>
+									</valItem>
+									<valItem ident="curly">
+										<gloss>geschwungen</gloss>
+									</valItem>
+								</valList>
+							</attDef>
+						</attList>
+					</classSpec>
+
+					<!-- ================== TEI-SIG Genetic Editions: START ================== -->
+
+					<classSpec ident="att.staged" type="atts" mode="add" module="tei">
+						<desc>groups elements which can be assigned to a specific text stage by means of the attributes it
+							provides.</desc>
+						<attList>
+							<attDef ident="stage" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+								<desc> points to one or more <gi>stageNote</gi> elements which contain a description of a text-stage
+									to which the editors think the alteration/ text passage marked by the element bearing this
+									attribute (and its children) belongs. </desc>
+								<datatype minOccurs="1" maxOccurs="unbounded">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+						</attList>
+					</classSpec>
+
+					<!--  ================================ MODIFIED for Faust ================== -->
+					
+					<classSpec type="atts" ident="att.global" mode="change" module="tei">
+						<classes>
+							<!-- 
+								<memberOf key="att.global.linking" />
+								<memberOf key="att.global.analytic" />
+								<memberOf key="att.global.facs" />
+							-->
+							<memberOf key="att.staged"/>
+							<memberOf key="att.layoutAlignment"/>
+						</classes>
+						<attList>
+							<attDef ident="rend" usage="opt" mode="change">
+								<valList type="semi" mode="add">
+									<valItem ident="left">
+										<gloss>linksbündigen Ausrichtung</gloss>
+									</valItem>
+									<valItem ident="right">
+										<gloss>rechtsbündige Ausrichtung</gloss>
+									</valItem>
+									<valItem ident="centered">
+										<gloss>zentrierte Ausrichtung</gloss>
+									</valItem>
+									<valItem ident="inline">
+										<gloss>innerhalb der (vorherigen) Zeile</gloss>
+									</valItem>
+									<valItem ident="underline">
+										<gloss>unterstrichen</gloss>
+									</valItem>
+									<valItem ident="underdots">
+										<gloss>unterpungiert</gloss>
+									</valItem>
+									<valItem ident="double">
+										<gloss>doppelt, z. B. bei Streichungen</gloss>
+									</valItem>
+									<valItem ident="multiple">
+										<gloss>mehrfach, z. B. bei Streichungen</gloss>
+									</valItem>
+									<valItem ident="vertical">
+										<gloss>vertikal, z. B. vertikal durchgestrichen</gloss>
+									</valItem>
+									<valItem ident="erase">
+										<gloss>Rasur</gloss>
+									</valItem>
+									<valItem ident="sub">
+										<gloss>hochgestellt</gloss>
+									</valItem>
+									<valItem ident="sup">
+										<gloss>tiefgestellt</gloss>
+									</valItem>
+									<valItem ident="font-big">
+										<gloss>große Schrift</gloss>
+									</valItem>
+									<valItem ident="font-small">
+										<gloss>kleine Schrift</gloss>
+									</valItem>
+									<valItem ident="indent-10">
+										<gloss>10% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-20">
+										<gloss>20% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-30">
+										<gloss>30% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-40">
+										<gloss>40% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-50">
+										<gloss>50% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-60">
+										<gloss>60% eingerückt</gloss>
+									</valItem>
+									<valItem ident="indent-70">
+										<gloss>70% eingerückt</gloss>
+									</valItem>
+
+								</valList>
+							</attDef>
+						</attList>
+					</classSpec>
+
+					<!-- =============== Content models for the documentary view =============== -->
+
+					<classSpec ident="model.zonePart" type="model" mode="add">
+						<desc>elements which can form part of a zone</desc>
+					</classSpec>
+
+					<classSpec ident="model.linePart" type="model" mode="add">
+						<desc>elements which can form part of a line</desc>
+					</classSpec>
+
+					<macroSpec ident="macro.lineContent" type="pe">
+						<content>
+							<rng:zeroOrMore>
+								<rng:choice>
+									<!-- copied from macro.phraseSeq -->
+									<rng:text/>
+									<rng:ref name="model.gLike"/>
+									<rng:ref name="model.phrase"/>
+									<rng:ref name="model.global"/>
+									<rng:ref name="model.linePart"/>
+								</rng:choice>
+							</rng:zeroOrMore>
+						</content>
+					</macroSpec>
+					<!-- customization  of the document content models -->
+
+					<elementSpec ident="grLine" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Kodiert eine Linie auf Dokumentebene</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.transcriptional"/>
+							<memberOf key="att.graphicOrientation"/>
+							<memberOf key="att.graphicStyle"/>
+						</classes>
+					</elementSpec>
+
+					<elementSpec ident="grBrace" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Kodiert eine Klammer auf Dokumentebene</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.transcriptional"/>
+							<memberOf key="att.graphicOrientation"/>
+							<memberOf key="att.graphicStyle"/>
+						</classes>
+					</elementSpec>
+
+					<elementSpec ident="hspace" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Kodiert horizontales Spatium</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.dimensions"/>
+						</classes>
+					</elementSpec>
+
+					<elementSpec ident="vspace" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Kodiert vertikales Spatium</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.dimensions"/>
+						</classes>
+					</elementSpec>
+
+					<elementSpec ident="ins" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Kodiert Einfügungszeichen auf Dokumentebene.</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.transcriptional"/>
+							<memberOf key="att.graphicStyle"/>
+						</classes>
+						<content>
+							<rng:ref name="macro.lineContent"/>
+						</content>
+						
+						<attList>
+							<attDef ident="at" ns="http://www.faustedition.net/ns" usage="req">
+								<desc>Verweist auf die Stelle, an der etwas eingefügt wird.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+							<attDef ident="orient" ns="http://www.faustedition.net/ns" usage="req">
+								<desc>Gibt an, ob der eingefügte Text zur Linken, oder zur Rechten des Einfügungszeichens
+									steht.</desc>
+								<valList type="closed">
+									<valItem ident="left">
+										<gloss>eingefügter Text links vom Einfügungszeichen</gloss>
+									</valItem>
+									<valItem ident="right">
+										<gloss>eingefügter Text rechts vom Einfügungszeichen</gloss>
+									</valItem>
+								</valList>
+							</attDef>
+						</attList>
+					</elementSpec>
+
+					<elementSpec ident="st" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Beschreibt eine Durchstreichung („strikethrough”) auf Dokumentebene.</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.spanning"/>
+							<memberOf key="att.transcriptional"/>
+						</classes>
+						<content>
+							<rng:ref name="macro.lineContent"/>
+						</content>
+					</elementSpec>
+
+					<classSpec ident="model.linePart.overwritten" type="model"/>
+
+					<elementSpec ident="under" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Das unter der Überschreibung stehende.</desc>
+						<classes>
+							<memberOf key="model.linePart.overwritten"/>
+						</classes>
+						<content>
+							<rng:ref name="macro.lineContent"/>
+						</content>
+					</elementSpec>
+
+					<elementSpec ident="over" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Das auf dem Überschriebenden stehende.</desc>
+						<classes>
+							<memberOf key="model.linePart.overwritten"/>
+						</classes>
+						<content>
+							<rng:ref name="macro.lineContent"/>
+						</content>
+					</elementSpec>
+
+					<elementSpec ident="overw" ns="http://www.faustedition.net/ns" mode="add">
+						<desc>Umgebung zur Kodierung von Überschreibungen.</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="model.linePart.overwritten"/>
+							<memberOf key="att.global"/>
+						</classes>
+						<content>
+							<rng:group>
+								<rng:group>
+									<rng:ref name="model.linePart.overwritten"/>
+								</rng:group>
+								<rng:oneOrMore>
+									<rng:ref name="model.linePart.overwritten"/>
+								</rng:oneOrMore>
+							</rng:group>
+						</content>
+					</elementSpec>
+
+					<!-- =============== Topographical document structure =============== -->
+
+					<elementSpec ident="document" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>contains a document-centric transcription of a primary source, providing topographical information as
+							well as transcription</desc>
+						<classes>
+							<memberOf key="model.resourceLike"/>
+							<memberOf key="att.global"/>
+						</classes>
+						<content>
+							<rng:oneOrMore>
+								<rng:ref name="surface"/>
+								<rng:zeroOrMore>
+									<rng:ref name="model.global.edit"/>
+								</rng:zeroOrMore>
+							</rng:oneOrMore>
+						</content>
+					</elementSpec>
+					<elementSpec ident="surface" module="physdesc" mode="change">
+						<classes mode="change">
+							<memberOf key="att.typed" mode="add"/>
+						</classes>
+						<content>
+							<rng:zeroOrMore>
+								<rng:choice>
+									<rng:ref name="model.global"/>
+									<rng:ref name="model.glossLike"/>
+									<rng:ref name="model.graphicLike"/>
+									<rng:ref name="zone"/>
+									<rng:ref name="patch"/>
+								</rng:choice>
+							</rng:zeroOrMore>
+						</content>
+					</elementSpec>
+					<elementSpec ident="patch" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>contains a part of a written surface which was originally physically distinct but became attached to
+							it at the time that one or more written zones were created.</desc>
+						<classes>
+							<memberOf key="att.coordinated"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.typed"/>
+						</classes>
+						<content>
+							<rng:zeroOrMore>
+								<rng:choice>
+									<rng:text/>
+									<rng:ref name="model.global"/>
+									<rng:ref name="zone"/>
+								</rng:choice>
+							</rng:zeroOrMore>
+						</content>
+						<attList>
+							<attDef ident="binder" mode="add">
+								<desc>Describe the method by which a patch is or was connected to the main surface</desc>
+								<datatype>
+									<ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.enumerated"/>
+								</datatype>
+								<valList type="open">
+									<valItem ident="glue">
+										<desc>patch is glued in place</desc>
+									</valItem>
+									<valItem ident="pin">
+										<desc>patch is pinned or stapled in place</desc>
+									</valItem>
+									<valItem ident="sewn">
+										<desc>patch is sewn in place</desc>
+									</valItem>
+								</valList>
+							</attDef>
+							<attDef ident="flipping" mode="add">
+								<desc>indicates whether the patch is attached and folded in such a way as to provide two writing
+									surfaces</desc>
+								<datatype>
+									<ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.truthValue"/>
+								</datatype>
+							</attDef>
+							<attDef ident="height">
+								<desc>height of the patch in mm</desc>
+								<datatype>
+									<ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.numeric"/>
+								</datatype>
+							</attDef>
+							<attDef ident="width">
+								<desc>width of the patch in mm</desc>
+								<datatype>
+									<ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.numeric"/>
+								</datatype>
+							</attDef>
+						</attList>
+					</elementSpec>
+					<elementSpec ident="zone" module="physdesc" mode="change">
+						<classes mode="change">
+							<memberOf key="att.coordinated" mode="add"/>
+							<!--  modification of SIG schema: allow @type in zones -->
+							<memberOf key="att.typed" mode="add"/>
+							<memberOf key="model.zonePart" mode="add"/>
+						</classes>
+						<content>
+							<rng:zeroOrMore>
+								<rng:choice>
+									<rng:text/>
+									<rng:ref name="model.zonePart"/>
+									<rng:ref name="model.global"/>
+								</rng:choice>
+							</rng:zeroOrMore>
+						</content>
+						<attList>
+							<attDef ident="rotate" mode="add">
+								<desc> indicates the amount by which this zone has been rotated clockwise, with respect to the
+									normal orientation of the parent <gi>surface</gi> element as implied by the dimensions given in
+									the <gi>msDesc</gi> section or by the coordinates of the <gi>surface</gi> itself. The
+									orientation is expressed in arc degrees. </desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.count"/>
+								</datatype>
+								<defaultVal>0</defaultVal>
+							</attDef>
+						</attList>
+					</elementSpec>
+					<elementSpec ident="line" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>contains the transcription of a topographic line in the source document</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="att.typed"/>
+							<memberOf key="att.global"/>
+						</classes>
+						<content>
+							<rng:ref name="macro.lineContent"/>
+						</content>
+					</elementSpec>
+					<!-- =============== Text stages =============== -->
+
+					<elementSpec ident="creation" mode="change">
+						<content>
+							<rng:ref name="macro.phraseSeq.limited"/>
+							<rng:optional>
+								<rng:ref name="stageNotes"/>
+							</rng:optional>
+						</content>
+					</elementSpec>
+					<elementSpec ident="stageNotes" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>contains one or more descriptions of the stages which have been identified in the genesis of a
+							text.</desc>
+						<classes>
+							<memberOf key="att.global"/>
+							<memberOf key="att.typed"/>
+						</classes>
+						<content>
+							<rng:oneOrMore>
+								<rng:choice>
+									<rng:ref name="stageNotes"/>
+									<rng:ref name="stageNote"/>
+								</rng:choice>
+							</rng:oneOrMore>
+						</content>
+						<attList>
+							<attDef ident="ordered" mode="add">
+								<desc>indicates whether or not the order in which the children of this element are presented is
+									significant</desc>
+								<datatype>
+									<ref xmlns="http://relaxng.org/ns/structure/1.0" name="data.truthValue"/>
+								</datatype>
+								<defaultVal>true</defaultVal>
+							</attDef>
+						</attList>
+					</elementSpec>
+					<elementSpec ident="stageNote" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>documents a particular stage in the genesis of a text.</desc>
+						<classes>
+							<memberOf key="att.datable"/>
+							<memberOf key="att.editLike"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.typed"/>
+						</classes>
+						<content>
+							<rng:zeroOrMore>
+								<rng:choice>
+									<rng:ref name="macro.specialPara"/>
+									<rng:ref name="stageNote"/>
+								</rng:choice>
+							</rng:zeroOrMore>
+						</content>
+						<attList>
+							<attDef ident="target" mode="add">
+								<desc>points to one or more elements that belong to this stage.</desc>
+								<datatype minOccurs="1" maxOccurs="unbounded">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+						</attList>
+					</elementSpec>
+					<!-- =============== Textual alterations =============== -->
+					<elementSpec ident="mod" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>represents any kind of modification identified within a text at a documentary level.</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.transcriptional"/>
+							<memberOf key="att.typed"/>
+						</classes>
+						<content>
+							<rng:ref name="macro.paraContent"/>
+						</content>
+					</elementSpec>
+					<elementSpec ident="modSpan" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>represents any kind of modification identified within a text at a documentary level, where this
+							extends over other XML markup constructs in the document.</desc>
+						<classes>
+							<memberOf key="model.global.edit"/>
+							<memberOf key="att.spanning"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.transcriptional"/>
+							<memberOf key="att.typed"/>
+						</classes>
+						<content>
+							<rng:empty/>
+						</content>
+					</elementSpec>
+					<elementSpec ident="transposeGrp" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>supplies a list of transpositions indicated at some point in the text, typically by means of
+							metamarks.</desc>
+						<classes>
+							<memberOf key="model.profileDescPart"/>
+							<memberOf key="model.global.meta"/>
+							<memberOf key="att.global"/>
+						</classes>
+						<content>
+							<!-- MODIFIED for Faust -->
+							<rng:oneOrMore>
+								<rng:choice>
+									<rng:ref name="transpose"/>
+									<rng:ref name="undo"/>
+								</rng:choice>
+							</rng:oneOrMore>
+						</content>
+					</elementSpec>
+					<elementSpec ident="transpose" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc> describes a single textual transposition as an ordered list of at least two pointers specifying the
+							order in which the elements indicated should be re-combined. </desc>
+						<classes>
+							<memberOf key="att.global"/>
+							<!-- MODIFIED for Faust -->
+							<memberOf key="att.changeRelated"/>
+						</classes>
+						<content>
+							<rng:group>
+								<rng:ref name="ptr"/>
+								<rng:oneOrMore>
+									<rng:ref name="ptr"/>
+								</rng:oneOrMore>
+							</rng:group>
+						</content>
+					</elementSpec>
+					<!-- =============== Undo/Redo/Rewrite =============== -->
+					<elementSpec ident="undo" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>points to any marked-up intervention in a text which has subsequently been marked as to be cancelled
+							or undone.</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.spanning"/>
+							<memberOf key="att.transcriptional"/>
+						</classes>
+						<content>
+							<rng:empty/>
+						</content>
+						<attList>
+							<attDef ident="target" mode="add">
+								<desc>points to the element representing the intervention to be undone.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+						</attList>
+					</elementSpec>
+
+
+					<classSpec type="atts" ident="att.repeatable">
+						<attList>
+							<attDef ident="cause">
+								<desc>documents the presumed cause of the repeated act of writing.</desc>
+								<datatype>
+									<rng:ref name="data.enumerated"/>
+								</datatype>
+								<valList type="closed">
+									<valItem ident="fix">
+										<desc>repeated for the purpose of fixation</desc>
+									</valItem>
+									<valItem ident="unclear">
+										<desc>repeated to clarify a previously illegible or badly written text or mark</desc>
+									</valItem>
+								</valList>
+							</attDef>
+						</attList>
+					</classSpec>
+
+					<elementSpec ident="redo" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>points to a marked-up intervention in a text which has subsequently been marked for a second time in a
+							different way. </desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.repeatable"/>
+							<memberOf key="att.spanning"/>
+							<memberOf key="att.transcriptional"/>
+						</classes>
+						<content>
+							<rng:empty/>
+						</content>
+						<attList>
+							<attDef ident="target" mode="add">
+								<desc>points to the element representing the intervention which is to be repeated.</desc>
+								<datatype minOccurs="1" maxOccurs="1">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+						</attList>
+					</elementSpec>
+
+					<elementSpec ident="rewrite" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>contains a sequence of text which has been rewritten by the author, for example by over-inking, to
+							clarify or fix it.</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="model.global"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.repeatable"/>
+							<memberOf key="att.spanning"/>
+							<memberOf key="att.transcriptional"/>
+						</classes>
+						<content>
+							<rng:ref name="macro.paraContent"/>
+						</content>
+						<remarks>
+							<p> Multiple rewritings are indicated by nesting one <gi>rewrite</gi> within another. In principle, a
+								rewriting differs from a substitution in that second and subsequent rewrites do not materially alter
+								the content of an element. Where there are minor changes made during the rewriting however these may
+								be marked up using <gi>del</gi> , <gi>add</gi> , etc. with an appropriate value for the
+									<att>stage</att> attribute. </p>
+						</remarks>
+					</elementSpec>
+					<!-- =============== Authorial changes =============== -->
+					<elementSpec ident="metaMark" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>contains any textual or graphical mark in a written text intended to signal how the text should be
+							read and not forming part of the text itself.</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.pPart.transcriptional"/>
+							<memberOf key="att.spanning"/>
+							<memberOf key="att.placement"/>
+							<memberOf key="att.global"/>
+						</classes>
+						<!--, for example some which 
+                     functional but not part of the text. Could transform the text, like a
+                     strikethrough, or provide meta-information, like a date-->
+						<content>
+							<rng:ref name="macro.specialPara"/>
+						</content>
+						<attList>
+							<attDef ident="function" mode="add">
+								<desc>describes the function (e.g. add, delete, alternate) of the mark.</desc>
+								<datatype minOccurs="1">
+									<rng:ref name="data.word"/>
+								</datatype>
+							</attDef>
+							<attDef ident="target">
+								<desc>indicates the element(s) to which the function of the meta-mark refers. Pointers are separated
+									by a white space</desc>
+								<datatype minOccurs="1" maxOccurs="unbounded">
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+						</attList>
+					</elementSpec>
+					<elementSpec ident="used" ns="http://www.tei-c.org/ns/geneticEditions" mode="add">
+						<desc>a passage of text which has been marked as used, usually meaning that it has been transcribed to a
+							fair copy.</desc>
+						<classes>
+							<memberOf key="model.zonePart"/>
+							<memberOf key="model.linePart"/>
+							<memberOf key="model.global"/>
+							<memberOf key="att.spanning"/>
+							<memberOf key="att.global"/>
+							<memberOf key="att.transcriptional"/>
+						</classes>
+						<content>
+							<rng:empty/>
+						</content>
+						<remarks>
+							<p>The mark is often a strikethrough, but can be any author-specific mark.</p>
+						</remarks>
+					</elementSpec>
+					<!-- =============== Genetic Groups =============== -->
+					<elementSpec ident="geneticGrp" mode="add" ns="http://www.tei-c.org/ns/geneticEditions">
+						<desc>Group texts and document which are somehow related in a genetic process</desc>
+						<classes>
+							<memberOf key="model.profileDescPart"/>
+							<memberOf key="att.global"/>
+						</classes>
+						<content>
+							<rng:oneOrMore>
+								<rng:ref name="geneticNote"/>
+							</rng:oneOrMore>
+						</content>
+					</elementSpec>
+					<elementSpec ident="geneticNote" mode="add" ns="http://www.tei-c.org/ns/geneticEditions">
+						<desc>describes a particular set of documents or document fragments which are considered to be mutually
+							associated in some way.</desc>
+						<classes>
+							<memberOf key="att.typed"/>
+							<memberOf key="att.editLike"/>
+							<memberOf key="att.global"/>
+						</classes>
+						<content>
+							<rng:oneOrMore>
+								<rng:ref name="linkGrp"/>
+							</rng:oneOrMore>
+							<rng:oneOrMore>
+								<rng:ref name="model.pLike"/>
+							</rng:oneOrMore>
+						</content>
+					</elementSpec>
+					<!-- =============== Adjust existing classes to new schema =============== -->
+					<elementSpec ident="arc" module="nets" mode="change">
+						<attList>
+							<attDef ident="value" usage="opt" mode="add">
+								<equiv/>
+								<desc>provides the value of an arc, which is a feature structure or other analytic element.</desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+								<valDesc>A valid identifier.</valDesc>
+								<remarks>
+									<p>Copied from the node element to support full-featured property graphs, where also arcs may be
+										annotated.</p>
+								</remarks>
+							</attDef>
+						</attList>
+					</elementSpec>
+					<classSpec type="atts" ident="att.editLike" mode="change">
+						<attList>
+							<attDef ident="instant" mode="add">
+								<desc>Is this an instant revision?</desc>
+								<datatype>
+									<rng:ref name="data.xTruthValue"/>
+								</datatype>
+								<defaultVal>false</defaultVal>
+							</attDef>
+						</attList>
+					</classSpec>
+					<!-- TODO: We are note sure, whether it is wise to add so much to the documentary markup -->
+					<classSpec type="model" ident="model.gLike" mode="change">
+						<classes mode="change">
+							<memberOf key="model.zonePart" mode="add"/>
+							<memberOf key="model.linePart" mode="add"/>
+						</classes>
+					</classSpec>
+					<classSpec type="model" ident="model.segLike" mode="change">
+						<classes mode="change">
+							<memberOf key="model.zonePart" mode="add"/>
+							<memberOf key="model.linePart" mode="add"/>
+						</classes>
+					</classSpec>
+					<classSpec type="model" ident="model.hiLike" mode="change">
+						<classes mode="change">
+							<memberOf key="model.zonePart" mode="add"/>
+							<memberOf key="model.linePart" mode="add"/>
+						</classes>
+					</classSpec>
+					<classSpec type="model" ident="model.pPart.editorial" mode="change">
+						<classes mode="change">
+							<memberOf key="model.zonePart" mode="add"/>
+							<memberOf key="model.linePart" mode="add"/>
+						</classes>
+					</classSpec>
+					<classSpec type="model" ident="model.pPart.transcriptional" mode="change">
+						<classes mode="change">
+							<memberOf key="model.zonePart" mode="add"/>
+							<memberOf key="model.linePart" mode="add"/>
+						</classes>
+					</classSpec>
+					<classSpec type="model" ident="model.pPart.msdesc" mode="change">
+						<classes mode="change">
+							<memberOf key="model.zonePart" mode="add"/>
+							<memberOf key="model.linePart" mode="add"/>
+						</classes>
+					</classSpec>
+					<elementSpec ident="unclear" module="core" mode="change">
+						<classes mode="change">
+							<memberOf key="att.editLike" mode="add"/>
+							<memberOf key="att.typed" mode="add"/>
+						</classes>
+					</elementSpec>
+					<elementSpec ident="table" mode="change">
+						<classes mode="change">
+							<memberOf key="model.zonePart" mode="add"/>
+						</classes>
+					</elementSpec>
+
+					<!-- ================== TEI-SIG Genetic Editions: END ================== -->
+
+
+					<elementSpec ident="line" ns="http://www.tei-c.org/ns/geneticEditions" mode="change">
+						<attList>
+							<attDef ident="type" mode="change">
+								<valList type="closed" mode="add">
+									<valItem ident="inter">
+										<gloss>interlineare Zeile</gloss>
+									</valItem>
+									<valItem ident="uncounted">
+										<gloss>nicht gezählte Zeile</gloss>
+									</valItem>
+								</valList>
+							</attDef>
+						</attList>
+					</elementSpec>
+
+					<elementSpec ident="line" ns="http://www.tei-c.org/ns/geneticEditions" mode="change">
+						<attList>
+						</attList>				
+					</elementSpec>
+
+
+					<elementSpec ident="add" mode="change">
+						<classes mode="change">
+							<memberOf key="att.changeRelated"/>
+						</classes>
+					</elementSpec>
+					<elementSpec ident="addSpan" mode="change">
+						<classes mode="change">
+							<memberOf key="att.changeRelated"/>
+						</classes>
+					</elementSpec>
+					<elementSpec ident="del" mode="change">
+						<classes mode="change">
+							<memberOf key="att.changeRelated"/>
+						</classes>
+					</elementSpec>
+					<elementSpec ident="delSpan" mode="change">
+						<classes mode="change">
+							<memberOf key="att.changeRelated"/>
+						</classes>
+					</elementSpec>
+					<elementSpec ident="restore" mode="change">
+						<classes mode="change">
+							<memberOf key="att.changeRelated"/>
+						</classes>
+					</elementSpec>
+					<elementSpec ident="subst" mode="change">
+						<classes mode="change">
+							<memberOf key="att.changeRelated"/>
+						</classes>
+					</elementSpec>
+
+					<elementSpec ident="space" module="transcr" mode="change">
+						<classes mode="change">
+							<memberOf key="att.typed"/>
+							<!--  modified for faust -->
+							<memberOf key="att.metrical"/>
+						</classes>
+					</elementSpec>
+
+					<elementSpec ident="hi" module="core" mode="change">
+						<classes mode="change">
+							<memberOf key="att.transcriptional"/>
+						</classes>
+					</elementSpec>
+					
+					<!-- modified for faust; temporary solution -->
+					<classSpec ident="att.segLike" type="atts"  mode="change">
+						<attList>
+							<attDef ident="questionedBy" ns="http://www.faustedition.net/ns" usage="rwa" mode="add">
+								<desc>
+									Beschreibt eine Monierung; anzugeben ist die monierende Hand.
+								</desc>
+								<datatype>
+									<rng:ref name="data.pointer"/>
+								</datatype>
+							</attDef>
+						</attList>
+					</classSpec>
+					
+				</schemaSpec>
+			</div>
+		</body>
+	</text>
+</TEI>

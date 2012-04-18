@@ -1,0 +1,120 @@
+#06  Beschreibung (für Anzeige vor Überlieferungsform) 
+#06a Typ der Hs. (z.B. Arbeitsblatt) 
+#06b Beschreibungsfeld (für Anzeige nach Überlieferungsform) 
+#07  Entstehungszusammenhang, Zweckbestimmung 
+#08  Signatur 
+#081 Bestandsbezeichnung 
+#08a Signatur in der Bohnenkamp-Datei 
+#08b Bosse-Seite (Divan) 
+#08c Maier-Sigle (Divan) 
+#08d Solms-Sigle (Divan) 
+#08e Siegfrieds Blattzählung (Divan) 
+#089 temporäre Pseudosignatur für Reproduktionen 
+#09  neue Signatur 
+#11  Kurzbezeichnung (WA-Kategorie mit Texterstreckung) 
+#113 Verweisebene Findbuch 
+#11z Druckstelle in der WA 
+#12a Zitiertitel der Handschrift 
+#12d Datierung auf der Handschrift 
+#12e ermittelte Datierung 
+#12i Index-Datum 
+#14  vorgefundenes Inzipit 
+#16  Numerierung der Handschrift 
+#19  Fassung 
+#20  Handschriftennachweis in WA und SNA 
+#20a weiterer Handschriftennachweis in WA 
+#20b weiterer Handschriftennachweis in WA 
+#21  WA-Abtlg. Bd. S. 
+#219 Titel höherer Gattung 
+#221 Titel höherer Ordnung z.B. Gedichtgruppe: Kunst 
+#220 Titel höherer Ordnung 
+#222 Titel 
+#223 Inzipit 
+#22a Pseudotitel (z.B. Römische Elegien) 
+#22b zusätzliche Bemerkungen zum Titel 
+#22c zusätzliche Bemerkungen zum Titel 
+#22m Gedichtnumerierung auf Titelebene (z.B. Sonette) 
+#22n Gedichtnumerierung auf Inzipitebene (z.B. 4 Jahreszeiten) 
+#22q Numerierung für Titel höherer Ordnung (#220) 
+#23  Mehrfachkategorie #23 (Titel unter 222) 
+#23a Inc (unter 223) 
+#23b zweiter Titel
+#23c zweites Inc usw. (Bsp. WA I 4, 182 ) 
+#24  Mehrfachkategorie #24 (Titel unter 222) 
+#24a Inc (unter 223)
+#24b zweiter Titel
+#24c zweites Inc usw. (Bsp. WA I 4, 143 ) [im Gegensatz zur #23er wird die #24er nicht indiziert] 
+#25  Sigle 
+#25a weitere Sigle 
+#25b weitere Sigle 
+#26  Bohnenkamp-Sigle 
+#30  Schrift 
+#30a Zusatz nach der Schriftangabe 
+#30b Schrift (Zusatzfeld für Indizierung) 
+#30c weiterer Zusatz nach der Schriftangabe 
+#30d weiterer Zusatz nach Inzipit 
+#31  Korrektur 
+#31b Korrektor (Zusatzfeld für Indizierung) 
+#32  Vollständigkeit 
+#333 Überlieferungsform 
+#41b Bohnenkamp-Seite 
+#41f fehlende Verse 
+#41h Hecker-Nummer 
+#41k Kommentar zu Paralipomena 
+#41p Paralipomenon 
+#41v Verszahlen 
+#41z Druckstelle: Prosatexte und Dramen ohne Verszählung (Band, Seite, Zeile) bzw. Paralipomena 
+#41y Hecker-Nummer (außerhalb der Bohnenkamp-Datei) 
+#42i Bohnenkamp-Inzipit 
+#42j Bohnenkamp-Inzipit
+#42k Bohnenkamp-Inzipit
+#42l Bohnenkamp-Inzipit
+#42m Bohnenkamp-Inzipit
+#42n Bohnenkamp-Inzipit
+#42o Bohnenkamp-Inzipit
+#42p Bohnenkamp-Inzipit
+#42q Bohnenkamp-Inzipit
+#43  WA-Paralipomenon-Nummer 
+#444 WA dtv-Zählung 
+#445 WA Abteilung- u. Bandangabe 
+#446 Druckort außerhalb WA (obligatorisch für Datei 10) 
+#50  Foto / Faksimile 
+#55a Druckort Beginn 
+#55b Druckort Ende 
+#55c Druckort-Verweis 
+#55v Versangaben bei Zyklen (z.B. Gott, Gemüth und Welt) 
+#59  (Leopoldina-Werkdatei) Druckort nat.-wiss. Texte in der WA als Referenz
+#60  Agenda 
+#603 Daten gehören nicht ins gedruckte Inventar 
+#61a weiterer Druckort in WA (Verknüpfungskategorie) (hart) 
+#61b weiterer Druckort in WA (Verknüpfungskategorie) (unscharf) 
+#61c etc 
+#70  Personen  
+#70a SPND-ID-Nummer
+#71  Bibliographische Angabe 
+#77  Grundsignatur oder Verweissignatur 
+#80  Blattzahl 
+#80a Umfangsangabe für Reproduktionen 
+#81  Stück 
+#85  Druck in AA (Akademie-Ausgabe) 
+#86  Handschriftennachweis in AA (Akademie-Ausgabe) 
+#87  Sigle bzw. Paralipomenon-Nr. in AA (Akademie-Ausgabe) 
+#88  Kräuters Repertorium 
+#888 WA-Paralipomena 
+#90  dabei-Vermerk 
+#91  Kommentar 
+#911 Standort 
+#912 Signatur des Originals bei auswärtigen Hss.   
+#92  Druck in Leopoldina 
+#93  Handschriftennachweis in Leopoldina 
+#94  Sigle in Leopoldina 
+#98  Export in die Archivdatenbank
+#951 KuA 
+#952 KuA-Titel 
+#953 FA-Druckort von KuA 
+#992 Überlieferungszusammenhang 
+#993 Überlieferungsweg 
+#994 Filmnummer 
+#995 Referenz auf WA-Brief-Nr. 
+#999 Gattung
+#xx0 Datensatznr.

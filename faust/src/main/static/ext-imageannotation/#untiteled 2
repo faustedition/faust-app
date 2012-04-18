@@ -1,0 +1,65 @@
+Index: svg-editor.html
+===================================================================
+--- svg-editor.html	(revision 2051)
++++ svg-editor.html	(working copy)
+@@ -42,7 +42,7 @@
+ <!--{endif}-->
+ 
+ <!-- you can load extensions here -->
+-<!-- <script type="text/javascript" src="extensions/ext-helloworld.js"></script> -->
++<script type="text/javascript" src="../../svg-edit-imageannotation/ext-imageannotation.js"></script>
+ 
+ <!-- always minified scripts -->
+ <script type="text/javascript" src="jquery-ui/jquery-ui-1.8.custom.min.js"></script>
+@@ -102,6 +102,7 @@
+ 			<option selected="selected" value="layer1">Layer 1</option>
+ 		</select>
+ 	</div>
++		
+ 	<div id="sidepanel_handle" title="Drag left/right to resize side panel [X]">L a y e r s</div>
+ </div>
+ 
+Index: svg-editor.css
+===================================================================
+--- svg-editor.css	(revision 2051)
++++ svg-editor.css	(working copy)
+@@ -223,15 +223,16 @@
+ 	border-left: none;
+ }
+ 
+-#svg_editor #layerpanel {
++#layerpanel,#textpanel {
+ 	display: inline-block;
+-	position:absolute;
++	position: relative;
+ 	top: 1px;
+ 	bottom: 0px;
+ 	right: 0px;
+-	width: 0px;
++	width: 100%;
+ 	overflow: auto;
+ 	margin: 0px;
++	margin-left: 10px;
+ 	-moz-user-select: none;
+ 	-webkit-user-select: none;
+ 
+@@ -320,6 +321,19 @@
+ 	background-color: #FFFFFF;
+ }
+ 
++#svg_editor #linelist {
++	margin: 1px;
++	padding: 0px;
++	border-collapse: collapse;	
++	border: 1px solid #808080;
++	background-color: #FFFFFF;
++}
++
++#svg_editor #linelist .line {
++	white-space: nowrap;
++}
++
++
+ #svg_editor #layerlist tr.layer {
+ 	background-color: #FFFFFF;
+ 	margin: 0px;

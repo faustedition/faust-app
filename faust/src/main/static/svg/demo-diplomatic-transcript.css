@@ -1,0 +1,43 @@
+text {
+    font-size: 11pt;
+}
+
+.small {
+    font-size: 9pt;
+}
+
+.goethe {
+    font-style: italic;
+}
+
+.scribe {
+    font-style: normal
+}
+
+.unknown {
+    font-variant: small-caps;
+}
+
+.ink {
+    fill: sienna;
+}
+
+.pencil {
+    fill: #333;
+}
+
+.right {
+    text-anchor: end;
+}
+
+.center {
+    text-anchor: middle;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.strikethrough {
+    text-decoration: line-through;
+}

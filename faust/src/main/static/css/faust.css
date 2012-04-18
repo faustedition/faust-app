@@ -1,0 +1,120 @@
+body { margin: auto; width: 960px; color: #333; }
+body.layout-wide {width: 100%;}
+
+a { color: #000; font-weight: bold; text-decoration: none }
+
+table, td, th, tr { border: 0 }
+
+#header, #footer { margin: 0; padding: 0 }
+
+#header { margin-bottom: 1em;}
+#header a { font-weight: normal;  }
+#header #search-form { text-align: right; margin: 1em 0; font-size: 138.5%; }
+
+#footer { margin-top: 2em; font-size: smaller; text-align: center; }
+
+#main { padding: 0 1em;}
+#main.layout-wide { padding: 0 0;}
+
+.hidden { visibility: hidden; }
+
+.left { text-align: left }
+.center { text-align: center }
+.right { text-align: right }
+
+.big { font-size: 123.1% }
+.small { font-size: 85% }
+
+.yui3-loading #top-navigation { display: none; }
+
+/* Stilkatalog */
+
+.font-family-0 { font-family: serif }
+.font-family-1 { font-family: sans-serif }
+.font-family-2 { font-family: monospace }
+
+.font-size-0 { font-size: 100%; font-variant: normal }
+.font-size-1 { font-size: 123.1%; font-variant: normal }
+.font-size-2 { font-size: 85%; font-variant: normal }
+.font-size-3 { font-size: 100%; font-variant: small-caps }
+
+.font-variant-0 { font-style: normal; font-weight: normal }
+.font-variant-1 { font-style: normal; font-weight: bold }
+.font-variant-2 { font-style: italic; font-weight: normal }
+.font-variant-3 { font-style: italic; font-weight: bold }
+
+.color-0 { color: #000 }
+.color-1 { color: #805F40 }
+.color-2 { color: #404D80 }
+.color-3 { color: #408051 }
+
+.stroke-0 { stroke: #000 }
+.stroke-1 { stroke: #805F40 }
+.stroke-2 { stroke: #404D80 }
+.stroke-3 { stroke: #408051 }
+
+.fill-0 { fill: #000 }
+.fill-1 { fill: #805F40 }
+.fill-2 { fill: #404D80 }
+.fill-3 { fill: #408051 }
+
+.text-decoration-0 { text-decoration: normal }
+.text-decoration-1 { text-decoration: underline }
+.text-decoration-2 { text-decoration: line-through }
+.text-decoration-3 { text-decoration: overline }
+
+/* System */
+
+.system-note { background: #404D80; color: white; padding: 2em; text-align: center; }
+.demo-note { margin: 0.5em 1em; padding: 0.5em 1em; background: #408051; color: white; border: 1px solid #fff; display: none}
+
+/* Text */
+
+.line { margin: 0; }
+p.head { margin: 1em 0; font-weight: bold; font-size: 123.1%; }
+p.para-start { margin-top: 1em; }
+.speaker { color: #805F40; }
+.stage { font-style: italic; }
+
+/* Diplomatic transcript */
+
+@font-face {
+  font-family: faust-serif;
+  src: url(../fonts/GenBkBasR.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: faust-sans-serif;
+  src: url(../fonts/RopaSans-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: faust-monospace;
+  src: url(../fonts/UbuntuMono-Regular.ttf) format("truetype");
+}
+
+svg.diplomatic {
+  font-family: faust-serif, serif; 
+}
+
+#error-display {
+  background-color: red;
+  color: white; 
+}
+
+g.Zone {
+  cursor: move;
+  -moz-user-select: none;-webkit-user-select: none;
+}
+
+g.Zone:hover {
+  stroke: black;
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+}
+
+a.edit-permissions {
+  background: url( "../img/wrench.png" ) no-repeat;
+  padding-left: 1.5em;
+  background-size: contain;  	
+}
