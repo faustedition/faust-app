@@ -13,6 +13,9 @@
 				<groupId>org.tei</groupId>
 				<artifactId>tei-odd-plugin</artifactId>
 				<version>1.0</version>
+				<configuration>
+				  <p5subsetUrl>http://www.tei-c.org/Vault/P5/1.9.1/xml/tei/odd/p5subset.xml</p5subsetUrl>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
