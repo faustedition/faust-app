@@ -1,26 +1,8 @@
 package de.faustedition.tei;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.apache.commons.mail.EmailException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import de.faustedition.EmailReporter;
 import de.faustedition.EmailReporter.ReportCreator;
 import de.faustedition.FaustAuthority;
@@ -30,6 +12,21 @@ import de.faustedition.xml.NodeListWrapper;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
+import org.apache.commons.mail.EmailException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
 
 @Singleton
 public class TeiEncodingReporter extends Runtime implements Runnable {
@@ -90,8 +87,10 @@ public class TeiEncodingReporter extends Runtime implements Runnable {
 
 			reporter.send("TEI encoding status", new ReportCreator() {
 
+                		@SuppressWarnings("unchecked")
 				@Override
 				public void create(PrintWriter body) {
+
 					for (Map<String, Integer> map : new Map[] { documentStatusMap, textStatusMap }) {
 						if (documentStatusMap == map) {
 							body.println("Documentary transcripts:");
@@ -113,7 +112,6 @@ public class TeiEncodingReporter extends Runtime implements Runnable {
 							body.println(status + Strings.padStart(count, (40 - status.length()), ' '));
 						}
 						body.println(Strings.repeat("=", 40));
-						
 					}
 				}
 			});
