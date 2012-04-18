@@ -55,7 +55,7 @@
         </dependency>
 		<dependency>
 			<groupId>org.restlet.jse</groupId>
-			<artifactId>org.restlet.ext.jetty</artifactId>
+			<artifactId>org.restlet.ext.simple</artifactId>
             <version>${restlet.version}</version>
         </dependency>
 		<dependency>
