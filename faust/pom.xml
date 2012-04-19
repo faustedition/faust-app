@@ -227,7 +227,10 @@
 		<repository>
 			<id>dh-snapshots</id>
 			<url>http://gregor.middell.net/maven/content/repositories/dh-snapshots</url>
-		</repository>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
         <repository>
             <id>interedition-releases</id>
             <url>http://gregor.middell.net/maven/content/repositories/interedition-releases</url>
@@ -235,6 +238,9 @@
         <repository>
             <id>interedition-snapshots</id>
             <url>http://gregor.middell.net/maven/content/repositories/interedition-snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>gregor-middell-releases</id>
