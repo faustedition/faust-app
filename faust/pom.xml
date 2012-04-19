@@ -222,19 +222,19 @@
 		</repository>
 		<repository>
 			<id>dh-releases</id>
-			<url>http://maven.middell.com/nexus/content/repositories/dh-releases</url>
+			<url>http://gregor.middell.net/maven/content/repositories/dh-releases</url>
 		</repository>
 		<repository>
 			<id>dh-snapshots</id>
-			<url>http://maven.middell.com/nexus/content/repositories/dh-snapshots</url>
+			<url>http://gregor.middell.net/maven/content/repositories/dh-snapshots</url>
 		</repository>
         <repository>
             <id>interedition-releases</id>
-            <url>http://maven.middell.com/nexus/content/repositories/interedition-releases</url>
+            <url>http://gregor.middell.net/maven/content/repositories/interedition-releases</url>
         </repository>
         <repository>
             <id>interedition-snapshots</id>
-            <url>http://maven.middell.com/nexus/content/repositories/interedition-snapshots</url>
+            <url>http://gregor.middell.net/maven/content/repositories/interedition-snapshots</url>
         </repository>
         <repository>
             <id>gregor-middell-releases</id>
