@@ -12,6 +12,7 @@
     <logger name="javax.swing" level="INFO"/>
     <logger name="net.sf.ehcache" level="INFO"/>
     <logger name="org.hibernate" level="INFO"/>
+    <logger name="org.hibernate.SQL" level="INFO"/>
     <logger name="org.restlet" level="INFO"/>
     <logger name="org.restlet.Component.InternalRouter.FaustApplication.Directory" level="WARN" />
     <logger name="org.springframework" level="INFO"/>

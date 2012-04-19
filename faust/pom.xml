@@ -18,6 +18,11 @@
 			<artifactId>goddag4j</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+        <dependency>
+            <groupId>eu.interedition</groupId>
+            <artifactId>text</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -49,11 +54,6 @@
 			<version>1.6.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
-			<version>1.6.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.restlet.jse</groupId>
 			<artifactId>org.restlet</artifactId>
 			<version>${restlet.version}</version>
@@ -79,7 +79,27 @@
 			<version>1.2.M04</version>
 			<type>pom</type>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>4.1.2.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+            <version>4.1.2.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.164</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jolbox</groupId>
+            <artifactId>bonecp</artifactId>
+            <version>0.7.1.RELEASE</version>
+        </dependency>
+        <dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-email</artifactId>
 			<version>1.2</version>
@@ -208,6 +228,14 @@
 			<id>dh-snapshots</id>
 			<url>http://maven.middell.com/nexus/content/repositories/dh-snapshots</url>
 		</repository>
+        <repository>
+            <id>interedition-releases</id>
+            <url>http://maven.middell.com/nexus/content/repositories/interedition-releases</url>
+        </repository>
+        <repository>
+            <id>interedition-snapshots</id>
+            <url>http://maven.middell.com/nexus/content/repositories/interedition-snapshots</url>
+        </repository>
         <repository>
             <id>gregor-middell-releases</id>
             <url>http://gregor.middell.net/maven/content/repositories/releases</url>
