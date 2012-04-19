@@ -1,30 +1,6 @@
 package de.faustedition.genesis;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.goddag4j.Element;
-import org.goddag4j.GoddagNode;
-import org.goddag4j.GoddagTreeNode;
-import org.goddag4j.visit.GoddagVisitor;
-import org.joda.time.LocalDate;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
-
 import au.com.bytecode.opencsv.CSVReader;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
 import de.faustedition.document.Document;
@@ -34,20 +10,40 @@ import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.text.Text;
 import de.faustedition.transcript.Transcript;
 import de.faustedition.transcript.Transcript.Type;
+import org.goddag4j.Element;
+import org.goddag4j.GoddagNode;
+import org.goddag4j.GoddagTreeNode;
+import org.goddag4j.visit.GoddagVisitor;
+import org.joda.time.LocalDate;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Singleton
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Component
 public class GeneticRelationManager extends Runtime implements Runnable {
 	private static final FaustRelationshipType GENETIC_REL = new FaustRelationshipType("is-genetically-related"); 
-	private final FaustGraph graph;
-	private final GraphDatabaseService db;
-	private final Logger logger;
 
-	@Inject
-	public GeneticRelationManager(FaustGraph graph, GraphDatabaseService db, Logger logger) {
-		this.graph = graph;
-		this.db = db;
-		this.logger = logger;
-	}
+	@Autowired
+	private FaustGraph graph;
+
+	@Autowired
+	private GraphDatabaseService db;
+
+	@Autowired
+	private Logger logger;
 
 	@Override
 	public void run() {
@@ -64,7 +60,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 					continue;
 				}
 
-				logger.fine(t.toString());
+				logger.debug(t.toString());
 				final Element root = t.getDefaultRoot();
 				new GoddagVisitor() {
 					public void startElement(Element root, Element element) {
@@ -104,7 +100,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 				texts.put(text.getSource(), text);
 			}
 			for (Text text : texts.values()) {
-				logger.fine(text.getSource().toString());
+				logger.debug(text.getSource().toString());
 				final Element root = text.getDefaultRoot();
 				new GoddagVisitor() {
 					public void startElement(Element root, Element element) {

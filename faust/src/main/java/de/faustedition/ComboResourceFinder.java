@@ -18,10 +18,11 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.Finder;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,13 +35,19 @@ import java.util.List;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Singleton
-public class ComboResourceFinder extends Finder {
+@Component
+public class ComboResourceFinder extends Finder implements InitializingBean {
+
+	@Autowired
+	private Environment environment;
 
 	private TextResourceResolver resolver;
 
-	@Inject
-	public ComboResourceFinder(@Named("static.home") String staticHome, @Named("ctx.path") String contextPath) {
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		final String contextPath = environment.getRequiredProperty("ctx.path");
+		final File staticHome = environment.getRequiredProperty("static.home", File.class);
+
 		resolver = new TextResourceResolver();
 		FileBasedTextResourceCollection.register(resolver, "yui-3.3.0/", new File(staticHome, "yui3"), contextPath + "/static/yui3", Charset.forName("UTF-8"), 86400);
 		FileBasedTextResourceCollection.register(resolver, "css/", new File(staticHome, "css"), contextPath + "/static/css/", Charset.forName("UTF-8"), 0);

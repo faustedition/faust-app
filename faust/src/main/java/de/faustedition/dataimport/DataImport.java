@@ -1,12 +1,6 @@
 package de.faustedition.dataimport;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.logging.Logger;
-
 import com.google.common.base.Joiner;
-import com.google.inject.Inject;
-
 import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
 import de.faustedition.document.ArchiveManager;
@@ -15,28 +9,34 @@ import de.faustedition.genesis.GeneticRelationManager;
 import de.faustedition.genesis.MacrogeneticRelationManager;
 import de.faustedition.text.TextManager;
 import de.faustedition.transcript.TranscriptManager;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.logging.Logger;
 
 public class DataImport extends Runtime implements Runnable {
 
-	private final ArchiveManager archiveManager;
-	private final TranscriptManager transcriptManager;
-	private final MaterialUnitManager documentManager;
-	private final TextManager textManager;
-	private final Logger logger;
-	private final GeneticRelationManager geneticRelationManager;
-	private final MacrogeneticRelationManager macrogeneticRelationManager;
+	@Autowired
+	private ArchiveManager archiveManager;
 
-	@Inject
-	public DataImport(ArchiveManager archiveManager, TranscriptManager transcriptManager, MaterialUnitManager documentManager,
-			TextManager textManager, GeneticRelationManager geneticRelationManager, MacrogeneticRelationManager macrogeneticRelationManager, Logger logger) {
-		this.archiveManager = archiveManager;
-		this.transcriptManager = transcriptManager;
-		this.documentManager = documentManager;
-		this.textManager = textManager;
-		this.geneticRelationManager = geneticRelationManager;
-		this.macrogeneticRelationManager = macrogeneticRelationManager;
-		this.logger = logger;
-	}
+	@Autowired
+	private TranscriptManager transcriptManager;
+
+	@Autowired
+	private MaterialUnitManager documentManager;
+
+	@Autowired
+	private TextManager textManager;
+
+	@Autowired
+	private Logger logger;
+
+	@Autowired
+	private GeneticRelationManager geneticRelationManager;
+
+	@Autowired
+	private MacrogeneticRelationManager macrogeneticRelationManager;
 
 	public static void main(String[] args) throws Exception {
 		try {

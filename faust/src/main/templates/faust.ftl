@@ -1,5 +1,3 @@
-<#assign cp = config["ctx.path"]>
-
 <#macro resources paths>${cp}/resources?<#list paths as p>${p}<#if p_has_next>&amp;</#if></#list></#macro>
 
 <#macro page title css="" header="" layout="">
@@ -17,7 +15,7 @@
     <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui.js"></script>
     <script type="text/javascript">
         YUI.GlobalConfig = { debug: true, combine: true, comboBase: '${cp?js_string}/resources?', root: 'yui-3.3.0/build/' };
-		var Faust = { contextPath: "${cp}", FacsimileServer: "${config['facsimile.iip.url']}" };
+		var Faust = { contextPath: "${cp}", FacsimileServer: "${facsimilieIIPUrl}" };
 		document.documentElement.className = "yui3-loading";
 	</script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>

@@ -1,61 +1,53 @@
 package de.faustedition.text;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
-
+import com.google.common.base.Strings;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.Runtime;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.tei.WhitespaceUtil;
+import de.faustedition.xml.*;
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.common.base.Strings;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.Runtime;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.tei.WhitespaceUtil;
-import de.faustedition.xml.CustomNamespaceMap;
-import de.faustedition.xml.MultiplexingContentHandler;
-import de.faustedition.xml.XMLFragmentFilter;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
 
-@Singleton
+@Component
 public class TextManager extends Runtime implements Runnable {
 
-	private final Logger logger;
-	private final FaustGraph graph;
-	private final GraphDatabaseService db;
-	private final XMLStorage xml;
-	private SortedMap<FaustURI, String> tableOfContents;
+	@Autowired
+	private Logger logger;
 
-	@Inject
-	public TextManager(FaustGraph graph, XMLStorage xml, Logger logger) {
-		this.graph = graph;
-		this.xml = xml;
-		this.db = graph.getGraphDatabaseService();
-		this.logger = logger;
-	}
+	@Autowired
+	private FaustGraph graph;
+
+	@Autowired
+	private GraphDatabaseService db;
+
+	@Autowired
+	private XMLStorage xml;
+
+	private SortedMap<FaustURI, String> tableOfContents;
 
 	public Set<FaustURI> feedGraph() {
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
@@ -65,13 +57,13 @@ public class TextManager extends Runtime implements Runnable {
 				logger.info("Importing text " + textSource);
 				add(textSource);
 			} catch (SAXException e) {
-				logger.log(Level.SEVERE, "XML error while adding text " + textSource, e);
+				logger.error("XML error while adding text " + textSource, e);
 				failed.add(textSource);
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "I/O error while adding text " + textSource, e);
+				logger.error("I/O error while adding text " + textSource, e);
 				failed.add(textSource);
 			} catch (TransformerException e) {
-				logger.log(Level.SEVERE, "XML error while adding text " + textSource, e);
+				logger.error("XML error while adding text " + textSource, e);
 				failed.add(textSource);
 			}
 		}
@@ -84,8 +76,8 @@ public class TextManager extends Runtime implements Runnable {
 	}
 
 	public Text add(FaustURI source) throws SAXException, IOException, TransformerException {
-		if (logger.isLoggable(Level.FINE)) {
-			logger.fine("Adding text from " + source);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Adding text from " + source);
 		}
 
 		final Document document = XMLUtil.parse(xml.getInputSource(source));
@@ -188,11 +180,7 @@ public class TextManager extends Runtime implements Runnable {
 		}
 	}
 	
-	public static void main(String[] args) {
-		try {
-			main(TextManager.class, args);
-		} finally {
-			System.exit(0);
-		}
+	public static void main(String[] args) throws IOException {
+		main(TextManager.class, args);
 	}
 }

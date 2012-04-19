@@ -1,42 +1,37 @@
 package de.faustedition.structure;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.xml.XMLStorage;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
+import java.util.ArrayDeque;
+import java.util.Arrays;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.xml.XMLStorage;
-
-@Singleton
+@Component
 public class StructureFinder extends Finder {
 
-	private final XMLStorage xml;
-	private final Injector injector;
-	private final Logger logger;
+	@Autowired
+	private ApplicationContext applicationContext;
 
-	@Inject
-	public StructureFinder(XMLStorage xml, Injector injector, Logger logger) {
-		this.xml = xml;
-		this.injector = injector;
-		this.logger = logger;
-	}
+	@Autowired
+	private XMLStorage xml;
+
+	@Autowired
+	private Logger logger;
 
 	@Override
 	public ServerResource find(Request request, Response response) {
 		final String path = request.getResourceRef().getRelativeRef().getPath().replaceAll("^/+", "").replaceAll("/+$", "");
 
-		logger.fine("Finding structure resource for '" + path + "'");
+		logger.debug("Finding structure resource for '" + path + "'");
 		final ArrayDeque<String> pathDeque = new ArrayDeque<String>(Arrays.asList(path.split("/+")));
 		if (pathDeque.size() == 0) {
 			return null;
@@ -57,12 +52,12 @@ public class StructureFinder extends Finder {
 				return null;
 			}
 		} catch (IllegalArgumentException e) {
-			logger.log(Level.FINE, "Parse error while resolving structure resource for '" + path + "'", e);
+			logger.debug("Parse error while resolving structure resource for '" + path + "'", e);
 			return null;
 		}
 
 
-		final StructureResource resource = injector.getInstance(StructureResource.class);
+		final StructureResource resource = applicationContext.getBean(StructureResource.class);
 		resource.setURI(uri);
 		return resource;
 	}

@@ -1,37 +1,43 @@
 package de.faustedition;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
+import com.google.common.collect.Iterables;
+import de.faustedition.tei.TeiEncodingReporter;
+import de.faustedition.tei.TeiValidator;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 import org.restlet.util.ClientList;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import de.faustedition.tei.TeiEncodingReporter;
-import de.faustedition.tei.TeiValidator;
+@org.springframework.stereotype.Component
+public class Server extends Runtime implements Runnable, InitializingBean {
+	@Autowired
+	private Environment environment;
 
-public class Server extends Runtime implements Runnable {
-	private final RuntimeMode runtimeMode;
-	private final String contextPath;
-	private final FaustApplication application;
-	private final Logger logger;
-	private final TeiValidator validator;
-	private final TeiEncodingReporter encodingReporter;
+	@Autowired
+	private FaustApplication application;
 
-	@Inject
-	public Server(RuntimeMode runtimeMode, @Named("ctx.path") String contextPath, FaustApplication application,
-			TeiValidator validator, TeiEncodingReporter encodingReporter, Logger logger) {
-		this.runtimeMode = runtimeMode;
-		this.contextPath = contextPath;
-		this.application = application;
-		this.validator = validator;
-		this.encodingReporter = encodingReporter;
-		this.logger = logger;
+	@Autowired
+	private Logger logger;
+
+	@Autowired
+	private TeiValidator validator;
+
+	@Autowired
+	private TeiEncodingReporter encodingReporter;
+
+	private String contextPath;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.contextPath = environment.getRequiredProperty("ctx.path");
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -41,7 +47,7 @@ public class Server extends Runtime implements Runnable {
 	@Override
 	public void run() {
 		try {
-			logger.info("Starting Faust-Edition in " + runtimeMode + " mode");
+			logger.info("Starting Faust-Edition with profiles " + Iterables.toString(Arrays.asList(environment.getActiveProfiles())));
 
 			schedulePeriodicTasks();
 			startWebserver();
@@ -62,20 +68,12 @@ public class Server extends Runtime implements Runnable {
 
 	private void startWebserver() throws Exception {
 		final Component component = new Component();
+		component.getServers().add(Protocol.HTTP, environment.getRequiredProperty("server.port", Integer.class));
+
 		ClientList clients = component.getClients();
 		clients.add(Protocol.FILE);
 		clients.add(Protocol.HTTP).setConnectTimeout(4000);
 		clients.add(Protocol.HTTPS).setConnectTimeout(4000);
-		
-
-		switch (runtimeMode) {
-		case PRODUCTION:
-			component.getServers().add(Protocol.AJP, 8089);
-			break;
-		case DEVELOPMENT:
-			component.getServers().add(Protocol.HTTP, 8080);
-			break;
-		}
 
 		logger.info("Mounting application under '" + contextPath + "/'");
 		component.getDefaultHost().attach(contextPath + "/", application);

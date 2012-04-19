@@ -1,27 +1,5 @@
 package de.faustedition.document;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit.Type;
@@ -33,39 +11,50 @@ import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLBaseTracker;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
-@Singleton
+import java.io.IOException;
+import java.util.*;
+
+@Component
 public class MaterialUnitManager {
 	public static final FaustURI DOCUMENT_BASE_URI = new FaustURI(FaustAuthority.XML, "/document");
 
-	private final FaustGraph graph;
-	private final XMLStorage xml;
-	private final TranscriptManager transcriptManager;
-	private final GraphDatabaseService db;
+	@Autowired
+	private FaustGraph graph;
 
-	private final Logger logger;
+	@Autowired
+	private XMLStorage xml;
 
-	@Inject
-	public MaterialUnitManager(FaustGraph graph, GraphDatabaseService db, XMLStorage xml, TranscriptManager transcriptManager, Logger logger) {
-		this.graph = graph;
-		this.db = db;
-		this.xml = xml;
-		this.transcriptManager = transcriptManager;
-		this.logger = logger;		
-	}
+	@Autowired
+	private TranscriptManager transcriptManager;
+
+	@Autowired
+	private GraphDatabaseService db;
+
+	@Autowired
+	private Logger logger;
 
 	public Set<FaustURI> feedGraph() {
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Feeding material units into graph");
 		for (FaustURI documentDescriptor : xml.iterate(MaterialUnitManager.DOCUMENT_BASE_URI)) {
 			try {
-				logger.fine("Importing document " + documentDescriptor);
+				logger.debug("Importing document " + documentDescriptor);
 				add(documentDescriptor);
 			} catch (SAXException e) {
-				logger.log(Level.SEVERE, "XML error while adding document " + documentDescriptor, e);
+				logger.error("XML error while adding document " + documentDescriptor, e);
 				failed.add(documentDescriptor);
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "I/O error while adding document " + documentDescriptor, e);
+				logger.error("I/O error while adding document " + documentDescriptor, e);
 				failed.add(documentDescriptor);
 			}
 		}

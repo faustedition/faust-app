@@ -1,5 +1,17 @@
 package de.faustedition.xml;
 
+import com.google.common.base.Preconditions;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import org.neo4j.helpers.collection.IterableWrapper;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,31 +21,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.xml.transform.TransformerException;
-
-import org.neo4j.helpers.collection.IterableWrapper;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-
-import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-
-@Singleton
-public class XMLStorage implements Iterable<FaustURI> {
+@Component
+public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 	private final Pattern xmlFilenamePattern = Pattern.compile("[^\\.]+\\.[xX][mM][lL]$");
-	private final File storageDirectory;
-	private final String storagePath;
 
-	@Inject
-	public XMLStorage(@Named("xml.home") String dbDirectory) {
-		this.storageDirectory = new File(dbDirectory);
-		Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getAbsolutePath()
-				+ " is a directory");
+	@Autowired
+	private Environment environment;
+
+	private File storageDirectory;
+	private String storagePath;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.storageDirectory = environment.getRequiredProperty("xml.home", File.class);
+		Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getAbsolutePath() + " is a directory");
 		this.storagePath = storageDirectory.getAbsolutePath();
 	}
 

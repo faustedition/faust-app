@@ -1,21 +1,28 @@
 package de.faustedition.document;
 
+import de.faustedition.template.TemplateFinder;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+@Component
+public class DocumentRouter extends Router implements InitializingBean {
 
-import de.faustedition.template.TemplateFinder;
+	@Autowired
+	private TemplateFinder templateFinder;
 
-@Singleton
-public class DocumentRouter extends Router {
+	@Autowired
+	private DocumentImageLinkFinder imageLinkFinder;
 
-	@Inject
-	public DocumentRouter(TemplateFinder templateFinder, DocumentImageLinkFinder imageLinkFinder, DocumentFinder documentFinder) {
+	@Autowired
+	private DocumentFinder documentFinder;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		attach("styles", templateFinder);
 		attach("imagelink", imageLinkFinder, Template.MODE_STARTS_WITH);
-		//attach("imagelink/{path}", new DocumentImageLinkPageResource(), Template.MODE_STARTS_WITH);
 		attach(documentFinder, Template.MODE_STARTS_WITH);
 	}
 }

@@ -1,13 +1,14 @@
 package de.faustedition.security;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.base.Joiner;
+import org.restlet.data.ClientInfo;
+import org.restlet.security.Enroler;
+import org.restlet.security.Role;
+import org.restlet.security.SecretVerifier;
+import org.restlet.security.User;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -17,27 +18,16 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import java.util.*;
 
-import org.restlet.data.ClientInfo;
-import org.restlet.security.Enroler;
-import org.restlet.security.Role;
-import org.restlet.security.SecretVerifier;
-import org.restlet.security.User;
-
-import com.google.common.base.Joiner;
-import com.google.inject.Inject;
-
+@Component
 public class LdapSecurityStore extends SecretVerifier implements Enroler {
 	private static final String LDAP_SERVER_URL = "ldap://localhost/";
 
-	private final Logger logger;
-	private Map<String, UserData> cache = Collections.synchronizedMap(new HashMap<String, UserData>());
+	@Autowired
+	private Logger logger;
 
-	@Inject
-	public LdapSecurityStore(Logger logger) {
-		super();
-		this.logger = logger;
-	}
+	private Map<String, UserData> cache = Collections.synchronizedMap(new HashMap<String, UserData>());
 
 	@Override
 	public boolean verify(String identifier, char[] secret) throws IllegalArgumentException {
@@ -47,14 +37,14 @@ public class LdapSecurityStore extends SecretVerifier implements Enroler {
 
 		UserData userData = cache.get(identifier);
 		if (userData != null && compare(userData.secret, secret)) {
-			logger.fine("Verifier found cached user data for " + identifier);
+			logger.debug("Verifier found cached user data for " + identifier);
 			return true;
 		}
 
 		final String userDn = String.format("uid=%s,ou=people,dc=faustedition,dc=uni-wuerzburg,dc=de", identifier);
 		DirContext ctx = null;
 		try {
-			logger.fine("Verifier authenticates " + userDn);
+			logger.debug("Verifier authenticates " + userDn);
 
 			final Properties env = new Properties();
 			env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -70,28 +60,28 @@ public class LdapSecurityStore extends SecretVerifier implements Enroler {
 			NamingEnumeration<SearchResult> answer = ctx.search("ou=groups,dc=faustedition,dc=uni-wuerzburg,dc=de",
 					"(&(uniqueMember=" + userDn + "))", searchCtrls);
 
-			logger.fine("Verifier authenticated " + userDn + "; getting group memberships ...");
+			logger.debug("Verifier authenticated " + userDn + "; getting group memberships ...");
 			final Set<Role> roles = new HashSet<Role>();
 			while (answer.hasMore()) {
 				String cn = (String) answer.next().getAttributes().get("cn").get();
 				if ("admin".equals(cn)) {
 					roles.add(SecurityConstants.ADMIN_ROLE);
-					logger.fine("Giving role " + SecurityConstants.ADMIN_ROLE + " to " + identifier);
+					logger.debug("Giving role " + SecurityConstants.ADMIN_ROLE + " to " + identifier);
 				} else if ("staff".equals(cn) || "editors".equals(cn)) {
 					roles.add(SecurityConstants.EDITOR_ROLE);
-					logger.fine("Giving role " + SecurityConstants.EDITOR_ROLE + " to " + identifier);
+					logger.debug("Giving role " + SecurityConstants.EDITOR_ROLE + " to " + identifier);
 				} else if ("external".equals(cn)) {
 					roles.add(SecurityConstants.EXTERNAL_ROLE);
-					logger.fine("Giving role " + SecurityConstants.EXTERNAL_ROLE + " to " + identifier);					
+					logger.debug("Giving role " + SecurityConstants.EXTERNAL_ROLE + " to " + identifier);
 				}
 			}
 
 			cache.put(identifier, new UserData(secret, roles));
 			return true;
 		} catch (AuthenticationException e) {
-			logger.log(Level.FINE, "Verifier failed authenticating " + userDn, e);
+			logger.debug("Verifier failed authenticating " + userDn, e);
 		} catch (NamingException e) {
-			logger.log(Level.WARNING, "JNDI error while authenticating " + identifier + " against LDAP server", e);
+			logger.warn("JNDI error while authenticating " + identifier + " against LDAP server", e);
 		} finally {
 			if (ctx != null) {
 				try {
@@ -112,14 +102,14 @@ public class LdapSecurityStore extends SecretVerifier implements Enroler {
 		}
 
 		final String userName = user.getName();
-		logger.fine("Enroler checks for roles of " + userName);
+		logger.debug("Enroler checks for roles of " + userName);
 		UserData userData = cache.get(userName);
 		if (userData == null) {
-			logger.fine("Enroler did not find user " + userName);
+			logger.debug("Enroler did not find user " + userName);
 			return;
 		}
 
-		logger.fine("Enroler assigns [" + Joiner.on(", ").join(userData.roles) + "] to user " + userName);
+		logger.debug("Enroler assigns [" + Joiner.on(", ").join(userData.roles) + "] to user " + userName);
 		clientInfo.getRoles().addAll(userData.roles);
 	}
 

@@ -1,16 +1,6 @@
 package de.faustedition.xml;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Deque;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
-
+import de.faustedition.FaustURI;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.MediaType;
@@ -18,39 +8,42 @@ import org.restlet.ext.xml.XmlRepresentation;
 import org.restlet.resource.Finder;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Deque;
 
-import de.faustedition.FaustURI;
-
-@Singleton
+@Component
 public class XMLFinder extends Finder {
 
-	private final XMLStorage xml;
-	private final Logger logger;
+	@Autowired
+	private XMLStorage xml;
 
-	@Inject
-	public XMLFinder(XMLStorage xml, Logger logger) {
-		this.xml = xml;
-		this.logger = logger;
-	}
+	@Autowired
+	private Logger logger;
 
 	@Override
 	public ServerResource find(Request request, Response response) {
 		final Deque<String> path = FaustURI.toPathDeque(request.getResourceRef().getRelativeRef().getPath());
-		logger.fine("Finding XML resource for " + path);
+		logger.debug("Finding XML resource for " + path);
 		
 		try {
 			final FaustURI uri = xml.walk(path);
 			if (uri == null) {
 				return null;
 			}
-			logger.fine("Delivering XML for " + uri);
+			logger.debug("Delivering XML for " + uri);
 			return new XMLResource(uri);
 		} catch (IllegalArgumentException e) {
-			logger.log(Level.FINE, "Parse error while resolving XML resource for " + path, e);
+			logger.debug("Parse error while resolving XML resource for " + path, e);
 			return null;
 		}
 	}

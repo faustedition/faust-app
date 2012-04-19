@@ -23,8 +23,12 @@ public class NodeListWrapper<T extends Node> implements Iterable<T> {
 
 	}
 
-	public NodeListWrapper(XPathExpression expr, Object item) throws XPathExpressionException {
-		this.nodeList = (NodeList) expr.evaluate(item, XPathConstants.NODESET);
+	public NodeListWrapper(XPathExpression expr, Object item) {
+		try {
+			this.nodeList = (NodeList) expr.evaluate(item, XPathConstants.NODESET);
+		} catch (XPathExpressionException e) {
+			throw new RuntimeException(String.format("XPath error while evaluating '%s'", expr), e);
+		}
 	}
 
 	public Iterator<T> iterator() {

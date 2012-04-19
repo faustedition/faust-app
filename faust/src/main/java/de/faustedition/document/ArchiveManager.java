@@ -1,45 +1,41 @@
 package de.faustedition.document;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.GraphDatabaseTransactional;
-import de.faustedition.xml.CustomNamespaceMap;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
-
-@Singleton
+@Component
 public class ArchiveManager {
 	public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
 
-	private final FaustGraph graph;
-	private final XMLStorage xml;
-	private final GraphDatabaseService db;
-	private final Logger logger;
+	@Autowired
+	private FaustGraph graph;
 
-	@Inject
-	public ArchiveManager(FaustGraph graph, GraphDatabaseService db, XMLStorage xml, Logger logger) {
-		this.graph = graph;
-		this.db = db;
-		this.xml = xml;
-		this.logger = logger;
-	}
+	@Autowired
+	private XMLStorage xml;
 
-	@GraphDatabaseTransactional
+	@Autowired
+	private GraphDatabaseService db;
+
+	@Autowired
+	private Logger logger;
+
+	@Transactional
 	public void feedGraph() {
 		logger.info("Feeding archive data into graph");
 		try {
@@ -74,9 +70,9 @@ public class ArchiveManager {
 				a.delete();
 			}
 		} catch (SAXException e) {
-			logger.log(Level.SEVERE, "XML error while feeding archive data into graph", e);
+			logger.error("XML error while feeding archive data into graph", e);
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "XML error while feeding archive data into graph", e);
+			logger.error("XML error while feeding archive data into graph", e);
 		}
 	}
 }

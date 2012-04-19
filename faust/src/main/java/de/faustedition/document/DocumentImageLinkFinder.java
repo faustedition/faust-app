@@ -1,30 +1,16 @@
 package de.faustedition.document;
 
-import java.util.Deque;
-import java.util.logging.Logger;
-
-import org.restlet.Request;
-import org.restlet.Response;
 import org.restlet.resource.ServerResource;
+import org.springframework.stereotype.Component;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.Deque;
 
-import de.faustedition.xml.XMLStorage;
-
+@Component
 public class DocumentImageLinkFinder extends AbstractDocumentFinder {
-
-	private final Provider<DocumentImageLinkResource> resources;
-
-	@Inject
-	public DocumentImageLinkFinder(XMLStorage xml, MaterialUnitManager documentManager, Provider<DocumentImageLinkResource> resources, Logger logger) {
-		super(xml, documentManager, logger);
-		this.resources = resources;
-	}
 
 	@Override
 	protected ServerResource getResource(Document document, Deque<String> postfix) {
-		DocumentImageLinkResource resource = resources.get();
+		DocumentImageLinkResource resource = applicationContext.getBean(DocumentImageLinkResource.class);
 		if (postfix.size() != 1)
 			return null;
 		else {

@@ -1,27 +1,28 @@
 package de.faustedition.structure;
 
+import de.faustedition.FaustURI;
+import de.faustedition.template.TemplateRepresentationFactory;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.ServerResource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
 
-import com.google.inject.Inject;
-
-import de.faustedition.FaustURI;
-import de.faustedition.template.TemplateRepresentationFactory;
-
-
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class StructureResource extends ServerResource {
-	private final TemplateRepresentationFactory viewFactory;
-	private FaustURI uri;
 
-	@Inject
-	public StructureResource(TemplateRepresentationFactory viewFactory) {
-		this.viewFactory = viewFactory;
-	}
+	@Autowired
+	private TemplateRepresentationFactory viewFactory;
+
+	private FaustURI uri;
 
 	public void setURI(FaustURI uri) {
 		this.uri = uri;

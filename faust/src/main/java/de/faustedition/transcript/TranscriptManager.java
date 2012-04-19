@@ -1,77 +1,69 @@
 package de.faustedition.transcript;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
-import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_URI;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
-
+import com.google.common.collect.Iterables;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.tei.WhitespaceUtil;
+import de.faustedition.transcript.Transcript.Type;
+import de.faustedition.xml.*;
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.IterableWrapper;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.common.collect.Iterables;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.tei.WhitespaceUtil;
-import de.faustedition.transcript.Transcript.Type;
-import de.faustedition.xml.CustomNamespaceMap;
-import de.faustedition.xml.MultiplexingContentHandler;
-import de.faustedition.xml.XMLFragmentFilter;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
+import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_URI;
 
-@Singleton
+@Component
 public class TranscriptManager {
 	private final ApparatusExtractor apparatusExtractor = new ApparatusExtractor();
-	private final FaustGraph graph;
-	private final XMLStorage xml;
-	private final Logger logger;
-	private final GraphDatabaseService db;
 
-	@Inject
-	public TranscriptManager(FaustGraph graph, XMLStorage xml, Logger logger) {
-		this.graph = graph;
-		this.xml = xml;
-		this.logger = logger;
-		this.db = graph.getGraphDatabaseService();
-	}
+	@Autowired
+	private FaustGraph graph;
+
+	@Autowired
+	private XMLStorage xml;
+
+	@Autowired
+	private Logger logger;
+
+	@Autowired
+	private GraphDatabaseService db;
 
 	public Set<FaustURI> feedGraph() {
 		logger.info("Feeding transcripts into graph");
 		Set<FaustURI> failed = new HashSet<FaustURI>();
 		for (FaustURI transcript : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
 			try {
-				logger.fine("Importing transcript " + transcript);
+				logger.debug("Importing transcript " + transcript);
 				add(transcript);
 			} catch (SAXException e) {
-				logger.log(Level.SEVERE, "XML error while adding transcript " + transcript, e);
+				logger.error("XML error while adding transcript " + transcript, e);
 				failed.add(transcript);
 			} catch (TransformerException e) {
-				logger.log(Level.SEVERE, "XML error while adding transcript " + transcript, e);
+				logger.error("XML error while adding transcript " + transcript, e);
 				failed.add(transcript);
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "I/O error while adding transcript " + transcript, e);
+				logger.error("I/O error while adding transcript " + transcript, e);
 				failed.add(transcript);
 			}
 		}
@@ -79,8 +71,8 @@ public class TranscriptManager {
 	}
 
 	public Iterable<Transcript> add(FaustURI source) throws SAXException, IOException, TransformerException {
-		if (logger.isLoggable(Level.FINE)) {
-			logger.fine("Adding transcripts for " + source);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Adding transcripts for " + source);
 		}
 
 		final Set<Transcript> transcripts = new HashSet<Transcript>();
@@ -94,13 +86,13 @@ public class TranscriptManager {
 		}
 
 		for (Transcript t : transcripts) {
-			logger.fine("Extracting apparatus of  " + t);
+			logger.debug("Extracting apparatus of  " + t);
 			apparatusExtractor.extract(t);
 
-			logger.fine("Postprocess  " + t);
+			logger.debug("Postprocess  " + t);
 			t.postprocess();
 
-			logger.fine("Tokenize " + t);
+			logger.debug("Tokenize " + t);
 			t.tokenize();
 		}
 		return transcripts;
@@ -126,7 +118,7 @@ public class TranscriptManager {
 
 		final Element documentRoot = documentHandler.result();
 		if (documentRoot != null) {
-			logger.fine("Adding documentary transcript for " + source);
+			logger.debug("Adding documentary transcript for " + source);
 			Transcript transcript = new DocumentaryTranscript(db, source, documentRoot, facsRefHandler.references);
 			transcripts.add(transcript);
 			register(transcript, source);
@@ -134,7 +126,7 @@ public class TranscriptManager {
 
 		final Element textRoot = textHandler.result();
 		if (textRoot != null) {
-			logger.fine("Adding textual transcript for " + source);
+			logger.debug("Adding textual transcript for " + source);
 			Transcript transcript = new TextualTranscript(db, source, textRoot);
 			transcripts.add(transcript);
 			register(transcript, source);
@@ -184,17 +176,17 @@ public class TranscriptManager {
 			if (inFacsimile && "graphic".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
 				String facsimileRefAttr = atts.getValue("url");
 				if (facsimileRefAttr == null) {
-					logger.warning("<tei:graphic/> without @url in " + source);
+					logger.warn("<tei:graphic/> without @url in " + source);
 					return;
 				}
 				try {
 					final FaustURI facsimileRef = FaustURI.parse(facsimileRefAttr);
-					if (logger.isLoggable(Level.FINE)) {
-						logger.fine("Found " + facsimileRef + " in " + source);
+					if (logger.isDebugEnabled()) {
+						logger.debug("Found " + facsimileRef + " in " + source);
 					}
 					references.add(facsimileRef);
 				} catch (Exception e) {
-					logger.warning("Invalid @url='" + facsimileRefAttr + "' in <tei:graphic/> in " + source);
+					logger.warn("Invalid @url='" + facsimileRefAttr + "' in <tei:graphic/> in " + source);
 				}
 			} else if ("facsimile".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
 				inFacsimile = true;

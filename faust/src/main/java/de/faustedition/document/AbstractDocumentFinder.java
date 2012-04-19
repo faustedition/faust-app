@@ -1,58 +1,62 @@
 package de.faustedition.document;
 
-import java.util.Deque;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import de.faustedition.FaustURI;
+import de.faustedition.xml.XMLStorage;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 
-import de.faustedition.FaustURI;
-import de.faustedition.xml.XMLStorage;
+import java.util.Deque;
 
 public abstract class AbstractDocumentFinder extends Finder {
 
-	protected final XMLStorage xml;
-	protected final MaterialUnitManager documentManager;
-	protected final Logger logger;
+	@Autowired
+	protected ApplicationContext applicationContext;
 
-	public AbstractDocumentFinder(XMLStorage xml, MaterialUnitManager documentManager, Logger logger) {
-		this.xml = xml;
-		this.documentManager = documentManager;
-		this.logger = logger;
-	}
+	@Autowired
+	protected XMLStorage xml;
+
+	@Autowired
+	protected MaterialUnitManager documentManager;
+
+	@Autowired
+	protected Logger logger;
 
 	protected class DocumentPath {
 		public DocumentPath(Document document, Deque<String> path) {
-			this.document = document; 
+			this.document = document;
 			this.path = path;
 		}
+
 		public Document document;
 		public Deque<String> path;
 	}
-	
+
 	@Override
 	public ServerResource find(Request request, Response response) {
 
 		try {
-			
+
 			final DocumentPath docPath = getDocument(request);
 			final Document document = docPath.document;
 			final Deque<String> remainder = docPath.path;
-			
-		if (document == null) {
+
+			if (document == null) {
 				return null;
 			}
 
 
-		return getResource(document, remainder);
+			return getResource(document, remainder);
 
 
 		} catch (IllegalArgumentException e) {
-			logger.log(Level.FINE, "Parse error while resolving document resource for " + 
-					request.getResourceRef().getRelativeRef().getPath(), e);
+			logger.debug("Parse error while resolving document resource for " +
+				request.getResourceRef().getRelativeRef().getPath(), e);
 			return null;
 		}
 
@@ -62,20 +66,14 @@ public abstract class AbstractDocumentFinder extends Finder {
 		final Deque<String> path = FaustURI.toPathDeque(request.getResourceRef().getRelativeRef().getPath());
 		path.addFirst("document");
 
-		logger.fine("Finding document resource for " + path);
-		
-			final FaustURI uri = xml.walk(path);
-			Document document;
-			
-			if (uri == null) 
-				document = null;
-			
-			logger.fine("Finding document for " + uri);
-			document = documentManager.find(uri);
-			return new DocumentPath(document, path);
+		logger.debug("Finding document resource for " + path);
+		final FaustURI uri = xml.walk(path);
+
+		logger.debug("Finding document for " + uri);
+		return new DocumentPath(documentManager.find(uri), path);
 	}
-	
-	
+
+
 	protected abstract ServerResource getResource(Document document, Deque<String> postfix);
-	
+
 }

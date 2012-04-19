@@ -1,68 +1,72 @@
 package de.faustedition.document;
 
-import static de.faustedition.xml.XPathUtil.xpath;
-
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-
+import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
+import de.faustedition.ApplicationContextFinder;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.xml.NodeListWrapper;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import com.google.common.collect.Iterables;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
+import javax.xml.xpath.XPathExpression;
+import java.io.IOException;
+import java.util.*;
 
-import de.faustedition.graph.GraphDatabaseTransactional;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.inject.InjectorFinder;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.xml.NodeListWrapper;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import static de.faustedition.xml.XPathUtil.xpath;
 
-@Singleton
-public class ArchiveRouter extends Router {
+@Component
+public class ArchiveRouter extends Router implements InitializingBean {
 
-	@Inject
-	public ArchiveRouter(Injector injector) {
-		InjectorFinder archiveResource = new InjectorFinder(injector, ArchiveResource.class);
+	@Autowired
+	private ApplicationContext applicationContext;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		ApplicationContextFinder<ArchiveResource> archiveResource = new ApplicationContextFinder<ArchiveResource>(applicationContext, ArchiveResource.class);
 		attach("", archiveResource);
 		attach("{id}", archiveResource);
 	}
 
-	@GraphDatabaseTransactional
+	@Component
+	@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 	public static class ArchiveResource extends ServerResource {
 
-		private final XMLStorage xmlStorage;
-		private final TemplateRepresentationFactory viewFactory;
-		private final FaustGraph graph;
+		@Autowired
+		private XMLStorage xmlStorage;
 
-		@Inject
-		public ArchiveResource(XMLStorage xmlStorage, FaustGraph graph, TemplateRepresentationFactory viewFactory) {
-			this.xmlStorage = xmlStorage;
-			this.graph = graph;
-			this.viewFactory = viewFactory;
-		}
+		@Autowired
+		private TemplateRepresentationFactory viewFactory;
+
+		@Autowired
+		private FaustGraph graph;
 
 		@Get
-		public Representation render() throws IOException, XPathExpressionException, SAXException {
+		public Representation render() {
 			final Map<String, Object> model = new HashMap<String, Object>();
 			final String id = (String) getRequestAttributes().get("id");
-			final org.w3c.dom.Document archives = XMLUtil.parse(xmlStorage
-					.getInputSource(ArchiveManager.ARCHIVE_DESCRIPTOR_URI));
+
+			final org.w3c.dom.Document archives;
+			try {
+				archives = XMLUtil.parse(xmlStorage.getInputSource(ArchiveManager.ARCHIVE_DESCRIPTOR_URI));
+			} catch (SAXException e) {
+				throw Throwables.propagate(e);
+			} catch (IOException e) {
+				throw Throwables.propagate(e);
+			}
 
 			if (id == null) {
 				model.put("archives", archives.getDocumentElement());

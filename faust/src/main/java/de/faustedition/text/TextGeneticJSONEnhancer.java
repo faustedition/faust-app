@@ -1,37 +1,32 @@
 package de.faustedition.text;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import com.google.common.base.Objects;
+import de.faustedition.document.Document;
+import de.faustedition.genesis.GeneticRelationManager;
 import org.codehaus.jackson.JsonGenerator;
 import org.goddag4j.Element;
 import org.goddag4j.GoddagNode.NodeType;
 import org.goddag4j.GoddagTreeNode;
 import org.goddag4j.io.GoddagJSONWriter.GoddagJSONEnhancer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import com.google.common.base.Objects;
-import com.google.inject.Inject;
+import java.io.IOException;
+import java.util.*;
 
-import de.faustedition.document.Document;
-import de.faustedition.genesis.GeneticRelationManager;
-
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class TextGeneticJSONEnhancer implements GoddagJSONEnhancer {
 
+	@Autowired
+	private GeneticRelationManager geneticRelationManager;
+
 	private final Map<Document, SortedSet<LineInterval>> geneticRelations = new HashMap<Document, SortedSet<LineInterval>>();
-	private final GeneticRelationManager geneticRelationManager;
 
 	private int intervalStart = Integer.MAX_VALUE;
 	private int intervalEnd = 0;
-
-	@Inject
-	public TextGeneticJSONEnhancer(GeneticRelationManager geneticRelationManager) {
-		this.geneticRelationManager = geneticRelationManager;
-	}
 
 	@Override
 	public void enhance(GoddagTreeNode node, NodeType nt, JsonGenerator out) throws IOException {

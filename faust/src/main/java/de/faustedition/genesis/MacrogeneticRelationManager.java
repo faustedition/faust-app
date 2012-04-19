@@ -1,40 +1,29 @@
 package de.faustedition.genesis;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.xml.transform.TransformerException;
-
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.impl.nioneo.store.RelationshipTypeStore;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnitManager;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
-@Singleton
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
+
+@Component
 public class MacrogeneticRelationManager {
 
 
@@ -43,36 +32,32 @@ public class MacrogeneticRelationManager {
 
 	public static final FaustURI MACROGENETIC_URI = new FaustURI(FaustAuthority.XML, "/genesis/");
 
-	private final FaustGraph graph;
-	private final XMLStorage xml;
-	private final GraphDatabaseService db;
-	private final MaterialUnitManager materialUnitManager;
-	private final Logger logger;
+	@Autowired
+	private XMLStorage xml;
+
+	@Autowired
+	private GraphDatabaseService db;
+
+	@Autowired
+	private MaterialUnitManager materialUnitManager;
+
+	@Autowired
+	private Logger logger;
 
 
 
-	@Inject
-	public MacrogeneticRelationManager(FaustGraph graph, GraphDatabaseService db, XMLStorage xml, MaterialUnitManager materialUnitManager, Logger logger) {
-		this.graph = graph;
-		this.db = db;
-		this.xml = xml;
-		this.materialUnitManager = materialUnitManager;
-		this.logger = logger;		
-	}
-
-	@GraphDatabaseTransactional
 	public Set<FaustURI> feedGraph() {
 		logger.info("Feeding macrogenetic data into graph");
 		Set<FaustURI> failed = new HashSet<FaustURI>();
 		for (FaustURI macrogeneticFile: xml.iterate(new FaustURI(FaustAuthority.XML, "/macrogenesis"))) {
 			try {	
-				logger.fine("Parsing macrogenetic file " + macrogeneticFile);
+				logger.debug("Parsing macrogenetic file " + macrogeneticFile);
 				evaluate(macrogeneticFile);
 			} catch (SAXException e) {
-				logger.log(Level.SEVERE, "XML error while adding macrogenetic file " + macrogeneticFile, e);
+				logger.error("XML error while adding macrogenetic file " + macrogeneticFile, e);
 				failed.add(macrogeneticFile);
 			} catch (IOException e) {
-				logger.log(Level.SEVERE, "I/O error while adding macrogenetic file " + macrogeneticFile, e);
+				logger.error("I/O error while adding macrogenetic file " + macrogeneticFile, e);
 				failed.add(macrogeneticFile);
 			}
 		}
@@ -80,8 +65,8 @@ public class MacrogeneticRelationManager {
 	};
 
 	public void evaluate(FaustURI source) throws SAXException, IOException {
-		if (logger.isLoggable(Level.FINE)) {
-			logger.fine("Adding macrogenetic relations from " + source);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Adding macrogenetic relations from " + source);
 		}
 
 		for (MGRelationship r: parse(source)) {
@@ -92,13 +77,13 @@ public class MacrogeneticRelationManager {
 			Transaction tx = db.beginTx();
 			try {
 				if (from == null)
-					logger.severe("Document " + r.from + " is not registered!");
+					logger.error("Document " + r.from + " is not registered!");
 				else {
 
 					if (to == null)
-						logger.severe("Document " + r.to + " is not registered!");
+						logger.error("Document " + r.to + " is not registered!");
 					else {
-						logger.fine("Adding: " + from.getSource() + " ---" + r.type.name() + "---> " + to.getSource());
+						logger.debug("Adding: " + from.getSource() + " ---" + r.type.name() + "---> " + to.getSource());
 						from.node.createRelationshipTo(to.node, r.type);
 					}
 				}
@@ -150,12 +135,12 @@ public class MacrogeneticRelationManager {
 								relationship.from = new FaustURI(new URI(itemURI));
 							} else {
 								relationship.to = new FaustURI(new URI(itemURI));
-								logger.fine("Parsed: " + relationship.from + " ---" + relationship.type.name() + "---> " + relationship.to);
+								logger.debug("Parsed: " + relationship.from + " ---" + relationship.type.name() + "---> " + relationship.to);
 								relationships.add(relationship);
 								relationship = new MGRelationship(new FaustURI(new URI(itemURI)), null, relationship.type);						
 							}	
 						} catch (Exception e) {
-							logger.warning("Invalid URI '" + itemURI);
+							logger.warn("Invalid URI '" + itemURI);
 						}
 					}	
 				}

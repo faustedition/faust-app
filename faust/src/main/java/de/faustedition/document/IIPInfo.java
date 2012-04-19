@@ -1,20 +1,24 @@
 package de.faustedition.document;
 
+import org.restlet.data.ChallengeResponse;
+import org.restlet.data.ChallengeScheme;
+import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.restlet.data.ChallengeResponse;
-import org.restlet.data.ChallengeScheme;
-import org.restlet.data.Conditions;
-import org.restlet.resource.ClientResource;
-import org.restlet.resource.ResourceException;
+@Component
+public class IIPInfo implements InitializingBean {
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-
-public class IIPInfo {
+	@Autowired
+	protected Environment environment;
 
 	protected String secret;
 	protected String ident;
@@ -22,15 +26,13 @@ public class IIPInfo {
 	protected int width;
 	protected int height;
 
-	@Inject
-	public IIPInfo(@Named("facsimile.iip.url") String imageServerUrl, 
-			@Named("auth.ident") String ident, @Named("auth.secret") String secret) {
-		this.ident = ident;
-		this.secret = secret;
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.ident = environment.getRequiredProperty("auth.ident");
+		this.secret = environment.getRequiredProperty("auth.secret");
 	}
 
 	public void retrieve(String facsimileUrl) throws ResourceException, IOException {
-
 		ClientResource cr = new ClientResource(facsimileUrl + "&obj=IIP,1.0&obj=Max-size&obj=Tile-size&obj=Resolution-number");
 		cr.setChallengeResponse(new ChallengeResponse(ChallengeScheme.HTTP_BASIC, ident, secret));
 		cr.setRetryAttempts(4);

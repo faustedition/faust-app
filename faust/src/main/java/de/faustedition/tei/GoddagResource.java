@@ -1,15 +1,11 @@
 package de.faustedition.tei;
 
-import static org.restlet.data.MediaType.APPLICATION_XML;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Iterator;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.stream.StreamResult;
-
+import com.google.common.base.Throwables;
+import de.faustedition.FaustURI;
+import de.faustedition.JsonRespresentation;
+import de.faustedition.transcript.Transcript;
+import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.XMLUtil;
 import org.goddag4j.Element;
 import org.goddag4j.MultiRootedTree;
 import org.goddag4j.io.GoddagJSONWriter;
@@ -22,30 +18,31 @@ import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import com.google.common.base.Throwables;
-import com.google.inject.Inject;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Iterator;
 
-import de.faustedition.FaustURI;
-import de.faustedition.JsonRespresentation;
-import de.faustedition.transcript.Transcript;
-import de.faustedition.xml.CustomNamespaceMap;
-import de.faustedition.xml.XMLUtil;
+import static org.restlet.data.MediaType.APPLICATION_XML;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class GoddagResource extends ServerResource {
 
-	protected final GraphDatabaseService db;
+	@Autowired
+	protected GraphDatabaseService db;
 
 	protected FaustURI source;
 	protected Transcript.Type transcriptType;
 	protected MultiRootedTree trees;
 	protected GoddagJSONEnhancer enhancer = GoddagJSONWriter.NOOP_ENHANCER;
-
-	@Inject
-	public GoddagResource(GraphDatabaseService db) {
-		this.db = db;
-
-	}
 
 	public void setSource(FaustURI source) {
 		this.source = source;

@@ -1,25 +1,31 @@
 package de.faustedition.template;
 
-import java.io.IOException;
-
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.ext.freemarker.TemplateRepresentation;
 import org.restlet.resource.Finder;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.io.IOException;
 
-public class TemplateFinder extends Finder {
-	private final String contextPath;
-	private final TemplateRepresentationFactory viewFactory;
+@Component
+public class TemplateFinder extends Finder implements InitializingBean {
+	@Autowired
+	private TemplateRepresentationFactory templateFactory;
 
-	@Inject
-	public TemplateFinder(TemplateRepresentationFactory viewFactory, @Named("ctx.path") String contextPath) {
-		this.viewFactory = viewFactory;
-		this.contextPath = contextPath;
+	@Autowired
+	private Environment environment;
+
+	private String contextPath;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.contextPath = environment.getRequiredProperty("ctx.path");
 	}
 
 	@Override
@@ -34,7 +40,7 @@ public class TemplateFinder extends Finder {
 			if (templatePath.startsWith(contextPath)) {
 				templatePath = templatePath.substring(contextPath.length() + 1);
 			}
-			return viewFactory.create(templatePath, getClientInfo());
+			return templateFactory.create(templatePath, getClientInfo());
 		}
 	}
 }

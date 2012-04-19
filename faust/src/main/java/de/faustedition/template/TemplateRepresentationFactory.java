@@ -1,67 +1,58 @@
 package de.faustedition.template;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.logging.Logger;
-
-import org.restlet.data.ClientInfo;
-import org.restlet.data.Language;
-import org.restlet.data.MediaType;
-import org.restlet.data.Metadata;
-import org.restlet.data.Preference;
-import org.restlet.engine.util.ConnegUtils;
-import org.restlet.ext.freemarker.TemplateRepresentation;
-
 import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import de.faustedition.FaustURI;
 import de.faustedition.text.TextManager;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import org.restlet.data.*;
+import org.restlet.engine.util.ConnegUtils;
+import org.restlet.ext.freemarker.TemplateRepresentation;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Singleton
+import java.io.IOException;
+import java.util.*;
+
+@Component
 public class TemplateRepresentationFactory {
 	private static final List<Language> SUPPORTED_LANGUAGES = Collections.unmodifiableList(//
 			Lists.newArrayList(new Language("de"), new Language("en")));
 
-	private final Configuration configuration;
-	private final TextManager textManager;
-	private final Logger logger;
+	@Autowired
+	private Configuration configuration;
 
-	@Inject
-	public TemplateRepresentationFactory(Configuration configuration, TextManager textManager, Logger logger) {
-		this.configuration = configuration;
-		this.textManager = textManager;
-		this.logger = logger;
-	}
+	@Autowired
+	private TextManager textManager;
+
+	@Autowired
+	private Logger logger;
 
 	public TemplateRepresentation create(String path, ClientInfo client) throws IOException {
 		return create(path, client, new HashMap<String, Object>());
 	}
 
-	public TemplateRepresentation create(String path, ClientInfo client, Map<String, Object> model) throws IOException {
+	public TemplateRepresentation create(String path, ClientInfo client, Map<String, Object> model) {
 		final Language language = getPreferredMetadata(SUPPORTED_LANGUAGES, client.getAcceptedLanguages());
 		final Locale locale = (language == null ? Locale.GERMAN : new Locale(language.getName()));
 
-		logger.fine("Getting template for " + path + " with locale " + locale);
-		Template template = configuration.getTemplate(path + ".ftl", locale);
-		Preconditions.checkNotNull(template, "Cannot find template for " + path);
+		Template template;
+		try {
+			logger.debug("Getting template for " + path + " with locale " + locale);
+			template = configuration.getTemplate(path + ".ftl", locale);
+			Preconditions.checkNotNull(template, "Cannot find template for " + path);
+		} catch (IOException e) {
+			throw Throwables.propagate(e);
+		}
 
 		model.put("roles", Lists.transform(client.getRoles(), Functions.toStringFunction()));
 		
 		final ResourceBundle messages = ResourceBundle.getBundle("messages", locale);
-		logger.fine("Putting message resource bundle '" + messages.getLocale() + "' into model (requested locale " + locale + ")");
+		logger.debug("Putting message resource bundle '" + messages.getLocale() + "' into model (requested locale " + locale + ")");
 		model.put("message", messages);
 
 		final SortedMap<String, String> textTableOfContents = new TreeMap<String, String>();

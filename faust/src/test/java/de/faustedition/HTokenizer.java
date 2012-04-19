@@ -1,25 +1,23 @@
 package de.faustedition;
 
-import java.util.logging.Logger;
-
-import com.google.inject.Inject;
-
 import de.faustedition.transcript.TranscriptManager;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
+@Component
 public class HTokenizer extends Runtime implements Runnable {
 
-	private final TranscriptManager transcriptManager;
-	private final Logger logger;
+	@Autowired
+	private TranscriptManager transcriptManager;
 
-	public static void main(String[] args) {
+	@Autowired
+	private Logger logger;
+
+	public static void main(String[] args) throws IOException {
 		main(HTokenizer.class, args);
-		System.exit(0);
-	}
-
-	@Inject
-	public HTokenizer(TranscriptManager transcriptManager, Logger logger) {
-		this.transcriptManager = transcriptManager;
-		this.logger = logger;
 	}
 
 	@Override

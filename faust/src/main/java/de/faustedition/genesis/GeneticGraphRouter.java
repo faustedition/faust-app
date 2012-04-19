@@ -1,63 +1,50 @@
 package de.faustedition.genesis;
 
-import static de.faustedition.xml.XPathUtil.xpath;
-
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-
+import com.google.common.collect.Iterables;
+import de.faustedition.ApplicationContextFinder;
+import de.faustedition.document.Archive;
+import de.faustedition.document.Document;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.template.TemplateRepresentationFactory;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
-import org.w3c.dom.Element;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
-import com.google.common.collect.Iterables;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
+import java.util.*;
 
-import de.faustedition.document.Archive;
-import de.faustedition.document.Document;
-import de.faustedition.graph.GraphDatabaseTransactional;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.inject.InjectorFinder;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.xml.NodeListWrapper;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+@Component
+public class GeneticGraphRouter extends Router implements InitializingBean {
 
-@Singleton
-public class GeneticGraphRouter extends Router {
+	@Autowired
+	private ApplicationContext applicationContext;
 
-	@Inject
-	public GeneticGraphRouter(Injector injector) {
-		InjectorFinder geneticGraphResource = new InjectorFinder(injector, GeneticGraphResource.class);
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		ApplicationContextFinder<GeneticGraphResource> geneticGraphResource = new ApplicationContextFinder<GeneticGraphResource>(applicationContext, GeneticGraphResource.class);
 		attach("", geneticGraphResource);
 		attach("{filter}", geneticGraphResource);
 	}
 
-	@GraphDatabaseTransactional
+	@Component
+	@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 	public static class GeneticGraphResource extends ServerResource {
 
-		private final XMLStorage xmlStorage;
-		private final TemplateRepresentationFactory viewFactory;
-		private final FaustGraph graph;
+		@Autowired
+		private TemplateRepresentationFactory viewFactory;
 
-		@Inject
-		public GeneticGraphResource(XMLStorage xmlStorage, FaustGraph graph, TemplateRepresentationFactory viewFactory) {
-			this.xmlStorage = xmlStorage;
-			this.graph = graph;
-			this.viewFactory = viewFactory;
-		}
+		@Autowired
+		private FaustGraph graph;
 
 		@Get
 		public Representation render() throws IOException, XPathExpressionException, SAXException {

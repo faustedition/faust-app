@@ -1,21 +1,6 @@
 package de.faustedition.text;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
-
-import java.io.IOException;
-import java.util.Stack;
-
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import com.google.common.base.Joiner;
-import com.google.inject.Inject;
-
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
@@ -23,15 +8,25 @@ import de.faustedition.xml.NodeListWrapper;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
+import java.util.Stack;
+
+import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
+
+@Component
 public class TextSplitter extends Runtime implements Runnable {
 
-	private final XMLStorage xml;
-
-	@Inject
-	public TextSplitter(XMLStorage xml) {
-		this.xml = xml;
-	}
+	@Autowired
+	private XMLStorage xml;
 
 	@Override
 	public void run() {

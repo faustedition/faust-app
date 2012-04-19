@@ -1,43 +1,39 @@
 package de.faustedition.text;
 
-import java.util.Deque;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import de.faustedition.FaustURI;
+import de.faustedition.xml.XMLStorage;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Finder;
 import org.restlet.resource.ServerResource;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
+import java.util.Deque;
 
-import de.faustedition.FaustURI;
-import de.faustedition.xml.XMLStorage;
-
-@Singleton
+@Component
 public class TextFinder extends Finder {
 
-	private final XMLStorage xml;
-	private final Logger logger;
-	private final TextManager textManager;
-	private final Provider<TextResource> textResources;
+	@Autowired
+	private XMLStorage xml;
 
-	@Inject
-	public TextFinder(XMLStorage xml, TextManager textManager, Provider<TextResource> textResources, Logger logger) {
-		this.xml = xml;
-		this.textManager = textManager;
-		this.textResources = textResources;
-		this.logger = logger;
-	}
+	@Autowired
+	private Logger logger;
+
+	@Autowired
+	private TextManager textManager;
+
+	@Autowired
+	private ApplicationContext applicationContext;
 
 	@Override
 	public ServerResource find(Request request, Response response) {
 		final Deque<String> path = FaustURI.toPathDeque(request.getResourceRef().getRelativeRef().getPath());
 		path.addFirst("text");
 
-		logger.fine("Finding text resource for " + path);
+		logger.debug("Finding text resource for " + path);
 
 		try {
 			final FaustURI uri = xml.walk(path);
@@ -45,17 +41,17 @@ public class TextFinder extends Finder {
 				return null;
 			}
 
-			logger.fine("Finding text for " + uri);
+			logger.debug("Finding text for " + uri);
 			final Text text = textManager.find(uri);
 			if (text == null) {
 				return null;
 			}
 
-			final TextResource resource = textResources.get();
+			final TextResource resource = applicationContext.getBean(TextResource.class);
 			resource.setText(text);
 			return resource;
 		} catch (IllegalArgumentException e) {
-			logger.log(Level.FINE, "Parse error while resolving text resource for " + path, e);
+			logger.debug("Parse error while resolving text resource for " + path, e);
 			return null;
 		}
 	}

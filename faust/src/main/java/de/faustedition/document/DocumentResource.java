@@ -1,33 +1,32 @@
 package de.faustedition.document;
 
+import de.faustedition.FaustURI;
+import de.faustedition.JsonRespresentation;
+import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.transcript.DocumentaryTranscript;
+import de.faustedition.transcript.Transcript;
+import de.faustedition.transcript.Transcript.Type;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.ServerResource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
-
-import com.google.inject.Inject;
-
-import de.faustedition.FaustURI;
-import de.faustedition.JsonRespresentation;
-import de.faustedition.graph.GraphDatabaseTransactional;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.transcript.DocumentaryTranscript;
-import de.faustedition.transcript.Transcript;
-import de.faustedition.transcript.Transcript.Type;
-
-@GraphDatabaseTransactional
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DocumentResource extends ServerResource {
-	private final TemplateRepresentationFactory viewFactory;
-	private Document document;
 
-	@Inject
-	public DocumentResource(TemplateRepresentationFactory viewFactory) {
-		this.viewFactory = viewFactory;
-	}
+	@Autowired
+	private TemplateRepresentationFactory viewFactory;
+
+	private Document document;
 
 	public void setDocument(Document document) {
 		this.document = document;

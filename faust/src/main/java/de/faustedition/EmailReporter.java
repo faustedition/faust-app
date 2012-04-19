@@ -1,28 +1,32 @@
 package de.faustedition;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.logging.Logger;
-
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.SimpleEmail;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
-@Singleton
-public class EmailReporter {
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
-	private final boolean mailEnabled;
-	private final Logger logger;
+@Component
+public class EmailReporter implements InitializingBean {
 
-	@Inject
-	public EmailReporter(@Named("email.enabled") boolean mailEnabled, Logger logger) {
-		this.mailEnabled = mailEnabled;
-		this.logger = logger;
+	@Autowired
+	private Logger logger;
+
+	@Autowired
+	private Environment environment;
+
+	private boolean mailEnabled;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.mailEnabled = environment.getRequiredProperty("email.enabled", Boolean.class);
 	}
 
 	public void send(String subject, ReportCreator creator) throws EmailException {
@@ -39,7 +43,7 @@ public class EmailReporter {
 
 		final String body = bodyWriter.toString();		
 		if (!mailEnabled) {
-			logger.warning(String.format("\n\nSubject: %s\n\n%s\n\n", subject, body));
+			logger.warn(String.format("\n\nSubject: %s\n\n%s\n\n", subject, body));
 			return;
 		}
 		

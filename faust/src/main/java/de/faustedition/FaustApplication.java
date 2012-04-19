@@ -1,9 +1,17 @@
 package de.faustedition;
 
-import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
-
-import java.util.List;
-
+import de.faustedition.collation.CollationFinder;
+import de.faustedition.db.TransactionFilter;
+import de.faustedition.document.ArchiveRouter;
+import de.faustedition.document.DocumentRouter;
+import de.faustedition.genesis.GeneticGraphRouter;
+import de.faustedition.security.LdapSecurityStore;
+import de.faustedition.security.SecurityConstants;
+import de.faustedition.structure.StructureFinder;
+import de.faustedition.tei.GoddagFinder;
+import de.faustedition.template.TemplateFinder;
+import de.faustedition.text.TextFinder;
+import de.faustedition.xml.XMLFinder;
 import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -21,66 +29,62 @@ import org.restlet.security.Authenticator;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Role;
 import org.restlet.security.RoleAuthorizer;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+import java.util.List;
 
-import de.faustedition.collation.CollationFinder;
-import de.faustedition.document.ArchiveRouter;
-import de.faustedition.document.DocumentRouter;
-import de.faustedition.genesis.GeneticGraphRouter;
-import de.faustedition.security.LdapSecurityStore;
-import de.faustedition.security.SecurityConstants;
-import de.faustedition.structure.StructureFinder;
-import de.faustedition.tei.GoddagFinder;
-import de.faustedition.template.TemplateFinder;
-import de.faustedition.text.TextFinder;
-import de.faustedition.xml.XMLFinder;
+import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
 
-@Singleton
-public class FaustApplication extends Application {
-	private final String staticResourcePath;
-	private final TemplateFinder templateFinder;
-	private final GeneticGraphRouter geneticGraphRouter;
-	private final ComboResourceFinder comboResourceFinder;
-	private final ArchiveRouter archiveRouter;
-	private final DocumentRouter documentRouter;
-	private final GoddagFinder goddagFinder;
-	private final TextFinder textFinder;
-	private final XMLFinder xmlFinder;
-	private final StructureFinder structureFinder;
-	private final LdapSecurityStore ldapSecurityStore;
-	private final RuntimeMode runtimeMode;
-	private final CollationFinder collationFinder;
+@Component
+public class FaustApplication extends Application implements InitializingBean {
+	@Autowired
+	private Environment environment;
 
-	@Inject
-	public FaustApplication(RuntimeMode runtimeMode,//
-			@Named("static.home") String staticResourcePath,//
-			ComboResourceFinder comboResourceFinder,
-			ArchiveRouter archiveRouter,//
-			DocumentRouter documentRouter,//
-			GoddagFinder goddagFinder,//
-			TextFinder textFinder,//
-			XMLFinder xmlFinder,//
-			StructureFinder structureFinder,//
-			CollationFinder collationFinder,//
-			TemplateFinder templateFinder,//
-			GeneticGraphRouter geneticGraphRouter,//
-			LdapSecurityStore ldapSecurityStore) {
-		this.runtimeMode = runtimeMode;
-		this.staticResourcePath = staticResourcePath;
-		this.comboResourceFinder = comboResourceFinder;
-		this.archiveRouter = archiveRouter;
-		this.documentRouter = documentRouter;
-		this.goddagFinder = goddagFinder;
-		this.textFinder = textFinder;
-		this.xmlFinder = xmlFinder;
-		this.structureFinder = structureFinder;
-		this.collationFinder = collationFinder;
-		this.templateFinder = templateFinder;
-		this.geneticGraphRouter = geneticGraphRouter;
-		this.ldapSecurityStore = ldapSecurityStore;
+	@Autowired
+	private PlatformTransactionManager transactionManager;
+
+	@Autowired
+	private TemplateFinder templateFinder;
+
+	@Autowired
+	private GeneticGraphRouter geneticGraphRouter;
+
+	@Autowired
+	private ComboResourceFinder comboResourceFinder;
+
+	@Autowired
+	private ArchiveRouter archiveRouter;
+
+	@Autowired
+	private DocumentRouter documentRouter;
+
+	@Autowired
+	private GoddagFinder goddagFinder;
+
+	@Autowired
+	private TextFinder textFinder;
+
+	@Autowired
+	private XMLFinder xmlFinder;
+
+	@Autowired
+	private StructureFinder structureFinder;
+
+	@Autowired
+	private LdapSecurityStore ldapSecurityStore;
+
+	@Autowired
+	private CollationFinder collationFinder;
+
+	private String staticResourcePath;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.staticResourcePath = environment.getRequiredProperty("static.home");
 	}
 
 	@Override
@@ -92,21 +96,20 @@ public class FaustApplication extends Application {
 		router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
 		router.attach("project/", templateFinder);
 		
-		router.attach("archive/", secured(archiveRouter));
-		router.attach("collation/", secured(collationFinder));
-		router.attach("demo/", secured(templateFinder));
-		router.attach("genesis/", secured(geneticGraphRouter));		
-		router.attach("document/", secured(documentRouter));
-		router.attach("goddag/", secured(goddagFinder));
-		router.attach("text/", secured(textFinder));
-		router.attach("structure/", secured(structureFinder));
+		router.attach("archive/", secured(transactional(archiveRouter)));
+		router.attach("collation/", secured(transactional(collationFinder)));
+		router.attach("demo/", secured(transactional(templateFinder)));
+		router.attach("genesis/", secured(transactional(geneticGraphRouter)));
+		router.attach("document/", secured(transactional(documentRouter)));
+		router.attach("goddag/", secured(transactional(goddagFinder)));
+		router.attach("text/", secured(transactional(textFinder)));
+		router.attach("structure/", secured(transactional(structureFinder)));
 		router.attach("xml/", secured(xmlFinder));
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
 		router.attach("resources", comboResourceFinder);
 
-		switch (runtimeMode) {
-		case DEVELOPMENT:
+		if (environment.acceptsProfiles("development", "test")) {
 			final Filter dummyAuthenticator = new Filter() {
 				@Override
 				protected int beforeHandle(Request request, Response response) {
@@ -119,9 +122,9 @@ public class FaustApplication extends Application {
 			};
 			dummyAuthenticator.setNext(router);
 			return dummyAuthenticator;
-		default:
+		} else {
 			final Authenticator authenticator = new ChallengeAuthenticator(getContext().createChildContext(), true,
-					HTTP_BASIC, "faustedition.net", ldapSecurityStore);
+				HTTP_BASIC, "faustedition.net", ldapSecurityStore);
 			authenticator.setEnroler(ldapSecurityStore);
 			authenticator.setNext(router);
 			return authenticator;
@@ -135,6 +138,10 @@ public class FaustApplication extends Application {
 		authorizer.getAuthorizedRoles().add(SecurityConstants.EXTERNAL_ROLE);
 		authorizer.setNext(resource);
 		return authorizer;
+	}
+
+	private Restlet transactional(Restlet resource) {
+		return new TransactionFilter(getContext(), resource, transactionManager);
 	}
 
 	public static class EntryPageRedirectionResource extends ServerResource {

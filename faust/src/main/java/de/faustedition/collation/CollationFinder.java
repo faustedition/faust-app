@@ -1,31 +1,8 @@
 package de.faustedition.collation;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.goddag4j.Element;
-import org.goddag4j.GoddagTreeNode;
-import org.goddag4j.Text;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.representation.Representation;
-import org.restlet.resource.Finder;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
@@ -33,21 +10,33 @@ import de.faustedition.document.MaterialUnit;
 import de.faustedition.document.MaterialUnitManager;
 import de.faustedition.template.TemplateRepresentationFactory;
 import de.faustedition.transcript.Transcript;
+import org.goddag4j.Element;
+import org.goddag4j.GoddagTreeNode;
+import org.goddag4j.Text;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Finder;
+import org.restlet.resource.Get;
+import org.restlet.resource.ServerResource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Singleton
+import java.io.IOException;
+import java.util.*;
+
+@Component
 public class CollationFinder extends Finder {
 
-	private final TemplateRepresentationFactory viewFactory;
-	private final MaterialUnitManager materialUnitManager;
-	private final GraphDatabaseService db;
+	@Autowired
+	private TemplateRepresentationFactory viewFactory;
 
-	@Inject
-	public CollationFinder(GraphDatabaseService db, TemplateRepresentationFactory viewFactory,
-			MaterialUnitManager materialUnitManager) {
-		this.db = db;
-		this.viewFactory = viewFactory;
-		this.materialUnitManager = materialUnitManager;
-	}
+	@Autowired
+	private MaterialUnitManager materialUnitManager;
+
+	@Autowired
+	private GraphDatabaseService db;
 
 	@Override
 	public ServerResource find(Request request, Response response) {
@@ -58,58 +47,53 @@ public class CollationFinder extends Finder {
 
 		@Get("html")
 		public Representation alignment() throws IOException {
-			Transaction tx = db.beginTx();
-			try {
-				final Document document = materialUnitManager.find(new FaustURI(FaustAuthority.XML,
-						"/document/faust/2.5/gsa_390883.xml"));
+			final Document document = materialUnitManager.find(new FaustURI(FaustAuthority.XML,
+				"/document/faust/2.5/gsa_390883.xml"));
 
-				final Element textRoot = document.getTranscript().getTrees().getRoot("f", "words");
-				final Iterable<Token> textTokens = Iterables.transform(textRoot.getChildren(textRoot),
-						new Function<GoddagTreeNode, Token>() {
+			final Element textRoot = document.getTranscript().getTrees().getRoot("f", "words");
+			final Iterable<Token> textTokens = Iterables.transform(textRoot.getChildren(textRoot),
+				new Function<GoddagTreeNode, Token>() {
 
-							@Override
-							public Token apply(GoddagTreeNode input) {
-								return new GoddagToken(input, textRoot);
-							}
-						});
-
-				final SortedSet<MaterialUnit> pages = document.getSortedContents();
-				List<Iterable<Token>> pageTokens = new ArrayList<Iterable<Token>>(pages.size());
-				for (MaterialUnit page : pages) {
-					final Transcript transcript = page.getTranscript();
-					if (transcript == null) {
-						continue;
+					@Override
+					public Token apply(GoddagTreeNode input) {
+						return new GoddagToken(input, textRoot);
 					}
-					final Element documentRoot = transcript.getTrees().getRoot("f", "words");
-					pageTokens.add(Iterables.transform(documentRoot.getChildren(documentRoot),
-							new Function<GoddagTreeNode, Token>() {
+				});
 
-								@Override
-								public Token apply(GoddagTreeNode input) {
-									return new GoddagToken(input, documentRoot);
-								}
-							}));
+			final SortedSet<MaterialUnit> pages = document.getSortedContents();
+			List<Iterable<Token>> pageTokens = new ArrayList<Iterable<Token>>(pages.size());
+			for (MaterialUnit page : pages) {
+				final Transcript transcript = page.getTranscript();
+				if (transcript == null) {
+					continue;
 				}
+				final Element documentRoot = transcript.getTrees().getRoot("f", "words");
+				pageTokens.add(Iterables.transform(documentRoot.getChildren(documentRoot),
+					new Function<GoddagTreeNode, Token>() {
 
-				final List<Alignment> alignmentTable = new DiffCollator().align(textTokens,
-						Iterables.concat(pageTokens));
-
-				Map<String, Object> model = new HashMap<String, Object>();
-				model.put("alignment",
-						Lists.transform(alignmentTable, new Function<Alignment, AlignmentInformation>() {
-
-							@Override
-							public AlignmentInformation apply(Alignment input) {
-								return new AlignmentInformation(input);
-							}
-
-						}));
-
-				tx.success();
-				return viewFactory.create("demo/collator", getClientInfo(), model);
-			} finally {
-				tx.finish();
+						@Override
+						public Token apply(GoddagTreeNode input) {
+							return new GoddagToken(input, documentRoot);
+						}
+					}));
 			}
+
+			final List<Alignment> alignmentTable = new DiffCollator().align(textTokens,
+				Iterables.concat(pageTokens));
+
+			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("alignment",
+				Lists.transform(alignmentTable, new Function<Alignment, AlignmentInformation>() {
+
+					@Override
+					public AlignmentInformation apply(Alignment input) {
+						return new AlignmentInformation(input);
+					}
+
+				}));
+
+			return viewFactory.create("demo/collator", getClientInfo(), model);
+
 		}
 
 	}
