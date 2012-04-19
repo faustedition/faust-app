@@ -17,7 +17,7 @@ Faust.URI.prototype = {
 };
 
 Faust.YUI = function() { 
-	return YUI({  debug: true, combine: true, comboBase: Faust.contextPath + '/resources?', root: 'yui-3.3.0/build/' });
+	return YUI({  debug: true, combine: true, comboBase: Faust.contextPath + '/resources?', root: 'yui3/build/' });
 };
 
 Faust.io = function(uri, callback, reviver) {

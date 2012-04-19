@@ -1,9 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.com/yui/license.html
-version: 3.3.0
-build: 3167
+YUI 3.5.0 (build 5089)
+Copyright 2012 Yahoo! Inc. All rights reserved.
+Licensed under the BSD License.
+http://yuilibrary.com/license/
 */
 YUI.add('loader-base', function(Y) {
 
@@ -20,10 +19,10 @@ if (!YUI.Env[Y.version]) {
             BUILD = '/build/',
             ROOT = VERSION + BUILD,
             CDN_BASE = Y.Env.base,
-            GALLERY_VERSION = 'gallery-2010.12.16-18-24',
+            GALLERY_VERSION = 'gallery-2012.04.10-14-57',
             TNT = '2in3',
             TNT_VERSION = '4',
-            YUI2_VERSION = '2.8.2',
+            YUI2_VERSION = '2.9.0',
             COMBO_BASE = CDN_BASE + 'combo?',
             META = { version: VERSION,
                               root: ROOT,
@@ -41,18 +40,28 @@ if (!YUI.Env[Y.version]) {
                               groups: {},
                               patterns: {} },
             groups = META.groups,
-            yui2Update = function(tnt, yui2) {
-                                  var root = TNT + '.' +
-                                            (tnt || TNT_VERSION) + '/' +
-                                            (yui2 || YUI2_VERSION) + BUILD;
-                                  groups.yui2.base = CDN_BASE + root;
-                                  groups.yui2.root = root;
-                              },
-            galleryUpdate = function(tag) {
-                                  var root = (tag || GALLERY_VERSION) + BUILD;
-                                  groups.gallery.base = CDN_BASE + root;
-                                  groups.gallery.root = root;
-                              };
+            yui2Update = function(tnt, yui2, config) {
+                    
+                var root = TNT + '.' +
+                        (tnt || TNT_VERSION) + '/' +
+                        (yui2 || YUI2_VERSION) + BUILD,
+                    base = (config && config.base) ? config.base : CDN_BASE,
+                    combo = (config && config.comboBase) ? config.comboBase : COMBO_BASE;
+
+                groups.yui2.base = base + root;
+                groups.yui2.root = root;
+                groups.yui2.comboBase = combo;
+            },
+            galleryUpdate = function(tag, config) {
+                var root = (tag || GALLERY_VERSION) + BUILD,
+                    base = (config && config.base) ? config.base : CDN_BASE,
+                    combo = (config && config.comboBase) ? config.comboBase : COMBO_BASE;
+
+                groups.gallery.base = base + root;
+                groups.gallery.root = root;
+                groups.gallery.comboBase = combo;
+            };
+
 
         groups[VERSION] = {};
 
@@ -62,6 +71,7 @@ if (!YUI.Env[Y.version]) {
             comboBase: COMBO_BASE,
             update: galleryUpdate,
             patterns: { 'gallery-': { },
+                        'lang/gallery-': {},
                         'gallerycss-': { type: 'css' } }
         };
 
@@ -94,24 +104,22 @@ if (!YUI.Env[Y.version]) {
 }
 
 
-
 /**
  * Loader dynamically loads script and css files.  It includes the dependency
- * info for the version of the library in use, and will automatically pull in
- * dependencies for the modules requested.  It supports rollup files and will
- * automatically use these when appropriate in order to minimize the number of
- * http connections required to load all of the dependencies.  It can load the
+ * information for the version of the library in use, and will automatically pull in
+ * dependencies for the modules requested. It can also load the
  * files from the Yahoo! CDN, and it can utilize the combo service provided on
  * this network to reduce the number of http connections required to download
  * YUI files.
  *
  * @module loader
+ * @main loader
  * @submodule loader-base
  */
 
 var NOT_FOUND = {},
     NO_REQUIREMENTS = [],
-    MAX_URL_LENGTH = (Y.UA.ie) ? 2048 : 8192,
+    MAX_URL_LENGTH = 1024,
     GLOBAL_ENV = YUI.Env,
     GLOBAL_LOADED = GLOBAL_ENV._loaded,
     CSS = 'css',
@@ -142,7 +150,7 @@ var NOT_FOUND = {},
 /**
  * The component metadata is stored in Y.Env.meta.
  * Part of the loader module.
- * @property Env.meta
+ * @property meta
  * @for YUI
  */
 Y.Env.meta = META;
@@ -150,111 +158,55 @@ Y.Env.meta = META;
 /**
  * Loader dynamically loads script and css files.  It includes the dependency
  * info for the version of the library in use, and will automatically pull in
- * dependencies for the modules requested.  It supports rollup files and will
- * automatically use these when appropriate in order to minimize the number of
- * http connections required to load all of the dependencies.  It can load the
+ * dependencies for the modules requested. It can load the
  * files from the Yahoo! CDN, and it can utilize the combo service provided on
  * this network to reduce the number of http connections required to download
- * YUI files.
- *
- * While the loader can be instantiated by the end user, it normally is not.
- * @see YUI.use for the normal use case.  The use function automatically will
- * pull in missing dependencies.
- *
+ * YUI files. You can also specify an external, custom combo service to host
+ * your modules as well.
+
+        var Y = YUI();
+        var loader = new Y.Loader({
+            filter: 'debug',
+            base: '../../',
+            root: 'build/',
+            combine: true,
+            require: ['node', 'dd', 'console']
+        });
+        var out = loader.resolve(true);
+ 
  * @constructor
  * @class Loader
- * @param {object} o an optional set of configuration options.  Valid options:
- * <ul>
- *  <li>base:
- *  The base dir</li>
- *  <li>comboBase:
- *  The YUI combo service base dir. Ex: http://yui.yahooapis.com/combo?</li>
- *  <li>root:
- *  The root path to prepend to module names for the combo service.
- *  Ex: 2.5.2/build/</li>
- *  <li>filter:.
- *
- * A filter to apply to result urls.  This filter will modify the default
- * path for all modules.  The default path for the YUI library is the
- * minified version of the files (e.g., event-min.js).  The filter property
- * can be a predefined filter or a custom filter.  The valid predefined
- * filters are:
- * <dl>
- *  <dt>DEBUG</dt>
- *  <dd>Selects the debug versions of the library (e.g., event-debug.js).
- *      This option will automatically include the Logger widget</dd>
- *  <dt>RAW</dt>
- *  <dd>Selects the non-minified version of the library (e.g., event.js).
- *  </dd>
- * </dl>
- * You can also define a custom filter, which must be an object literal
- * containing a search expression and a replace string:
- * <pre>
- *  myFilter: &#123;
- *      'searchExp': "-min\\.js",
- *      'replaceStr': "-debug.js"
- *  &#125;
- * </pre>
- *
- *  </li>
- *  <li>filters: per-component filter specification.  If specified
- *  for a given component, this overrides the filter config</li>
- *  <li>combine:
- *  Use the YUI combo service to reduce the number of http connections
- *  required to load your dependencies</li>
- *  <li>ignore:
- *  A list of modules that should never be dynamically loaded</li>
- *  <li>force:
- *  A list of modules that should always be loaded when required, even if
- *  already present on the page</li>
- *  <li>insertBefore:
- *  Node or id for a node that should be used as the insertion point for
- *  new nodes</li>
- *  <li>charset:
- *  charset for dynamic nodes (deprecated, use jsAttributes or cssAttributes)
- *  </li>
- *  <li>jsAttributes: object literal containing attributes to add to script
- *  nodes</li>
- *  <li>cssAttributes: object literal containing attributes to add to link
- *  nodes</li>
- *  <li>timeout:
- *  The number of milliseconds before a timeout occurs when dynamically
- *  loading nodes.  If not set, there is no timeout</li>
- *  <li>context:
- *  execution context for all callbacks</li>
- *  <li>onSuccess:
- *  callback for the 'success' event</li>
- *  <li>onFailure: callback for the 'failure' event</li>
- *  <li>onCSS: callback for the 'CSSComplete' event.  When loading YUI
- *  components with CSS the CSS is loaded first, then the script.  This
- *  provides a moment you can tie into to improve
- *  the presentation of the page while the script is loading.</li>
- *  <li>onTimeout:
- *  callback for the 'timeout' event</li>
- *  <li>onProgress:
- *  callback executed each time a script or css file is loaded</li>
- *  <li>modules:
- *  A list of module definitions.  See Loader.addModule for the supported
- *  module metadata</li>
- *  <li>groups:
- *  A list of group definitions.  Each group can contain specific definitions
- *  for base, comboBase, combine, and accepts a list of modules.  See above
- *  for the description of these properties.</li>
- *  <li>2in3: the version of the YUI 2 in 3 wrapper to use.  The intrinsic
- *  support for YUI 2 modules in YUI 3 relies on versions of the YUI 2
- *  components inside YUI 3 module wrappers.  These wrappers
- *  change over time to accomodate the issues that arise from running YUI 2
- *  in a YUI 3 sandbox.</li>
- *  <li>yui2: when using the 2in3 project, you can select the version of
- *  YUI 2 to use.  Valid values *  are 2.2.2, 2.3.1, 2.4.1, 2.5.2, 2.6.0,
- *  2.7.0, 2.8.0, and 2.8.1 [default] -- plus all versions of YUI 2
- *  going forward.</li>
- * </ul>
+ * @param {Object} config an optional set of configuration options.
+ * @param {String} config.base The base dir which to fetch this module from
+ * @param {String} config.comboBase The Combo service base path. Ex: `http://yui.yahooapis.com/combo?`
+ * @param {String} config.root The root path to prepend to module names for the combo service. Ex: `2.5.2/build/`
+ * @param {String|Object} config.filter A filter to apply to result urls. <a href="#property_filter">See filter property</a>
+ * @param {Object} config.filters Per-component filter specification.  If specified for a given component, this overrides the filter config.
+ * @param {Boolean} config.combine Use a combo service to reduce the number of http connections required to load your dependencies
+ * @param {Array} config.ignore: A list of modules that should never be dynamically loaded
+ * @param {Array} config.force A list of modules that should always be loaded when required, even if already present on the page
+ * @param {HTMLElement|String} config.insertBefore Node or id for a node that should be used as the insertion point for new nodes
+ * @param {Object} config.jsAttributes Object literal containing attributes to add to script nodes
+ * @param {Object} config.cssAttributes Object literal containing attributes to add to link nodes
+ * @param {Number} config.timeout The number of milliseconds before a timeout occurs when dynamically loading nodes.  If not set, there is no timeout
+ * @param {Object} config.context Execution context for all callbacks
+ * @param {Function} config.onSuccess Callback for the 'success' event
+ * @param {Function} config.onFailure Callback for the 'failure' event
+ * @param {Function} config.onCSS Callback for the 'CSSComplete' event.  When loading YUI components with CSS the CSS is loaded first, then the script.  This provides a moment you can tie into to improve the presentation of the page while the script is loading.
+ * @param {Function} config.onTimeout Callback for the 'timeout' event
+ * @param {Function} config.onProgress Callback executed each time a script or css file is loaded
+ * @param {Object} config.modules A list of module definitions.  See <a href="#method_addModule">Loader.addModule</a> for the supported module metadata
+ * @param {Object} config.groups A list of group definitions.  Each group can contain specific definitions for `base`, `comboBase`, `combine`, and accepts a list of `modules`.
+ * @param {String} config.2in3 The version of the YUI 2 in 3 wrapper to use.  The intrinsic support for YUI 2 modules in YUI 3 relies on versions of the YUI 2 components inside YUI 3 module wrappers.  These wrappers change over time to accomodate the issues that arise from running YUI 2 in a YUI 3 sandbox.
+ * @param {String} config.yui2 When using the 2in3 project, you can select the version of YUI 2 to use.  Valid values are `2.2.2`, `2.3.1`, `2.4.1`, `2.5.2`, `2.6.0`, `2.7.0`, `2.8.0`, `2.8.1` and `2.9.0` [default] -- plus all versions of YUI 2 going forward.
  */
 Y.Loader = function(o) {
 
     var defaults = META.modules,
         self = this;
+    
+    //Catch no config passed.
+    o = o || {};
 
     modulekey = META.md5;
 
@@ -353,7 +305,7 @@ Y.Loader = function(o) {
      * @type string
      * @default http://yui.yahooapis.com/[YUI VERSION]/build/
      */
-    self.base = Y.Env.meta.base;
+    self.base = Y.Env.meta.base + Y.Env.meta.root;
 
     /**
      * Base path for the combo service
@@ -378,23 +330,21 @@ Y.Loader = function(o) {
      */
     self.combine = o.base &&
         (o.base.indexOf(self.comboBase.substr(0, 20)) > -1);
-
+    
     /**
-     * Max url length for combo urls.  The default is 2048 for
-     * internet explorer, and 8192 otherwise.  This is the URL
+    * The default seperator to use between files in a combo URL
+    * @property comboSep
+    * @type {String}
+    * @default Ampersand
+    */
+    self.comboSep = '&';
+    /**
+     * Max url length for combo urls.  The default is 2048. This is the URL
      * limit for the Yahoo! hosted combo servers.  If consuming
      * a different combo service that has a different URL limit
      * it is possible to override this default by supplying
      * the maxURLLength config option.  The config option will
      * only take effect if lower than the default.
-     *
-     * Browsers:
-     *    IE: 2048
-     *    Other A-Grade Browsers: Higher that what is typically supported
-     *    'capable' mobile browsers:
-     *
-     * Servers:
-     *    Apache: 8192
      *
      * @property maxURLLength
      * @type int
@@ -406,7 +356,7 @@ Y.Loader = function(o) {
      * @property ignoreRegistered
      * @default false
      */
-    // self.ignoreRegistered = false;
+    //self.ignoreRegistered = false;
 
     /**
      * Root path to prepend to module path for the combo
@@ -448,9 +398,9 @@ Y.Loader = function(o) {
      * Should we allow rollups
      * @property allowRollup
      * @type boolean
-     * @default true
+     * @default false
      */
-    self.allowRollup = true;
+    self.allowRollup = false;
 
     /**
      * A filter to apply to result urls.  This filter will modify the default
@@ -468,12 +418,12 @@ Y.Loader = function(o) {
      * </dl>
      * You can also define a custom filter, which must be an object literal
      * containing a search expression and a replace string:
-     * <pre>
-     *  myFilter: &#123;
-     *      'searchExp': "-min\\.js",
-     *      'replaceStr': "-debug.js"
-     *  &#125;
-     * </pre>
+     *
+     *      myFilter: {
+     *          'searchExp': "-min\\.js",
+     *          'replaceStr': "-debug.js"
+     *      }
+     *
      * @property filter
      * @type string| {searchExp: string, replaceStr: string}
      */
@@ -522,29 +472,27 @@ Y.Loader = function(o) {
      * being loaded for calendar (if calendar was requested), and
      * 'sam' for all other skinnable components:
      *
-     *   <code>
-     *   skin: {
+     *      skin: {
+     *          // The default skin, which is automatically applied if not
+     *          // overriden by a component-specific skin definition.
+     *          // Change this in to apply a different skin globally
+     *          defaultSkin: 'sam',
      *
-     *      // The default skin, which is automatically applied if not
-     *      // overriden by a component-specific skin definition.
-     *      // Change this in to apply a different skin globally
-     *      defaultSkin: 'sam',
-     *
-     *      // This is combined with the loader base property to get
-     *      // the default root directory for a skin. ex:
-     *      // http://yui.yahooapis.com/2.3.0/build/assets/skins/sam/
-     *      base: 'assets/skins/',
-     *
-     *      // Any component-specific overrides can be specified here,
-     *      // making it possible to load different skins for different
-     *      // components.  It is possible to load more than one skin
-     *      // for a given component as well.
-     *      overrides: {
-     *          calendar: ['skin1', 'skin2']
+     *          // This is combined with the loader base property to get
+     *          // the default root directory for a skin. ex:
+     *          // http://yui.yahooapis.com/2.3.0/build/assets/skins/sam/
+     *          base: 'assets/skins/',
+     *          
+     *          // Any component-specific overrides can be specified here,
+     *          // making it possible to load different skins for different
+     *          // components.  It is possible to load more than one skin
+     *          // for a given component as well.
+     *          overrides: {
+     *              calendar: ['skin1', 'skin2']
+     *          }
      *      }
-     *   }
-     *   </code>
-     *   @property skin
+     * @property skin
+     * @type {Object}
      */
     self.skin = Y.merge(Y.Env.meta.skin);
 
@@ -564,13 +512,13 @@ Y.Loader = function(o) {
     cache = GLOBAL_ENV._renderedMods;
 
     if (cache) {
-        oeach(cache, function(v, k) {
+        oeach(cache, function modCache(v, k) {
             self.moduleInfo[k] = Y.merge(v);
         });
 
         cache = GLOBAL_ENV._conditions;
 
-        oeach(cache, function(v, k) {
+        oeach(cache, function condCache(v, k) {
             self.conditions[k] = Y.merge(v);
         });
 
@@ -578,16 +526,31 @@ Y.Loader = function(o) {
         oeach(defaults, self.addModule, self);
     }
 
-    if (!GLOBAL_ENV._renderedMods) {
-        GLOBAL_ENV._renderedMods = Y.merge(self.moduleInfo);
-        GLOBAL_ENV._conditions = Y.merge(self.conditions);
-    }
+
+    /**
+     * Set when beginning to compute the dependency tree.
+     * Composed of what YUI reports to be loaded combined
+     * with what has been loaded by any instance on the page
+     * with the version number specified in the metadata.
+     * @property loaded
+     * @type {string: boolean}
+     */
+    self.loaded = GLOBAL_LOADED[VERSION];
+
 
     self._inspectPage();
 
     self._internal = false;
 
     self._config(o);
+
+    self.forceMap = (self.force) ? Y.Array.hash(self.force) : {};	
+
+    self.testresults = null;
+
+    if (Y.config.tests) {
+        self.testresults = Y.config.tests;
+    }
 
     /**
      * List of rollup files found in the library metadata
@@ -612,16 +575,6 @@ Y.Loader = function(o) {
      * @type string[]
      */
     self.sorted = [];
-
-    /**
-     * Set when beginning to compute the dependency tree.
-     * Composed of what YUI reports to be loaded combined
-     * with what has been loaded by any instance on the page
-     * with the version number specified in the metadata.
-     * @property loaded
-     * @type {string: boolean}
-     */
-    self.loaded = GLOBAL_LOADED[VERSION];
 
     /*
      * A list of modules to attach to the YUI instance when complete.
@@ -667,7 +620,25 @@ Y.Loader = function(o) {
 };
 
 Y.Loader.prototype = {
+    /**
+    Regex that matches a CSS URL. Used to guess the file type when it's not
+    specified.
 
+    @property REGEX_CSS
+    @type RegExp
+    @final
+    @protected
+    @since 3.5.0
+    **/
+    REGEX_CSS: /\.css(?:[?;].*)?$/i,
+    
+    /**
+    * Default filters for raw and debug
+    * @property FILTER_DEFS
+    * @type Object
+    * @final
+    * @protected
+    */
     FILTER_DEFS: {
         RAW: {
             'searchExp': '-min\\.js',
@@ -678,9 +649,23 @@ Y.Loader.prototype = {
             'replaceStr': '-debug.js'
         }
     },
-
-   _inspectPage: function() {
-       oeach(ON_PAGE, function(v, k) {
+    /*
+    * Check the pages meta-data and cache the result.
+    * @method _inspectPage
+    * @private
+    */
+    _inspectPage: function() {
+        
+        //Inspect the page for CSS only modules and mark them as loaded.
+        oeach(this.moduleInfo, function(v, k) {
+            if (v.type && v.type === CSS) {
+                if (this.isCSSLoaded(v.name)) {
+                    this.loaded[k] = true;
+                }
+            }
+        }, this);
+        
+        oeach(ON_PAGE, function(v, k) {
            if (v.details) {
                var m = this.moduleInfo[k],
                    req = v.details.requires,
@@ -696,23 +681,21 @@ Y.Loader.prototype = {
                m._inspected = true;
            }
        }, this);
-   },
-
-// returns true if b is not loaded, and is required
-// directly or by means of modules it supersedes.
+    },
+    /*
+    * returns true if b is not loaded, and is required directly or by means of modules it supersedes.
+    * @private
+    * @method _requires
+    * @param {String} mod1 The first module to compare
+    * @param {String} mod2 The second module to compare
+    */
    _requires: function(mod1, mod2) {
 
         var i, rm, after_map, s,
             info = this.moduleInfo,
             m = info[mod1],
             other = info[mod2];
-            // key = mod1 + mod2;
 
-        // if (this.tested[key]) {
-            // return this.tested[key];
-        // }
-
-        // if (loaded[mod2] || !m || !other) {
         if (!m || !other) {
             return false;
         }
@@ -765,7 +748,12 @@ Y.Loader.prototype = {
 
         return false;
     },
-
+    /**
+    * Apply a new config to the Loader instance
+    * @method _config
+    * @private
+    * @param {Object} o The new configuration
+    */
     _config: function(o) {
         var i, j, val, f, group, groupName, self = this;
         // apply config values
@@ -776,25 +764,36 @@ Y.Loader.prototype = {
                     if (i == 'require') {
                         self.require(val);
                     } else if (i == 'skin') {
-                        Y.mix(self.skin, o[i], true);
+                        //If the config.skin is a string, format to the expected object
+                        if (typeof val === 'string') {
+                            self.skin.defaultSkin = o.skin;
+                            val = {
+                                defaultSkin: val
+                            };
+                        }
+
+                        Y.mix(self.skin, val, true);
                     } else if (i == 'groups') {
                         for (j in val) {
                             if (val.hasOwnProperty(j)) {
                                 groupName = j;
                                 group = val[j];
                                 self.addGroup(group, groupName);
+                                if (group.aliases) {
+                                    oeach(group.aliases, self.addAlias, self);
+                                }
                             }
                         }
 
                     } else if (i == 'modules') {
                         // add a hash of module definitions
                         oeach(val, self.addModule, self);
+                    } else if (i === 'aliases') {
+                        oeach(val, self.addAlias, self);
                     } else if (i == 'gallery') {
-                        this.groups.gallery.update(val);
+                        this.groups.gallery.update(val, o);
                     } else if (i == 'yui2' || i == '2in3') {
-                        this.groups.yui2.update(o['2in3'], o.yui2);
-                    } else if (i == 'maxURLLength') {
-                        self[i] = Math.min(MAX_URL_LENGTH, val);
+                        this.groups.yui2.update(o['2in3'], o.yui2, o);
                     } else {
                         self[i] = val;
                     }
@@ -812,6 +811,13 @@ Y.Loader.prototype = {
             if (f == 'DEBUG') {
                 self.require('yui-log', 'dump');
             }
+        }
+        
+
+        if (self.lang) {
+            //Removed this so that when Loader is invoked
+            //it doesn't request what it doesn't need.
+            //self.require('intl-base', 'intl');
         }
 
     },
@@ -845,7 +851,7 @@ Y.Loader.prototype = {
      * @private
      */
     _addSkin: function(skin, mod, parent) {
-        var mdef, pkg, name,
+        var mdef, pkg, name, nmod,
             info = this.moduleInfo,
             sinf = this.skin,
             ext = info[mod] && info[mod].ext;
@@ -856,7 +862,7 @@ Y.Loader.prototype = {
             if (!info[name]) {
                 mdef = info[mod];
                 pkg = mdef.pkg || mod;
-                this.addModule({
+                nmod = {
                     name: name,
                     group: mdef.group,
                     type: 'css',
@@ -864,27 +870,62 @@ Y.Loader.prototype = {
                     path: (parent || pkg) + '/' + sinf.base + skin +
                           '/' + mod + '.css',
                     ext: ext
-                });
+                };
+                if (mdef.base) {
+                    nmod.base = mdef.base;
+                }
+                if (mdef.configFn) {
+                    nmod.configFn = mdef.configFn;
+                }
+                this.addModule(nmod, name);
 
             }
         }
 
         return name;
     },
-
-    /** Add a new module group
-     * <dl>
-     *   <dt>name:</dt>      <dd>required, the group name</dd>
-     *   <dt>base:</dt>      <dd>The base dir for this module group</dd>
-     *   <dt>root:</dt>      <dd>The root path to add to each combo
-     *   resource path</dd>
-     *   <dt>combine:</dt>   <dd>combo handle</dd>
-     *   <dt>comboBase:</dt> <dd>combo service base path</dd>
-     *   <dt>modules:</dt>   <dd>the group of modules</dd>
-     * </dl>
+    /**
+    * Adds an alias module to the system
+    * @method addAlias
+    * @param {Array} use An array of modules that makes up this alias
+    * @param {String} name The name of the alias
+    * @example
+    *       var loader = new Y.Loader({});
+    *       loader.addAlias([ 'node', 'yql' ], 'davglass');
+    *       loader.require(['davglass']);
+    *       var out = loader.resolve(true);
+    *
+    *       //out.js will contain Node and YQL modules
+    */
+    addAlias: function(use, name) {
+        YUI.Env.aliases[name] = use;
+        this.addModule({
+            name: name,
+            use: use
+        });
+    },
+    /**
+     * Add a new module group
      * @method addGroup
-     * @param {object} o An object containing the module data.
-     * @param {string} name the group name.
+     * @param {Object} config An object containing the group configuration data
+     * @param {String} config.name required, the group name
+     * @param {String} config.base The base directory for this module group
+     * @param {String} config.root The root path to add to each combo resource path
+     * @param {Boolean} config.combine Should the request be combined
+     * @param {String} config.comboBase Combo service base path
+     * @param {Object} config.modules The group of modules
+     * @param {String} name the group name.
+     * @example
+     *      var loader = new Y.Loader({});
+     *      loader.addGroup({
+     *          name: 'davglass',
+     *          combine: true,
+     *          comboBase: '/combo?',
+     *          root: '',
+     *          modules: {
+     *              //Module List here
+     *          }
+     *      }, 'davglass');
      */
     addGroup: function(o, name) {
         var mods = o.modules,
@@ -902,65 +943,65 @@ Y.Loader.prototype = {
 
         if (mods) {
             oeach(mods, function(v, k) {
+                if (typeof v === 'string') {
+                    v = { name: k, fullpath: v };
+                }
                 v.group = name;
                 self.addModule(v, k);
             }, self);
         }
     },
 
-    /** Add a new module to the component metadata.
-     * <dl>
-     *     <dt>name:</dt>       <dd>required, the component name</dd>
-     *     <dt>type:</dt>       <dd>required, the component type (js or css)
-     *     </dd>
-     *     <dt>path:</dt>       <dd>required, the path to the script from
-     *     "base"</dd>
-     *     <dt>requires:</dt>   <dd>array of modules required by this
-     *     component</dd>
-     *     <dt>optional:</dt>   <dd>array of optional modules for this
-     *     component</dd>
-     *     <dt>supersedes:</dt> <dd>array of the modules this component
-     *     replaces</dd>
-     *     <dt>after:</dt>      <dd>array of modules the components which, if
-     *     present, should be sorted above this one</dd>
-     *     <dt>after_map:</dt>  <dd>faster alternative to 'after' -- supply
-     *     a hash instead of an array</dd>
-     *     <dt>rollup:</dt>     <dd>the number of superseded modules required
-     *     for automatic rollup</dd>
-     *     <dt>fullpath:</dt>   <dd>If fullpath is specified, this is used
-     *     instead of the configured base + path</dd>
-     *     <dt>skinnable:</dt>  <dd>flag to determine if skin assets should
-     *     automatically be pulled in</dd>
-     *     <dt>submodules:</dt> <dd>a hash of submodules</dd>
-     *     <dt>group:</dt>      <dd>The group the module belongs to -- this
-     *     is set automatically when it is added as part of a group
-     *     configuration.</dd>
-     *     <dt>lang:</dt>
-     *       <dd>array of BCP 47 language tags of languages for which this
-     *           module has localized resource bundles,
-     *           e.g., ["en-GB","zh-Hans-CN"]</dd>
-     *     <dt>condition:</dt>
-     *       <dd>Specifies that the module should be loaded automatically if
-     *           a condition is met.  This is an object with up to three fields:
-     *           [trigger] - the name of a module that can trigger the auto-load
-     *           [test] - a function that returns true when the module is to be
-     *           loaded.
-     *           [when] - specifies the load order of the conditional module
-     *           with regard to the position of the trigger module.
-     *           This should be one of three values: 'before', 'after', or
-     *           'instead'.  The default is 'after'.
-     *       </dd>
-     * </dl>
+    /**
+     * Add a new module to the component metadata.
      * @method addModule
-     * @param {object} o An object containing the module data.
-     * @param {string} name the module name (optional), required if not
-     * in the module data.
-     * @return {object} the module definition or null if
-     * the object passed in did not provide all required attributes.
+     * @param {Object} config An object containing the module data.
+     * @param {String} config.name Required, the component name
+     * @param {String} config.type Required, the component type (js or css)
+     * @param {String} config.path Required, the path to the script from `base`
+     * @param {Array} config.requires Array of modules required by this component
+     * @param {Array} [config.optional] Array of optional modules for this component
+     * @param {Array} [config.supersedes] Array of the modules this component replaces
+     * @param {Array} [config.after] Array of modules the components which, if present, should be sorted above this one
+     * @param {Object} [config.after_map] Faster alternative to 'after' -- supply a hash instead of an array
+     * @param {Number} [config.rollup] The number of superseded modules required for automatic rollup
+     * @param {String} [config.fullpath] If `fullpath` is specified, this is used instead of the configured `base + path`
+     * @param {Boolean} [config.skinnable] Flag to determine if skin assets should automatically be pulled in
+     * @param {Object} [config.submodules] Hash of submodules
+     * @param {String} [config.group] The group the module belongs to -- this is set automatically when it is added as part of a group configuration.
+     * @param {Array} [config.lang] Array of BCP 47 language tags of languages for which this module has localized resource bundles, e.g., `["en-GB", "zh-Hans-CN"]`
+     * @param {Object} [config.condition] Specifies that the module should be loaded automatically if a condition is met.  This is an object with up to three fields:
+     * @param {String} [config.condition.trigger] The name of a module that can trigger the auto-load
+     * @param {Function} [config.condition.test] A function that returns true when the module is to be loaded.
+     * @param {String} [config.condition.when] Specifies the load order of the conditional module
+     *  with regard to the position of the trigger module.
+     *  This should be one of three values: `before`, `after`, or `instead`.  The default is `after`.
+     * @param {Object} [config.testresults] A hash of test results from `Y.Features.all()`
+     * @param {Function} [config.configFn] A function to exectute when configuring this module
+     * @param {Object} config.configFn.mod The module config, modifying this object will modify it's config. Returning false will delete the module's config.
+     * @param {String} [name] The module name, required if not in the module data.
+     * @return {Object} the module definition or null if the object passed in did not provide all required attributes.
      */
     addModule: function(o, name) {
-
         name = name || o.name;
+
+        if (typeof o === 'string') {
+            o = { name: name, fullpath: o };
+        }
+        
+        //Only merge this data if the temp flag is set
+        //from an earlier pass from a pattern or else
+        //an override module (YUI_config) can not be used to
+        //replace a default module.
+        if (this.moduleInfo[name] && this.moduleInfo[name].temp) {
+            //This catches temp modules loaded via a pattern
+            // The module will be added twice, once from the pattern and
+            // Once from the actual add call, this ensures that properties
+            // that were added to the module the first time around (group: gallery)
+            // are also added the second time around too.
+            o = Y.merge(this.moduleInfo[name], o);
+        }
+
         o.name = name;
 
         if (!o || !o.name) {
@@ -968,26 +1009,38 @@ Y.Loader.prototype = {
         }
 
         if (!o.type) {
+            //Always assume it's javascript unless the CSS pattern is matched.
             o.type = JS;
+            var p = o.path || o.fullpath;
+            if (p && this.REGEX_CSS.test(p)) {
+                o.type = CSS;
+            }
         }
 
         if (!o.path && !o.fullpath) {
             o.path = _path(name, name, o.type);
         }
-
         o.supersedes = o.supersedes || o.use;
 
         o.ext = ('ext' in o) ? o.ext : (this._internal) ? false : true;
-        o.requires = o.requires || [];
 
         // Handle submodule logic
-        var subs = o.submodules, i, l, sup, s, smod, plugins, plug,
+        var subs = o.submodules, i, l, t, sup, s, smod, plugins, plug,
             j, langs, packName, supName, flatSup, flatLang, lang, ret,
             overrides, skinname, when,
             conditions = this.conditions, trigger;
             // , existing = this.moduleInfo[name], newr;
-
+        
         this.moduleInfo[name] = o;
+
+        o.requires = o.requires || [];
+
+        if (o.skinnable) {
+            skinname = this._addSkin(this.skin.defaultSkin, name);
+            o.requires.unshift(skinname);
+        }
+
+        o.requires = this.filterRequires(o.requires) || [];
 
         if (!o.langPack && o.lang) {
             langs = YArray(o.lang);
@@ -1000,6 +1053,7 @@ Y.Loader.prototype = {
                 }
             }
         }
+
 
         if (subs) {
             sup = o.supersedes || [];
@@ -1089,8 +1143,11 @@ Y.Loader.prototype = {
                     l++;
                 }
             }
-            o.supersedes = YObject.keys(YArray.hash(sup));
-            o.rollup = (l < 4) ? l : Math.min(l - 1, 4);
+            //o.supersedes = YObject.keys(YArray.hash(sup));
+            o.supersedes = YArray.dedupe(sup);
+            if (this.allowRollup) {
+                o.rollup = (l < 4) ? l : Math.min(l - 1, 4);
+            }
         }
 
         plugins = o.plugins;
@@ -1112,28 +1169,43 @@ Y.Loader.prototype = {
         }
 
         if (o.condition) {
-            trigger = o.condition.trigger;
-            when = o.condition.when;
-            conditions[trigger] = conditions[trigger] || {};
-            conditions[trigger][name] = o.condition;
-            // the 'when' attribute can be 'before', 'after', or 'instead'
-            // the default is after.
-            if (when && when != 'after') {
-                if (when == 'instead') { // replace the trigger
-                    o.supersedes = o.supersedes || [];
-                    o.supersedes.push(trigger);
-                } else { // before the trigger
-                    // the trigger requires the conditional mod,
-                    // so it should appear before the conditional
-                    // mod if we do not intersede.
+            t = o.condition.trigger;
+            if (YUI.Env.aliases[t]) {
+                t = YUI.Env.aliases[t];
+            }
+            if (!Y.Lang.isArray(t)) {
+                t = [t];
+            }
+
+            for (i = 0; i < t.length; i++) {
+                trigger = t[i];
+                when = o.condition.when;
+                conditions[trigger] = conditions[trigger] || {};
+                conditions[trigger][name] = o.condition;
+                // the 'when' attribute can be 'before', 'after', or 'instead'
+                // the default is after.
+                if (when && when != 'after') {
+                    if (when == 'instead') { // replace the trigger
+                        o.supersedes = o.supersedes || [];
+                        o.supersedes.push(trigger);
+                    } else { // before the trigger
+                        // the trigger requires the conditional mod,
+                        // so it should appear before the conditional
+                        // mod if we do not intersede.
+                    }
+                } else { // after the trigger
+                    o.after = o.after || [];
+                    o.after.push(trigger);
                 }
-            } else { // after the trigger
-                o.after = o.after || [];
-                o.after.push(trigger);
             }
         }
 
+        if (o.supersedes) {
+            o.supersedes = this.filterRequires(o.supersedes);
+        }
+
         if (o.after) {
+            o.after = this.filterRequires(o.after);
             o.after_map = YArray.hash(o.after);
         }
 
@@ -1143,8 +1215,17 @@ Y.Loader.prototype = {
             ret = o.configFn(o);
             if (ret === false) {
                 delete this.moduleInfo[name];
+                delete GLOBAL_ENV._renderedMods[name];
                 o = null;
             }
+        }
+        //Add to global cache
+        if (o) {
+            if (!GLOBAL_ENV._renderedMods) {
+                GLOBAL_ENV._renderedMods = {};
+            }
+            GLOBAL_ENV._renderedMods[name] = Y.merge(o);
+            GLOBAL_ENV._conditions = conditions;
         }
 
         return o;
@@ -1156,11 +1237,80 @@ Y.Loader.prototype = {
      * @param {string[] | string*} what the modules to load.
      */
     require: function(what) {
-        var a = (typeof what === 'string') ? arguments : what;
+        var a = (typeof what === 'string') ? YArray(arguments) : what;
         this.dirty = true;
-        Y.mix(this.required, YArray.hash(a));
-    },
+        this.required = Y.merge(this.required, YArray.hash(this.filterRequires(a)));
 
+        this._explodeRollups();
+    },
+    /**
+    * Grab all the items that were asked for, check to see if the Loader
+    * meta-data contains a "use" array. If it doesm remove the asked item and replace it with 
+    * the content of the "use".
+    * This will make asking for: "dd"
+    * Actually ask for: "dd-ddm-base,dd-ddm,dd-ddm-drop,dd-drag,dd-proxy,dd-constrain,dd-drop,dd-scroll,dd-drop-plugin"
+    * @private
+    * @method _explodeRollups
+    */
+    _explodeRollups: function() {
+        var self = this, m,
+        r = self.required;
+        if (!self.allowRollup) {
+            oeach(r, function(v, name) {
+                m = self.getModule(name);
+                if (m && m.use) {
+                    //delete r[name];
+                    YArray.each(m.use, function(v) {
+                        m = self.getModule(v);
+                        if (m && m.use) {
+                            //delete r[v];
+                            YArray.each(m.use, function(v) {
+                                r[v] = true;
+                            });
+                        } else {
+                            r[v] = true;
+                        }
+                    });
+                }
+            });
+            self.required = r;
+        }
+
+    },
+    /**
+    * Explodes the required array to remove aliases and replace them with real modules
+    * @method filterRequires
+    * @param {Array} r The original requires array
+    * @return {Array} The new array of exploded requirements
+    */
+    filterRequires: function(r) {
+        if (r) {
+            if (!Y.Lang.isArray(r)) {
+                r = [r];
+            }
+            r = Y.Array(r);
+            var c = [], i, mod, o, m;
+
+            for (i = 0; i < r.length; i++) {
+                mod = this.getModule(r[i]);
+                if (mod && mod.use) {
+                    for (o = 0; o < mod.use.length; o++) {
+                        //Must walk the other modules in case a module is a rollup of rollups (datatype)
+                        m = this.getModule(mod.use[o]);
+                        if (m && m.use) {
+                            c = Y.Array.dedupe([].concat(c, this.filterRequires(m.use)));
+                        } else {
+                            c.push(mod.use[o]);
+                        }
+                    }
+                } else {
+                    c.push(r[i]);
+                }
+            }
+            r = c;
+        }
+        return r;
+    },
     /**
      * Returns an object containing properties for all modules required
      * in order to load the requested module
@@ -1170,19 +1320,30 @@ Y.Loader.prototype = {
      */
     getRequires: function(mod) {
 
-        if (!mod || mod._parsed) {
+        if (!mod) {
+            //console.log('returning no reqs for ' + mod.name);
             return NO_REQUIREMENTS;
         }
 
-        var i, m, j, add, packName, lang,
-            name = mod.name, cond, go,
+        if (mod._parsed) {
+            //console.log('returning requires for ' + mod.name, mod.requires);
+            return mod.expanded || NO_REQUIREMENTS;
+        }
+
+        //TODO add modue cache here out of scope..
+
+        var i, m, j, add, packName, lang, testresults = this.testresults,
+            name = mod.name, cond,
             adddef = ON_PAGE[name] && ON_PAGE[name].details,
-            d,
+            d, k, m1,
             r, old_mod,
-            o, skinmod, skindef,
+            o, skinmod, skindef, skinpar, skinname,
             intl = mod.lang || mod.intl,
             info = this.moduleInfo,
+            ftests = Y.Features && Y.Features.tests.load,
             hash;
+
+        // console.log(name);
 
         // pattern match leaves module stub that needs to be filled out
         if (mod.temp && adddef) {
@@ -1193,20 +1354,28 @@ Y.Loader.prototype = {
             delete mod.expanded;
         }
 
+        // console.log('cache: ' + mod.langCache + ' == ' + this.lang);
+
         // if (mod.expanded && (!mod.langCache || mod.langCache == this.lang)) {
         if (mod.expanded && (!this.lang || mod.langCache === this.lang)) {
             return mod.expanded;
         }
+        
 
         d = [];
         hash = {};
-
-        r = mod.requires;
-        o = mod.optional;
+        r = this.filterRequires(mod.requires);
+        if (mod.lang) {
+            //If a module has a lang attribute, auto add the intl requirement.
+            d.unshift('intl');
+            r.unshift('intl');
+            intl = true;
+        }
+        o = this.filterRequires(mod.optional);
 
 
         mod._parsed = true;
-
+        mod.langCache = this.lang;
 
         for (i = 0; i < r.length; i++) {
             if (!hash[r[i]]) {
@@ -1225,7 +1394,7 @@ Y.Loader.prototype = {
         }
 
         // get the requirements from superseded modules, if any
-        r = mod.supersedes;
+        r = this.filterRequires(mod.supersedes);
         if (r) {
             for (i = 0; i < r.length; i++) {
                 if (!hash[r[i]]) {
@@ -1273,37 +1442,68 @@ Y.Loader.prototype = {
         cond = this.conditions[name];
 
         if (cond) {
-            oeach(cond, function(def, condmod) {
+            //Set the module to not parsed since we have conditionals and this could change the dependency tree.
+            mod._parsed = false;
+            if (testresults && ftests) {
+                oeach(testresults, function(result, id) {
+                    var condmod = ftests[id].name;
+                    if (!hash[condmod] && ftests[id].trigger == name) {
+                        if (result && ftests[id]) {
+                            hash[condmod] = true;
+                            d.push(condmod);
+                        }
+                    }
+                });
+            } else {
+                oeach(cond, function(def, condmod) {
+                    if (!hash[condmod]) {
+                        //first see if they've specfied a ua check
+                        //then see if they've got a test fn & if it returns true
+                        //otherwise just having a condition block is enough
+                        var go = def && ((!def.ua && !def.test) || (def.ua && Y.UA[def.ua]) ||
+                                    (def.test && def.test(Y, r)));
 
-                if (!hash[condmod]) {
-                    go = def && ((def.ua && Y.UA[def.ua]) ||
-                                 (def.test && def.test(Y, r)));
-                    if (go) {
-                        hash[condmod] = true;
-                        d.push(condmod);
-                        m = this.getModule(condmod);
-                        if (m) {
-                            add = this.getRequires(m);
-                            for (j = 0; j < add.length; j++) {
-                                d.push(add[j]);
+                        if (go) {
+                            hash[condmod] = true;
+                            d.push(condmod);
+                            m = this.getModule(condmod);
+                            if (m) {
+                                add = this.getRequires(m);
+                                for (j = 0; j < add.length; j++) {
+                                    d.push(add[j]);
+                                }
+
                             }
                         }
                     }
-                }
-            }, this);
+                }, this);
+            }
         }
 
         // Create skin modules
         if (mod.skinnable) {
             skindef = this.skin.overrides;
-            if (skindef && skindef[name]) {
-                for (i = 0; i < skindef[name].length; i++) {
-                    skinmod = this._addSkin(skindef[name][i], name);
-                    d.push(skinmod);
+            oeach(YUI.Env.aliases, function(o, n) {
+                if (Y.Array.indexOf(o, name) > -1) {
+                    skinpar = n;
+                }
+            });
+            if (skindef && (skindef[name] || (skinpar && skindef[skinpar]))) {
+                skinname = name;
+                if (skindef[skinpar]) {
+                    skinname = skinpar;
+                }
+                for (i = 0; i < skindef[skinname].length; i++) {
+                    skinmod = this._addSkin(skindef[skinname][i], name);
+                    if (!this.isCSSLoaded(skinmod, this._boot)) {
+                        d.push(skinmod);
+                    }
                 }
             } else {
                 skinmod = this._addSkin(this.skin.defaultSkin, name);
-                d.push(skinmod);
+                if (!this.isCSSLoaded(skinmod, this._boot)) {
+                    d.push(skinmod);
+                }
             }
         }
 
@@ -1313,13 +1513,11 @@ Y.Loader.prototype = {
 
             if (mod.lang && !mod.langPack && Y.Intl) {
                 lang = Y.Intl.lookupBestLang(this.lang || ROOT_LANG, mod.lang);
-                mod.langCache = this.lang;
                 packName = this.getLangPackName(lang, name);
                 if (packName) {
                     d.unshift(packName);
                 }
             }
-
             d.unshift(INTL);
         }
 
@@ -1329,7 +1527,37 @@ Y.Loader.prototype = {
 
         return mod.expanded;
     },
+    /**
+    * Check to see if named css module is already loaded on the page
+    * @method isCSSLoaded
+    * @param {String} name The name of the css file
+    * @return Boolean
+    */
+    isCSSLoaded: function(name, skip) {
+        //TODO - Make this call a batching call with name being an array
+        if (!name || !YUI.Env.cssStampEl || (!skip && this.ignoreRegistered)) {
+            return false;
+        }
 
+        var el = YUI.Env.cssStampEl,
+            ret = false,
+            style = el.currentStyle; //IE
+
+        //Add the classname to the element
+        el.className = name;
+
+        if (!style) {
+            style = Y.config.doc.defaultView.getComputedStyle(el, null);
+        }
+
+        if (style && style['display'] === 'none') {
+            ret = true;
+        }
+
+
+        el.className = ''; //Reset the classname to ''
+        return ret;
+    },
 
     /**
      * Returns a hash of module names the supplied module satisfies.
@@ -1385,27 +1613,45 @@ Y.Loader.prototype = {
 
             if (this.allowRollup) {
                 this._rollup();
+            } else {
+                this._explodeRollups();
             }
             this._reduce();
             this._sort();
         }
     },
-
+    /**
+    * Creates a "psuedo" package for languages provided in the lang array
+    * @method _addLangPack
+    * @private
+    * @param {String} lang The language to create
+    * @param {Object} m The module definition to create the language pack around
+    * @param {String} packName The name of the package (e.g: lang/datatype-date-en-US)
+    * @return {Object} The module definition
+    */
     _addLangPack: function(lang, m, packName) {
         var name = m.name,
-            packPath,
+            packPath, conf,
             existing = this.moduleInfo[packName];
 
         if (!existing) {
 
             packPath = _path((m.pkg || name), packName, JS, true);
 
-            this.addModule({ path: packPath,
-                             intl: true,
-                             langPack: true,
-                             ext: m.ext,
-                             group: m.group,
-                             supersedes: [] }, packName, true);
+            conf = {
+                path: packPath,
+                intl: true,
+                langPack: true,
+                ext: m.ext,
+                group: m.group,
+                supersedes: []
+            };
+
+            if (m.configFn) {
+                conf.configFn = m.configFn;
+            }
+
+            this.addModule(conf, packName);
 
             if (lang) {
                 Y.Env.lang = Y.Env.lang || {};
@@ -1434,7 +1680,8 @@ Y.Loader.prototype = {
                 if (m) {
 
                     // remove dups
-                    m.requires = YObject.keys(YArray.hash(m.requires));
+                    //m.requires = YObject.keys(YArray.hash(m.requires));
+                    m.requires = YArray.dedupe(m.requires);
 
                     // Create lang pack modules
                     if (m.lang && m.lang.length) {
@@ -1493,7 +1740,6 @@ Y.Loader.prototype = {
     getLangPackName: function(lang, mname) {
         return ('lang/' + mname + ((lang) ? '_' + lang : ''));
     },
-
     /**
      * Inspects the required modules list looking for additional
      * dependencies.  Expands the required list to include all
@@ -1502,12 +1748,16 @@ Y.Loader.prototype = {
      * @private
      */
     _explode: function() {
+        //TODO Move done out of scope
         var r = this.required, m, reqs, done = {},
             self = this;
 
         // the setup phase is over, all modules have been created
         self.dirty = false;
 
+        self._explodeRollups();
+        r = self.required;
+        
         oeach(r, function(v, name) {
             if (!done[name]) {
                 done[name] = true;
@@ -1528,7 +1778,12 @@ Y.Loader.prototype = {
         });
 
     },
-
+    /**
+    * Get's the loader meta data for the requested module
+    * @method getModule
+    * @param {String} mname The module name to get
+    * @return {Object} The module metadata
+    */
     getModule: function(mname) {
         //TODO: Remove name check - it's a quick hack to fix pattern WIP
         if (!mname) {
@@ -1545,10 +1800,18 @@ Y.Loader.prototype = {
             for (pname in patterns) {
                 if (patterns.hasOwnProperty(pname)) {
                     p = patterns[pname];
+                    
+                    //There is no test method, create a default one that tests
+                    // the pattern against the mod name
+                    if (!p.test) {
+                        p.test = function(mname, pname) {
+                            return (mname.indexOf(pname) > -1);
+                        };
+                    }
 
-                    // use the metadata supplied for the pattern
-                    // as the module definition.
-                    if (mname.indexOf(pname) > -1) {
+                    if (p.test(mname, pname)) {
+                        // use the metadata supplied for the pattern
+                        // as the module definition.
                         found = p;
                         break;
                     }
@@ -1583,7 +1846,9 @@ Y.Loader.prototype = {
 
         r = r || this.required;
 
-        var i, j, s, m, type = this.loadType;
+        var i, j, s, m, type = this.loadType,
+        ignore = this.ignore ? YArray.hash(this.ignore) : false;
+
         for (i in r) {
             if (r.hasOwnProperty(i)) {
                 m = this.getModule(i);
@@ -1591,6 +1856,9 @@ Y.Loader.prototype = {
                 if (((this.loaded[i] || ON_PAGE[i]) &&
                         !this.forceMap[i] && !this.ignoreRegistered) ||
                         (type && m && m.type != type)) {
+                    delete r[i];
+                }
+                if (ignore && ignore[i]) {
                     delete r[i];
                 }
                 // remove anything this module supersedes
@@ -1607,7 +1875,13 @@ Y.Loader.prototype = {
 
         return r;
     },
-
+    /**
+    * Handles the queue when a module has been loaded for all cases
+    * @method _finish
+    * @private
+    * @param {String} msg The message from Loader
+    * @param {Boolean} success A boolean denoting success or failure
+    */
     _finish: function(msg, success) {
 
         _queue.running = false;
@@ -1622,7 +1896,11 @@ Y.Loader.prototype = {
         }
         this._continue();
     },
-
+    /**
+    * The default Loader onSuccess handler, calls this.onSuccess with a payload
+    * @method _onSuccess
+    * @private
+    */
     _onSuccess: function() {
         var self = this, skipped = Y.merge(self.skipped), fn,
             failed = [], rreg = self.requireRegistration,
@@ -1657,8 +1935,35 @@ Y.Loader.prototype = {
         }
         self._finish(msg, success);
     },
+    /**
+    * The default Loader onProgress handler, calls this.onProgress with a payload
+    * @method _onProgress
+    * @private
+    */
+    _onProgress: function(e) {
+        var self = this;
+        if (self.onProgress) {
+            self.onProgress.call(self.context, {
+                name: e.url,
+                data: e.data
+            });
+        }
+    },
+    /**
+    * The default Loader onFailure handler, calls this.onFailure with a payload
+    * @method _onFailure
+    * @private
+    */
     _onFailure: function(o) {
-        var f = this.onFailure, msg = 'failure: ' + o.msg;
+        var f = this.onFailure, msg = [], i = 0, len = o.errors.length;
+        
+        for (i; i < len; i++) {
+            msg.push(o.errors[i].error);
+        }
+
+        msg = msg.join(',');
+
+        
         if (f) {
             f.call(this.context, {
                 msg: msg,
@@ -1666,9 +1971,16 @@ Y.Loader.prototype = {
                 success: false
             });
         }
+        
         this._finish(msg, false);
+
     },
 
+    /**
+    * The default Loader onTimeout handler, calls this.onTimeout with a payload
+    * @method _onTimeout
+    * @private
+    */
     _onTimeout: function() {
         var f = this.onTimeout;
         if (f) {
@@ -1678,7 +1990,6 @@ Y.Loader.prototype = {
                 success: false
             });
         }
-        this._finish('timeout', false);
     },
 
     /**
@@ -1691,9 +2002,9 @@ Y.Loader.prototype = {
         // create an indexed list
         var s = YObject.keys(this.required),
             // loaded = this.loaded,
+            //TODO Move this out of scope
             done = {},
             p = 0, l, a, b, j, k, moved, doneKey;
-
 
         // keep going until we make a pass without moving anything
         for (;;) {
@@ -1751,14 +2062,17 @@ Y.Loader.prototype = {
         }
 
         this.sorted = s;
-
     },
 
-    partial: function(partial, o, type) {
-        this.sorted = partial;
-        this.insert(o, type, true);
-    },
-
+    /**
+    * Handles the actual insertion of script/link tags
+    * @method _insert
+    * @private
+    * @param {Object} source The YUI instance the request came from
+    * @param {Object} o The metadata to include
+    * @param {String} type JS or CSS
+    * @param {Boolean} [skipcalc=false] Do a Loader.calculate on the meta
+    */
     _insert: function(source, o, type, skipcalc) {
 
 
@@ -1774,57 +2088,125 @@ Y.Loader.prototype = {
             this.calculate(o);
         }
 
-        this.loadType = type;
+        var modules = this.resolve(),
+            self = this, comp = 0, actions = 0;
 
-        if (!type) {
-
-            var self = this;
-
-            this._internalCallback = function() {
-
-                var f = self.onCSS, n, p, sib;
-
-                // IE hack for style overrides that are not being applied
-                if (this.insertBefore && Y.UA.ie) {
-                    n = Y.config.doc.getElementById(this.insertBefore);
-                    p = n.parentNode;
-                    sib = n.nextSibling;
-                    p.removeChild(n);
-                    if (sib) {
-                        p.insertBefore(n, sib);
-                    } else {
-                        p.appendChild(n);
-                    }
-                }
-
-                if (f) {
-                    f.call(self.context, Y);
-                }
-                self._internalCallback = null;
-
-                self._insert(null, null, JS);
-            };
-
-            this._insert(null, null, CSS);
-
-            return;
+        if (type) {
+            //Filter out the opposite type and reset the array so the checks later work
+            modules[((type === JS) ? CSS : JS)] = [];
+        }
+        if (modules.js.length) {
+            comp++;
+        }
+        if (modules.css.length) {
+            comp++;
         }
 
-        // set a flag to indicate the load has started
+        //console.log('Resolved Modules: ', modules);
+
+        var complete = function(d) {
+            actions++;
+            var errs = {}, i = 0, u = '', fn;
+
+            if (d && d.errors) {
+                for (i = 0; i < d.errors.length; i++) {
+                    if (d.errors[i].request) {
+                        u = d.errors[i].request.url;
+                    } else {
+                        u = d.errors[i];
+                    }
+                    errs[u] = u;
+                }
+            }
+            
+            if (d && d.data && d.data.length && (d.type === 'success')) {
+                for (i = 0; i < d.data.length; i++) {
+                    self.inserted[d.data[i].name] = true;
+                }
+            }
+
+            if (actions === comp) {
+                self._loading = null;
+                if (d && d.fn) {
+                    fn = d.fn;
+                    delete d.fn;
+                    fn.call(self, d);
+                }
+            }
+        };
+
         this._loading = true;
 
-        // flag to indicate we are done with the combo service
-        // and any additional files will need to be loaded
-        // individually
-        this._combineComplete = {};
+        if (!modules.js.length && !modules.css.length) {
+            actions = -1;
+            complete({
+                fn: self._onSuccess
+            });
+            return;
+        }
+        
 
-        // start the load
-        this.loadNext();
+        if (modules.css.length) { //Load CSS first
+            Y.Get.css(modules.css, {
+                data: modules.cssMods,
+                attributes: self.cssAttributes,
+                insertBefore: self.insertBefore,
+                charset: self.charset,
+                timeout: self.timeout,
+                context: self,
+                onProgress: function(e) {
+                    self._onProgress.call(self, e);
+                },
+                onTimeout: function(d) {
+                    self._onTimeout.call(self, d);
+                },
+                onSuccess: function(d) {
+                    d.type = 'success';
+                    d.fn = self._onSuccess;
+                    complete.call(self, d);
+                },
+                onFailure: function(d) {
+                    d.type = 'failure';
+                    d.fn = self._onFailure;
+                    complete.call(self, d);
+                }
+            });
+        }
 
+        if (modules.js.length) {
+            Y.Get.js(modules.js, {
+                data: modules.jsMods,
+                insertBefore: self.insertBefore,
+                attributes: self.jsAttributes,
+                charset: self.charset,
+                timeout: self.timeout,
+                autopurge: false,
+                context: self,
+                async: true,
+                onProgress: function(e) {
+                    self._onProgress.call(self, e);
+                },
+                onTimeout: function(d) {
+                    self._onTimeout.call(self, d);
+                },
+                onSuccess: function(d) {
+                    d.type = 'success';
+                    d.fn = self._onSuccess;
+                    complete.call(self, d);
+                },
+                onFailure: function(d) {
+                    d.type = 'failure';
+                    d.fn = self._onFailure;
+                    complete.call(self, d);
+                }
+            });
+        }
     },
-
-    // Once a loader operation is completely finished, process
-    // any additional queued items.
+    /**
+    * Once a loader operation is completely finished, process any additional queued items.
+    * @method _continue
+    * @private
+    */
     _continue: function() {
         if (!(_queue.running) && _queue.size() > 0) {
             _queue.running = true;
@@ -1856,270 +2238,34 @@ Y.Loader.prototype = {
      * is possible to call this if using a method other than
      * Y.register to determine when scripts are fully loaded
      * @method loadNext
+     * @deprecated
      * @param {string} mname optional the name of the module that has
      * been loaded (which is usually why it is time to load the next
      * one).
      */
     loadNext: function(mname) {
-        // It is possible that this function is executed due to something
-        // else one the page loading a YUI module.  Only react when we
-        // are actively loading something
-        if (!this._loading) {
-            return;
-        }
-
-        var s, len, i, m, url, fn, msg, attr, group, groupName, j, frag,
-            comboSource, comboSources, mods, combining, urls, comboBase,
-            self = this,
-            type = self.loadType,
-            handleSuccess = function(o) {
-                self.loadNext(o.data);
-            },
-            handleCombo = function(o) {
-                self._combineComplete[type] = true;
-                var i, len = combining.length;
-
-                for (i = 0; i < len; i++) {
-                    self.inserted[combining[i]] = true;
-                }
-
-                handleSuccess(o);
-            };
-
-        if (self.combine && (!self._combineComplete[type])) {
-
-            combining = [];
-
-            self._combining = combining;
-            s = self.sorted;
-            len = s.length;
-
-            // the default combo base
-            comboBase = self.comboBase;
-
-            url = comboBase;
-            urls = [];
-
-            comboSources = {};
-
-            for (i = 0; i < len; i++) {
-                comboSource = comboBase;
-                m = self.getModule(s[i]);
-                groupName = m && m.group;
-                if (groupName) {
-
-                    group = self.groups[groupName];
-
-                    if (!group.combine) {
-                        m.combine = false;
-                        continue;
-                    }
-                    m.combine = true;
-                    if (group.comboBase) {
-                        comboSource = group.comboBase;
-                    }
-
-                    if (group.root) {
-                        m.root = group.root;
-                    }
-
-                }
-
-                comboSources[comboSource] = comboSources[comboSource] || [];
-                comboSources[comboSource].push(m);
-            }
-
-            for (j in comboSources) {
-                if (comboSources.hasOwnProperty(j)) {
-                    url = j;
-                    mods = comboSources[j];
-                    len = mods.length;
-
-                    for (i = 0; i < len; i++) {
-                        // m = self.getModule(s[i]);
-                        m = mods[i];
-
-                        // Do not try to combine non-yui JS unless combo def
-                        // is found
-                        if (m && (m.type === type) && (m.combine || !m.ext)) {
-
-                            frag = (m.root || self.root) + m.path;
-
-                            if ((url !== j) && (i < (len - 1)) &&
-                            ((frag.length + url.length) > self.maxURLLength)) {
-                                urls.push(self._filter(url));
-                                url = j;
-                            }
-
-                            url += frag;
-                            if (i < (len - 1)) {
-                                url += '&';
-                            }
-
-                            combining.push(m.name);
-                        }
-
-                    }
-
-                    if (combining.length && (url != j)) {
-                        urls.push(self._filter(url));
-                    }
-                }
-            }
-
-            if (combining.length) {
-
-
-                // if (m.type === CSS) {
-                if (type === CSS) {
-                    fn = Y.Get.css;
-                    attr = self.cssAttributes;
-                } else {
-                    fn = Y.Get.script;
-                    attr = self.jsAttributes;
-                }
-
-                fn(urls, {
-                    data: self._loading,
-                    onSuccess: handleCombo,
-                    onFailure: self._onFailure,
-                    onTimeout: self._onTimeout,
-                    insertBefore: self.insertBefore,
-                    charset: self.charset,
-                    attributes: attr,
-                    timeout: self.timeout,
-                    autopurge: false,
-                    context: self
-                });
-
-                return;
-
-            } else {
-                self._combineComplete[type] = true;
-            }
-        }
-
-        if (mname) {
-
-            // if the module that was just loaded isn't what we were expecting,
-            // continue to wait
-            if (mname !== self._loading) {
-                return;
-            }
-
-
-            // The global handler that is called when each module is loaded
-            // will pass that module name to this function.  Storing this
-            // data to avoid loading the same module multiple times
-            // centralize this in the callback
-            self.inserted[mname] = true;
-            // self.loaded[mname] = true;
-
-            // provided = self.getProvides(mname);
-            // Y.mix(self.loaded, provided);
-            // Y.mix(self.inserted, provided);
-
-            if (self.onProgress) {
-                self.onProgress.call(self.context, {
-                        name: mname,
-                        data: self.data
-                    });
-            }
-        }
-
-        s = self.sorted;
-        len = s.length;
-
-        for (i = 0; i < len; i = i + 1) {
-            // this.inserted keeps track of what the loader has loaded.
-            // move on if this item is done.
-            if (s[i] in self.inserted) {
-                continue;
-            }
-
-            // Because rollups will cause multiple load notifications
-            // from Y, loadNext may be called multiple times for
-            // the same module when loading a rollup.  We can safely
-            // skip the subsequent requests
-            if (s[i] === self._loading) {
-                return;
-            }
-
-            // log("inserting " + s[i]);
-            m = self.getModule(s[i]);
-
-            if (!m) {
-                if (!self.skipped[s[i]]) {
-                    msg = 'Undefined module ' + s[i] + ' skipped';
-                    // self.inserted[s[i]] = true;
-                    self.skipped[s[i]] = true;
-                }
-                continue;
-
-            }
-
-            group = (m.group && self.groups[m.group]) || NOT_FOUND;
-
-            // The load type is stored to offer the possibility to load
-            // the css separately from the script.
-            if (!type || type === m.type) {
-                self._loading = s[i];
-
-                if (m.type === CSS) {
-                    fn = Y.Get.css;
-                    attr = self.cssAttributes;
-                } else {
-                    fn = Y.Get.script;
-                    attr = self.jsAttributes;
-                }
-
-                url = (m.fullpath) ? self._filter(m.fullpath, s[i]) :
-                      self._url(m.path, s[i], group.base || m.base);
-
-                fn(url, {
-                    data: s[i],
-                    onSuccess: handleSuccess,
-                    insertBefore: self.insertBefore,
-                    charset: self.charset,
-                    attributes: attr,
-                    onFailure: self._onFailure,
-                    onTimeout: self._onTimeout,
-                    timeout: self.timeout,
-                    autopurge: false,
-                    context: self
-                });
-
-                return;
-            }
-        }
-
-        // we are finished
-        self._loading = null;
-
-        fn = self._internalCallback;
-
-        // internal callback for loading css first
-        if (fn) {
-            self._internalCallback = null;
-            fn.call(self);
-        } else {
-            self._onSuccess();
-        }
+        return;
     },
 
     /**
      * Apply filter defined for this instance to a url/path
-     * method _filter
+     * @method _filter
      * @param {string} u the string to filter.
      * @param {string} name the name of the module, if we are processing
      * a single module as opposed to a combined url.
      * @return {string} the filtered string.
      * @private
      */
-    _filter: function(u, name) {
+    _filter: function(u, name, group) {
         var f = this.filter,
             hasFilter = name && (name in this.filters),
-            modFilter = hasFilter && this.filters[name];
+            modFilter = hasFilter && this.filters[name],
+	        groupName = group || (this.moduleInfo[name] ? this.moduleInfo[name].group : null);
+
+	    if (groupName && this.groups[groupName] && this.groups[groupName].filter) {		
+	 	    modFilter = this.groups[groupName].filter;
+		    hasFilter = true;		
+	    };
 
         if (u) {
             if (hasFilter) {
@@ -2137,21 +2283,250 @@ Y.Loader.prototype = {
 
     /**
      * Generates the full url for a module
-     * method _url
+     * @method _url
      * @param {string} path the path fragment.
+     * @param {String} name The name of the module
+     * @param {String} [base=self.base] The base url to use
      * @return {string} the full url.
      * @private
      */
     _url: function(path, name, base) {
         return this._filter((base || this.base || '') + path, name);
+    },
+    /**
+    * Returns an Object hash of file arrays built from `loader.sorted` or from an arbitrary list of sorted modules.
+    * @method resolve
+    * @param {Boolean} [calc=false] Perform a loader.calculate() before anything else
+    * @param {Array} [s=loader.sorted] An override for the loader.sorted array
+    * @return {Object} Object hash (js and css) of two arrays of file lists
+    * @example This method can be used as an off-line dep calculator
+    *
+    *        var Y = YUI();
+    *        var loader = new Y.Loader({
+    *            filter: 'debug',
+    *            base: '../../',
+    *            root: 'build/',
+    *            combine: true,
+    *            require: ['node', 'dd', 'console']
+    *        });
+    *        var out = loader.resolve(true);
+    *
+    */
+    resolve: function(calc, s) {
+
+        var len, i, m, url, fn, msg, attr, group, groupName, j, frag,
+            comboSource, comboSources, mods, comboBase,
+            base, urls, u = [], tmpBase, baseLen, resCombos = {},
+            self = this, comboSep, maxURLLength, singles = [],
+            inserted = (self.ignoreRegistered) ? {} : self.inserted,
+            resolved = { js: [], jsMods: [], css: [], cssMods: [] },
+            type = self.loadType || 'js';
+
+        if (calc) {
+            self.calculate();
+        }
+        s = s || self.sorted;
+
+        var addSingle = function(m) {
+            
+            if (m) {
+                group = (m.group && self.groups[m.group]) || NOT_FOUND;
+                
+                //Always assume it's async
+                if (group.async === false) {
+                    m.async = group.async;
+                }
+
+                url = (m.fullpath) ? self._filter(m.fullpath, s[i]) :
+                      self._url(m.path, s[i], group.base || m.base);
+                
+                if (m.attributes || m.async === false) {
+                    url = {
+                        url: url,
+                        async: m.async
+                    };
+                    if (m.attributes) {
+                        url.attributes = m.attributes
+                    }
+                }
+                resolved[m.type].push(url);
+                resolved[m.type + 'Mods'].push(m);
+            } else {
+            }
+            
+        };
+
+        len = s.length;
+
+        // the default combo base
+        comboBase = self.comboBase;
+
+        url = comboBase;
+
+        comboSources = {};
+
+        for (i = 0; i < len; i++) {
+            comboSource = comboBase;
+            m = self.getModule(s[i]);
+            groupName = m && m.group;
+            group = self.groups[groupName];
+            if (groupName && group) {
+
+                if (!group.combine || m.fullpath) {
+                    //This is not a combo module, skip it and load it singly later.
+                    //singles.push(s[i]);
+                    addSingle(m);
+                    continue;
+                }
+                m.combine = true;
+                if (group.comboBase) {
+                    comboSource = group.comboBase;
+                }
+
+                if ("root" in group && L.isValue(group.root)) {
+                    m.root = group.root;
+                }
+                m.comboSep = group.comboSep || self.comboSep;
+                m.maxURLLength = group.maxURLLength || self.maxURLLength;
+            } else {
+                if (!self.combine) {
+                    //This is not a combo module, skip it and load it singly later.
+                    //singles.push(s[i]);
+                    addSingle(m);
+                    continue;
+                }
+            }
+
+            comboSources[comboSource] = comboSources[comboSource] || [];
+            comboSources[comboSource].push(m);
+        }
+
+        for (j in comboSources) {
+            if (comboSources.hasOwnProperty(j)) {
+                resCombos[j] = resCombos[j] || { js: [], jsMods: [], css: [], cssMods: [] };
+                url = j;
+                mods = comboSources[j];
+                len = mods.length;
+                
+                if (len) {
+                    for (i = 0; i < len; i++) {
+                        if (inserted[mods[i]]) {
+                            continue;
+                        }
+                        m = mods[i];
+                        // Do not try to combine non-yui JS unless combo def
+                        // is found
+                        if (m && (m.combine || !m.ext)) {
+                            resCombos[j].comboSep = m.comboSep;
+                            resCombos[j].group = m.group;
+                            resCombos[j].maxURLLength = m.maxURLLength;
+                            frag = ((L.isValue(m.root)) ? m.root : self.root) + (m.path || m.fullpath);
+                            frag = self._filter(frag, m.name);
+                            resCombos[j][m.type].push(frag);
+                            resCombos[j][m.type + 'Mods'].push(m);
+                        } else {
+                            //Add them to the next process..
+                            if (mods[i]) {
+                                //singles.push(mods[i].name);
+                                addSingle(mods[i]);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+
+        for (j in resCombos) {
+            base = j;
+            comboSep = resCombos[base].comboSep || self.comboSep;
+            maxURLLength = resCombos[base].maxURLLength || self.maxURLLength;
+            for (type in resCombos[base]) {
+                if (type === JS || type === CSS) {
+                    urls = resCombos[base][type];
+                    mods = resCombos[base][type + 'Mods'];
+                    len = urls.length;
+                    tmpBase = base + urls.join(comboSep);
+                    baseLen = tmpBase.length;
+                    if (maxURLLength <= base.length) {
+                        maxURLLength = MAX_URL_LENGTH;
+                    }
+                    
+                    if (len) {
+                        if (baseLen > maxURLLength) {
+                            u = [];
+                            for (s = 0; s < len; s++) {
+                                u.push(urls[s]);
+                                tmpBase = base + u.join(comboSep);
+
+                                if (tmpBase.length > maxURLLength) {
+                                    m = u.pop();
+                                    tmpBase = base + u.join(comboSep)
+                                    resolved[type].push(self._filter(tmpBase, null, resCombos[base].group));
+                                    u = [];
+                                    if (m) {
+                                        u.push(m);
+                                    }
+                                }
+                            }
+                            if (u.length) {
+                                tmpBase = base + u.join(comboSep);
+                                resolved[type].push(self._filter(tmpBase, null, resCombos[base].group));
+                            }
+                        } else {
+                            resolved[type].push(self._filter(tmpBase, null, resCombos[base].group));
+                        }
+                    }
+                    resolved[type + 'Mods'] = resolved[type + 'Mods'].concat(mods);
+                }
+            }
+        }
+
+        resCombos = null;
+
+        return resolved;
+    },
+    /**
+    Shortcut to calculate, resolve and load all modules.
+
+        var loader = new Y.Loader({
+            ignoreRegistered: true,
+            modules: {
+                mod: {
+                    path: 'mod.js'
+                }
+            },
+            requires: [ 'mod' ]
+        });
+        loader.load(function() {
+            console.log('All modules have loaded..');
+        });
+
+
+    @method load
+    @param {Callback} cb Executed after all load operations are complete
+    */
+    load: function(cb) {
+        if (!cb) {
+            return;
+        }
+        var self = this,
+            out = self.resolve(true);
+        
+        self.data = out;
+
+        self.onEnd = function() {
+            cb.apply(self.context || self, arguments);
+        };
+
+        self.insert();
     }
 };
 
 
 
-
-}, '3.3.0' ,{requires:['get']});
-
+}, '3.5.0' ,{requires:['get', 'features']});
 YUI.add('loader-rollup', function(Y) {
 
 /**
@@ -2187,8 +2562,6 @@ Y.Loader.prototype._rollup = function() {
                 }
             }
         }
-
-        this.forceMap = (this.force) ? Y.Array.hash(this.force) : {};
     }
 
     // make as many passes as needed to pick up rollup rollups
@@ -2252,12 +2625,10 @@ Y.Loader.prototype._rollup = function() {
 };
 
 
-
-}, '3.3.0' ,{requires:['loader-base']});
-
+}, '3.5.0' ,{requires:['loader-base']});
 YUI.add('loader-yui3', function(Y) {
 
-/* This file is auto-generated by src/loader/meta_join.py */
+/* This file is auto-generated by src/loader/scripts/meta_join.py */
 
 /**
  * YUI 3 module metadata
@@ -2265,47 +2636,140 @@ YUI.add('loader-yui3', function(Y) {
  * @submodule yui3
  */
 YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
+    "align-plugin": {
+        "requires": [
+            "node-screen", 
+            "node-pluginhost"
+        ]
+    }, 
     "anim": {
-        "submodules": {
-            "anim-base": {
-                "requires": [
-                    "base-base", 
-                    "node-style"
-                ]
-            }, 
-            "anim-color": {
-                "requires": [
-                    "anim-base"
-                ]
-            }, 
-            "anim-curve": {
-                "requires": [
-                    "anim-xy"
-                ]
-            }, 
-            "anim-easing": {
-                "requires": [
-                    "anim-base"
-                ]
-            }, 
-            "anim-node-plugin": {
-                "requires": [
-                    "node-pluginhost", 
-                    "anim-base"
-                ]
-            }, 
-            "anim-scroll": {
-                "requires": [
-                    "anim-base"
-                ]
-            }, 
-            "anim-xy": {
-                "requires": [
-                    "anim-base", 
-                    "node-screen"
-                ]
-            }
-        }
+        "use": [
+            "anim-base", 
+            "anim-color", 
+            "anim-curve", 
+            "anim-easing", 
+            "anim-node-plugin", 
+            "anim-scroll", 
+            "anim-xy"
+        ]
+    }, 
+    "anim-base": {
+        "requires": [
+            "base-base", 
+            "node-style"
+        ]
+    }, 
+    "anim-color": {
+        "requires": [
+            "anim-base"
+        ]
+    }, 
+    "anim-curve": {
+        "requires": [
+            "anim-xy"
+        ]
+    }, 
+    "anim-easing": {
+        "requires": [
+            "anim-base"
+        ]
+    }, 
+    "anim-node-plugin": {
+        "requires": [
+            "node-pluginhost", 
+            "anim-base"
+        ]
+    }, 
+    "anim-scroll": {
+        "requires": [
+            "anim-base"
+        ]
+    }, 
+    "anim-shape-transform": {
+        "requires": [
+            "anim-base", 
+            "anim-easing", 
+            "matrix"
+        ]
+    }, 
+    "anim-xy": {
+        "requires": [
+            "anim-base", 
+            "node-screen"
+        ]
+    }, 
+    "app": {
+        "use": [
+            "app-base", 
+            "app-transitions", 
+            "model", 
+            "model-list", 
+            "router", 
+            "view"
+        ]
+    }, 
+    "app-base": {
+        "requires": [
+            "classnamemanager", 
+            "pjax-base", 
+            "router", 
+            "view"
+        ]
+    }, 
+    "app-transitions": {
+        "requires": [
+            "app-base"
+        ]
+    }, 
+    "app-transitions-css": {
+        "type": "css"
+    }, 
+    "app-transitions-native": {
+        "condition": {
+            "name": "app-transitions-native", 
+            "test": function (Y) {
+    var doc  = Y.config.doc,
+        node = doc ? doc.documentElement : null;
+
+    if (node && node.style) {
+        return ('MozTransition' in node.style || 'WebkitTransition' in node.style);
+    }
+
+    return false;
+}, 
+            "trigger": "app-transitions"
+        }, 
+        "requires": [
+            "app-transitions", 
+            "app-transitions-css", 
+            "parallel", 
+            "transition"
+        ]
+    }, 
+    "array-extras": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "array-invoke": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "arraylist": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "arraylist-add": {
+        "requires": [
+            "arraylist"
+        ]
+    }, 
+    "arraylist-filter": {
+        "requires": [
+            "arraylist"
+        ]
     }, 
     "arraysort": {
         "requires": [
@@ -2318,73 +2782,106 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         ]
     }, 
     "attribute": {
-        "submodules": {
-            "attribute-base": {
-                "requires": [
-                    "event-custom"
-                ]
-            }, 
-            "attribute-complex": {
-                "requires": [
-                    "attribute-base"
-                ]
-            }
-        }
+        "use": [
+            "attribute-base", 
+            "attribute-complex"
+        ]
+    }, 
+    "attribute-base": {
+        "requires": [
+            "attribute-core", 
+            "attribute-events", 
+            "attribute-extras"
+        ]
+    }, 
+    "attribute-complex": {
+        "requires": [
+            "attribute-base"
+        ]
+    }, 
+    "attribute-core": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "attribute-events": {
+        "requires": [
+            "event-custom"
+        ]
+    }, 
+    "attribute-extras": {
+        "requires": [
+            "yui-base"
+        ]
     }, 
     "autocomplete": {
-        "submodules": {
-            "autocomplete-base": {
-                "optional": [
-                    "autocomplete-sources"
-                ], 
-                "plugins": {
-                    "autocomplete-filters": {
-                        "path": "autocomplete/autocomplete-filters-min.js", 
-                        "requires": [
-                            "array-extras", 
-                            "text-wordbreak"
-                        ]
-                    }, 
-                    "autocomplete-filters-accentfold": {
-                        "path": "autocomplete/autocomplete-filters-accentfold-min.js", 
-                        "requires": [
-                            "array-extras", 
-                            "text-accentfold", 
-                            "text-wordbreak"
-                        ]
-                    }, 
-                    "autocomplete-highlighters": {
-                        "path": "autocomplete/autocomplete-highlighters-min.js", 
-                        "requires": [
-                            "array-extras", 
-                            "highlight-base"
-                        ]
-                    }, 
-                    "autocomplete-highlighters-accentfold": {
-                        "path": "autocomplete/autocomplete-highlighters-accentfold-min.js", 
-                        "requires": [
-                            "array-extras", 
-                            "highlight-accentfold"
-                        ]
-                    }
-                }, 
-                "requires": [
-                    "array-extras", 
-                    "base-build", 
-                    "escape", 
-                    "event-valuechange", 
-                    "node-base"
-                ]
-            }, 
-            "autocomplete-list": {
-                "after": "autocomplete-sources", 
-                "lang": [
-                    "en"
-                ], 
-                "plugins": {
-                    "autocomplete-list-keys": {
-                        "condition": {
-                            "test": function (Y) {
+        "use": [
+            "autocomplete-base", 
+            "autocomplete-sources", 
+            "autocomplete-list", 
+            "autocomplete-plugin"
+        ]
+    }, 
+    "autocomplete-base": {
+        "optional": [
+            "autocomplete-sources"
+        ], 
+        "requires": [
+            "array-extras", 
+            "base-build", 
+            "escape", 
+            "event-valuechange", 
+            "node-base"
+        ]
+    }, 
+    "autocomplete-filters": {
+        "requires": [
+            "array-extras", 
+            "text-wordbreak"
+        ]
+    }, 
+    "autocomplete-filters-accentfold": {
+        "requires": [
+            "array-extras", 
+            "text-accentfold", 
+            "text-wordbreak"
+        ]
+    }, 
+    "autocomplete-highlighters": {
+        "requires": [
+            "array-extras", 
+            "highlight-base"
+        ]
+    }, 
+    "autocomplete-highlighters-accentfold": {
+        "requires": [
+            "array-extras", 
+            "highlight-accentfold"
+        ]
+    }, 
+    "autocomplete-list": {
+        "after": [
+            "autocomplete-sources"
+        ], 
+        "lang": [
+            "en"
+        ], 
+        "requires": [
+            "autocomplete-base", 
+            "event-resize", 
+            "node-screen", 
+            "selector-css3", 
+            "shim-plugin", 
+            "widget", 
+            "widget-position", 
+            "widget-position-align"
+        ], 
+        "skinnable": true
+    }, 
+    "autocomplete-list-keys": {
+        "condition": {
+            "name": "autocomplete-list-keys", 
+            "test": function (Y) {
     // Only add keyboard support to autocomplete-list if this doesn't appear to
     // be an iOS or Android-based mobile device.
     //
@@ -2398,98 +2895,183 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
     // available.
     return !(Y.UA.ios || Y.UA.android);
 }, 
-                            "trigger": "autocomplete-list"
-                        }, 
-                        "path": "autocomplete/autocomplete-list-keys-min.js", 
-                        "requires": [
-                            "autocomplete-list", 
-                            "base-build"
-                        ]
-                    }, 
-                    "autocomplete-plugin": {
-                        "path": "autocomplete/autocomplete-plugin-min.js", 
-                        "requires": [
-                            "autocomplete-list", 
-                            "node-pluginhost"
-                        ]
-                    }
-                }, 
-                "requires": [
-                    "autocomplete-base", 
-                    "selector-css3", 
-                    "widget", 
-                    "widget-position", 
-                    "widget-position-align", 
-                    "widget-stack"
-                ], 
-                "skinnable": true
-            }, 
-            "autocomplete-sources": {
-                "optional": [
-                    "io-base", 
-                    "json-parse", 
-                    "jsonp", 
-                    "yql"
-                ], 
-                "requires": [
-                    "autocomplete-base"
-                ]
-            }
-        }
+            "trigger": "autocomplete-list"
+        }, 
+        "requires": [
+            "autocomplete-list", 
+            "base-build"
+        ]
+    }, 
+    "autocomplete-plugin": {
+        "requires": [
+            "autocomplete-list", 
+            "node-pluginhost"
+        ]
+    }, 
+    "autocomplete-sources": {
+        "optional": [
+            "io-base", 
+            "json-parse", 
+            "jsonp", 
+            "yql"
+        ], 
+        "requires": [
+            "autocomplete-base"
+        ]
     }, 
     "base": {
-        "submodules": {
-            "base-base": {
-                "after": [
-                    "attribute-complex"
-                ], 
-                "requires": [
-                    "attribute-base"
-                ]
-            }, 
-            "base-build": {
-                "requires": [
-                    "base-base"
-                ]
-            }, 
-            "base-pluginhost": {
-                "requires": [
-                    "base-base", 
-                    "pluginhost"
-                ]
-            }
-        }
+        "use": [
+            "base-base", 
+            "base-pluginhost", 
+            "base-build"
+        ]
+    }, 
+    "base-base": {
+        "after": [
+            "attribute-complex"
+        ], 
+        "requires": [
+            "base-core", 
+            "attribute-base"
+        ]
+    }, 
+    "base-build": {
+        "requires": [
+            "base-base"
+        ]
+    }, 
+    "base-core": {
+        "requires": [
+            "attribute-core"
+        ]
+    }, 
+    "base-pluginhost": {
+        "requires": [
+            "base-base", 
+            "pluginhost"
+        ]
+    }, 
+    "button": {
+        "requires": [
+            "button-core", 
+            "cssbutton", 
+            "widget"
+        ]
+    }, 
+    "button-core": {
+        "requires": [
+            "attribute-core", 
+            "classnamemanager", 
+            "node-base"
+        ]
+    }, 
+    "button-group": {
+        "requires": [
+            "button-plugin", 
+            "cssbutton", 
+            "widget"
+        ]
+    }, 
+    "button-plugin": {
+        "requires": [
+            "button-core", 
+            "cssbutton", 
+            "node-pluginhost"
+        ]
     }, 
     "cache": {
-        "submodules": {
-            "cache-base": {
-                "requires": [
-                    "base"
-                ]
-            }, 
-            "cache-offline": {
-                "requires": [
-                    "cache-base", 
-                    "json"
-                ]
-            }, 
-            "cache-plugin": {
-                "requires": [
-                    "plugin", 
-                    "cache-base"
-                ]
-            }
-        }
+        "use": [
+            "cache-base", 
+            "cache-offline", 
+            "cache-plugin"
+        ]
+    }, 
+    "cache-base": {
+        "requires": [
+            "base"
+        ]
+    }, 
+    "cache-offline": {
+        "requires": [
+            "cache-base", 
+            "json"
+        ]
+    }, 
+    "cache-plugin": {
+        "requires": [
+            "plugin", 
+            "cache-base"
+        ]
+    }, 
+    "calendar": {
+        "lang": [
+            "de", 
+            "en", 
+            "fr", 
+            "ja", 
+            "nb-NO", 
+            "pt-BR", 
+            "ru", 
+            "zh-HANT-TW"
+        ], 
+        "requires": [
+            "calendar-base", 
+            "calendarnavigator"
+        ], 
+        "skinnable": true
+    }, 
+    "calendar-base": {
+        "lang": [
+            "de", 
+            "en", 
+            "fr", 
+            "ja", 
+            "nb-NO", 
+            "pt-BR", 
+            "ru", 
+            "zh-HANT-TW"
+        ], 
+        "requires": [
+            "widget", 
+            "substitute", 
+            "datatype-date", 
+            "datatype-date-math", 
+            "cssgrids"
+        ], 
+        "skinnable": true
+    }, 
+    "calendarnavigator": {
+        "requires": [
+            "plugin", 
+            "classnamemanager", 
+            "datatype-date", 
+            "node", 
+            "substitute"
+        ], 
+        "skinnable": true
     }, 
     "charts": {
         "requires": [
+            "charts-base"
+        ]
+    }, 
+    "charts-base": {
+        "requires": [
             "dom", 
-            "datatype", 
+            "datatype-number", 
+            "datatype-date", 
             "event-custom", 
             "event-mouseenter", 
+            "event-touch", 
             "widget", 
             "widget-position", 
-            "widget-stack"
+            "widget-stack", 
+            "graphics"
+        ]
+    }, 
+    "charts-legend": {
+        "requires": [
+            "charts-base"
         ]
     }, 
     "classnamemanager": {
@@ -2497,45 +3079,26 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "yui-base"
         ]
     }, 
-    "collection": {
-        "submodules": {
-            "array-extras": {}, 
-            "array-invoke": {}, 
-            "arraylist": {}, 
-            "arraylist-add": {
-                "requires": [
-                    "arraylist"
-                ]
-            }, 
-            "arraylist-filter": {
-                "requires": [
-                    "arraylist"
-                ]
-            }
-        }
-    }, 
-    "compat": {
+    "clickable-rail": {
         "requires": [
-            "event-base", 
-            "dom", 
-            "dump", 
-            "substitute"
+            "slider-base"
+        ]
+    }, 
+    "collection": {
+        "use": [
+            "array-extras", 
+            "arraylist", 
+            "arraylist-add", 
+            "arraylist-filter", 
+            "array-invoke"
         ]
     }, 
     "console": {
         "lang": [
             "en", 
-            "es"
+            "es", 
+            "ja"
         ], 
-        "plugins": {
-            "console-filters": {
-                "requires": [
-                    "plugin", 
-                    "console"
-                ], 
-                "skinnable": true
-            }
-        }, 
         "requires": [
             "yui-log", 
             "widget", 
@@ -2543,9 +3106,26 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         ], 
         "skinnable": true
     }, 
+    "console-filters": {
+        "requires": [
+            "plugin", 
+            "console"
+        ], 
+        "skinnable": true
+    }, 
+    "controller": {
+        "use": [
+            "router"
+        ]
+    }, 
     "cookie": {
         "requires": [
             "yui-base"
+        ]
+    }, 
+    "createlink-base": {
+        "requires": [
+            "editor-base"
         ]
     }, 
     "cssbase": {
@@ -2557,7 +3137,6 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "cssfonts-context", 
             "cssgrids-context"
         ], 
-        "path": "cssbase/base-min.css", 
         "type": "css"
     }, 
     "cssbase-context": {
@@ -2569,15 +3148,15 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "cssfonts-context", 
             "cssgrids-context"
         ], 
-        "path": "cssbase/base-context-min.css", 
+        "type": "css"
+    }, 
+    "cssbutton": {
         "type": "css"
     }, 
     "cssfonts": {
-        "path": "cssfonts/fonts-min.css", 
         "type": "css"
     }, 
     "cssfonts-context": {
-        "path": "cssfonts/fonts-context-min.css", 
         "type": "css"
     }, 
     "cssgrids": {
@@ -2585,358 +3164,483 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "cssreset", 
             "cssfonts"
         ], 
-        "path": "cssgrids/grids-min.css", 
         "type": "css"
     }, 
-    "cssgrids-context-deprecated": {
+    "cssgrids-base": {
         "optional": [
-            "cssreset-context"
-        ], 
-        "path": "cssgrids-deprecated/grids-context-min.css", 
-        "requires": [
-            "cssfonts-context"
-        ], 
-        "type": "css"
-    }, 
-    "cssgrids-deprecated": {
-        "optional": [
-            "cssreset"
-        ], 
-        "path": "cssgrids-deprecated/grids-min.css", 
-        "requires": [
+            "cssreset", 
             "cssfonts"
         ], 
         "type": "css"
     }, 
+    "cssgrids-units": {
+        "optional": [
+            "cssreset", 
+            "cssfonts"
+        ], 
+        "requires": [
+            "cssgrids-base"
+        ], 
+        "type": "css"
+    }, 
     "cssreset": {
-        "path": "cssreset/reset-min.css", 
         "type": "css"
     }, 
     "cssreset-context": {
-        "path": "cssreset/reset-context-min.css", 
         "type": "css"
     }, 
     "dataschema": {
-        "submodules": {
-            "dataschema-array": {
-                "requires": [
-                    "dataschema-base"
-                ]
-            }, 
-            "dataschema-base": {
-                "requires": [
-                    "base"
-                ]
-            }, 
-            "dataschema-json": {
-                "requires": [
-                    "dataschema-base", 
-                    "json"
-                ]
-            }, 
-            "dataschema-text": {
-                "requires": [
-                    "dataschema-base"
-                ]
-            }, 
-            "dataschema-xml": {
-                "requires": [
-                    "dataschema-base"
-                ]
-            }
-        }
+        "use": [
+            "dataschema-base", 
+            "dataschema-json", 
+            "dataschema-xml", 
+            "dataschema-array", 
+            "dataschema-text"
+        ]
+    }, 
+    "dataschema-array": {
+        "requires": [
+            "dataschema-base"
+        ]
+    }, 
+    "dataschema-base": {
+        "requires": [
+            "base"
+        ]
+    }, 
+    "dataschema-json": {
+        "requires": [
+            "dataschema-base", 
+            "json"
+        ]
+    }, 
+    "dataschema-text": {
+        "requires": [
+            "dataschema-base"
+        ]
+    }, 
+    "dataschema-xml": {
+        "requires": [
+            "dataschema-base"
+        ]
     }, 
     "datasource": {
-        "submodules": {
-            "datasource-arrayschema": {
-                "requires": [
-                    "datasource-local", 
-                    "plugin", 
-                    "dataschema-array"
-                ]
-            }, 
-            "datasource-cache": {
-                "requires": [
-                    "datasource-local", 
-                    "cache-base"
-                ]
-            }, 
-            "datasource-function": {
-                "requires": [
-                    "datasource-local"
-                ]
-            }, 
-            "datasource-get": {
-                "requires": [
-                    "datasource-local", 
-                    "get"
-                ]
-            }, 
-            "datasource-io": {
-                "requires": [
-                    "datasource-local", 
-                    "io-base"
-                ]
-            }, 
-            "datasource-jsonschema": {
-                "requires": [
-                    "datasource-local", 
-                    "plugin", 
-                    "dataschema-json"
-                ]
-            }, 
-            "datasource-local": {
-                "requires": [
-                    "base"
-                ]
-            }, 
-            "datasource-polling": {
-                "requires": [
-                    "datasource-local"
-                ]
-            }, 
-            "datasource-textschema": {
-                "requires": [
-                    "datasource-local", 
-                    "plugin", 
-                    "dataschema-text"
-                ]
-            }, 
-            "datasource-xmlschema": {
-                "requires": [
-                    "datasource-local", 
-                    "plugin", 
-                    "dataschema-xml"
-                ]
-            }
-        }
+        "use": [
+            "datasource-local", 
+            "datasource-io", 
+            "datasource-get", 
+            "datasource-function", 
+            "datasource-cache", 
+            "datasource-jsonschema", 
+            "datasource-xmlschema", 
+            "datasource-arrayschema", 
+            "datasource-textschema", 
+            "datasource-polling"
+        ]
+    }, 
+    "datasource-arrayschema": {
+        "requires": [
+            "datasource-local", 
+            "plugin", 
+            "dataschema-array"
+        ]
+    }, 
+    "datasource-cache": {
+        "requires": [
+            "datasource-local", 
+            "plugin", 
+            "cache-base"
+        ]
+    }, 
+    "datasource-function": {
+        "requires": [
+            "datasource-local"
+        ]
+    }, 
+    "datasource-get": {
+        "requires": [
+            "datasource-local", 
+            "get"
+        ]
+    }, 
+    "datasource-io": {
+        "requires": [
+            "datasource-local", 
+            "io-base"
+        ]
+    }, 
+    "datasource-jsonschema": {
+        "requires": [
+            "datasource-local", 
+            "plugin", 
+            "dataschema-json"
+        ]
+    }, 
+    "datasource-local": {
+        "requires": [
+            "base"
+        ]
+    }, 
+    "datasource-polling": {
+        "requires": [
+            "datasource-local"
+        ]
+    }, 
+    "datasource-textschema": {
+        "requires": [
+            "datasource-local", 
+            "plugin", 
+            "dataschema-text"
+        ]
+    }, 
+    "datasource-xmlschema": {
+        "requires": [
+            "datasource-local", 
+            "plugin", 
+            "dataschema-xml"
+        ]
     }, 
     "datatable": {
-        "submodules": {
-            "datatable-base": {
-                "requires": [
-                    "recordset-base", 
-                    "widget", 
-                    "substitute", 
-                    "event-mouseenter"
-                ], 
-                "skinnable": true
-            }, 
-            "datatable-datasource": {
-                "requires": [
-                    "datatable-base", 
-                    "plugin", 
-                    "datasource-local"
-                ]
-            }, 
-            "datatable-scroll": {
-                "requires": [
-                    "datatable-base", 
-                    "plugin", 
-                    "stylesheet"
-                ]
-            }, 
-            "datatable-sort": {
-                "lang": [
-                    "en"
-                ], 
-                "requires": [
-                    "datatable-base", 
-                    "plugin", 
-                    "recordset-sort"
-                ]
-            }
-        }
+        "use": [
+            "datatable-core", 
+            "datatable-head", 
+            "datatable-body", 
+            "datatable-base", 
+            "datatable-column-widths", 
+            "datatable-message", 
+            "datatable-mutable", 
+            "datatable-sort", 
+            "datatable-datasource"
+        ]
+    }, 
+    "datatable-base": {
+        "requires": [
+            "datatable-core", 
+            "datatable-head", 
+            "datatable-body", 
+            "base-build", 
+            "widget"
+        ], 
+        "skinnable": true
+    }, 
+    "datatable-base-deprecated": {
+        "requires": [
+            "recordset-base", 
+            "widget", 
+            "substitute", 
+            "event-mouseenter"
+        ], 
+        "skinnable": true
+    }, 
+    "datatable-body": {
+        "requires": [
+            "datatable-core", 
+            "view", 
+            "classnamemanager"
+        ]
+    }, 
+    "datatable-column-widths": {
+        "requires": [
+            "datatable-base"
+        ]
+    }, 
+    "datatable-core": {
+        "requires": [
+            "escape", 
+            "model-list", 
+            "node-event-delegate"
+        ]
+    }, 
+    "datatable-datasource": {
+        "requires": [
+            "datatable-base", 
+            "plugin", 
+            "datasource-local"
+        ]
+    }, 
+    "datatable-datasource-deprecated": {
+        "requires": [
+            "datatable-base-deprecated", 
+            "plugin", 
+            "datasource-local"
+        ]
+    }, 
+    "datatable-deprecated": {
+        "use": [
+            "datatable-base-deprecated", 
+            "datatable-datasource-deprecated", 
+            "datatable-sort-deprecated", 
+            "datatable-scroll-deprecated"
+        ]
+    }, 
+    "datatable-head": {
+        "requires": [
+            "datatable-core", 
+            "view", 
+            "classnamemanager"
+        ]
+    }, 
+    "datatable-message": {
+        "lang": [
+            "en"
+        ], 
+        "requires": [
+            "datatable-base"
+        ], 
+        "skinnable": true
+    }, 
+    "datatable-mutable": {
+        "requires": [
+            "datatable-base"
+        ]
+    }, 
+    "datatable-scroll": {
+        "requires": [
+            "datatable-base", 
+            "datatable-column-widths", 
+            "dom-screen"
+        ], 
+        "skinnable": true
+    }, 
+    "datatable-scroll-deprecated": {
+        "requires": [
+            "datatable-base-deprecated", 
+            "plugin"
+        ]
+    }, 
+    "datatable-sort": {
+        "lang": [
+            "en"
+        ], 
+        "requires": [
+            "datatable-base"
+        ], 
+        "skinnable": true
+    }, 
+    "datatable-sort-deprecated": {
+        "lang": [
+            "en"
+        ], 
+        "requires": [
+            "datatable-base-deprecated", 
+            "plugin", 
+            "recordset-sort"
+        ]
     }, 
     "datatype": {
-        "submodules": {
-            "datatype-date": {
-                "lang": [
-                    "ar", 
-                    "ar-JO", 
-                    "ca", 
-                    "ca-ES", 
-                    "da", 
-                    "da-DK", 
-                    "de", 
-                    "de-AT", 
-                    "de-DE", 
-                    "el", 
-                    "el-GR", 
-                    "en", 
-                    "en-AU", 
-                    "en-CA", 
-                    "en-GB", 
-                    "en-IE", 
-                    "en-IN", 
-                    "en-JO", 
-                    "en-MY", 
-                    "en-NZ", 
-                    "en-PH", 
-                    "en-SG", 
-                    "en-US", 
-                    "es", 
-                    "es-AR", 
-                    "es-BO", 
-                    "es-CL", 
-                    "es-CO", 
-                    "es-EC", 
-                    "es-ES", 
-                    "es-MX", 
-                    "es-PE", 
-                    "es-PY", 
-                    "es-US", 
-                    "es-UY", 
-                    "es-VE", 
-                    "fi", 
-                    "fi-FI", 
-                    "fr", 
-                    "fr-BE", 
-                    "fr-CA", 
-                    "fr-FR", 
-                    "hi", 
-                    "hi-IN", 
-                    "id", 
-                    "id-ID", 
-                    "it", 
-                    "it-IT", 
-                    "ja", 
-                    "ja-JP", 
-                    "ko", 
-                    "ko-KR", 
-                    "ms", 
-                    "ms-MY", 
-                    "nb", 
-                    "nb-NO", 
-                    "nl", 
-                    "nl-BE", 
-                    "nl-NL", 
-                    "pl", 
-                    "pl-PL", 
-                    "pt", 
-                    "pt-BR", 
-                    "ro", 
-                    "ro-RO", 
-                    "ru", 
-                    "ru-RU", 
-                    "sv", 
-                    "sv-SE", 
-                    "th", 
-                    "th-TH", 
-                    "tr", 
-                    "tr-TR", 
-                    "vi", 
-                    "vi-VN", 
-                    "zh-Hans", 
-                    "zh-Hans-CN", 
-                    "zh-Hant", 
-                    "zh-Hant-HK", 
-                    "zh-Hant-TW"
-                ], 
-                "requires": [
-                    "yui-base"
-                ], 
-                "supersedes": [
-                    "datatype-date-format"
-                ]
-            }, 
-            "datatype-number": {
-                "requires": [
-                    "yui-base"
-                ]
-            }, 
-            "datatype-xml": {
-                "requires": [
-                    "yui-base"
-                ]
-            }
-        }
+        "use": [
+            "datatype-number", 
+            "datatype-date", 
+            "datatype-xml"
+        ]
+    }, 
+    "datatype-date": {
+        "supersedes": [
+            "datatype-date-format"
+        ], 
+        "use": [
+            "datatype-date-parse", 
+            "datatype-date-format"
+        ]
     }, 
     "datatype-date-format": {
-        "path": "datatype/datatype-date-format-min.js"
+        "lang": [
+            "ar", 
+            "ar-JO", 
+            "ca", 
+            "ca-ES", 
+            "da", 
+            "da-DK", 
+            "de", 
+            "de-AT", 
+            "de-DE", 
+            "el", 
+            "el-GR", 
+            "en", 
+            "en-AU", 
+            "en-CA", 
+            "en-GB", 
+            "en-IE", 
+            "en-IN", 
+            "en-JO", 
+            "en-MY", 
+            "en-NZ", 
+            "en-PH", 
+            "en-SG", 
+            "en-US", 
+            "es", 
+            "es-AR", 
+            "es-BO", 
+            "es-CL", 
+            "es-CO", 
+            "es-EC", 
+            "es-ES", 
+            "es-MX", 
+            "es-PE", 
+            "es-PY", 
+            "es-US", 
+            "es-UY", 
+            "es-VE", 
+            "fi", 
+            "fi-FI", 
+            "fr", 
+            "fr-BE", 
+            "fr-CA", 
+            "fr-FR", 
+            "hi", 
+            "hi-IN", 
+            "id", 
+            "id-ID", 
+            "it", 
+            "it-IT", 
+            "ja", 
+            "ja-JP", 
+            "ko", 
+            "ko-KR", 
+            "ms", 
+            "ms-MY", 
+            "nb", 
+            "nb-NO", 
+            "nl", 
+            "nl-BE", 
+            "nl-NL", 
+            "pl", 
+            "pl-PL", 
+            "pt", 
+            "pt-BR", 
+            "ro", 
+            "ro-RO", 
+            "ru", 
+            "ru-RU", 
+            "sv", 
+            "sv-SE", 
+            "th", 
+            "th-TH", 
+            "tr", 
+            "tr-TR", 
+            "vi", 
+            "vi-VN", 
+            "zh-Hans", 
+            "zh-Hans-CN", 
+            "zh-Hant", 
+            "zh-Hant-HK", 
+            "zh-Hant-TW"
+        ]
     }, 
+    "datatype-date-math": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "datatype-date-parse": {}, 
+    "datatype-number": {
+        "use": [
+            "datatype-number-parse", 
+            "datatype-number-format"
+        ]
+    }, 
+    "datatype-number-format": {}, 
+    "datatype-number-parse": {}, 
+    "datatype-xml": {
+        "use": [
+            "datatype-xml-parse", 
+            "datatype-xml-format"
+        ]
+    }, 
+    "datatype-xml-format": {}, 
+    "datatype-xml-parse": {}, 
     "dd": {
-        "plugins": {
-            "dd-drop-plugin": {
-                "requires": [
-                    "dd-drop"
-                ]
-            }, 
-            "dd-gestures": {
-                "condition": {
-                    "test": function(Y) {
-    return (Y.config.win && ('ontouchstart' in Y.config.win && !Y.UA.chrome));
+        "use": [
+            "dd-ddm-base", 
+            "dd-ddm", 
+            "dd-ddm-drop", 
+            "dd-drag", 
+            "dd-proxy", 
+            "dd-constrain", 
+            "dd-drop", 
+            "dd-scroll", 
+            "dd-delegate"
+        ]
+    }, 
+    "dd-constrain": {
+        "requires": [
+            "dd-drag"
+        ]
+    }, 
+    "dd-ddm": {
+        "requires": [
+            "dd-ddm-base", 
+            "event-resize"
+        ]
+    }, 
+    "dd-ddm-base": {
+        "requires": [
+            "node", 
+            "base", 
+            "yui-throttle", 
+            "classnamemanager"
+        ]
+    }, 
+    "dd-ddm-drop": {
+        "requires": [
+            "dd-ddm"
+        ]
+    }, 
+    "dd-delegate": {
+        "requires": [
+            "dd-drag", 
+            "dd-drop-plugin", 
+            "event-mouseenter"
+        ]
+    }, 
+    "dd-drag": {
+        "requires": [
+            "dd-ddm-base"
+        ]
+    }, 
+    "dd-drop": {
+        "requires": [
+            "dd-drag", 
+            "dd-ddm-drop"
+        ]
+    }, 
+    "dd-drop-plugin": {
+        "requires": [
+            "dd-drop"
+        ]
+    }, 
+    "dd-gestures": {
+        "condition": {
+            "name": "dd-gestures", 
+            "test": function(Y) {
+    return ((Y.config.win && ("ontouchstart" in Y.config.win)) && !(Y.UA.chrome && Y.UA.chrome < 6));
 }, 
-                    "trigger": "dd-drag"
-                }, 
-                "requires": [
-                    "dd-drag", 
-                    "event-move"
-                ]
-            }, 
-            "dd-plugin": {
-                "optional": [
-                    "dd-constrain", 
-                    "dd-proxy"
-                ], 
-                "requires": [
-                    "dd-drag"
-                ]
-            }
+            "trigger": "dd-drag"
         }, 
-        "submodules": {
-            "dd-constrain": {
-                "requires": [
-                    "dd-drag"
-                ]
-            }, 
-            "dd-ddm": {
-                "requires": [
-                    "dd-ddm-base", 
-                    "event-resize"
-                ]
-            }, 
-            "dd-ddm-base": {
-                "requires": [
-                    "node", 
-                    "base", 
-                    "yui-throttle", 
-                    "classnamemanager"
-                ]
-            }, 
-            "dd-ddm-drop": {
-                "requires": [
-                    "dd-ddm"
-                ]
-            }, 
-            "dd-delegate": {
-                "requires": [
-                    "dd-drag", 
-                    "dd-drop-plugin", 
-                    "event-mouseenter"
-                ]
-            }, 
-            "dd-drag": {
-                "requires": [
-                    "dd-ddm-base"
-                ]
-            }, 
-            "dd-drop": {
-                "requires": [
-                    "dd-ddm-drop"
-                ]
-            }, 
-            "dd-proxy": {
-                "requires": [
-                    "dd-drag"
-                ]
-            }, 
-            "dd-scroll": {
-                "requires": [
-                    "dd-drag"
-                ]
-            }
-        }
+        "requires": [
+            "dd-drag", 
+            "event-synthetic", 
+            "event-gestures"
+        ]
+    }, 
+    "dd-plugin": {
+        "optional": [
+            "dd-constrain", 
+            "dd-proxy"
+        ], 
+        "requires": [
+            "dd-drag"
+        ]
+    }, 
+    "dd-proxy": {
+        "requires": [
+            "dd-drag"
+        ]
+    }, 
+    "dd-scroll": {
+        "requires": [
+            "dd-drag"
+        ]
     }, 
     "dial": {
         "lang": [
@@ -2948,21 +3652,53 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "dd-drag", 
             "substitute", 
             "event-mouseenter", 
+            "event-move", 
+            "event-key", 
             "transition", 
             "intl"
         ], 
         "skinnable": true
     }, 
     "dom": {
-        "plugins": {
-            "dom-deprecated": {
-                "requires": [
-                    "dom-base"
-                ]
-            }, 
-            "dom-style-ie": {
-                "condition": {
-                    "test": function (Y) {
+        "use": [
+            "dom-base", 
+            "dom-screen", 
+            "dom-style", 
+            "selector-native", 
+            "selector"
+        ]
+    }, 
+    "dom-base": {
+        "requires": [
+            "dom-core"
+        ]
+    }, 
+    "dom-core": {
+        "requires": [
+            "oop", 
+            "features"
+        ]
+    }, 
+    "dom-deprecated": {
+        "requires": [
+            "dom-base"
+        ]
+    }, 
+    "dom-screen": {
+        "requires": [
+            "dom-base", 
+            "dom-style"
+        ]
+    }, 
+    "dom-style": {
+        "requires": [
+            "dom-base"
+        ]
+    }, 
+    "dom-style-ie": {
+        "condition": {
+            "name": "dom-style-ie", 
+            "test": function (Y) {
 
     var testFeature = Y.Features.test,
         addFeature = Y.Features.add,
@@ -2988,54 +3724,11 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
 
     return ret;
 }, 
-                    "trigger": "dom-style"
-                }, 
-                "requires": [
-                    "dom-style"
-                ]
-            }, 
-            "selector-css3": {
-                "requires": [
-                    "selector-css2"
-                ]
-            }
+            "trigger": "dom-style"
         }, 
         "requires": [
-            "oop"
-        ], 
-        "submodules": {
-            "dom-base": {
-                "requires": [
-                    "oop"
-                ]
-            }, 
-            "dom-screen": {
-                "requires": [
-                    "dom-base", 
-                    "dom-style"
-                ]
-            }, 
-            "dom-style": {
-                "requires": [
-                    "dom-base"
-                ]
-            }, 
-            "selector": {
-                "requires": [
-                    "dom-base"
-                ]
-            }, 
-            "selector-css2": {
-                "requires": [
-                    "selector-native"
-                ]
-            }, 
-            "selector-native": {
-                "requires": [
-                    "dom-base"
-                ]
-            }
-        }
+            "dom-style"
+        ]
     }, 
     "dump": {
         "requires": [
@@ -3043,171 +3736,220 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         ]
     }, 
     "editor": {
-        "submodules": {
-            "createlink-base": {
-                "requires": [
-                    "editor-base"
-                ]
-            }, 
-            "editor-base": {
-                "requires": [
-                    "base", 
-                    "frame", 
-                    "node", 
-                    "exec-command", 
-                    "selection"
-                ]
-            }, 
-            "editor-bidi": {
-                "requires": [
-                    "editor-base"
-                ]
-            }, 
-            "editor-br": {
-                "requires": [
-                    "node"
-                ]
-            }, 
-            "editor-lists": {
-                "requires": [
-                    "editor-base"
-                ]
-            }, 
-            "editor-para": {
-                "requires": [
-                    "node"
-                ]
-            }, 
-            "exec-command": {
-                "requires": [
-                    "frame"
-                ]
-            }, 
-            "frame": {
-                "requires": [
-                    "base", 
-                    "node", 
-                    "selector-css3", 
-                    "substitute"
-                ]
-            }, 
-            "selection": {
-                "requires": [
-                    "node"
-                ]
-            }
-        }
+        "use": [
+            "frame", 
+            "editor-selection", 
+            "exec-command", 
+            "editor-base", 
+            "editor-para", 
+            "editor-br", 
+            "editor-bidi", 
+            "editor-tab", 
+            "createlink-base"
+        ]
     }, 
-    "escape": {}, 
+    "editor-base": {
+        "requires": [
+            "base", 
+            "frame", 
+            "node", 
+            "exec-command", 
+            "editor-selection"
+        ]
+    }, 
+    "editor-bidi": {
+        "requires": [
+            "editor-base"
+        ]
+    }, 
+    "editor-br": {
+        "requires": [
+            "editor-base"
+        ]
+    }, 
+    "editor-lists": {
+        "requires": [
+            "editor-base"
+        ]
+    }, 
+    "editor-para": {
+        "requires": [
+            "editor-para-base"
+        ]
+    }, 
+    "editor-para-base": {
+        "requires": [
+            "editor-base"
+        ]
+    }, 
+    "editor-para-ie": {
+        "condition": {
+            "name": "editor-para-ie", 
+            "trigger": "editor-para", 
+            "ua": "ie", 
+            "when": "instead"
+        }, 
+        "requires": [
+            "editor-para-base"
+        ]
+    }, 
+    "editor-selection": {
+        "requires": [
+            "node"
+        ]
+    }, 
+    "editor-tab": {
+        "requires": [
+            "editor-base"
+        ]
+    }, 
+    "escape": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
     "event": {
-        "after": "node-base", 
-        "plugins": {
-            "event-base-ie": {
-                "after": [
-                    "event-base"
-                ], 
-                "condition": {
-                    "test": function(Y) {
+        "after": [
+            "node-base"
+        ], 
+        "use": [
+            "event-base", 
+            "event-delegate", 
+            "event-synthetic", 
+            "event-mousewheel", 
+            "event-mouseenter", 
+            "event-key", 
+            "event-focus", 
+            "event-resize", 
+            "event-hover", 
+            "event-outside", 
+            "event-touch", 
+            "event-move", 
+            "event-flick", 
+            "event-valuechange"
+        ]
+    }, 
+    "event-base": {
+        "after": [
+            "node-base"
+        ], 
+        "requires": [
+            "event-custom-base"
+        ]
+    }, 
+    "event-base-ie": {
+        "after": [
+            "event-base"
+        ], 
+        "condition": {
+            "name": "event-base-ie", 
+            "test": function(Y) {
     var imp = Y.config.doc && Y.config.doc.implementation;
     return (imp && (!imp.hasFeature('Events', '2.0')));
 }, 
-                    "trigger": "node-base"
-                }, 
-                "requires": [
-                    "node-base"
-                ]
-            }, 
-            "event-touch": {
-                "requires": [
-                    "node-base"
-                ]
-            }
+            "trigger": "node-base"
         }, 
-        "submodules": {
-            "event-base": {
-                "after": "node-base", 
-                "requires": [
-                    "event-custom-base"
-                ]
-            }, 
-            "event-delegate": {
-                "requires": [
-                    "node-base"
-                ]
-            }, 
-            "event-focus": {
-                "requires": [
-                    "event-synthetic"
-                ]
-            }, 
-            "event-hover": {
-                "requires": [
-                    "event-synthetic"
-                ]
-            }, 
-            "event-key": {
-                "requires": [
-                    "event-synthetic"
-                ]
-            }, 
-            "event-mouseenter": {
-                "requires": [
-                    "event-synthetic"
-                ]
-            }, 
-            "event-mousewheel": {
-                "requires": [
-                    "event-synthetic"
-                ]
-            }, 
-            "event-resize": {
-                "requires": [
-                    "event-synthetic"
-                ]
-            }, 
-            "event-synthetic": {
-                "requires": [
-                    "node-base", 
-                    "event-custom-complex"
-                ]
-            }
-        }
+        "requires": [
+            "node-base"
+        ]
+    }, 
+    "event-contextmenu": {
+        "requires": [
+            "event-synthetic", 
+            "dom-screen"
+        ]
     }, 
     "event-custom": {
-        "submodules": {
-            "event-custom-base": {
-                "requires": [
-                    "oop"
-                ]
-            }, 
-            "event-custom-complex": {
-                "requires": [
-                    "event-custom-base"
-                ]
-            }
-        }
+        "use": [
+            "event-custom-base", 
+            "event-custom-complex"
+        ]
+    }, 
+    "event-custom-base": {
+        "requires": [
+            "oop"
+        ]
+    }, 
+    "event-custom-complex": {
+        "requires": [
+            "event-custom-base"
+        ]
+    }, 
+    "event-delegate": {
+        "requires": [
+            "node-base"
+        ]
+    }, 
+    "event-flick": {
+        "requires": [
+            "node-base", 
+            "event-touch", 
+            "event-synthetic"
+        ]
+    }, 
+    "event-focus": {
+        "requires": [
+            "event-synthetic"
+        ]
     }, 
     "event-gestures": {
-        "submodules": {
-            "event-flick": {
-                "requires": [
-                    "node-base", 
-                    "event-touch", 
-                    "event-synthetic"
-                ]
-            }, 
-            "event-move": {
-                "requires": [
-                    "node-base", 
-                    "event-touch", 
-                    "event-synthetic"
-                ]
-            }
-        }
+        "use": [
+            "event-flick", 
+            "event-move"
+        ]
+    }, 
+    "event-hover": {
+        "requires": [
+            "event-mouseenter"
+        ]
+    }, 
+    "event-key": {
+        "requires": [
+            "event-synthetic"
+        ]
+    }, 
+    "event-mouseenter": {
+        "requires": [
+            "event-synthetic"
+        ]
+    }, 
+    "event-mousewheel": {
+        "requires": [
+            "node-base"
+        ]
+    }, 
+    "event-move": {
+        "requires": [
+            "node-base", 
+            "event-touch", 
+            "event-synthetic"
+        ]
+    }, 
+    "event-outside": {
+        "requires": [
+            "event-synthetic"
+        ]
+    }, 
+    "event-resize": {
+        "requires": [
+            "node-base", 
+            "event-synthetic"
+        ]
     }, 
     "event-simulate": {
         "requires": [
             "event-base"
+        ]
+    }, 
+    "event-synthetic": {
+        "requires": [
+            "node-base", 
+            "event-custom-complex"
+        ]
+    }, 
+    "event-touch": {
+        "requires": [
+            "node-base"
         ]
     }, 
     "event-valuechange": {
@@ -3216,75 +3958,221 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "event-synthetic"
         ]
     }, 
-    "highlight": {
-        "submodules": {
-            "highlight-accentfold": {
-                "requires": [
-                    "highlight-base", 
-                    "text-accentfold"
-                ]
-            }, 
-            "highlight-base": {
-                "requires": [
-                    "array-extras", 
-                    "escape", 
-                    "text-wordbreak"
-                ]
-            }
+    "exec-command": {
+        "requires": [
+            "frame"
+        ]
+    }, 
+    "features": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "file": {
+        "requires": [
+            "file-flash", 
+            "file-html5"
+        ]
+    }, 
+    "file-flash": {
+        "requires": [
+            "base"
+        ]
+    }, 
+    "file-html5": {
+        "requires": [
+            "base"
+        ]
+    }, 
+    "frame": {
+        "requires": [
+            "base", 
+            "node", 
+            "selector-css3", 
+            "substitute", 
+            "yui-throttle"
+        ]
+    }, 
+    "get": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "graphics": {
+        "requires": [
+            "node", 
+            "event-custom", 
+            "pluginhost", 
+            "matrix"
+        ]
+    }, 
+    "graphics-canvas": {
+        "condition": {
+            "name": "graphics-canvas", 
+            "test": function(Y) {
+    var DOCUMENT = Y.config.doc,
+        useCanvas = Y.config.defaultGraphicEngine && Y.config.defaultGraphicEngine == "canvas",
+		canvas = DOCUMENT && DOCUMENT.createElement("canvas"),
+        svg = (DOCUMENT && DOCUMENT.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1"));
+    return (!svg || useCanvas) && (canvas && canvas.getContext && canvas.getContext("2d"));
+}, 
+            "trigger": "graphics"
+        }, 
+        "requires": [
+            "graphics"
+        ]
+    }, 
+    "graphics-canvas-default": {
+        "condition": {
+            "name": "graphics-canvas-default", 
+            "test": function(Y) {
+    var DOCUMENT = Y.config.doc,
+        useCanvas = Y.config.defaultGraphicEngine && Y.config.defaultGraphicEngine == "canvas",
+		canvas = DOCUMENT && DOCUMENT.createElement("canvas"),
+        svg = (DOCUMENT && DOCUMENT.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1"));
+    return (!svg || useCanvas) && (canvas && canvas.getContext && canvas.getContext("2d"));
+}, 
+            "trigger": "graphics"
         }
     }, 
+    "graphics-svg": {
+        "condition": {
+            "name": "graphics-svg", 
+            "test": function(Y) {
+    var DOCUMENT = Y.config.doc,
+        useSVG = !Y.config.defaultGraphicEngine || Y.config.defaultGraphicEngine != "canvas",
+		canvas = DOCUMENT && DOCUMENT.createElement("canvas"),
+        svg = (DOCUMENT && DOCUMENT.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1"));
+    
+    return svg && (useSVG || !canvas);
+}, 
+            "trigger": "graphics"
+        }, 
+        "requires": [
+            "graphics"
+        ]
+    }, 
+    "graphics-svg-default": {
+        "condition": {
+            "name": "graphics-svg-default", 
+            "test": function(Y) {
+    var DOCUMENT = Y.config.doc,
+        useSVG = !Y.config.defaultGraphicEngine || Y.config.defaultGraphicEngine != "canvas",
+		canvas = DOCUMENT && DOCUMENT.createElement("canvas"),
+        svg = (DOCUMENT && DOCUMENT.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1"));
+    
+    return svg && (useSVG || !canvas);
+}, 
+            "trigger": "graphics"
+        }
+    }, 
+    "graphics-vml": {
+        "condition": {
+            "name": "graphics-vml", 
+            "test": function(Y) {
+    var DOCUMENT = Y.config.doc,
+		canvas = DOCUMENT && DOCUMENT.createElement("canvas");
+    return (DOCUMENT && !DOCUMENT.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") && (!canvas || !canvas.getContext || !canvas.getContext("2d")));
+}, 
+            "trigger": "graphics"
+        }, 
+        "requires": [
+            "graphics"
+        ]
+    }, 
+    "graphics-vml-default": {
+        "condition": {
+            "name": "graphics-vml-default", 
+            "test": function(Y) {
+    var DOCUMENT = Y.config.doc,
+		canvas = DOCUMENT && DOCUMENT.createElement("canvas");
+    return (DOCUMENT && !DOCUMENT.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") && (!canvas || !canvas.getContext || !canvas.getContext("2d")));
+}, 
+            "trigger": "graphics"
+        }
+    }, 
+    "handlebars": {
+        "use": [
+            "handlebars-compiler"
+        ]
+    }, 
+    "handlebars-base": {
+        "requires": [
+            "escape"
+        ]
+    }, 
+    "handlebars-compiler": {
+        "requires": [
+            "handlebars-base"
+        ]
+    }, 
+    "highlight": {
+        "use": [
+            "highlight-base", 
+            "highlight-accentfold"
+        ]
+    }, 
+    "highlight-accentfold": {
+        "requires": [
+            "highlight-base", 
+            "text-accentfold"
+        ]
+    }, 
+    "highlight-base": {
+        "requires": [
+            "array-extras", 
+            "classnamemanager", 
+            "escape", 
+            "text-wordbreak"
+        ]
+    }, 
     "history": {
-        "plugins": {
-            "history-hash-ie": {
-                "condition": {
-                    "test": function (Y) {
-    var docMode = Y.config.doc.documentMode;
+        "use": [
+            "history-base", 
+            "history-hash", 
+            "history-hash-ie", 
+            "history-html5"
+        ]
+    }, 
+    "history-base": {
+        "requires": [
+            "event-custom-complex"
+        ]
+    }, 
+    "history-hash": {
+        "after": [
+            "history-html5"
+        ], 
+        "requires": [
+            "event-synthetic", 
+            "history-base", 
+            "yui-later"
+        ]
+    }, 
+    "history-hash-ie": {
+        "condition": {
+            "name": "history-hash-ie", 
+            "test": function (Y) {
+    var docMode = Y.config.doc && Y.config.doc.documentMode;
 
     return Y.UA.ie && (!('onhashchange' in Y.config.win) ||
             !docMode || docMode < 8);
 }, 
-                    "trigger": "history-hash"
-                }, 
-                "requires": [
-                    "history-hash", 
-                    "node-base"
-                ]
-            }
+            "trigger": "history-hash"
         }, 
-        "submodules": {
-            "history-base": {
-                "after": [
-                    "history-deprecated"
-                ], 
-                "requires": [
-                    "event-custom-complex"
-                ]
-            }, 
-            "history-hash": {
-                "after": [
-                    "history-html5"
-                ], 
-                "requires": [
-                    "event-synthetic", 
-                    "history-base", 
-                    "yui-later"
-                ]
-            }, 
-            "history-html5": {
-                "optional": [
-                    "json"
-                ], 
-                "requires": [
-                    "event-base", 
-                    "history-base", 
-                    "node-base"
-                ]
-            }
-        }
-    }, 
-    "history-deprecated": {
         "requires": [
-            "node"
+            "history-hash", 
+            "node-base"
+        ]
+    }, 
+    "history-html5": {
+        "optional": [
+            "json"
+        ], 
+        "requires": [
+            "event-base", 
+            "history-base", 
+            "node-base"
         ]
     }, 
     "imageloader": {
@@ -3300,165 +4188,176 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "event-custom"
         ]
     }, 
+    "intl-base": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
     "io": {
-        "submodules": {
-            "io-base": {
-                "optional": [
-                    "querystring-stringify-simple"
-                ], 
-                "requires": [
-                    "event-custom-base"
-                ]
-            }, 
-            "io-form": {
-                "requires": [
-                    "io-base", 
-                    "node-base", 
-                    "node-style"
-                ]
-            }, 
-            "io-queue": {
-                "requires": [
-                    "io-base", 
-                    "queue-promote"
-                ]
-            }, 
-            "io-upload-iframe": {
-                "requires": [
-                    "io-base", 
-                    "node-base"
-                ]
-            }, 
-            "io-xdr": {
-                "requires": [
-                    "io-base", 
-                    "datatype-xml"
-                ]
-            }
-        }
+        "use": [
+            "io-base", 
+            "io-xdr", 
+            "io-form", 
+            "io-upload-iframe", 
+            "io-queue"
+        ]
+    }, 
+    "io-base": {
+        "requires": [
+            "event-custom-base", 
+            "querystring-stringify-simple"
+        ]
+    }, 
+    "io-form": {
+        "requires": [
+            "io-base", 
+            "node-base"
+        ]
+    }, 
+    "io-nodejs": {
+        "condition": {
+            "name": "io-nodejs", 
+            "trigger": "io-base", 
+            "ua": "nodejs"
+        }, 
+        "requires": [
+            "io-base"
+        ]
+    }, 
+    "io-queue": {
+        "requires": [
+            "io-base", 
+            "queue-promote"
+        ]
+    }, 
+    "io-upload-iframe": {
+        "requires": [
+            "io-base", 
+            "node-base"
+        ]
+    }, 
+    "io-xdr": {
+        "requires": [
+            "io-base", 
+            "datatype-xml-parse"
+        ]
     }, 
     "json": {
-        "submodules": {
-            "json-parse": {
-                "requires": [
-                    "yui-base"
-                ]
-            }, 
-            "json-stringify": {
-                "requires": [
-                    "yui-base"
-                ]
-            }
-        }
+        "use": [
+            "json-parse", 
+            "json-stringify"
+        ]
+    }, 
+    "json-parse": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "json-stringify": {
+        "requires": [
+            "yui-base"
+        ]
     }, 
     "jsonp": {
-        "plugins": {
-            "jsonp-url": {
-                "requires": [
-                    "jsonp"
-                ]
-            }
-        }, 
         "requires": [
             "get", 
             "oop"
         ]
     }, 
+    "jsonp-url": {
+        "requires": [
+            "jsonp"
+        ]
+    }, 
     "loader": {
-        "submodules": {
-            "loader-base": {
-                "requires": [
-                    "get"
-                ]
-            }, 
-            "loader-rollup": {
-                "requires": [
-                    "loader-base"
-                ]
-            }, 
-            "loader-yui3": {
-                "requires": [
-                    "loader-base"
-                ]
-            }
-        }
+        "use": [
+            "loader-base", 
+            "loader-rollup", 
+            "loader-yui3"
+        ]
+    }, 
+    "loader-base": {
+        "requires": [
+            "get", 
+            "features"
+        ]
+    }, 
+    "loader-rollup": {
+        "requires": [
+            "loader-base"
+        ]
+    }, 
+    "loader-yui3": {
+        "requires": [
+            "loader-base"
+        ]
+    }, 
+    "matrix": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "model": {
+        "requires": [
+            "base-build", 
+            "escape", 
+            "json-parse"
+        ]
+    }, 
+    "model-list": {
+        "requires": [
+            "array-extras", 
+            "array-invoke", 
+            "arraylist", 
+            "base-build", 
+            "escape", 
+            "json-parse", 
+            "model"
+        ]
     }, 
     "node": {
-        "plugins": {
-            "align-plugin": {
-                "requires": [
-                    "node-screen", 
-                    "node-pluginhost"
-                ]
-            }, 
-            "node-deprecated": {
-                "requires": [
-                    "node-base"
-                ]
-            }, 
-            "node-event-simulate": {
-                "requires": [
-                    "node-base", 
-                    "event-simulate"
-                ]
-            }, 
-            "node-load": {
-                "requires": [
-                    "node-base", 
-                    "io-base"
-                ]
-            }, 
-            "shim-plugin": {
-                "requires": [
-                    "node-style", 
-                    "node-pluginhost"
-                ]
-            }, 
-            "transition": {
-                "requires": [
-                    "transition-native", 
-                    "node-style"
-                ]
-            }, 
-            "transition-native": {
-                "requires": [
-                    "node-base"
-                ]
-            }
-        }, 
-        "submodules": {
-            "node-base": {
-                "requires": [
-                    "dom-base", 
-                    "selector-css2", 
-                    "event-base"
-                ]
-            }, 
-            "node-event-delegate": {
-                "requires": [
-                    "node-base", 
-                    "event-delegate"
-                ]
-            }, 
-            "node-pluginhost": {
-                "requires": [
-                    "node-base", 
-                    "pluginhost"
-                ]
-            }, 
-            "node-screen": {
-                "requires": [
-                    "dom-screen", 
-                    "node-base"
-                ]
-            }, 
-            "node-style": {
-                "requires": [
-                    "dom-style", 
-                    "node-base"
-                ]
-            }
-        }
+        "use": [
+            "node-base", 
+            "node-event-delegate", 
+            "node-pluginhost", 
+            "node-screen", 
+            "node-style"
+        ]
+    }, 
+    "node-base": {
+        "requires": [
+            "event-base", 
+            "node-core", 
+            "dom-base"
+        ]
+    }, 
+    "node-core": {
+        "requires": [
+            "dom-core", 
+            "selector"
+        ]
+    }, 
+    "node-deprecated": {
+        "requires": [
+            "node-base"
+        ]
+    }, 
+    "node-event-delegate": {
+        "requires": [
+            "node-base", 
+            "event-delegate"
+        ]
+    }, 
+    "node-event-html5": {
+        "requires": [
+            "node-base"
+        ]
+    }, 
+    "node-event-simulate": {
+        "requires": [
+            "node-base", 
+            "event-simulate"
+        ]
     }, 
     "node-flick": {
         "requires": [
@@ -3479,6 +4378,12 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "event-focus"
         ]
     }, 
+    "node-load": {
+        "requires": [
+            "node-base", 
+            "io-base"
+        ]
+    }, 
     "node-menunav": {
         "requires": [
             "node", 
@@ -3487,6 +4392,24 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "node-focusmanager"
         ], 
         "skinnable": true
+    }, 
+    "node-pluginhost": {
+        "requires": [
+            "node-base", 
+            "pluginhost"
+        ]
+    }, 
+    "node-screen": {
+        "requires": [
+            "dom-screen", 
+            "node-base"
+        ]
+    }, 
+    "node-style": {
+        "requires": [
+            "dom-style", 
+            "node-base"
+        ]
     }, 
     "oop": {
         "requires": [
@@ -3504,24 +4427,65 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         ], 
         "skinnable": true
     }, 
+    "panel": {
+        "requires": [
+            "widget", 
+            "widget-autohide", 
+            "widget-buttons", 
+            "widget-modality", 
+            "widget-position", 
+            "widget-position-align", 
+            "widget-position-constrain", 
+            "widget-stack", 
+            "widget-stdmod"
+        ], 
+        "skinnable": true
+    }, 
+    "parallel": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "pjax": {
+        "requires": [
+            "pjax-base", 
+            "io-base"
+        ]
+    }, 
+    "pjax-base": {
+        "requires": [
+            "classnamemanager", 
+            "node-event-delegate", 
+            "router"
+        ]
+    }, 
+    "pjax-plugin": {
+        "requires": [
+            "node-pluginhost", 
+            "pjax", 
+            "plugin"
+        ]
+    }, 
     "plugin": {
         "requires": [
             "base-base"
         ]
     }, 
     "pluginhost": {
-        "submodules": {
-            "pluginhost-base": {
-                "requires": [
-                    "yui-base"
-                ]
-            }, 
-            "pluginhost-config": {
-                "requires": [
-                    "pluginhost-base"
-                ]
-            }
-        }
+        "use": [
+            "pluginhost-base", 
+            "pluginhost-config"
+        ]
+    }, 
+    "pluginhost-base": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "pluginhost-config": {
+        "requires": [
+            "pluginhost-base"
+        ]
     }, 
     "profiler": {
         "requires": [
@@ -3529,28 +4493,28 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         ]
     }, 
     "querystring": {
-        "submodules": {
-            "querystring-parse": {
-                "requires": [
-                    "yui-base", 
-                    "array-extras"
-                ]
-            }, 
-            "querystring-stringify": {
-                "requires": [
-                    "yui-base"
-                ]
-            }
-        }
+        "use": [
+            "querystring-parse", 
+            "querystring-stringify"
+        ]
+    }, 
+    "querystring-parse": {
+        "requires": [
+            "yui-base", 
+            "array-extras"
+        ]
     }, 
     "querystring-parse-simple": {
-        "path": "querystring/querystring-parse-simple-min.js", 
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "querystring-stringify": {
         "requires": [
             "yui-base"
         ]
     }, 
     "querystring-stringify-simple": {
-        "path": "querystring/querystring-stringify-simple-min.js", 
         "requires": [
             "yui-base"
         ]
@@ -3560,150 +4524,219 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "yui-base"
         ]
     }, 
-    "queue-run": {
-        "path": "async-queue/async-queue-min.js", 
+    "range-slider": {
         "requires": [
-            "event-custom"
+            "slider-base", 
+            "slider-value-range", 
+            "clickable-rail"
         ]
     }, 
     "recordset": {
-        "submodules": {
-            "recordset-base": {
-                "requires": [
-                    "base", 
-                    "arraylist"
-                ]
-            }, 
-            "recordset-filter": {
-                "requires": [
-                    "recordset-base", 
-                    "array-extras", 
-                    "plugin"
-                ]
-            }, 
-            "recordset-indexer": {
-                "requires": [
-                    "recordset-base", 
-                    "plugin"
-                ]
-            }, 
-            "recordset-sort": {
-                "requires": [
-                    "arraysort", 
-                    "recordset-base", 
-                    "plugin"
-                ]
-            }
-        }
+        "use": [
+            "recordset-base", 
+            "recordset-sort", 
+            "recordset-filter", 
+            "recordset-indexer"
+        ]
+    }, 
+    "recordset-base": {
+        "requires": [
+            "base", 
+            "arraylist"
+        ]
+    }, 
+    "recordset-filter": {
+        "requires": [
+            "recordset-base", 
+            "array-extras", 
+            "plugin"
+        ]
+    }, 
+    "recordset-indexer": {
+        "requires": [
+            "recordset-base", 
+            "plugin"
+        ]
+    }, 
+    "recordset-sort": {
+        "requires": [
+            "arraysort", 
+            "recordset-base", 
+            "plugin"
+        ]
     }, 
     "resize": {
-        "submodules": {
-            "resize-base": {
-                "requires": [
-                    "widget", 
-                    "substitute", 
-                    "event", 
-                    "oop", 
-                    "dd-drag", 
-                    "dd-delegate", 
-                    "dd-drop"
-                ], 
-                "skinnable": true
-            }, 
-            "resize-constrain": {
-                "requires": [
-                    "plugin", 
-                    "resize-base"
-                ]
-            }, 
-            "resize-proxy": {
-                "requires": [
-                    "plugin", 
-                    "resize-base"
-                ]
-            }
-        }
+        "use": [
+            "resize-base", 
+            "resize-proxy", 
+            "resize-constrain"
+        ]
+    }, 
+    "resize-base": {
+        "requires": [
+            "base", 
+            "widget", 
+            "substitute", 
+            "event", 
+            "oop", 
+            "dd-drag", 
+            "dd-delegate", 
+            "dd-drop"
+        ], 
+        "skinnable": true
+    }, 
+    "resize-constrain": {
+        "requires": [
+            "plugin", 
+            "resize-base"
+        ]
+    }, 
+    "resize-plugin": {
+        "optional": [
+            "resize-constrain"
+        ], 
+        "requires": [
+            "resize-base", 
+            "plugin"
+        ]
+    }, 
+    "resize-proxy": {
+        "requires": [
+            "plugin", 
+            "resize-base"
+        ]
+    }, 
+    "rls": {
+        "requires": [
+            "get", 
+            "features"
+        ]
+    }, 
+    "router": {
+        "optional": [
+            "querystring-parse"
+        ], 
+        "requires": [
+            "array-extras", 
+            "base-build", 
+            "history"
+        ]
     }, 
     "scrollview": {
-        "plugins": {
-            "scrollview-base": {
-                "path": "scrollview/scrollview-base-min.js", 
-                "requires": [
-                    "widget", 
-                    "event-gestures", 
-                    "transition"
-                ], 
-                "skinnable": true
-            }, 
-            "scrollview-base-ie": {
-                "condition": {
-                    "trigger": "scrollview-base", 
-                    "ua": "ie"
-                }, 
-                "requires": [
-                    "scrollview-base"
-                ]
-            }, 
-            "scrollview-paginator": {
-                "path": "scrollview/scrollview-paginator-min.js", 
-                "requires": [
-                    "plugin"
-                ]
-            }, 
-            "scrollview-scrollbars": {
-                "path": "scrollview/scrollview-scrollbars-min.js", 
-                "requires": [
-                    "plugin"
-                ], 
-                "skinnable": true
-            }
-        }, 
         "requires": [
             "scrollview-base", 
             "scrollview-scrollbars"
         ]
     }, 
+    "scrollview-base": {
+        "requires": [
+            "widget", 
+            "event-gestures", 
+            "event-mousewheel", 
+            "transition"
+        ], 
+        "skinnable": true
+    }, 
+    "scrollview-base-ie": {
+        "condition": {
+            "name": "scrollview-base-ie", 
+            "trigger": "scrollview-base", 
+            "ua": "ie"
+        }, 
+        "requires": [
+            "scrollview-base"
+        ]
+    }, 
+    "scrollview-list": {
+        "requires": [
+            "plugin", 
+            "classnamemanager"
+        ], 
+        "skinnable": true
+    }, 
+    "scrollview-paginator": {
+        "requires": [
+            "plugin"
+        ]
+    }, 
+    "scrollview-scrollbars": {
+        "requires": [
+            "classnamemanager", 
+            "transition", 
+            "plugin"
+        ], 
+        "skinnable": true
+    }, 
+    "selector": {
+        "requires": [
+            "selector-native"
+        ]
+    }, 
+    "selector-css2": {
+        "condition": {
+            "name": "selector-css2", 
+            "test": function (Y) {
+    var DOCUMENT = Y.config.doc,
+        ret = DOCUMENT && !('querySelectorAll' in DOCUMENT);
+
+    return ret;
+}, 
+            "trigger": "selector"
+        }, 
+        "requires": [
+            "selector-native"
+        ]
+    }, 
+    "selector-css3": {
+        "requires": [
+            "selector-native", 
+            "selector-css2"
+        ]
+    }, 
+    "selector-native": {
+        "requires": [
+            "dom-base"
+        ]
+    }, 
+    "shim-plugin": {
+        "requires": [
+            "node-style", 
+            "node-pluginhost"
+        ]
+    }, 
     "slider": {
-        "submodules": {
-            "clickable-rail": {
-                "requires": [
-                    "slider-base"
-                ]
-            }, 
-            "range-slider": {
-                "requires": [
-                    "slider-base", 
-                    "slider-value-range", 
-                    "clickable-rail"
-                ]
-            }, 
-            "slider-base": {
-                "requires": [
-                    "widget", 
-                    "dd-constrain", 
-                    "substitute"
-                ], 
-                "skinnable": true
-            }, 
-            "slider-value-range": {
-                "requires": [
-                    "slider-base"
-                ]
-            }
-        }
+        "use": [
+            "slider-base", 
+            "slider-value-range", 
+            "clickable-rail", 
+            "range-slider"
+        ]
+    }, 
+    "slider-base": {
+        "requires": [
+            "widget", 
+            "dd-constrain", 
+            "substitute", 
+            "event-key"
+        ], 
+        "skinnable": true
+    }, 
+    "slider-value-range": {
+        "requires": [
+            "slider-base"
+        ]
     }, 
     "sortable": {
-        "plugins": {
-            "sortable-scroll": {
-                "requires": [
-                    "dd-scroll"
-                ]
-            }
-        }, 
         "requires": [
             "dd-delegate", 
             "dd-drop-plugin", 
             "dd-proxy"
+        ]
+    }, 
+    "sortable-scroll": {
+        "requires": [
+            "dd-scroll", 
+            "sortable"
         ]
     }, 
     "stylesheet": {
@@ -3714,31 +4747,25 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
     "substitute": {
         "optional": [
             "dump"
+        ], 
+        "requires": [
+            "yui-base"
         ]
     }, 
     "swf": {
         "requires": [
             "event-custom", 
             "node", 
-            "swfdetect"
+            "swfdetect", 
+            "escape"
         ]
     }, 
-    "swfdetect": {}, 
+    "swfdetect": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
     "tabview": {
-        "plugins": {
-            "tabview-base": {
-                "requires": [
-                    "node-event-delegate", 
-                    "classnamemanager", 
-                    "skin-sam-tabview"
-                ]
-            }, 
-            "tabview-plugin": {
-                "requires": [
-                    "tabview-base"
-                ]
-            }
-        }, 
         "requires": [
             "widget", 
             "widget-parent", 
@@ -3749,49 +4776,94 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
         ], 
         "skinnable": true
     }, 
+    "tabview-base": {
+        "requires": [
+            "node-event-delegate", 
+            "classnamemanager", 
+            "skin-sam-tabview"
+        ]
+    }, 
+    "tabview-plugin": {
+        "requires": [
+            "tabview-base"
+        ]
+    }, 
     "test": {
         "requires": [
+            "event-simulate", 
+            "event-custom", 
             "substitute", 
-            "node", 
-            "json", 
-            "event-simulate"
+            "json-stringify"
+        ], 
+        "skinnable": true
+    }, 
+    "test-console": {
+        "requires": [
+            "console-filters", 
+            "test"
         ], 
         "skinnable": true
     }, 
     "text": {
-        "submodules": {
-            "text-accentfold": {
-                "requires": [
-                    "array-extras", 
-                    "text-data-accentfold"
-                ]
-            }, 
-            "text-data-accentfold": {}, 
-            "text-data-wordbreak": {}, 
-            "text-wordbreak": {
-                "requires": [
-                    "array-extras", 
-                    "text-data-wordbreak"
-                ]
-            }
-        }
+        "use": [
+            "text-accentfold", 
+            "text-wordbreak"
+        ]
+    }, 
+    "text-accentfold": {
+        "requires": [
+            "array-extras", 
+            "text-data-accentfold"
+        ]
+    }, 
+    "text-data-accentfold": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "text-data-wordbreak": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "text-wordbreak": {
+        "requires": [
+            "array-extras", 
+            "text-data-wordbreak"
+        ]
     }, 
     "transition": {
-        "submodules": {
-            "transition-native": {
-                "requires": [
-                    "node-base"
-                ]
-            }, 
-            "transition-timer": {
-                "requires": [
-                    "transition-native", 
-                    "node-style"
-                ]
-            }
-        }
+        "requires": [
+            "node-style"
+        ]
+    }, 
+    "transition-timer": {
+        "condition": {
+            "name": "transition-timer", 
+            "test": function (Y) {
+    var DOCUMENT = Y.config.doc,
+        node = (DOCUMENT) ? DOCUMENT.documentElement: null,
+        ret = true;
+
+    if (node && node.style) {
+        ret = !('MozTransition' in node.style || 'WebkitTransition' in node.style);
+    } 
+
+    return ret;
+}, 
+            "trigger": "transition"
+        }, 
+        "requires": [
+            "transition"
+        ]
     }, 
     "uploader": {
+        "requires": [
+            "uploader-html5", 
+            "uploader-flash"
+        ]
+    }, 
+    "uploader-deprecated": {
         "requires": [
             "event-custom", 
             "node", 
@@ -3799,102 +4871,165 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "swf"
         ]
     }, 
+    "uploader-flash": {
+        "requires": [
+            "swf", 
+            "widget", 
+            "substitute", 
+            "base", 
+            "cssbutton", 
+            "node", 
+            "event-custom", 
+            "file-flash", 
+            "uploader-queue"
+        ]
+    }, 
+    "uploader-html5": {
+        "requires": [
+            "widget", 
+            "node-event-simulate", 
+            "substitute", 
+            "file-html5", 
+            "uploader-queue"
+        ]
+    }, 
+    "uploader-queue": {
+        "requires": [
+            "base"
+        ]
+    }, 
+    "view": {
+        "requires": [
+            "base-build", 
+            "node-event-delegate"
+        ]
+    }, 
+    "view-node-map": {
+        "requires": [
+            "view"
+        ]
+    }, 
     "widget": {
-        "plugins": {
-            "widget-base-ie": {
-                "condition": {
-                    "trigger": "widget-base", 
-                    "ua": "ie"
-                }, 
-                "requires": [
-                    "widget-base"
-                ]
-            }, 
-            "widget-child": {
-                "requires": [
-                    "base-build", 
-                    "widget"
-                ]
-            }, 
-            "widget-parent": {
-                "requires": [
-                    "base-build", 
-                    "arraylist", 
-                    "widget"
-                ]
-            }, 
-            "widget-position": {
-                "requires": [
-                    "base-build", 
-                    "node-screen", 
-                    "widget"
-                ]
-            }, 
-            "widget-position-align": {
-                "requires": [
-                    "widget-position"
-                ]
-            }, 
-            "widget-position-constrain": {
-                "requires": [
-                    "widget-position"
-                ]
-            }, 
-            "widget-stack": {
-                "requires": [
-                    "base-build", 
-                    "widget"
-                ], 
-                "skinnable": true
-            }, 
-            "widget-stdmod": {
-                "requires": [
-                    "base-build", 
-                    "widget"
-                ]
-            }
-        }, 
-        "skinnable": true, 
-        "submodules": {
-            "widget-base": {
-                "requires": [
-                    "attribute", 
-                    "event-focus", 
-                    "base-base", 
-                    "base-pluginhost", 
-                    "node-base", 
-                    "node-style", 
-                    "classnamemanager"
-                ]
-            }, 
-            "widget-htmlparser": {
-                "requires": [
-                    "widget-base"
-                ]
-            }, 
-            "widget-skin": {
-                "requires": [
-                    "widget-base"
-                ]
-            }, 
-            "widget-uievents": {
-                "requires": [
-                    "widget-base", 
-                    "node-event-delegate"
-                ]
-            }
-        }
+        "use": [
+            "widget-base", 
+            "widget-htmlparser", 
+            "widget-skin", 
+            "widget-uievents"
+        ]
     }, 
     "widget-anim": {
         "requires": [
-            "plugin", 
             "anim-base", 
+            "plugin", 
             "widget"
         ]
     }, 
-    "widget-locale": {
-        "path": "widget/widget-locale-min.js", 
+    "widget-autohide": {
         "requires": [
+            "base-build", 
+            "event-key", 
+            "event-outside", 
+            "widget"
+        ]
+    }, 
+    "widget-base": {
+        "requires": [
+            "attribute", 
+            "base-base", 
+            "base-pluginhost", 
+            "classnamemanager", 
+            "event-focus", 
+            "node-base", 
+            "node-style"
+        ], 
+        "skinnable": true
+    }, 
+    "widget-base-ie": {
+        "condition": {
+            "name": "widget-base-ie", 
+            "trigger": "widget-base", 
+            "ua": "ie"
+        }, 
+        "requires": [
+            "widget-base"
+        ]
+    }, 
+    "widget-buttons": {
+        "requires": [
+            "button-plugin", 
+            "cssbutton", 
+            "widget-stdmod"
+        ]
+    }, 
+    "widget-child": {
+        "requires": [
+            "base-build", 
+            "widget"
+        ]
+    }, 
+    "widget-htmlparser": {
+        "requires": [
+            "widget-base"
+        ]
+    }, 
+    "widget-locale": {
+        "requires": [
+            "widget-base"
+        ]
+    }, 
+    "widget-modality": {
+        "requires": [
+            "base-build", 
+            "event-outside", 
+            "widget"
+        ], 
+        "skinnable": true
+    }, 
+    "widget-parent": {
+        "requires": [
+            "arraylist", 
+            "base-build", 
+            "widget"
+        ]
+    }, 
+    "widget-position": {
+        "requires": [
+            "base-build", 
+            "node-screen", 
+            "widget"
+        ]
+    }, 
+    "widget-position-align": {
+        "requires": [
+            "widget-position"
+        ]
+    }, 
+    "widget-position-constrain": {
+        "requires": [
+            "widget-position"
+        ]
+    }, 
+    "widget-skin": {
+        "requires": [
+            "widget-base"
+        ]
+    }, 
+    "widget-stack": {
+        "requires": [
+            "base-build", 
+            "widget"
+        ], 
+        "skinnable": true
+    }, 
+    "widget-stdmod": {
+        "requires": [
+            "base-build", 
+            "widget"
+        ]
+    }, 
+    "widget-uievents": {
+        "requires": [
+            "node-event-delegate", 
             "widget-base"
         ]
     }, 
@@ -3904,55 +5039,30 @@ YUI.Env[Y.version].modules = YUI.Env[Y.version].modules || {
             "jsonp-url"
         ]
     }, 
-    "yui": {
-        "submodules": {
-            "features": {
-                "requires": [
-                    "yui-base"
-                ]
-            }, 
-            "get": {
-                "requires": [
-                    "yui-base"
-                ]
-            }, 
-            "intl-base": {
-                "requires": [
-                    "yui-base"
-                ]
-            }, 
-            "rls": {
-                "requires": [
-                    "get", 
-                    "features"
-                ]
-            }, 
-            "yui-base": {}, 
-            "yui-later": {
-                "requires": [
-                    "yui-base"
-                ]
-            }, 
-            "yui-log": {
-                "requires": [
-                    "yui-base"
-                ]
-            }, 
-            "yui-throttle": {
-                "requires": [
-                    "yui-base"
-                ]
-            }
-        }
+    "yui": {}, 
+    "yui-base": {}, 
+    "yui-later": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "yui-log": {
+        "requires": [
+            "yui-base"
+        ]
+    }, 
+    "yui-rls": {}, 
+    "yui-throttle": {
+        "requires": [
+            "yui-base"
+        ]
     }
 };
-YUI.Env[Y.version].md5 = 'faf08d27c01d7ab5575789a63b1e36fc';
+YUI.Env[Y.version].md5 = 'f5a3bc9bda2441a3b15fb52c567fc1f7';
 
 
-
-}, '3.3.0' ,{requires:['loader-base']});
-
+}, '3.5.0' ,{requires:['loader-base']});
 
 
-YUI.add('loader', function(Y){}, '3.3.0' ,{use:['loader-base', 'loader-rollup', 'loader-yui3' ]});
+YUI.add('loader', function(Y){}, '3.5.0' ,{use:['loader-base', 'loader-rollup', 'loader-yui3' ]});
 

@@ -6,10 +6,10 @@
 <head>
 	<title>Digitale Faust-Edition: ${title}</title>
 	<link rel="stylesheet" type="text/css" href="<@resources [
-        "yui-3.3.0/build/cssreset/reset-min.css",
-        "yui-3.3.0/build/cssgrids/grids-min.css",
-        "yui-3.3.0/build/cssfonts/fonts-min.css",
-        "yui-3.3.0/build/cssbase/base-min.css",
+        "yui3/build/cssreset/reset-min.css",
+        "yui3/build/cssgrids/grids-min.css",
+        "yui3/build/cssfonts/fonts-min.css",
+        "yui3/build/cssbase/base-min.css",
         "css/faust.css"
     ] />" />
     <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui.js"></script>

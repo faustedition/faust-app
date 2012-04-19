@@ -49,7 +49,7 @@ public class ComboResourceFinder extends Finder implements InitializingBean {
 		final File staticHome = environment.getRequiredProperty("static.home", File.class);
 
 		resolver = new TextResourceResolver();
-		FileBasedTextResourceCollection.register(resolver, "yui-3.3.0/", new File(staticHome, "yui3"), contextPath + "/static/yui3", Charset.forName("UTF-8"), 86400);
+		FileBasedTextResourceCollection.register(resolver, "yui3/", new File(staticHome, "yui3"), contextPath + "/static/yui3", Charset.forName("UTF-8"), 86400);
 		FileBasedTextResourceCollection.register(resolver, "css/", new File(staticHome, "css"), contextPath + "/static/css/", Charset.forName("UTF-8"), 0);
 		FileBasedTextResourceCollection.register(resolver, "js/", new File(staticHome, "js"), contextPath + "/static/js/", Charset.forName("UTF-8"), 0);
 	}

@@ -1,9 +1,8 @@
 /*
-Copyright (c) 2010, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.com/yui/license.html
-version: 3.3.0
-build: 3167
+YUI 3.5.0 (build 5089)
+Copyright 2012 Yahoo! Inc. All rights reserved.
+Licensed under the BSD License.
+http://yuilibrary.com/license/
 */
 YUI.add('tabview', function(Y) {
 
@@ -312,6 +311,10 @@ Y.Tab = Y.Base.create('tab', Y.Widget, [Y.WidgetChild], {
         return content;
     },
 
+    _defContentGetter: function(content) {
+        return this.get('panelNode').getContent();
+    },
+
     // find panel by ID mapping from label href
     _defPanelNodeValueFn: function() {
         var href = this.get('contentBox').get('href') || '',
@@ -352,7 +355,7 @@ Y.Tab = Y.Base.create('tab', Y.Widget, [Y.WidgetChild], {
 
         /**
          * @attribute label
-         * @type String
+         * @type HTML
          */
         label: { 
             setter: '_defLabelSetter',
@@ -361,11 +364,11 @@ Y.Tab = Y.Base.create('tab', Y.Widget, [Y.WidgetChild], {
 
         /**
          * @attribute content
-         * @type String
+         * @type HTML
          */
         content: {
             setter: '_defContentSetter',
-            validator: Lang.isString
+            getter: '_defContentGetter'
         },
 
         /**
@@ -401,4 +404,4 @@ Y.Tab = Y.Base.create('tab', Y.Widget, [Y.WidgetChild], {
 });
 
 
-}, '3.3.0' ,{requires:['substitute', 'node-pluginhost', 'node-focusmanager', 'tabview-base', 'widget', 'widget-parent', 'widget-child']});
+}, '3.5.0' ,{requires:['node-pluginhost', 'node-focusmanager', 'tabview-base', 'widget', 'widget-parent', 'widget-child']});

@@ -21,10 +21,6 @@ ACBase = Y.Base.create('autocomplete', Y.Base, [Y.AutoCompleteBase], {
     initializer: function () {
         this._bindUIACBase();
         this._syncUIACBase();
-    },
-
-    destructor: function () {
-        this._destructorACBase();
     }
 });
 
@@ -69,9 +65,10 @@ function setUpACInstance() {
 
     // Helper method that synchronously simulates a valueChange event on the
     // inputNode.
-    this.simulateInput = function (value) {
+    this.simulateInput = function (value, ac) {
+        ac || (ac = this.ac);
         this.inputNode.set('value', value);
-        Y.ValueChange._poll(this.inputNode, Y.stamp(this.inputNode));
+        ac._onInputValueChange({newVal: value});
     };
 }
 
@@ -88,9 +85,10 @@ function setUpACListInstance() {
 
     // Helper method that synchronously simulates a valueChange event on the
     // inputNode.
-    this.simulateInput = function (value) {
+    this.simulateInput = function (value, ac) {
+        ac || (ac = this.ac);
         this.inputNode.set('value', value);
-        Y.ValueChange._poll(this.inputNode, Y.stamp(this.inputNode));
+        ac._onInputValueChange({newVal: value});
     };
 }
 
@@ -142,6 +140,16 @@ baseSuite.add(new Y.Test.Case({
 
         ac = new ACBase({inputNode: '#ac'});
         Assert.areSame(this.inputNode, ac.get('inputNode'));
+    },
+
+    'destructor should detach events': function () {
+        var ac = new ACBase({inputNode: this.inputNode});
+        ac.destroy();
+
+        Assert.isUndefined(ac._acBaseEvents, '_acBaseEvents should be undefined');
+        Assert.isUndefined(ac._cache, '_cache should be undefined');
+        Assert.isUndefined(ac._inputNode, '_inputNode should be undefined');
+        Assert.isUndefined(ac._rawSource, '_rawSource should be undefined');
     }
 
     // Note: This test is temporarily commented out since it appears to cause
@@ -301,6 +309,21 @@ baseSuite.add(new Y.Test.Case({
         Assert.areSame('/ac?q=foo%20%26%20bar&a=aardvark', rt('foo & bar'));
     },
 
+    '`this` object in requestTemplate functions should be the AutoComplete instance': function () {
+        var ac    = this.ac,
+            calls = 0;
+
+        this.ac.set('requestTemplate', function () {
+            calls += 1;
+            Assert.areSame(ac, this);
+        });
+
+        this.ac.set('source', ['foo', 'bar']);
+        this.ac.sendRequest('foo');
+
+        Assert.areSame(1, calls);
+    },
+
     'resultFilters should accept a function, array of functions, string, array of strings, or null': function () {
         var filter = function () {};
 
@@ -326,6 +349,7 @@ baseSuite.add(new Y.Test.Case({
 
     'result filters should receive the query and an array of result objects as parameters': function () {
         var called = 0,
+            self   = this,
             filter = function (query, results) {
                 called += 1;
 
@@ -337,6 +361,8 @@ baseSuite.add(new Y.Test.Case({
                     raw    : 'foo&bar',
                     text   : 'foo&bar'
                 }, results[0]);
+
+                Assert.areSame(self.ac, this, '`this` object in filters should be the AutoComplete instance');
 
                 return results;
             };
@@ -359,6 +385,7 @@ baseSuite.add(new Y.Test.Case({
 
     'result formatters should receive the query and an array of result objects as parameters': function () {
         var called = 0,
+            self   = this,
             formatter = function (query, results) {
                 called += 1;
 
@@ -370,6 +397,8 @@ baseSuite.add(new Y.Test.Case({
                     raw    : 'foo&bar',
                     text   : 'foo&bar'
                 }, results[0]);
+
+                Assert.areSame(self.ac, this, '`this` object in formatters should be the AutoComplete instance');
 
                 return ['|foo|'];
             };
@@ -396,6 +425,7 @@ baseSuite.add(new Y.Test.Case({
 
     'result highlighters should receive the query and an array of result objects as parameters': function () {
         var called = 0,
+            self   = this,
             highlighter = function (query, results) {
                 called += 1;
 
@@ -407,6 +437,8 @@ baseSuite.add(new Y.Test.Case({
                     raw    : 'foo&bar',
                     text   : 'foo&bar'
                 }, results[0]);
+
+                Assert.areSame(self.ac, this, '`this` object in highlighters should be the AutoComplete instance');
 
                 return ['|foo|'];
             };
@@ -432,19 +464,35 @@ baseSuite.add(new Y.Test.Case({
     },
 
     'resultListLocator should locate results': function () {
+        var self = this;
+
         this.ac.set('resultListLocator', 'foo.bar');
         this.ac._parseResponse('foo', {results: {foo: {bar: ['foo']}}});
 
         Assert.areSame(1, this.ac.get('results').length, 'results array is empty');
         Assert.areSame('foo', this.ac.get('results')[0].text);
+
+        this.ac.set('resultListLocator', function () {
+            Assert.areSame(self.ac, this, '`this` object should be the AutoComplete instance');
+        });
+
+        this.ac._parseResponse('foo', {results: {foo: {bar: ['foo']}}});
     },
 
     'resultTextLocator should locate result text': function () {
+        var self = this;
+
         this.ac.set('resultTextLocator', 'foo.bar');
         this.ac._parseResponse('foo', {results: [{foo: {bar: 'foo'}}]});
 
         Assert.areSame(1, this.ac.get('results').length, 'results array is empty');
         Assert.areSame('foo', this.ac.get('results')[0].text);
+
+        this.ac.set('resultTextLocator', function () {
+            Assert.areSame(self.ac, this, '`this` object should be the AutoComplete instance');
+        });
+
+        this.ac._parseResponse('foo', {results: [{foo: {bar: 'foo'}}]});
     },
 
     '_parseResponse should preserve duplicates in text when using resultTextLocator': function () {
@@ -468,16 +516,25 @@ baseSuite.add(new Y.Test.Case({
         this.ac._parseResponse('90631', response);
     },
 
-    'value attribute should update the inputNode value when set via the API, and should not trigger a query event': function () {
+    // See the "Built-in Sources" test case below for source and sourceType
+    // tests.
+
+    'value attribute should update the inputNode value and query attribute when set via the API, but should not fire a query event': function () {
         this.ac.on('query', function () {
-            Assert.fail('query was triggered');
+            Assert.fail('query event was triggered');
         });
 
         this.ac.set('value', 'foo');
         Assert.areSame('foo', this.inputNode.get('value'));
+        Assert.areSame('foo', this.ac.get('query'));
 
         this.ac.set('value', 'bar');
         Assert.areSame('bar', this.inputNode.get('value'));
+        Assert.areSame('bar', this.ac.get('query'));
+
+        this.ac.set('value', '');
+        Assert.areSame('', this.inputNode.get('value'));
+        Assert.isNull(this.ac.get('query'));
     },
 
     // -- Generic setters and validators ---------------------------------------
@@ -518,6 +575,20 @@ baseSuite.add(new Y.Test.Case({
         this.simulateInput('');
 
         Assert.areSame(2, fired);
+    },
+
+    'clear event should fire when the value attribute is cleared via the API': function () {
+        var fired = 0;
+
+        this.ac.on('clear', function (e) {
+            fired += 1;
+            Assert.areSame('foo', e.prevVal);
+        });
+
+        this.simulateInput('foo');
+        this.ac.set('value', '');
+
+        Assert.areSame(1, fired);
     },
 
     'clear event should be preventable': function () {
@@ -589,6 +660,37 @@ baseSuite.add(new Y.Test.Case({
     }
 }));
 
+// -- Base: Methods ------------------------------------------------------------
+baseSuite.add(new Y.Test.Case({
+    name: 'Methods',
+
+    setUp: setUpACInstance,
+    tearDown: tearDownACInstance,
+
+    'sendRequest should provide a complete request object to source.sendRequest': function () {
+        var mockSource = Y.Mock();
+
+        // Create a mock DataSource-like source so we can test what gets passed
+        // to source.sendRequest().
+        Y.Mock.expect(mockSource, {
+            method: 'sendRequest',
+            args: [Y.Mock.Value(function (request) {
+                ObjectAssert.hasKeys(['query', 'request', 'callback'], request);
+                Assert.areSame('foo bar', request.query);
+                Assert.areSame('?q=foo%20bar&baz=quux', request.request);
+                Assert.isObject(request.callback);
+                Assert.isFunction(request.callback.success);
+            })]
+        });
+
+        this.ac.set('source', mockSource);
+        this.ac.set('requestTemplate', '?q={query}&baz=quux');
+        this.ac.sendRequest('foo bar');
+
+        Y.Mock.verify(mockSource);
+    }
+}));
+
 // -- Base: Built-in Sources ---------------------------------------------------
 baseSuite.add(new Y.Test.Case({
     name: 'Built-in sources',
@@ -599,6 +701,8 @@ baseSuite.add(new Y.Test.Case({
     // -- Behavior -------------------------------------------------------------
     'Array sources should return the full array regardless of query': function () {
         this.ac.set('source', ['foo', 'bar', 'baz']);
+
+        Assert.areSame('array', this.ac.get('source').type);
 
         this.ac.sendRequest('foo');
         ArrayAssert.itemsAreSame(['foo', 'bar', 'baz'], resultsToArray(this.ac.get('results')));
@@ -618,7 +722,7 @@ baseSuite.add(new Y.Test.Case({
         ArrayAssert.itemsAreSame(['foo', 'bar'], resultsToArray(this.ac.get('results')));
     },
 
-    'Function sources should work': function () {
+    'Function sources should support synchronous return values': function () {
         var realQuery;
 
         this.ac.set('source', function (query) {
@@ -626,12 +730,31 @@ baseSuite.add(new Y.Test.Case({
             return ['foo', 'bar', 'baz'];
         });
 
+        Assert.areSame('function', this.ac.get('source').type);
+
         realQuery = 'foo';
         this.ac.sendRequest(realQuery);
         ArrayAssert.itemsAreSame(['foo', 'bar', 'baz'], resultsToArray(this.ac.get('results')));
+    },
 
-        realQuery = 'bar';
+    'Function sources should support asynchronous return values': function () {
+        var realQuery;
+
+        this.ac.set('source', function (query, callback) {
+            Assert.areSame(realQuery, query);
+            setTimeout(function () {
+                callback(['foo', 'bar', 'baz']);
+            }, 10);
+        });
+
+        Assert.areSame('function', this.ac.get('source').type);
+
+        realQuery = 'foo';
         this.ac.sendRequest(realQuery);
+
+        this.wait(function () {
+            ArrayAssert.itemsAreSame(['foo', 'bar', 'baz'], resultsToArray(this.ac.get('results')));
+        }, 15);
     },
 
     'Object sources should work': function () {
@@ -639,6 +762,8 @@ baseSuite.add(new Y.Test.Case({
             foo: ['foo'],
             bar: ['bar']
         });
+
+        Assert.areSame('object', this.ac.get('source').type);
 
         this.ac.sendRequest('foo');
         ArrayAssert.itemsAreSame(['foo'], resultsToArray(this.ac.get('results')));
@@ -648,6 +773,14 @@ baseSuite.add(new Y.Test.Case({
 
         this.ac.sendRequest('baz');
         ArrayAssert.itemsAreSame([], resultsToArray(this.ac.get('results')));
+    },
+
+    'sourceType should override source type detection for built-in types': function () {
+        this.ac.set('source', ['foo', 'bar']);
+        Assert.areSame('array', this.ac.get('source').type);
+
+        this.ac.set('sourceType', 'object');
+        Assert.areSame('object', this.ac.get('source').type);
     }
 }));
 
@@ -658,24 +791,121 @@ baseSuite.add(new Y.Test.Case({
     setUp: setUpACInstance,
     tearDown: tearDownACInstance,
 
-    // -- Source setters -------------------------------------------------------
-    '_setSource() should accept a URL string': function () {
-        Assert.isFunction(this.ac._setSource('http://example.com/').sendRequest);
+    // -- Source types ---------------------------------------------------------
+    '<select> nodes should be turned into select source objects': function () {
+        var select = Y.Node.create('<select><option>foo</option><option>bar</option><option>baz</option></select>');
+        this.ac.set('source', select);
+        Assert.areSame('select', this.ac.get('source').type);
     },
 
-    '_setSource() should accept a YQL string': function () {
-        Assert.isFunction(this.ac._setSource('select * from foo where query="{query}"').sendRequest);
+    'A <select> result should be an object with convenient properties': function () {
+        var select = Y.Node.create('<select><option value="abc">foo &amp; bar</option><option>bar</option><option>baz</option></select>'),
+            result;
+
+        this.ac.set('source', select);
+        this.ac.sendRequest('foo');
+        result = this.ac.get('results')[0].raw;
+
+        ObjectAssert.areEqual({
+            html    : 'foo &amp; bar',
+            index   : 0,
+            node    : select.get('options').item(0),
+            selected: true,
+            text    : 'foo & bar',
+            value   : 'abc'
+        }, result);
     },
 
-    '_setSource() should accept a Y.JSONPRequest instance': function () {
-        Assert.isFunction(this.ac._setSource(new Y.JSONPRequest('http://example.com/')).sendRequest);
+    'XHR strings should be turned into IO source objects': function () {
+        // Absolute URL.
+        this.ac.set('source', 'http://example.com/');
+        Assert.areSame('io', this.ac.get('source').type);
+
+        this.ac.set('source', 'http://example.com/?q={query}');
+        Assert.areSame('io', this.ac.get('source').type);
+
+        // Relative URL.
+        this.ac.set('source', 'foo');
+        Assert.areSame('io', this.ac.get('source').type);
+
+        this.ac.set('source', 'foo?q={query}');
+        Assert.areSame('io', this.ac.get('source').type);
     },
+
+    // TODO: mock io requests
+
+    'JSONP strings should be turned into JSONP source objects': function () {
+        // Absolute URL.
+        this.ac.set('source', 'http://example.com/?callback={callback}');
+        Assert.areSame('jsonp', this.ac.get('source').type);
+
+        this.ac.set('source', 'http://example.com/?q={query}&callback={callback}');
+        Assert.areSame('jsonp', this.ac.get('source').type);
+
+        // Relative URL.
+        this.ac.set('source', 'foo?callback={callback}');
+        Assert.areSame('jsonp', this.ac.get('source').type);
+
+        this.ac.set('source', 'foo?q={query}&callback={callback}');
+        Assert.areSame('jsonp', this.ac.get('source').type);
+    },
+
+    'Y.JSONPRequest instances should be turned into JSONP source objects': function () {
+        this.ac.set('source', new Y.JSONPRequest('http://example.com/'));
+        Assert.areSame('jsonp', this.ac.get('source').type);
+    },
+
+    // TODO: mock JSONP requests
+
+    'YQL strings should be turned into YQL source objects': function () {
+        this.ac.set('source', 'select * from search.suggest where q="{query}"');
+        Assert.areSame('yql', this.ac.get('source').type);
+
+        this.ac.set('source', 'select * from search.suggest where q="{request}"');
+        Assert.areSame('yql', this.ac.get('source').type);
+
+        this.ac.set('source', 'set foo="bar" on search; select * from search.suggest where q="{query}"');
+        Assert.areSame('yql', this.ac.get('source').type);
+
+        this.ac.set('source', 'use "http://example.com/foo.env"; select * from search.suggest where q="{query}"');
+        Assert.areSame('yql', this.ac.get('source').type);
+    },
+
+    // TODO: mock YQL requests
 
     // -- Other stuff ----------------------------------------------------------
+    'sourceType should override source type detection for extra types': function () {
+        this.ac.set('source', 'moo');
+        Assert.areSame('io', this.ac.get('source').type);
+
+        this.ac.set('sourceType', 'jsonp');
+        Assert.areSame('jsonp', this.ac.get('source').type);
+    },
+
     '_jsonpFormatter should correctly format URLs both with and without a requestTemplate set': function () {
         Assert.areSame('foo?q=bar%20baz&cb=callback', this.ac._jsonpFormatter('foo?q={query}&cb={callback}', 'callback', 'bar baz'));
+
         this.ac.set('requestTemplate', '?q={query}&cb={callback}');
         Assert.areSame('foo?q=bar%20baz&cb=callback', this.ac._jsonpFormatter('foo', 'callback', 'bar baz'));
+
+        this.ac.set('requestTemplate', '&cb={callback}');
+        Assert.areSame('foo?q=bar%20baz&cb=callback', this.ac._jsonpFormatter('foo?q={query}', 'callback', 'bar baz'));
+    },
+
+    'requestTemplate should be appended to XHR source URLs': function () {
+        var query  = 'monkey pants',
+            source = '/foo?q={query}';
+
+        this.ac.set('source', source);
+        this.ac.set('requestTemplate', '&bar=baz');
+
+        Assert.areSame(
+            '/foo?q=' + encodeURIComponent(query) + '&bar=baz',
+            this.ac._getXHRUrl(source, {
+                query  : query,
+                request: this.ac.get('requestTemplate').call(this.ac, query)
+            })
+        );
     }
 }));
 
@@ -816,6 +1046,74 @@ filtersSuite.add(new Y.Test.Case({
         ArrayAssert.itemsAreSame(
             ['FÓÓ', 'FÖÖ', 'FOO'],
             resultsToArray(Filters.startsWithFold('foo', arrayToResults(['FÓÓ', 'FÖÖ', 'FOO', 'BARFOO'])))
+        );
+    },
+
+    // -- subWordMatch() -------------------------------------------------------
+    'subWordMatch() should match results where all words in the query - ignoring whitespace and punctuation - occur partially in the text': function () {
+        ArrayAssert.isEmpty(
+            Filters.subWordMatch('foo bar baz', arrayToResults(['foo', 'bar', 'baz']))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['foo bar baz', 'foobar baz'],
+            resultsToArray(Filters.subWordMatch('baz foo bar', arrayToResults(['foo', 'bar', 'foo bar baz', 'foobar baz'])))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['John Doe'],
+            resultsToArray(Filters.subWordMatch('John', arrayToResults(['John Doe', 'Jon Doe', 'Richard Roe'])))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['John Doe', 'Jon Doe'],
+            resultsToArray(Filters.subWordMatch('J. Doe', arrayToResults(['John Doe', 'Jon Doe', 'Richard Roe'])))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['John Doe', 'Jon Doe'],
+            resultsToArray(Filters.subWordMatch('D., Jo.', arrayToResults(['John Doe', 'Jon Doe', 'Richard Roe'])))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['John Doe', 'Jon Doe', 'Richard Roe [12345]'],
+            resultsToArray(Filters.subWordMatch('oe', arrayToResults(['John Doe', 'Jon Doe', 'Richard Roe [12345]', 'O.E.'])))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['Anne-Sophie'],
+            resultsToArray(Filters.subWordMatch('(Sophie-Ann.)', arrayToResults(['Anne-Sophie', 'Ann-Christine'])))
+        );
+    },
+
+    'subWordMatch() should be case-insensitive': function () {
+        ArrayAssert.itemsAreSame(
+            ['Foo', 'foo'],
+            resultsToArray(Filters.subWordMatch('foo', arrayToResults(['Foo', 'foo'])))
+        );
+    },
+
+    'subWordMatchCase() should be case-sensitive': function () {
+        ArrayAssert.itemsAreSame(
+            ['foo'],
+            resultsToArray(Filters.subWordMatchCase('foo', arrayToResults(['Foo', 'foo'])))
+        );
+    },
+
+    'subWordMatchFold() should match accent-folded characters': function () {
+        ArrayAssert.itemsAreSame(
+            [],
+            resultsToArray(Filters.subWordMatchFold('foobaz', arrayToResults(['fóóbar [12345]', '.fóó-baz!'])))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['fóó bar baz'],
+            resultsToArray(Filters.subWordMatchFold('baz foo bar', arrayToResults(['fóó', 'fóó bar baz'])))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['Anne-Sophie', 'Sophie, Anné'],
+            resultsToArray(Filters.subWordMatchFold('Anné S.', arrayToResults(['Anne-Sophie', 'Sophie, Anné', 'Ann Sophie'])))
         );
     },
 
@@ -999,6 +1297,57 @@ highlightSuite.add(new Y.Test.Case({
         );
     },
 
+    // -- subWordMatch() -------------------------------------------------------
+    'subWordMatch() should highlight partial words in the query': function () {
+        ArrayAssert.itemsAreSame(
+            ['foobar [12345]', '.foo-baz!'],
+            Hi.subWordMatch('foobaz', arrayToResults(['foobar [12345]', '.foo-baz!']))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['<b class="yui3-highlight">foo</b>', '<b class="yui3-highlight">foo</b> <b class="yui3-highlight">bar</b> <b class="yui3-highlight">baz</b>'],
+            Hi.subWordMatch('baz foo bar', arrayToResults(['foo', 'foo bar baz']))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['<b class="yui3-highlight">Anne</b>-<b class="yui3-highlight">S</b>ophie', '<b class="yui3-highlight">S</b>ophie, <b class="yui3-highlight">Anne</b>', 'Ann <b class="yui3-highlight">S</b>ophie'],
+            Hi.subWordMatch('Anne S.', arrayToResults(['Anne-Sophie', 'Sophie, Anne', 'Ann Sophie']))
+        );
+    },
+
+    'subWordMatch() should be case-insensitive': function () {
+        ArrayAssert.itemsAreSame(
+            ['<b class="yui3-highlight">Foo</b>', '<b class="yui3-highlight">foo</b>'],
+            Hi.subWordMatch('foo', arrayToResults(['Foo', 'foo']))
+        );
+    },
+
+    // -- subWordMatchCase() ---------------------------------------------------
+    'subWordMatchCase() should be case-sensitive': function () {
+        ArrayAssert.itemsAreSame(
+            ['Foo', '<b class="yui3-highlight">foo</b>'],
+            Hi.subWordMatchCase('foo', arrayToResults(['Foo', 'foo']))
+        );
+    },
+
+    // -- subWordMatchFold() ---------------------------------------------------
+    'subWordMatchFold() should match accent-folded characters': function () {
+        ArrayAssert.itemsAreSame(
+            ['fóóbar [12345]', '.fóó-baz!'],
+            Hi.subWordMatchFold('foobaz', arrayToResults(['fóóbar [12345]', '.fóó-baz!']))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['<b class="yui3-highlight">fóó</b>', '<b class="yui3-highlight">fóó</b> <b class="yui3-highlight">bar</b> <b class="yui3-highlight">baz</b>'],
+            Hi.subWordMatchFold('baz foo bar', arrayToResults(['fóó', 'fóó bar baz']))
+        );
+
+        ArrayAssert.itemsAreSame(
+            ['<b class="yui3-highlight">Anne</b>-<b class="yui3-highlight">S</b>ophie', '<b class="yui3-highlight">S</b>ophie, <b class="yui3-highlight">Anné</b>', 'Ann <b class="yui3-highlight">S</b>ophie'],
+            Hi.subWordMatchFold('Anné S.', arrayToResults(['Anne-Sophie', 'Sophie, Anné', 'Ann Sophie']))
+        );
+    },
+
     // -- wordMatch() ----------------------------------------------------------
     'wordMatch() should highlight complete words in the query': function () {
         ArrayAssert.itemsAreSame(
@@ -1097,7 +1446,6 @@ listSuite.add(new Y.Test.Case({
         Assert.areSame('list', this.inputNode.get('aria-autocomplete'));
         Assert.areSame('false', this.inputNode.get('aria-expanded'));
         Assert.areSame(this.ac.get('listNode').get('id'), this.inputNode.get('aria-owns'));
-        Assert.areSame('combobox', this.inputNode.get('role'));
 
         // Verify ARIA markup on the bounding box and list node.
         Assert.areSame('true', this.ac.get('boundingBox').get('aria-hidden'));
@@ -1270,17 +1618,17 @@ listSuite.add(new Y.Test.Case({
         });
 
         this.ac.set('activeItem', items.item(0));
-        this.inputNode.simulate(Y.UA.gecko ? 'keypress' : 'keydown', {keyCode: 9});
+        this.inputNode.simulate('keydown', {keyCode: 9});
         Assert.areSame(1, fired);
 
         this.ac.set('tabSelect', false);
         this.ac.set('activeItem', items.item(0));
-        this.inputNode.simulate(Y.UA.gecko ? 'keypress' : 'keydown', {keyCode: 9});
+        this.inputNode.simulate('keydown', {keyCode: 9});
         Assert.areSame(1, fired);
 
         this.ac.set('tabSelect', true);
         this.ac.set('activeItem', items.item(0));
-        this.inputNode.simulate(Y.UA.gecko ? 'keypress' : 'keydown', {keyCode: 9});
+        this.inputNode.simulate('keydown', {keyCode: 9});
         Assert.areSame(2, fired);
     },
 
