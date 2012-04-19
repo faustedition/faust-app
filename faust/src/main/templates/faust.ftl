@@ -12,7 +12,7 @@
         "yui3/build/cssbase/base-min.css",
         "css/faust.css"
     ] />" />
-    <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui.js"></script>
+    <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-min.js"></script>
     <script type="text/javascript">
         YUI.GlobalConfig = { debug: true, combine: true, comboBase: '${cp?js_string}/resources?', root: 'yui-3.3.0/build/' };
 		var Faust = { contextPath: "${cp}", FacsimileServer: "${facsimilieIIPUrl}" };
