@@ -9,12 +9,14 @@ import de.faustedition.genesis.GeneticRelationManager;
 import de.faustedition.genesis.MacrogeneticRelationManager;
 import de.faustedition.text.TextManager;
 import de.faustedition.transcript.TranscriptManager;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 
+@Component
 public class DataImport extends Runtime implements Runnable {
 
 	@Autowired
@@ -57,12 +59,13 @@ public class DataImport extends Runtime implements Runnable {
 		failed.addAll(documentManager.feedGraph());
 		failed.addAll(macrogeneticRelationManager.feedGraph());
 		failed.addAll(textManager.feedGraph());
+		//failed.addAll(textManager.feedDatabase());
 		geneticRelationManager.feedGraph();
 		
 
 		logger.info(String.format("Import finished in %.3f seconds", (System.currentTimeMillis() - startTime) / 1000.0f));
 		if (!failed.isEmpty()) {
-			logger.severe("Failed imports:\n" + Joiner.on("\n").join(failed));
+			logger.error("Failed imports:\n" + Joiner.on("\n").join(failed));
 		}
 	}
 }

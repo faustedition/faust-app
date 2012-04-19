@@ -1,39 +1,53 @@
 package de.faustedition.text;
 
 import com.google.common.base.Strings;
+import com.google.common.io.Closeables;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.tei.WhitespaceUtil;
 import de.faustedition.xml.*;
+import eu.interedition.text.Name;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
+import eu.interedition.text.xml.XML;
+import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.XMLTransformerModule;
+import eu.interedition.text.xml.module.*;
+import org.codehaus.stax2.XMLInputFactory2;
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.io.InputStream;
+import java.util.*;
 
 import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
+import static eu.interedition.text.TextConstants.TEI_NS;
 
 @Component
 public class TextManager extends Runtime implements Runnable {
+
+	private final XMLInputFactory2 xmlInputFactory = XML.createXMLInputFactory();
 
 	@Autowired
 	private Logger logger;
@@ -47,7 +61,70 @@ public class TextManager extends Runtime implements Runnable {
 	@Autowired
 	private XMLStorage xml;
 
+	@Autowired
+	private SessionFactory sessionFactory;
+
 	private SortedMap<FaustURI, String> tableOfContents;
+
+	@Transactional
+	public Set<FaustURI> feedDatabase() {
+		final SimpleXMLTransformerConfiguration conf = new SimpleXMLTransformerConfiguration();
+
+		final List<XMLTransformerModule> modules = conf.getModules();
+		modules.add(new LineElementXMLTransformerModule());
+		modules.add(new NotableCharacterXMLTransformerModule());
+		modules.add(new TextXMLTransformerModule());
+		modules.add(new DefaultAnnotationXMLTransformerModule(1000, true));
+		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
+		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
+
+		conf.addLineElement(new Name(TEI_NS, "div"));
+		conf.addLineElement(new Name(TEI_NS, "head"));
+		conf.addLineElement(new Name(TEI_NS, "sp"));
+		conf.addLineElement(new Name(TEI_NS, "stage"));
+		conf.addLineElement(new Name(TEI_NS, "speaker"));
+		conf.addLineElement(new Name(TEI_NS, "lg"));
+		conf.addLineElement(new Name(TEI_NS, "l"));
+		conf.addLineElement(new Name(TEI_NS, "p"));
+		conf.addLineElement(new Name(null, "line"));
+
+		conf.addContainerElement(new Name(TEI_NS, "text"));
+		conf.addContainerElement(new Name(TEI_NS, "div"));
+		conf.addContainerElement(new Name(TEI_NS, "lg"));
+		conf.addContainerElement(new Name(TEI_NS, "subst"));
+		conf.addContainerElement(new Name(TEI_NS, "choice"));
+
+		conf.exclude(new Name(TEI_NS, "teiHeader"));
+		conf.exclude(new Name(TEI_NS, "front"));
+		conf.exclude(new Name(TEI_NS, "fw"));
+		conf.exclude(new Name(TEI_NS, "app"));
+
+		conf.include(new Name(TEI_NS, "lem"));
+
+		final Session session = sessionFactory.getCurrentSession();
+		final XMLTransformer xmlTransformer = new XMLTransformer(sessionFactory, conf);
+
+		final Set<FaustURI> failed = new HashSet<FaustURI>();
+		logger.info("Importing texts");
+		for (FaustURI textSource : xml.iterate(new FaustURI(FaustAuthority.XML, "/text"))) {
+			InputStream xmlStream = null;
+			try {
+				logger.info("Importing text " + textSource);
+				xmlStream = xml.getInputSource(textSource).getByteStream();
+				final eu.interedition.text.Text xmlText = eu.interedition.text.Text.create(session, null, xmlInputFactory.createXMLStreamReader(xmlStream));
+				final eu.interedition.text.Text text = xmlTransformer.transform(xmlText);
+			} catch (IOException e) {
+				logger.error("I/O error while adding text " + textSource, e);
+				failed.add(textSource);
+			} catch (XMLStreamException e) {
+				logger.error("XML error while adding text " + textSource, e);
+				failed.add(textSource);
+			} finally {
+				Closeables.closeQuietly(xmlStream);
+			}
+		}
+		return failed;
+	}
 
 	public Set<FaustURI> feedGraph() {
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
