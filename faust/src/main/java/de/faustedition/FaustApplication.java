@@ -17,6 +17,7 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.Reference;
+import org.restlet.engine.application.Encoder;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Directory;
 import org.restlet.resource.Finder;
@@ -121,13 +122,18 @@ public class FaustApplication extends Application implements InitializingBean {
 				}
 			};
 			dummyAuthenticator.setNext(router);
+
 			return dummyAuthenticator;
 		} else {
 			final Authenticator authenticator = new ChallengeAuthenticator(getContext().createChildContext(), true,
 				HTTP_BASIC, "faustedition.net", ldapSecurityStore);
 			authenticator.setEnroler(ldapSecurityStore);
 			authenticator.setNext(router);
-			return authenticator;
+
+			final Encoder encoder = new Encoder(getContext());
+			encoder.setNext(authenticator);
+
+			return encoder;
 		}
 	}
 
