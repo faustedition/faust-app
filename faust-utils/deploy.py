@@ -7,7 +7,7 @@
 import os
 import sys
 from time import sleep
-from subprocess import check_call
+from subprocess import check_call, call
 
 SRC_DIR = '/mnt/data/src/app/'
 APP_DIR = '/mnt/data/'
@@ -21,7 +21,7 @@ def is_alive (name):
 	return reduce(logical_or, map(contains, psout))
 
 def pids (name):
-	return [int(l.split()[0]) for l in os.popen('ps xaww') if name in l.split()[4]]
+	return [l.split()[0] for l in os.popen('ps xaww') if name in l]
 
 print 'Pulling source...'
 os.chdir(SRC_DIR)
@@ -36,7 +36,9 @@ os.chdir('target')
 check_call(['cp', NAME + '-app' + '.zip', APP_DIR])
 
 print 'Stopping running application...'
-check_call(['killall', '-r', NAME + '-app'])
+app_pids = pids(NAME)
+if len(app_pids) > 0:
+	check_call(['kill', app_pids[0]])
 
 for i in range(20):
 	sleep(KILL_TIMEOUT / 20.0)
@@ -48,11 +50,12 @@ if is_alive(NAME):
 	sys.exit(1)
 
 print 'Making a backup...'
+os.chdir('/mnt/data')
 call(['rm', '-rf', 'app.bak3'])
 call(['mv', 'app.bak2', 'app.bak3'])
 call(['mv', 'app.bak1', 'app.bak2'])
 call(['mv', 'app.bak', 'app.bak1'])
-call_check(['mv', 'app', 'app.bak'])
+check_call(['mv', 'app', 'app.bak'])
 
 print 'Unzipping...'
 os.chdir(APP_DIR)
