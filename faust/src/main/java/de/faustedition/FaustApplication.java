@@ -4,6 +4,7 @@ import de.faustedition.collation.CollationFinder;
 import de.faustedition.db.TransactionFilter;
 import de.faustedition.document.ArchiveRouter;
 import de.faustedition.document.DocumentRouter;
+import de.faustedition.facsimile.FacsimileFinder;
 import de.faustedition.genesis.GeneticGraphRouter;
 import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.security.SecurityConstants;
@@ -66,6 +67,9 @@ public class FaustApplication extends Application implements InitializingBean {
 	@Autowired
 	private GoddagFinder goddagFinder;
 
+    @Autowired
+    private FacsimileFinder facsimileFinder;
+
 	@Autowired
 	private TextFinder textFinder;
 
@@ -94,17 +98,17 @@ public class FaustApplication extends Application implements InitializingBean {
 
 		router.setDefaultMatchingMode(Template.MODE_STARTS_WITH);
 
-		router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
-		router.attach("project/", templateFinder);
-		
 		router.attach("archive/", secured(transactional(archiveRouter)));
 		router.attach("collation/", secured(transactional(collationFinder)));
-		router.attach("demo/", secured(transactional(templateFinder)));
+        router.attach("demo/", secured(transactional(templateFinder)));
+        router.attach("document/", secured(transactional(documentRouter)));
+        router.attach("facsimile/", facsimileFinder);
 		router.attach("genesis/", secured(transactional(geneticGraphRouter)));
-		router.attach("document/", secured(transactional(documentRouter)));
 		router.attach("goddag/", secured(transactional(goddagFinder)));
-		router.attach("text/", secured(transactional(textFinder)));
-		router.attach("structure/", secured(transactional(structureFinder)));
+        router.attach("project/", templateFinder);
+        router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
+        router.attach("structure/", secured(transactional(structureFinder)));
+        router.attach("text/", secured(transactional(textFinder)));
 		router.attach("xml/", secured(xmlFinder));
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
