@@ -9,7 +9,6 @@ import com.google.common.collect.Sets;
 import de.faustedition.AbstractContextTest;
 import eu.interedition.text.*;
 import eu.interedition.text.Text;
-import eu.interedition.text.query.QueryCriteria;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,8 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import static eu.interedition.text.query.QueryCriteria.annotationName;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -30,7 +31,7 @@ public class SpeakerList extends AbstractContextTest {
 	@Test
 	public void listVerses() throws IOException {
 		Multimap<eu.interedition.text.Text, Annotation> speakers = HashMultimap.create();
-		for (Annotation annotation : QueryCriteria.annotationName(new Name(TextConstants.TEI_NS, "speaker")).iterate(sessionFactory.getCurrentSession())) {
+		for (Annotation annotation : annotationName(new Name(TextConstants.TEI_NS, "speaker")).iterate(sessionFactory.getCurrentSession())) {
 			speakers.put(annotation.getTarget().getText(), annotation);
 		}
 
