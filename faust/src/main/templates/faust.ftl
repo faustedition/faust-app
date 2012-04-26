@@ -2,22 +2,23 @@
 
 <#macro page title css="" header="" layout="">
 <!DOCTYPE html>
-<html>
+<html class="yui3-loading">
 <head>
 	<title>Digitale Faust-Edition: ${title}</title>
 	<link rel="stylesheet" type="text/css" href="<@resources [
         "yui3/build/cssreset/reset-min.css",
         "yui3/build/cssgrids/grids-min.css",
         "yui3/build/cssfonts/fonts-min.css",
-        "yui3/build/cssbase/base-min.css",
-        "css/faust.css"
+        "yui3/build/cssbase/base-min.css"
     ] />" />
-    <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css"/>
+
     <script type="text/javascript">
-        YUI.GlobalConfig = { debug: true, combine: true, comboBase: '${cp?js_string}/resources?', root: 'yui-3.3.0/build/' };
-		var Faust = { contextPath: "${cp}", FacsimileServer: "${facsimilieIIPUrl}" };
-		document.documentElement.className = "yui3-loading";
-	</script>
+        var cp = '${cp?js_string}';
+        var Faust = { contextPath: cp, FacsimileServer: "${facsimilieIIPUrl}" };
+    </script>
+    <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-min.js"></script>
+    <script type="text/javascript" src="${cp}/static/js/yui-config.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
 
 	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
