@@ -16,6 +16,7 @@ import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -43,6 +44,7 @@ public class MaterialUnitManager {
 	@Autowired
 	private Logger logger;
 
+    @Transactional
 	public Set<FaustURI> feedGraph() {
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Feeding material units into graph");

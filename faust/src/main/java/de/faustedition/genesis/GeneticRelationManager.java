@@ -21,6 +21,7 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +50,8 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 	public void run() {
 		feedGraph();
 	}
-	
+
+    @Transactional
 	public void feedGraph() {
 		final Pattern numbers = Pattern.compile("\\d+");
 		Transaction tx = db.beginTx();

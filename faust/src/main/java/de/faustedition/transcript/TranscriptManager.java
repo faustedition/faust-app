@@ -16,6 +16,7 @@ import org.neo4j.helpers.collection.IterableWrapper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -49,6 +50,7 @@ public class TranscriptManager {
 	@Autowired
 	private GraphDatabaseService db;
 
+    @Transactional
 	public Set<FaustURI> feedGraph() {
 		logger.info("Feeding transcripts into graph");
 		Set<FaustURI> failed = new HashSet<FaustURI>();

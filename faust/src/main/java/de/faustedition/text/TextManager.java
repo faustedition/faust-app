@@ -126,6 +126,7 @@ public class TextManager extends Runtime implements Runnable {
 		return failed;
 	}
 
+    @Transactional
 	public Set<FaustURI> feedGraph() {
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Importing texts");
