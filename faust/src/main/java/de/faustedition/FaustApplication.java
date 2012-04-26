@@ -17,6 +17,7 @@ import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
+import org.restlet.data.CharacterSet;
 import org.restlet.data.Reference;
 import org.restlet.engine.application.Encoder;
 import org.restlet.representation.Representation;
@@ -90,6 +91,7 @@ public class FaustApplication extends Application implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.staticResourcePath = environment.getRequiredProperty("static.home");
+		this.getMetadataService().setDefaultCharacterSet(CharacterSet.UTF_8);
 	}
 
 	@Override
