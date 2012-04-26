@@ -238,7 +238,7 @@ YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function
 	});
 
 	imageannotationLines = new Y.LineList();
-	
+
  	svgEditor.addExtension("imageannotation-linking", function() {
 		return {
 			elementChanged: function(opts) {
@@ -263,12 +263,12 @@ YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function
 						modelList: imageannotationLines
 					});
 					imageannotationView.render();
-										
+					
 				}
 				// has an element been deleted?
 				else if (! opts.elems
-					.map(function(e){return Boolean(e && svgCanvas.getElem(e.id))})
-					.reduce(function(e,f){e && f}))
+						 .map(function(e){return Boolean(e && svgCanvas.getElem(e.id))})
+						 .reduce(function(e,f){e && f}))
 					imageannotationView.render();
 			},
 			// if autolink mode is on, find the first unlinked line,
@@ -286,8 +286,9 @@ YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function
 						unlinkedLine.set('linkedWith', shape.getAttribute('id'));
 
 				}
-					
+				
 			}
 		}
 	});
+
 });
