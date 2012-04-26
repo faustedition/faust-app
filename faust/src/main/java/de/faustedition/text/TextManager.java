@@ -26,7 +26,10 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -64,7 +67,10 @@ public class TextManager extends Runtime implements Runnable {
 	@Autowired
 	private SessionFactory sessionFactory;
 
-	private SortedMap<FaustURI, String> tableOfContents;
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+    private SortedMap<FaustURI, String> tableOfContents;
 
 	@Transactional
 	public Set<FaustURI> feedDatabase() {
@@ -126,24 +132,28 @@ public class TextManager extends Runtime implements Runnable {
 		return failed;
 	}
 
-    @Transactional
 	public Set<FaustURI> feedGraph() {
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Importing texts");
-		for (FaustURI textSource : xml.iterate(new FaustURI(FaustAuthority.XML, "/text"))) {
-			try {
-				logger.info("Importing text " + textSource);
-				add(textSource);
-			} catch (SAXException e) {
-				logger.error("XML error while adding text " + textSource, e);
-				failed.add(textSource);
-			} catch (IOException e) {
-				logger.error("I/O error while adding text " + textSource, e);
-				failed.add(textSource);
-			} catch (TransformerException e) {
-				logger.error("XML error while adding text " + textSource, e);
-				failed.add(textSource);
-			}
+		for (final FaustURI textSource : xml.iterate(new FaustURI(FaustAuthority.XML, "/text"))) {
+            transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                    try {
+                        logger.info("Importing text " + textSource);
+                        add(textSource);
+                    } catch (SAXException e) {
+                        logger.error("XML error while adding text " + textSource, e);
+                        failed.add(textSource);
+                    } catch (IOException e) {
+                        logger.error("I/O error while adding text " + textSource, e);
+                        failed.add(textSource);
+                    } catch (TransformerException e) {
+                        logger.error("XML error while adding text " + textSource, e);
+                        failed.add(textSource);
+                    }
+                }
+            });
 		}
 		return failed;
 	}

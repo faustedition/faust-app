@@ -16,7 +16,10 @@ import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -44,21 +47,29 @@ public class MaterialUnitManager {
 	@Autowired
 	private Logger logger;
 
-    @Transactional
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+
 	public Set<FaustURI> feedGraph() {
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Feeding material units into graph");
-		for (FaustURI documentDescriptor : xml.iterate(MaterialUnitManager.DOCUMENT_BASE_URI)) {
-			try {
-				logger.debug("Importing document " + documentDescriptor);
-				add(documentDescriptor);
-			} catch (SAXException e) {
-				logger.error("XML error while adding document " + documentDescriptor, e);
-				failed.add(documentDescriptor);
-			} catch (IOException e) {
-				logger.error("I/O error while adding document " + documentDescriptor, e);
-				failed.add(documentDescriptor);
-			}
+		for (final FaustURI documentDescriptor : xml.iterate(MaterialUnitManager.DOCUMENT_BASE_URI)) {
+            transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                    try {
+                        logger.debug("Importing document " + documentDescriptor);
+                        add(documentDescriptor);
+                    } catch (SAXException e) {
+                        logger.error("XML error while adding document " + documentDescriptor, e);
+                        failed.add(documentDescriptor);
+                    } catch (IOException e) {
+                        logger.error("I/O error while adding document " + documentDescriptor, e);
+                        failed.add(documentDescriptor);
+                    }
+                }
+            });
 		}
 		return failed;
 	}

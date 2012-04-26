@@ -14,7 +14,10 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -45,21 +48,28 @@ public class MacrogeneticRelationManager {
 	@Autowired
 	private Logger logger;
 
-    @Transactional
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
 	public Set<FaustURI> feedGraph() {
 		logger.info("Feeding macrogenetic data into graph");
-		Set<FaustURI> failed = new HashSet<FaustURI>();
-		for (FaustURI macrogeneticFile: xml.iterate(new FaustURI(FaustAuthority.XML, "/macrogenesis"))) {
-			try {	
-				logger.debug("Parsing macrogenetic file " + macrogeneticFile);
-				evaluate(macrogeneticFile);
-			} catch (SAXException e) {
-				logger.error("XML error while adding macrogenetic file " + macrogeneticFile, e);
-				failed.add(macrogeneticFile);
-			} catch (IOException e) {
-				logger.error("I/O error while adding macrogenetic file " + macrogeneticFile, e);
-				failed.add(macrogeneticFile);
-			}
+		final Set<FaustURI> failed = new HashSet<FaustURI>();
+		for (final FaustURI macrogeneticFile: xml.iterate(new FaustURI(FaustAuthority.XML, "/macrogenesis"))) {
+            transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                    try {
+                        logger.debug("Parsing macrogenetic file " + macrogeneticFile);
+                        evaluate(macrogeneticFile);
+                    } catch (SAXException e) {
+                        logger.error("XML error while adding macrogenetic file " + macrogeneticFile, e);
+                        failed.add(macrogeneticFile);
+                    } catch (IOException e) {
+                        logger.error("I/O error while adding macrogenetic file " + macrogeneticFile, e);
+                        failed.add(macrogeneticFile);
+                    }
+                }
+            });
 		}
 		return failed;
 	};

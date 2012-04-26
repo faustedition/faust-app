@@ -16,7 +16,10 @@ import org.neo4j.helpers.collection.IterableWrapper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -50,24 +53,31 @@ public class TranscriptManager {
 	@Autowired
 	private GraphDatabaseService db;
 
-    @Transactional
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
 	public Set<FaustURI> feedGraph() {
 		logger.info("Feeding transcripts into graph");
-		Set<FaustURI> failed = new HashSet<FaustURI>();
-		for (FaustURI transcript : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
-			try {
+		final Set<FaustURI> failed = new HashSet<FaustURI>();
+		for (final FaustURI transcript : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
 				logger.debug("Importing transcript " + transcript);
-				add(transcript);
-			} catch (SAXException e) {
-				logger.error("XML error while adding transcript " + transcript, e);
-				failed.add(transcript);
-			} catch (TransformerException e) {
-				logger.error("XML error while adding transcript " + transcript, e);
-				failed.add(transcript);
-			} catch (IOException e) {
-				logger.error("I/O error while adding transcript " + transcript, e);
-				failed.add(transcript);
-			}
+                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                    @Override
+                    protected void doInTransactionWithoutResult(TransactionStatus status) {
+                        try {
+                            add(transcript);
+                        } catch (SAXException e) {
+                            logger.error("XML error while adding transcript " + transcript, e);
+                            failed.add(transcript);
+                        } catch (TransformerException e) {
+                            logger.error("XML error while adding transcript " + transcript, e);
+                            failed.add(transcript);
+                        } catch (IOException e) {
+                            logger.error("I/O error while adding transcript " + transcript, e);
+                            failed.add(transcript);
+                        }
+                    }
+                });
 		}
 		return failed;
 	}
