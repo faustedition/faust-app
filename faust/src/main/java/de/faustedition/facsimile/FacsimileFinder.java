@@ -3,6 +3,7 @@ package de.faustedition.facsimile;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import eu.interedition.image.ImageFile;
+import eu.interedition.image.transform.Crop;
 import eu.interedition.image.transform.Rotate;
 import eu.interedition.image.transform.Scale;
 import eu.interedition.image.transform.TransformList;
@@ -15,12 +16,15 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Finder;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,6 +34,7 @@ import java.io.OutputStream;
  */
 @Component
 public class FacsimileFinder extends Finder implements InitializingBean {
+    private static final Logger LOG = LoggerFactory.getLogger(FacsimileFinder.class);
 
     @Autowired
     private Environment environment;
@@ -50,7 +55,13 @@ public class FacsimileFinder extends Finder implements InitializingBean {
             final Form query = request.getResourceRef().getQueryAsForm();
             final float zoom = Float.parseFloat(query.getFirstValue("zoom", "1"));
             final int rotate = Integer.parseInt(query.getFirstValue("rotate", "0"));
-            return new FacsimileResource(facsimile, 1 / zoom, rotate);
+            final Dimension facsimileSize = facsimile.getSize().getSize();
+            final float tileSize = 256 / zoom;
+            return new FacsimileResource(facsimile,
+                    1 / zoom,
+                    (((float) facsimileSize.getWidth()) / zoom - tileSize) / 2.0f,
+                    (((float) facsimileSize.getHeight()) / zoom - tileSize) / 2.0f,
+                    tileSize, tileSize, rotate);
         } catch (IOException e) {
             throw Throwables.propagate(e);
         } catch (IllegalArgumentException e) {
@@ -70,11 +81,19 @@ public class FacsimileFinder extends Finder implements InitializingBean {
 
         private final ImageFile facsimile;
         private final float scale;
+        private final float x;
+        private final float y;
+        private final float width;
+        private final float height;
         private final int rotate;
 
-        public FacsimileResource(ImageFile facsimile, float scale, int rotate) {
+        public FacsimileResource(ImageFile facsimile, float scale, float x, float y, float width, float height, int rotate) {
             this.facsimile = facsimile;
             this.scale = scale;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
             this.rotate = rotate;
         }
 
@@ -83,7 +102,8 @@ public class FacsimileFinder extends Finder implements InitializingBean {
             return new OutputRepresentation(MediaType.IMAGE_JPEG) {
                 @Override
                 public void write(OutputStream outputStream) throws IOException {
-                    ImageFile.write(new TransformList(Lists.newArrayList(new Scale(2, scale), new Rotate(2, rotate))).apply(facsimile.read()), "JPEG", outputStream);
+                    LOG.debug("Writing {}x{}+{}+{} of {} (scale {}, rotate {})", new Object[] { width, height, x, y, facsimile, scale, rotate});
+                    ImageFile.write(new TransformList(Lists.newArrayList(new Scale(2, scale), new Crop(x, y, width, height), new Rotate(2, rotate))).apply(facsimile.read()), "JPEG", outputStream);
                 }
             };
         }
