@@ -48,28 +48,21 @@ public class MacrogeneticRelationManager {
 	@Autowired
 	private Logger logger;
 
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-
+    @Transactional
 	public Set<FaustURI> feedGraph() {
 		logger.info("Feeding macrogenetic data into graph");
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		for (final FaustURI macrogeneticFile: xml.iterate(new FaustURI(FaustAuthority.XML, "/macrogenesis"))) {
-            transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    try {
-                        logger.debug("Parsing macrogenetic file " + macrogeneticFile);
-                        evaluate(macrogeneticFile);
-                    } catch (SAXException e) {
-                        logger.error("XML error while adding macrogenetic file " + macrogeneticFile, e);
-                        failed.add(macrogeneticFile);
-                    } catch (IOException e) {
-                        logger.error("I/O error while adding macrogenetic file " + macrogeneticFile, e);
-                        failed.add(macrogeneticFile);
-                    }
-                }
-            });
+            try {
+                logger.debug("Parsing macrogenetic file " + macrogeneticFile);
+                evaluate(macrogeneticFile);
+            } catch (SAXException e) {
+                logger.error("XML error while adding macrogenetic file " + macrogeneticFile, e);
+                failed.add(macrogeneticFile);
+            } catch (IOException e) {
+                logger.error("I/O error while adding macrogenetic file " + macrogeneticFile, e);
+                failed.add(macrogeneticFile);
+            }
 		}
 		return failed;
 	};
@@ -84,24 +77,17 @@ public class MacrogeneticRelationManager {
 			Document from = materialUnitManager.find(r.from);
 			Document to = materialUnitManager.find(r.to);
 
-			Transaction tx = db.beginTx();
-			try {
-				if (from == null)
-					logger.error("Document " + r.from + " is not registered!");
-				else {
+            if (from == null)
+                logger.error("Document " + r.from + " is not registered!");
+            else {
 
-					if (to == null)
-						logger.error("Document " + r.to + " is not registered!");
-					else {
-						logger.debug("Adding: " + from.getSource() + " ---" + r.type.name() + "---> " + to.getSource());
-						from.node.createRelationshipTo(to.node, r.type);
-					}
-				}
-				tx.success();
-			} finally {
-				tx.finish();
-			}
-
+                if (to == null)
+                    logger.error("Document " + r.to + " is not registered!");
+                else {
+                    logger.debug("Adding: " + from.getSource() + " ---" + r.type.name() + "---> " + to.getSource());
+                    from.node.createRelationshipTo(to.node, r.type);
+                }
+            }
 		}
 	}
 

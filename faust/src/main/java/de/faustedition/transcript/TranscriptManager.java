@@ -53,32 +53,24 @@ public class TranscriptManager {
 	@Autowired
 	private GraphDatabaseService db;
 
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-
 	public Set<FaustURI> feedGraph() {
 		logger.info("Feeding transcripts into graph");
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		for (final FaustURI transcript : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
 				logger.debug("Importing transcript " + transcript);
-                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        try {
-                            add(transcript);
-                        } catch (SAXException e) {
-                            logger.error("XML error while adding transcript " + transcript, e);
-                            failed.add(transcript);
-                        } catch (TransformerException e) {
-                            logger.error("XML error while adding transcript " + transcript, e);
-                            failed.add(transcript);
-                        } catch (IOException e) {
-                            logger.error("I/O error while adding transcript " + transcript, e);
-                            failed.add(transcript);
-                        }
-                    }
-                });
-		}
+                try {
+                    add(transcript);
+                } catch (SAXException e) {
+                    logger.error("XML error while adding transcript " + transcript, e);
+                    failed.add(transcript);
+                } catch (TransformerException e) {
+                    logger.error("XML error while adding transcript " + transcript, e);
+                    failed.add(transcript);
+                } catch (IOException e) {
+                    logger.error("I/O error while adding transcript " + transcript, e);
+                    failed.add(transcript);
+                }
+        }
 		return failed;
 	}
 
@@ -90,7 +82,7 @@ public class TranscriptManager {
 		final Set<Transcript> transcripts = new HashSet<Transcript>();
 		Transaction tx = db.beginTx();
 		try {
-		    
+
 			Iterables.addAll(transcripts, parse(source));
 			tx.success();
 		} finally {
@@ -104,8 +96,16 @@ public class TranscriptManager {
 			logger.debug("Postprocess  " + t);
 			t.postprocess();
 
-			logger.debug("Tokenize " + t);
-			t.tokenize();
+            /*
+            tx = db.beginTx();
+            try {
+                logger.debug("Tokenize " + t);
+                t.tokenize();
+                tx.success();
+            } finally {
+                tx.finish();
+            }
+            */
 		}
 		return transcripts;
 	}
@@ -143,7 +143,7 @@ public class TranscriptManager {
 			transcripts.add(transcript);
 			register(transcript, source);
 		}
-		
+
 		return transcripts;
 	}
 

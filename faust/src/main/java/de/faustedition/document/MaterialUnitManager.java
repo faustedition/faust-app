@@ -47,35 +47,26 @@ public class MaterialUnitManager {
 	@Autowired
 	private Logger logger;
 
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-
-
+    @Transactional
 	public Set<FaustURI> feedGraph() {
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Feeding material units into graph");
 		for (final FaustURI documentDescriptor : xml.iterate(MaterialUnitManager.DOCUMENT_BASE_URI)) {
-            transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                @Override
-                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                    try {
-                        logger.debug("Importing document " + documentDescriptor);
-                        add(documentDescriptor);
-                    } catch (SAXException e) {
-                        logger.error("XML error while adding document " + documentDescriptor, e);
-                        failed.add(documentDescriptor);
-                    } catch (IOException e) {
-                        logger.error("I/O error while adding document " + documentDescriptor, e);
-                        failed.add(documentDescriptor);
-                    }
-                }
-            });
-		}
+            try {
+                logger.debug("Importing document " + documentDescriptor);
+                add(documentDescriptor);
+            } catch (SAXException e) {
+                logger.error("XML error while adding document " + documentDescriptor, e);
+                failed.add(documentDescriptor);
+            } catch (IOException e) {
+                logger.error("I/O error while adding document " + documentDescriptor, e);
+                failed.add(documentDescriptor);
+            }
+        }
 		return failed;
 	}
 
-	@GraphDatabaseTransactional
-	public Document add(FaustURI source) throws SAXException, IOException {
+    public Document add(FaustURI source) throws SAXException, IOException {
 		final DocumentDescriptorHandler handler = new DocumentDescriptorHandler(source);
 		final InputSource xmlSource = xml.getInputSource(source);
 		try {
@@ -91,7 +82,7 @@ public class MaterialUnitManager {
 		}
 	}
 
-	@GraphDatabaseTransactional
+	@Transactional
 	public Document find(FaustURI source) {
 		final Node node = db.index().forNodes(Document.SOURCE_KEY).get(Document.SOURCE_KEY, source).getSingle();
 		return (node == null ? null : new Document(node));
