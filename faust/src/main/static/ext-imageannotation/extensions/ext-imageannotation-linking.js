@@ -174,12 +174,10 @@ YUI().use('model', 'model-list', 'view', 'node', 'event', 'io', 'json', function
 							 '</select><br/>');
 
 			
-			// var size = Math.max(this.modelList.size(), 10);
-			var size = 10;
+			var size = Math.max(this.modelList.size(), 10);
 			var list = Y.Node.create('<div style="height: 100%"><select id="linesView" size="'
 									 + parseInt(size) + '"></select></div>');
 			container.append(list);
-
 		},
 
 
