@@ -1,8 +1,8 @@
 package de.faustedition.facsimile;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import eu.interedition.image.ImageFile;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -22,10 +22,17 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageInputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -51,7 +58,7 @@ public class FacsimileFinder extends Finder implements InitializingBean {
     @Override
     public ServerResource find(Request request, Response response) {
         try {
-            final ImageFile facsimile = findFacsimile(request.getResourceRef().getRelativeRef().getPath());
+            final File facsimile = findFacsimile(request.getResourceRef().getRelativeRef().getPath());
             final Form query = request.getResourceRef().getQueryAsForm();
             if (query.getFirst("metadata") != null) {
                 return new FacsimileMetadataResource(facsimile);
@@ -68,52 +75,63 @@ public class FacsimileFinder extends Finder implements InitializingBean {
         }
     }
 
-    public ImageFile findFacsimile(String path) throws IOException, IllegalArgumentException {
+    public File findFacsimile(String path) throws IOException, IllegalArgumentException {
         final File facsimile = new File(home, path + "." + fileExtension);
-        if (facsimile.isFile() && isInHome(facsimile)) {
-            return new ImageFile(facsimile);
-        }
-        throw new IllegalArgumentException(path);
+        Preconditions.checkArgument(facsimile.isFile() && isInHome(facsimile), path);
+        return facsimile;
+    }
+
+    protected static ImageReader getImageReader(File file) throws IOException {
+        final FileImageInputStream imageInputStream = new FileImageInputStream(file);
+
+        final Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);
+        Preconditions.checkArgument(readers.hasNext(), file + " cannot be read via Java ImageIO");
+
+        final ImageReader imageReader = readers.next();
+        imageReader.setInput(imageInputStream);
+        return imageReader;
     }
 
     public static class FacsimileMetadataResource extends ServerResource {
         private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-        private final ImageFile facsimile;
+        private final File facsimile;
 
-        public FacsimileMetadataResource(ImageFile facsimile) {
+        public FacsimileMetadataResource(File facsimile) {
             this.facsimile = facsimile;
         }
 
         @Get("json")
         public Representation metadata() throws IOException {
-            final Rectangle size = facsimile.getSize();
+            ImageReader reader = null;
+            try {
+                reader = getImageReader(facsimile);
+                final Map<String, Object> metadata = Maps.newHashMap();
+                metadata.put("width", reader.getWidth(0));
+                metadata.put("height", reader.getHeight(0));
+                metadata.put("tileSize", TILE_SIZE);
+                return new StringRepresentation(OBJECT_MAPPER.writeValueAsString(metadata), MediaType.APPLICATION_JSON);
 
-            final Map<String, Object> metadata = Maps.newHashMap();
-            metadata.put("width", new Double(size.getWidth()).intValue());
-            metadata.put("height", new Double(size.getHeight()).intValue());
-            metadata.put("tileSize", TILE_SIZE);
-            return new StringRepresentation(OBJECT_MAPPER.writeValueAsString(metadata), MediaType.APPLICATION_JSON);
+            } finally {
+                if (reader != null) {
+                    reader.dispose();
+                }
+            }
         }
     }
 
     public static class FacsimileResource extends ServerResource {
 
-        private final ImageFile facsimile;
+        private final File facsimile;
         private final int zoom;
         private final int x;
         private final int y;
-        private final int width;
-        private final int height;
 
-        public FacsimileResource(ImageFile facsimile, int x, int y, int zoom) {
+        public FacsimileResource(File facsimile, int x, int y, int zoom) {
             super();
             this.facsimile = facsimile;
-            final Rectangle size = this.facsimile.getSize();
-            this.x = Math.min(x * TILE_SIZE * zoom, (int) size.getWidth() * zoom);
-            this.y = Math.min(y * TILE_SIZE * zoom, (int) size.getHeight() * zoom);
-            this.width = Math.min(TILE_SIZE * zoom, Math.round((float) size.getWidth() * zoom - x));
-            this.height = Math.min(TILE_SIZE * zoom, Math.round((float) size.getHeight() * zoom - y));
+            this.x = x;
+            this.y = y;
             this.zoom = zoom;
         }
 
@@ -122,8 +140,36 @@ public class FacsimileFinder extends Finder implements InitializingBean {
             return new OutputRepresentation(MediaType.IMAGE_JPEG) {
                 @Override
                 public void write(OutputStream outputStream) throws IOException {
-                    LOG.debug("Writing [{}, {}] [{} x {}] of {} (zoom {})", new Object[]{x, y, width, height, facsimile, zoom });
-                    ImageFile.write(facsimile.read(new Rectangle(x, y, width, height), zoom), "JPEG", outputStream);
+                    ImageReader reader = null;
+                    ImageWriter writer = null;
+                    try {
+                        reader = getImageReader(facsimile);
+                        final int imageWidth = reader.getWidth(0);
+                        final int imageHeight = reader.getHeight(0);
+                        final ImageReadParam parameters = reader.getDefaultReadParam();
+                        final Rectangle tile = new Rectangle(
+                                Math.min(x * TILE_SIZE * zoom, imageWidth * zoom),
+                                Math.min(y * TILE_SIZE * zoom, imageHeight * zoom),
+                                Math.min(TILE_SIZE * zoom, Math.round(imageWidth * zoom - x)),
+                                Math.min(TILE_SIZE * zoom, Math.round(imageHeight * zoom - y))
+                        );
+                        parameters.setSourceRegion(tile);
+                        parameters.setSourceSubsampling(zoom, zoom, 0, 0);
+
+                        LOG.debug("Writing {} of {} (zoom {})", new Object[]{ tile, facsimile, zoom});
+                        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("JPEG");
+                        Preconditions.checkState(writers.hasNext());
+                        writer = writers.next();
+                        writer.setOutput(new MemoryCacheImageOutputStream(outputStream));
+                        writer.write(reader.read(0, parameters));
+                    } finally {
+                        if (writer != null) {
+                            writer.dispose();
+                        }
+                        if (reader != null) {
+                            reader.dispose();
+                        }
+                    }
                 }
             };
         }
