@@ -12,6 +12,10 @@
  	-webkit-user-select: none;
 }
 
+#svg_editor #sidepanels {
+	overflow: scroll;
+}
+
 #svg_editor #linelist {
 	margin: 1px;
 	padding: 0px;
