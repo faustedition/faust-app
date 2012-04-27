@@ -115,6 +115,7 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
 		router.attach("resources", comboResourceFinder);
+        router.attach("test", templateFinder);
 
 		if (environment.acceptsProfiles("development", "test")) {
 			final Filter dummyAuthenticator = new Filter() {
