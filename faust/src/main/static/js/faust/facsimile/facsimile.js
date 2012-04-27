@@ -1,5 +1,9 @@
 YUI.add('facsimile', function (Y) {
 
+    var NULL_IMAGE_VALUE = {width: Number.MAX_VALUE, height: Number.MAX_VALUE, tileSize: 1},
+        NULL_VIEW_VALUE = {x: 0, y: 0, width: 0, height: 0, zoom: 1 },
+        MAX_ZOOM = 10;
+
     function FacsimileViewer(config) {
         FacsimileViewer.superclass.constructor.apply(this, arguments);
     }
@@ -7,26 +11,31 @@ YUI.add('facsimile', function (Y) {
     FacsimileViewer.NAME = 'facsimile-viewer';
     FacsimileViewer.ATTRS = {
         image: {
-            value: {
-                width: 0,
-                height: 0,
-                tileSize: 1
+            value: NULL_IMAGE_VALUE,
+            validator: function (val) {
+                return (val.width >= 0) && (val.height >= 0) && (val.tileSize > 0);
             }
         },
         view: {
-            value: {
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0
+            value: NULL_VIEW_VALUE,
+            setter: function (val) {
+                var image = this.get("image") || NULL_IMAGE_VALUE,
+                    view = this.get("view") || NULL_VIEW_VALUE,
+                    isNumber = Y.Lang.isNumber;
+                return {
+                    x: Math.min(Math.max(isNumber(val.x) ? val.x : view.x, 0), image.width),
+                    y: Math.min(Math.max(isNumber(val.y) ? val.y : view.y, 0), image.height),
+                    width: Math.min(Math.max(isNumber(val.width) ? val.width : view.width, 0), image.width),
+                    height: Math.min(Math.max(isNumber(val.height) ? val.height : view.height, 0), image.height),
+                    zoom: Math.min(Math.max(isNumber(val.zoom) ? val.zoom : view.zoom, 1), MAX_ZOOM)
+                };
             }
         },
         tiles: {
             valueFn: function () {
                 return []
             }
-        },
-        canvas: {}
+        }
     };
 
     Y.extend(FacsimileViewer, Y.Widget, {
@@ -62,9 +71,6 @@ YUI.add('facsimile', function (Y) {
             if (state.image.width < state.view.width) xoffset -= (state.view.width - state.image.width) / 2;
             if (state.image.height < state.view.height) yoffset -= (state.view.height - state.image.height) / 2;
 
-            var centerx = startx + Math.round((endx - startx) / 2);
-            var centery = starty + Math.round((endy - starty) / 2);
-
             var tiles = [];
             for (var j = starty; j <= endy; j++) {
                 for (var i = startx; i <= endx; i++) {
@@ -85,12 +91,16 @@ YUI.add('facsimile', function (Y) {
             this.set("image", Y.merge(this.get("image"), Y.JSON.parse(response.responseText)));
             this.center();
         },
-        center: function() {
-            var state = this.getAttrs(["image", "view"]);
-            this.moveTo(Math.max(state.image.width - state.view.width, 0) / 2, Math.max(state.image.width - state.view.width, 0) / 2 );
+        center: function () {
+            var st = this.getAttrs(["image", "view"]);
+            this.moveTo(Math.max(st.image.width - st.view.width, 0) / 2, Math.max(st.image.width - st.view.width, 0) / 2);
         },
-        moveTo: function(x, y) {
-            this.set("view", Y.merge(this.get("view"), { x: x, y: y }));
+        moveTo: function (x, y) {
+            this.set("view", { x: x, y: y });
+        },
+        move: function (x, y) {
+            var view = this.get("view");
+            this.moveTo(view.x + x, view.y + y);
         },
         imageSrc: function () {
             return cp + "/facsimile/gsa/390883/390883_0002";
@@ -118,7 +128,6 @@ YUI.add('facsimile', function (Y) {
                 overflow: "hidden"
             });
 
-            Y.log(Y.dump(tiles));
             Y.Array.each(tiles, function (tile) {
                 contentBox.append(Y.Node.create(Y.substitute('<img src="{src}" alt="{x}x{y}">', Y.merge(tile, {
                     src: this.tileSrc(tile.x, tile.y)
