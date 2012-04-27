@@ -26,8 +26,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileImageInputStream;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -82,7 +81,7 @@ public class FacsimileFinder extends Finder implements InitializingBean {
     }
 
     protected static ImageReader getImageReader(File file) throws IOException {
-        final FileImageInputStream imageInputStream = new FileImageInputStream(file);
+        final ImageInputStream imageInputStream = ImageIO.createImageInputStream(file);
 
         final Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);
         Preconditions.checkArgument(readers.hasNext(), file + " cannot be read via Java ImageIO");
@@ -135,9 +134,9 @@ public class FacsimileFinder extends Finder implements InitializingBean {
             this.zoom = zoom;
         }
 
-        @Get("jpg")
+        @Get("png")
         public Representation image() {
-            return new OutputRepresentation(MediaType.IMAGE_JPEG) {
+            return new OutputRepresentation(MediaType.IMAGE_PNG) {
                 @Override
                 public void write(OutputStream outputStream) throws IOException {
                     ImageReader reader = null;
@@ -157,10 +156,10 @@ public class FacsimileFinder extends Finder implements InitializingBean {
                         parameters.setSourceSubsampling(zoom, zoom, 0, 0);
 
                         LOG.debug("Writing {} of {} (zoom {})", new Object[]{ tile, facsimile, zoom});
-                        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("JPEG");
+                        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("PNG");
                         Preconditions.checkState(writers.hasNext());
                         writer = writers.next();
-                        writer.setOutput(new MemoryCacheImageOutputStream(outputStream));
+                        writer.setOutput(ImageIO.createImageOutputStream(outputStream));
                         writer.write(reader.read(0, parameters));
                     } finally {
                         if (writer != null) {
