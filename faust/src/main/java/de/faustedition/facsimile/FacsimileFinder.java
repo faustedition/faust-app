@@ -134,9 +134,9 @@ public class FacsimileFinder extends Finder implements InitializingBean {
             this.zoom = zoom;
         }
 
-        @Get("png")
+        @Get("jpg")
         public Representation image() {
-            return new OutputRepresentation(MediaType.IMAGE_PNG) {
+            return new OutputRepresentation(MediaType.IMAGE_JPEG) {
                 @Override
                 public void write(OutputStream outputStream) throws IOException {
                     ImageReader reader = null;
@@ -145,18 +145,21 @@ public class FacsimileFinder extends Finder implements InitializingBean {
                         reader = getImageReader(facsimile);
                         final int imageWidth = reader.getWidth(0);
                         final int imageHeight = reader.getHeight(0);
+                        final int tileSize = TILE_SIZE * zoom;
+                        final int tileX = x * tileSize;
+                        final int tileY = y * tileSize;
                         final ImageReadParam parameters = reader.getDefaultReadParam();
                         final Rectangle tile = new Rectangle(
-                                Math.min(x * TILE_SIZE * zoom, imageWidth * zoom),
-                                Math.min(y * TILE_SIZE * zoom, imageHeight * zoom),
-                                Math.min(TILE_SIZE * zoom, Math.round(imageWidth * zoom - x)),
-                                Math.min(TILE_SIZE * zoom, Math.round(imageHeight * zoom - y))
+                                Math.min(tileX, imageWidth),
+                                Math.min(tileY, imageHeight),
+                                Math.min(tileSize, imageWidth - tileX),
+                                Math.min(tileSize, imageHeight - tileY)
                         );
                         parameters.setSourceRegion(tile);
                         parameters.setSourceSubsampling(zoom, zoom, 0, 0);
 
-                        LOG.debug("Writing {} of {} (zoom {})", new Object[]{ tile, facsimile, zoom});
-                        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("PNG");
+                        LOG.debug("Writing {} of {} (zoom {})", new Object[]{tile, facsimile, zoom});
+                        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("JPEG");
                         Preconditions.checkState(writers.hasNext());
                         writer = writers.next();
                         writer.setOutput(ImageIO.createImageOutputStream(outputStream));
