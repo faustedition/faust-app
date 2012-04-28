@@ -27,6 +27,7 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -164,18 +165,19 @@ public class FacsimileFinder extends Finder implements InitializingBean {
                         parameters.setSourceSubsampling(zoom, zoom, 0, 0);
 
                         final BufferedImage tileImage = reader.read(0, parameters);
-                        final ColorSpace sRgbSpace = new ICC_ColorSpace(ICC_Profile.getInstance(ICC_ColorSpace.CS_sRGB));
-
-                        final ColorConvertOp op = new ColorConvertOp(tileImage.getColorModel().getColorSpace(), sRgbSpace, null);
+                        final ColorConvertOp op = new ColorConvertOp(tileImage.getColorModel().getColorSpace(), ColorSpace.getInstance(ColorSpace.CS_sRGB), null);
                         final BufferedImage rgbImage = new BufferedImage(tileImage.getWidth(), tileImage.getHeight(), BufferedImage.OPAQUE);
                         op.filter(tileImage, rgbImage);
 
                         LOG.debug("Writing {} of {} (zoom {})", new Object[]{tile, facsimile, zoom});
                         final Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("JPEG");
                         Preconditions.checkState(writers.hasNext());
+
+                        final ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(outputStream);
                         writer = writers.next();
-                        writer.setOutput(ImageIO.createImageOutputStream(outputStream));
+                        writer.setOutput(imageOutputStream);
                         writer.write(rgbImage);
+                        imageOutputStream.flush();
                     } finally {
                         if (writer != null) {
                             writer.dispose();
