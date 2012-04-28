@@ -3,6 +3,8 @@ package de.faustedition.facsimile;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
+import com.google.common.io.Closeables;
+import com.sun.media.jai.codec.FileSeekableStream;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -23,19 +25,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
-import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.ImageOutputStream;
-import java.awt.*;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 import java.awt.color.ColorSpace;
-import java.awt.color.ICC_ColorSpace;
-import java.awt.color.ICC_Profile;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Map;
@@ -127,6 +128,11 @@ public class FacsimileFinder extends Finder implements InitializingBean {
 
     public static class FacsimileResource extends ServerResource {
 
+        public static final ComponentColorModel COLOR_MODEL = new ComponentColorModel(
+                ColorSpace.getInstance(ColorSpace.CS_sRGB),
+                new int[]{8, 8, 8},
+                false, false, ColorModel.OPAQUE, DataBuffer.TYPE_BYTE);
+
         private final File facsimile;
         private final int zoom;
         private final int x;
@@ -145,46 +151,29 @@ public class FacsimileFinder extends Finder implements InitializingBean {
             return new OutputRepresentation(MediaType.IMAGE_JPEG) {
                 @Override
                 public void write(OutputStream outputStream) throws IOException {
-                    ImageReader reader = null;
-                    ImageWriter writer = null;
+                    InputStream facsimileStream = null;
                     try {
-                        reader = getImageReader(facsimile);
-                        final int imageWidth = reader.getWidth(0);
-                        final int imageHeight = reader.getHeight(0);
-                        final int tileSize = TILE_SIZE * zoom;
-                        final int tileX = x * tileSize;
-                        final int tileY = y * tileSize;
-                        final ImageReadParam parameters = reader.getDefaultReadParam();
-                        final Rectangle tile = new Rectangle(
-                                Math.min(tileX, imageWidth),
-                                Math.min(tileY, imageHeight),
-                                Math.min(tileSize, imageWidth - tileX),
-                                Math.min(tileSize, imageHeight - tileY)
-                        );
-                        parameters.setSourceRegion(tile);
-                        parameters.setSourceSubsampling(zoom, zoom, 0, 0);
+                        RenderedOp image = JAI.create("stream", facsimileStream = new FileSeekableStream(facsimile));
 
-                        final BufferedImage tileImage = reader.read(0, parameters);
-                        final ColorConvertOp op = new ColorConvertOp(tileImage.getColorModel().getColorSpace(), ColorSpace.getInstance(ColorSpace.CS_sRGB), null);
-                        final BufferedImage rgbImage = new BufferedImage(tileImage.getWidth(), tileImage.getHeight(), BufferedImage.OPAQUE);
-                        op.filter(tileImage, rgbImage);
+                        final int imageWidth = image.getWidth();
+                        final int imageHeight = image.getHeight();
+                        final float tileSize = TILE_SIZE * zoom;
+                        final float tileX = x * tileSize;
+                        final float tileY = y * tileSize;
+                        image = JAI.create("Crop", new ParameterBlock()
+                                .addSource(image)
+                                .add(Math.min(tileX, imageWidth))
+                                .add(Math.min(tileY, imageHeight))
+                                .add(Math.min(tileSize, imageWidth - tileX))
+                                .add(Math.min(tileSize, imageHeight - tileY)));
 
-                        LOG.debug("Writing {} of {} (zoom {})", new Object[]{tile, facsimile, zoom});
-                        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("JPEG");
-                        Preconditions.checkState(writers.hasNext());
+                        image = JAI.create("ColorConvert", new ParameterBlock()
+                                .addSource(image)
+                                .add(COLOR_MODEL));
 
-                        final ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(outputStream);
-                        writer = writers.next();
-                        writer.setOutput(imageOutputStream);
-                        writer.write(rgbImage);
-                        imageOutputStream.flush();
+                        JAI.create("Encode", image, outputStream, "JPEG", null);
                     } finally {
-                        if (writer != null) {
-                            writer.dispose();
-                        }
-                        if (reader != null) {
-                            reader.dispose();
-                        }
+                        Closeables.close(facsimileStream, true);
                     }
                 }
             };
