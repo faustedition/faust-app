@@ -122,14 +122,14 @@ public class FacsimileFinder extends Finder implements InitializingBean {
 
         private final File facsimile;
         private final int zoom;
-        private final int x;
-        private final int y;
+        private final int tileX;
+        private final int tileY;
 
         public FacsimileResource(File facsimile, int x, int y, int zoom) {
             super();
             this.facsimile = facsimile;
-            this.x = x;
-            this.y = y;
+            this.tileX = x;
+            this.tileY = y;
             this.zoom = zoom;
         }
 
@@ -143,16 +143,16 @@ public class FacsimileFinder extends Finder implements InitializingBean {
                     try {
                         reader = createImageReader(facsimile);
                         final int imageIndex = Math.max(0, Math.min(zoom, reader.getNumImages(true) - 1));
-                        final int imageWidth = reader.getWidth(0);
-                        final int imageHeight = reader.getHeight(0);
-                        final int tileX = x * TILE_SIZE;
-                        final int tileY = y * TILE_SIZE;
+                        final int imageWidth = reader.getWidth(imageIndex);
+                        final int imageHeight = reader.getHeight(imageIndex);
+                        final int x = tileX * TILE_SIZE;
+                        final int y = tileY * TILE_SIZE;
                         final ImageReadParam parameters = reader.getDefaultReadParam();
                         final Rectangle tile = new Rectangle(
-                                Math.min(tileX, imageWidth),
-                                Math.min(tileY, imageHeight),
-                                Math.min(TILE_SIZE, tileX >= imageWidth ? imageWidth : imageWidth - tileX),
-                                Math.min(TILE_SIZE, tileY >= imageHeight ? imageHeight : imageHeight - tileY)
+                                Math.min(x, imageWidth),
+                                Math.min(y, imageHeight),
+                                Math.min(TILE_SIZE, x >= imageWidth ? imageWidth : imageWidth - x),
+                                Math.min(TILE_SIZE, y >= imageHeight ? imageHeight : imageHeight - y)
                         );
                         parameters.setSourceRegion(tile);
                         final BufferedImage tileImage = reader.read(imageIndex, parameters);
