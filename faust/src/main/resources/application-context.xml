@@ -5,12 +5,16 @@
        xmlns:task="http://www.springframework.org/schema/task" xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
-    <context:component-scan base-package="de.faustedition" />
+    <context:component-scan base-package="de.faustedition"/>
 
-    <tx:annotation-driven proxy-target-class="true" />
+    <tx:annotation-driven proxy-target-class="true"/>
 
-    <task:executor id="taskExecutor" />
+    <task:executor id="taskExecutor"/>
 
-    <task:annotation-driven executor="taskExecutor" proxy-target-class="true" />
+    <task:annotation-driven executor="taskExecutor" proxy-target-class="true"/>
 
+    <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="ehcache-app.xml"/>
+        <property name="shared" value="true"/>
+    </bean>
 </beans>
