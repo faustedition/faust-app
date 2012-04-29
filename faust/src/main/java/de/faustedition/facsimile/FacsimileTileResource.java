@@ -55,8 +55,8 @@ public class FacsimileTileResource extends ServerResource {
             final Rectangle tile = new Rectangle(
                     Math.min(x, imageWidth),
                     Math.min(y, imageHeight),
-                    Math.min(FacsimileTile.SIZE, x >= imageWidth ? imageWidth : imageWidth - x),
-                    Math.min(FacsimileTile.SIZE, y >= imageHeight ? imageHeight : imageHeight - y)
+                    Math.min(FacsimileTile.SIZE, Math.max(0, imageWidth - x)),
+                    Math.min(FacsimileTile.SIZE, Math.max(0, imageHeight - y))
             );
             parameters.setSourceRegion(tile);
             final BufferedImage tileImage = reader.read(imageIndex, parameters);

@@ -1,8 +1,7 @@
 YUI.add('facsimile', function (Y) {
 
-    var NULL_IMAGE_VALUE = {width: Number.MAX_VALUE, height: Number.MAX_VALUE, tileSize: 1},
-        NULL_VIEW_VALUE = {x: 0, y: 0, width: 0, height: 0, zoom: 1 },
-        MAX_ZOOM = 10;
+    var NULL_IMAGE_VALUE = {width: Number.MAX_VALUE, height: Number.MAX_VALUE, tileSize: 1, maxZoom: 0 },
+        NULL_VIEW_VALUE = {x: 0, y: 0, width: 0, height: 0, zoom: 0 };
 
     function FacsimileViewer(config) {
         FacsimileViewer.superclass.constructor.apply(this, arguments);
@@ -13,21 +12,36 @@ YUI.add('facsimile', function (Y) {
         image: {
             value: NULL_IMAGE_VALUE,
             validator: function (val) {
-                return (val.width >= 0) && (val.height >= 0) && (val.tileSize > 0);
+                return (val.width >= 0) && (val.height >= 0) && (val.maxZoom >= 0) && (val.tileSize > 0);
             }
         },
         view: {
             value: NULL_VIEW_VALUE,
             setter: function (val) {
-                var image = this.get("image") || NULL_IMAGE_VALUE,
+                var image = this.get("scaled"),
                     view = this.get("view") || NULL_VIEW_VALUE,
                     isNumber = Y.Lang.isNumber;
                 return {
                     x: Math.min(Math.max(isNumber(val.x) ? val.x : view.x, 0), image.width),
                     y: Math.min(Math.max(isNumber(val.y) ? val.y : view.y, 0), image.height),
-                    width: Math.min(Math.max(isNumber(val.width) ? val.width : view.width, 0), image.width),
-                    height: Math.min(Math.max(isNumber(val.height) ? val.height : view.height, 0), image.height),
-                    zoom: Math.min(Math.max(isNumber(val.zoom) ? val.zoom : view.zoom, 1), MAX_ZOOM)
+                    width: Math.max(isNumber(val.width) ? val.width : view.width, 0),
+                    height: Math.max(isNumber(val.height) ? val.height : view.height, 0)
+                };
+            }
+        },
+        zoom: {
+            value: 0,
+            setter: function (val) {
+                return Math.min(Math.max(val || 0, 0), this.get("image").maxZoom);
+            }
+        },
+        scaled: {
+            getter: function () {
+                var zoom = this.get("zoom"), image = this.get("image"),
+                    scale = Math.pow(2, zoom);
+                return {
+                    width: Math.floor(image.width / scale),
+                    height: Math.floor(image.height / scale)
                 };
             }
         },
@@ -46,34 +60,19 @@ YUI.add('facsimile', function (Y) {
             this.fetchMetadata();
         },
         _updateTiles: function () {
-            var state = this.getAttrs(["image", "view"]);
+            var sc = this.get("scaled"), view = this.get("view"), tileSize = this.get("image").tileSize;
 
             // Get the start points for our tiles
-            var startx = Math.max(Math.floor(state.view.x / state.image.tileSize), 0);
-            var starty = Math.max(Math.floor(state.view.y / state.image.tileSize), 0);
+            var startx = Math.max(0, Math.floor(Math.min(sc.width, view.x) / tileSize));
+            var starty = Math.max(0, Math.floor(Math.min(sc.height, view.y) / tileSize));
 
             // If our size is smaller than the display window, only get these tiles!
-            var endx = Math.ceil(((Math.min(state.image.width, state.view.width) + state.view.x) / state.image.tileSize) - 1);
-            var endy = Math.ceil(((Math.min(state.image.height, state.view.height) + state.view.y) / state.image.tileSize) - 1);
-
-            // Number of tiles is dependent on view width and height
-            var xtiles = Math.ceil(state.image.width / state.image.tileSize);
-            var ytiles = Math.ceil(state.image.height / state.image.tileSize);
-
-            if (endx >= xtiles) endx = xtiles - 1;
-            if (endy >= ytiles) endy = ytiles - 1;
-
-            // Calculate the offset from the tile top left that we want to display.
-            var xoffset = Math.floor(state.view.x % state.image.tileSize);
-            var yoffset = Math.floor(state.view.y % state.image.tileSize);
-
-            // Center the image if our viewable image is smaller than the window
-            if (state.image.width < state.view.width) xoffset -= (state.view.width - state.image.width) / 2;
-            if (state.image.height < state.view.height) yoffset -= (state.view.height - state.image.height) / 2;
+            var endx = Math.ceil(Math.min(sc.width, view.x + view.width) / tileSize);
+            var endy = Math.ceil(Math.min(sc.height, view.y + view.height) / tileSize);
 
             var tiles = [];
-            for (var j = starty; j <= endy; j++) {
-                for (var i = startx; i <= endx; i++) {
+            for (var j = starty - 1; j < endy; j++) {
+                for (var i = startx - 1; i < endx; i++) {
                     tiles.push({ x: i, y: j });
                 }
             }
@@ -92,8 +91,8 @@ YUI.add('facsimile', function (Y) {
             this.center();
         },
         center: function () {
-            var st = this.getAttrs(["image", "view"]);
-            this.moveTo(Math.max(st.image.width - st.view.width, 0) / 2, Math.max(st.image.width - st.view.width, 0) / 2);
+            var st = this.getAttrs(["scaled", "view"]);
+            this.moveTo(Math.max(st.scaled.width - st.view.width, 0) / 2, Math.max(st.scaled.height - st.view.height, 0) / 2);
         },
         moveTo: function (x, y) {
             this.set("view", { x: x, y: y });
@@ -102,11 +101,24 @@ YUI.add('facsimile', function (Y) {
             var view = this.get("view");
             this.moveTo(view.x + x, view.y + y);
         },
+        zoom: function (zoom) {
+            var prev = this.get("zoom"), next = Math.max(0, prev + (zoom || 1)), view = this.get("view");
+            this.set("zoom", next);
+            this.set("view", {
+                x: Math.floor(view.x * Math.pow(2, prev) / Math.pow(2, next)),
+                y: Math.floor(view.y * Math.pow(2, prev) / Math.pow(2, next))
+            });
+        },
         imageSrc: function () {
             return cp + "/facsimile/gsa/390883/390883_0002";
         },
         tileSrc: function (x, y) {
-            return Y.substitute("{imageSrc}?x={x}&y={y}", {imageSrc: this.imageSrc(), x: x, y: y});
+            return Y.substitute("{imageSrc}?x={x}&y={y}&zoom={zoom}", {
+                imageSrc: this.imageSrc(),
+                x: x,
+                y: y,
+                zoom: this.get("zoom")
+            });
         },
         syncUI: function () {
             var contentBox = this.get("contentBox"),
