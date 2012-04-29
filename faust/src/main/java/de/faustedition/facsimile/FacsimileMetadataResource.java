@@ -11,8 +11,8 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 import javax.imageio.ImageReader;
-import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -34,7 +34,7 @@ public class FacsimileMetadataResource extends ServerResource {
         final Element cacheElement = cache.get(facsimile);
         if (cacheElement != null) {
             if (cacheElement.getCreationTime() >= facsimile.getFile().lastModified()) {
-                return new StringRepresentation((String) cacheElement.getValue(), MediaType.APPLICATION_JSON);
+                return toRepresentation((String) cacheElement.getValue());
             }
             cache.remove(facsimile);
         }
@@ -42,19 +42,25 @@ public class FacsimileMetadataResource extends ServerResource {
         ImageReader reader = null;
         try {
             reader = facsimile.createImageReader();
-            final Map<String, Object> metadata = Maps.newHashMap();
-            metadata.put("width", reader.getWidth(0));
-            metadata.put("height", reader.getHeight(0));
-            metadata.put("maxZoom", reader.getNumImages(true) - 1);
-            metadata.put("tileSize", FacsimileTile.SIZE);
+            final Map<String, Object> metadataMap = Maps.newHashMap();
+            metadataMap.put("width", reader.getWidth(0));
+            metadataMap.put("height", reader.getHeight(0));
+            metadataMap.put("maxZoom", reader.getNumImages(true) - 1);
+            metadataMap.put("tileSize", FacsimileTile.SIZE);
 
-            final String metadataStr = OBJECT_MAPPER.writeValueAsString(metadata);
-            cache.put(new Element(facsimile, metadataStr));
-            return new StringRepresentation(metadataStr, MediaType.APPLICATION_JSON);
+            final String metadata = OBJECT_MAPPER.writeValueAsString(metadataMap);
+            cache.put(new Element(facsimile, metadata));
+            return toRepresentation(metadata);
         } finally {
             if (reader != null) {
                 reader.dispose();
             }
         }
+    }
+
+    private StringRepresentation toRepresentation(String metadata) {
+        final StringRepresentation representation = new StringRepresentation(metadata, MediaType.APPLICATION_JSON);
+        representation.setModificationDate(new Date(facsimile.getFile().lastModified()));
+        return representation;
     }
 }

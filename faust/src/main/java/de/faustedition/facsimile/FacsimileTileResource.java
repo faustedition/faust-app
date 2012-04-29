@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -72,13 +73,14 @@ public class FacsimileTileResource extends ServerResource {
         return new FacsimileTileRepresentation(tileData);
     }
 
-    private static class FacsimileTileRepresentation extends OutputRepresentation {
+    private class FacsimileTileRepresentation extends OutputRepresentation {
 
         private final byte[] data;
 
         public FacsimileTileRepresentation(byte[] data) {
             super(MediaType.IMAGE_JPEG);
             this.data = data;
+            setModificationDate(new Date(tile.getFile().lastModified()));
         }
 
         @Override
