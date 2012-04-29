@@ -2,9 +2,8 @@ package de.faustedition.facsimile;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
-import com.google.common.io.Closeables;
-import com.sun.media.jai.codec.FileSeekableStream;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -25,20 +24,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-import java.awt.color.ColorSpace;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.renderable.ParameterBlock;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -72,7 +66,7 @@ public class FacsimileFinder extends Finder implements InitializingBean {
 
             final int x = Integer.parseInt(query.getFirstValue("x", "0"));
             final int y = Integer.parseInt(query.getFirstValue("y", "0"));
-            final int zoom = Integer.parseInt(query.getFirstValue("zoom", "1"));
+            final int zoom = Integer.parseInt(query.getFirstValue("zoom", "0"));
             return new FacsimileResource(facsimile, x, y, zoom);
         } catch (IOException e) {
             throw Throwables.propagate(e);
@@ -87,13 +81,10 @@ public class FacsimileFinder extends Finder implements InitializingBean {
         return facsimile;
     }
 
-    protected static ImageReader getImageReader(File file) throws IOException {
+    protected static ImageReader createImageReader(File file) throws IOException {
         final ImageInputStream imageInputStream = ImageIO.createImageInputStream(file);
 
-        final Iterator<ImageReader> readers = ImageIO.getImageReaders(imageInputStream);
-        Preconditions.checkArgument(readers.hasNext(), file + " cannot be read via Java ImageIO");
-
-        final ImageReader imageReader = readers.next();
+        final ImageReader imageReader = Iterators.get(ImageIO.getImageReaders(imageInputStream), 0);
         imageReader.setInput(imageInputStream);
         return imageReader;
     }
@@ -111,10 +102,11 @@ public class FacsimileFinder extends Finder implements InitializingBean {
         public Representation metadata() throws IOException {
             ImageReader reader = null;
             try {
-                reader = getImageReader(facsimile);
+                reader = createImageReader(facsimile);
                 final Map<String, Object> metadata = Maps.newHashMap();
                 metadata.put("width", reader.getWidth(0));
                 metadata.put("height", reader.getHeight(0));
+                metadata.put("maxZoom", reader.getNumImages(true) - 1);
                 metadata.put("tileSize", TILE_SIZE);
                 return new StringRepresentation(OBJECT_MAPPER.writeValueAsString(metadata), MediaType.APPLICATION_JSON);
 
@@ -127,11 +119,6 @@ public class FacsimileFinder extends Finder implements InitializingBean {
     }
 
     public static class FacsimileResource extends ServerResource {
-
-        public static final ComponentColorModel COLOR_MODEL = new ComponentColorModel(
-                ColorSpace.getInstance(ColorSpace.CS_sRGB),
-                new int[]{8, 8, 8},
-                false, false, ColorModel.OPAQUE, DataBuffer.TYPE_BYTE);
 
         private final File facsimile;
         private final int zoom;
@@ -151,29 +138,34 @@ public class FacsimileFinder extends Finder implements InitializingBean {
             return new OutputRepresentation(MediaType.IMAGE_JPEG) {
                 @Override
                 public void write(OutputStream outputStream) throws IOException {
-                    InputStream facsimileStream = null;
+                    ImageReader reader = null;
+                    ImageWriter writer = null;
                     try {
-                        RenderedOp image = JAI.create("stream", facsimileStream = new FileSeekableStream(facsimile));
+                        reader = createImageReader(facsimile);
+                        final int imageIndex = Math.max(0, Math.min(zoom, reader.getNumImages(true) - 1));
+                        final int imageWidth = reader.getWidth(0);
+                        final int imageHeight = reader.getHeight(0);
+                        final int tileX = x * TILE_SIZE;
+                        final int tileY = y * TILE_SIZE;
+                        final ImageReadParam parameters = reader.getDefaultReadParam();
+                        final Rectangle tile = new Rectangle(
+                                Math.min(tileX, imageWidth),
+                                Math.min(tileY, imageHeight),
+                                Math.min(TILE_SIZE, tileX >= imageWidth ? imageWidth : imageWidth - tileX),
+                                Math.min(TILE_SIZE, tileY >= imageHeight ? imageHeight : imageHeight - tileY)
+                        );
+                        parameters.setSourceRegion(tile);
+                        final BufferedImage tileImage = reader.read(imageIndex, parameters);
 
-                        final int imageWidth = image.getWidth();
-                        final int imageHeight = image.getHeight();
-                        final float tileSize = TILE_SIZE * zoom;
-                        final float tileX = x * tileSize;
-                        final float tileY = y * tileSize;
-                        image = JAI.create("Crop", new ParameterBlock()
-                                .addSource(image)
-                                .add(Math.min(tileX, imageWidth))
-                                .add(Math.min(tileY, imageHeight))
-                                .add(Math.min(tileSize, imageWidth - tileX))
-                                .add(Math.min(tileSize, imageHeight - tileY)));
-
-                        image = JAI.create("ColorConvert", new ParameterBlock()
-                                .addSource(image)
-                                .add(COLOR_MODEL));
-
-                        JAI.create("Encode", image, outputStream, "JPEG", null);
+                        LOG.debug("Writing {} of {} (zoom {})", new Object[]{tile, facsimile, zoom});
+                        ImageIO.write(tileImage, "JPEG", outputStream);
                     } finally {
-                        Closeables.close(facsimileStream, true);
+                        if (writer != null) {
+                            writer.dispose();
+                        }
+                        if (reader != null) {
+                            reader.dispose();
+                        }
                     }
                 }
             };
