@@ -1,6 +1,8 @@
 YUI.add('facsimile', function (Y) {
 
-    var NULL_IMAGE_VALUE = { width: Number.MAX_VALUE, height: Number.MAX_VALUE, tileSize: 1, maxZoom: 0 },
+    var SVG_NS = "http://www.w3.org/2000/svg",
+        XLINK_NS = "http://www.w3.org/1999/xlink",
+        NULL_IMAGE_VALUE = { width: Number.MAX_VALUE, height: Number.MAX_VALUE, tileSize: 1, maxZoom: 0 },
         NULL_VIEW_VALUE = { x: 0, y: 0, width: 0, height: 0, zoom: 0 };
 
     function qscale(degree) {
@@ -9,12 +11,30 @@ YUI.add('facsimile', function (Y) {
         };
     }
 
+    function svgElement(name) {
+        return Y.config.doc.createElementNS(SVG_NS, name);
+    }
+
+    function svgAttrs(element, attrs) {
+        Y.Object.each(attrs, function(v, k) {
+            element.setAttribute(k, v);
+        });
+        return element;
+    }
+
+    function svgStyles(element, styles) {
+        Y.Object.each(styles, function(v, k) {
+            element.style.setProperty(k, v);
+        });
+        return element;
+    }
+
     var TiledViewModel = Y.Base.create("tile-view-model", Y.Base, [], {
         initializer: function () {
             this.imageChangeSub = this.after("imageChange", this.generateTiles, this);
             this.viewChangeSub = this.after("viewChange", this.generateTiles, this);
         },
-        destructor: function() {
+        destructor: function () {
             this.viewChangeSub.detach();
             this.imageChangeSub.detach();
         },
@@ -119,17 +139,32 @@ YUI.add('facsimile', function (Y) {
 
     var FacsimileViewer = Y.Base.create("facsimile-viewer", Y.Widget, [], {
         initializer: function (config) {
-            this.model = new TiledViewModel({
-                view: config.view || NULL_VIEW_VALUE
+            var view = config.view || NULL_VIEW_VALUE;
+
+            this.svg = svgStyles(svgAttrs(svgElement("svg"), {
+                "version": "1.1",
+                "width": view.width,
+                "height": view.height
+            }), {
+                background: "black",
+                margin: "1em auto",
+                border: 0,
+                padding: 0,
+                position: "relative",
+                overflow: "hidden"
             });
-            this.tilesChangeSub = this.model.after("tilesChange", this.syncUI, this);
+            this.get("contentBox").getDOMNode().appendChild(this.svg);
+
+            this.model = new TiledViewModel({ view: view });
+            this.modelChangeSub = this.model.after(["tilesChange", "viewChange", "imageChange"], this.syncUI, this);
+
             Y.io(this.imageSrc(), {
                 data: {metadata: true },
                 on: { success: Y.bind(this.metadataReceived, this) }
             });
         },
-        destructor: function() {
-            this.tilesChangeSub.detach();
+        destructor: function () {
+            this.modelChangeSub.detach();
         },
         renderUI: function () {
         },
@@ -149,35 +184,25 @@ YUI.add('facsimile', function (Y) {
             });
         },
         syncUI: function () {
-            var contentBox = this.get("contentBox"), view = this.model.get("view"),
+            var view = this.model.get("view"),
                 xOffset = Math.max(0, (view.width - view.imageWidth) / 2),
                 yOffset = Math.max(0, (view.height - view.imageHeight) / 2),
                 tileSize = this.model.get("image").tileSize,
                 tiles = this.model.get("tiles");
 
-            contentBox.empty();
-            contentBox.setStyles({
-                background: "black",
-                margin: "1em auto",
-                border: 0,
-                padding: 0,
-                position: "relative",
-                left: 0,
-                top: 0,
-                width: view.width,
-                height: view.height,
-                overflow: "hidden"
+            while (this.svg.firstChild) this.svg.removeChild(this.svg.firstChild);
+            svgAttrs(this.svg, {
+                "width": view.width,
+                "height": view.height
             });
-
-
             Y.Array.each(tiles, function (tile) {
-                contentBox.append(Y.Node.create(Y.substitute('<img src="{src}" alt="{x}x{y}">', Y.merge(tile, {
-                    src: this.tileSrc(tile.x, tile.y)
-                }))).setStyles({
-                        position: "absolute",
-                        left: Math.floor((tile.x * tileSize) - view.x + xOffset),
-                        top: Math.floor((tile.y * tileSize) - view.y + yOffset)
-                    }));
+                var x = tile.x * tileSize, y = tile.y * tileSize;
+                this.svg.appendChild(svgAttrs(svgElement("image"), {
+                    "x": Math.floor(x - view.x + xOffset),
+                    "y": Math.floor(y - view.y + yOffset),
+                    "width": Math.min(tileSize, view.imageWidth - x),
+                    "height": Math.min(tileSize, view.imageHeight - y)
+                })).setAttributeNS(XLINK_NS, "href", this.tileSrc(tile.x, tile.y));
             }, this);
         }
     });
