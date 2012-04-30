@@ -19,12 +19,21 @@ YUI().use('node', 'event', 'io', 'json', function(Y) {
 		
 		svgOpts = {
 			callback: function() {
+				//zoom and center (this should be a function in SvgCanvas ...)
+				// var scrbar = 15,
+				// w_area = $('#workarea');
+				// var z_info = svgCanvas.setBBoxZoom('canvas', w_area.width()-scrbar, w_area.height()-scrbar); 
+				// svgCanvas.updateCanvas();
+				//zoomDone();
+				$('#fit_to_canvas').trigger('mouseup');
 				$.unblockUI();
 			}
 		}
 
 		$.blockUI({ message: '<h1>Loading SVG data...</h1>' });
 		svgEditor.loadFromURL(svgURL, svgOpts);
+
+		
 	}
 
 	var textCfg = {
