@@ -29,6 +29,12 @@ YUI.add('facsimile', function (Y) {
         return element;
     }
 
+    function empty(element) {
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+    }
+
     var TiledViewModel = Y.Base.create("tile-view-model", Y.Base, [], {
         initializer: function () {
             this.imageChangeSub = this.after("imageChange", this.generateTiles, this);
@@ -141,7 +147,7 @@ YUI.add('facsimile', function (Y) {
         initializer: function (config) {
             var view = config.view || NULL_VIEW_VALUE;
 
-            this.svg = svgStyles(svgAttrs(svgElement("svg"), {
+            var svgRoot = svgStyles(svgAttrs(svgElement("svg"), {
                 "version": "1.1",
                 "width": view.width,
                 "height": view.height
@@ -153,7 +159,16 @@ YUI.add('facsimile', function (Y) {
                 position: "relative",
                 overflow: "hidden"
             });
-            this.svg = this.get("contentBox").getDOMNode().appendChild(this.svg).appendChild(svgElement("g"));
+            this.mask = svgRoot.appendChild(svgElement("defs")).appendChild(svgAttrs(svgElement("mask"), {
+                id: "highlight",
+                x: "0",
+                y: "0",
+                width: "100%",
+                height: "100%"
+            }));
+            this.svg = this.get("contentBox").getDOMNode().appendChild(svgRoot).appendChild(svgStyles(svgElement("g"), {
+                mask: "url(#highlight)"
+            }));
 
             this.model = new TiledViewModel({ view: view });
             this.modelChangeSub = this.model.after(["tilesChange", "viewChange", "imageChange"], this.syncUI, this);
@@ -190,18 +205,42 @@ YUI.add('facsimile', function (Y) {
                 tileSize = this.model.get("image").tileSize,
                 tiles = this.model.get("tiles");
 
-            while (this.svg.firstChild) this.svg.removeChild(this.svg.firstChild);
+            empty(this.svg);
             svgAttrs(this.svg.parentNode, {
                 "width": view.width,
                 "height": view.height
             });
+
+            empty(this.mask);
+            this.mask.appendChild(svgStyles(svgAttrs(svgElement("rect"), {
+                x: 0,
+                y: 0,
+                width: "100%",
+                height: "100%"
+            }), {
+                fill: "#999"
+            }));
+            this.mask.appendChild(svgStyles(svgAttrs(svgElement("rect"), {
+                x: "10%",
+                y: "40%",
+                rx: "10",
+                ry: "10",
+                width: "80%",
+                height: "20%"
+            }), {
+                fill: "#fff",
+                stroke: "#fff",
+                strokeWidth: "10"
+            }));
+
+            var fixedCoordOffset = (Y.UA.gecko && 1 || 0);
             Y.Array.each(tiles, function (tile) {
                 var x = tile.x * tileSize, y = tile.y * tileSize;
                 this.svg.appendChild(svgAttrs(svgElement("image"), {
                     "x": Math.floor(x - view.x + xOffset),
                     "y": Math.floor(y - view.y + yOffset),
-                    "width": Math.min(tileSize, view.imageWidth - x) + 1,
-                    "height": Math.min(tileSize, view.imageHeight - y) + 1
+                    "width": Math.min(tileSize, view.imageWidth - x) + fixedCoordOffset,
+                    "height": Math.min(tileSize, view.imageHeight - y) + fixedCoordOffset
                 })).setAttributeNS(XLINK_NS, "href", this.tileSrc(tile.x, tile.y));
             }, this);
         }
