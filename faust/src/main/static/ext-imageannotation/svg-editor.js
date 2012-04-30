@@ -59,7 +59,8 @@
 				gridColor: "#000",
 				baseUnit: 'px',
 				snappingStep: 10,
-				showRulers: true
+				showRulers: true,
+				showlayers: true
 			},
 			uiStrings = Editor.uiStrings = {
 				common: {

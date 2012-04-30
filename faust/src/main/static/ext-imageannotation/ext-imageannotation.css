@@ -1,3 +1,7 @@
+html body {
+	overflow: hidden;
+}
+
 #svg_editor #textpanel {
  	display: inline-block;
 	position: relative;
