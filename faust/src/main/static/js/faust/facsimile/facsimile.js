@@ -24,7 +24,7 @@ YUI.add('facsimile', function (Y) {
 
     function svgStyles(element, styles) {
         Y.Object.each(styles, function(v, k) {
-            element.style.setProperty(k, v);
+            element.style[k] = v;
         });
         return element;
     }
@@ -153,7 +153,7 @@ YUI.add('facsimile', function (Y) {
                 position: "relative",
                 overflow: "hidden"
             });
-            this.get("contentBox").getDOMNode().appendChild(this.svg);
+            this.svg = this.get("contentBox").getDOMNode().appendChild(this.svg).appendChild(svgElement("g"));
 
             this.model = new TiledViewModel({ view: view });
             this.modelChangeSub = this.model.after(["tilesChange", "viewChange", "imageChange"], this.syncUI, this);
@@ -185,13 +185,13 @@ YUI.add('facsimile', function (Y) {
         },
         syncUI: function () {
             var view = this.model.get("view"),
-                xOffset = Math.max(0, (view.width - view.imageWidth) / 2),
-                yOffset = Math.max(0, (view.height - view.imageHeight) / 2),
+                xOffset = Math.floor(Math.max(0, (view.width - view.imageWidth) / 2)),
+                yOffset = Math.floor(Math.max(0, (view.height - view.imageHeight) / 2)),
                 tileSize = this.model.get("image").tileSize,
                 tiles = this.model.get("tiles");
 
             while (this.svg.firstChild) this.svg.removeChild(this.svg.firstChild);
-            svgAttrs(this.svg, {
+            svgAttrs(this.svg.parentNode, {
                 "width": view.width,
                 "height": view.height
             });
@@ -200,8 +200,8 @@ YUI.add('facsimile', function (Y) {
                 this.svg.appendChild(svgAttrs(svgElement("image"), {
                     "x": Math.floor(x - view.x + xOffset),
                     "y": Math.floor(y - view.y + yOffset),
-                    "width": Math.min(tileSize, view.imageWidth - x),
-                    "height": Math.min(tileSize, view.imageHeight - y)
+                    "width": Math.min(tileSize, view.imageWidth - x) + 1,
+                    "height": Math.min(tileSize, view.imageHeight - y) + 1
                 })).setAttributeNS(XLINK_NS, "href", this.tileSrc(tile.x, tile.y));
             }, this);
         }
