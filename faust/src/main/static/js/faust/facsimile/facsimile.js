@@ -22,8 +22,8 @@ YUI.add('facsimile', function (Y) {
                     view = this.get("view") || NULL_VIEW_VALUE,
                     isNumber = Y.Lang.isNumber;
                 return {
-                    x: Math.min(Math.max(isNumber(val.x) ? val.x : view.x, 0), image.width),
-                    y: Math.min(Math.max(isNumber(val.y) ? val.y : view.y, 0), image.height),
+                    x: Math.min(Math.max(isNumber(val.x) ? val.x : view.x, 0), Math.max(0, image.width - view.width)),
+                    y: Math.min(Math.max(isNumber(val.y) ? val.y : view.y, 0), Math.max(0, image.height - view.height)),
                     width: Math.max(isNumber(val.width) ? val.width : view.width, 0),
                     height: Math.max(isNumber(val.height) ? val.height : view.height, 0)
                 };
@@ -35,6 +35,16 @@ YUI.add('facsimile', function (Y) {
                 return Math.min(Math.max(val || 0, 0), this.get("image").maxZoom);
             }
         },
+        focus: {
+            getter: function() {
+                var zoom = this.get("zoom"), scaled = this.get("scaled"), view = this.get("view"),
+                    scale = Math.pow(2, zoom);
+                return {
+                    x: (view.x + Math.floor((Math.min(scaled.width, view.x + view.width) - view.x) / 2)) * scale,
+                    y: (view.y + Math.floor((Math.min(scaled.height, view.y + view.height) - view.y) / 2)) * scale
+                };
+            }
+        },
         scaled: {
             getter: function () {
                 var zoom = this.get("zoom"), image = this.get("image"),
@@ -42,6 +52,15 @@ YUI.add('facsimile', function (Y) {
                 return {
                     width: Math.floor(image.width / scale),
                     height: Math.floor(image.height / scale)
+                };
+            }
+        },
+        center: {
+            getter: function() {
+                var view = this.get("view");
+                return {
+                    x: view.x + Math.floor(view.width / 2),
+                    y: view.y + Math.floor(view.height / 2)
                 };
             }
         },
@@ -71,8 +90,8 @@ YUI.add('facsimile', function (Y) {
             var endy = Math.ceil(Math.min(sc.height, view.y + view.height) / tileSize);
 
             var tiles = [];
-            for (var j = starty - 1; j < endy; j++) {
-                for (var i = startx - 1; i < endx; i++) {
+            for (var j = starty; j < endy; j++) {
+                for (var i = startx; i < endx; i++) {
                     tiles.push({ x: i, y: j });
                 }
             }
@@ -88,11 +107,17 @@ YUI.add('facsimile', function (Y) {
         },
         metadataReceived: function (transactionId, response) {
             this.set("image", Y.merge(this.get("image"), Y.JSON.parse(response.responseText)));
-            this.center();
+            this.fitToView();
         },
         center: function () {
             var st = this.getAttrs(["scaled", "view"]);
             this.moveTo(Math.max(st.scaled.width - st.view.width, 0) / 2, Math.max(st.scaled.height - st.view.height, 0) / 2);
+        },
+        centerOn: function(x, y) {
+            var scaled = this.get("scaled"), view = this.get("view");
+            this.moveTo(
+                x - Math.floor(Math.min(scaled.width, view.width) / 2),
+                y - Math.floor(Math.min(scaled.height, view.height) / 2));
         },
         moveTo: function (x, y) {
             this.set("view", { x: x, y: y });
@@ -101,16 +126,23 @@ YUI.add('facsimile', function (Y) {
             var view = this.get("view");
             this.moveTo(view.x + x, view.y + y);
         },
+        fitToView: function() {
+            var image = this.get("image"), view = this.get("view"), prevZoom = this.get("zoom");
+            var nextZoom = Math.ceil(Math.log(Math.max(image.width / view.width, image.height / view.height)) / Math.log(2));
+            if (nextZoom != prevZoom) {
+                this.zoom(nextZoom - prevZoom);
+            }
+        },
         zoom: function (zoom) {
-            var prev = this.get("zoom"), next = Math.max(0, prev + (zoom || 1)), view = this.get("view");
+            var prev = this.get("zoom"), next = Math.max(0, prev + (zoom || 1)),
+                view = this.get("view"), scaled = this.get("scaled");
             this.set("zoom", next);
-            this.set("view", {
-                x: Math.floor(view.x * Math.pow(2, prev) / Math.pow(2, next)),
-                y: Math.floor(view.y * Math.pow(2, prev) / Math.pow(2, next))
-            });
+            this.centerOn(
+                (view.x + Math.floor((Math.min(scaled.width, view.x + view.width) - view.x) / 2)) * Math.pow(2, prev) / Math.pow(2, next),
+                (view.y + Math.floor((Math.min(scaled.height, view.y + view.height) - view.y) / 2)) * Math.pow(2, prev) / Math.pow(2, next));
         },
         imageSrc: function () {
-            return cp + "/facsimile/gsa/390883/390883_0002";
+            return cp + "/facsimile/gsa/391098/391098_0001";
         },
         tileSrc: function (x, y) {
             return Y.substitute("{imageSrc}?x={x}&y={y}&zoom={zoom}", {
@@ -122,8 +154,11 @@ YUI.add('facsimile', function (Y) {
         },
         syncUI: function () {
             var contentBox = this.get("contentBox"),
-                tileSize = this.get("image").tileSize,
                 view = this.get("view"),
+                scaled = this.get("scaled"),
+                xOffset = Math.max(0, Math.floor((view.width - scaled.width) / 2)),
+                yOffset = Math.max(0, Math.floor((view.height - scaled.height) / 2)),
+                tileSize = this.get("image").tileSize,
                 tiles = this.get("tiles");
 
             contentBox.empty();
@@ -140,13 +175,14 @@ YUI.add('facsimile', function (Y) {
                 overflow: "hidden"
             });
 
+
             Y.Array.each(tiles, function (tile) {
                 contentBox.append(Y.Node.create(Y.substitute('<img src="{src}" alt="{x}x{y}">', Y.merge(tile, {
                     src: this.tileSrc(tile.x, tile.y)
                 }))).setStyles({
                         position: "absolute",
-                        left: (tile.x * tileSize) - view.x,
-                        top: (tile.y * tileSize) - view.y
+                        left: (tile.x * tileSize) - view.x + xOffset,
+                        top: (tile.y * tileSize) - view.y + yOffset
                     }));
             }, this);
         }

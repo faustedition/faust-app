@@ -6,7 +6,7 @@
            eternal="true"
            timeToIdleSeconds="0"
            timeToLiveSeconds="0"
-           diskPersistent="true"
+           diskPersistent="false"
             />
 
     <defaultCache
