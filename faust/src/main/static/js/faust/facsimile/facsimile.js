@@ -3,7 +3,9 @@ YUI.add('facsimile', function (Y) {
     var SVG_NS = "http://www.w3.org/2000/svg",
         XLINK_NS = "http://www.w3.org/1999/xlink",
         NULL_IMAGE_VALUE = { width: Number.MAX_VALUE, height: Number.MAX_VALUE, tileSize: 1, maxZoom: 0 },
-        NULL_VIEW_VALUE = { x: 0, y: 0, width: 0, height: 0, zoom: 0 };
+        NULL_VIEW_VALUE = { x: 0, y: 0, width: 0, height: 0, zoom: 0 },
+        NULL_HIGHLIGHT_VALUE = { x: 0, y: 0, width: 0, height: 0 }
+
 
     function qscale(degree) {
         return function (val) {
@@ -27,6 +29,10 @@ YUI.add('facsimile', function (Y) {
             element.style[k] = v;
         });
         return element;
+    }
+
+    function svg(element, attrs, styles) {
+        return svgStyles(svgAttrs(svgElement(element), attrs || {}), styles || {});
     }
 
     function empty(element) {
@@ -62,28 +68,36 @@ YUI.add('facsimile', function (Y) {
         },
         center: function () {
             var view = this.get("view");
-            this.moveTo(
+            this.panTo(
                 Math.max(view.imageWidth - view.width, 0) / 2,
                 Math.max(view.imageHeight - view.height, 0) / 2
             );
         },
         centerOn: function (x, y) {
             var view = this.get("view");
-            this.moveTo(
+            this.panTo(
                 x - Math.min(view.imageWidth, view.width) / 2,
                 y - Math.min(view.imageHeight, view.height) / 2
             );
         },
-        moveTo: function (x, y) {
+        moveTo: function(x, y) {
+            var scale = qscale(-this.get("zoom"));
+            this.panTo(scale(x || 0), scale(y || 0));
+        },
+        move: function(x, y) {
+            var scale = qscale(-this.get("zoom"));
+            this.pan(scale(x || 0), scale(y || 0));
+        },
+        panTo: function (x, y) {
             var view = this.get("view");
             this.set("view", {
                 x: x || 0,
                 y: y || 0
             });
         },
-        move: function (x, y) {
+        pan: function (x, y) {
             var view = this.get("view");
-            this.moveTo(
+            this.panTo(
                 view.x + (x || 0),
                 view.y + (y || 0)
             );
@@ -96,11 +110,12 @@ YUI.add('facsimile', function (Y) {
                 nextScale(prevScale(view.x + (Math.min(view.imageWidth, view.x + view.width) - view.x) / 2)),
                 nextScale(prevScale(view.y + (Math.min(view.imageHeight, view.y + view.height) - view.y) / 2)));
         },
-        fitToView: function () {
+        fittingZoom: function(width, height) {
             var image = this.get("image"), view = this.get("view");
-            var zoom = Math.round(Math.log(Math.max((image.width / view.width), (image.height / view.height))) / Math.log(2));
-            this.zoom(zoom - this.get("zoom"));
-            this.center();
+            return Math.round(Math.log(Math.max(((width || image.width) / view.width), ((height || image.height) / view.height))) / Math.log(2));
+        },
+        fitToView: function (width, height) {
+            this.zoom(this.fittingZoom(width, height) - this.get("zoom"));
         }
     }, {
         ATTRS: {
@@ -114,16 +129,21 @@ YUI.add('facsimile', function (Y) {
                 value: NULL_VIEW_VALUE,
                 setter: function (val) {
                     var image = this.get("image"),
-                        scale = qscale(-this.get("zoom")),
-                        imageWidth = scale(image.width),
-                        imageHeight = scale(image.height),
                         view = this.get("view") || NULL_VIEW_VALUE,
-                        isNumber = Y.Lang.isNumber;
+                        scale = qscale(-this.get("zoom")),
+                        isNumber = Y.Lang.isNumber,
+                        width = Math.max(isNumber(val.width) ? val.width : view.width, 0),
+                        height = Math.max(isNumber(val.height) ? val.height : view.height, 0),
+                        imageWidth = scale(image.width),
+                        imageHeight = scale(image.height);
+
                     return {
                         x: Math.min(Math.max(isNumber(val.x) ? val.x : view.x, 0), Math.max(0, imageWidth - view.width)),
                         y: Math.min(Math.max(isNumber(val.y) ? val.y : view.y, 0), Math.max(0, imageHeight - view.height)),
-                        width: Math.max(isNumber(val.width) ? val.width : view.width, 0),
-                        height: Math.max(isNumber(val.height) ? val.height : view.height, 0),
+                        centerX: Math.floor(Math.max(0, (view.width - imageWidth) / 2)),
+                        centerY: Math.floor(Math.max(0, (view.height - imageHeight) / 2)),
+                        width: width,
+                        height: height,
                         imageWidth: imageWidth,
                         imageHeight: imageHeight
                     };
@@ -143,15 +163,91 @@ YUI.add('facsimile', function (Y) {
         }
     });
 
+    var HighlightPane = Y.Base.create("hightlight-pane", Y.Base, [], {
+        initializer: function() {
+            var view = this.get("view"),
+                svgRoot = view.ownerSVGElement,
+                defs = svgRoot.getElementsByTagNameNS(SVG_NS, "defs"),
+                model = this.get("model");
+
+            this.mask = (defs.length ? defs[0] : svgRoot.appendChild(svg("defs"))).appendChild(svg("mask", {
+                id: "highlight",
+                x: "0",
+                y: "0",
+                width: "100%",
+                height: "100%"
+            }));
+            this.mask.appendChild(svg("rect", {
+                x: 0,
+                y: 0,
+                width: "100%",
+                height: "100%"
+            }, {
+                fill: "#999"
+            }));
+            this.highlightRect = this.mask.appendChild(svg("rect", {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+                rx: 0,
+                ry: 0
+            }, {
+                fill: "#fff",
+                stroke: "#fff",
+                strokeWidth: "10"
+            }));
+
+            this.modelChangeSub = model.after(["tilesChange", "viewChange", "imageChange"], this.highlight, this);
+            this.highlightChangeSub = this.after("highlightChange", this.highlight, this);
+        },
+        destructor: function() {
+            this.highlightChangeSub.detach();
+            this.modelChangeSub.detach();
+
+            this.mask.parentNode.removeChild(this.mask);
+        },
+        highlight: function() {
+            var highlight = this.get("highlight"), model = this.get("model"),
+                scale = qscale(-model.get("zoom")),
+                x = Math.floor(scale(highlight.x)),
+                y = Math.floor(scale(highlight.y)),
+                width = Math.floor(scale(highlight.width)),
+                height = Math.floor(scale(highlight.height)),
+                view = model.get("view");
+
+            svgStyles(this.get("view"), {
+                mask: ((width && height) ? "url(#highlight)" : "none")
+            });
+
+            svgAttrs(this.highlightRect, {
+                x: x - view.x + view.centerX,
+                y: y - view.y + view.centerY,
+                rx: Math.floor(width / 100),
+                ry: Math.floor(height / 100),
+                width: width,
+                height: height
+            });
+        }
+    }, {
+        ATTRS: {
+            view: {},
+            model: {},
+            highlight: {
+                value: NULL_HIGHLIGHT_VALUE
+            }
+        }
+    });
+
     var FacsimileViewer = Y.Base.create("facsimile-viewer", Y.Widget, [], {
         initializer: function (config) {
             var view = config.view || NULL_VIEW_VALUE;
 
-            var svgRoot = svgStyles(svgAttrs(svgElement("svg"), {
+            var svgRoot = svg("svg", {
                 "version": "1.1",
                 "width": view.width,
                 "height": view.height
-            }), {
+            }, {
                 background: "black",
                 margin: "1em auto",
                 border: 0,
@@ -159,19 +255,15 @@ YUI.add('facsimile', function (Y) {
                 position: "relative",
                 overflow: "hidden"
             });
-            this.mask = svgRoot.appendChild(svgElement("defs")).appendChild(svgAttrs(svgElement("mask"), {
-                id: "highlight",
-                x: "0",
-                y: "0",
-                width: "100%",
-                height: "100%"
-            }));
-            this.svg = this.get("contentBox").getDOMNode().appendChild(svgRoot).appendChild(svgStyles(svgElement("g"), {
-                mask: "url(#highlight)"
-            }));
+            var contentBox = this.get("contentBox");
+            this.view = contentBox.getDOMNode().appendChild(svgRoot).appendChild(svg("g"));
+
+            this.navigationSub = Y.one("body").on('key', Y.bind(this.navigate, this), 'down:37,38,39,40,48,67,107,109,187,189');
 
             this.model = new TiledViewModel({ view: view });
             this.modelChangeSub = this.model.after(["tilesChange", "viewChange", "imageChange"], this.syncUI, this);
+
+            this.highlightPane = new HighlightPane({ view: this.view, model: this.model });
 
             Y.io(this.imageSrc(), {
                 data: {metadata: true },
@@ -179,74 +271,98 @@ YUI.add('facsimile', function (Y) {
             });
         },
         destructor: function () {
+            this.navigationSub.detach();
             this.modelChangeSub.detach();
         },
-        renderUI: function () {
+        navigate: function(e) {
+            var view = this.model.get("view"), moveX = Math.floor(view.width / 4), moveY = Math.floor(view.height / 4);
+            switch (e.keyCode) {
+                case 37:
+                    // arrow left
+                    this.model.pan(-moveX, 0);
+                    break;
+                case 38:
+                    // arrow up
+                    this.model.pan(0, -moveY);
+                    break;
+                case 39:
+                    // arrow right
+                    this.model.pan(moveX, 0);
+                    break;
+                case 40:
+                    // arrow down
+                    this.model.pan(0, moveY);
+                    break;
+                case 48:
+                    // 0
+                    this.model.fitToView();
+                    this.model.center();
+                    break;
+                case 67:
+                    // c
+                    this.model.center();
+                    break;
+                case 107:
+                case 187:
+                    // +
+                    this.model.zoom(-1);
+                    return;
+                case 109:
+                case 189:
+                    // -
+                    this.model.zoom(1);
+                    return;
+            }
+            this.highlightPane.set("highlight", NULL_HIGHLIGHT_VALUE);
+        },
+        highlight: function(area) {
+            this.model.zoom(this.model.fittingZoom(area.width, area.height) + 1 - this.model.get("zoom"));
+            var scale = qscale(-this.model.get("zoom"));
+            this.model.centerOn(scale(area.x + Math.floor(area.width / 2)), scale(area.y + Math.floor(area.height / 2)));
+            this.highlightPane.set("highlight", area);
         },
         metadataReceived: function (transactionId, response) {
             this.model.set("image", Y.merge(this.get("image"), Y.JSON.parse(response.responseText)));
             this.model.fitToView();
+            this.model.center();
         },
         imageSrc: function () {
             return cp + "/facsimile/gsa/391098/391098_0001";
         },
-        tileSrc: function (x, y) {
+        tileSrc: function (x, y, zoom) {
             return Y.substitute("{imageSrc}?x={x}&y={y}&zoom={zoom}", {
                 imageSrc: this.imageSrc(),
                 x: x,
                 y: y,
-                zoom: this.model.get("zoom")
+                zoom: zoom
             });
         },
         syncUI: function () {
             var view = this.model.get("view"),
-                xOffset = Math.floor(Math.max(0, (view.width - view.imageWidth) / 2)),
-                yOffset = Math.floor(Math.max(0, (view.height - view.imageHeight) / 2)),
                 tileSize = this.model.get("image").tileSize,
-                tiles = this.model.get("tiles");
+                tiles = this.model.get("tiles"),
+                zoom = this.model.get("zoom"),
+                fixedCoordOffset = (Y.UA.gecko && 1 || 0);
 
-            empty(this.svg);
-            svgAttrs(this.svg.parentNode, {
+            svgAttrs(this.view.ownerSVGElement, {
                 "width": view.width,
                 "height": view.height
             });
 
-            empty(this.mask);
-            this.mask.appendChild(svgStyles(svgAttrs(svgElement("rect"), {
-                x: 0,
-                y: 0,
-                width: "100%",
-                height: "100%"
-            }), {
-                fill: "#999"
-            }));
-            this.mask.appendChild(svgStyles(svgAttrs(svgElement("rect"), {
-                x: "10%",
-                y: "40%",
-                rx: "10",
-                ry: "10",
-                width: "80%",
-                height: "20%"
-            }), {
-                fill: "#fff",
-                stroke: "#fff",
-                strokeWidth: "10"
-            }));
-
-            var fixedCoordOffset = (Y.UA.gecko && 1 || 0);
+            empty(this.view);
             Y.Array.each(tiles, function (tile) {
                 var x = tile.x * tileSize, y = tile.y * tileSize;
-                this.svg.appendChild(svgAttrs(svgElement("image"), {
-                    "x": Math.floor(x - view.x + xOffset),
-                    "y": Math.floor(y - view.y + yOffset),
+                this.view.appendChild(svg("image", {
+                    "x": Math.floor(x - view.x + view.centerX),
+                    "y": Math.floor(y - view.y + view.centerY),
                     "width": Math.min(tileSize, view.imageWidth - x) + fixedCoordOffset,
                     "height": Math.min(tileSize, view.imageHeight - y) + fixedCoordOffset
-                })).setAttributeNS(XLINK_NS, "href", this.tileSrc(tile.x, tile.y));
+                })).setAttributeNS(XLINK_NS, "href", this.tileSrc(tile.x, tile.y, zoom));
             }, this);
         }
     });
 
     Y.mix(Y.namespace("Faust"), { FacsimileViewer: FacsimileViewer });
 }, '0.0', {
-    requires: ["base", "widget", "substitute", "array-extras", "io", "json"]
+    requires: ["base", "widget", "substitute", "array-extras", "io", "json", "event-key"]
 });
