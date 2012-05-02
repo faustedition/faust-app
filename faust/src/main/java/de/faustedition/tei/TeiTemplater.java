@@ -48,7 +48,7 @@ public class TeiTemplater extends Runtime implements Runnable {
 				return;
 			}
 
-			for (FaustURI source : xml) {
+			for (FaustURI source : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
 				if (!source.getPath().endsWith(".xml")) {
 					continue;
 				}
