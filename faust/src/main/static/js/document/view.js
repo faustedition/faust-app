@@ -351,7 +351,7 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 				nextPage.addClass("disabled");
 			
 			if (Y.one('#image-link'))
-				Y.one('#image-link').set('href', imageLinkBase + '/' + this.currentPage);
+				Y.one('#image-link').set('href', imageLinkBase + '/' + this.pages[this.currentPage].order);
 
 			var schemeAuth = location.href.slice(0, location.href.search(/[^\/]\/[^\/]/) + 1);
 			//var editxml = 'editxml://' + authority + '/xml/' + this.pages[this.currentPage].transcript.source.components[2];

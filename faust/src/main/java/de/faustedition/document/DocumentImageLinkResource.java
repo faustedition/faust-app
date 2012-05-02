@@ -11,6 +11,7 @@ import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.ext.xml.DomRepresentation;
 import org.restlet.representation.InputRepresentation;
 import org.restlet.representation.OutputRepresentation;
@@ -192,12 +193,12 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 	protected MaterialUnit page() {
 
 		final Object[] contents = document.getSortedContents().toArray();
-		if (contents.length < pageNum) {
-			logger.warn("Request for page " + pageNum + ", but there are only " + contents.length + " pages.");
-			return null;
+		if (pageNum < 1 || contents.length < pageNum) {
+			final String msg = "Request for page " + pageNum + "; there are " + contents.length + " pages.";
+			throw new ResourceException(new Status(404), msg);
 		}
 
-		return (MaterialUnit) contents[pageNum];
+		return (MaterialUnit) contents[pageNum - 1];
 	}
 
 	private DocumentaryTranscript transcript() {
@@ -220,6 +221,10 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 
 	protected String facsimileUrl() {
 		final DocumentaryTranscript dt = transcript();
+		if (dt == null) {
+			final String msg = "There is no documentary transcript for this page!";
+			throw new ResourceException(new Status(404), msg);
+		}		
 		final FaustURI facsimileURI = dt.getFacsimileReferences().first();
 		return String.format(imageUrlTemplate, facsimileURI.getPath()
 			.replaceAll("^/", ""));
