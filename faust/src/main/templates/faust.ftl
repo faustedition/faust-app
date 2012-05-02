@@ -82,6 +82,7 @@
 					<li class="yui3-menuitem"><a href="${cp}/structure/gsa/391282/391282-structure.xml" class="yui3-menuitem-content">${message("menu.demo.manuscript_description")}</a></li>
 					<li class="yui3-menuitem"><a href="${cp}/demo/genesis" class="yui3-menuitem-content">${message("menu.demo.genesis_1")}</a></li>
 					<li class="yui3-menuitem"><a href="${cp}/text/2-5-4.xml" class="yui3-menuitem-content">${message("menu.demo.genesis_2")}</a></li>
+                    <li class="yui3-menuitem"><a href="${cp}/demo/text-image-link" class="yui3-menuitem-content">${message("menu.demo.text_image_link")}</a></li>
 				</ul>
 				</div>
 				</div>
