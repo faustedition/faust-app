@@ -28,6 +28,7 @@
     YUI().use("facsimile", "event", "dump", function (Y) {
         facsimileViewer = new Y.Faust.FacsimileViewer({
             srcNode: "#facsimile-view",
+			src: "/facsimile/gsa/391098/391098_0001",
             view: { x: 0, y: 0, width: 600, height: 600 }
         });
         facsimileViewer.render();

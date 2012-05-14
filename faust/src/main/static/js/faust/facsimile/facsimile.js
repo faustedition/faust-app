@@ -6,7 +6,6 @@ YUI.add('facsimile', function (Y) {
         NULL_VIEW_VALUE = { x: 0, y: 0, width: 0, height: 0, zoom: 0 },
         NULL_HIGHLIGHT_VALUE = { x: 0, y: 0, width: 0, height: 0 }
 
-
     function qscale(degree) {
         return function (val) {
             return val * Math.pow(2, degree);
@@ -239,6 +238,71 @@ YUI.add('facsimile', function (Y) {
         }
     });
 
+    var SvgPane = Y.Base.create("svg-pane", Y.Base, [], {
+
+        loadSvg : function(svgSrc){
+			var that = this;
+			if (svgSrc) {
+				Y.io(svgSrc, {
+					method: "GET",
+					xdr: { responseXML: false },
+					headers: { "Accept": "image/svg" },
+					on: {
+						success: function(id, o, a) {
+							// FIXME this is a silly hack, use a different library
+							that.svgContainer.innerHTML = o.responseText;
+						}, 
+						failure: function(id, o, a) { 
+							Y.log("ERROR " + id + " " + a, "info", "Faust") }
+					}
+				});
+			}
+		},
+		adjustTransform: function() {
+			var svgContainer = this.svgContainer;
+			var createTransform = function(){
+				return svgContainer.viewportElement.createSVGTransform();
+			};
+
+			var transforms = this.svgContainer.transform.baseVal;
+			transforms.clear();
+			var view = this.get("model").get("view");
+			var image = this.get("model").get("image");
+
+			// Set position
+			var translateTransform = createTransform();
+			translateTransform.setTranslate(-view.x, -view.y);
+			transforms.appendItem(translateTransform);
+			
+			// Set scale
+			var scale = view.imageHeight / image.height;
+			var zoomTransform = createTransform();
+			zoomTransform.setScale(scale, scale);
+			transforms.appendItem(zoomTransform);
+
+
+		},
+		initializer: function(config) {
+            var svgRoot = this.get("view").ownerSVGElement;
+            this.svgContainer = svg("g", {
+                id: "svgpane",
+                x: "0",
+                y: "0",
+			});
+			svgRoot.appendChild(this.svgContainer);
+			this.modelChangeSub = this.get("model").after(["tilesChange", "viewChange", "imageChange"], this.adjustTransform, this);
+			this.loadSvg(config.svgSrc);
+        },
+        // destructor: function() {
+        // },
+            }, {
+        ATTRS: {
+            view: {},
+            model: {},
+        }
+    });
+
+
     var FacsimileViewer = Y.Base.create("facsimile-viewer", Y.Widget, [], {
         initializer: function (config) {
             var view = config.view || NULL_VIEW_VALUE;
@@ -262,8 +326,9 @@ YUI.add('facsimile', function (Y) {
 
             this.model = new TiledViewModel({ view: view });
             this.modelChangeSub = this.model.after(["tilesChange", "viewChange", "imageChange"], this.syncUI, this);
-
+			this.src = config.src;
             this.highlightPane = new HighlightPane({ view: this.view, model: this.model });
+            this.svgPane = new SvgPane({ svgSrc: config.svgSrc, view: this.view, model: this.model });
 
             Y.io(this.imageSrc(), {
                 data: {metadata: true },
@@ -327,7 +392,7 @@ YUI.add('facsimile', function (Y) {
             this.model.center();
         },
         imageSrc: function () {
-            return cp + "/facsimile/gsa/391098/391098_0001";
+			return cp + this.src;
         },
         tileSrc: function (x, y, zoom) {
             return Y.substitute("{imageSrc}?x={x}&y={y}&zoom={zoom}", {
@@ -353,8 +418,8 @@ YUI.add('facsimile', function (Y) {
             Y.Array.each(tiles, function (tile) {
                 var x = tile.x * tileSize, y = tile.y * tileSize;
                 this.view.appendChild(svg("image", {
-                    "x": Math.floor(x - view.x + view.centerX),
-                    "y": Math.floor(y - view.y + view.centerY),
+                    "x": Math.floor(x - view.x /*+ view.centerX*/),
+                    "y": Math.floor(y - view.y /*+ view.centerY*/),
                     "width": Math.min(tileSize, view.imageWidth - x) + fixedCoordOffset,
                     "height": Math.min(tileSize, view.imageHeight - y) + fixedCoordOffset
                 })).setAttributeNS(XLINK_NS, "href", this.tileSrc(tile.x, tile.y, zoom));
