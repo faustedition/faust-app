@@ -1,4 +1,4 @@
-Faust.YUI().use("oop", function(Y) {
+YUI.add('materialunit', function (Y) {		
 	Faust.MaterialUnit = function() {};
 	Faust.MaterialUnit.prototype = {
 		descendants: function() {
@@ -36,6 +36,8 @@ Faust.YUI().use("oop", function(Y) {
 			return value;
 		});
 	};	
+}, '0.0', {
+	requires: ['oop']
 });
 
 

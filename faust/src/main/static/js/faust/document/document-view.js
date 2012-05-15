@@ -1,11 +1,12 @@
 SVG_NS = "http://www.w3.org/2000/svg";
 DRAG_NS = "http://www.codedread.com/dragsvg";
 var faust_svg_root = null;
+var facsimileViewer;
 
-Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "resize", function(Y) {
-		
+YUI.add('document-view', function (Y) {		
 	// TODO: cut dependencies to controller
-	
+
+	console.log('document-view');
 	Faust.DocumentTranscriptCanvas =  function(node) {
 		this.svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		faust_svg_root = this.svgRoot;
@@ -187,12 +188,6 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 					this.renderPage();	
 				}		
 			}, "#transcript-next-page", this);
-
-			Y.on("click", function(e) {
-				//e.preventDefault();
-				//alert(this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif");
-				//window.location = '/static/js/ext-imageannotation/svg-editor.html';
-			}, "#image-link", this);
 			
 			var viewModeSelector = Y.one("#transcript-view-mode");
 			viewModeSelector.get("options").each(function(o) {
@@ -330,6 +325,7 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 					transcript_text.setStyle("width", (width - ev.info.offsetWidth) + "px");
 				})
 			}
+
 		},
 		updateNavigation: function() {
 			var browsePages = Y.one("#transcript-browse");
@@ -372,39 +368,62 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 		renderFacsimiles: function() {
 			var container = Y.one("#transcript-facsimile");
 			if (container == null) return;
+
+			// FLASH-BASED IMAGEVIEWER
+
+			// container.append('<div id="transcript-swf"></div>');
+			// swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
+			// 	"transcript-swf",
+			// 	"100%", "100%",
+			// 	"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
+			// 		server: Faust.FacsimileServer,
+			// 		image: this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif",
+			// 		navigation: true,
+			// 		credit: "Copyright Digitale Faust-Edition"
+			// 	}, {
+			// 		scale: "noscale",
+			// 		bgcolor: "#000000",
+			// 		allowfullscreen: "true",
+			// 		allowscriptaccess: "always",
+			// 		wmode: "opaque"
+			// 	});
+
+			// IIP AJAX VIEWER
 			
-//			container.append('<div id="transcript-swf"></div>');
-//			swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
-//				"transcript-swf",
-//				"100%", "100%",
-//				"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
-//					server: Faust.FacsimileServer,
-//					image: this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif",
-//					navigation: true,
-//					credit: "Copyright Digitale Faust-Edition"
-//				}, {
-//					scale: "noscale",
-//					bgcolor: "#000000",
-//					allowfullscreen: "true",
-//					allowscriptaccess: "always",
-//					wmode: "opaque"
-//				});
-			
+			// container.append('<div id="transcript-ajax" style="width:100%; height: 100%;"></div>');
+		    // var server = Faust.FacsimileServer;
+		    // var images = this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif";
+		    // var credit = "Copyright Digitale Faust-Edition";
+		    // var iipmooviewer = new IIPMooViewer( "transcript-ajax", {
+			// 	image: images,
+			// 	server: server,
+			// 	credit: credit, 
+			// 	scale: 100.0,
+			// 	showNavWindow: true,
+			// 	showNavButtons: true,
+			// 	winResize: true,
+			// 	protocol: 'iip',
+			// 	prefix: '../../../static/js/imageviewer/images/'
+		    // });
+
+			// FAUST SVG BASED VIEWER
+
+			// Text-image-links
+			var imageLinkURL = imageLinkBase + '/' + this.pages[this.currentPage].order;
+
+			container.empty();
 			container.append('<div id="transcript-ajax" style="width:100%; height: 100%;"></div>');
-		    var server = Faust.FacsimileServer;
-		    var images = this.pages[this.currentPage].transcript.facsimiles[0].encodedPath() + ".tif";
-		    var credit = "Copyright Digitale Faust-Edition";
-		    var iipmooviewer = new IIPMooViewer( "transcript-ajax", {
-				image: images,
-				server: server,
-				credit: credit, 
-				scale: 100.0,
-				showNavWindow: true,
-				showNavButtons: true,
-				winResize: true,
-				protocol: 'iip',
-				prefix: '../../../static/js/imageviewer/images/'
-		    });
+		    var image = '/facsimile/' + this.pages[this.currentPage].transcript.facsimiles[0].encodedPath();
+			
+			// TODO change this back to local variable
+			facsimileViewer = new Y.Faust.FacsimileViewer({
+				srcNode: "#transcript-ajax",
+				src: image,
+				svgSrc: imageLinkURL,
+				view: { x: 0, y: 0, width: 600, height: 600 }
+			});
+			facsimileViewer.render();
+
 
 		},
 		renderTranscript: function() {
@@ -417,4 +436,8 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 			});
 		}
 	};
+}, '0.0', {
+	requires: ["node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump",
+			   "async-queue", "resize", "io", "facsimile", "document-model", "document-view-svg"]
 });
+

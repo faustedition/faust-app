@@ -1,5 +1,7 @@
+YUI.add('document-model', function (Y) {		
 
-Faust.YUI().use("oop", "dump", function(Y) {
+	console.log('document-model');
+
 	Faust.ENC_EXC_PREF = "ENCODING ERROR: ";
 	
 	Faust.ViewComponent = function() {};
@@ -401,4 +403,6 @@ Faust.YUI().use("oop", "dump", function(Y) {
  		if (!this.yMax || this.yMax < yMax )
 			this.yMax = yMax;
 	}
+}, '0.0', {
+	requires: ["oop", "dump", "materialunit"]
 });

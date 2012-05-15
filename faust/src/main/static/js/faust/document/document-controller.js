@@ -1,6 +1,7 @@
 SVG_NS = "http://www.w3.org/2000/svg";
 
-Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "resize", function(Y) {
+YUI.add('document-controller', function (Y) {		
+	console.log('document-controller');
 
 	//FIXME: cleanup: put this in view or model, etc.
 	Faust.LayoutPreferences = {
@@ -245,9 +246,9 @@ Faust.YUI().use("node", "dom", "dom-screen", "event", "overlay", "scrollview", "
 			}
 	};
 	
-	
-	
-	
-
-
+}, '0.0', {
+	requires: ["node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump", "async-queue", "resize",
+			   "document-model"]
 });
+
+

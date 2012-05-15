@@ -1,7 +1,7 @@
 SVG_NS = "http://www.w3.org/2000/svg";
 DRAG_NS = "http://www.codedread.com/dragsvg";
 
-Faust.YUI().use("node", "dom", "event", function(Y) {
+YUI.add('document-view-svg', function (Y) {		
 
 	// START of view components. Keep in sync with model.
 	// These components are based on SVG. The model is only
@@ -363,4 +363,6 @@ Faust.YUI().use("node", "dom", "event", function(Y) {
 		  return result;
 	};
 	
+}, '0.0', {
+	requires: ["node", "dom", "event", "document-model"]
 });

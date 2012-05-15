@@ -17,7 +17,7 @@
         var cp = '${cp?js_string}';
         var Faust = { contextPath: cp, FacsimileServer: "${facsimilieIIPUrl}" };
     </script>
-    <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-min.js"></script>
+    <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-debug.js"></script>
     <script type="text/javascript" src="${cp}/static/js/yui-config.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
 
