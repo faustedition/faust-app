@@ -1,45 +1,15 @@
 YUI.add('facsimile', function (Y) {
 
     var SVG_NS = "http://www.w3.org/2000/svg",
-        XLINK_NS = "http://www.w3.org/1999/xlink",
-        NULL_IMAGE_VALUE = { width: Number.MAX_VALUE, height: Number.MAX_VALUE, tileSize: 1, maxZoom: 0 },
-        NULL_VIEW_VALUE = { x: 0, y: 0, width: 0, height: 0, zoom: 0 },
-        NULL_HIGHLIGHT_VALUE = { x: 0, y: 0, width: 0, height: 0 }
+    XLINK_NS = "http://www.w3.org/1999/xlink",
+    NULL_IMAGE_VALUE = { width: Number.MAX_VALUE, height: Number.MAX_VALUE, tileSize: 1, maxZoom: 0 },
+    NULL_VIEW_VALUE = { x: 0, y: 0, width: 0, height: 0, zoom: 0 };
 
-    function qscale(degree) {
-        return function (val) {
-            return val * Math.pow(2, degree);
-        };
-    }
-
-    function svgElement(name) {
-        return Y.config.doc.createElementNS(SVG_NS, name);
-    }
-
-    function svgAttrs(element, attrs) {
-        Y.Object.each(attrs, function(v, k) {
-            element.setAttribute(k, v);
-        });
-        return element;
-    }
-
-    function svgStyles(element, styles) {
-        Y.Object.each(styles, function(v, k) {
-            element.style[k] = v;
-        });
-        return element;
-    }
-
-    function svg(element, attrs, styles) {
-        return svgStyles(svgAttrs(svgElement(element), attrs || {}), styles || {});
-    }
-
-    function empty(element) {
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
-        }
-    }
-
+	var svg = Y.SvgUtils.svg,
+	qscale = Y.SvgUtils.qscale,
+	svgAttrs = Y.SvgUtils.svgAttrs,
+	empty = Y.SvgUtils.empty;
+	
     var TiledViewModel = Y.Base.create("tile-view-model", Y.Base, [], {
         initializer: function () {
             this.imageChangeSub = this.after("imageChange", this.generateTiles, this);
@@ -162,147 +132,6 @@ YUI.add('facsimile', function (Y) {
         }
     });
 
-    var HighlightPane = Y.Base.create("hightlight-pane", Y.Base, [], {
-        initializer: function() {
-            var view = this.get("view"),
-                svgRoot = view.ownerSVGElement,
-                defs = svgRoot.getElementsByTagNameNS(SVG_NS, "defs"),
-                model = this.get("model");
-
-            this.mask = (defs.length ? defs[0] : svgRoot.appendChild(svg("defs"))).appendChild(svg("mask", {
-                id: "highlight",
-                x: "0",
-                y: "0",
-                width: "100%",
-                height: "100%"
-            }));
-            this.mask.appendChild(svg("rect", {
-                x: 0,
-                y: 0,
-                width: "100%",
-                height: "100%"
-            }, {
-                fill: "#999"
-            }));
-            this.highlightRect = this.mask.appendChild(svg("rect", {
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0,
-                rx: 0,
-                ry: 0
-            }, {
-                fill: "#fff",
-                stroke: "#fff",
-                strokeWidth: "10"
-            }));
-
-            this.modelChangeSub = model.after(["tilesChange", "viewChange", "imageChange"], this.highlight, this);
-            this.highlightChangeSub = this.after("highlightChange", this.highlight, this);
-        },
-        destructor: function() {
-            this.highlightChangeSub.detach();
-            this.modelChangeSub.detach();
-
-            this.mask.parentNode.removeChild(this.mask);
-        },
-        highlight: function() {
-            var highlight = this.get("highlight"), model = this.get("model"),
-                scale = qscale(-model.get("zoom")),
-                x = Math.floor(scale(highlight.x)),
-                y = Math.floor(scale(highlight.y)),
-                width = Math.floor(scale(highlight.width)),
-                height = Math.floor(scale(highlight.height)),
-                view = model.get("view");
-
-            svgStyles(this.get("view"), {
-                mask: ((width && height) ? "url(#highlight)" : "none")
-            });
-
-            svgAttrs(this.highlightRect, {
-                x: x - view.x + view.centerX,
-                y: y - view.y + view.centerY,
-                rx: Math.floor(width / 100),
-                ry: Math.floor(height / 100),
-                width: width,
-                height: height
-            });
-        }
-    }, {
-        ATTRS: {
-            view: {},
-            model: {},
-            highlight: {
-                value: NULL_HIGHLIGHT_VALUE
-            }
-        }
-    });
-
-    var SvgPane = Y.Base.create("svg-pane", Y.Base, [], {
-
-        loadSvg : function(svgSrc){
-			var that = this;
-			if (svgSrc) {
-				Y.io(svgSrc, {
-					method: "GET",
-					xdr: { responseXML: false },
-					headers: { "Accept": "image/svg" },
-					on: {
-						success: function(id, o, a) {
-							// FIXME this is a silly hack, use a different library
-							that.svgContainer.innerHTML = o.responseText;
-						}, 
-						failure: function(id, o, a) { 
-							Y.log("ERROR " + id + " " + a, "info", "Faust") }
-					}
-				});
-			}
-		},
-		adjustTransform: function() {
-			var svgContainer = this.svgContainer;
-			var createTransform = function(){
-				return svgContainer.viewportElement.createSVGTransform();
-			};
-
-			var transforms = this.svgContainer.transform.baseVal;
-			transforms.clear();
-			var view = this.get("model").get("view");
-			var image = this.get("model").get("image");
-
-			// Set position
-			var translateTransform = createTransform();
-			translateTransform.setTranslate(-view.x, -view.y);
-			transforms.appendItem(translateTransform);
-			
-			// Set scale
-			var scale = view.imageHeight / image.height;
-			var zoomTransform = createTransform();
-			zoomTransform.setScale(scale, scale);
-			transforms.appendItem(zoomTransform);
-
-
-		},
-		initializer: function(config) {
-            var svgRoot = this.get("view").ownerSVGElement;
-            this.svgContainer = svg("g", {
-                id: "svgpane",
-                x: "0",
-                y: "0",
-			});
-			svgRoot.appendChild(this.svgContainer);
-			this.modelChangeSub = this.get("model").after(["tilesChange", "viewChange", "imageChange"], this.adjustTransform, this);
-			this.loadSvg(config.svgSrc);
-        },
-        // destructor: function() {
-        // },
-            }, {
-        ATTRS: {
-            view: {},
-            model: {},
-        }
-    });
-
-
     var FacsimileViewer = Y.Base.create("facsimile-viewer", Y.Widget, [], {
         initializer: function (config) {
             var view = config.view || NULL_VIEW_VALUE;
@@ -327,8 +156,8 @@ YUI.add('facsimile', function (Y) {
             this.model = new TiledViewModel({ view: view });
             this.modelChangeSub = this.model.after(["tilesChange", "viewChange", "imageChange"], this.syncUI, this);
 			this.src = config.src;
-            this.highlightPane = new HighlightPane({ view: this.view, model: this.model });
-            this.svgPane = new SvgPane({ svgSrc: config.svgSrc, view: this.view, model: this.model });
+            //this.highlightPane = new HighlightPane({ view: this.view, model: this.model });
+            //this.svgPane = new SvgPane({ svgSrc: config.svgSrc, view: this.view, model: this.model });
 
             Y.io(this.imageSrc(), {
                 data: {metadata: true },
@@ -378,13 +207,7 @@ YUI.add('facsimile', function (Y) {
                     this.model.zoom(1);
                     return;
             }
-            this.highlightPane.set("highlight", NULL_HIGHLIGHT_VALUE);
-        },
-        highlight: function(area) {
-            this.model.zoom(this.model.fittingZoom(area.width, area.height) + 1 - this.model.get("zoom"));
-            var scale = qscale(-this.model.get("zoom"));
-            this.model.centerOn(scale(area.x + Math.floor(area.width / 2)), scale(area.y + Math.floor(area.height / 2)));
-            this.highlightPane.set("highlight", area);
+
         },
         metadataReceived: function (transactionId, response) {
             this.model.set("image", Y.merge(this.get("image"), Y.JSON.parse(response.responseText)));
@@ -429,5 +252,6 @@ YUI.add('facsimile', function (Y) {
 
     Y.mix(Y.namespace("Faust"), { FacsimileViewer: FacsimileViewer });
 }, '0.0', {
-    requires: ["base", "widget", "substitute", "array-extras", "io", "json", "event-key"]
+    requires: ["base", "widget", "substitute", "array-extras", "io", "json", "event-key",
+			   "svg-utils"]
 });

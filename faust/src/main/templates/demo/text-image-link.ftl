@@ -25,13 +25,15 @@
     </div>
 </div>
 <script type="text/javascript">
-    YUI().use("facsimile", "event", "dump", function (Y) {
+    YUI().use("facsimile", "facsimile-highlightpane", "event", "dump", function (Y) {
         facsimileViewer = new Y.Faust.FacsimileViewer({
             srcNode: "#facsimile-view",
 			src: "/facsimile/gsa/391098/391098_0001",
             view: { x: 0, y: 0, width: 600, height: 600 }
         });
+
         facsimileViewer.render();
+		facsimileViewer.plug(Y.Faust.HighlightPane);
 
         var coords = {
             "line-1": { x: 1700, y: 2300, width: 700, height: 400 },
@@ -40,7 +42,7 @@
         };
 
         Y.one("#lines").delegate("click", function(e) {
-            facsimileViewer.highlight(coords[e.target.get("id")]);
+            facsimileViewer.highlight.highlightArea(coords[e.target.get("id")]);
         }, "p");
     });
 </script>

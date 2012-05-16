@@ -422,6 +422,8 @@ YUI.add('document-view', function (Y) {
 				svgSrc: imageLinkURL,
 				view: { x: 0, y: 0, width: 600, height: 600 }
 			});
+
+			facsimileViewer.plug(Y.Faust.SvgPane);
 			facsimileViewer.render();
 
 
@@ -438,6 +440,7 @@ YUI.add('document-view', function (Y) {
 	};
 }, '0.0', {
 	requires: ["node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump",
-			   "async-queue", "resize", "io", "facsimile", "document-model", "document-view-svg"]
+			   "async-queue", "resize", "io", "facsimile", "facsimile-svgpane",
+			   "document-model", "document-view-svg"]
 });
 
