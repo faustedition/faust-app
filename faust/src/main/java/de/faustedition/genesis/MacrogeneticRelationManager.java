@@ -3,21 +3,15 @@ package de.faustedition.genesis;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnitManager;
-import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -41,9 +35,6 @@ public class MacrogeneticRelationManager {
 
 	@Autowired
 	private GraphDatabaseService db;
-
-	@Autowired
-	private MaterialUnitManager materialUnitManager;
 
 	@Autowired
 	private Logger logger;
@@ -74,8 +65,8 @@ public class MacrogeneticRelationManager {
 
 		for (MGRelationship r: parse(source)) {
 
-			Document from = materialUnitManager.find(r.from);
-			Document to = materialUnitManager.find(r.to);
+			Document from = Document.find(db, r.from);
+			Document to = Document.find(db, r.to);
 
             if (from == null)
                 logger.error("Document " + r.from + " is not registered!");

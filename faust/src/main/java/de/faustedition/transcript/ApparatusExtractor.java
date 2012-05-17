@@ -17,7 +17,7 @@ import de.faustedition.xml.CustomNamespaceMap;
 
 public class ApparatusExtractor {
 
-	public void extract(Transcript transcript) {
+	public void extract(GoddagTranscript transcript) {
 		final GraphDatabaseService db = transcript.node.getGraphDatabase();
 		final Transaction tx = db.beginTx();
 		try {

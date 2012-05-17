@@ -4,9 +4,9 @@ import de.faustedition.FaustURI;
 import de.faustedition.text.Text;
 import de.faustedition.text.TextGeneticJSONEnhancer;
 import de.faustedition.text.TextManager;
-import de.faustedition.transcript.Transcript;
-import de.faustedition.transcript.Transcript.Type;
-import de.faustedition.transcript.TranscriptManager;
+import de.faustedition.transcript.GoddagTranscript;
+import de.faustedition.transcript.GoddagTranscript.Type;
+import de.faustedition.transcript.GoddagTranscriptManager;
 import de.faustedition.xml.XMLStorage;
 import org.goddag4j.MultiRootedTree;
 import org.restlet.Request;
@@ -32,7 +32,7 @@ public class GoddagFinder extends Finder {
 	private Logger logger;
 
 	@Autowired
-	private TranscriptManager transcriptManager;
+	private GoddagTranscriptManager transcriptManager;
 
 	@Autowired
 	private TextManager textManager;
@@ -76,7 +76,7 @@ public class GoddagFinder extends Finder {
 			}
 
 			logger.debug("Finding transcript for " + uri + (transcriptType == null ? "" : "[" + transcriptType + "]"));
-			Transcript transcript = transcriptManager.find(uri, transcriptType);
+			GoddagTranscript transcript = transcriptManager.find(uri, transcriptType);
 			if (transcript != null) {
 				resource = getResource(parameters, uri, transcript.getTrees());
 				resource.setTranscriptType(transcript.getType());

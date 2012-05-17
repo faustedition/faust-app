@@ -10,13 +10,13 @@ import org.neo4j.graphdb.Node;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.TokenizerUtil;
 
-public class TextualTranscript extends Transcript {
+public class TextualGoddagTranscript extends GoddagTranscript {
 
-	public TextualTranscript(Node node) {
+	public TextualGoddagTranscript(Node node) {
 		super(node);
 	}
 
-	public TextualTranscript(GraphDatabaseService db, FaustURI source, Element root) {
+	public TextualGoddagTranscript(GraphDatabaseService db, FaustURI source, Element root) {
 		super(db, Type.TEXTUAL, source, root);
 	}
 

@@ -18,7 +18,7 @@ import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapper;
 import de.faustedition.graph.TokenizerUtil;
 
-public abstract class Transcript extends NodeWrapper {
+public abstract class GoddagTranscript extends NodeWrapper {
 	public enum Type {
 		DOCUMENTARY, TEXTUAL;
 	}
@@ -31,12 +31,12 @@ public abstract class Transcript extends NodeWrapper {
 
 	private final MultiRootedTree trees;
 
-	protected Transcript(Node node) {
+	protected GoddagTranscript(Node node) {
 		super(node);
 		this.trees = new MultiRootedTree(node, MARKUP_VIEW_RT);
 	}
 
-	protected Transcript(GraphDatabaseService db, Type type, FaustURI source, Element root) {
+	protected GoddagTranscript(GraphDatabaseService db, Type type, FaustURI source, Element root) {
 		this(db.createNode());
 		setType(type);
 		setSource(source);
@@ -55,13 +55,13 @@ public abstract class Transcript extends NodeWrapper {
 		return getType(node);
 	}
 
-	public static Transcript forNode(Node node) {
+	public static GoddagTranscript forNode(Node node) {
 		Type type = getType(node);
 		switch (type) {
 		case DOCUMENTARY:
-			return new DocumentaryTranscript(node);
+			return new DocumentaryGoddagTranscript(node);
 		case TEXTUAL:
-			return new TextualTranscript(node);
+			return new TextualGoddagTranscript(node);
 		}
 		throw new IllegalArgumentException(type.toString());
 	}
@@ -91,7 +91,7 @@ public abstract class Transcript extends NodeWrapper {
 		return Objects.toStringHelper(this).add("type", getType()).add("source", getSource()).toString();
 	}
 
-	public static Transcript find(GoddagTreeNode node) {
+	public static GoddagTranscript find(GoddagTreeNode node) {
 		Element root = Iterables.getFirst(node.getRoots(), null);
 		if (root == null) {
 			return null;

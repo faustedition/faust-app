@@ -2,6 +2,7 @@ package de.faustedition.document;
 
 import de.faustedition.FaustURI;
 import de.faustedition.xml.XMLStorage;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Finder;
@@ -9,7 +10,6 @@ import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
 
 import java.util.Deque;
 
@@ -22,7 +22,7 @@ public abstract class AbstractDocumentFinder extends Finder {
 	protected XMLStorage xml;
 
 	@Autowired
-	protected MaterialUnitManager documentManager;
+	private GraphDatabaseService db;
 
 	@Autowired
 	protected Logger logger;
@@ -60,7 +60,7 @@ public abstract class AbstractDocumentFinder extends Finder {
 		final FaustURI uri = xml.walk(path);
 
 		logger.debug("Finding document for " + uri);
-		return new DocumentPath(documentManager.find(uri), path);
+		return new DocumentPath(Document.find(db, uri), path);
 	}
 
 	protected abstract ServerResource getResource(Document document, Deque<String> postfix);

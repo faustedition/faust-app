@@ -7,9 +7,8 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
-import de.faustedition.document.MaterialUnitManager;
 import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.transcript.Transcript;
+import de.faustedition.transcript.GoddagTranscript;
 import org.goddag4j.Element;
 import org.goddag4j.GoddagTreeNode;
 import org.goddag4j.Text;
@@ -33,9 +32,6 @@ public class CollationFinder extends Finder {
 	private TemplateRepresentationFactory viewFactory;
 
 	@Autowired
-	private MaterialUnitManager materialUnitManager;
-
-	@Autowired
 	private GraphDatabaseService db;
 
 	@Override
@@ -47,8 +43,7 @@ public class CollationFinder extends Finder {
 
 		@Get("html")
 		public Representation alignment() throws IOException {
-			final Document document = materialUnitManager.find(new FaustURI(FaustAuthority.XML,
-				"/document/faust/2.5/gsa_390883.xml"));
+			final Document document = Document.find(db, new FaustURI(FaustAuthority.XML, "/document/faust/2.5/gsa_390883.xml"));
 
 			final Element textRoot = document.getTranscript().getTrees().getRoot("f", "words");
 			final Iterable<Token> textTokens = Iterables.transform(textRoot.getChildren(textRoot),
@@ -63,7 +58,7 @@ public class CollationFinder extends Finder {
 			final SortedSet<MaterialUnit> pages = document.getSortedContents();
 			List<Iterable<Token>> pageTokens = new ArrayList<Iterable<Token>>(pages.size());
 			for (MaterialUnit page : pages) {
-				final Transcript transcript = page.getTranscript();
+				final GoddagTranscript transcript = page.getTranscript();
 				if (transcript == null) {
 					continue;
 				}

@@ -3,7 +3,7 @@ package de.faustedition.tei;
 import com.google.common.base.Throwables;
 import de.faustedition.FaustURI;
 import de.faustedition.JsonRespresentation;
-import de.faustedition.transcript.Transcript;
+import de.faustedition.transcript.GoddagTranscript;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLUtil;
 import org.goddag4j.Element;
@@ -40,7 +40,7 @@ public class GoddagResource extends ServerResource {
 	protected GraphDatabaseService db;
 
 	protected FaustURI source;
-	protected Transcript.Type transcriptType;
+	protected GoddagTranscript.Type transcriptType;
 	protected MultiRootedTree trees;
 	protected GoddagJSONEnhancer enhancer = GoddagJSONWriter.NOOP_ENHANCER;
 
@@ -48,7 +48,7 @@ public class GoddagResource extends ServerResource {
 		this.source = source;
 	}
 
-	public void setTranscriptType(Transcript.Type transcriptType) {
+	public void setTranscriptType(GoddagTranscript.Type transcriptType) {
 		this.transcriptType = transcriptType;
 	}
 

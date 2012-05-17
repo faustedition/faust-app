@@ -3,7 +3,7 @@ package de.faustedition.graph;
 import de.faustedition.document.ArchiveCollection;
 import de.faustedition.document.MaterialUnitCollection;
 import de.faustedition.text.TextCollection;
-import de.faustedition.transcript.TranscriptCollection;
+import de.faustedition.transcript.GoddagTranscriptCollection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -32,8 +32,8 @@ public class FaustGraph {
 		return new ArchiveCollection(root(ARCHIVES_ROOT_NAME));
 	}
 
-	public TranscriptCollection getTranscripts() {
-		return new TranscriptCollection(root(TRANSCRIPTS_ROOT_NAME));
+	public GoddagTranscriptCollection getTranscripts() {
+		return new GoddagTranscriptCollection(root(TRANSCRIPTS_ROOT_NAME));
 	}
 
 	public MaterialUnitCollection getMaterialUnits() {

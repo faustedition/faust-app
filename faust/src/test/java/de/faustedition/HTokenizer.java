@@ -1,6 +1,6 @@
 package de.faustedition;
 
-import de.faustedition.transcript.TranscriptManager;
+import de.faustedition.transcript.GoddagTranscriptManager;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.io.IOException;
 public class HTokenizer extends Runtime implements Runnable {
 
 	@Autowired
-	private TranscriptManager transcriptManager;
+	private GoddagTranscriptManager transcriptManager;
 
 	@Autowired
 	private Logger logger;

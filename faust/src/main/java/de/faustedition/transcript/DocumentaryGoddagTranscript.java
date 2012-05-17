@@ -18,13 +18,13 @@ import org.neo4j.graphdb.Transaction;
 import de.faustedition.FaustURI;
 import de.faustedition.xml.CustomNamespaceMap;
 
-public class DocumentaryTranscript extends Transcript {
+public class DocumentaryGoddagTranscript extends GoddagTranscript {
 
-	public DocumentaryTranscript(Node node) {
+	public DocumentaryGoddagTranscript(Node node) {
 		super(node);
 	}
 
-	public DocumentaryTranscript(GraphDatabaseService db, FaustURI source, Element root, SortedSet<FaustURI> facsimileReferences) {
+	public DocumentaryGoddagTranscript(GraphDatabaseService db, FaustURI source, Element root, SortedSet<FaustURI> facsimileReferences) {
 		super(db, Type.DOCUMENTARY, source, root);
 		setFacsimileReferences(facsimileReferences);
 	}

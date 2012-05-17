@@ -5,9 +5,9 @@ import de.faustedition.FaustURI;
 import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
 import de.faustedition.facsimile.FacsimileFinder;
 import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.transcript.DocumentaryTranscript;
-import de.faustedition.transcript.Transcript;
-import de.faustedition.transcript.Transcript.Type;
+import de.faustedition.transcript.DocumentaryGoddagTranscript;
+import de.faustedition.transcript.GoddagTranscript;
+import de.faustedition.transcript.GoddagTranscript.Type;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
@@ -205,10 +205,10 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 		return (MaterialUnit) contents[pageNum - 1];
 	}
 
-	private DocumentaryTranscript transcript() {
+	private DocumentaryGoddagTranscript transcript() {
 
 		final MaterialUnit mu = page();
-		final Transcript transcript = mu.getTranscript();
+		final GoddagTranscript transcript = mu.getTranscript();
 
 		if (transcript == null) {
 			return null;
@@ -216,7 +216,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 		if (transcript.getType() != Type.DOCUMENTARY) {
 			return null;
 		}
-		final DocumentaryTranscript dt = (DocumentaryTranscript) transcript;
+		final DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
 		if (dt.getFacsimileReferences().isEmpty()) {
 			return null;
 		}
@@ -224,7 +224,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 	}
 
 	protected String facsimileUrl() {
-		final DocumentaryTranscript dt = transcript();
+		final DocumentaryGoddagTranscript dt = transcript();
 		if (dt == null) {
 			final String msg = "There is no documentary transcript for this page!";
 			throw new ResourceException(new Status(404), msg);

@@ -1,7 +1,7 @@
 package de.faustedition.tei;
 
-import de.faustedition.transcript.Transcript;
-import de.faustedition.transcript.TranscriptManager;
+import de.faustedition.transcript.GoddagTranscript;
+import de.faustedition.transcript.GoddagTranscriptManager;
 import org.goddag4j.MultiRootedTree;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class SnapshotGoddagResource extends GoddagResource {
 
 	@Autowired
-	private TranscriptManager transcriptManager;
+	private GoddagTranscriptManager transcriptManager;
 
 	@Autowired
 	private Logger logger;
@@ -24,7 +24,7 @@ public class SnapshotGoddagResource extends GoddagResource {
 	public MultiRootedTree trees() {
 		try {
 			if (transcriptType != null) {
-				for (Transcript transcript : transcriptManager.parse(source)) {
+				for (GoddagTranscript transcript : transcriptManager.parse(source)) {
 					if (transcript.getType() == transcriptType) {
 						transcript.postprocess();
 						return transcript.getTrees();

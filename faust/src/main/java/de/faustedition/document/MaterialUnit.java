@@ -4,14 +4,14 @@ import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapper;
 import de.faustedition.graph.NodeWrapperCollection;
-import de.faustedition.transcript.Transcript;
+import de.faustedition.transcript.GoddagTranscript;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static de.faustedition.transcript.Transcript.TRANSCRIPT_RT;
+import static de.faustedition.transcript.GoddagTranscript.TRANSCRIPT_RT;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -98,19 +98,19 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		return (Integer) node.getProperty(PREFIX + ".order", -1);
 	}
 
-	public Transcript getTranscript() {
+	public GoddagTranscript getTranscript() {
 		final Relationship r = node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
-		return (r == null ? null : Transcript.forNode(r.getStartNode()));
+		return (r == null ? null : GoddagTranscript.forNode(r.getStartNode()));
 	}
 
-	public static MaterialUnit find(Transcript t) {
+	public static MaterialUnit find(GoddagTranscript t) {
 		for (Relationship r : t.node.getRelationships(TRANSCRIPT_RT, OUTGOING)) {
 			return forNode(r.getEndNode());
 		}
 		return null;
 	}
 
-	public void setTranscript(Transcript transcript) {
+	public void setTranscript(GoddagTranscript transcript) {
 		final Relationship r = node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
 		if (r != null) {
 			r.delete();
