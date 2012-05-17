@@ -4,7 +4,6 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit.Type;
 import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.GraphDatabaseTransactional;
 import de.faustedition.transcript.Transcript;
 import de.faustedition.transcript.TranscriptManager;
 import de.faustedition.xml.CustomNamespaceMap;
@@ -14,7 +13,9 @@ import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,8 @@ import java.io.IOException;
 import java.util.*;
 
 @Component
-public class MaterialUnitManager {
+@DependsOn(value = "archiveInitializer")
+public class MaterialUnitManager implements InitializingBean {
 	public static final FaustURI DOCUMENT_BASE_URI = new FaustURI(FaustAuthority.XML, "/document");
 
 	@Autowired
@@ -47,34 +49,43 @@ public class MaterialUnitManager {
 	@Autowired
 	private Logger logger;
 
-    @Transactional
-	public Set<FaustURI> feedGraph() {
-		final Set<FaustURI> failed = new HashSet<FaustURI>();
-		logger.info("Feeding material units into graph");
-		for (final FaustURI documentDescriptor : xml.iterate(MaterialUnitManager.DOCUMENT_BASE_URI)) {
-            try {
-                logger.debug("Importing document " + documentDescriptor);
-                add(documentDescriptor);
-            } catch (SAXException e) {
-                logger.error("XML error while adding document " + documentDescriptor, e);
-                failed.add(documentDescriptor);
-            } catch (IOException e) {
-                logger.error("I/O error while adding document " + documentDescriptor, e);
-                failed.add(documentDescriptor);
-            }
-        }
-		return failed;
+	@Autowired
+	private TransactionTemplate transactionTemplate;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+			@Override
+			protected void doInTransactionWithoutResult(TransactionStatus status) {
+				if (graph.getMaterialUnits().isEmpty()) {
+					feedGraph();
+				}
+			}
+		});
 	}
 
-    public Document add(FaustURI source) throws SAXException, IOException {
+	public void feedGraph() {
+		logger.info("Feeding material units into graph");
+		for (final FaustURI documentDescriptor : xml.iterate(MaterialUnitManager.DOCUMENT_BASE_URI)) {
+			try {
+				logger.debug("Importing document " + documentDescriptor);
+				add(documentDescriptor);
+			} catch (SAXException e) {
+				logger.error("XML error while adding document " + documentDescriptor, e);
+			} catch (IOException e) {
+				logger.error("I/O error while adding document " + documentDescriptor, e);
+			}
+		}
+	}
+
+	public Document add(FaustURI source) throws SAXException, IOException {
 		final DocumentDescriptorHandler handler = new DocumentDescriptorHandler(source);
 		final InputSource xmlSource = xml.getInputSource(source);
 		try {
 			XMLUtil.saxParser().parse(xmlSource, handler);
 			final Document document = handler.getDocument();
 			if (document != null) {
-				db.index().forNodes(Document.SOURCE_KEY)
-						.add(document.node, Document.SOURCE_KEY, document.getSource());
+				db.index().forNodes(Document.SOURCE_KEY).add(document.node, Document.SOURCE_KEY, document.getSource());
 			}
 			return document;
 		} finally {
@@ -140,12 +151,12 @@ public class MaterialUnitManager {
 					final Type type = MaterialUnit.Type.valueOf(typeAttr.toUpperCase());
 					MaterialUnit unit = null;
 					switch (type) {
-					case DOCUMENT:
-					case ARCHIVAL_UNIT:
-						unit = new Document(db.createNode(), type, source);
-						break;
-					default:
-						unit = new MaterialUnit(db.createNode(), type);
+						case DOCUMENT:
+						case ARCHIVAL_UNIT:
+							unit = new Document(db.createNode(), type, source);
+							break;
+						default:
+							unit = new MaterialUnit(db.createNode(), type);
 					}
 
 					unit.setOrder(materialUnitCounter++);
@@ -154,8 +165,8 @@ public class MaterialUnitManager {
 					if (materialUnitStack.isEmpty()) {
 						if (!(unit instanceof Document)) {
 							throw new SAXException(
-									"Encountered top-level material unit of wrong @type '"
-											+ type + "'");
+								"Encountered top-level material unit of wrong @type '"
+									+ type + "'");
 						}
 						document = (Document) unit;
 						transcriptType = Transcript.Type.TEXTUAL;
@@ -168,7 +179,7 @@ public class MaterialUnitManager {
 					final String transcript = attributes.getValue("transcript");
 					if (transcript != null) {
 						final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(
-								transcript));
+							transcript));
 						unit.setTranscript(transcriptManager.find(transcriptSource, transcriptType));
 					}
 				} catch (IllegalArgumentException e) {
@@ -197,7 +208,7 @@ public class MaterialUnitManager {
 				for (Map.Entry<String, List<String>> metadataEntry : metadata.entrySet()) {
 					List<String> value = metadataEntry.getValue();
 					subject.setMetadata(convertMetadataKey(metadataEntry.getKey()),
-							value.toArray(new String[value.size()]));
+						value.toArray(new String[value.size()]));
 				}
 				metadata = null;
 				inMetadataSection = false;

@@ -61,7 +61,7 @@ public class ArchiveRouter extends Router implements InitializingBean {
 
 			final org.w3c.dom.Document archives;
 			try {
-				archives = XMLUtil.parse(xmlStorage.getInputSource(ArchiveManager.ARCHIVE_DESCRIPTOR_URI));
+				archives = XMLUtil.parse(xmlStorage.getInputSource(ArchiveInitializer.ARCHIVE_DESCRIPTOR_URI));
 			} catch (SAXException e) {
 				throw Throwables.propagate(e);
 			} catch (IOException e) {

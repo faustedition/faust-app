@@ -1,21 +1,19 @@
 package de.faustedition.document;
 
-import static de.faustedition.transcript.Transcript.TRANSCRIPT_RT;
-import static org.neo4j.graphdb.Direction.INCOMING;
-import static org.neo4j.graphdb.Direction.OUTGOING;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
-
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapper;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.transcript.Transcript;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import static de.faustedition.transcript.Transcript.TRANSCRIPT_RT;
+import static org.neo4j.graphdb.Direction.INCOMING;
+import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
 	public enum Type {
@@ -34,6 +32,11 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 	public MaterialUnit(Node node, Type type) {
 		this(node);
 		setType(type);
+		node.setProperty(PREFIX + ".last-modified", System.currentTimeMillis());
+	}
+
+	public long created() {
+		return (Long) node.getProperty(PREFIX + ".last-modified");
 	}
 
 	public MaterialUnit getParent() {
@@ -44,11 +47,11 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		}
 		final MaterialUnit mu = NodeWrapper.newInstance(MaterialUnit.class, r.getStartNode());
 		switch (mu.getType()) {
-		case ARCHIVAL_UNIT:
-		case DOCUMENT:
-			return new Document(mu.node);
-		default:
-			return mu;
+			case ARCHIVAL_UNIT:
+			case DOCUMENT:
+				return new Document(mu.node);
+			default:
+				return mu;
 		}
 	}
 
@@ -71,11 +74,11 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 
 	public static MaterialUnit forNode(Node node) {
 		switch (getType(node)) {
-		case DOCUMENT:
-		case ARCHIVAL_UNIT:
-			return new Document(node);
-		default:
-			return new MaterialUnit(node);
+			case DOCUMENT:
+			case ARCHIVAL_UNIT:
+				return new Document(node);
+			default:
+				return new MaterialUnit(node);
 		}
 	}
 
@@ -106,7 +109,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		}
 		return null;
 	}
-	
+
 	public void setTranscript(Transcript transcript) {
 		final Relationship r = node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
 		if (r != null) {
@@ -143,5 +146,5 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		final int o2 = o.getOrder();
 		return (o1 >= 0 && o2 >= 0) ? (o1 - o2) : 0;
 	}
-	
+
 }
