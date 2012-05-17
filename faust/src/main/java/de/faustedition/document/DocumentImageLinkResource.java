@@ -3,6 +3,7 @@ package de.faustedition.document;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
+import de.faustedition.facsimile.FacsimileFinder;
 import de.faustedition.template.TemplateRepresentationFactory;
 import de.faustedition.transcript.DocumentaryTranscript;
 import de.faustedition.transcript.Transcript;
@@ -57,6 +58,9 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 
 	@Autowired
 	private IIPInfo iipInfo;
+
+	@Autowired
+	private FacsimileFinder facsimileFinder;
 
 	@Autowired
 	private XMLStorage xml;
@@ -224,7 +228,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 		if (dt == null) {
 			final String msg = "There is no documentary transcript for this page!";
 			throw new ResourceException(new Status(404), msg);
-		}		
+		}
 		final FaustURI facsimileURI = dt.getFacsimileReferences().first();
 		return String.format(imageUrlTemplate, facsimileURI.getPath()
 			.replaceAll("^/", ""));
@@ -233,12 +237,6 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 	@Get("svg")
 	public Representation graphic() throws ResourceException, IOException,
 		SAXException, XPathExpressionException, URISyntaxException {
-
-		iipInfo.retrieve(facsimileUrl());
-		final int width = iipInfo.getWidth();
-		final int height = iipInfo.getHeight();
-		//final int width = 4000;
-		//final int height = 6000;
 
 		final FaustURI transcriptURI = transcript().getSource();
 		final org.w3c.dom.Document source = XMLUtil.parse(xml
@@ -267,6 +265,18 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 
 		} else {
 			logger.debug(transcriptURI + " doesn't have image-text links yet");
+
+			iipInfo.retrieve(facsimileUrl());
+			final int width = iipInfo.getWidth();
+			final int height = iipInfo.getHeight();
+
+			/*
+			final DocumentaryTranscript dt = transcript();
+			final FaustURI facsimileURI = dt.getFacsimileReferences().first();
+			final Dimension facsimileDimension = new FacsimileTile(facsimileFinder.findFacsimile(facsimileURI.getPath())).getDimension();
+			final int width = (int) Math.floor(facsimileDimension.getWidth());
+			final int height = (int) Math.floor(facsimileDimension.getHeight());
+			*/
 			return new WriterRepresentation(MediaType.IMAGE_SVG) {
 
 				@Override
