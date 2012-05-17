@@ -27,16 +27,6 @@ public abstract class AbstractDocumentFinder extends Finder {
 	@Autowired
 	protected Logger logger;
 
-	protected class DocumentPath {
-		public DocumentPath(Document document, Deque<String> path) {
-			this.document = document;
-			this.path = path;
-		}
-
-		public Document document;
-		public Deque<String> path;
-	}
-
 	@Override
 	public ServerResource find(Request request, Response response) {
 
@@ -73,7 +63,17 @@ public abstract class AbstractDocumentFinder extends Finder {
 		return new DocumentPath(documentManager.find(uri), path);
 	}
 
-
 	protected abstract ServerResource getResource(Document document, Deque<String> postfix);
+
+
+    protected class DocumentPath {
+        public DocumentPath(Document document, Deque<String> path) {
+            this.document = document;
+            this.path = path;
+        }
+
+        public Document document;
+        public Deque<String> path;
+    }
 
 }
