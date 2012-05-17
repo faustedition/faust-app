@@ -4,7 +4,7 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
 import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -104,7 +104,7 @@ public class MacrogeneticRelationManager {
 			public void startElement(String uri, String localName, String qName, Attributes attributes)
 			throws SAXException {
 
-				if 	("relation".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+				if 	("relation".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
 					FaustRelationshipType type;
 					if("temp-pre".equals(attributes.getValue("name"))) {
 						type = TEMP_PRE_REL;
@@ -114,7 +114,7 @@ public class MacrogeneticRelationManager {
 						throw new SAXException("The relation " + attributes.getValue("name") + " is unknown.");
 					}
 					this.relationship = new MGRelationship(null, null, type);
-				} else if ("item".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+				} else if ("item".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
 					String itemURI = attributes.getValue("uri");
 					if (relationship != null) {
 						try {
@@ -136,7 +136,7 @@ public class MacrogeneticRelationManager {
 			@Override
 			public void endElement(String uri, String localName, String qName)
 			throws SAXException {
-				if ("relation".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+				if ("relation".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
 					this.relationship = null;
 				}				
 			}

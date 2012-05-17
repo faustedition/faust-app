@@ -20,7 +20,7 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.util.Stack;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
 
 @Component
 public class TextSplitter extends Runtime implements Runnable {

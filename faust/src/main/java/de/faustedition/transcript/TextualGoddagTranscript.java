@@ -1,6 +1,6 @@
 package de.faustedition.transcript;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_PREFIX;
+import static de.faustedition.xml.Namespaces.TEI_NS_PREFIX;
 
 import org.goddag4j.Element;
 import org.goddag4j.token.LineTokenMarkupGenerator;

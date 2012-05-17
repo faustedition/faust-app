@@ -9,7 +9,6 @@ import de.faustedition.graph.FaustGraph;
 import de.faustedition.tei.WhitespaceUtil;
 import de.faustedition.xml.*;
 import eu.interedition.text.Name;
-import eu.interedition.text.TextConstants;
 import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
@@ -44,7 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
 import static eu.interedition.text.TextConstants.TEI_NS;
 
 @Component
@@ -108,7 +107,7 @@ public class TextManager extends Runtime implements Runnable {
 		conf.include(new Name(TEI_NS, "lem"));
 
 		final Session session = sessionFactory.getCurrentSession();
-		final XMLTransformer xmlTransformer = new XMLTransformer(sessionFactory, conf);
+		final XMLTransformer xmlTransformer = new XMLTransformer(session, conf);
 
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Importing texts");

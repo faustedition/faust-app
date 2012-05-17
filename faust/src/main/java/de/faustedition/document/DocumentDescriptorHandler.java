@@ -4,10 +4,7 @@ import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.GoddagTranscriptManager;
 import de.faustedition.transcript.TranscriptType;
-import de.faustedition.xml.CustomNamespaceMap;
-import de.faustedition.xml.XMLBaseTracker;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import de.faustedition.xml.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -82,7 +79,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		baseTracker.startElement(uri, localName, qName, attributes);
 
-		if (!CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+		if (!Namespaces.FAUST_NS_URI.equals(uri)) {
 			return;
 		}
 
@@ -140,7 +137,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		baseTracker.endElement(uri, localName, qName);
-		if (!CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+		if (!Namespaces.FAUST_NS_URI.equals(uri)) {
 			return;
 		}
 

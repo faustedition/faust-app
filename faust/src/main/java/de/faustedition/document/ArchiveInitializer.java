@@ -5,7 +5,7 @@ import com.google.common.base.Throwables;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
-import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -48,7 +48,7 @@ public class ArchiveInitializer implements InitializingBean {
 			XMLUtil.saxParser().parse(xml.getInputSource(ARCHIVE_DESCRIPTOR_URI), new DefaultHandler() {
 				@Override
 				public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-					if ("archive".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+					if ("archive".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
 						final Archive archive = new Archive(db.createNode(), Preconditions.checkNotNull(attributes.getValue("id")));
 						if (LOG.isDebugEnabled()) {
 							LOG.debug("Adding {}", archive);

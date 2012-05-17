@@ -29,8 +29,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
-import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_URI;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_SIG_GE_URI;
 
 @Component
 public class GoddagTranscriptManager {
@@ -180,7 +180,7 @@ public class GoddagTranscriptManager {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-			if (inFacsimile && "graphic".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
+			if (inFacsimile && "graphic".equals(localName) && Namespaces.TEI_NS_URI.equals(uri)) {
 				String facsimileRefAttr = atts.getValue("url");
 				if (facsimileRefAttr == null) {
 					logger.warn("<tei:graphic/> without @url in " + source);
@@ -195,14 +195,14 @@ public class GoddagTranscriptManager {
 				} catch (Exception e) {
 					logger.warn("Invalid @url='" + facsimileRefAttr + "' in <tei:graphic/> in " + source);
 				}
-			} else if ("facsimile".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
+			} else if ("facsimile".equals(localName) && Namespaces.TEI_NS_URI.equals(uri)) {
 				inFacsimile = true;
 			}
 		}
 
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
-			if ("facsimile".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
+			if ("facsimile".equals(localName) && Namespaces.TEI_NS_URI.equals(uri)) {
 				inFacsimile = false;
 			}
 		}

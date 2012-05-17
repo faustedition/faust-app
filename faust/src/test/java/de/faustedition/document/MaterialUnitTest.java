@@ -1,6 +1,5 @@
 package de.faustedition.document;
 
-import com.google.common.base.Strings;
 import de.faustedition.AbstractContextTest;
 import de.faustedition.graph.FaustGraph;
 import org.junit.Test;

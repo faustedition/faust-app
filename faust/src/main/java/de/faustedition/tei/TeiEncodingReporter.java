@@ -24,7 +24,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
 
 @Component
 public class TeiEncodingReporter extends Runtime implements Runnable {

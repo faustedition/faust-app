@@ -11,7 +11,7 @@ public class CustomNamespaceContextTest {
 
     @Test
     public void retrieveNamespacesByPrefix() {
-        Assert.assertEquals(CustomNamespaceMap.FAUST_NS_URI, nsCtx.getNamespaceURI("f"));
-        Assert.assertEquals(CustomNamespaceMap.TEI_NS_URI, nsCtx.getNamespaceURI("tei"));
+        Assert.assertEquals(Namespaces.FAUST_NS_URI, nsCtx.getNamespaceURI("f"));
+        Assert.assertEquals(Namespaces.TEI_NS_URI, nsCtx.getNamespaceURI("tei"));
     }
 }

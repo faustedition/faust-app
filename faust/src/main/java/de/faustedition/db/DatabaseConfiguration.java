@@ -1,6 +1,7 @@
 package de.faustedition.db;
 
 import com.jolbox.bonecp.BoneCPDataSource;
+import de.faustedition.transcript.Transcript;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
@@ -49,7 +50,7 @@ public class DatabaseConfiguration {
 	@Bean
 	public SessionFactory sessionFactory() throws Exception {
 		return new LocalSessionFactoryBuilder(dataSource())
-			.addAnnotatedClasses(Annotation.class, Name.class, Text.class, TextTarget.class)
+			.addAnnotatedClasses(Annotation.class, Name.class, Text.class, TextTarget.class, Transcript.class)
 			.buildSessionFactory();
 	}
 
