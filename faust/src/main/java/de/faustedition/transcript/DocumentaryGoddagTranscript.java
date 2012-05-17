@@ -25,7 +25,7 @@ public class DocumentaryGoddagTranscript extends GoddagTranscript {
 	}
 
 	public DocumentaryGoddagTranscript(GraphDatabaseService db, FaustURI source, Element root, SortedSet<FaustURI> facsimileReferences) {
-		super(db, Type.DOCUMENTARY, source, root);
+		super(db, TranscriptType.DOCUMENTARY, source, root);
 		setFacsimileReferences(facsimileReferences);
 	}
 

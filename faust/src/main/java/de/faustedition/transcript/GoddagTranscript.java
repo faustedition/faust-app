@@ -19,9 +19,6 @@ import de.faustedition.graph.NodeWrapper;
 import de.faustedition.graph.TokenizerUtil;
 
 public abstract class GoddagTranscript extends NodeWrapper {
-	public enum Type {
-		DOCUMENTARY, TEXTUAL;
-	}
 
 	public static final FaustRelationshipType TRANSCRIPT_RT = new FaustRelationshipType("transcribes");
 	public static final String PREFIX = FaustGraph.PREFIX + ".transcript";
@@ -36,7 +33,7 @@ public abstract class GoddagTranscript extends NodeWrapper {
 		this.trees = new MultiRootedTree(node, MARKUP_VIEW_RT);
 	}
 
-	protected GoddagTranscript(GraphDatabaseService db, Type type, FaustURI source, Element root) {
+	protected GoddagTranscript(GraphDatabaseService db, TranscriptType type, FaustURI source, Element root) {
 		this(db.createNode());
 		setType(type);
 		setSource(source);
@@ -47,16 +44,16 @@ public abstract class GoddagTranscript extends NodeWrapper {
 		return trees;
 	}
 
-	public void setType(Type type) {
+	public void setType(TranscriptType type) {
 		node.setProperty(PREFIX + ".type", type.name().toLowerCase());
 	}
 
-	public Type getType() {
+	public TranscriptType getType() {
 		return getType(node);
 	}
 
 	public static GoddagTranscript forNode(Node node) {
-		Type type = getType(node);
+		TranscriptType type = getType(node);
 		switch (type) {
 		case DOCUMENTARY:
 			return new DocumentaryGoddagTranscript(node);
@@ -66,8 +63,8 @@ public abstract class GoddagTranscript extends NodeWrapper {
 		throw new IllegalArgumentException(type.toString());
 	}
 
-	public static Type getType(Node node) {
-		return Type.valueOf(((String) node.getProperty(PREFIX + ".type")).toUpperCase());
+	public static TranscriptType getType(Node node) {
+		return TranscriptType.valueOf(((String) node.getProperty(PREFIX + ".type")).toUpperCase());
 	}
 
 	public void setSource(FaustURI uri) {

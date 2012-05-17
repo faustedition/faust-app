@@ -17,7 +17,7 @@ public class TextualGoddagTranscript extends GoddagTranscript {
 	}
 
 	public TextualGoddagTranscript(GraphDatabaseService db, FaustURI source, Element root) {
-		super(db, Type.TEXTUAL, source, root);
+		super(db, TranscriptType.TEXTUAL, source, root);
 	}
 
 	public void postprocess() {

@@ -2,8 +2,8 @@ package de.faustedition.document;
 
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
-import de.faustedition.transcript.GoddagTranscript;
 import de.faustedition.transcript.GoddagTranscriptManager;
+import de.faustedition.transcript.TranscriptType;
 import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XMLBaseTracker;
 import de.faustedition.xml.XMLStorage;
@@ -94,7 +94,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 				}
 
 				final MaterialUnit.Type type = MaterialUnit.Type.valueOf(typeAttr.toUpperCase());
-				MaterialUnit unit = null;
+				MaterialUnit unit;
 				switch (type) {
 					case DOCUMENT:
 					case ARCHIVAL_UNIT:
@@ -106,15 +106,13 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 
 				unit.setOrder(materialUnitCounter++);
 
-				GoddagTranscript.Type transcriptType = GoddagTranscript.Type.DOCUMENTARY;
+				TranscriptType transcriptType = TranscriptType.DOCUMENTARY;
 				if (materialUnitStack.isEmpty()) {
 					if (!(unit instanceof Document)) {
-						throw new SAXException(
-							"Encountered top-level material unit of wrong @type '"
-								+ type + "'");
+						throw new SAXException("Encountered top-level material unit of wrong @type '"+ type + "'");
 					}
 					document = (Document) unit;
-					transcriptType = GoddagTranscript.Type.TEXTUAL;
+					transcriptType = TranscriptType.TEXTUAL;
 				} else {
 					materialUnitStack.peek().add(unit);
 				}
@@ -123,8 +121,8 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 
 				final String transcript = attributes.getValue("transcript");
 				if (transcript != null) {
-					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(
-						transcript));
+					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
+					unit.setTranscriptSource(transcriptSource);
 					unit.setTranscript(transcriptManager.find(transcriptSource, transcriptType));
 				}
 			} catch (IllegalArgumentException e) {

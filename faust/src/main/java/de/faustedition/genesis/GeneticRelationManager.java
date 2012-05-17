@@ -9,7 +9,7 @@ import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.text.Text;
 import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.GoddagTranscript.Type;
+import de.faustedition.transcript.TranscriptType;
 import org.goddag4j.Element;
 import org.goddag4j.GoddagNode;
 import org.goddag4j.GoddagTreeNode;
@@ -58,7 +58,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 		try {
 			final SortedMap<Integer, Element> textLineIndex = textLineIndex();
 			for (GoddagTranscript t : graph.getTranscripts()) {
-				if (t.getType() != Type.TEXTUAL || !t.getSource().isTextEncodingDocument()) {
+				if (t.getType() != TranscriptType.TEXTUAL || !t.getSource().isTextEncodingDocument()) {
 					continue;
 				}
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.StopWatch;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -50,7 +51,9 @@ public class MaterialUnitInitializer implements InitializingBean {
 	}
 
 	protected void feedGraph() {
-		logger.info("Feeding material units into graph");
+		logger.info("Initializing material unit graph");
+		StopWatch sw = new StopWatch();
+		sw.start();
 		for (final FaustURI documentDescriptor : xml.iterate(DOCUMENT_BASE_URI)) {
 			try {
 				logger.debug("Importing document " + documentDescriptor);
@@ -61,6 +64,8 @@ public class MaterialUnitInitializer implements InitializingBean {
 				logger.error("I/O error while adding document " + documentDescriptor, e);
 			}
 		}
+		sw.stop();
+		logger.info("Initialized material unit graph in {}s", sw.getTotalTimeSeconds());
 	}
 
 

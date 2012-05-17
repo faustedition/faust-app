@@ -5,7 +5,7 @@ import de.faustedition.JsonRespresentation;
 import de.faustedition.template.TemplateRepresentationFactory;
 import de.faustedition.transcript.DocumentaryGoddagTranscript;
 import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.GoddagTranscript.Type;
+import de.faustedition.transcript.TranscriptType;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -61,7 +61,7 @@ public class DocumentResource extends ServerResource {
 					generator.writeObjectFieldStart("transcript");
 					generator.writeStringField("type", transcript.getType().name().toLowerCase());
 					generator.writeStringField("source", transcript.getSource().toString());
-					if (transcript.getType() == Type.DOCUMENTARY) {
+					if (transcript.getType() == TranscriptType.DOCUMENTARY) {
 						DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
 						generator.writeArrayFieldStart("facsimiles");
 						for (FaustURI facsimile : dt.getFacsimileReferences()) {

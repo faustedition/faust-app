@@ -5,7 +5,6 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.tei.WhitespaceUtil;
-import de.faustedition.transcript.GoddagTranscript.Type;
 import de.faustedition.xml.*;
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
@@ -159,7 +158,7 @@ public class GoddagTranscriptManager {
 		};
 	}
 
-	public GoddagTranscript find(FaustURI source, Type type) {
+	public GoddagTranscript find(FaustURI source, TranscriptType type) {
 		for (GoddagTranscript t : find(source)) {
 			if (type == null || t.getType() == type) {
 				return t;

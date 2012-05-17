@@ -5,7 +5,7 @@ import de.faustedition.text.Text;
 import de.faustedition.text.TextGeneticJSONEnhancer;
 import de.faustedition.text.TextManager;
 import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.GoddagTranscript.Type;
+import de.faustedition.transcript.TranscriptType;
 import de.faustedition.transcript.GoddagTranscriptManager;
 import de.faustedition.xml.XMLStorage;
 import org.goddag4j.MultiRootedTree;
@@ -69,9 +69,9 @@ public class GoddagFinder extends Finder {
 				resource.setEnhancer(applicationContext.getBean(TextGeneticJSONEnhancer.class));
 			}
 		} else if (uriPath.startsWith("/transcript")) {
-			Type transcriptType = null;
+			TranscriptType transcriptType = null;
 			try {
-				transcriptType = Type.valueOf(parameters.getFirstValue("type", "").toUpperCase());
+				transcriptType = TranscriptType.valueOf(parameters.getFirstValue("type", "").toUpperCase());
 			} catch (IllegalArgumentException e) {
 			}
 

@@ -42,7 +42,7 @@ public class ArchiveInitializer implements InitializingBean {
 	private TransactionTemplate transactionTemplate;
 
 	public void createArchives() {
-		LOG.info("Adding archive data");
+		LOG.info("Initializing archive register");
 		try {
 			final ArchiveCollection archives = graph.getArchives();
 			XMLUtil.saxParser().parse(xml.getInputSource(ARCHIVE_DESCRIPTOR_URI), new DefaultHandler() {

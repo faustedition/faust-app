@@ -7,7 +7,7 @@ import de.faustedition.facsimile.FacsimileFinder;
 import de.faustedition.template.TemplateRepresentationFactory;
 import de.faustedition.transcript.DocumentaryGoddagTranscript;
 import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.GoddagTranscript.Type;
+import de.faustedition.transcript.TranscriptType;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
@@ -213,7 +213,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 		if (transcript == null) {
 			return null;
 		}
-		if (transcript.getType() != Type.DOCUMENTARY) {
+		if (transcript.getType() != TranscriptType.DOCUMENTARY) {
 			return null;
 		}
 		final DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
