@@ -4,7 +4,15 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.WildcardQuery;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -14,12 +22,18 @@ import de.faustedition.FaustURI;
 import de.faustedition.genesis.MacrogeneticRelationManager;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.NodeWrapper;
+import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexManager;
 import org.springframework.transaction.annotation.Transactional;
 
 public class Document extends MaterialUnit {
 	private static final String PREFIX = FaustGraph.PREFIX + ".document";
 
-	public static final String SOURCE_KEY = PREFIX + ".uri";
+	private static final String SOURCE_KEY = PREFIX + ".uri";
+	private static final String CALLNUMBER_KEY = METADATA_PREFIX + "callnumber";
+	private static final String WA_ID_KEY = METADATA_PREFIX + "wa-id";
+
+	private static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("[a-zA-Z0-9]");
 
 	public Document(Node node) {
 		super(node);
@@ -28,14 +42,7 @@ public class Document extends MaterialUnit {
 	public Document(Node node, Type type, FaustURI source) {
 		super(node, type);
 		setSource(source);
-		node.getGraphDatabase().index().forNodes(SOURCE_KEY).add(node, SOURCE_KEY, source);
 	}
-
-	public static Document find(GraphDatabaseService db, FaustURI source) {
-		final Node node = db.index().forNodes(SOURCE_KEY).get(SOURCE_KEY, source).getSingle();
-		return (node == null ? null : new Document(node));
-	}
-
 
 	public FaustURI getSource() {
 		return FaustURI.parse((String) node.getProperty(SOURCE_KEY));
@@ -58,4 +65,35 @@ public class Document extends MaterialUnit {
 			return result;
 	}
 
+	public static Document find(GraphDatabaseService db, FaustURI source) {
+		final Node node = db.index().forNodes(SOURCE_KEY).get(SOURCE_KEY, source).getSingle();
+		return (node == null ? null : new Document(node));
+	}
+
+
+	public static Iterable<Document> find(GraphDatabaseService db, String id) {
+		final BooleanQuery query = new BooleanQuery();
+		query.add(new WildcardQuery(new Term(CALLNUMBER_KEY, id)), BooleanClause.Occur.SHOULD);
+		query.add(new WildcardQuery(new Term(WA_ID_KEY, id)), BooleanClause.Occur.SHOULD);
+
+		return Iterables.transform(
+			db.index().forNodes(PREFIX + "id").query(query),
+			newWrapperFunction(Document.class));
+	}
+
+	public void index() {
+		final IndexManager indexManager = node.getGraphDatabase().index();
+
+		indexManager.forNodes(SOURCE_KEY).add(node, SOURCE_KEY, getSource());
+
+		final Index<Node> idIndex = indexManager.forNodes(PREFIX + "id");
+		for (String callnumber : Objects.firstNonNull(getMetadata("callnumber"), new String[0])) {
+			idIndex.add(node, CALLNUMBER_KEY, callnumber.toLowerCase());
+		}
+		for (String waId : Objects.firstNonNull(getMetadata("wa-id"), new String[0])) {
+			if (ALPHA_NUMERIC_PATTERN.matcher(waId).find()) {
+				idIndex.add(node, WA_ID_KEY, waId.toLowerCase());
+			}
+		}
+	}
 }

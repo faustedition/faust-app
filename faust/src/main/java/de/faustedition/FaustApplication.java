@@ -6,12 +6,15 @@ import de.faustedition.document.ArchiveRouter;
 import de.faustedition.document.DocumentRouter;
 import de.faustedition.facsimile.FacsimileFinder;
 import de.faustedition.genesis.GeneticGraphRouter;
+import de.faustedition.search.SearchResource;
 import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.security.SecurityConstants;
 import de.faustedition.structure.StructureFinder;
 import de.faustedition.tei.GoddagFinder;
 import de.faustedition.template.TemplateFinder;
 import de.faustedition.text.TextFinder;
+import de.faustedition.transcript.TranscriptViewResource;
+import de.faustedition.transcript.TranscriptSourceResource;
 import de.faustedition.xml.XMLFinder;
 import org.restlet.Application;
 import org.restlet.Request;
@@ -34,6 +37,7 @@ import org.restlet.security.Role;
 import org.restlet.security.RoleAuthorizer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -46,6 +50,9 @@ import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
 public class FaustApplication extends Application implements InitializingBean {
 	@Autowired
 	private Environment environment;
+
+	@Autowired
+	private ApplicationContext applicationContext;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
@@ -68,8 +75,8 @@ public class FaustApplication extends Application implements InitializingBean {
 	@Autowired
 	private GoddagFinder goddagFinder;
 
-    @Autowired
-    private FacsimileFinder facsimileFinder;
+    	@Autowired
+    	private FacsimileFinder facsimileFinder;
 
 	@Autowired
 	private TextFinder textFinder;
@@ -102,15 +109,18 @@ public class FaustApplication extends Application implements InitializingBean {
 
 		router.attach("archive/", secured(transactional(archiveRouter)));
 		router.attach("collation/", secured(transactional(collationFinder)));
-        router.attach("demo/", secured(transactional(templateFinder)));
-        router.attach("document/", secured(transactional(documentRouter)));
-        router.attach("facsimile/", facsimileFinder);
+        	router.attach("demo/", secured(transactional(templateFinder)));
+        	router.attach("document/", secured(transactional(documentRouter)));
+        	router.attach("facsimile/", facsimileFinder);
 		router.attach("genesis/", secured(transactional(geneticGraphRouter)));
 		router.attach("goddag/", secured(transactional(goddagFinder)));
-        router.attach("project/", templateFinder);
-        router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
-        router.attach("structure/", secured(transactional(structureFinder)));
-        router.attach("text/", secured(transactional(textFinder)));
+        	router.attach("project/", templateFinder);
+        	router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
+		router.attach("search/{term}", secured(transactional(contextResource(SearchResource.class))));
+        	router.attach("structure/", secured(transactional(structureFinder)));
+        	router.attach("text/", secured(transactional(textFinder)));
+		router.attach("transcript/source/{id}", secured(transactional(contextResource(TranscriptSourceResource.class))));
+		router.attach("transcript/{id}", secured(transactional(contextResource(TranscriptViewResource.class))));
 		router.attach("xml/", secured(xmlFinder));
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
@@ -141,6 +151,10 @@ public class FaustApplication extends Application implements InitializingBean {
 
 			return encoder;
 		}
+	}
+
+	private <T extends ServerResource> Restlet contextResource(Class<T> type) {
+		return new ApplicationContextFinder<T>(applicationContext, type);
 	}
 
 	private Restlet secured(Restlet resource) {

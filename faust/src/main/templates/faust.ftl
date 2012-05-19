@@ -37,15 +37,8 @@
 </head>
 <body class="yui3-skin-sam<#if layout?has_content> layout-${layout}</#if>">
 <div id="header">
-	<div class="yui3-g">
-		<div class="yui3-u-2-3"><h1><span class="color-1">Digitale Faustedition:&#160;</span>${title}</h1></div>
-		<div class="yui3-u-1-3">
-			<form id="search-form" action="${cp}/search" method="get">
-				<input id="term" type="text" value="" disabled="disabled"/>
-				<input type="submit" value="${message('search')}" disabled="disabled"/>
-			</form>
-		</div>		
-	</div>
+	<div style="float: right"><input title="${message('menu.search')}" id="quick-search" type="text" value=""/></div>
+	<h1><span class="color-1">Digitale Faustedition:&#160;</span>${title}</h1>
 	<@topNavigation />
 </div>
 <div id="main" class="<#if layout?has_content>layout-${layout}</#if>">
@@ -55,12 +48,13 @@
 	<p>Digitale Faust-Edition. Copyright (c) 2009, 2010 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
 </div>
 <script type="text/javascript">
-	Faust.YUI().use("node", "dom", "node-menunav", function(Y) { 
-		topNav = Y.one("#top-navigation")
-		topNav.plug(Y.Plugin.NodeMenuNav); 
-		topNav.get("ownerDocument").get("documentElement").removeClass("yui3-loading");
-		
-		//Y.one("#search-form #term").focus();
+	YUI().use("node", "dom", "node-menunav", "search", function(Y) {
+		Y.one("#top-navigation").plug(Y.Plugin.NodeMenuNav);
+		Y.one("html").removeClass("yui3-loading");
+
+		var quickSearch = Y.one("#quick-search");
+		new Y.Faust.QuickSearch({ srcNode: quickSearch }).render();
+		quickSearch.focus();
 	});
 </script>
 </body>
@@ -68,7 +62,7 @@
 </#macro>
 
 <#macro topNavigation>
-<div id="top-navigation" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav">
+<div id="top-navigation" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav" style="clear: both">
 	<div class="yui3-menu-content">
 		<ul class="first-of-type">
 			<#if roles?seq_contains("editor") || roles?seq_contains("external")>

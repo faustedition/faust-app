@@ -57,6 +57,9 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		final InputSource xmlSource = xml.getInputSource(source);
 		try {
 			XMLUtil.saxParser().parse(xmlSource, this);
+			if (document != null) {
+				document.index();
+			}
 			return document;
 		} finally {
 			xmlSource.getByteStream().close();

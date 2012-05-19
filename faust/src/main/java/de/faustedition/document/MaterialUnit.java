@@ -17,12 +17,13 @@ import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
+
 	public enum Type {
 		ARCHIVAL_UNIT, DOCUMENT, QUIRE, SHEET, FOLIO, PAGE, SURFACE
 	}
 
-	private static final String PREFIX = FaustGraph.PREFIX + ".material-unit";
-	private static final String METADATA_PREFIX = PREFIX + ".metadata.";
+	protected static final String PREFIX = FaustGraph.PREFIX + ".material-unit";
+	protected static final String METADATA_PREFIX = PREFIX + ".metadata.";
 
 	private static final FaustRelationshipType MATERIAL_PART_OF_RT = new FaustRelationshipType("is-material-part-of");
 
@@ -40,20 +41,20 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		return (Long) node.getProperty(PREFIX + ".last-modified");
 	}
 
+	public Archive getArchive() {
+		for (MaterialUnit unit = this; unit != null; unit = unit.getParent()) {
+			if (unit instanceof Document) {
+				return Archive.getArchive((Document) unit);
+			}
+		}
+		return null;
+	}
+
+
 	public MaterialUnit getParent() {
 		// FIXME: we might want to have multiple parentship here too
 		final Relationship r = node.getSingleRelationship(MATERIAL_PART_OF_RT, OUTGOING);
-		if (r == null) {
-			return null;
-		}
-		final MaterialUnit mu = NodeWrapper.newInstance(MaterialUnit.class, r.getStartNode());
-		switch (mu.getType()) {
-			case ARCHIVAL_UNIT:
-			case DOCUMENT:
-				return new Document(mu.node);
-			default:
-				return mu;
-		}
+		return (r == null ? null : forNode(r.getStartNode()));
 	}
 
 	public SortedSet<MaterialUnit> getSortedContents() {

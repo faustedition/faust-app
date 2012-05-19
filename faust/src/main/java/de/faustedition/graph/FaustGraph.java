@@ -28,6 +28,10 @@ public class FaustGraph {
 	@Autowired
 	private GraphDatabaseService db;
 
+	public GraphDatabaseService getDb() {
+		return db;
+	}
+
 	public ArchiveCollection getArchives() {
 		return new ArchiveCollection(root(ARCHIVES_ROOT_NAME));
 	}

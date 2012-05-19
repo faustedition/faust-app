@@ -21,6 +21,7 @@ YUI.GlobalConfig = {
 				'document-controller' : { path: 'document/document-controller.js' },
 				'document-model' : { path: 'document/document-model.js' },
 				'materialunit' : { path: 'document/materialunit.js' },
+                'search': {},
 				'svg-utils' : {}
             }
         }

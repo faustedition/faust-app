@@ -23,6 +23,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 @Component
 public class ArchiveInitializer implements InitializingBean {
 	public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
@@ -46,14 +48,42 @@ public class ArchiveInitializer implements InitializingBean {
 		try {
 			final ArchiveCollection archives = graph.getArchives();
 			XMLUtil.saxParser().parse(xml.getInputSource(ARCHIVE_DESCRIPTOR_URI), new DefaultHandler() {
+
+				private Archive archive;
+				private StringBuilder archiveName;
+
 				@Override
 				public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+					if (!Namespaces.FAUST_NS_URI.equals(uri)) {
+						return;
+					}
+					if ("archive".equals(localName)) {
+						archive = new Archive(db.createNode(), checkNotNull(attributes.getValue("id")));
+					} else if (archive != null && "name".equals(localName)) {
+						archiveName = new StringBuilder();
+					}
+				}
+
+				@Override
+				public void endElement(String uri, String localName, String qName) throws SAXException {
+					if (!Namespaces.FAUST_NS_URI.equals(uri)) {
+						return;
+					}
 					if ("archive".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
-						final Archive archive = new Archive(db.createNode(), Preconditions.checkNotNull(attributes.getValue("id")));
+						Preconditions.checkState(archive.getName() != null);
+						archives.add(archive);
 						if (LOG.isDebugEnabled()) {
 							LOG.debug("Adding {}", archive);
 						}
-						archives.add(archive);
+					} else if (archiveName != null && "name".equals(localName)) {
+						archive.setName(archiveName.toString().trim());
+					}
+				}
+
+				@Override
+				public void characters(char[] ch, int start, int length) throws SAXException {
+					if (archiveName != null) {
+						archiveName.append(ch, start, length);
 					}
 				}
 			});
