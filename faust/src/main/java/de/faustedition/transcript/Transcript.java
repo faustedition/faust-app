@@ -1,8 +1,9 @@
 package de.faustedition.transcript;
 
+import com.google.common.base.Objects;
 import com.google.common.io.Closeables;
 import de.faustedition.FaustURI;
-import de.faustedition.xml.Namespaces;
+import de.faustedition.genesis.TranscribedVerseInterval;
 import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
@@ -11,17 +12,17 @@ import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerModule;
 import eu.interedition.text.xml.module.*;
+import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.xml.sax.InputSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.sax.SAXSource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.List;
 
 import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
@@ -33,6 +34,7 @@ import static eu.interedition.text.TextConstants.TEI_NS;
 @Entity
 @Table(name = "faust_transcript")
 public class Transcript {
+	private static final Logger LOG = LoggerFactory.getLogger(Transcript.class);
 
 	private long id;
 	private String sourceURI;
@@ -76,29 +78,42 @@ public class Transcript {
 		this.text = text;
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this).addValue(getSource()).toString();
+	}
+
 	public static Transcript find(Session session, XMLStorage xml, FaustURI source) throws IOException, XMLStreamException {
 		final String sourceURI = source.toString();
 		Transcript transcript = (Transcript) session.createCriteria(Transcript.class)
 			.add(Restrictions.eq("sourceURI", sourceURI))
+			.setLockMode(LockMode.UPGRADE_NOWAIT)
 			.uniqueResult();
 		if (transcript == null) {
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Creating transcript for {}", sourceURI);
+			}
 			transcript = new Transcript();
 			transcript.setSourceURI(sourceURI);
-			session.merge(transcript);
+			session.save(transcript);
 		}
 
 		if (transcript.getText() == null) {
-			transcript.setText(save(session, xml.getInputSource(source)));
+			transcript.setText(read(session, xml, source));
+			TranscribedVerseInterval.register(session, transcript);
 		}
 
 		return transcript;
 	}
 
-	private static Text save(Session session, InputSource source) throws XMLStreamException, IOException {
+	private static Text read(Session session, XMLStorage xml, FaustURI source) throws XMLStreamException, IOException {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Transforming XML transcript from {}", source);
+		}
 		InputStream xmlStream = null;
 		XMLStreamReader xmlReader = null;
 		try {
-			xmlStream = source.getByteStream();
+			xmlStream = xml.getInputSource(source).getByteStream();
 			xmlReader = XML.createXMLInputFactory().createXMLStreamReader(xmlStream);
 			return createXMLTransformer(session).transform(Text.create(session, null, xmlReader));
 		} finally {
@@ -118,6 +133,7 @@ public class Transcript {
 		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
 		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
 
+		conf.addLineElement(new Name(TEI_NS, "text"));
 		conf.addLineElement(new Name(TEI_NS, "div"));
 		conf.addLineElement(new Name(TEI_NS, "head"));
 		conf.addLineElement(new Name(TEI_NS, "sp"));
@@ -126,6 +142,7 @@ public class Transcript {
 		conf.addLineElement(new Name(TEI_NS, "lg"));
 		conf.addLineElement(new Name(TEI_NS, "l"));
 		conf.addLineElement(new Name(TEI_NS, "p"));
+		conf.addLineElement(new Name(TEI_NS, "ab"));
 		conf.addLineElement(new Name(TEI_NS, "line"));
 		conf.addLineElement(new Name(TEI_SIG_GE, "line"));
 
@@ -145,5 +162,6 @@ public class Transcript {
 
 		return new XMLTransformer(session, conf);
 	}
+
 
 }
