@@ -12,6 +12,7 @@ import org.restlet.data.*;
 import org.restlet.engine.util.ConnegUtils;
 import org.restlet.ext.freemarker.TemplateRepresentation;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,8 @@ import java.util.*;
 
 @Component
 public class TemplateRepresentationFactory {
+	private static final Logger LOG = LoggerFactory.getLogger(TemplateRepresentationFactory.class);
+
 	private static final List<Language> SUPPORTED_LANGUAGES = Collections.unmodifiableList(//
 			Lists.newArrayList(new Language("de"), new Language("en")));
 
@@ -28,9 +31,6 @@ public class TemplateRepresentationFactory {
 
 	@Autowired
 	private TextManager textManager;
-
-	@Autowired
-	private Logger logger;
 
 	public TemplateRepresentation create(String path, ClientInfo client) throws IOException {
 		return create(path, client, new HashMap<String, Object>());
@@ -42,7 +42,9 @@ public class TemplateRepresentationFactory {
 
 		Template template;
 		try {
-			logger.debug("Getting template for " + path + " with locale " + locale);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Getting template for {} (locale: {})", path, locale);
+			}
 			template = configuration.getTemplate(path + ".ftl", locale);
 			Preconditions.checkNotNull(template, "Cannot find template for " + path);
 		} catch (IOException e) {
@@ -52,7 +54,9 @@ public class TemplateRepresentationFactory {
 		model.put("roles", Lists.transform(client.getRoles(), Functions.toStringFunction()));
 		
 		final ResourceBundle messages = ResourceBundle.getBundle("messages", locale);
-		logger.debug("Putting message resource bundle '" + messages.getLocale() + "' into model (requested locale " + locale + ")");
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Putting message resource bundle '" + messages.getLocale() + "' into model (requested locale " + locale + ")");
+		}
 		model.put("message", messages);
 
 		final SortedMap<String, String> textTableOfContents = new TreeMap<String, String>();
