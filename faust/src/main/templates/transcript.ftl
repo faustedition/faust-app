@@ -76,7 +76,7 @@
 						success: function(id, response) {
 							var sourceNode = Y.one("#source");
 							sourceNode.append(Y.config.doc.createTextNode(response.responseText));
-							if (response.responseText.length < 512000) {
+							if (response.responseText.length < 51200) {
 								sourceNode.addClass("prettyprint");
 								prettyPrint();
 							}
