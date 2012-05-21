@@ -17,6 +17,7 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -31,17 +32,13 @@ import java.util.*;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class SearchResource extends ServerResource {
 
-	@Autowired
-	private TemplateRepresentationFactory templateFactory;
+	private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
 	@Autowired
 	private JsonRepresentationFactory jsonFactory;
 
 	@Autowired
 	private GraphDatabaseService db;
-
-	@Autowired
-	private Logger logger;
 
 	private String searchTerm;
 
@@ -56,8 +53,8 @@ public class SearchResource extends ServerResource {
 
 	@Get("json")
 	public Representation results() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Searching for '{}'", searchTerm);
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Searching for '{}'", searchTerm);
 		}
 		final Map<String,Object> results = Maps.newHashMap();
 
