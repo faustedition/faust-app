@@ -37,13 +37,13 @@ public class TemplateRepresentationFactory {
 	}
 
 	public TemplateRepresentation create(String path, ClientInfo client, Map<String, Object> model) {
-		final Language language = getPreferredMetadata(SUPPORTED_LANGUAGES, client.getAcceptedLanguages());
+		final Language language = client.getPreferredLanguage(SUPPORTED_LANGUAGES);
 		final Locale locale = (language == null ? Locale.GERMAN : new Locale(language.getName()));
 
 		Template template;
 		try {
 			if (LOG.isDebugEnabled()) {
-				LOG.debug("Getting template for {} (locale: {})", path, locale);
+				LOG.debug("Getting template for '{}' (locale: '{}')", path, locale);
 			}
 			template = configuration.getTemplate(path + ".ftl", locale);
 			Preconditions.checkNotNull(template, "Cannot find template for " + path);
@@ -55,7 +55,7 @@ public class TemplateRepresentationFactory {
 		
 		final ResourceBundle messages = ResourceBundle.getBundle("messages", locale);
 		if (LOG.isTraceEnabled()) {
-			LOG.trace("Putting message resource bundle '" + messages.getLocale() + "' into model (requested locale " + locale + ")");
+			LOG.trace("Putting message resource bundle '{}' into model (requested locale '{}')", messages.getLocale(), locale);
 		}
 		model.put("message", messages);
 
@@ -89,28 +89,5 @@ public class TemplateRepresentationFactory {
 		public String getTitle() {
 			return title;
 		}
-	}
-
-	/**
-	 * Copied from {@link ConnegUtils#getPreferredMetadata(List, List)} and
-	 * patched to correctly update <code>maxQuality</code>.
-	 * 
-	 * @see ConnegUtils#getPreferredMetadata(List, List)
-	 */
-	private static <T extends Metadata> T getPreferredMetadata(List<T> supported, List<Preference<T>> preferences) {
-		T result = null;
-		float maxQuality = 0;
-
-		if (supported != null) {
-			for (Preference<T> pref : preferences) {
-				if (supported.contains(pref.getMetadata()) && (pref.getQuality() > maxQuality)) {
-					result = pref.getMetadata();
-					// was not updated in original method
-					maxQuality = pref.getQuality();
-				}
-			}
-		}
-
-		return result;
 	}
 }
