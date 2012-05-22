@@ -30,7 +30,7 @@
 	</div>
 
 	<script type="text/javascript">
-		YUI().use("io", "node", "overlay", "dd-plugin", "facsimile", function(Y) {
+		YUI().use("io", "node", "overlay", "dd-plugin", "facsimile", "text-annotation", function(Y) {
 			Y.on("domready", function() {
 				var facsimileViewer = new Y.Faust.FacsimileViewer({
 					srcNode: "#facsimile-view",
@@ -51,12 +51,13 @@
 
 				Y.io(cp + "/transcript/source/${id?c}", {
 					headers: {
-						"Accept": "text/plain"
+						"Accept": "application/json"
 					},
 					on: {
 						success: function(id, response) {
-							var plainTextNode = Y.one("#plain-text")
-							Y.Array.each(response.responseText.split("\n"), function(line, n) {
+							var plainTextNode = Y.one("#plain-text");
+							text = Y.Faust.Text.create(Y.JSON.parse(response.responseText));
+							Y.Array.each(text.content.split("\n"), function(line, n) {
 								if (n > 0) {
 									plainTextNode.append("<br>");
 								}

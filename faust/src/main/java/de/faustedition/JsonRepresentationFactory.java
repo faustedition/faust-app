@@ -1,6 +1,7 @@
 package de.faustedition;
 
 import com.google.common.base.Throwables;
+import eu.interedition.text.json.map.TextModule;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.data.MediaType;
@@ -8,7 +9,6 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.WriterRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -25,7 +25,11 @@ public class JsonRepresentationFactory {
 	@Autowired
 	private TransactionTemplate transactionTemplate;
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper();
+
+	public JsonRepresentationFactory() {
+		this.objectMapper.registerModule(new TextModule());
+	}
 
 	public Representation map(Object object) {
 		return map(object, true);

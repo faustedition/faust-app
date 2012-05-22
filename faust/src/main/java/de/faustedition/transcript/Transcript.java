@@ -129,7 +129,7 @@ public class Transcript {
 		modules.add(new LineElementXMLTransformerModule());
 		modules.add(new NotableCharacterXMLTransformerModule());
 		modules.add(new TextXMLTransformerModule());
-		modules.add(new DefaultAnnotationXMLTransformerModule(1000, true));
+		modules.add(new DefaultAnnotationXMLTransformerModule(1000, false));
 		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
 		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
 

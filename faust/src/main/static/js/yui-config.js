@@ -22,7 +22,8 @@ YUI.GlobalConfig = {
 				'document-model' : { path: 'document/document-model.js' },
 				'materialunit' : { path: 'document/materialunit.js' },
                 'search': {},
-				'svg-utils' : {}
+				'svg-utils' : {},
+                'text-annotation': {}
             }
         }
     }
