@@ -1,0 +1,17 @@
+* TRANSITIVITY TESTS*
+* E prover *
+Relation size | time
+1 0m0.128s
+2 0.125s
+3 0m0.126s
+4 0m0.124s
+5 0m0.169s
+6 0m0.531s
+7 0m8.300s
+8 2m49.101s
+9
+10
+
+* Java with transitivity-utils*
+500 0m40.142s
+1000 9m35.492s
