@@ -20,13 +20,13 @@ public class InscriptionRelationTest {
 	@org.junit.Before
 	public void setup() {
 		this.inscriptionA = new Inscription(Arrays.asList(
-				5, 6, 7));
+				5, 6, 7), "A");
 		this.inscriptionB = new Inscription(Arrays.asList(
-				6, 7, 8));
+				6, 7, 8), "B");
 		this.inscriptionC = new Inscription(Arrays.asList(
-				8, 9, 10));
+				8, 9, 10), "C");
 		this.inscriptionD = new Inscription(Arrays.asList(
-				4, 9, 10));
+				4, 9, 10), "D");
 
 	}
 

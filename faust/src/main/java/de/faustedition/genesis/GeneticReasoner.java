@@ -59,9 +59,6 @@ public class GeneticReasoner extends Runtime implements Runnable {
 		final Set<Inscription> inscriptions = inscriptions();
 		final GeneticReasoning reasoning = new GeneticReasoning();
 		LOG.debug("Reasoning on " + inscriptions.size() + " inscriptions");
-		for (Inscription i: inscriptions)
-			LOG.debug("Inscription from " + (i.first()) + " to " +
-					i.last());
 		reasoning.reason(inscriptions);
 
 	}
@@ -73,37 +70,41 @@ public class GeneticReasoner extends Runtime implements Runnable {
 			for (MaterialUnit mu : graph.getMaterialUnits()) {
 				if (mu instanceof Document) {
 					final Document document = (Document) mu;
-					final FaustURI source = document.getSource();
-
-					Transcript transcript = tt
-					.execute(new TransactionCallback<Transcript>() {
-						@Override
-						public Transcript doInTransaction(
-								TransactionStatus status) {
-							Session session = sessionFactory
-							.getCurrentSession();
-							try {
-								Transcript transcript = Transcript
-								.find(session, xml, source);
-								TranscribedVerseInterval.register(
-										session, transcript);
-								Iterable<TranscribedVerseInterval> intervals = TranscribedVerseInterval
-								.registeredFor(session,
-										transcript);
-								Inscription inscription = new Inscription();
-								for (TranscribedVerseInterval interval : intervals) {
-									inscription.addInterval(interval.getStart(), interval.getEnd());									
+					final FaustURI source = document.getTranscriptSource();
+					if (source != null) {
+						Transcript transcript = tt
+						.execute(new TransactionCallback<Transcript>() {
+							@Override
+							public Transcript doInTransaction(
+									TransactionStatus status) {
+								Session session = sessionFactory
+								.getCurrentSession();
+								try {
+									Transcript transcript = Transcript
+									.find(session, xml, source);
+									TranscribedVerseInterval.register(
+											session, transcript);
+									Iterable<TranscribedVerseInterval> intervals = TranscribedVerseInterval
+									.registeredFor(session,
+											transcript);
+									String name = document.getMetadataValue("callnumber");
+									name = (name == null || "".equals(name)) ? "noname" : name;
+									Inscription inscription = new Inscription(name);
+									for (TranscribedVerseInterval interval : intervals) {
+										inscription.addInterval(interval.getStart(), interval.getEnd());									
+									}
+									if (inscription.size() > 0)
+										inscriptions.add(inscription);
+								} catch (IOException e) {
+									LOG.error("IO error in " + source, e);
+								} catch (XMLStreamException e) {
+									LOG.error("XML error in " + source, e);
 								}
-								inscriptions.add(inscription);
-							} catch (IOException e) {
-								LOG.error("IO error in " + source, e);
-							} catch (XMLStreamException e) {
-								LOG.error("XML error in " + source, e);
-							}
 
-							return null;
-						}
-					});
+								return null;
+							}
+						});
+					}
 				}
 
 			}

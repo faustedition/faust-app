@@ -1,4 +1,6 @@
 package de.faustedition.reasoning;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.NavigableSet;
 import java.util.Random;
 import java.util.Set;
@@ -22,58 +24,58 @@ public class GeneticReasoning {
 		this.con = Relations.<Inscription>newTransitiveRelation();
 	}
 	
+	private static void printRelation(Relation<Inscription> r, String relationName, Set<Inscription> s, PrintStream stream){
+		stream.println("digraph " + relationName + " {");
+		stream.println("edge [label=" + relationName + "];");
+		for (Inscription i : s) {
+			for (Inscription j : s) {
+				if (r.areRelated(i, j)) {
+					String nameI = "i_" + i.toString().replaceAll("[ ,:\\(\\)-]", "_");
+					String nameJ = "i_" + j.toString().replaceAll("[ ,:\\(\\)-]", "_");
+					stream.println(" " + nameI + " -> " + nameJ + ";");
+				}
+			}
+			
+		}
+		stream.println("}");
+	}
+	
 	public void reason (Set<Inscription> inscriptions) {
 
 		for (Inscription i: inscriptions)
 			for (Inscription j: inscriptions) {
 				if (InscriptionRelations.syntagmaticallyPrecedes(i, j))
-					this.syn.relate(i, j);
+					syn.relate(i, j);
 			}
 		
+		printRelation(syn, "syn", inscriptions, System.out);
 		
 		for (Inscription i: inscriptions)
 			for (Inscription j: inscriptions) {
 				if (InscriptionRelations.exclusivelyContains(i, j))
-					this.con.relate(i, j);
+					con.relate(i, j);
 			}
 
 		for (Inscription i: inscriptions)
 			for (Inscription j: inscriptions) {
 				if (
-						this.syn.areRelated(i, j) &&
-						! this.con.areRelated(i, j))					
-					this.con.relate(i, j);
+						syn.areRelated(i, j) &&
+						! con.areRelated(i, j))					
+					con.relate(i, j);
 			}
+		
+
 		
 		for (Inscription i: inscriptions)
 			for (Inscription j: inscriptions) {
 				if (
-						this.con.areRelated(i, j))					
-					this.con.relate(i, j);
+						con.areRelated(i, j))					
+					pre.relate(i, j);
 			}
+
+		printRelation(pre, "pre", inscriptions, System.out);
+
 		
 	}
 	
-	
-	public static void main(String[] args) {
-		
-		Relation<Integer> prec = Relations.newTransitiveRelation();
-		
-		final int size = 500;
-		final Random rand = new Random();
-		for (int i=0; i < size; i++) {
-			for (int j=0; j < size; j++) {
-				if (rand.nextInt(500) == 1)				
-					prec.relate(i, j);
-			}			
-		}
-
-		for (int i=0; i < size; i++) {
-			for (int j=0; j < size; j++) {
-				if (prec.areRelated(i, j))
-				System.out.println(" " + i + " -> " + j);
-			}			
-		}
-
-	}
 }
