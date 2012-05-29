@@ -74,7 +74,7 @@ YUI.add('text-annotation', function (Y) {
 
             // If range is to the right of the rightmost point of any interval
             // in this node and all children, there won't be any matches.
-            if (range.start >= node.maxEnd) {
+            if (range.start > node.maxEnd) {
                 return;
             }
 
@@ -84,7 +84,7 @@ YUI.add('text-annotation', function (Y) {
             }
 
             // Check this node
-            if (node.key.overlapsWith(range)) {
+            if (node.key.overlapsWith(range) || range.includes(node.key)) {
                 Y.Array.each(node.values, function(v) {
                     result.push(v);
                 });
@@ -92,7 +92,7 @@ YUI.add('text-annotation', function (Y) {
 
             // If range is to the left of the start of this interval,
             // then it can't be in any child to the right.
-            if (range.end <= node.key.start) {
+            if (range.end < node.key.start) {
                 return;
             }
 
@@ -154,7 +154,10 @@ YUI.add('text-annotation', function (Y) {
             return (this.end <= other.start);
         },
         overlapsWith: function (other) {
-            return (this.start < other.end) && (this.end > other.start);
+            return ((this.start < other.end) && (this.end > other.start));
+        },
+        includes: function(other) {
+            return (this.start <= other.start && this.end >= other.end);
         },
         of: function (text) {
             return text.substring(this.start, this.end);
