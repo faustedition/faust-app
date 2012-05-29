@@ -63,7 +63,9 @@
 								}
 								plainTextNode.append(Y.config.doc.createTextNode(line));
 							});
-							Y.log(text.find(new Y.Faust.Range(0, 10)));
+							Y.Array.each(text.find(null, null, ["l", "stage", "speaker"]), function(a) {
+								Y.log((a.name.localName != "l" ? ">> " : "") + a.target().textContent());
+							});
 						}
 					}
 				});
