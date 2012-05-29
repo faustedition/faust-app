@@ -1,6 +1,7 @@
 package de.faustedition.transcript;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
@@ -91,10 +92,11 @@ public class TranscriptSourceResource extends TranscriptResource {
 		final Session session = sessionFactory.getCurrentSession();
 		final Text text = transcript.getText();
 
-		final SortedSet<Name> names = Sets.newTreeSet();
+		final Map<String, Name> names = Maps.newHashMap();
 		final ArrayList<Annotation> annotations = Lists.newArrayList();
 		for (Annotation annotation : text(text).iterate(session)) {
-			names.add(annotation.getName());
+			final Name name = annotation.getName();
+			names.put(Long.toString(name.getId()), name);
 			annotations.add(annotation);
 		}
 		return jsonFactory.map(new ModelMap()

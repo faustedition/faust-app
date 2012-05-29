@@ -39,17 +39,18 @@
 					view: { x: 0, y: 0, width: 900, height: 600 }
 				});
 				facsimileViewer.render();
-
+				*/
 				var plainTextOverlay = new Y.Overlay({ srcNode: "#plain-text-overlay", width: "30em", height: "50em", centered: true });
 				plainTextOverlay.plug(Y.Plugin.Drag);
 				plainTextOverlay.dd.addHandle(".yui3-widget-hd");
 				plainTextOverlay.render();
 
+				/*
 				var sourceOverlay = new Y.Overlay({ srcNode: "#source-overlay", width: "60em", height: "50em", centered: true });
 				sourceOverlay.plug(Y.Plugin.Drag);
 				sourceOverlay.dd.addHandle(".yui3-widget-hd");
 				sourceOverlay.render();
-
+				*/
 				Y.io(cp + "/transcript/source/${id?c}", {
 					headers: {
 						"Accept": "application/json"
@@ -63,13 +64,13 @@
 									plainTextNode.append("<br>");
 								}
 								plainTextNode.append(Y.config.doc.createTextNode(line));
-							})
-							facsimileViewer.model.zoom(-2);
-							facsimileViewer.model.center();
+							});
+							Y.log(text.find(new Y.Faust.Range(0, 10)));
 						}
 					}
 				});
 
+				/*
 				Y.io(cp + "/transcript/source/${id?c}", {
 					headers: {
 						"Accept": "application/xml"
@@ -86,24 +87,6 @@
 					}
 				});
 				*/
-				var tree = new Y.Faust.RBTree(function(a, b) { return a - b; });
-				tree.insert(20);
-				tree.insert(10);
-				tree.insert(10);
-				tree.insert(10);
-				tree.insert(10);
-				tree.insert(100);
-				tree.remove(10);
-				tree.remove(10);
-				tree.remove(10);
-				tree.remove(100);
-				tree.insert(100);
-				tree.insert(100);
-				tree.each(function(c) {
-					Y.log(c.key + ": " + c.values);
-				});
-				//Y.log(tree.min());
-				//Y.log(tree.max());
 
 			});
 		})

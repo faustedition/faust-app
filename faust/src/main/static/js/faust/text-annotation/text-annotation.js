@@ -19,12 +19,20 @@ YUI.add('text-annotation', function (Y) {
         this.text = text;
         this.range = range;
     };
+
     var UNKNOWN_NAME = new Name(null, "");
     var Annotation = function (name, data, targets) {
         this.name = name || UNKNOWN_NAME;
         this.data = data || {};
         this.targets = targets || [];
     };
+    Y.extend(Annotation, Object, {
+        targetIn: function(text) {
+            return Y.Array.find(this.targets, function(t) {
+                return (t.text === text);
+            });
+        }
+    });
 
     Y.extend(Text, Object, {
         partition: function () {
@@ -52,6 +60,46 @@ YUI.add('text-annotation', function (Y) {
                 start = end;
             });
             return partitions;
+        },
+        find: function(range) {
+            var result = [];
+            this._searchRange(this.rangeIndex._root, range, result);
+            return result;
+        },
+        _searchRange: function(node, range, result) {
+            // Don't search nodes that don't exist
+            if (node === null) {
+                return;
+            }
+
+            // If range is to the right of the rightmost point of any interval
+            // in this node and all children, there won't be any matches.
+            if (range.start >= node.maxEnd) {
+                return;
+            }
+
+            // Search left children
+            if (node.left !== null) {
+                this._searchRange(node.left, range, result);
+            }
+
+            // Check this node
+            if (node.key.overlapsWith(range)) {
+                Y.Array.each(node.values, function(v) {
+                    result.push(v);
+                });
+            }
+
+            // If range is to the left of the start of this interval,
+            // then it can't be in any child to the right.
+            if (range.end <= node.key.start) {
+                return;
+            }
+
+            // Otherwise, search right children
+            if (node.right !== null) {
+                this._searchRange(node.right, range, result);
+            }
         }
     }, {
         create: function (data) {
@@ -64,6 +112,20 @@ YUI.add('text-annotation', function (Y) {
                     return new TextTarget((target[2] == text.id ? text : target[2]), new Range(target[0], target[1]));
                 }));
             });
+            text.rangeIndex = new Y.Faust.RBTree(Range.sort, function(a) {
+                return a.targetIn(text).range;
+            });
+            Y.Array.each(text.annotations, function(a) {
+                text.rangeIndex.insert(a);
+            });
+            (function(treeNode) {
+                if (treeNode === null) {
+                    return 0;
+                } else {
+                    treeNode.maxEnd = Math.max(treeNode.key.end, arguments.callee(treeNode.left), arguments.callee(treeNode.right));
+                    return treeNode.maxEnd;
+                }
+            })(text.rangeIndex._root);
             return text;
         }
     });
@@ -92,9 +154,8 @@ YUI.add('text-annotation', function (Y) {
             return (this.end <= other.start);
         },
         overlapsWith: function (other) {
-            return this.amountOfOverlapWith(other) > 0;
+            return (this.start < other.end) && (this.end > other.start);
         },
-
         of: function (text) {
             return text.substring(this.start, this.end);
         },
@@ -128,5 +189,5 @@ YUI.add('text-annotation', function (Y) {
         Annotation: Annotation
     });
 }, '0.0', {
-    requires: ["base", "substitute", "array-extras", "io", "json"]
+    requires: ["text-index", "base", "substitute", "array-extras", "io", "json"]
 });
