@@ -32,25 +32,23 @@
 	<script type="text/javascript">
 		YUI().use("io", "node", "overlay", "dd-plugin", "facsimile", "text-annotation", "text-index", function(Y) {
 			Y.on("domready", function() {
-				/*
 				var facsimileViewer = new Y.Faust.FacsimileViewer({
 					srcNode: "#facsimile-view",
 					src: "/facsimile/agad_warszawa/PL_1_354_13-16-24/0014",
 					view: { x: 0, y: 0, width: 900, height: 600 }
 				});
 				facsimileViewer.render();
-				*/
+
 				var plainTextOverlay = new Y.Overlay({ srcNode: "#plain-text-overlay", width: "30em", height: "50em", centered: true });
 				plainTextOverlay.plug(Y.Plugin.Drag);
 				plainTextOverlay.dd.addHandle(".yui3-widget-hd");
 				plainTextOverlay.render();
 
-				/*
 				var sourceOverlay = new Y.Overlay({ srcNode: "#source-overlay", width: "60em", height: "50em", centered: true });
 				sourceOverlay.plug(Y.Plugin.Drag);
 				sourceOverlay.dd.addHandle(".yui3-widget-hd");
 				sourceOverlay.render();
-				*/
+
 				Y.io(cp + "/transcript/source/${id?c}", {
 					headers: {
 						"Accept": "application/json"
@@ -70,7 +68,6 @@
 					}
 				});
 
-				/*
 				Y.io(cp + "/transcript/source/${id?c}", {
 					headers: {
 						"Accept": "application/xml"
@@ -86,8 +83,6 @@
 						}
 					}
 				});
-				*/
-
 			});
 		})
 	</script>
