@@ -28,7 +28,7 @@ YUI.add('text-index', function (Y) {
     };
     Y.extend(Iterator, Object, {
         data: function () {
-            return this._cursor !== null ? this._cursor.data : null;
+            return this._cursor;
         },
         // if null-iterator, returns first node
         // otherwise, returns next node
@@ -38,8 +38,7 @@ YUI.add('text-index', function (Y) {
                 if (root !== null) {
                     this._minNode(root);
                 }
-            }
-            else {
+            } else {
                 if (this._cursor.right === null) {
                     // no greater node in subtree, go up to parent
                     // if coming from a right child, continue up the stack
@@ -48,20 +47,18 @@ YUI.add('text-index', function (Y) {
                         save = this._cursor;
                         if (this._ancestors.length) {
                             this._cursor = this._ancestors.pop();
-                        }
-                        else {
+                        } else {
                             this._cursor = null;
                             break;
                         }
                     } while (this._cursor.right === save);
-                }
-                else {
+                } else {
                     // get the next node from the subtree
                     this._ancestors.push(this._cursor);
                     this._minNode(this._cursor.right);
                 }
             }
-            return this._cursor !== null ? this._cursor.data : null;
+            return this._cursor;
         },
         // if null-iterator, returns last node
         // otherwise, returns previous node
@@ -79,19 +76,17 @@ YUI.add('text-index', function (Y) {
                         save = this._cursor;
                         if (this._ancestors.length) {
                             this._cursor = this._ancestors.pop();
-                        }
-                        else {
+                        } else {
                             this._cursor = null;
                             break;
                         }
                     } while (this._cursor.left === save);
-                }
-                else {
+                } else {
                     this._ancestors.push(this._cursor);
                     this._maxNode(this._cursor.left);
                 }
             }
-            return this._cursor !== null ? this._cursor.data : null;
+            return this._cursor;
         },
         _minNode: function (start) {
             while (start.left !== null) {
@@ -117,16 +112,15 @@ YUI.add('text-index', function (Y) {
             this._root = null;
             this.size = 0;
         },
-        // returns node data if found, null otherwise
-        find: function (data) {
+        // returns node if found, null otherwise
+        find: function (key) {
             var res = this._root;
 
             while (res !== null) {
-                var c = this._comparator(data, res.data);
+                var c = this._comparator(key, res.key);
                 if (c === 0) {
-                    return res.data;
-                }
-                else {
+                    return res;
+                } else {
                     res = res.get_child(c > 0);
                 }
             }
@@ -144,7 +138,7 @@ YUI.add('text-index', function (Y) {
                 res = res.left;
             }
 
-            return res.data;
+            return res;
         },
         // returns null if tree is empty
         max: function () {
@@ -157,7 +151,7 @@ YUI.add('text-index', function (Y) {
                 res = res.right;
             }
 
-            return res.data;
+            return res;
         },
         // returns a null iterator, call next() or prev() to point to an element
         iterator: function () {
@@ -165,22 +159,23 @@ YUI.add('text-index', function (Y) {
         },
         // calls cb on each node's data, in order
         each: function (cb) {
-            var it = this.iterator(), data;
-            while ((data = it.next()) !== null) {
-                cb(data);
+            var it = this.iterator(), node;
+            while ((node = it.next()) !== null) {
+                cb(node);
             }
         },
         // calls cb on each node's data, in reverse order
         reach: function (cb) {
-            var it = this.iterator(), data;
-            while ((data = it.prev()) !== null) {
-                cb(data);
+            var it = this.iterator(), node;
+            while ((node = it.prev()) !== null) {
+                cb(node);
             }
         }
     });
 
-    var Node = function (data) {
-        this.data = data;
+    var Node = function (key) {
+        this.key = key;
+        this.values = [];
         this.left = null;
         this.right = null;
         this.red = true;
@@ -192,8 +187,7 @@ YUI.add('text-index', function (Y) {
         set_child: function (dir, val) {
             if (dir) {
                 this.right = val;
-            }
-            else {
+            } else {
                 this.left = val;
             }
         }
@@ -220,23 +214,25 @@ YUI.add('text-index', function (Y) {
         return single_rotate(root, dir);
     }
 
-    var RBTree = function (comparator) {
+    var RBTree = function (comparator, keyFunction) {
         this._root = null;
         this._comparator = comparator;
+        this._keyFunction = keyFunction || function(d) { return d; };
         this.size = 0;
     };
     Y.extend(RBTree, TreeBase, {
         // returns true if inserted, false if duplicate
         insert: function (data) {
+            var key = this._keyFunction(data);
             var ret = false;
 
             if (this._root === null) {
                 // empty tree
-                this._root = new Node(data);
+                this._root = new Node(key);
+                this._root.values.push(data);
                 ret = true;
                 this.size++;
-            }
-            else {
+            } else {
                 var head = new Node(undefined); // fake tree root
 
                 var dir = 0;
@@ -253,12 +249,11 @@ YUI.add('text-index', function (Y) {
                 while (true) {
                     if (node === null) {
                         // insert new node at the bottom
-                        node = new Node(data);
+                        node = new Node(key);
                         p.set_child(dir, node);
                         ret = true;
                         this.size++;
-                    }
-                    else if (is_red(node.left) && is_red(node.right)) {
+                    } else if (is_red(node.left) && is_red(node.right)) {
                         // color flip
                         node.red = true;
                         node.left.red = false;
@@ -277,10 +272,11 @@ YUI.add('text-index', function (Y) {
                         }
                     }
 
-                    var cmp = this._comparator(node.data, data);
+                    var cmp = this._comparator(node.key, key);
 
                     // stop if found
                     if (cmp === 0) {
+                        node.values.push(data);
                         break;
                     }
 
@@ -311,6 +307,7 @@ YUI.add('text-index', function (Y) {
                 return false;
             }
 
+            var key = this._keyFunction(data);
             var head = new Node(undefined); // fake tree root
             var node = head;
             node.right = this._root;
@@ -327,12 +324,19 @@ YUI.add('text-index', function (Y) {
                 p = node;
                 node = node.get_child(dir);
 
-                var cmp = this._comparator(data, node.data);
+                var cmp = this._comparator(key, node.key);
 
                 dir = cmp > 0;
 
                 // save found node
                 if (cmp === 0) {
+                    var valIndex = Y.Array.indexOf(node.values, data), valFound = (valIndex >= 0);
+                    if (valFound) {
+                        node.values.splice(valIndex, 1);
+                    }
+                    if (node.values.length > 0) {
+                        return valFound;
+                    }
                     found = node;
                 }
 
@@ -342,8 +346,7 @@ YUI.add('text-index', function (Y) {
                         var sr = single_rotate(node, dir);
                         p.set_child(last, sr);
                         p = sr;
-                    }
-                    else if (!is_red(node.get_child(!dir))) {
+                    } else if (!is_red(node.get_child(!dir))) {
                         var sibling = p.get_child(!last);
                         if (sibling !== null) {
                             if (!is_red(sibling.get_child(!last)) && !is_red(sibling.get_child(last))) {
@@ -351,14 +354,12 @@ YUI.add('text-index', function (Y) {
                                 p.red = false;
                                 sibling.red = true;
                                 node.red = true;
-                            }
-                            else {
+                            } else {
                                 var dir2 = gp.right === p;
 
                                 if (is_red(sibling.get_child(last))) {
                                     gp.set_child(dir2, double_rotate(p, last));
-                                }
-                                else if (is_red(sibling.get_child(!last))) {
+                                } else if (is_red(sibling.get_child(!last))) {
                                     gp.set_child(dir2, single_rotate(p, last));
                                 }
 
@@ -376,7 +377,6 @@ YUI.add('text-index', function (Y) {
 
             // replace and remove if found
             if (found !== null) {
-                found.data = node.data;
                 p.set_child(p.right === node, node.get_child(node.left === null));
                 this.size--;
             }

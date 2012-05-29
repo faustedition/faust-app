@@ -89,12 +89,21 @@
 				var tree = new Y.Faust.RBTree(function(a, b) { return a - b; });
 				tree.insert(20);
 				tree.insert(10);
+				tree.insert(10);
+				tree.insert(10);
+				tree.insert(10);
+				tree.insert(100);
+				tree.remove(10);
+				tree.remove(10);
+				tree.remove(10);
+				tree.remove(100);
+				tree.insert(100);
 				tree.insert(100);
 				tree.each(function(c) {
-					Y.log(c);
+					Y.log(c.key + ": " + c.values);
 				});
-				Y.log(tree.min());
-				Y.log(tree.max());
+				//Y.log(tree.min());
+				//Y.log(tree.max());
 
 			});
 		})
