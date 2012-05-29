@@ -30,8 +30,9 @@
 	</div>
 
 	<script type="text/javascript">
-		YUI().use("io", "node", "overlay", "dd-plugin", "facsimile", "text-annotation", function(Y) {
+		YUI().use("io", "node", "overlay", "dd-plugin", "facsimile", "text-annotation", "text-index", function(Y) {
 			Y.on("domready", function() {
+				/*
 				var facsimileViewer = new Y.Faust.FacsimileViewer({
 					srcNode: "#facsimile-view",
 					src: "/facsimile/agad_warszawa/PL_1_354_13-16-24/0014",
@@ -84,6 +85,17 @@
 						}
 					}
 				});
+				*/
+				var tree = new Y.Faust.RBTree(function(a, b) { return a - b; });
+				tree.insert(20);
+				tree.insert(10);
+				tree.insert(100);
+				tree.each(function(c) {
+					Y.log(c);
+				});
+				Y.log(tree.min());
+				Y.log(tree.max());
+
 			});
 		})
 	</script>

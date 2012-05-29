@@ -23,7 +23,8 @@ YUI.GlobalConfig = {
 				'materialunit' : { path: 'document/materialunit.js' },
                 'search': {},
 				'svg-utils' : {},
-                'text-annotation': {}
+                'text-annotation': {},
+                'text-index': { path: 'text-annotation/text-index.js'}
             }
         }
     }
