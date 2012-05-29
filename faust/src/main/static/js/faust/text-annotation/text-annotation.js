@@ -27,10 +27,19 @@ YUI.add('text-annotation', function (Y) {
         this.targets = targets || [];
     };
     Y.extend(Annotation, Object, {
-        targetIn: function(text) {
-            return Y.Array.find(this.targets, function(t) {
+        target: function () {
+            return (this.targets ? this.targets[0] : null);
+        },
+        targetIn: function (text) {
+            return Y.Array.find(this.targets, function (t) {
                 return (t.text === text);
             });
+        }
+    });
+
+    Y.extend(TextTarget, Object, {
+        textContent: function () {
+            return this.range.of(this.text.content);
         }
     });
 
@@ -38,7 +47,7 @@ YUI.add('text-annotation', function (Y) {
         partition: function () {
             var offsets = [];
             Y.Array.each(this.annotations, function (a) {
-                Y.Array.each(a.targets, function(t) {
+                Y.Array.each(a.targets, function (t) {
                     if (t.text == this) {
                         var range = t.range;
                         if (offsets.indexOf(range.start) < 0) offsets.push(range.start);
@@ -61,12 +70,34 @@ YUI.add('text-annotation', function (Y) {
             });
             return partitions;
         },
-        find: function(range) {
-            var result = [];
-            this._searchRange(this.rangeIndex._root, range, result);
+        find: function (start, end, filter) {
+            var result = [],
+                nameFilter = null,
+                range =  new Range(
+                    (Y.Lang.isNumber(start) ? start : 0),
+                    (Y.Lang.isNumber(end) ? end : text.contentLength)
+                );
+
+            if (Y.Lang.isFunction(filter)) {
+                nameFilter = filter;
+            } else if (Y.Lang.isArray(filter)) {
+                nameFilter = function (a) {
+                    return (Y.Array.indexOf(filter, a.name.localName) >= 0);
+                };
+            } else if (Y.Lang.isString(filter)) {
+                nameFilter = function (a) {
+                    return filter == a.name.localName;
+                };
+            } else {
+                nameFilter = function () {
+                    return true;
+                }
+            }
+
+            this._searchRange(this.rangeIndex._root, range, nameFilter, result);
             return result;
         },
-        _searchRange: function(node, range, result) {
+        _searchRange: function (node, range, annotationFilter, result) {
             // Don't search nodes that don't exist
             if (node === null) {
                 return;
@@ -80,12 +111,12 @@ YUI.add('text-annotation', function (Y) {
 
             // Search left children
             if (node.left !== null) {
-                this._searchRange(node.left, range, result);
+                this._searchRange(node.left, range, annotationFilter, result);
             }
 
             // Check this node
             if (node.key.overlapsWith(range) || range.includes(node.key)) {
-                Y.Array.each(node.values, function(v) {
+                Y.Array.each(Y.Array.filter(node.values, annotationFilter), function (v) {
                     result.push(v);
                 });
             }
@@ -98,7 +129,15 @@ YUI.add('text-annotation', function (Y) {
 
             // Otherwise, search right children
             if (node.right !== null) {
-                this._searchRange(node.right, range, result);
+                this._searchRange(node.right, range, annotationFilter, result);
+            }
+        },
+        _setupRangeIndexNode: function (node) {
+            if (node === null) {
+                return 0;
+            } else {
+                node.maxEnd = Math.max(node.key.end, this._setupRangeIndexNode(node.left), this._setupRangeIndexNode(node.right));
+                return node.maxEnd;
             }
         }
     }, {
@@ -107,25 +146,24 @@ YUI.add('text-annotation', function (Y) {
             Y.Object.each(data.names, function (v, k) {
                 names[k] = new Name(v[0], v[1]);
             });
-            text.annotations = Y.Array.map(data.annotations, function (a) {
-                return new Annotation(names[a.n], a.d, Y.Array.map(a.t, function (target) {
-                    return new TextTarget((target[2] == text.id ? text : target[2]), new Range(target[0], target[1]));
-                }));
-            });
-            text.rangeIndex = new Y.Faust.RBTree(Range.sort, function(a) {
+            text.rangeIndex = new Y.Faust.RBTree(Range.sort, function (a) {
                 return a.targetIn(text).range;
             });
-            Y.Array.each(text.annotations, function(a) {
-                text.rangeIndex.insert(a);
+            text.localNameIndex = {};
+            text.annotations = Y.Array.map(data.annotations, function (a) {
+                var annotation = new Annotation(names[a.n], a.d, Y.Array.map(a.t, function (target) {
+                    return new TextTarget((target[2] == text.id ? text : target[2]), new Range(target[0], target[1]));
+                }));
+
+                text.rangeIndex.insert(annotation);
+
+                var ln = annotation.name.localName;
+                text.localNameIndex[ln] = (text.localNameIndex[ln] || []).concat(annotation);
+
+                return annotation;
             });
-            (function(treeNode) {
-                if (treeNode === null) {
-                    return 0;
-                } else {
-                    treeNode.maxEnd = Math.max(treeNode.key.end, arguments.callee(treeNode.left), arguments.callee(treeNode.right));
-                    return treeNode.maxEnd;
-                }
-            })(text.rangeIndex._root);
+            text._setupRangeIndexNode(text.rangeIndex._root);
+
             return text;
         }
     });
@@ -156,7 +194,7 @@ YUI.add('text-annotation', function (Y) {
         overlapsWith: function (other) {
             return ((this.start < other.end) && (this.end > other.start));
         },
-        includes: function(other) {
+        includes: function (other) {
             return (this.start <= other.start && this.end >= other.end);
         },
         of: function (text) {
