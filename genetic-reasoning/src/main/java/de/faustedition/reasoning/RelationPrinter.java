@@ -1,5 +1,7 @@
 package de.faustedition.reasoning;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Set;
 
@@ -15,20 +17,35 @@ public class RelationPrinter {
 		stream.println("}");
 	}
 	
-	public static void printRelationDot(Relation<Inscription> r, String relationName, String color, Set<Inscription> s, PrintStream stream){
+	public static void printRelationDot(ImmutableRelation r, String relationName, String color, int weight, Set s, PrintStream stream){
 
-		String edgeattr =  String.format("edge [label=%s color=%s fontcolor=%s]", relationName, color, color);
+		String edgeattr =  String.format("edge [label=%s color=%s fontcolor=%s weight=%d]", relationName, color, color, weight);
 		stream.println(edgeattr);
-		for (Inscription i : s) {
-			for (Inscription j : s) {
+		for (Object i : s) {
+			for (Object j : s) {
 				if (r.areRelated(i, j)) {
 					String nameI = "i_" + i.toString().replaceAll("[ ,:\\(\\)-.]", "_");
 					String nameJ = "i_" + j.toString().replaceAll("[ ,:\\(\\)-.]", "_");
 					stream.println(" " + nameI + " -> " + nameJ + ";");
 				}
 			}
-			
 		}
+	}
+	
+	public static void printGraph(ImmutableRelation relation, String name, String color, int weight,
+			Set<Inscription> inscriptions, String filename) throws FileNotFoundException {
+
+		FileOutputStream out;
+		PrintStream ps;
+			out = new FileOutputStream(filename);
+			ps = new PrintStream(out);
+			
+			RelationPrinter.startDot(name, ps);
+			RelationPrinter.printRelationDot(relation, name, color, weight,
+					inscriptions, ps);
+			RelationPrinter.endDot(ps);
+			
+			ps.close();
 	}
 
 }

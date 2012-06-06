@@ -25,11 +25,15 @@ import de.faustedition.Runtime;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
-import de.faustedition.reasoning.GeneticReasoning;
+import de.faustedition.reasoning.FaustReasoning;
+import de.faustedition.reasoning.ImmutableRelation;
 import de.faustedition.reasoning.Inscription;
 import de.faustedition.reasoning.RelationPrinter;
+import de.faustedition.reasoning.Rule;
+import de.faustedition.reasoning.Rules;
 import de.faustedition.transcript.Transcript;
 import de.faustedition.xml.XMLStorage;
+import edu.bath.transitivityutils.Relation;
 
 @Component
 public class GeneticReasoner extends Runtime implements Runnable {
@@ -64,39 +68,9 @@ public class GeneticReasoner extends Runtime implements Runnable {
 	public void run() {
 
 		final Set<Inscription> inscriptions = inscriptions();
-
-		LOG.debug("Reasoning on " + inscriptions.size() + " inscriptions");
-
-		final GeneticReasoning reasoning = new GeneticReasoning(inscriptions);
-		reasoning.initSyn();
-		reasoning.initCon();
-		reasoning.ruleSynImpliesPre();
-		reasoning.ruleConImpliesPre();
-
-		printGraph(reasoning, inscriptions);
-
+		reason(inscriptions);
 	}
 
-	private void printGraph(GeneticReasoning reasoning, Set<Inscription> inscriptions) {
-		String path = environment.getRequiredProperty("reasoner.out");
-		FileOutputStream out;
-		PrintStream ps;
-		try {
-			out = new FileOutputStream(path);
-			ps = new PrintStream(out);			
-			RelationPrinter.startDot("genetic_graph", ps);
-			//RelationPrinter.printRelationDot(reasoning.syn, "syn", "red", inscriptions, ps);
-			//RelationPrinter.printRelationDot(reasoning.con, "con", "blue", inscriptions, ps);
-			RelationPrinter.printRelationDot(reasoning.pre, "pre", "black", inscriptions, ps);
-			RelationPrinter.endDot(ps);
-			
-			ps.close();
-		} catch (FileNotFoundException e) {
-			LOG.error("Error writing graph file", e);
-		} finally {
-
-		}
-	}
 
 	private HashSet<Inscription> inscriptions() {
 		final HashSet<Inscription> inscriptions = new HashSet<Inscription>();
@@ -124,13 +98,20 @@ public class GeneticReasoner extends Runtime implements Runnable {
 															transcript);
 											String name = document
 													.getMetadataValue("wa-id");
-											name = (name == null || ""
-													.equals(name)) ? document
-													.getMetadataValue("callnumber")
-													: name;
-											name = (name == null || ""
-													.equals(name)) ? "noname"
-													: name;
+											if (name == null || "".equals(name))
+												name = document
+														.getMetadataValue("callnumber");
+											if (name == null || "".equals(name)
+													|| "-".equals(name)) {
+												String path = document
+														.getSource().getPath();
+												String filename = path.substring(path
+														.lastIndexOf("/") + 1);
+												String filenameStripped = filename
+														.replaceAll("\\.xml$",
+																"");
+												name = filenameStripped;
+											}
 											Inscription inscription = new Inscription(
 													name);
 
@@ -170,4 +151,37 @@ public class GeneticReasoner extends Runtime implements Runnable {
 		}
 		return inscriptions;
 	}
+	
+	public void reason(Set<Inscription> inscriptions) {
+
+		LOG.debug("Reasoning on " + inscriptions.size() + " inscriptions");
+
+		final FaustReasoning reasoning = new FaustReasoning(inscriptions);
+
+		String path = environment.getRequiredProperty("reasoner.out") + "/";
+
+		try {
+			RelationPrinter.printGraph(reasoning.pre, "pre", "black", 1, inscriptions,
+					path + "pre.dot");
+
+			RelationPrinter.printGraph(reasoning.con, "con", "black", 1,
+					inscriptions, path + "con.dot");
+
+			RelationPrinter.printGraph(reasoning.syn, "syn", "black", 1,
+					inscriptions, path + "syn.dot");
+
+			Relation synContradictingPre = reasoning.contradictions(
+					reasoning.syn, reasoning.pre);
+
+			RelationPrinter.printGraph(synContradictingPre, "syn", "red", 1,
+					inscriptions, path + "syn_contradicting_pre.dot");
+
+		} catch (FileNotFoundException e) {
+			LOG.error("Error writing graph file", e);
+		} finally {
+
+		}
+
+	}
+
 }
