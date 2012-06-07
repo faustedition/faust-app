@@ -38,6 +38,9 @@ import edu.bath.transitivityutils.Relation;
 @Component
 public class GeneticReasoner extends Runtime implements Runnable {
 
+	private static int FROM_LINE = 11043;
+	private static int TO_LINE = 12112;
+	
 	@Autowired
 	private XMLStorage xml;
 
@@ -120,10 +123,10 @@ public class GeneticReasoner extends Runtime implements Runnable {
 												// filter: only 5th act
 												int start = Math.max(
 														interval.getStart(),
-														11043);
+														FROM_LINE);
 												int end = Math.min(
 														interval.getEnd(),
-														12112);
+														TO_LINE);
 
 												if (start <= end)
 													inscription.addInterval(
@@ -181,6 +184,9 @@ public class GeneticReasoner extends Runtime implements Runnable {
 
 			RelationPrinter.printGraph(synContradictingPre, "syn", "red", 1,
 					inscriptions, path + "syn_contradicting_pre.dot");
+
+			RelationPrinter.printInscriptionCSV(RelationPrinter.orderUniverse(
+					reasoning.pre, inscriptions), FROM_LINE, TO_LINE, path + "gantt.csv");
 
 		} catch (FileNotFoundException e) {
 			LOG.error("Error writing graph file", e);
