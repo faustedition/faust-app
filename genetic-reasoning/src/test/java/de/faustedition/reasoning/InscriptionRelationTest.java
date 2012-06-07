@@ -40,24 +40,24 @@ public class InscriptionRelationTest {
 	
 	@Test
 	public void testSyntagmaticallyPrecedes() {
-		assertTrue(InscriptionRelations.syntagmaticallyPrecedes(
+		assertTrue(InscriptionRelations.syntagmaticallyPrecedesByAverage(
 				this.inscriptionA, this.inscriptionB));
-		assertTrue(InscriptionRelations.syntagmaticallyPrecedes(
+		assertTrue(InscriptionRelations.syntagmaticallyPrecedesByAverage(
 				this.inscriptionA, this.inscriptionC));
-		assertTrue(InscriptionRelations.syntagmaticallyPrecedes(
+		assertTrue(InscriptionRelations.syntagmaticallyPrecedesByAverage(
 				this.inscriptionB, this.inscriptionC));
 
-		assertFalse(InscriptionRelations.syntagmaticallyPrecedes(
+		assertFalse(InscriptionRelations.syntagmaticallyPrecedesByAverage(
 				this.inscriptionC, this.inscriptionC));
-		assertFalse(InscriptionRelations.syntagmaticallyPrecedes(
+		assertFalse(InscriptionRelations.syntagmaticallyPrecedesByAverage(
 				this.inscriptionC, this.inscriptionA));
 	}
 	
 	@Test
 	public void testExclusivelyContains() {
-		assertTrue(InscriptionRelations.exclusivelyContains(
+		assertTrue(InscriptionRelations.containsByFirstAndLast(
 				this.inscriptionD, this.inscriptionA));
-		assertFalse(InscriptionRelations.exclusivelyContains(
+		assertFalse(InscriptionRelations.containsByFirstAndLast(
 				this.inscriptionB, this.inscriptionA));
 		
 		

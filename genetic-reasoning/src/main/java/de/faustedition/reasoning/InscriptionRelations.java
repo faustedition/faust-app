@@ -17,7 +17,7 @@ public class InscriptionRelations{
 	
 	}
 	
-	public static boolean syntagmaticallyPrecedes(Inscription i, Inscription j) {
+	public static boolean syntagmaticallyPrecedesByAverage(Inscription i, Inscription j) {
 		
 		double iAverage = 0;
 		for (int line : i) {
@@ -34,7 +34,33 @@ public class InscriptionRelations{
 		return iAverage < jAverage;
 	}
 	
-	public static boolean exclusivelyContains(Inscription i, Inscription j) {
+	public static boolean syntagmaticallyPrecedesByFirstLine(Inscription i, Inscription j) {	
+		return i.first() < j.first();
+	}
+	
+	public static boolean containsByFirstAndLast(Inscription i, Inscription j) {
 		return i.first() < j.first() && i.last() > j.last();
 	}
+
+	public static boolean exclusivelyContains(Inscription i, Inscription j) {
+		Inscription intersection = ((Inscription)i.clone());
+		intersection.retainAll(j);
+
+		// 0% of j may be in i
+		int threshold = (int)((i.size() + j.size()) * 0.5 * 0.00);
+		return containsByFirstAndLast(i, j)
+		  && intersection.size() <= threshold; 
+	}
+
+	public static boolean paradigmaticallyContains(Inscription i, Inscription j) {
+		Inscription intersection = ((Inscription)i.clone());
+		intersection.retainAll(j);
+		
+		// 100 % of j must be in i
+		int threshold = (int)((j.size()) * 1);
+		return containsByFirstAndLast(i, j)
+		  && intersection.size() >= threshold; 
+	}
+
+	
 }

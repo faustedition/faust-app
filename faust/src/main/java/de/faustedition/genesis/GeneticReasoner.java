@@ -157,6 +157,8 @@ public class GeneticReasoner extends Runtime implements Runnable {
 		LOG.debug("Reasoning on " + inscriptions.size() + " inscriptions");
 
 		final FaustReasoning reasoning = new FaustReasoning(inscriptions);
+		
+		reasoning.reason();
 
 		String path = environment.getRequiredProperty("reasoner.out") + "/";
 
@@ -164,9 +166,13 @@ public class GeneticReasoner extends Runtime implements Runnable {
 			RelationPrinter.printGraph(reasoning.pre, "pre", "black", 1, inscriptions,
 					path + "pre.dot");
 
-			RelationPrinter.printGraph(reasoning.con, "con", "black", 1,
-					inscriptions, path + "con.dot");
+			RelationPrinter.printGraph(reasoning.econ, "econ", "black", 1,
+					inscriptions, path + "econ.dot");
 
+			RelationPrinter.printGraph(reasoning.pcon, "pcon", "black", 1,
+					inscriptions, path + "pcon.dot");
+
+			
 			RelationPrinter.printGraph(reasoning.syn, "syn", "black", 1,
 					inscriptions, path + "syn.dot");
 

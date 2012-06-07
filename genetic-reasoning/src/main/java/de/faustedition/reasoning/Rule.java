@@ -7,4 +7,6 @@ package de.faustedition.reasoning;
  */
 public interface Rule<E> {
 	public boolean premise(E o, E p);
+	
+	public String getName();
 }

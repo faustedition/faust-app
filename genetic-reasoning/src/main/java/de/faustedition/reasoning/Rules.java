@@ -23,4 +23,14 @@ public class Rules<E> extends ArrayList<Rule> implements ImmutableRelation<E>{
 		return false;		
 	}
 	
+	public Rule relevantRule(E i, E j) {
+		for (Rule r: this) {
+			if (r.premise(i, j))
+					return r;
+			else if (r.premise(j, i))
+					return null;
+		}
+		return null;		
+	}
+
 }

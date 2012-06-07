@@ -17,7 +17,8 @@ public class FaustReasoning {
 
 
 	public Relation<Inscription> syn;
-	public Relation<Inscription> con;
+	public Relation<Inscription> econ;
+	public Relation<Inscription> pcon;
 	public Rules<Inscription> pre;
 	private Set<Inscription> inscriptions;
 	private Relation<Inscription> synContradictsPre;
@@ -26,7 +27,8 @@ public class FaustReasoning {
 		this.inscriptions = inscriptions;
 
 		this.syn = Relations.<Inscription>newTransitiveRelation();
-		this.con = Relations.<Inscription>newTransitiveRelation();
+		this.econ = new DefaultRelation<Inscription>();//Relations.<Inscription>newTransitiveRelation();
+		this.pcon = new DefaultRelation<Inscription>();
 		this.pre = new Rules<Inscription>();
 
 	}
@@ -35,20 +37,29 @@ public class FaustReasoning {
 
 		for (Inscription i: inscriptions)
 			for (Inscription j: inscriptions) {
-				if (InscriptionRelations.syntagmaticallyPrecedes(i, j))
+				if (InscriptionRelations.syntagmaticallyPrecedesByFirstLine(i, j))
 					syn.relate(i, j);
 			}
 	}
 	
-	public void initCon() {
+	public void initECon() {
 		
 		for (Inscription i: inscriptions)
 			for (Inscription j: inscriptions) {
 				if (InscriptionRelations.exclusivelyContains(i, j))
-					con.relate(i, j);
+					econ.relate(i, j);
 			}
 	}
-	
+
+	public void initPCon() {
+		
+		for (Inscription i: inscriptions)
+			for (Inscription j: inscriptions) {
+				if (InscriptionRelations.paradigmaticallyContains(i, j))
+					pcon.relate(i, j);
+			}
+	}
+
 			
 	/**
 	 * @param relA 
@@ -71,23 +82,39 @@ public class FaustReasoning {
 	public void reason() {
 		
 		initSyn();
-		initCon();
+		initECon();
+		initPCon();
 
-		Rule<Inscription> conImpliesPre = new Rule<Inscription>() {
+		Rule<Inscription> econImpliesPre = new Rule<Inscription>() {
+			@Override 
+			public String getName() {return "r_econ";}
 			@Override
 			public boolean premise(Inscription i, Inscription j) {
-				return con.areRelated(i, j);
+				return econ.areRelated(i, j);
 			}
 		};
 
+		Rule<Inscription> pconImpliesPre = new Rule<Inscription>() {
+			@Override 
+			public String getName() {return "r_pcon";}
+			@Override
+			public boolean premise(Inscription i, Inscription j) {
+				return pcon.areRelated(j, i);
+			}
+		};
+
+		
 		Rule<Inscription> synImpliesPre = new Rule<Inscription>() {
+			@Override 
+			public String getName() {return "r_syn";}
 			@Override
 			public boolean premise(Inscription i, Inscription j) {
 				return syn.areRelated(i, j);
 			}
 		};
 
-		pre.add(conImpliesPre);
+		pre.add(econImpliesPre);
+		pre.add(pconImpliesPre);
 		pre.add(synImpliesPre);
 	
 	}
