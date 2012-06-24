@@ -67,7 +67,7 @@ public class RelationPrinter {
 		}
 	}
 	
-	public static List orderUniverse (ImmutableRelation rel, Set universe) {
+	public static List orderUniverse(ImmutableRelation rel, Set universe) {
 		
 		class ObjectAndScore implements Comparable<ObjectAndScore>{
 			public int score = 0;
