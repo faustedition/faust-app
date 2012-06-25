@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import edu.bath.transitivityutils.Relation;
+import edu.bath.transitivityutils.ImmutableRelation;
 
 public class RelationPrinter {
 
@@ -28,8 +28,8 @@ public class RelationPrinter {
 			for (Object j : s) {
 				if (r.areRelated(i, j)) {
 
-					String label = r instanceof Rules ?
-							((Rules)r).relevantRule(i, j).getName() :
+					String label = r instanceof PremiseBasedRelation ?
+							((PremiseBasedRelation)r).findRelevantPremise(i, j).getName() :
 								relationName;
 					
 					String edgeattr = String.format(
@@ -66,27 +66,29 @@ public class RelationPrinter {
 			ps.close();
 		}
 	}
-	
-	public static List orderUniverse(ImmutableRelation rel, Set universe) {
-		
-		class ObjectAndScore implements Comparable<ObjectAndScore>{
-			public int score = 0;
-			public Object object;
-			@Override
-			public int compareTo(ObjectAndScore oas) {
-				return this.score - oas.score;
-			}
+
+	static class ObjectAndScore<E> implements Comparable<ObjectAndScore<E>>{
+		public int score = 0;
+		public E object;
+
+		@Override
+		public int compareTo(ObjectAndScore<E> oas) {
+			return this.score - oas.score;
 		}
+	}
+
+
+	public static <E> List<E> orderUniverse(ImmutableRelation<E> rel, Set<E> universe) {
 		
-		List<ObjectAndScore> oasList = new ArrayList<ObjectAndScore>();
-		for (Object o : universe) {
-			ObjectAndScore oas = new ObjectAndScore();
+		List<ObjectAndScore<E>> oasList = new ArrayList<ObjectAndScore<E>>();
+		for (E o : universe) {
+			ObjectAndScore<E> oas = new ObjectAndScore<E>();
 			oas.object = o;
 			oasList.add(oas);
 		}
 		
-		for (ObjectAndScore o : oasList) {
-			for (ObjectAndScore p : oasList) {
+		for (ObjectAndScore<E> o : oasList) {
+			for (ObjectAndScore<E> p : oasList) {
 				if (rel.areRelated(o.object, p.object)) {
 					o.score--;
 					p.score++;
@@ -96,8 +98,8 @@ public class RelationPrinter {
 		
 		Collections.sort(oasList);
 		
-		List<Object> result = new ArrayList<Object>();
-		for (ObjectAndScore oas : oasList) {
+		List<E> result = new ArrayList<E>();
+		for (ObjectAndScore<E> oas : oasList) {
 			result.add(oas.object);
 		}
 		return result;

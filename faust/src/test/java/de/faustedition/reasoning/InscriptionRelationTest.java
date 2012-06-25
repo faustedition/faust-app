@@ -7,9 +7,6 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import de.faustedition.reasoning.Inscription;
-import de.faustedition.reasoning.InscriptionRelations;
-
 public class InscriptionRelationTest {
 
 	private Inscription inscriptionA;
@@ -32,36 +29,23 @@ public class InscriptionRelationTest {
 
 	@Test
 	public void testAreParadigmaticallyRelated() {
-		assertTrue(InscriptionRelations.areParadigmaticallyRelated(
-						this.inscriptionA, this.inscriptionB));
-		assertFalse(InscriptionRelations.areParadigmaticallyRelated(
-				this.inscriptionB, this.inscriptionC));
+		assertTrue(InscriptionRelations.areParadigmaticallyRelated(this.inscriptionA, this.inscriptionB));
+		assertFalse(InscriptionRelations.areParadigmaticallyRelated(this.inscriptionB, this.inscriptionC));
 	}
 	
 	@Test
 	public void testSyntagmaticallyPrecedes() {
-		assertTrue(InscriptionRelations.syntagmaticallyPrecedesByAverage(
-				this.inscriptionA, this.inscriptionB));
-		assertTrue(InscriptionRelations.syntagmaticallyPrecedesByAverage(
-				this.inscriptionA, this.inscriptionC));
-		assertTrue(InscriptionRelations.syntagmaticallyPrecedesByAverage(
-				this.inscriptionB, this.inscriptionC));
+		assertTrue(InscriptionRelations.syntagmaticallyPrecedesByAverage(this.inscriptionA, this.inscriptionB));
+		assertTrue(InscriptionRelations.syntagmaticallyPrecedesByAverage(this.inscriptionA, this.inscriptionC));
+		assertTrue(InscriptionRelations.syntagmaticallyPrecedesByAverage(this.inscriptionB, this.inscriptionC));
 
-		assertFalse(InscriptionRelations.syntagmaticallyPrecedesByAverage(
-				this.inscriptionC, this.inscriptionC));
-		assertFalse(InscriptionRelations.syntagmaticallyPrecedesByAverage(
-				this.inscriptionC, this.inscriptionA));
+		assertFalse(InscriptionRelations.syntagmaticallyPrecedesByAverage(this.inscriptionC, this.inscriptionC));
+		assertFalse(InscriptionRelations.syntagmaticallyPrecedesByAverage(this.inscriptionC, this.inscriptionA));
 	}
 	
 	@Test
 	public void testExclusivelyContains() {
-		assertTrue(InscriptionRelations.containsByFirstAndLast(
-				this.inscriptionD, this.inscriptionA));
-		assertFalse(InscriptionRelations.containsByFirstAndLast(
-				this.inscriptionB, this.inscriptionA));
-		
-		
+		assertTrue(InscriptionRelations.covers(this.inscriptionD, this.inscriptionA));
+		assertFalse(InscriptionRelations.covers(this.inscriptionB, this.inscriptionA));
 	}
-
-	
 }

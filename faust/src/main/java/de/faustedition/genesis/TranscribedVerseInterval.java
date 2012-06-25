@@ -129,5 +129,7 @@ public class TranscribedVerseInterval extends VerseInterval {
 		return SQL.iterate(session.createCriteria(TranscribedVerseInterval.class).add(Restrictions.eq("transcript", transcript)), TranscribedVerseInterval.class);
 	}
 
-
+	public static Iterable<TranscribedVerseInterval> all(Session session) {
+		return SQL.iterate(session.createCriteria(TranscribedVerseInterval.class), TranscribedVerseInterval.class);
+	}
 }

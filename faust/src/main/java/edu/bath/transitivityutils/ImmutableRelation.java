@@ -1,4 +1,4 @@
-package de.faustedition.reasoning;
+package edu.bath.transitivityutils;
 
 public interface ImmutableRelation<E> {
     /**

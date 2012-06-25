@@ -1,7 +1,5 @@
 package edu.bath.transitivityutils;
 
-import de.faustedition.reasoning.ImmutableRelation;
-
 /**
  * A binary relation.
  *

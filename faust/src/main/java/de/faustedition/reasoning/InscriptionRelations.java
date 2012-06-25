@@ -1,24 +1,18 @@
 package de.faustedition.reasoning;
-import java.util.HashSet;
+
+import com.google.common.collect.Sets;
 
 
-public class InscriptionRelations{
+public class InscriptionRelations {
 
-	public static boolean areParadigmaticallyRelated(Inscription i,
-			Inscription j) {
-	
-		final double COMMON_RATIO = 0.4;
-		
-	HashSet<Integer> intersection = new HashSet<Integer>(i);
-	intersection.retainAll(j);
-	final int common = intersection.size();
-	return (common >= COMMON_RATIO * i.size() && 
-			common >= COMMON_RATIO * j.size());
-	
+	private static final double COMMON_RATIO = 0.4;
+
+	public static boolean areParadigmaticallyRelated(Inscription i, Inscription j) {
+		final int intersectionSize = Sets.intersection(i, j).size();
+		return (intersectionSize >= (COMMON_RATIO * i.size())) && (intersectionSize >= (COMMON_RATIO * j.size()));
 	}
-	
+
 	public static boolean syntagmaticallyPrecedesByAverage(Inscription i, Inscription j) {
-		
 		double iAverage = 0;
 		for (int line : i) {
 			iAverage += line;
@@ -35,31 +29,24 @@ public class InscriptionRelations{
 	}
 	
 	public static boolean syntagmaticallyPrecedesByFirstLine(Inscription i, Inscription j) {	
-		return i.first() < j.first();
+		return (i.first() < j.first());
 	}
 	
-	public static boolean containsByFirstAndLast(Inscription i, Inscription j) {
-		return i.first() < j.first() && i.last() > j.last();
+	public static boolean covers(Inscription i, Inscription j) {
+		return (i.first() < j.first()) && (i.last() > j.last());
 	}
 
 	public static boolean exclusivelyContains(Inscription i, Inscription j) {
-		Inscription intersection = ((Inscription)i.clone());
-		intersection.retainAll(j);
-
-		// 0% of j may be in i
-		int threshold = (int)((i.size() + j.size()) * 0.5 * 0.00);
-		return containsByFirstAndLast(i, j)
-		  && intersection.size() <= threshold; 
+		// i spans j but j is missing from i
+		return i.spans(j) && Sets.intersection(i, j).isEmpty();
 	}
 
 	public static boolean paradigmaticallyContains(Inscription i, Inscription j) {
 		Inscription intersection = ((Inscription)i.clone());
 		intersection.retainAll(j);
 		
-		// 100 % of j must be in i
-		int threshold = (int)((j.size()) * 1);
-		return containsByFirstAndLast(i, j)
-		  && intersection.size() >= threshold; 
+		// (i spans j && j is contained in i
+		return i.spans(j) && i.containsAll(j);
 	}
 
 	
