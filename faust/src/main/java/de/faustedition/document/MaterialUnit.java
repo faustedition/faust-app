@@ -1,5 +1,7 @@
 package de.faustedition.document;
 
+import com.google.common.base.Strings;
+import com.google.common.io.Files;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
@@ -158,4 +160,23 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		return (o1 >= 0 && o2 >= 0) ? (o1 - o2) : 0;
 	}
 
+	@Override
+	public String toString() {
+		final String waId = getMetadataValue("wa-id");
+		if (!Strings.isNullOrEmpty(waId) && !"-".equals(waId)) {
+			return waId;
+		}
+
+		final String callnumber = getMetadataValue("callnumber");
+		if (!Strings.isNullOrEmpty(callnumber) && !"-".equals(callnumber)) {
+			return new StringBuilder(getArchive().getId()).append("/").append(callnumber).toString();
+		}
+
+		final FaustURI transcriptSource = getTranscriptSource();
+		if (transcriptSource != null) {
+			return transcriptSource.getFilename();
+		}
+
+		return super.toString();
+	}
 }
