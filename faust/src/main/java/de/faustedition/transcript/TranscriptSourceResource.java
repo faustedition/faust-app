@@ -2,7 +2,6 @@ package de.faustedition.transcript;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import de.faustedition.JsonRepresentationFactory;
@@ -12,9 +11,7 @@ import de.faustedition.xml.XPathUtil;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
-import eu.interedition.text.query.QueryCriteria;
 import org.hibernate.Session;
-import org.hibernate.type.SortedSetType;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.ext.xml.DomRepresentation;
@@ -36,7 +33,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.SortedSet;
 
 import static eu.interedition.text.query.QueryCriteria.text;
 
@@ -56,7 +52,7 @@ public class TranscriptSourceResource extends TranscriptResource {
 	protected void doInit() throws ResourceException {
 		super.doInit();
 		try {
-			this.transcript = Transcript.find(sessionFactory.getCurrentSession(), xml, document.getTranscriptSource());
+			this.transcript = Transcript.read(sessionFactory.getCurrentSession(), xml, document);
 		} catch (XMLStreamException e) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
 		} catch (IOException e) {
