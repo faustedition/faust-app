@@ -45,6 +45,8 @@ public class DatabaseConfiguration {
 		dataSource.setPassword("");
 		dataSource.setMinConnectionsPerPartition(1);
 		dataSource.setMaxConnectionsPerPartition(20);
+		dataSource.setReleaseHelperThreads(0);
+		dataSource.setDisableConnectionTracking(true);
 		return dataSource;
 	}
 
