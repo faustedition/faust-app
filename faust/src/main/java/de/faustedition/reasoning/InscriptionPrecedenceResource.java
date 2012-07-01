@@ -1,9 +1,11 @@
 package de.faustedition.reasoning;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
@@ -17,7 +19,6 @@ import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.restlet.data.MediaType;
-import org.restlet.data.Status;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -36,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -66,7 +66,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 			@Override
 			public String apply(@Nullable TranscribedVerseInterval input) {
 				final Node materialUnitNode = graphDb.getNodeById(input.getTranscript().getMaterialUnitId());
-				return MaterialUnit.forNode(materialUnitNode).toString();
+				return MaterialUnit.forNode(materialUnitNode).toString() + "_" + materialUnitNode.getId();
 			}
 		});
 
@@ -96,16 +96,6 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	}
 
 	public Representation dot() {
-		/*
-		RelationPrinter.printGraph(reasoning.precedence, "pre", "black", 1, inscriptions, path + "pre.dot");
-		RelationPrinter.printGraph(reasoning.exclusiveContainment, "econ", "black", 1, inscriptions, path + "econ.dot");
-		RelationPrinter.printGraph(reasoning.paradigmaticContainment, "pcon", "black", 1, inscriptions, path + "pcon.dot");
-		RelationPrinter.printGraph(reasoning.syntagmaticPrecedence, "syn", "black", 1, inscriptions, path + "syn.dot");
-
-		RelationPrinter.printGraph(reasoning.contradictions(reasoning.syntagmaticPrecedence, reasoning.precedence), "syn", "red", 1, inscriptions, path + "syn_contradicting_pre.dot");
-
-		RelationPrinter.printInscriptionCSV(RelationPrinter.orderUniverse(reasoning.precedence, inscriptions), FROM_LINE, TO_LINE, path + "gantt.csv");
-		*/
 		return new StringRepresentation(asDot());
 	}
 
@@ -172,17 +162,6 @@ public class InscriptionPrecedenceResource extends ServerResource {
 				resultBuf.reset();
 			}
 		};
-
-		/*
-		RelationPrinter.printGraph(reasoning.precedence, "pre", "black", 1, inscriptions, path + "pre.dot");
-		RelationPrinter.printGraph(reasoning.exclusiveContainment, "econ", "black", 1, inscriptions, path + "econ.dot");
-		RelationPrinter.printGraph(reasoning.paradigmaticContainment, "pcon", "black", 1, inscriptions, path + "pcon.dot");
-		RelationPrinter.printGraph(reasoning.syntagmaticPrecedence, "syn", "black", 1, inscriptions, path + "syn.dot");
-
-		RelationPrinter.printGraph(reasoning.contradictions(reasoning.syntagmaticPrecedence, reasoning.precedence), "syn", "red", 1, inscriptions, path + "syn_contradicting_pre.dot");
-
-		RelationPrinter.printInscriptionCSV(RelationPrinter.orderUniverse(reasoning.precedence, inscriptions), FROM_LINE, TO_LINE, path + "gantt.csv");
-		*/
 	}
 
 	private String asDot() {
