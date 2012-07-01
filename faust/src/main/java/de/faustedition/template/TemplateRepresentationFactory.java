@@ -9,7 +9,6 @@ import de.faustedition.text.TextManager;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.restlet.data.*;
-import org.restlet.engine.util.ConnegUtils;
 import org.restlet.ext.freemarker.TemplateRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +36,7 @@ public class TemplateRepresentationFactory {
 	}
 
 	public TemplateRepresentation create(String path, ClientInfo client, Map<String, Object> model) {
+		path = path.replaceAll("^/+" ,"").replaceAll("/+$", "");
 		final Language language = client.getPreferredLanguage(SUPPORTED_LANGUAGES);
 		final Locale locale = (language == null ? Locale.GERMAN : new Locale(language.getName()));
 
