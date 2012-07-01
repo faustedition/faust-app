@@ -52,6 +52,7 @@ public class VerseInterval {
 
 	public static final SortedMap<Integer,VerseInterval> PROLOGUE_SCENES = Maps.newTreeMap();
 	public static final SortedMap<Integer,VerseInterval> FAUST_1_SCENES = Maps.newTreeMap();
+	public static final SortedMap<Integer,SortedMap<Integer, VerseInterval>> FAUST_2_SCENES = Maps.newTreeMap();
 
 	static {
 		PROLOGUE_SCENES.put(1, new VerseInterval("Zueignung", 1, 33));
@@ -84,6 +85,35 @@ public class VerseInterval {
 		FAUST_1_SCENES.put(24, new VerseInterval("Nacht, offen Feld", 4399, 4405));
 		FAUST_1_SCENES.put(25, new VerseInterval("Kerker", 4405, 4613));
 
+		final SortedMap<Integer, VerseInterval> faust2FirstActScenes = Maps.newTreeMap();
+		faust2FirstActScenes.put(1, new VerseInterval("Anmutige Gegend", 4613, 4728));
+		faust2FirstActScenes.put(2, new VerseInterval("Kaiserliche Pfalz", 4728, 6566));
+		FAUST_2_SCENES.put(1, faust2FirstActScenes);
 
+		final SortedMap<Integer, VerseInterval> faust2SecondActScenes = Maps.newTreeMap();
+		faust2SecondActScenes.put(1, new VerseInterval("Hochgew\u00f6lbtes, enges, gothisches Zimmer", 6566, 6819));
+		faust2SecondActScenes.put(2, new VerseInterval("Laboratorium", 6819, 7005));
+		faust2SecondActScenes.put(3, new VerseInterval("Klassische Walpurgisnacht", 7005, 8488));
+		FAUST_2_SCENES.put(2, faust2SecondActScenes);
+
+		final SortedMap<Integer, VerseInterval> faust2ThirdActScenes = Maps.newTreeMap();
+		faust2ThirdActScenes.put(1, new VerseInterval("Vor dem Pallaste des Menelas zu Sparta", 8488, 9127));
+		faust2ThirdActScenes.put(2, new VerseInterval("Innerer Burghof", 9127, 9574));
+		faust2ThirdActScenes.put(3, new VerseInterval("Schattiger Hain", 9574, 10039));
+		FAUST_2_SCENES.put(3, faust2ThirdActScenes);
+
+		final SortedMap<Integer, VerseInterval> faust2FourthActScenes = Maps.newTreeMap();
+		faust2FourthActScenes.put(1, new VerseInterval("Hochgebirg", 10039, 10345));
+		faust2FourthActScenes.put(2, new VerseInterval("Auf dem Vorgebirg", 10345, 10783));
+		faust2FourthActScenes.put(3, new VerseInterval("Des Gegenkaisers Zelt", 10783, 11043));
+		FAUST_2_SCENES.put(4, faust2FourthActScenes);
+
+		final SortedMap<Integer, VerseInterval> faust2FifthActScenes = Maps.newTreeMap();
+		faust2FifthActScenes.put(1, new VerseInterval("Offene Gegend", 11043, 11143));
+		faust2FifthActScenes.put(2, new VerseInterval("Pallast", 11143, 11288));
+		faust2FifthActScenes.put(3, new VerseInterval("Tiefe Nacht", 11288, 11511));
+		faust2FifthActScenes.put(4, new VerseInterval("Gro\u00dfer Vorhof des Pallasts", 11511, 11844));
+		faust2FifthActScenes.put(5, new VerseInterval("Bergschluchten", 11844, 12112));
+		FAUST_2_SCENES.put(5, faust2FifthActScenes);
 	}
 }
