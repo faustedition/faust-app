@@ -47,6 +47,12 @@ public class TranscribedVerseInterval extends VerseInterval {
 		this.id = id;
 	}
 
+	@Transient
+	@Override
+	public String getName() {
+		return super.getName();
+	}
+
 	@ManyToOne
 	@JoinColumn(name = "transcript_id", nullable = false)
 	public Transcript getTranscript() {
