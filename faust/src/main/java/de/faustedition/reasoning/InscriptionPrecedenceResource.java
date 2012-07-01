@@ -2,10 +2,7 @@ package de.faustedition.reasoning;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
@@ -27,6 +24,7 @@ import org.restlet.resource.ServerResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
@@ -35,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -53,6 +52,9 @@ public class InscriptionPrecedenceResource extends ServerResource {
 
 	@Autowired
 	private SessionFactory sessionFactory;
+
+	@Autowired
+	private Environment environment;
 
 	@Override
 	protected void doInit() throws ResourceException {
@@ -116,8 +118,8 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	@Get("svg")
 	public Representation svg() throws IOException, ExecutionException, InterruptedException {
 		final ExecutorService executorService = Executors.newCachedThreadPool();
-		final Process tred = new ProcessBuilder("/opt/local/bin/tred").start();
-		final Process dot = new ProcessBuilder("/opt/local/bin/dot", "-Tsvg").start();
+		final Process tred = new ProcessBuilder(environment.getRequiredProperty("graphviz.tred.path")).start();
+		final Process dot = new ProcessBuilder(environment.getRequiredProperty("graphviz.dot.path"), "-Tsvg").start();
 
 		executorService.submit(new Callable<Void>() {
 			@Override
@@ -231,7 +233,8 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	private Relation<Inscription> exclusiveContainment = MultimapBasedRelation.create();
 	private Relation<Inscription> paradigmaticContainment = MultimapBasedRelation.create();
 
-	public PremiseBasedRelation<Inscription> precedence = PremiseBasedRelation.create(
+	@SuppressWarnings("unchecked")
+	public PremiseBasedRelation<Inscription> precedence = new PremiseBasedRelation<Inscription>(
 		new PremiseBasedRelation.Premise<Inscription>() {
 			@Override
 			public String getName() {

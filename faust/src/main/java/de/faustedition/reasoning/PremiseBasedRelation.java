@@ -13,11 +13,10 @@ import java.util.Collection;
  */
 public class PremiseBasedRelation<E> extends ArrayList<PremiseBasedRelation.Premise<E>> implements ImmutableRelation<E> {
 
-	public static <E> PremiseBasedRelation<E> create(Premise<E>... premises) {
-		return new PremiseBasedRelation<E>(Arrays.asList(premises));
+	public PremiseBasedRelation(Premise<E>... premises) {
+		this(Arrays.asList(premises));
 	}
-
-	private PremiseBasedRelation(Collection<? extends Premise<E>> c) {
+	public PremiseBasedRelation(Collection<? extends Premise<E>> c) {
 		super(c);
 	}
 
