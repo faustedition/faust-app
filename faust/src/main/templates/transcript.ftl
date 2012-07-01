@@ -17,15 +17,15 @@
 
 	<div id="facsimile-view" style="text-align: center"></div>
 
-	<div id="plain-text-overlay" class="yui3-overlay-loading">
-		<div class="yui3-widget-hd">Textual Transcript</div>
-		<div class="yui3-widget-bd"><p id="plain-text" style="font-size: 108%; padding: 1em"></p></div>
-		<div class="yui3-widget-ft"></div>
-	</div>
-
 	<div id="source-overlay" class="yui3-overlay-loading">
 		<div class="yui3-widget-hd">XML Source</div>
 		<div class="yui3-widget-bd"><pre id="source" style="font-size: 108%; padding: 1em; border: 0"></pre></div>
+		<div class="yui3-widget-ft"></div>
+	</div>
+
+	<div id="plain-text-overlay" class="yui3-overlay-loading">
+		<div class="yui3-widget-hd">Textual Transcript</div>
+		<div class="yui3-widget-bd"><p id="plain-text" style="font-size: 108%; padding: 1em"></p></div>
 		<div class="yui3-widget-ft"></div>
 	</div>
 
@@ -39,15 +39,15 @@
 				});
 				facsimileViewer.render();
 
-				var plainTextOverlay = new Y.Overlay({ srcNode: "#plain-text-overlay", width: "30em", height: "50em", centered: true });
-				plainTextOverlay.plug(Y.Plugin.Drag);
-				plainTextOverlay.dd.addHandle(".yui3-widget-hd");
-				plainTextOverlay.render();
-
 				var sourceOverlay = new Y.Overlay({ srcNode: "#source-overlay", width: "60em", height: "50em", centered: true });
 				sourceOverlay.plug(Y.Plugin.Drag);
 				sourceOverlay.dd.addHandle(".yui3-widget-hd");
 				sourceOverlay.render();
+
+				var plainTextOverlay = new Y.Overlay({ srcNode: "#plain-text-overlay", width: "30em", height: "50em", centered: true });
+				plainTextOverlay.plug(Y.Plugin.Drag);
+				plainTextOverlay.dd.addHandle(".yui3-widget-hd");
+				plainTextOverlay.render();
 
 				Y.io(cp + "/transcript/source/${id?c}", {
 					headers: {
