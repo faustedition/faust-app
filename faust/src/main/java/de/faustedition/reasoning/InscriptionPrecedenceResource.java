@@ -1,13 +1,15 @@
 package de.faustedition.reasoning;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
+import de.faustedition.VerseInterval;
 import de.faustedition.document.MaterialUnit;
-import de.faustedition.genesis.TranscribedVerseInterval;
+import de.faustedition.transcript.TranscribedVerseInterval;
 import edu.bath.transitivityutils.ImmutableRelation;
 import edu.bath.transitivityutils.Relation;
 import edu.bath.transitivityutils.Relations;
@@ -15,6 +17,7 @@ import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -33,7 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -43,9 +46,6 @@ import java.util.concurrent.*;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class InscriptionPrecedenceResource extends ServerResource {
-
-	private static final int FROM_LINE = 11043;
-	private static final int TO_LINE = 12112;
 
 	@Autowired
 	private GraphDatabaseService graphDb;
@@ -60,7 +60,8 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	protected void doInit() throws ResourceException {
 		super.doInit();
 
-		final Multimap<String, TranscribedVerseInterval> intervalIndex = Multimaps.index(TranscribedVerseInterval.all(sessionFactory.getCurrentSession()), new Function<TranscribedVerseInterval, String>() {
+		final VerseInterval verseInterval = VerseInterval.fromRequestAttibutes(getRequestAttributes());
+		final Multimap<String, TranscribedVerseInterval> intervalIndex = Multimaps.index(TranscribedVerseInterval.forInterval(sessionFactory.getCurrentSession(), verseInterval), new Function<TranscribedVerseInterval, String>() {
 
 			@Override
 			public String apply(@Nullable TranscribedVerseInterval input) {
@@ -73,17 +74,10 @@ public class InscriptionPrecedenceResource extends ServerResource {
 		for (String sigil : Ordering.natural().immutableSortedCopy(intervalIndex.keySet())) {
 			final Inscription inscription = new Inscription(sigil);
 			for (TranscribedVerseInterval interval : intervalIndex.get(sigil)) {
-				// filter: only 5th act
-				int start = Math.max(interval.getStart(), FROM_LINE);
-				int end = Math.min(interval.getEnd(), TO_LINE);
-
-				if (start <= end) {
-					inscription.addInterval(start, end);
-				}
+				inscription.addInterval(interval.getStart(), interval.getEnd());
 			}
-			if (!inscription.isEmpty()) {
-				inscriptions.add(inscription);
-			}
+			Preconditions.checkState(!inscription.isEmpty());
+			inscriptions.add(inscription);
 
 		}
 		for (Inscription subject : inscriptions) {

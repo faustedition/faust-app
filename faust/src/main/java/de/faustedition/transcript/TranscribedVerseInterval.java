@@ -1,9 +1,9 @@
-package de.faustedition.genesis;
+package de.faustedition.transcript;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import de.faustedition.transcript.Transcript;
+import de.faustedition.VerseInterval;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextConstants;
@@ -137,5 +137,12 @@ public class TranscribedVerseInterval extends VerseInterval {
 
 	public static Iterable<TranscribedVerseInterval> all(Session session) {
 		return SQL.iterate(session.createCriteria(TranscribedVerseInterval.class), TranscribedVerseInterval.class);
+	}
+
+	public static Iterable<TranscribedVerseInterval> forInterval(Session session, VerseInterval verseInterval) {
+		return SQL.iterate(session.createCriteria(TranscribedVerseInterval.class)
+			.add(Restrictions.lt("start", verseInterval.getEnd()))
+			.add(Restrictions.gt("end", verseInterval.getStart())),
+			TranscribedVerseInterval.class);
 	}
 }

@@ -1,7 +1,12 @@
-package de.faustedition.genesis;
+package de.faustedition;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
 
+import java.util.Map;
 import java.util.SortedMap;
 
 /**
@@ -48,6 +53,53 @@ public class VerseInterval {
 	@Override
 	public String toString() {
 		return new StringBuilder("[").append(getStart()).append(", ").append(getEnd()).append("]").toString();
+	}
+
+	public static VerseInterval fromRequestAttibutes(Map<String, Object> requestAttributes) throws ResourceException {
+		try {
+			final int part = Integer.parseInt((String) requestAttributes.get("part"));
+			final int actOrScene = Integer.parseInt((String) requestAttributes.get("act_scene"));
+			final int scene = Integer.parseInt(Objects.firstNonNull((String) requestAttributes.get("scene"), "0"));
+
+			if (part == 1) {
+				return VerseInterval.ofScene(part, actOrScene);
+			} else if (part == 2) {
+				if (scene == 0) {
+					return VerseInterval.ofAct(part, actOrScene);
+				} else {
+					return VerseInterval.ofScene(part, actOrScene, scene);
+				}
+			}
+			throw new IllegalArgumentException("Part " + part);
+		} catch (IllegalArgumentException e) {
+			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
+		}
+	}
+
+	public static VerseInterval ofScene(int part, int act, int scene) {
+		Preconditions.checkArgument(part == 2, "Part " + part);
+		Preconditions.checkArgument(FAUST_2_SCENES.containsKey(act), "Act " + act);
+		final SortedMap<Integer, VerseInterval> scenes = FAUST_2_SCENES.get(act);
+		Preconditions.checkArgument(scenes.containsKey(scene), "Scene " + scene);
+		return scenes.get(scene);
+	}
+
+	public static VerseInterval ofScene(int part, int scene) {
+		Preconditions.checkArgument(part == 1, "Part " + part);
+		Preconditions.checkArgument(FAUST_1_SCENES.containsKey(scene), "Scene " + scene);
+		return FAUST_1_SCENES.get(scene);
+	}
+
+	public static VerseInterval ofAct(int part, int act) {
+		Preconditions.checkArgument(part == 2, "Part " + part);
+		Preconditions.checkArgument(FAUST_2_SCENES.containsKey(act), "Act " + act);
+
+		final SortedMap<Integer, VerseInterval> scenes = FAUST_2_SCENES.get(act);
+		return new VerseInterval(
+			String.format("%d.%d", part, act),
+			scenes.get(scenes.firstKey()).getStart(),
+			scenes.get(scenes.lastKey()).getEnd()
+		);
 	}
 
 	public static final SortedMap<Integer,VerseInterval> PROLOGUE_SCENES = Maps.newTreeMap();

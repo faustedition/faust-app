@@ -113,7 +113,9 @@ public class FaustApplication extends Application implements InitializingBean {
         	router.attach("demo/", secured(transactional(templateFinder)));
         	router.attach("document/", secured(transactional(documentRouter)));
         	router.attach("facsimile/", facsimileFinder);
-		router.attach("genesis/inscriptions", secured(transactional(contextResource(InscriptionPrecedenceResource.class))));
+		final Restlet inscriptionPrecendence = secured(transactional(contextResource(InscriptionPrecedenceResource.class)));
+		router.attach("genesis/inscriptions/{part}/{act_scene}/{scene}", inscriptionPrecendence);
+		router.attach("genesis/inscriptions/{part}/{act_scene}", inscriptionPrecendence);
 		router.attach("genesis/", secured(transactional(geneticGraphRouter)));
 		router.attach("goddag/", secured(transactional(goddagFinder)));
         	router.attach("project/", templateFinder);

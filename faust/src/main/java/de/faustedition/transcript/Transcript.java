@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.Closeables;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
-import de.faustedition.genesis.TranscribedVerseInterval;
 import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;

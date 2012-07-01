@@ -1,7 +1,7 @@
 package de.faustedition.db;
 
 import com.jolbox.bonecp.BoneCPDataSource;
-import de.faustedition.genesis.TranscribedVerseInterval;
+import de.faustedition.transcript.TranscribedVerseInterval;
 import de.faustedition.transcript.Transcript;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
