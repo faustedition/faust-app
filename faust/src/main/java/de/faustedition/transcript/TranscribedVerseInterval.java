@@ -1,9 +1,10 @@
 package de.faustedition.transcript;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import de.faustedition.VerseInterval;
+import de.faustedition.document.MaterialUnit;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextConstants;
@@ -11,10 +12,14 @@ import eu.interedition.text.util.SQL;
 import org.hibernate.Session;
 import org.hibernate.annotations.Index;
 import org.hibernate.criterion.Restrictions;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
+import javax.persistence.Table;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.regex.Matcher;
@@ -144,5 +149,16 @@ public class TranscribedVerseInterval extends VerseInterval {
 			.add(Restrictions.lt("start", verseInterval.getEnd()))
 			.add(Restrictions.gt("end", verseInterval.getStart())),
 			TranscribedVerseInterval.class);
+	}
+
+	public static ImmutableListMultimap<MaterialUnit, TranscribedVerseInterval> indexByMaterialUnit(final GraphDatabaseService db, Iterable<TranscribedVerseInterval> intervals) {
+		return Multimaps.index(intervals, new Function<TranscribedVerseInterval, MaterialUnit>() {
+
+			@Override
+			public MaterialUnit apply(@Nullable TranscribedVerseInterval input) {
+				final Node materialUnitNode = db.getNodeById(input.getTranscript().getMaterialUnitId());
+				return MaterialUnit.forNode(materialUnitNode);
+			}
+		});
 	}
 }

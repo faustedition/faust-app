@@ -3,11 +3,15 @@ package de.faustedition;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import de.faustedition.transcript.TranscribedVerseInterval;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -55,24 +59,76 @@ public class VerseInterval {
 		return new StringBuilder("[").append(getStart()).append(", ").append(getEnd()).append("]").toString();
 	}
 
+	public static SortedSet<VerseInterval> scenesOf(int part) {
+		final SortedSet<VerseInterval> scenes = Sets.newTreeSet(INTERVAL_COMPARATOR);
+		switch (part) {
+			case 0:
+				scenes.addAll(PROLOGUE_SCENES.values());
+				break;
+			case 1:
+				scenes.addAll(FAUST_1_SCENES.values());
+				break;
+			case 2:
+				for (SortedMap<Integer, VerseInterval> act : FAUST_2_SCENES.values()) {
+					scenes.addAll(act.values());
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Part " + part);
+		}
+		return scenes;
+	}
+
 	public static VerseInterval fromRequestAttibutes(Map<String, Object> requestAttributes) throws ResourceException {
 		try {
 			final int part = Integer.parseInt((String) requestAttributes.get("part"));
-			final int actOrScene = Integer.parseInt((String) requestAttributes.get("act_scene"));
+			final int actOrScene = Integer.parseInt(Objects.firstNonNull((String) requestAttributes.get("act_scene"), "0"));
 			final int scene = Integer.parseInt(Objects.firstNonNull((String) requestAttributes.get("scene"), "0"));
 
-			if (part == 1) {
-				return VerseInterval.ofScene(part, actOrScene);
-			} else if (part == 2) {
-				if (scene == 0) {
-					return VerseInterval.ofAct(part, actOrScene);
-				} else {
-					return VerseInterval.ofScene(part, actOrScene, scene);
-				}
+			switch (part) {
+				case 0:
+				case 1:
+					if (actOrScene == 0) {
+						return VerseInterval.ofPart(part);
+					}
+					return VerseInterval.ofScene(part, actOrScene);
+				case 2:
+					if (actOrScene == 0) {
+						return VerseInterval.ofPart(part);
+					}
+					if (scene == 0) {
+						return VerseInterval.ofAct(part, actOrScene);
+					} else {
+						return VerseInterval.ofScene(part, actOrScene, scene);
+					}
+				default:
+					throw new IllegalArgumentException("Part " + part);
 			}
-			throw new IllegalArgumentException("Part " + part);
 		} catch (IllegalArgumentException e) {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
+		}
+	}
+
+	public static VerseInterval ofPart(int part) {
+		switch (part) {
+			case 0:
+			case 1:
+				final SortedMap<Integer, VerseInterval> scenes = (part == 0 ? PROLOGUE_SCENES : FAUST_1_SCENES);
+				return new VerseInterval(
+					Integer.toString(part),
+					scenes.get(scenes.firstKey()).getStart(),
+					scenes.get(scenes.lastKey()).getEnd()
+				);
+			case 2:
+				final SortedMap<Integer, VerseInterval> firstAct = FAUST_2_SCENES.get(FAUST_2_SCENES.firstKey());
+				final SortedMap<Integer, VerseInterval> lastAct = FAUST_2_SCENES.get(FAUST_2_SCENES.lastKey());
+				return new VerseInterval(
+					Integer.toString(part),
+					firstAct.get(firstAct.firstKey()).getStart(),
+					lastAct.get(lastAct.lastKey()).getEnd()
+				);
+			default:
+				throw new IllegalArgumentException("Part " + part);
 		}
 	}
 
@@ -85,9 +141,10 @@ public class VerseInterval {
 	}
 
 	public static VerseInterval ofScene(int part, int scene) {
-		Preconditions.checkArgument(part == 1, "Part " + part);
-		Preconditions.checkArgument(FAUST_1_SCENES.containsKey(scene), "Scene " + scene);
-		return FAUST_1_SCENES.get(scene);
+		Preconditions.checkArgument(part == 0 || part == 1, "Part " + part);
+		final SortedMap<Integer, VerseInterval> scenes = (part == 0 ? PROLOGUE_SCENES : FAUST_1_SCENES);
+		Preconditions.checkArgument(scenes.containsKey(scene), "Scene " + scene);
+		return scenes.get(scene);
 	}
 
 	public static VerseInterval ofAct(int part, int act) {
@@ -101,6 +158,15 @@ public class VerseInterval {
 			scenes.get(scenes.lastKey()).getEnd()
 		);
 	}
+
+	public static final Comparator<VerseInterval> INTERVAL_COMPARATOR = new Comparator<VerseInterval>() {
+
+		@Override
+		public int compare(VerseInterval o1, VerseInterval o2) {
+			final int startDiff = o1.start - o2.start;
+			return (startDiff == 0 ? (o2.end - o1.end) : startDiff);
+		}
+	};
 
 	public static final SortedMap<Integer,VerseInterval> PROLOGUE_SCENES = Maps.newTreeMap();
 	public static final SortedMap<Integer,VerseInterval> FAUST_1_SCENES = Maps.newTreeMap();
@@ -167,5 +233,9 @@ public class VerseInterval {
 		faust2FifthActScenes.put(4, new VerseInterval("Gro\u00dfer Vorhof des Pallasts", 11511, 11844));
 		faust2FifthActScenes.put(5, new VerseInterval("Bergschluchten", 11844, 12112));
 		FAUST_2_SCENES.put(5, faust2FifthActScenes);
+	}
+
+	public boolean overlapsWith(VerseInterval other) {
+		return (start < other.end) && (end > other.start);
 	}
 }
