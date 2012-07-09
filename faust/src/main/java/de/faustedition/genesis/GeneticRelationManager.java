@@ -75,6 +75,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 									final Element target = textLineIndex.get(lineNumber);
 									if (target != null) {
 										element.node.createRelationshipTo(target.node, GENETIC_REL);
+										
 									}
 								}
 							}

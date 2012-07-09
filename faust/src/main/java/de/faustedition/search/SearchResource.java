@@ -70,6 +70,7 @@ public class SearchResource extends ServerResource {
 			documentDesc.put("id", document.node.getId());
 			documentDesc.put("callnumbers", toSortedValues(document.getMetadata("callnumber")));
 			documentDesc.put("waIds", toSortedValues(document.getMetadata("wa-id")));
+			documentDesc.put("uri", toSortedValues(document.getMetadata("uri")));			
 			documentDescs.add(documentDesc);
 		}
 		return jsonFactory.map(results, false);
@@ -79,7 +80,7 @@ public class SearchResource extends ServerResource {
 		return Lists.newArrayList(Iterables.limit(Document.find(db, term), 25));
 	}
 
-	private static String toQuery(String search) {
+	public static String toQuery(String search) {
 		return new StringBuilder("*").append(search.replaceAll("\\*", "").toLowerCase()).append("*").toString();
 	}
 

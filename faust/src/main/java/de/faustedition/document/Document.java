@@ -2,7 +2,10 @@ package de.faustedition.document;
 
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -29,7 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class Document extends MaterialUnit {
 	private static final String PREFIX = FaustGraph.PREFIX + ".document";
 
-	private static final String SOURCE_KEY = PREFIX + ".uri";
+	private static final String SOURCE_KEY = PREFIX + ".source";
+	private static final String URI_KEY = PREFIX + "uri";
 	private static final String CALLNUMBER_KEY = METADATA_PREFIX + "callnumber";
 	private static final String WA_ID_KEY = METADATA_PREFIX + "wa-id";
 
@@ -65,9 +69,18 @@ public class Document extends MaterialUnit {
 			return result;
 	}
 
-	public static Document find(GraphDatabaseService db, FaustURI source) {
+	public static Document findBySource(GraphDatabaseService db, FaustURI source) {
 		final Node node = db.index().forNodes(SOURCE_KEY).get(SOURCE_KEY, source).getSingle();
 		return (node == null ? null : new Document(node));
+	}
+
+	public static Document findByUri(GraphDatabaseService db, FaustURI uri) {
+		try {
+			final Node node = db.index().forNodes(URI_KEY).get(URI_KEY, uri).getSingle();
+			return (node == null ? null : new Document(node));
+		} catch(NoSuchElementException e) {
+			return null;
+		}
 	}
 
 
@@ -80,12 +93,21 @@ public class Document extends MaterialUnit {
 			db.index().forNodes(PREFIX + "id").query(query),
 			newWrapperFunction(Document.class));
 	}
-
+	
 	public void index() {
 		final IndexManager indexManager = node.getGraphDatabase().index();
 
 		indexManager.forNodes(SOURCE_KEY).add(node, SOURCE_KEY, getSource());
 
+		for (String uri: Objects.firstNonNull(getMetadata("uri"), new String[0])) {
+			try {
+				indexManager.forNodes(URI_KEY).add(node, URI_KEY, new FaustURI(new URI(uri)));
+			} catch (URISyntaxException e) {
+				// TODO error logging
+                //logger.error("error!", e);
+			}
+		}		
+		
 		final Index<Node> idIndex = indexManager.forNodes(PREFIX + "id");
 		for (String callnumber : Objects.firstNonNull(getMetadata("callnumber"), new String[0])) {
 			idIndex.add(node, CALLNUMBER_KEY, callnumber.toLowerCase());

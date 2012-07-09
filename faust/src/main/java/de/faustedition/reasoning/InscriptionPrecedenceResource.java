@@ -10,6 +10,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
 import de.faustedition.VerseInterval;
+import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.transcript.TranscribedVerseInterval;
 import edu.bath.transitivityutils.ImmutableRelation;
@@ -37,6 +38,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -61,12 +64,13 @@ public class InscriptionPrecedenceResource extends ServerResource {
 		super.doInit();
 
 		final VerseInterval verseInterval = VerseInterval.fromRequestAttibutes(getRequestAttributes());
-		final Multimap<String, TranscribedVerseInterval> intervalIndex = Multimaps.index(TranscribedVerseInterval.forInterval(sessionFactory.getCurrentSession(), verseInterval), new Function<TranscribedVerseInterval, String>() {
-
+		final Map<Inscription, Node> nodeMap = new HashMap<Inscription, Node>();
+		final Multimap<String, TranscribedVerseInterval> intervalIndex = Multimaps.index(TranscribedVerseInterval.forInterval(sessionFactory.getCurrentSession(), verseInterval), new Function<TranscribedVerseInterval, String>() {		
 			@Override
 			public String apply(@Nullable TranscribedVerseInterval input) {
 				final Node materialUnitNode = graphDb.getNodeById(input.getTranscript().getMaterialUnitId());
-				return MaterialUnit.forNode(materialUnitNode).toString() + "_" + materialUnitNode.getId();
+				final String sigil = MaterialUnit.forNode(materialUnitNode).toString() + "_" + materialUnitNode.getId();
+				return sigil;
 			}
 		});
 
@@ -78,7 +82,10 @@ public class InscriptionPrecedenceResource extends ServerResource {
 			}
 			Preconditions.checkState(!inscription.isEmpty());
 			inscriptions.add(inscription);
-
+			long materialUnitId = intervalIndex.get(sigil).iterator().next().getTranscript().getMaterialUnitId();
+			Node node = graphDb.getNodeById(materialUnitId);
+			nodeMap.put(inscription, node);
+			
 		}
 		for (Inscription subject : inscriptions) {
 			for (Inscription object : inscriptions) {
@@ -90,6 +97,13 @@ public class InscriptionPrecedenceResource extends ServerResource {
 				}
 				if (InscriptionRelations.paradigmaticallyContains(subject, object)) {
 					paradigmaticContainment.relate(subject, object);
+				}
+				Document subjectDoc = (Document)(Document.forNode(nodeMap.get(subject)));
+				Document objectDoc = (Document)(Document.forNode(nodeMap.get(object)));
+				
+				//TODO efficiency (this is cubic)
+				if (subjectDoc.geneticallyRelatedTo().contains(objectDoc)) {
+					explicitPrecedence.relate(subject, object);
 				}
 			}
 		}
@@ -205,9 +219,22 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	private Relation<Inscription> syntagmaticPrecedence = Relations.newTransitiveRelation();
 	private Relation<Inscription> exclusiveContainment = MultimapBasedRelation.create();
 	private Relation<Inscription> paradigmaticContainment = MultimapBasedRelation.create();
+	private Relation<Inscription> explicitPrecedence = MultimapBasedRelation.create();
+	
 
 	@SuppressWarnings("unchecked")
 	public PremiseBasedRelation<Inscription> precedence = new PremiseBasedRelation<Inscription>(
+		new PremiseBasedRelation.Premise<Inscription>() {
+			@Override
+			public String getName() {
+				return "r_exp";
+			}
+			
+			@Override
+			public boolean applies(Inscription i, Inscription j) {
+				return explicitPrecedence.areRelated(i, j);
+			}
+		},	
 		new PremiseBasedRelation.Premise<Inscription>() {
 			@Override
 			public String getName() {

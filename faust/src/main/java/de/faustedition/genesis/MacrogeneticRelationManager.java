@@ -4,6 +4,7 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
 import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.search.SearchResource;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
@@ -16,9 +17,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.google.common.base.Objects;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 @Component
@@ -58,27 +62,26 @@ public class MacrogeneticRelationManager {
 		return failed;
 	};
 
-	public void evaluate(FaustURI source) throws SAXException, IOException {
+	private void evaluate(FaustURI source) throws SAXException, IOException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Adding macrogenetic relations from " + source);
 		}
 
 		for (MGRelationship r: parse(source)) {
+			Document from = Document.findByUri(db, r.from);
+			if (from == null) {
+				logger.warn(r.from + " unknown, but referenced in " + source);
+				continue;
+			}
 
-			Document from = Document.find(db, r.from);
-			Document to = Document.find(db, r.to);
-
-            if (from == null)
-                logger.error("Document " + r.from + " is not registered!");
-            else {
-
-                if (to == null)
-                    logger.error("Document " + r.to + " is not registered!");
-                else {
-                    logger.debug("Adding: " + from.getSource() + " ---" + r.type.name() + "---> " + to.getSource());
-                    from.node.createRelationshipTo(to.node, r.type);
-                }
-            }
+			Document to = Document.findByUri(db, r.to);
+			if (to == null) {
+				logger.warn(r.to + " unknown, but referenced in " + source);
+				continue;
+			}
+			
+            logger.debug("Adding: " + r.from + " ---" + r.type.name() + "---> " + r.to);
+            from.node.createRelationshipTo(to.node, r.type);
 		}
 	}
 
@@ -92,7 +95,7 @@ public class MacrogeneticRelationManager {
 		}
 	}
 
-	public Iterable<MGRelationship> parse(FaustURI source) throws SAXException, IOException {
+	public Iterable<MGRelationship> parse(final FaustURI source) throws SAXException, IOException {
 
 
 		final Set<MGRelationship> relationships = new HashSet<MGRelationship>();

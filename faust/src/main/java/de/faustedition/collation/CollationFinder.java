@@ -43,7 +43,7 @@ public class CollationFinder extends Finder {
 
 		@Get("html")
 		public Representation alignment() throws IOException {
-			final Document document = Document.find(db, new FaustURI(FaustAuthority.XML, "/document/faust/2.5/gsa_390883.xml"));
+			final Document document = Document.findBySource(db, new FaustURI(FaustAuthority.XML, "/document/faust/2.5/gsa_390883.xml"));
 
 			final Element textRoot = document.getTranscript().getTrees().getRoot("f", "words");
 			final Iterable<Token> textTokens = Iterables.transform(textRoot.getChildren(textRoot),

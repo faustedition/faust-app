@@ -60,7 +60,7 @@ public abstract class AbstractDocumentFinder extends Finder {
 		final FaustURI uri = xml.walk(path);
 
 		logger.debug("Finding document for " + uri);
-		return new DocumentPath(Document.find(db, uri), path);
+		return new DocumentPath(Document.findBySource(db, uri), path);
 	}
 
 	protected abstract ServerResource getResource(Document document, Deque<String> postfix);
