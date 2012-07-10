@@ -3,28 +3,26 @@ package de.faustedition.genesis;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnitManager;
-import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.search.SearchResource;
+import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.google.common.base.Objects;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 @Component
@@ -41,9 +39,6 @@ public class MacrogeneticRelationManager {
 
 	@Autowired
 	private GraphDatabaseService db;
-
-	@Autowired
-	private MaterialUnitManager materialUnitManager;
 
 	@Autowired
 	private Logger logger;
@@ -67,27 +62,26 @@ public class MacrogeneticRelationManager {
 		return failed;
 	};
 
-	public void evaluate(FaustURI source) throws SAXException, IOException {
+	private void evaluate(FaustURI source) throws SAXException, IOException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Adding macrogenetic relations from " + source);
 		}
 
 		for (MGRelationship r: parse(source)) {
+			Document from = Document.findByUri(db, r.from);
+			if (from == null) {
+				logger.warn(r.from + " unknown, but referenced in " + source);
+				continue;
+			}
 
-			Document from = materialUnitManager.find(r.from);
-			Document to = materialUnitManager.find(r.to);
-
-            if (from == null)
-                logger.error("Document " + r.from + " is not registered!");
-            else {
-
-                if (to == null)
-                    logger.error("Document " + r.to + " is not registered!");
-                else {
-                    logger.debug("Adding: " + from.getSource() + " ---" + r.type.name() + "---> " + to.getSource());
-                    from.node.createRelationshipTo(to.node, r.type);
-                }
-            }
+			Document to = Document.findByUri(db, r.to);
+			if (to == null) {
+				logger.warn(r.to + " unknown, but referenced in " + source);
+				continue;
+			}
+			
+            logger.debug("Adding: " + r.from + " ---" + r.type.name() + "---> " + r.to);
+            from.node.createRelationshipTo(to.node, r.type);
 		}
 	}
 
@@ -101,7 +95,7 @@ public class MacrogeneticRelationManager {
 		}
 	}
 
-	public Iterable<MGRelationship> parse(FaustURI source) throws SAXException, IOException {
+	public Iterable<MGRelationship> parse(final FaustURI source) throws SAXException, IOException {
 
 
 		final Set<MGRelationship> relationships = new HashSet<MGRelationship>();
@@ -113,7 +107,7 @@ public class MacrogeneticRelationManager {
 			public void startElement(String uri, String localName, String qName, Attributes attributes)
 			throws SAXException {
 
-				if 	("relation".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+				if 	("relation".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
 					FaustRelationshipType type;
 					if("temp-pre".equals(attributes.getValue("name"))) {
 						type = TEMP_PRE_REL;
@@ -123,7 +117,7 @@ public class MacrogeneticRelationManager {
 						throw new SAXException("The relation " + attributes.getValue("name") + " is unknown.");
 					}
 					this.relationship = new MGRelationship(null, null, type);
-				} else if ("item".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+				} else if ("item".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
 					String itemURI = attributes.getValue("uri");
 					if (relationship != null) {
 						try {
@@ -145,7 +139,7 @@ public class MacrogeneticRelationManager {
 			@Override
 			public void endElement(String uri, String localName, String qName)
 			throws SAXException {
-				if ("relation".equals(localName) && CustomNamespaceMap.FAUST_NS_URI.equals(uri)) {
+				if ("relation".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
 					this.relationship = null;
 				}				
 			}

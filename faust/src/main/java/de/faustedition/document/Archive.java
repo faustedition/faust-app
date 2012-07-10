@@ -1,6 +1,8 @@
 package de.faustedition.document;
 
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.IterableWrapper;
 
 import de.faustedition.graph.FaustRelationshipType;
@@ -26,6 +28,19 @@ public class Archive extends NodeWrapperCollection<MaterialUnit> {
 
 	public void setId(String id) {
 		node.setProperty(PREFIX + ".id", id);
+	}
+
+	public String getName() {
+		return (String) node.getProperty(PREFIX + ".name", null);
+	}
+
+	public void setName(String name) {
+		node.setProperty(PREFIX + ".name", name);
+	}
+
+	public static Archive getArchive(Document document) {
+		final Relationship r = document.node.getSingleRelationship(IN_ARCHIVE_RT, Direction.OUTGOING);
+		return (r == null ? null : new Archive(r.getEndNode()));
 	}
 
 	@Override

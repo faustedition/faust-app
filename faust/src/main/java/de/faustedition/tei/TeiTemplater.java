@@ -59,7 +59,7 @@ public class TeiTemplater extends Runtime implements Runnable {
 					final Document current = XMLUtil.parse(xml.getInputSource(source));
 					Element docElement = current.getDocumentElement();
 					if (!"TEI".equals(docElement.getLocalName())
-							|| !CustomNamespaceMap.TEI_NS_URI.equals(docElement.getNamespaceURI())) {
+							|| !Namespaces.TEI_NS_URI.equals(docElement.getNamespaceURI())) {
 						continue;
 					}
 

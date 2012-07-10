@@ -1,105 +1,183 @@
 package de.faustedition.transcript;
 
-import org.goddag4j.Element;
-import org.goddag4j.GoddagTreeNode;
-import org.goddag4j.MultiRootedTree;
-import org.goddag4j.token.WhitespaceTokenMarkupGenerator;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-
 import com.google.common.base.Objects;
-import com.google.common.collect.Iterables;
-
+import com.google.common.base.Preconditions;
+import com.google.common.io.Closeables;
 import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.graph.NodeWrapper;
-import de.faustedition.graph.TokenizerUtil;
+import de.faustedition.document.MaterialUnit;
+import de.faustedition.xml.XMLStorage;
+import eu.interedition.text.Name;
+import eu.interedition.text.Text;
+import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
+import eu.interedition.text.xml.XML;
+import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.XMLTransformerModule;
+import eu.interedition.text.xml.module.*;
+import org.hibernate.LockMode;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class Transcript extends NodeWrapper {
-	public enum Type {
-		DOCUMENTARY, TEXTUAL;
+import javax.persistence.*;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
+import static eu.interedition.text.TextConstants.TEI_NS;
+
+/**
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ */
+@Entity
+@Table(name = "faust_transcript")
+public class Transcript {
+	private static final Logger LOG = LoggerFactory.getLogger(Transcript.class);
+
+	private long id;
+	private String sourceURI;
+	private Text text;
+	private long materialUnitId;
+
+	@Id
+	@GeneratedValue
+	public long getId() {
+		return id;
 	}
 
-	public static final FaustRelationshipType TRANSCRIPT_RT = new FaustRelationshipType("transcribes");
-	public static final String PREFIX = FaustGraph.PREFIX + ".transcript";
-	public static final String SOURCE_KEY = PREFIX + ".source";
-
-	private static final FaustRelationshipType MARKUP_VIEW_RT = new FaustRelationshipType("markup-view");
-
-	private final MultiRootedTree trees;
-
-	protected Transcript(Node node) {
-		super(node);
-		this.trees = new MultiRootedTree(node, MARKUP_VIEW_RT);
+	public void setId(long id) {
+		this.id = id;
 	}
 
-	protected Transcript(GraphDatabaseService db, Type type, FaustURI source, Element root) {
-		this(db.createNode());
-		setType(type);
-		setSource(source);
-		this.trees.addRoot(root);
+	@Column(name = "source_uri", nullable = false, unique = true)
+	public String getSourceURI() {
+		return sourceURI;
 	}
 
-	public MultiRootedTree getTrees() {
-		return trees;
+	public void setSourceURI(String sourceURI) {
+		this.sourceURI = sourceURI;
 	}
 
-	public void setType(Type type) {
-		node.setProperty(PREFIX + ".type", type.name().toLowerCase());
-	}
-
-	public Type getType() {
-		return getType(node);
-	}
-
-	public static Transcript forNode(Node node) {
-		Type type = getType(node);
-		switch (type) {
-		case DOCUMENTARY:
-			return new DocumentaryTranscript(node);
-		case TEXTUAL:
-			return new TextualTranscript(node);
-		}
-		throw new IllegalArgumentException(type.toString());
-	}
-
-	public static Type getType(Node node) {
-		return Type.valueOf(((String) node.getProperty(PREFIX + ".type")).toUpperCase());
-	}
-
-	public void setSource(FaustURI uri) {
-		node.setProperty(SOURCE_KEY, uri.toString());
-	}
-
+	@Transient
 	public FaustURI getSource() {
-		return FaustURI.parse((String) node.getProperty(SOURCE_KEY));
+		return FaustURI.parse(getSourceURI());
 	}
 
-	public abstract Element getDefaultRoot();
+	public void setSource(FaustURI source) {
+		setSourceURI(source.toString());
+	}
 
-	public abstract void postprocess();
+	@Column(name = "material_unit_id", nullable = false)
+	public long getMaterialUnitId() {
+		return materialUnitId;
+	}
 
-	public void tokenize() {
-		TokenizerUtil.tokenize(getTrees(), getDefaultRoot(), new WhitespaceTokenMarkupGenerator(), "f", "words");
+	public void setMaterialUnitId(long materialUnitId) {
+		this.materialUnitId = materialUnitId;
+	}
+
+
+	@ManyToOne
+	@JoinColumn(name = "text_id")
+	public Text getText() {
+		return text;
+	}
+
+	public void setText(Text text) {
+		this.text = text;
 	}
 
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this).add("type", getType()).add("source", getSource()).toString();
+		return Objects.toStringHelper(this).addValue(getSource()).toString();
 	}
 
-	public static Transcript find(GoddagTreeNode node) {
-		Element root = Iterables.getFirst(node.getRoots(), null);
-		if (root == null) {
-			return null;
-		}
-		for (Relationship r : root.node.getRelationships(MARKUP_VIEW_RT, Direction.INCOMING)) {
-			return forNode(r.getStartNode());
-		}
-		return null;
+	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit) throws IOException, XMLStreamException {
+		final FaustURI source = materialUnit.getTranscriptSource();
+		Preconditions.checkArgument(source != null);
 
+		final String sourceURI = source.toString();
+		Transcript transcript = (Transcript) session.createCriteria(Transcript.class)
+			.add(Restrictions.eq("sourceURI", sourceURI))
+			.setLockMode(LockMode.UPGRADE_NOWAIT)
+			.uniqueResult();
+		if (transcript == null) {
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Creating transcript for {}", sourceURI);
+			}
+			transcript = new Transcript();
+			transcript.setMaterialUnitId(materialUnit.node.getId());
+			transcript.setSourceURI(sourceURI);
+			session.save(transcript);
+		}
+
+		if (transcript.getText() == null) {
+			transcript.setText(readText(session, xml, source));
+			TranscribedVerseInterval.register(session, transcript);
+		}
+
+		return transcript;
 	}
+
+	private static Text readText(Session session, XMLStorage xml, FaustURI source) throws XMLStreamException, IOException {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Transforming XML transcript from {}", source);
+		}
+		InputStream xmlStream = null;
+		XMLStreamReader xmlReader = null;
+		try {
+			xmlStream = xml.getInputSource(source).getByteStream();
+			xmlReader = XML.createXMLInputFactory().createXMLStreamReader(xmlStream);
+			return createXMLTransformer(session).transform(Text.create(session, null, xmlReader));
+		} finally {
+			XML.closeQuietly(xmlReader);
+			Closeables.close(xmlStream, false);
+		}
+	}
+
+	private static XMLTransformer createXMLTransformer(Session session) {
+		final SimpleXMLTransformerConfiguration conf = new SimpleXMLTransformerConfiguration();
+
+		final List<XMLTransformerModule> modules = conf.getModules();
+		modules.add(new LineElementXMLTransformerModule());
+		modules.add(new NotableCharacterXMLTransformerModule());
+		modules.add(new TextXMLTransformerModule());
+		modules.add(new DefaultAnnotationXMLTransformerModule(1000, false));
+		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
+		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
+
+		conf.addLineElement(new Name(TEI_NS, "text"));
+		conf.addLineElement(new Name(TEI_NS, "div"));
+		conf.addLineElement(new Name(TEI_NS, "head"));
+		conf.addLineElement(new Name(TEI_NS, "sp"));
+		conf.addLineElement(new Name(TEI_NS, "stage"));
+		conf.addLineElement(new Name(TEI_NS, "speaker"));
+		conf.addLineElement(new Name(TEI_NS, "lg"));
+		conf.addLineElement(new Name(TEI_NS, "l"));
+		conf.addLineElement(new Name(TEI_NS, "p"));
+		conf.addLineElement(new Name(TEI_NS, "ab"));
+		conf.addLineElement(new Name(TEI_NS, "line"));
+		conf.addLineElement(new Name(TEI_SIG_GE, "line"));
+
+		conf.addContainerElement(new Name(TEI_NS, "text"));
+		conf.addContainerElement(new Name(TEI_NS, "div"));
+		conf.addContainerElement(new Name(TEI_NS, "lg"));
+		conf.addContainerElement(new Name(TEI_NS, "subst"));
+		conf.addContainerElement(new Name(TEI_NS, "choice"));
+		conf.addContainerElement(new Name(TEI_NS, "zone"));
+
+		conf.exclude(new Name(TEI_NS, "teiHeader"));
+		conf.exclude(new Name(TEI_NS, "front"));
+		conf.exclude(new Name(TEI_NS, "fw"));
+		conf.exclude(new Name(TEI_NS, "app"));
+
+		conf.include(new Name(TEI_NS, "lem"));
+
+		return new XMLTransformer(session, conf);
+	}
+
+
 }

@@ -1,29 +1,31 @@
 package de.faustedition.document;
 
-import static de.faustedition.transcript.Transcript.TRANSCRIPT_RT;
-import static org.neo4j.graphdb.Direction.INCOMING;
-import static org.neo4j.graphdb.Direction.OUTGOING;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
-
+import com.google.common.base.Strings;
+import com.google.common.io.Files;
+import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapper;
 import de.faustedition.graph.NodeWrapperCollection;
-import de.faustedition.transcript.Transcript;
+import de.faustedition.transcript.GoddagTranscript;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import static de.faustedition.transcript.GoddagTranscript.TRANSCRIPT_RT;
+import static org.neo4j.graphdb.Direction.INCOMING;
+import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
+
 	public enum Type {
 		ARCHIVAL_UNIT, DOCUMENT, QUIRE, SHEET, FOLIO, PAGE, SURFACE
 	}
 
-	private static final String PREFIX = FaustGraph.PREFIX + ".material-unit";
-	private static final String METADATA_PREFIX = PREFIX + ".metadata.";
+	protected static final String PREFIX = FaustGraph.PREFIX + ".material-unit";
+	protected static final String METADATA_PREFIX = PREFIX + ".metadata.";
 
 	private static final FaustRelationshipType MATERIAL_PART_OF_RT = new FaustRelationshipType("is-material-part-of");
 
@@ -34,22 +36,27 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 	public MaterialUnit(Node node, Type type) {
 		this(node);
 		setType(type);
+		node.setProperty(PREFIX + ".last-modified", System.currentTimeMillis());
 	}
+
+	public long created() {
+		return (Long) node.getProperty(PREFIX + ".last-modified");
+	}
+
+	public Archive getArchive() {
+		for (MaterialUnit unit = this; unit != null; unit = unit.getParent()) {
+			if (unit instanceof Document) {
+				return Archive.getArchive((Document) unit);
+			}
+		}
+		return null;
+	}
+
 
 	public MaterialUnit getParent() {
 		// FIXME: we might want to have multiple parentship here too
 		final Relationship r = node.getSingleRelationship(MATERIAL_PART_OF_RT, OUTGOING);
-		if (r == null) {
-			return null;
-		}
-		final MaterialUnit mu = NodeWrapper.newInstance(MaterialUnit.class, r.getStartNode());
-		switch (mu.getType()) {
-		case ARCHIVAL_UNIT:
-		case DOCUMENT:
-			return new Document(mu.node);
-		default:
-			return mu;
-		}
+		return (r == null ? null : forNode(r.getStartNode()));
 	}
 
 	public SortedSet<MaterialUnit> getSortedContents() {
@@ -71,11 +78,11 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 
 	public static MaterialUnit forNode(Node node) {
 		switch (getType(node)) {
-		case DOCUMENT:
-		case ARCHIVAL_UNIT:
-			return new Document(node);
-		default:
-			return new MaterialUnit(node);
+			case DOCUMENT:
+			case ARCHIVAL_UNIT:
+				return new Document(node);
+			default:
+				return new MaterialUnit(node);
 		}
 	}
 
@@ -95,19 +102,19 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		return (Integer) node.getProperty(PREFIX + ".order", -1);
 	}
 
-	public Transcript getTranscript() {
-		final Relationship r = node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
-		return (r == null ? null : Transcript.forNode(r.getStartNode()));
-	}
-
-	public static MaterialUnit find(Transcript t) {
+	public static MaterialUnit find(GoddagTranscript t) {
 		for (Relationship r : t.node.getRelationships(TRANSCRIPT_RT, OUTGOING)) {
 			return forNode(r.getEndNode());
 		}
 		return null;
 	}
-	
-	public void setTranscript(Transcript transcript) {
+
+	public GoddagTranscript getTranscript() {
+		final Relationship r = node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
+		return (r == null ? null : GoddagTranscript.forNode(r.getStartNode()));
+	}
+
+	public void setTranscript(GoddagTranscript transcript) {
 		final Relationship r = node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
 		if (r != null) {
 			r.delete();
@@ -115,6 +122,15 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		if (transcript != null) {
 			transcript.node.createRelationshipTo(node, TRANSCRIPT_RT);
 		}
+	}
+
+	public FaustURI getTranscriptSource() {
+		final String uri = (String) node.getProperty(PREFIX + ".transcript", null);
+		return (uri == null ? null :FaustURI.parse(uri));
+	}
+
+	public void setTranscriptSource(FaustURI source) {
+		node.setProperty(PREFIX + ".transcript", source.toString());
 	}
 
 	public String getMetadataValue(String key) {
@@ -143,5 +159,24 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		final int o2 = o.getOrder();
 		return (o1 >= 0 && o2 >= 0) ? (o1 - o2) : 0;
 	}
-	
+
+	@Override
+	public String toString() {
+		final String waId = getMetadataValue("wa-id");
+		if (!Strings.isNullOrEmpty(waId) && !"-".equals(waId)) {
+			return waId;
+		}
+
+		final String callnumber = getMetadataValue("callnumber");
+		if (!Strings.isNullOrEmpty(callnumber) && !"-".equals(callnumber)) {
+			return new StringBuilder(getArchive().getId()).append("/").append(callnumber).toString();
+		}
+
+		final FaustURI transcriptSource = getTranscriptSource();
+		if (transcriptSource != null) {
+			return transcriptSource.getFilename();
+		}
+
+		return super.toString();
+	}
 }

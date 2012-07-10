@@ -5,7 +5,6 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.tei.WhitespaceUtil;
-import de.faustedition.transcript.Transcript.Type;
 import de.faustedition.xml.*;
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
@@ -16,10 +15,6 @@ import org.neo4j.helpers.collection.IterableWrapper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -34,11 +29,11 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
-import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_URI;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_SIG_GE_URI;
 
 @Component
-public class TranscriptManager {
+public class GoddagTranscriptManager {
 	private final ApparatusExtractor apparatusExtractor = new ApparatusExtractor();
 
 	@Autowired
@@ -74,12 +69,12 @@ public class TranscriptManager {
 		return failed;
 	}
 
-	public Iterable<Transcript> add(FaustURI source) throws SAXException, IOException, TransformerException {
+	public Iterable<GoddagTranscript> add(FaustURI source) throws SAXException, IOException, TransformerException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Adding transcripts for " + source);
 		}
 
-		final Set<Transcript> transcripts = new HashSet<Transcript>();
+		final Set<GoddagTranscript> transcripts = new HashSet<GoddagTranscript>();
 		Transaction tx = db.beginTx();
 		try {
 
@@ -89,7 +84,7 @@ public class TranscriptManager {
 			tx.finish();
 		}
 
-		for (Transcript t : transcripts) {
+		for (GoddagTranscript t : transcripts) {
 			logger.debug("Extracting apparatus of  " + t);
 			apparatusExtractor.extract(t);
 
@@ -110,7 +105,7 @@ public class TranscriptManager {
 		return transcripts;
 	}
 
-	public Iterable<Transcript> parse(FaustURI source) throws SAXException, IOException, TransformerException  {
+	public Iterable<GoddagTranscript> parse(FaustURI source) throws SAXException, IOException, TransformerException  {
 		final Document document = XMLUtil.parse(xml.getInputSource(source));
 		WhitespaceUtil.normalize(document);
 		document.normalizeDocument();
@@ -123,7 +118,7 @@ public class TranscriptManager {
 
 		final FacsimileReferenceExtractionHandler facsRefHandler = new FacsimileReferenceExtractionHandler(source);
 
-		final Set<Transcript> transcripts = new HashSet<Transcript>();
+		final Set<GoddagTranscript> transcripts = new HashSet<GoddagTranscript>();
 		final SAXResult pipeline = new SAXResult(new MultiplexingContentHandler(docFragmentFilter, textFragmentFilter,
 				facsRefHandler));
 		XMLUtil.transformerFactory().newTransformer().transform(new DOMSource(document), pipeline);
@@ -131,7 +126,7 @@ public class TranscriptManager {
 		final Element documentRoot = documentHandler.result();
 		if (documentRoot != null) {
 			logger.debug("Adding documentary transcript for " + source);
-			Transcript transcript = new DocumentaryTranscript(db, source, documentRoot, facsRefHandler.references);
+			GoddagTranscript transcript = new DocumentaryGoddagTranscript(db, source, documentRoot, facsRefHandler.references);
 			transcripts.add(transcript);
 			register(transcript, source);
 		}
@@ -139,7 +134,7 @@ public class TranscriptManager {
 		final Element textRoot = textHandler.result();
 		if (textRoot != null) {
 			logger.debug("Adding textual transcript for " + source);
-			Transcript transcript = new TextualTranscript(db, source, textRoot);
+			GoddagTranscript transcript = new TextualGoddagTranscript(db, source, textRoot);
 			transcripts.add(transcript);
 			register(transcript, source);
 		}
@@ -147,24 +142,24 @@ public class TranscriptManager {
 		return transcripts;
 	}
 
-	protected void register(Transcript transcript, FaustURI source) {
+	protected void register(GoddagTranscript transcript, FaustURI source) {
 		graph.getTranscripts().add(transcript);
-		db.index().forNodes(Transcript.SOURCE_KEY).add(transcript.node, Transcript.SOURCE_KEY, source.toString());
+		db.index().forNodes(GoddagTranscript.SOURCE_KEY).add(transcript.node, GoddagTranscript.SOURCE_KEY, source.toString());
 	}
 
-	public Iterable<Transcript> find(FaustURI source) {
-		return new IterableWrapper<Transcript, Node>(db.index().forNodes(Transcript.SOURCE_KEY)
-				.get(Transcript.SOURCE_KEY, source.toString())) {
+	public Iterable<GoddagTranscript> find(FaustURI source) {
+		return new IterableWrapper<GoddagTranscript, Node>(db.index().forNodes(GoddagTranscript.SOURCE_KEY)
+				.get(GoddagTranscript.SOURCE_KEY, source.toString())) {
 
 			@Override
-			protected Transcript underlyingObjectToObject(Node object) {
-				return Transcript.forNode(object);
+			protected GoddagTranscript underlyingObjectToObject(Node object) {
+				return GoddagTranscript.forNode(object);
 			}
 		};
 	}
 
-	public Transcript find(FaustURI source, Type type) {
-		for (Transcript t : find(source)) {
+	public GoddagTranscript find(FaustURI source, TranscriptType type) {
+		for (GoddagTranscript t : find(source)) {
 			if (type == null || t.getType() == type) {
 				return t;
 			}
@@ -185,7 +180,7 @@ public class TranscriptManager {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-			if (inFacsimile && "graphic".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
+			if (inFacsimile && "graphic".equals(localName) && Namespaces.TEI_NS_URI.equals(uri)) {
 				String facsimileRefAttr = atts.getValue("url");
 				if (facsimileRefAttr == null) {
 					logger.warn("<tei:graphic/> without @url in " + source);
@@ -200,14 +195,14 @@ public class TranscriptManager {
 				} catch (Exception e) {
 					logger.warn("Invalid @url='" + facsimileRefAttr + "' in <tei:graphic/> in " + source);
 				}
-			} else if ("facsimile".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
+			} else if ("facsimile".equals(localName) && Namespaces.TEI_NS_URI.equals(uri)) {
 				inFacsimile = true;
 			}
 		}
 
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
-			if ("facsimile".equals(localName) && CustomNamespaceMap.TEI_NS_URI.equals(uri)) {
+			if ("facsimile".equals(localName) && Namespaces.TEI_NS_URI.equals(uri)) {
 				inFacsimile = false;
 			}
 		}

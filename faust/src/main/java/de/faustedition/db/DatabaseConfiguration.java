@@ -1,6 +1,8 @@
 package de.faustedition.db;
 
 import com.jolbox.bonecp.BoneCPDataSource;
+import de.faustedition.transcript.TranscribedVerseInterval;
+import de.faustedition.transcript.Transcript;
 import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
@@ -38,19 +40,27 @@ public class DatabaseConfiguration {
 
 		final BoneCPDataSource dataSource = new BoneCPDataSource();
 		dataSource.setDriverClass(Driver.class.getName());
-		dataSource.setJdbcUrl(database.toURI().toString().replaceAll("^file:", "jdbc:h2://"));
+		dataSource.setJdbcUrl(database.toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";LOCK_TIMEOUT=10000");
 		dataSource.setUsername("sa");
 		dataSource.setPassword("");
 		dataSource.setMinConnectionsPerPartition(1);
 		dataSource.setMaxConnectionsPerPartition(20);
+		dataSource.setReleaseHelperThreads(0);
+		dataSource.setDisableConnectionTracking(true);
 		return dataSource;
 	}
 
 	@Bean
 	public SessionFactory sessionFactory() throws Exception {
 		return new LocalSessionFactoryBuilder(dataSource())
-			.addAnnotatedClasses(Annotation.class, Name.class, Text.class, TextTarget.class)
-			.buildSessionFactory();
+			.addAnnotatedClasses(
+				Annotation.class,
+				Name.class,
+				Text.class,
+				TextTarget.class,
+				Transcript.class,
+				TranscribedVerseInterval.class
+			).buildSessionFactory();
 	}
 
 	@Bean

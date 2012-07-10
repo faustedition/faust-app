@@ -1,13 +1,14 @@
 package de.faustedition.transcript;
 
-import static de.faustedition.xml.CustomNamespaceMap.FAUST_NS_PREFIX;
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_PREFIX;
+import static de.faustedition.xml.Namespaces.FAUST_NS_PREFIX;
+import static de.faustedition.xml.Namespaces.TEI_NS_PREFIX;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import de.faustedition.xml.Namespaces;
 import org.goddag4j.Element;
 import org.goddag4j.Text;
 import org.goddag4j.visit.GoddagVisitor;
@@ -16,16 +17,15 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
 import de.faustedition.FaustURI;
-import de.faustedition.xml.CustomNamespaceMap;
 
-public class DocumentaryTranscript extends Transcript {
+public class DocumentaryGoddagTranscript extends GoddagTranscript {
 
-	public DocumentaryTranscript(Node node) {
+	public DocumentaryGoddagTranscript(Node node) {
 		super(node);
 	}
 
-	public DocumentaryTranscript(GraphDatabaseService db, FaustURI source, Element root, SortedSet<FaustURI> facsimileReferences) {
-		super(db, Type.DOCUMENTARY, source, root);
+	public DocumentaryGoddagTranscript(GraphDatabaseService db, FaustURI source, Element root, SortedSet<FaustURI> facsimileReferences) {
+		super(db, TranscriptType.DOCUMENTARY, source, root);
 		setFacsimileReferences(facsimileReferences);
 	}
 
@@ -48,7 +48,7 @@ public class DocumentaryTranscript extends Transcript {
 
 	@Override
 	public Element getDefaultRoot() {
-		return getTrees().getRoot(CustomNamespaceMap.TEI_SIG_GE_PREFIX, "document");
+		return getTrees().getRoot(Namespaces.TEI_SIG_GE_PREFIX, "document");
 	}
 
 	public void postprocess() {

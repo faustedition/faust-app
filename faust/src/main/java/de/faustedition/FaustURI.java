@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Deque;
 
 import com.google.common.base.Preconditions;
+import com.google.common.io.Files;
 
 public class FaustURI implements Comparable<FaustURI> {
 	public static final String FAUST_SCHEME = "faust";
@@ -44,6 +45,14 @@ public class FaustURI implements Comparable<FaustURI> {
 
 	public String getPath() {
 		return uri.getPath();
+	}
+
+	public String getFilename() {
+		final String path = getPath();
+		final String filename = path.substring(path.lastIndexOf('/') + 1);
+
+		final int lastDot = filename.lastIndexOf(".");
+		return (lastDot > 0 ? filename.substring(0, lastDot) : filename);
 	}
 
 	@Override

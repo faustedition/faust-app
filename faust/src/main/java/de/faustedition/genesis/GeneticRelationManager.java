@@ -8,8 +8,8 @@ import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.text.Text;
-import de.faustedition.transcript.Transcript;
-import de.faustedition.transcript.Transcript.Type;
+import de.faustedition.transcript.GoddagTranscript;
+import de.faustedition.transcript.TranscriptType;
 import org.goddag4j.Element;
 import org.goddag4j.GoddagNode;
 import org.goddag4j.GoddagTreeNode;
@@ -57,8 +57,8 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 		Transaction tx = db.beginTx();
 		try {
 			final SortedMap<Integer, Element> textLineIndex = textLineIndex();
-			for (Transcript t : graph.getTranscripts()) {
-				if (t.getType() != Type.TEXTUAL || !t.getSource().isTextEncodingDocument()) {
+			for (GoddagTranscript t : graph.getTranscripts()) {
+				if (t.getType() != TranscriptType.TEXTUAL || !t.getSource().isTextEncodingDocument()) {
 					continue;
 				}
 
@@ -75,6 +75,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 									final Element target = textLineIndex.get(lineNumber);
 									if (target != null) {
 										element.node.createRelationshipTo(target.node, GENETIC_REL);
+										
 									}
 								}
 							}
@@ -177,7 +178,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 	public Set<Document> findRelatedDocuments(Element l) {
 		Set<Document> related = new HashSet<Document>();
 		for (Relationship r : l.node.getRelationships(GENETIC_REL)) {
-			final Transcript transcript = Transcript.find((GoddagTreeNode) GoddagNode.wrap(r.getOtherNode(l.node)));
+			final GoddagTranscript transcript = GoddagTranscript.find((GoddagTreeNode) GoddagNode.wrap(r.getOtherNode(l.node)));
 			if (transcript == null) {
 				continue;
 			}

@@ -9,7 +9,8 @@ table, td, th, tr { border: 0 }
 
 #header { margin-bottom: 1em;}
 #header a { font-weight: normal;  }
-#header #search-form { text-align: right; margin: 1em 0; font-size: 138.5%; }
+#header #quick-search { margin: 0; font-size: 138.1%; width: 20em }
+
 
 #footer { margin-top: 2em; font-size: smaller; text-align: center; }
 
@@ -117,4 +118,38 @@ a.edit-permissions {
   background: url(../img/wrench.png) no-repeat;
   padding-left: 1.5em;
   background-size: contain;  	
+}
+
+/* Hide overlay markup while loading, if js is enabled */
+.yui3-js-enabled .yui3-overlay-loading {
+    top: -1000em;
+    left: -1000em;
+    position: absolute;
+}
+/* Overlay Look/Feel */
+.yui3-overlay-content {
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: 3px;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.25);
+}
+
+.yui3-overlay-content .yui3-widget-hd {
+    background-color: #eee;
+    color: #000;
+    font-size: 120%;
+    font-weight: bold;
+    padding: 0.2em 0.5em 0.3em;
+    border-radius: 2px 2px 0 0;
+}
+
+.yui3-overlay-content .yui3-widget-bd {
+    padding: 0.4em 0.6em 0.5em;
+    overflow: auto;
+}
+
+.yui3-overlay-content .yui3-widget-ft {
+    background-color:#eee;
+    padding: 0.4em 0.6em 0.5em;
+    border-radius: 0 0 2px 2px;
 }

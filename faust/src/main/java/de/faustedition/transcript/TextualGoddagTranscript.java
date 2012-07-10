@@ -1,6 +1,6 @@
 package de.faustedition.transcript;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_PREFIX;
+import static de.faustedition.xml.Namespaces.TEI_NS_PREFIX;
 
 import org.goddag4j.Element;
 import org.goddag4j.token.LineTokenMarkupGenerator;
@@ -10,14 +10,14 @@ import org.neo4j.graphdb.Node;
 import de.faustedition.FaustURI;
 import de.faustedition.graph.TokenizerUtil;
 
-public class TextualTranscript extends Transcript {
+public class TextualGoddagTranscript extends GoddagTranscript {
 
-	public TextualTranscript(Node node) {
+	public TextualGoddagTranscript(Node node) {
 		super(node);
 	}
 
-	public TextualTranscript(GraphDatabaseService db, FaustURI source, Element root) {
-		super(db, Type.TEXTUAL, source, root);
+	public TextualGoddagTranscript(GraphDatabaseService db, FaustURI source, Element root) {
+		super(db, TranscriptType.TEXTUAL, source, root);
 	}
 
 	public void postprocess() {

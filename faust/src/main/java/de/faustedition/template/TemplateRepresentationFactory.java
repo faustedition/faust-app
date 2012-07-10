@@ -9,9 +9,9 @@ import de.faustedition.text.TextManager;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.restlet.data.*;
-import org.restlet.engine.util.ConnegUtils;
 import org.restlet.ext.freemarker.TemplateRepresentation;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +20,8 @@ import java.util.*;
 
 @Component
 public class TemplateRepresentationFactory {
+	private static final Logger LOG = LoggerFactory.getLogger(TemplateRepresentationFactory.class);
+
 	private static final List<Language> SUPPORTED_LANGUAGES = Collections.unmodifiableList(//
 			Lists.newArrayList(new Language("de"), new Language("en")));
 
@@ -29,20 +31,20 @@ public class TemplateRepresentationFactory {
 	@Autowired
 	private TextManager textManager;
 
-	@Autowired
-	private Logger logger;
-
 	public TemplateRepresentation create(String path, ClientInfo client) throws IOException {
 		return create(path, client, new HashMap<String, Object>());
 	}
 
 	public TemplateRepresentation create(String path, ClientInfo client, Map<String, Object> model) {
-		final Language language = getPreferredMetadata(SUPPORTED_LANGUAGES, client.getAcceptedLanguages());
+		path = path.replaceAll("^/+" ,"").replaceAll("/+$", "");
+		final Language language = client.getPreferredLanguage(SUPPORTED_LANGUAGES);
 		final Locale locale = (language == null ? Locale.GERMAN : new Locale(language.getName()));
 
 		Template template;
 		try {
-			logger.debug("Getting template for " + path + " with locale " + locale);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Getting template for '{}' (locale: '{}')", path, locale);
+			}
 			template = configuration.getTemplate(path + ".ftl", locale);
 			Preconditions.checkNotNull(template, "Cannot find template for " + path);
 		} catch (IOException e) {
@@ -52,7 +54,9 @@ public class TemplateRepresentationFactory {
 		model.put("roles", Lists.transform(client.getRoles(), Functions.toStringFunction()));
 		
 		final ResourceBundle messages = ResourceBundle.getBundle("messages", locale);
-		logger.debug("Putting message resource bundle '" + messages.getLocale() + "' into model (requested locale " + locale + ")");
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("Putting message resource bundle '{}' into model (requested locale '{}')", messages.getLocale(), locale);
+		}
 		model.put("message", messages);
 
 		final SortedMap<String, String> textTableOfContents = new TreeMap<String, String>();
@@ -85,28 +89,5 @@ public class TemplateRepresentationFactory {
 		public String getTitle() {
 			return title;
 		}
-	}
-
-	/**
-	 * Copied from {@link ConnegUtils#getPreferredMetadata(List, List)} and
-	 * patched to correctly update <code>maxQuality</code>.
-	 * 
-	 * @see ConnegUtils#getPreferredMetadata(List, List)
-	 */
-	private static <T extends Metadata> T getPreferredMetadata(List<T> supported, List<Preference<T>> preferences) {
-		T result = null;
-		float maxQuality = 0;
-
-		if (supported != null) {
-			for (Preference<T> pref : preferences) {
-				if (supported.contains(pref.getMetadata()) && (pref.getQuality() > maxQuality)) {
-					result = pref.getMetadata();
-					// was not updated in original method
-					maxQuality = pref.getQuality();
-				}
-			}
-		}
-
-		return result;
 	}
 }

@@ -9,24 +9,22 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
+import de.faustedition.xml.Namespaces;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.restlet.data.MediaType;
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.google.common.base.Throwables;
 
-import de.faustedition.xml.CustomNamespaceMap;
 import de.faustedition.xml.XPathUtil;
 
 /**
@@ -61,19 +59,19 @@ public class XMLDocumentImageLinker {
 	/** Insert a new URI in the transcript **/
 	public static void insertLinkURI (org.w3c.dom.Document xml, URI linkDataURI) throws XPathExpressionException {
 			
-			final Node teiHeader = xml.getElementsByTagNameNS(CustomNamespaceMap.TEI_NS_URI, "teiHeader").item(0);
-			final NodeList facsimiles = xml.getElementsByTagNameNS(CustomNamespaceMap.TEI_NS_URI, "facsimile");
+			final Node teiHeader = xml.getElementsByTagNameNS(Namespaces.TEI_NS_URI, "teiHeader").item(0);
+			final NodeList facsimiles = xml.getElementsByTagNameNS(Namespaces.TEI_NS_URI, "facsimile");
 			Node facsimile;
 			if (facsimiles.getLength() > 0)
 				facsimile = facsimiles.item(0);			
 			else { 
-				facsimile = xml.createElementNS(CustomNamespaceMap.TEI_NS_URI, "facsimile");
+				facsimile = xml.createElementNS(Namespaces.TEI_NS_URI, "facsimile");
 				teiHeader.getParentNode().insertBefore(teiHeader.getNextSibling(), facsimile);
 			}
 //			Node lastGraphic = (Node)(XPathUtil.xpath("/tei:TEI/tei:facsimile/tei:graphic[last()]")
 //					.evaluate(xml, XPathConstants.NODE));
 			
-			final Node graphic = xml.createElementNS(CustomNamespaceMap.TEI_NS_URI, "graphic");
+			final Node graphic = xml.createElementNS(Namespaces.TEI_NS_URI, "graphic");
 			
 			Attr mimeType = xml.createAttribute("mimeType");
 			mimeType.setNodeValue(MediaType.IMAGE_SVG.getName());

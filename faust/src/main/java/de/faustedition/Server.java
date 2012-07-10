@@ -1,8 +1,8 @@
 package de.faustedition;
 
 import com.google.common.collect.Iterables;
-import de.faustedition.tei.TeiEncodingReporter;
 import de.faustedition.tei.TeiValidator;
+import de.faustedition.transcript.TranscriptBatchReader;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 import org.restlet.util.ClientList;
@@ -31,7 +31,7 @@ public class Server extends Runtime implements Runnable, InitializingBean {
 	private TeiValidator validator;
 
 	@Autowired
-	private TeiEncodingReporter encodingReporter;
+	private TranscriptBatchReader transcriptBatchReader;
 
 	private String contextPath;
 
@@ -49,7 +49,7 @@ public class Server extends Runtime implements Runnable, InitializingBean {
 		try {
 			logger.info("Starting Faust-Edition with profiles " + Iterables.toString(Arrays.asList(environment.getActiveProfiles())));
 
-			schedulePeriodicTasks();
+			scheduleTasks();
 			startWebserver();
 
 		} catch (Exception e) {
@@ -58,12 +58,14 @@ public class Server extends Runtime implements Runnable, InitializingBean {
 		}
 	}
 
-	private void schedulePeriodicTasks() throws Exception {
+	private void scheduleTasks() throws Exception {
 		final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-		for (Runnable task : new Runnable[] { validator, encodingReporter }) {
-			logger.info("Scheduling " + task + " for daily execution; starting in one hour from now");			
-			executor.scheduleAtFixedRate(task, 1, 24, TimeUnit.HOURS);
-		}
+
+		logger.info("Scheduling TEI P5 encoding validator for daily execution; starting in one hour from now");
+		executor.scheduleAtFixedRate(validator, 1, 24, TimeUnit.HOURS);
+
+		logger.info("Scheduling transcript batch reader for hourly execution; starting in one hour now");
+		executor.scheduleAtFixedRate(transcriptBatchReader, 1, 1, TimeUnit.HOURS);
 	}
 
 	private void startWebserver() throws Exception {

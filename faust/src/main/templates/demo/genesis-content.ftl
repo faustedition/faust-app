@@ -32,7 +32,7 @@
 				{ url: "faust/2/gsa_391098.xml#417", interval: [11563, 11586] },
 				{ url: "faust/2/gsa_391098.xml#418", interval: [11587, 11593] },
 				{ url: "faust/2/gsa_391098.xml#419", interval: [11594, 11619] }
-				] },
+				] }
 		];
 		data.reverse();
 		

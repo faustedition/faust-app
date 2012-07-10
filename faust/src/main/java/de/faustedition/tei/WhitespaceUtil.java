@@ -1,8 +1,8 @@
 package de.faustedition.tei;
 
-import static de.faustedition.xml.CustomNamespaceMap.FAUST_NS_URI;
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
-import static de.faustedition.xml.CustomNamespaceMap.TEI_SIG_GE_URI;
+import static de.faustedition.xml.Namespaces.FAUST_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_SIG_GE_URI;
 
 import java.util.HashMap;
 import java.util.Map;

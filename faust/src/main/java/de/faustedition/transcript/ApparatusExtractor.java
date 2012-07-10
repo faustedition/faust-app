@@ -1,10 +1,11 @@
 package de.faustedition.transcript;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_PREFIX;
+import static de.faustedition.xml.Namespaces.TEI_NS_PREFIX;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.faustedition.xml.Namespaces;
 import org.goddag4j.Element;
 import org.goddag4j.GoddagNode;
 import org.goddag4j.visit.GoddagVisitor;
@@ -13,16 +14,14 @@ import org.neo4j.graphdb.Transaction;
 
 import com.google.common.collect.Lists;
 
-import de.faustedition.xml.CustomNamespaceMap;
-
 public class ApparatusExtractor {
 
-	public void extract(Transcript transcript) {
+	public void extract(GoddagTranscript transcript) {
 		final GraphDatabaseService db = transcript.node.getGraphDatabase();
 		final Transaction tx = db.beginTx();
 		try {
 			final Element source = transcript.getDefaultRoot();
-			final Element apps = transcript.getTrees().getRoot(CustomNamespaceMap.FAUST_NS_PREFIX, "apps");
+			final Element apps = transcript.getTrees().getRoot(Namespaces.FAUST_NS_PREFIX, "apps");
 			final List<Element> appElements = new ArrayList<Element>();
 			new GoddagVisitor() {
 

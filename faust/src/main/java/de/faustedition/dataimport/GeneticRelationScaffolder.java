@@ -20,7 +20,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static de.faustedition.xml.CustomNamespaceMap.TEI_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
 
 public class GeneticRelationScaffolder extends Runtime implements Runnable {
 
