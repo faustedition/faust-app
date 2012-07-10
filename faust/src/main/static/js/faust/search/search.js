@@ -7,7 +7,10 @@ YUI.add('search', function (Y) {
                 source: cp + "/search/{query}",
                 resultListLocator: "documents",
                 resultTextLocator: function(document) {
-                    return Y.Array.map(document.waIds.concat(document.callnumbers), function(id) {
+                	uri_parts = Y.Array.map(document.uris, function(uri) {
+                		return uri.substring("faust://document/".length);
+                	});
+                    return Y.Array.map(document.waIds.concat(document.callnumbers.concat(uri_parts)), function(id) {
                         return "<" + id + ">"
                     }).join("; ");
                 },
