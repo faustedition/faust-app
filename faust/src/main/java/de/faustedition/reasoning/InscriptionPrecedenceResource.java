@@ -69,7 +69,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 			@Override
 			public String apply(@Nullable TranscribedVerseInterval input) {
 				final Node materialUnitNode = graphDb.getNodeById(input.getTranscript().getMaterialUnitId());
-				final String sigil = MaterialUnit.forNode(materialUnitNode).toString() + "_" + materialUnitNode.getId();
+				final String sigil = MaterialUnit.forNode(materialUnitNode).toString(); // + "_" + materialUnitNode.getId();
 				return sigil;
 			}
 		});
