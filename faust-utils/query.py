@@ -199,14 +199,22 @@ if __name__ == "__main__":
 # ==== ARCHIVAL UNITS ====
 
 
-	arch_units = matches(faust.files_in('document/'), '//f:materialUnit[@type="archival_unit"]')
-	# xml = lxml.etree.parse(file)
-	# return faust.xpath(xpath)(xml)
+	# arch_units = matches(faust.files_in('document/'), '//f:materialUnit[@type="archival_unit"]')
+	# # xml = lxml.etree.parse(file)
+	# # return faust.xpath(xpath)(xml)
 
 
-	pgs = matches(faust.files_in('document/'), '//f:materialUnit')
+	# pgs = matches(faust.files_in('document/'), '//f:materialUnit')
 	
-	print len(arch_units)
-	# print len(pgs)
+	# print len(arch_units)
+	# # print len(pgs)
 	
 # =========
+
+# ==== look for lines with soon, then instant revision ====
+	for (file, matches) in list_matches(faust.transcript_files(), '//tei:p[./descendant::*[@f:revType="soon"]/following-sibling::*[@f:revType="instant"]]'):
+		if matches:
+			print file
+			# for match in matches:
+				# print " " + str(match)
+			
