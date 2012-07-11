@@ -9,9 +9,14 @@ import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
+
+import de.faustedition.FaustURI;
 import de.faustedition.VerseInterval;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
+import de.faustedition.genesis.GeneticSource;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.reasoning.PremiseBasedRelation.Premise;
 import de.faustedition.transcript.TranscribedVerseInterval;
 import edu.bath.transitivityutils.ImmutableRelation;
 import edu.bath.transitivityutils.Relation;
@@ -37,8 +42,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -58,13 +67,18 @@ public class InscriptionPrecedenceResource extends ServerResource {
 
 	@Autowired
 	private Environment environment;
+	
+	@Autowired
+	private FaustGraph faustGraph;
+
+	
+	final private Map<Inscription, Node> nodeMap = new HashMap<Inscription, Node>();
 
 	@Override
 	protected void doInit() throws ResourceException {
 		super.doInit();
 
 		final VerseInterval verseInterval = VerseInterval.fromRequestAttibutes(getRequestAttributes());
-		final Map<Inscription, Node> nodeMap = new HashMap<Inscription, Node>();
 		final Multimap<String, TranscribedVerseInterval> intervalIndex = Multimaps.index(TranscribedVerseInterval.forInterval(sessionFactory.getCurrentSession(), verseInterval), new Function<TranscribedVerseInterval, String>() {		
 			@Override
 			public String apply(@Nullable TranscribedVerseInterval input) {
@@ -72,6 +86,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 				final String sigil = MaterialUnit.forNode(materialUnitNode).toString(); // + "_" + materialUnitNode.getId();
 				return sigil;
 			}
+
 		});
 
 		inscriptions = Sets.newHashSet();
@@ -98,15 +113,17 @@ public class InscriptionPrecedenceResource extends ServerResource {
 				if (InscriptionRelations.paradigmaticallyContains(subject, object)) {
 					paradigmaticContainment.relate(subject, object);
 				}
-				Document subjectDoc = (Document)(Document.forNode(nodeMap.get(subject)));
-				Document objectDoc = (Document)(Document.forNode(nodeMap.get(object)));
 				
-				//TODO efficiency (this is cubic)
-				if (subjectDoc.geneticallyRelatedTo().contains(objectDoc)) {
-					explicitPrecedence.relate(subject, object);
-				}
 			}
 		}
+		try {
+			explicitPrecedence = new GraphBasedRelation<Inscription>(nodeMap, new FaustURI(new URI("faust://secondary/gruss2011")));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		precedence = new PremiseBasedRelation<Inscription> (premisesFromGeneticSources());
 	}
 
 	public Representation dot() {
@@ -219,56 +236,78 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	private Relation<Inscription> syntagmaticPrecedence = Relations.newTransitiveRelation();
 	private Relation<Inscription> exclusiveContainment = MultimapBasedRelation.create();
 	private Relation<Inscription> paradigmaticContainment = MultimapBasedRelation.create();
-	private Relation<Inscription> explicitPrecedence = MultimapBasedRelation.create();
+	private ImmutableRelation<Inscription> explicitPrecedence;
 	
 
-	@SuppressWarnings("unchecked")
-	public PremiseBasedRelation<Inscription> precedence = new PremiseBasedRelation<Inscription>(
-		new PremiseBasedRelation.Premise<Inscription>() {
-			@Override
-			public String getName() {
-				return "r_exp";
-			}
-			
-			@Override
-			public boolean applies(Inscription i, Inscription j) {
-				return explicitPrecedence.areRelated(i, j);
-			}
-		},	
-		new PremiseBasedRelation.Premise<Inscription>() {
-			@Override
-			public String getName() {
-				return "r_econ";
-			}
-
-			@Override
-			public boolean applies(Inscription i, Inscription j) {
-				return exclusiveContainment.areRelated(i, j);
-			}
-		},
-		new PremiseBasedRelation.Premise<Inscription>() {
-			@Override
-			public String getName() {
-				return "r_pcon";
-			}
-
-			@Override
-			public boolean applies(Inscription i, Inscription j) {
-				return paradigmaticContainment.areRelated(j, i);
-			}
-		},
-		new PremiseBasedRelation.Premise<Inscription>() {
-			@Override
-			public String getName() {
-				return "r_syn";
-			}
-
-			@Override
-			public boolean applies(Inscription i, Inscription j) {
-				return syntagmaticPrecedence.areRelated(i, j);
-			}
+	private List<Premise<Inscription>> premisesFromGeneticSources() {
+		List<Premise<Inscription>> result = new ArrayList<Premise<Inscription>>();
+		for (final GeneticSource geneticSource : faustGraph.getGeneticSources()) {
+			final GraphBasedRelation<Inscription> gbr = new GraphBasedRelation<Inscription>(nodeMap, geneticSource.getUri());
+			Premise<Inscription> premise = new Premise<Inscription>() {
+				@Override
+				public String getName() {
+					return geneticSource.getUri().toString().substring("faust://secondary/".length()).replaceAll("[:/]", "_");
+				}
+				public boolean applies(Inscription i, Inscription j) {
+					
+					return gbr.areRelated(i, j);				
+				}	
+			};
+			result.add(premise);
 		}
-	);
+		return result;
+	}
+	
+//	@SuppressWarnings("unchecked")
+//	public PremiseBasedRelation<Inscription> precedence = new PremiseBasedRelation<Inscription>(
+//		new PremiseBasedRelation.Premise<Inscription>() {
+//			@Override
+//			public String getName() {
+//				return "r_exp";
+//			}
+//			
+//			@Override
+//			public boolean applies(Inscription i, Inscription j) {
+//				return explicitPrecedence.areRelated(i, j);
+//			}
+//		},	
+//		new PremiseBasedRelation.Premise<Inscription>() {
+//			@Override
+//			public String getName() {
+//				return "r_econ";
+//			}
+//
+//			@Override
+//			public boolean applies(Inscription i, Inscription j) {
+//				return exclusiveContainment.areRelated(i, j);
+//			}
+//		},
+//		new PremiseBasedRelation.Premise<Inscription>() {
+//			@Override
+//			public String getName() {
+//				return "r_pcon";
+//			}
+//
+//			@Override
+//			public boolean applies(Inscription i, Inscription j) {
+//				return paradigmaticContainment.areRelated(j, i);
+//			}
+//		},
+//		new PremiseBasedRelation.Premise<Inscription>() {
+//			@Override
+//			public String getName() {
+//				return "r_syn";
+//			}
+//
+//			@Override
+//			public boolean applies(Inscription i, Inscription j) {
+//				return syntagmaticPrecedence.areRelated(i, j);
+//			}
+//		}
+//	);
+	
+	public PremiseBasedRelation<Inscription> precedence; 
+	
 
 	/**
 	 * @param relA

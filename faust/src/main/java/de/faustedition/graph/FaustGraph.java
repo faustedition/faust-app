@@ -2,6 +2,7 @@ package de.faustedition.graph;
 
 import de.faustedition.document.ArchiveCollection;
 import de.faustedition.document.MaterialUnitCollection;
+import de.faustedition.genesis.GeneticSourceCollection;
 import de.faustedition.text.TextCollection;
 import de.faustedition.transcript.GoddagTranscriptCollection;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -24,6 +25,7 @@ public class FaustGraph {
 	private static final String MATERIAL_UNITS_ROOT_NAME = PREFIX + ".material-units";
 	private static final String TRANSCRIPTS_ROOT_NAME = PREFIX + ".transcripts";
 	private static final String TEXTS_ROOT_NAME = PREFIX + ".texts";
+	private static final String GENETIC_SOURCES_ROOT_NAME = PREFIX + ".genetic-sources";
 
 	@Autowired
 	private GraphDatabaseService db;
@@ -48,6 +50,11 @@ public class FaustGraph {
 		return new TextCollection(root(TEXTS_ROOT_NAME));
 	}
 
+	public GeneticSourceCollection getGeneticSources() {
+		return new GeneticSourceCollection(root(GENETIC_SOURCES_ROOT_NAME));
+	}
+
+	
 	protected Node root(String rootName) {
 		final Node referenceNode = db.getReferenceNode();
 		for (Relationship r : referenceNode.getRelationships(ROOT_RT, OUTGOING)) {

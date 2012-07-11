@@ -3,6 +3,7 @@ package de.faustedition.genesis;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
+import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.search.SearchResource;
 import de.faustedition.xml.Namespaces;
@@ -22,6 +23,7 @@ import com.google.common.base.Objects;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,14 +39,14 @@ public class MacrogeneticRelationManager {
 	public static final FaustURI MACROGENETIC_URI = new FaustURI(FaustAuthority.XML, "/genesis/");
 	
 	public static final String SOURCE_PROPERTY = "source";
-	public static final String GENETIC_SOURCE_PROPERTY = "genetic-source";
-	
-
 	@Autowired
 	private XMLStorage xml;
 
 	@Autowired
 	private GraphDatabaseService db;
+	
+	@Autowired
+	private FaustGraph faustGraph;
 
 	@Autowired
 	private Logger logger;
@@ -65,6 +67,9 @@ public class MacrogeneticRelationManager {
                 failed.add(macrogeneticFile);
             }
 		}
+		logger.debug("Found genetic sources: ");
+		for (GeneticSource gs :faustGraph.getGeneticSources())
+			logger.debug(gs.getUri().toString());
 		return failed;
 	};
 
@@ -93,8 +98,8 @@ public class MacrogeneticRelationManager {
 		
         logger.debug("Adding: " + r.from + " ---" + r.type.name() + "---> " + r.to);
         Relationship rel =  from.node.createRelationshipTo(to.node, r.type);
-        rel.setProperty(SOURCE_PROPERTY, source);
-        rel.setProperty(GENETIC_SOURCE_PROPERTY, geneticSource);		
+        rel.setProperty(SOURCE_PROPERTY, source.toString());
+        rel.setProperty(Document.GENETIC_SOURCE_PROPERTY, geneticSource.toString());		
 	}
 
 	private class MGRelationship {
@@ -114,7 +119,8 @@ public class MacrogeneticRelationManager {
 		XMLUtil.saxParser().parse(xml.getInputSource(source), new DefaultHandler() {
 
 			private MGRelationship relationship = null;
-			private ArrayList<FaustURI> geneticSources = new ArrayList<FaustURI>();
+			private GeneticSourceCollection geneticSources = faustGraph.getGeneticSources();
+			private ArrayList<FaustURI> geneticSourceURIs = new ArrayList<FaustURI>();
 			
 
 			@Override
@@ -122,7 +128,7 @@ public class MacrogeneticRelationManager {
 			throws SAXException {
 
 				if 	("relation".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
-					geneticSources.clear();
+					geneticSourceURIs.clear();
 					FaustRelationshipType type;
 					if("temp-pre".equals(attributes.getValue("name"))) {
 						type = TEMP_PRE_REL;
@@ -135,28 +141,55 @@ public class MacrogeneticRelationManager {
 				} else if ("item".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
 					String itemURI = attributes.getValue("uri");
 					if (relationship != null) {
-						try {
+						
 							if (relationship.from == null) {
-								relationship.from = new FaustURI(new URI(itemURI));
+								try {
+									relationship.from = new FaustURI(new URI(itemURI));
+								} catch (URISyntaxException e) {
+									logger.warn("Invalid URI '" + itemURI);
+								} catch (IllegalArgumentException e) {
+									logger.warn("Invalid Faust URI " + itemURI);
+								} 
+								
 							} else {
-								relationship.to = new FaustURI(new URI(itemURI));
+								
+								try {
+									relationship.to = new FaustURI(new URI(itemURI));
+								} catch (URISyntaxException e) {
+									logger.warn("Invalid URI '" + itemURI);
+								} catch (IllegalArgumentException e) {
+									logger.warn("Invalid Faust URI " + itemURI);
+								}
+
 								logger.debug("Parsed: " + relationship.from + " ---" + relationship.type.name() + "---> " + relationship.to);
 								
-								for (FaustURI geneticSource: geneticSources) 
-									setRelationship(relationship, source, geneticSource);
+								for (FaustURI geneticSourceURI: geneticSourceURIs) {
+									setRelationship(relationship, source, geneticSourceURI);
+								}
 								//relationships.add(relationship);
-								relationship = new MGRelationship(new FaustURI(new URI(itemURI)), null, relationship.type);						
+								relationship = new MGRelationship(relationship.to, null, relationship.type);						
 							}	
-						} catch (Exception e) {
-							logger.warn("Invalid URI '" + itemURI);
 						}
-					}	
 				} else if ("source".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
 					String sourceURI = attributes.getValue("uri");
-					try {
-						geneticSources.add(new FaustURI(new URI(sourceURI)));
-					} catch (Exception e) {
-						logger.warn("Invalid URI '" + sourceURI);
+					if (sourceURI != null) {
+						try {
+							boolean registered = false;
+							for (GeneticSource geneticSource : geneticSources) {
+								String registeredURI = geneticSource.getUri().toString();
+								if (registeredURI.equals(sourceURI)) {
+									registered = true;
+									break;
+								}
+							}
+							if (!registered)
+								geneticSources.add(new GeneticSource(db, new FaustURI(new URI(sourceURI))));
+							geneticSourceURIs.add(new FaustURI(new URI(sourceURI)));
+						} catch (URISyntaxException e) {
+							logger.warn("Invalid URI '" + sourceURI);
+						} catch (IllegalArgumentException e) {
+							logger.warn("Invalid Faust URI " + sourceURI);
+						}
 					}
 				}	
 
