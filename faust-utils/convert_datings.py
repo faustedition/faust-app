@@ -95,12 +95,12 @@ for row in csvreader:
 					print '      %s%s%s' %  ('<item uri="', id, '"/>')
 					print '   </relation>'
 				elif (string.find(rel.lower(), 'mit') == 0):
-					print_rel_header ("sync")
+					print_rel_header ("temp-syn")
 					print '      %s%s%s' %  ('<item uri="', id, '"/>')
 					print '      %s%s%s' %  ('<item uri="', string.strip(rel[4:]), '"/>')
 					print '   </relation>'
 				elif (string.find(rel.lower(), 'um') == 0):
-					print_rel_header ("about")
+					print_rel_header ("temp-about")
 					print '      %s%s%s' %  ('<item uri="', id, '"/>')
 					print '      %s%s%s' %  ('<item uri="', string.strip(rel[2:]), '"/>')
 					print '   </relation>'

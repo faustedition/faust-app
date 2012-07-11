@@ -246,7 +246,11 @@ public class InscriptionPrecedenceResource extends ServerResource {
 			Premise<Inscription> premise = new Premise<Inscription>() {
 				@Override
 				public String getName() {
+					try {
 					return geneticSource.getUri().toString().substring("faust://secondary/".length()).replaceAll("[:/]", "_");
+					} catch (Exception e) {
+						return geneticSource.getUri().toString().replaceAll("[:/]", "_");
+					}
 				}
 				public boolean applies(Inscription i, Inscription j) {
 					
