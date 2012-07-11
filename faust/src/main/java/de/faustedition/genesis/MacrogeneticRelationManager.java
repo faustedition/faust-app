@@ -135,7 +135,8 @@ public class MacrogeneticRelationManager {
 					} else if("temp-syn".equals(attributes.getValue("name"))) {
 						type = TEMP_SYN_REL;
 					}  else {
-						throw new SAXException("The relation " + attributes.getValue("name") + " is unknown.");
+						logger.warn("The relation " + attributes.getValue("name") + " is unknown.");
+						type = null;
 					}
 					this.relationship = new MGRelationship(null, null, type);
 				} else if ("item".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
@@ -161,13 +162,17 @@ public class MacrogeneticRelationManager {
 									logger.warn("Invalid Faust URI " + itemURI);
 								}
 
-								logger.debug("Parsed: " + relationship.from + " ---" + relationship.type.name() + "---> " + relationship.to);
-								
-								for (FaustURI geneticSourceURI: geneticSourceURIs) {
-									setRelationship(relationship, source, geneticSourceURI);
+								if (relationship.to != null && relationship.type != null) {
+									logger.debug("Parsed: " + relationship.from + " ---" + relationship.type.name() + "---> " + relationship.to);
+
+									for (FaustURI geneticSourceURI: geneticSourceURIs) {
+										setRelationship(relationship, source, geneticSourceURI);
+									}
+									//relationships.add(relationship);
+									relationship = new MGRelationship(relationship.to, null, relationship.type);
 								}
-								//relationships.add(relationship);
-								relationship = new MGRelationship(relationship.to, null, relationship.type);						
+								
+
 							}	
 						}
 				} else if ("source".equals(localName) && Namespaces.FAUST_NS_URI.equals(uri)) {
