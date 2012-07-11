@@ -70,7 +70,7 @@ public class SearchResource extends ServerResource {
 			documentDesc.put("id", document.node.getId());
 			documentDesc.put("callnumbers", toSortedValues(document.getMetadata("callnumber")));
 			documentDesc.put("waIds", toSortedValues(document.getMetadata("wa-id")));
-			documentDesc.put("uri", toSortedValues(document.getMetadata("uri")));			
+			documentDesc.put("uris", toSortedValues(document.getMetadata("uri")));		
 			documentDescs.add(documentDesc);
 		}
 		return jsonFactory.map(results, false);
@@ -86,5 +86,6 @@ public class SearchResource extends ServerResource {
 
 	private static SortedSet<String> toSortedValues(String[] metadata) {
 		return Sets.newTreeSet(Arrays.asList(Objects.firstNonNull(metadata, new String[0])));
-	}
+	}	
+	
 }

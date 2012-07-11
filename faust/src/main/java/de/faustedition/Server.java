@@ -65,7 +65,7 @@ public class Server extends Runtime implements Runnable, InitializingBean {
 		executor.scheduleAtFixedRate(validator, 1, 24, TimeUnit.HOURS);
 
 		logger.info("Scheduling transcript batch reader for hourly execution; starting in one hour now");
-		executor.scheduleAtFixedRate(transcriptBatchReader, 1, 1, TimeUnit.HOURS);
+		executor.scheduleAtFixedRate(transcriptBatchReader, 2, 60, TimeUnit.MINUTES);
 	}
 
 	private void startWebserver() throws Exception {

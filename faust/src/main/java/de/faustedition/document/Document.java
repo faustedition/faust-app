@@ -34,10 +34,13 @@ public class Document extends MaterialUnit {
 
 	private static final String SOURCE_KEY = PREFIX + ".source";
 	private static final String URI_KEY = PREFIX + "uri";
+	private static final String URI_PART_KEY = PREFIX + "uri-part";	
 	private static final String CALLNUMBER_KEY = METADATA_PREFIX + "callnumber";
 	private static final String WA_ID_KEY = METADATA_PREFIX + "wa-id";
 
 	private static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("[a-zA-Z0-9]");
+
+	public static final String GENETIC_SOURCE_PROPERTY = "genetic-source";
 
 	public Document(Node node) {
 		super(node);
@@ -56,15 +59,21 @@ public class Document extends MaterialUnit {
 		node.setProperty(SOURCE_KEY, uri.toString());
 	}
 
-	public Set<Document> geneticallyRelatedTo(/*RelationshipType type*/) {
+	/**
+	 * @param geneticSource filter; can be null
+	 * @return
+	 */
+	public Set<Document> geneticallyRelatedTo(FaustURI geneticSource /*, RelationshipType type*/) {
 		RelationshipType type = MacrogeneticRelationManager.TEMP_PRE_REL;
 		final Iterable<Relationship> relationships = node.getRelationships(type, OUTGOING);
 
 		final Set<Document> result = new HashSet<Document>();
 		
 		for (Relationship relationship : relationships) {
-			final Document document = NodeWrapper.newInstance(Document.class, relationship.getEndNode());
-			result.add(document);
+			if (geneticSource != null && relationship.getProperty(GENETIC_SOURCE_PROPERTY).equals(geneticSource.toString())){
+				final Document document = NodeWrapper.newInstance(Document.class, relationship.getEndNode());
+				result.add(document);
+			}
 		}
 			return result;
 	}
@@ -88,6 +97,7 @@ public class Document extends MaterialUnit {
 		final BooleanQuery query = new BooleanQuery();
 		query.add(new WildcardQuery(new Term(CALLNUMBER_KEY, id)), BooleanClause.Occur.SHOULD);
 		query.add(new WildcardQuery(new Term(WA_ID_KEY, id)), BooleanClause.Occur.SHOULD);
+		query.add(new WildcardQuery(new Term(URI_PART_KEY, id)), BooleanClause.Occur.SHOULD);
 
 		return Iterables.transform(
 			db.index().forNodes(PREFIX + "id").query(query),
@@ -99,16 +109,24 @@ public class Document extends MaterialUnit {
 
 		indexManager.forNodes(SOURCE_KEY).add(node, SOURCE_KEY, getSource());
 
+		final Index<Node> idIndex = indexManager.forNodes(PREFIX + "id");
+
 		for (String uri: Objects.firstNonNull(getMetadata("uri"), new String[0])) {
 			try {
 				indexManager.forNodes(URI_KEY).add(node, URI_KEY, new FaustURI(new URI(uri)));
+				try {
+					idIndex.add(node, URI_PART_KEY, uri.substring("faust://document/".length()).toLowerCase());
+				} catch (IndexOutOfBoundsException e) {
+					//do nothing
+				}
+				
 			} catch (URISyntaxException e) {
 				// TODO error logging
                 //logger.error("error!", e);
 			}
 		}		
 		
-		final Index<Node> idIndex = indexManager.forNodes(PREFIX + "id");
+
 		for (String callnumber : Objects.firstNonNull(getMetadata("callnumber"), new String[0])) {
 			idIndex.add(node, CALLNUMBER_KEY, callnumber.toLowerCase());
 		}
