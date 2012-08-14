@@ -7,13 +7,12 @@ import time
 import faust
 from report_encoding_status import count
 
-filename = faust.config.get("log", "encoded")
-
 status_dict, status_unknown = count()
-line = str(time.time()) + "," + str(status_dict["encoded"]) + '\n'
+for (key, filename) in faust.config.items("log-status"):
+    line = str(time.time()) + "," + str(status_dict[key]) + '\n'
+    print "writing to",  filename
+    with open (filename, 'a') as f:
+        f.write(line)
 
-f = open (filename, 'a')
-f.write(line)
-f.close()
 
 
