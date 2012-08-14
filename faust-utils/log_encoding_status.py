@@ -10,9 +10,11 @@ from report_encoding_status import count
 status_dict, status_unknown = count()
 for (key, filename) in faust.config.items("log-status"):
     line = str(time.time()) + "," + str(status_dict[key]) + '\n'
-    print "writing to",  filename
-    with open (filename, 'a') as f:
+    try:
+        f = open (filename, 'a')
         f.write(line)
+    finally:
+        f.close()
 
 
 
