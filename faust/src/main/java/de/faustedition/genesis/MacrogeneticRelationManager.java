@@ -97,9 +97,13 @@ public class MacrogeneticRelationManager {
 		}
 		
         logger.debug("Adding: " + r.from + " ---" + r.type.name() + "---> " + r.to);
-        Relationship rel =  from.node.createRelationshipTo(to.node, r.type);
-        rel.setProperty(SOURCE_PROPERTY, source.toString());
-        rel.setProperty(Document.GENETIC_SOURCE_PROPERTY, geneticSource.toString());		
+        try {
+        	Relationship rel =  from.node.createRelationshipTo(to.node, r.type);
+        	rel.setProperty(SOURCE_PROPERTY, source.toString());
+        	rel.setProperty(Document.GENETIC_SOURCE_PROPERTY, geneticSource.toString());
+        } catch (Exception e) {
+        	logger.warn("Could not create relationship " + r.from + " ---" + r.type.name() + "---> " + r.to + ". Reason: " + e.getMessage());
+        }
 	}
 
 	private class MGRelationship {
@@ -165,9 +169,12 @@ public class MacrogeneticRelationManager {
 								if (relationship.to != null && relationship.type != null) {
 									logger.debug("Parsed: " + relationship.from + " ---" + relationship.type.name() + "---> " + relationship.to);
 
-									for (FaustURI geneticSourceURI: geneticSourceURIs) {
-										setRelationship(relationship, source, geneticSourceURI);
-									}
+//									for (FaustURI geneticSourceURI: geneticSourceURIs) {
+//										setRelationship(relationship, source, geneticSourceURI);
+//									}
+									if (geneticSourceURIs.size() > 0)
+										setRelationship(relationship, source, geneticSourceURIs.get(0));
+										
 									//relationships.add(relationship);
 									relationship = new MGRelationship(relationship.to, null, relationship.type);
 								}

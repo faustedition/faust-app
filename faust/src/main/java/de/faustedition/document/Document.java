@@ -112,18 +112,19 @@ public class Document extends MaterialUnit {
 		final Index<Node> idIndex = indexManager.forNodes(PREFIX + "id");
 
 		for (String uri: Objects.firstNonNull(getMetadata("uri"), new String[0])) {
-			try {
-				indexManager.forNodes(URI_KEY).add(node, URI_KEY, new FaustURI(new URI(uri)));
+
+				try {
+					indexManager.forNodes(URI_KEY).add(node, URI_KEY, new FaustURI(new URI(uri)));
+				} catch (Exception e) {
+					// TODO error logging
+	                //logger.error("error!", e);
+				}
 				try {
 					idIndex.add(node, URI_PART_KEY, uri.substring("faust://document/".length()).toLowerCase());
 				} catch (IndexOutOfBoundsException e) {
 					//do nothing
 				}
 				
-			} catch (URISyntaxException e) {
-				// TODO error logging
-                //logger.error("error!", e);
-			}
 		}		
 		
 

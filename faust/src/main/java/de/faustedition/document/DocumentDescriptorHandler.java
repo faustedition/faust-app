@@ -1,6 +1,7 @@
 package de.faustedition.document;
 
 import de.faustedition.FaustURI;
+import de.faustedition.document.MaterialUnit.Type;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.GoddagTranscriptManager;
 import de.faustedition.transcript.TranscriptType;
@@ -14,6 +15,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.google.common.base.Strings;
 
 import java.io.IOException;
 import java.util.*;
@@ -86,30 +89,20 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			return;
 		}
 
-		if ("materialUnit".equals(localName)) {
+		if ("archivalDocument".equals(localName)) {
 			try {
-				final String typeAttr = attributes.getValue("type");
-				if (typeAttr == null) {
-					throw new SAXException("Encountered <f:materialUnit/> without @type");
-				}
 
-				final MaterialUnit.Type type = MaterialUnit.Type.valueOf(typeAttr.toUpperCase());
-				MaterialUnit unit;
-				switch (type) {
-					case DOCUMENT:
-					case ARCHIVAL_UNIT:
-						unit = new Document(db.createNode(), type, source);
-						break;
-					default:
-						unit = new MaterialUnit(db.createNode(), type);
-				}
+				MaterialUnit unit = new Document(db.createNode(), Type.DOCUMENT, source);
+					//default:
+						//unit = new MaterialUnit(db.createNode(), type);
+				
 
 				unit.setOrder(materialUnitCounter++);
 
 				TranscriptType transcriptType = TranscriptType.DOCUMENTARY;
 				if (materialUnitStack.isEmpty()) {
 					if (!(unit instanceof Document)) {
-						throw new SAXException("Encountered top-level material unit of wrong @type '"+ type + "'");
+						throw new SAXException("Encountered top-level material unit of wrong @type '"+ Type.DOCUMENT + "'");
 					}
 					document = (Document) unit;
 					transcriptType = TranscriptType.TEXTUAL;
@@ -132,6 +125,8 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			inMetadataSection = true;
 			metadata = new HashMap<String, List<String>>();
 		} else if (inMetadataSection && metadataKey == null) {
+			// String type = attributes.getValue("type");
+			// metadataKey = type == null ? localName : localName + "_" + type;
 			metadataKey = localName;
 			metadataValue = new StringBuilder();
 		}
@@ -144,7 +139,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			return;
 		}
 
-		if ("materialUnit".equals(localName)) {
+		if ("archivalDocument".equals(localName)) {
 			materialUnitStack.pop();
 		} else if ("metadata".equals(localName) && !materialUnitStack.isEmpty()) {
 			final MaterialUnit subject = materialUnitStack.peek();
@@ -157,7 +152,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			inMetadataSection = false;
 
 			if (subject instanceof Document) {
-				final String archiveId = subject.getMetadataValue("archive");
+				final String archiveId = subject.getMetadataValue("repository");
 				if (archiveId != null) {
 					final Archive archive = graph.getArchives().findById(archiveId);
 					if (archive == null) {
