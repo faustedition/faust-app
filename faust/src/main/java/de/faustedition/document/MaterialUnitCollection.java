@@ -19,7 +19,7 @@ public class MaterialUnitCollection extends NodeWrapperCollection<MaterialUnit> 
 			protected MaterialUnit underlyingObjectToObject(Node object) {
 				switch (MaterialUnit.getType(object)) {
 				case DOCUMENT:
-				case ARCHIVAL_UNIT:
+				case ARCHIVALDOCUMENT:
 					return new Document(object);
 				default:
 					return new MaterialUnit(object);

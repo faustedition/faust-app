@@ -17,6 +17,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.util.*;
@@ -52,6 +55,24 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 	private String metadataKey;
 	private StringBuilder metadataValue;
 
+	private static final Set<String> materialUnitNames = ImmutableSet.of("archivalDocument",
+			"sheet", "leaf", "disjunctLeaf", "page", "patch", "patchSurface");
+	
+	private static final Map<String, String> legacyNames;
+	static {
+		legacyNames = new HashMap<String, String>();
+		legacyNames.put("idno", "callnumber");
+		legacyNames.put("repository", "archive");
+	}
+	
+	private static final Map<String, String> valueAttribute;
+	static {
+		valueAttribute = new HashMap<String, String>();
+		valueAttribute.put("textTranscript", "uri");
+		valueAttribute.put("docTranscript", "uri");
+	}
+	
+	
 	public Document handle(FaustURI source) throws IOException, SAXException {
 		this.source = source;
 		this.baseTracker = new XMLBaseTracker(source.toString());
@@ -89,13 +110,22 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			return;
 		}
 
-		if ("archivalDocument".equals(localName)) {
+		
+		if (materialUnitNames.contains(localName)) {
 			try {
-
-				MaterialUnit unit = new Document(db.createNode(), Type.DOCUMENT, source);
-					//default:
-						//unit = new MaterialUnit(db.createNode(), type);
 				
+				
+				final MaterialUnit.Type type = MaterialUnit.Type.valueOf(localName.toUpperCase());
+				MaterialUnit unit;
+				switch (type) {
+					case DOCUMENT:
+					case ARCHIVALDOCUMENT:
+						unit = new Document(db.createNode(), type, source);
+						break;
+					default:
+						unit = new MaterialUnit(db.createNode(), type);
+				}
+
 
 				unit.setOrder(materialUnitCounter++);
 
@@ -112,12 +142,6 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 				materialUnitStack.push(unit);
 				materialUnitCollection.add(unit);
 
-				final String transcript = attributes.getValue("transcript");
-				if (transcript != null) {
-					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
-					unit.setTranscriptSource(transcriptSource);
-					unit.setTranscript(transcriptManager.find(transcriptSource, transcriptType));
-				}
 			} catch (IllegalArgumentException e) {
 				throw new SAXException("Encountered invalid @type or @transcript in <f:materialUnit/>", e);
 			}
@@ -127,8 +151,33 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		} else if (inMetadataSection && metadataKey == null) {
 			// String type = attributes.getValue("type");
 			// metadataKey = type == null ? localName : localName + "_" + type;
-			metadataKey = localName;
+			
+			
+			metadataKey = legacyNames.containsKey(localName) ? legacyNames.get(localName) : localName;
 			metadataValue = new StringBuilder();
+			if (valueAttribute.containsKey(localName))
+				metadataValue.append(attributes.getValue(valueAttribute.get(localName)));
+
+			// TODO: transcript uris as regular metadata
+			
+			if (localName == "textTranscript") {
+				final String transcript = metadataValue.toString();
+				if (transcript != null) {
+					final MaterialUnit unit = materialUnitStack.peek();
+					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
+					unit.setTranscriptSource(transcriptSource);
+					unit.setTranscript(transcriptManager.find(transcriptSource, TranscriptType.TEXTUAL));
+				}
+			} else if (localName == "docTranscript") {
+				final String transcript = metadataValue.toString();
+				if (transcript != null) {
+					final MaterialUnit archDoc = materialUnitStack.peekLast();
+					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
+					archDoc.setTranscriptSource(transcriptSource);
+					archDoc.setTranscript(transcriptManager.find(transcriptSource, TranscriptType.TEXTUAL));
+				}
+			}
+
 		}
 	}
 
@@ -152,7 +201,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			inMetadataSection = false;
 
 			if (subject instanceof Document) {
-				final String archiveId = subject.getMetadataValue("repository");
+				final String archiveId = subject.getMetadataValue("archive");
 				if (archiveId != null) {
 					final Archive archive = graph.getArchives().findById(archiveId);
 					if (archive == null) {
