@@ -160,21 +160,15 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 
 			// TODO: transcript uris as regular metadata
 			
-			if (localName == "textTranscript") {
+			if (localName == "textTranscript" || localName == "docTranscript") {
+				TranscriptType type = localName == "textTranscript" ? TranscriptType.TEXTUAL : 
+					TranscriptType.DOCUMENTARY;
 				final String transcript = metadataValue.toString();
 				if (transcript != null) {
 					final MaterialUnit unit = materialUnitStack.peek();
 					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
 					unit.setTranscriptSource(transcriptSource);
-					unit.setTranscript(transcriptManager.find(transcriptSource, TranscriptType.TEXTUAL));
-				}
-			} else if (localName == "docTranscript") {
-				final String transcript = metadataValue.toString();
-				if (transcript != null) {
-					final MaterialUnit archDoc = materialUnitStack.peekLast();
-					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
-					archDoc.setTranscriptSource(transcriptSource);
-					archDoc.setTranscript(transcriptManager.find(transcriptSource, TranscriptType.TEXTUAL));
+					unit.setTranscript(transcriptManager.find(transcriptSource, type));
 				}
 			}
 
@@ -188,7 +182,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			return;
 		}
 
-		if ("archivalDocument".equals(localName)) {
+		if (materialUnitNames.contains(localName)) {
 			materialUnitStack.pop();
 		} else if ("metadata".equals(localName) && !materialUnitStack.isEmpty()) {
 			final MaterialUnit subject = materialUnitStack.peek();

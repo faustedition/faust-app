@@ -45,7 +45,7 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		for (final MaterialUnit mu : graph.getMaterialUnits()) {
-			if (!(mu instanceof Document)) {
+			if ((mu instanceof Document)) {
 				continue;
 			}
 			if (mu.getTranscriptSource() == null) {
