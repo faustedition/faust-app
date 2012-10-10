@@ -56,19 +56,20 @@ public class DocumentResource extends ServerResource {
 				generator.writeStringField("type", unit.getType().name().toLowerCase());
 				generator.writeNumberField("order", unit.getOrder());
 
-				final GoddagTranscript transcript = unit.getTranscript();
-				if (transcript != null) {
+//				final GoddagTranscript transcript = unit.getTranscript();
+				if (unit.getTranscriptSource() != null) {
 					generator.writeObjectFieldStart("transcript");
-					generator.writeStringField("type", transcript.getType().name().toLowerCase());
-					generator.writeStringField("source", transcript.getSource().toString());
-					if (transcript.getType() == TranscriptType.DOCUMENTARY) {
-						DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
-						generator.writeArrayFieldStart("facsimiles");
-						for (FaustURI facsimile : dt.getFacsimileReferences()) {
-							generator.writeString(facsimile.toString());
-						}
-						generator.writeEndArray();
-					}
+//					generator.writeStringField("type", transcript.getType().name().toLowerCase());
+					generator.writeStringField("source", unit.getTranscriptSource().toString());
+					generator.writeNumberField("id", unit.getTranscriptId());
+//					if (transcript.getType() == TranscriptType.DOCUMENTARY) {
+//						DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
+//						generator.writeArrayFieldStart("facsimiles");
+//						for (FaustURI facsimile : dt.getFacsimileReferences()) {
+//							generator.writeString(facsimile.toString());
+//						}
+//						generator.writeEndArray();
+//					}
 					generator.writeEndObject();
 				}
 

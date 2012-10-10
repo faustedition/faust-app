@@ -52,7 +52,7 @@ public class TranscriptSourceResource extends TranscriptResource {
 	protected void doInit() throws ResourceException {
 		super.doInit();
 		try {
-			this.transcript = Transcript.read(sessionFactory.getCurrentSession(), xml, document);
+			this.transcript = Transcript.read(sessionFactory.getCurrentSession(), xml, materialUnit);
 		} catch (XMLStreamException e) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
 		} catch (IOException e) {

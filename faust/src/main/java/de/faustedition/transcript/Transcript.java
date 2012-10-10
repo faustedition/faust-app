@@ -112,6 +112,8 @@ public class Transcript {
 			transcript.setMaterialUnitId(materialUnit.node.getId());
 			transcript.setSourceURI(sourceURI);
 			session.save(transcript);
+			// TODO: put in one transaction
+			materialUnit.setTranscriptId(transcript.getId());			
 		}
 
 		if (transcript.getText() == null) {

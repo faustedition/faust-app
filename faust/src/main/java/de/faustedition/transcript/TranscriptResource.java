@@ -33,16 +33,16 @@ public abstract class TranscriptResource extends ServerResource {
 	@Autowired
 	protected XMLStorage xml;
 
-	protected Document document;
+	protected MaterialUnit materialUnit;
 
 	@Override
 	protected void doInit() throws ResourceException {
 		super.doInit();
 		final String nodeId = Objects.firstNonNull((String) getRequest().getAttributes().get("id"), "-1");
 		try {
-			this.document = (Document) MaterialUnit.forNode(db.getNodeById(Long.parseLong(nodeId)));
-			if (document.getTranscriptSource() == null) {
-				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, document.getSource().toString());
+			this.materialUnit = MaterialUnit.forNode(db.getNodeById(Long.parseLong(nodeId)));
+			if (materialUnit.getTranscriptSource() == null) {
+				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, materialUnit.toString());
 			}
 		} catch (NumberFormatException e) {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e);
