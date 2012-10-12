@@ -1,15 +1,15 @@
 YUI.GlobalConfig = {
     debug: true,
-    combine: true,
-    comboBase: cp + '/resources?',
+    combine: false,
+    //comboBase: cp + '/resources?',
     root: 'yui3/build/',
     groups: {
         faust: {
-            base: cp + '/js/',
-            combine: true,
-            comboBase: cp + '/resources?',
+            base: cp + '/static/js/',
+            combine: false,
+            //comboBase: cp + '/resources?',
             filter: "raw",
-            root: 'js/',
+            root: '/js/',
             modules: {
                 'facsimile': { path: 'faust/facsimile/facsimile.js'},
                 'facsimile-svgpane': { path: 'faust/facsimile/facsimile-svgpane.js' },

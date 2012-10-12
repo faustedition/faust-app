@@ -55,13 +55,12 @@ public class DocumentResource extends ServerResource {
 
 				generator.writeStringField("type", unit.getType().name().toLowerCase());
 				generator.writeNumberField("order", unit.getOrder());
-
+				generator.writeNumberField("id", unit.node.getId());
 //				final GoddagTranscript transcript = unit.getTranscript();
 				if (unit.getTranscriptSource() != null) {
 					generator.writeObjectFieldStart("transcript");
 //					generator.writeStringField("type", transcript.getType().name().toLowerCase());
 					generator.writeStringField("source", unit.getTranscriptSource().toString());
-					generator.writeNumberField("id", unit.getTranscriptId());
 //					if (transcript.getType() == TranscriptType.DOCUMENTARY) {
 //						DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
 //						generator.writeArrayFieldStart("facsimiles");

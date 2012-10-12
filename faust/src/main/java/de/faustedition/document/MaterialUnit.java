@@ -133,14 +133,6 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		node.setProperty(PREFIX + ".transcript", source.toString());
 	}
 	
-	public void setTranscriptId(long id) {
-		node.setProperty(PREFIX + ".transcript-id", id);
-	}
-
-	public long getTranscriptId() {
-		return (Long) node.getProperty(PREFIX + ".transcript-id");
-	}
-	
 	public String getMetadataValue(String key) {
 		final String[] metadata = getMetadata(key);
 		return (metadata == null ? null : metadata[0]);
