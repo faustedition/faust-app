@@ -75,7 +75,7 @@ YUI.add('document-view', function (Y) {
 			Faust.DocumentController.mainZone = null;
 			try {
 				//this.view = Faust.DocumentController.buildVC(null, transcript.root("ge:document"));
-				this.view = Faust.DocumentRanges.buildVC(transcript);
+				this.view = Faust.DocumentRanges.transcriptVC(transcript);
 				var containerElement = document.createElementNS(SVG_NS, "g");
 				containerElement.setAttribute("id", "transcript_container");
 				this.svgRoot.appendChild(containerElement);

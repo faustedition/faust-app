@@ -5,33 +5,46 @@ YUI.add('document-ranges', function (Y) {
 
 	
 	Faust.DocumentRanges = {
-			buildVC: function(text) {
+			
+			
+			transcriptVC: function(jsonRepresentation) {
 
-				var vc = new Faust.Surface();
-				var zone = new Faust.Zone();
-				vc.add(zone);
-				
-				var createText = function(content, node){
+				function textVC(content, node){
 					var textAttrs = {};
-					return new Faust.Text(content, textAttrs);				
+					return new Faust.Text(content, textAttrs);		
 				};
+
 				
+				transcript = Y.Faust.Text.create(jsonRepresentation);
 				
-				Y.Array.each(text.textContent.split("\n"), function(line, n) {
-					var linetext = createText(line);
-					var line = new Faust.Line({});
-					line.add(linetext);
+				var surfaceVC = new Faust.Surface();
+				var zoneVC = new Faust.Zone();
+				surfaceVC.add(zoneVC);
+
+				//for all lines
+				
+				Y.Array.each(transcript.find(null, null, ["line"]), function(line) {				
+					var linetextVC = textVC(line.target().textContent());
+					var lineVC = new Faust.Line({});
 					
-					zone.add(line);					
+					//find the zone of the line
 					
+					var linestart = line.target().range.start;
+					var lineend = line.target().range.end;
+					
+					zones = transcript.find()
+					
+					lineVC.add(linetextVC);
+					zoneVC.add(lineVC);
 				});				
 				
-				return vc;
+
+				return surfaceVC;
 			}
 	};
 	
 }, '0.0', {
-	requires: ["document-model"]
+	requires: ["document-model", "text-annotation"]
 });
 
 
