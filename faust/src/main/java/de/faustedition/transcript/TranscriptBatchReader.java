@@ -1,10 +1,9 @@
 package de.faustedition.transcript;
 
-import de.faustedition.Runtime;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.xml.XMLStorage;
+import java.io.IOException;
+
+import javax.xml.stream.XMLStreamException;
+
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,11 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StopWatch;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
+import de.faustedition.Runtime;
+import de.faustedition.document.Document;
+import de.faustedition.document.MaterialUnit;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.xml.XMLStorage;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -56,7 +58,11 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					try {
 						logger.debug("Reading transcript of {}", mu);
-						Transcript.read(sessionFactory.getCurrentSession(), xml, mu);
+						if (mu instanceof Document) 
+							TextualTranscripts.read(sessionFactory.getCurrentSession(), xml, mu);
+						else
+							DocumentaryTranscripts.read(sessionFactory.getCurrentSession(), xml, mu);
+						
 					} catch (IOException e) {
 						if (logger.isWarnEnabled()) {
 							logger.warn("I/O error while reading transcript from " + mu, e);

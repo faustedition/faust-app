@@ -1,11 +1,5 @@
 package de.faustedition.transcript;
 
-import com.google.common.base.Objects;
-import de.faustedition.FaustURI;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.xml.XMLStorage;
 import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
@@ -14,8 +8,11 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
+import com.google.common.base.Objects;
+
+import de.faustedition.document.MaterialUnit;
+import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.xml.XMLStorage;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
