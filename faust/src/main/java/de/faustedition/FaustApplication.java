@@ -118,8 +118,10 @@ public class FaustApplication extends Application implements InitializingBean {
 		final Restlet inscriptionPrecendence = secured(transactional(contextResource(InscriptionPrecedenceResource.class)));
 		router.attach("genesis/inscriptions/{part}/{act_scene}/{scene}/", inscriptionPrecendence);
 		router.attach("genesis/inscriptions/{part}/{act_scene}/", inscriptionPrecendence);
+		router.attach("genesis/work", secured(templateFinder));
 		router.attach("genesis/app/", secured(templateFinder));
 		router.attach("genesis/", secured(transactional(geneticGraphRouter)));
+		
 		router.attach("goddag/", secured(transactional(goddagFinder)));
         	router.attach("project/", templateFinder);
         	router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
@@ -182,7 +184,7 @@ public class FaustApplication extends Application implements InitializingBean {
 	public static class EntryPageRedirectionResource extends ServerResource {
 		@Override
 		protected Representation doHandle() throws ResourceException {
-			getResponse().redirectTemporary(new Reference(getReference(), "project/about"));
+			getResponse().redirectTemporary(new Reference(getReference(), "genesis/work"));
 			return null;
 		}
 	}
