@@ -162,15 +162,27 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 
 	@Override
 	public String toString() {
+
+		final String waFaust = getMetadataValue("callnumber.wa-faust");
+		if (!Strings.isNullOrEmpty(waFaust) && !"-".equals(waFaust)) {
+			return waFaust;
+		}
+
+		final String gsaOld = getMetadataValue("callnumber.gsa-old");
+		if (!Strings.isNullOrEmpty(gsaOld) && !"-".equals(gsaOld)) {
+			return gsaOld;
+		}
+		
 		final String waId = getMetadataValue("wa-id");
 		if (!Strings.isNullOrEmpty(waId) && !"-".equals(waId)) {
 			return waId;
 		}
-
+		
 		final String callnumber = getMetadataValue("callnumber");
 		if (!Strings.isNullOrEmpty(callnumber) && !"-".equals(callnumber)) {
 			return new StringBuilder(getArchive().getId()).append("/").append(callnumber).toString();
 		}
+		
 
 		final FaustURI transcriptSource = getTranscriptSource();
 		if (transcriptSource != null) {

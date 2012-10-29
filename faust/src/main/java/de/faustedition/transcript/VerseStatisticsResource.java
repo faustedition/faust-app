@@ -64,7 +64,7 @@ public class VerseStatisticsResource extends ServerResource {
 		final ImmutableMap<String, MaterialUnit> documentIndex = Maps.uniqueIndex(verseStatistics.keySet(), new Function<MaterialUnit, String>() {
 			@Override
 			public String apply(@Nullable MaterialUnit input) {
-				return input.toString() + " [" + input.node.getId() + "]";
+				return input.toString(); /* + " [" + input.node.getId() + "]"; */
 			}
 		});
 		for (String documentDesc : Ordering.natural().immutableSortedCopy(documentIndex.keySet())) {

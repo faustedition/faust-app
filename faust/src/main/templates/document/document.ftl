@@ -1,7 +1,7 @@
 <#assign archiveId = document.getMetadataValue("archive")>
-<#assign callnumber = document.getMetadataValue("callnumber")>
+<#assign callnumber = document.toString()>
 <#assign waId = document.getMetadataValue('wa-id')!"">
-<#assign title>${archiveId?upper_case}/ ${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
+<#assign title>${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
 <#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
 <#assign css>
 	#transcript { margin: 1em auto; text-align: center }

@@ -42,7 +42,7 @@
 				<td>${unit_index + 1}.</td>
 				<td>
 					<a href="${cp + unit.source.toString()?replace('faust://xml', '')}" title="${message('archive.goto_document')}">
-					${unit.getMetadataValue("callnumber")!"–"?html}
+					${unit.toString()!"–"?html}
 					</a>
 				</td>
 				<td>${unit.getMetadataValue("wa-id")!"–"?html}</td>

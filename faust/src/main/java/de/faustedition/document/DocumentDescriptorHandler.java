@@ -102,6 +102,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		metadataValue = null;
 	}
 
+	
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		baseTracker.startElement(uri, localName, qName, attributes);
@@ -143,7 +144,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 				materialUnitCollection.add(unit);
 
 			} catch (IllegalArgumentException e) {
-				throw new SAXException("Encountered invalid @type or @transcript in <f:materialUnit/>", e);
+				throw new SAXException("Encountered invalid @type or @transcript in <" + localName + "/>", e);
 			}
 		} else if ("metadata".equals(localName) && !materialUnitStack.isEmpty()) {
 			inMetadataSection = true;
@@ -153,7 +154,12 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			// metadataKey = type == null ? localName : localName + "_" + type;
 			
 			
-			metadataKey = legacyNames.containsKey(localName) ? legacyNames.get(localName) : localName;
+			
+			
+			metadataKey = metadataKeyFromElement(localName, attributes);
+				
+				
+			
 			metadataValue = new StringBuilder();
 			if (valueAttribute.containsKey(localName))
 				metadataValue.append(attributes.getValue(valueAttribute.get(localName)));
@@ -217,6 +223,18 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		}
 	}
 
+	protected String metadataKeyFromElement(String localName, Attributes attributes) {
+		
+		String key = legacyNames.containsKey(localName) ? legacyNames.get(localName) : localName;
+		
+		String type = attributes.getValue("", "type");
+		
+		if ("idno".equals(localName) && type != null) 
+			return key + "." + type;
+		else 
+			return key;
+	}
+	
 	protected String convertMetadataKey(String key) {
 		final StringBuilder converted = new StringBuilder();
 		for (int cc = 0; cc < key.length(); cc++) {
@@ -224,6 +242,9 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			if (cc > 0 && Character.isUpperCase(current)) {
 				converted.append("-");
 				current = Character.toLowerCase(current);
+			}
+			if (!Character.isLetterOrDigit(current) && current != '.') {
+				current = '-';
 			}
 			converted.append(current);
 		}
