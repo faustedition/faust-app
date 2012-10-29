@@ -7,7 +7,7 @@
         </encoder>
     </appender>
     <logger name="de.faustedition" level="DEBUG"/>
-    <logger name="freemarker" level="INFO"/>
+    <logger name="freemarker" level="DEBUG"/>
     <logger name="java.awt" level="INFO"/>
     <logger name="javax.swing" level="INFO"/>
     <logger name="net.sf.ehcache" level="INFO"/>

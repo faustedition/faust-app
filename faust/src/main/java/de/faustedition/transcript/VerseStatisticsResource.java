@@ -5,6 +5,7 @@ import com.google.common.base.Functions;
 import com.google.common.collect.*;
 import de.faustedition.JsonRepresentationFactory;
 import de.faustedition.VerseInterval;
+import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -77,7 +78,8 @@ public class VerseStatisticsResource extends ServerResource {
 			}
 			chartData.add(new ModelMap()
 				.addAttribute("sigil", documentDesc)
-				.addAttribute("transcript", documentIndex.get(documentDesc).node.getId())
+				/*.addAttribute("transcript", documentIndex.get(documentDesc).node.getId())*/
+				.addAttribute("source", ((Document)documentIndex.get(documentDesc)).getSource().toString())
 				.addAttribute("intervals", intervals));
 		}
 		return jsonRepresentationFactory.map(chartData, false);
