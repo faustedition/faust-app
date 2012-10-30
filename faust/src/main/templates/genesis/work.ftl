@@ -44,11 +44,17 @@
 								
 								for (var i=1; i < 27; i++) {
 									(function (){
-										var start = lines[i+1].start;
-										var end = lines[i+1].end;																							
-										ynodes.item(i).on('click', function(e){
+										var line = lines[i+1];
+										var start = line.start;
+										var end = line.end;											
+										var element = ynodes.item(i);																							
+										element.on('click', function(e){
 											window.location.href = '/genesis/app/#/' + start + '/' + end;
-										});								
+										});
+										var domElement = element.getDOMNode();
+										title = domElement.ownerDocument.createElementNS("http://www.w3.org/2000/svg", "title");
+										title.appendChild(domElement.ownerDocument.createTextNode(line.title));
+										element.insert(title, 0);								
 									})();
 								}
 							});
