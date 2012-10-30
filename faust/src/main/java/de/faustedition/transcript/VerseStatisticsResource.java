@@ -64,8 +64,8 @@ public class VerseStatisticsResource extends ServerResource {
 		final List<Map<String, Object>> chartData = Lists.newLinkedList();
 		final ImmutableMap<String, MaterialUnit> documentIndex = Maps.uniqueIndex(verseStatistics.keySet(), new Function<MaterialUnit, String>() {
 			@Override
-			public String apply(@Nullable MaterialUnit input) {
-				return input.toString(); /* + " [" + input.node.getId() + "]"; */
+			public String apply(@Nullable MaterialUnit input) {				
+				return input.toString() + " [" + input.node.getId() + "]";
 			}
 		});
 		for (String documentDesc : Ordering.natural().immutableSortedCopy(documentIndex.keySet())) {
@@ -77,7 +77,7 @@ public class VerseStatisticsResource extends ServerResource {
 				);
 			}
 			chartData.add(new ModelMap()
-				.addAttribute("sigil", documentDesc)
+				.addAttribute("sigil", documentDesc.substring(0,documentDesc.indexOf('[') ))
 				/*.addAttribute("transcript", documentIndex.get(documentDesc).node.getId())*/
 				.addAttribute("source", ((Document)documentIndex.get(documentDesc)).getSource().toString())
 				.addAttribute("intervals", intervals));
