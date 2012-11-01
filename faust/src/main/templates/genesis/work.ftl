@@ -49,7 +49,7 @@
 										var end = line.end;											
 										var element = ynodes.item(i);																							
 										element.on('click', function(e){
-											window.location.href = '/genesis/app/#/' + start + '/' + end;
+											window.location.href = '${cp}/genesis/app/#/' + start + '/' + end;
 										});
 										var domElement = element.getDOMNode();
 										title = domElement.ownerDocument.createElementNS("http://www.w3.org/2000/svg", "title");
