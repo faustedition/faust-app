@@ -26,6 +26,15 @@ public class FaustURI implements Comparable<FaustURI> {
 		setURI(uri);
 	}
 
+	public static FaustURI fromDeque(Deque<String> path) {
+		final FaustAuthority authority = FaustAuthority.valueOf(path.pop().toUpperCase());
+		String remainder = "";
+		for (final String s: path) {
+			remainder = remainder.concat("/").concat(s);
+		}
+		return new FaustURI(authority, remainder);
+	}
+	
 	protected void setURI(URI uri) {
 		Preconditions.checkArgument(FAUST_SCHEME.equals(uri.getScheme()));
 		Preconditions.checkNotNull(uri.getPath());

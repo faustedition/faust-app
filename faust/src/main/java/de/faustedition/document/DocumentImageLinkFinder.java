@@ -9,7 +9,7 @@ import java.util.Deque;
 public class DocumentImageLinkFinder extends AbstractDocumentFinder {
 
 	@Override
-	protected ServerResource getResource(Document document, Deque<String> postfix) {
+	protected ServerResource getResource(Document document, Deque<String> postfix, Deque<String> path) {
 		DocumentImageLinkResource resource = applicationContext.getBean(DocumentImageLinkResource.class);
 		if (postfix.size() != 1)
 			return null;

@@ -3,8 +3,7 @@ DRAG_NS = "http://www.codedread.com/dragsvg";
 var faust_svg_root = null;
 var facsimileViewer;
 
-YUI.add('document-view', function (Y) {		
-	// TODO: cut dependencies to controller
+YUI.add('document-view', function (Y) {
 
 	console.log('document-view');
 	Faust.DocumentTranscriptCanvas =  function(node) {

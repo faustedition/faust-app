@@ -75,19 +75,26 @@ public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 		XMLUtil.serialize(xml, toFile(uri));
 	}
 
-	public FaustURI walk(Deque<String> path) throws IllegalArgumentException {
+	public FaustURI walk (Deque<String> path) {
+		return walk(path, null);
+	}
+	
+	public FaustURI walk(Deque<String> path, Deque<String> walked) throws IllegalArgumentException {
 		if (path.size() == 0) {
 			return null;
 		}
 
 		FaustURI uri = new FaustURI(FaustAuthority.XML, "/");
 		while (path.size() > 0) {
-			final FaustURI next = uri.resolve(path.pop());
-			if (isDirectory(next)) {
-				uri = FaustURI.parse(next.toString() + "/");
+			String next = path.pop();
+			final FaustURI nextURI = uri.resolve(next);
+			if (walked != null)
+				walked.add(next);
+			if (isDirectory(nextURI)) {
+				uri = FaustURI.parse(nextURI.toString() + "/");
 				continue;
-			} else if (isResource(next)) {
-				uri = next;
+			} else if (isResource(nextURI)) {
+				uri = nextURI;
 				break;
 			} else {
 				return null;

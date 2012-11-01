@@ -61,7 +61,10 @@ YUI.add('document-view-svg', function (Y) {
 			else
 				return this.parent.svgContainer();
 		else
-			return this.svgDocument().getElementById("transcript_container");
+			if (this.svgCont)
+				return this.svgCont;
+		else
+			throw ('Cannot find SVG container for view component');
 	};
 	
 	Faust.ViewComponent.prototype.svgDocument = function() {
