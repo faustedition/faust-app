@@ -21,7 +21,7 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
 
 	public enum Type {
-		ARCHIVAL_UNIT, DOCUMENT, QUIRE, SHEET, FOLIO, PAGE, SURFACE
+		ARCHIVALDOCUMENT, DOCUMENT, SHEET, LEAF, DISJUNCTLEAF, PAGE, PATCH, PATCHSURFACE
 	}
 
 	protected static final String PREFIX = FaustGraph.PREFIX + ".material-unit";
@@ -79,7 +79,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 	public static MaterialUnit forNode(Node node) {
 		switch (getType(node)) {
 			case DOCUMENT:
-			case ARCHIVAL_UNIT:
+			case ARCHIVALDOCUMENT:
 				return new Document(node);
 			default:
 				return new MaterialUnit(node);
@@ -132,7 +132,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 	public void setTranscriptSource(FaustURI source) {
 		node.setProperty(PREFIX + ".transcript", source.toString());
 	}
-
+	
 	public String getMetadataValue(String key) {
 		final String[] metadata = getMetadata(key);
 		return (metadata == null ? null : metadata[0]);
@@ -162,15 +162,27 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 
 	@Override
 	public String toString() {
+
+		final String waFaust = getMetadataValue("callnumber.wa-faust");
+		if (!Strings.isNullOrEmpty(waFaust) && !"-".equals(waFaust)) {
+			return waFaust;
+		}
+
+		final String gsaOld = getMetadataValue("callnumber.gsa-old");
+		if (!Strings.isNullOrEmpty(gsaOld) && !"-".equals(gsaOld)) {
+			return gsaOld;
+		}
+		
 		final String waId = getMetadataValue("wa-id");
 		if (!Strings.isNullOrEmpty(waId) && !"-".equals(waId)) {
 			return waId;
 		}
-
+		
 		final String callnumber = getMetadataValue("callnumber");
 		if (!Strings.isNullOrEmpty(callnumber) && !"-".equals(callnumber)) {
 			return new StringBuilder(getArchive().getId()).append("/").append(callnumber).toString();
 		}
+		
 
 		final FaustURI transcriptSource = getTranscriptSource();
 		if (transcriptSource != null) {

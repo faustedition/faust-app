@@ -75,7 +75,7 @@ YUI.add('text-annotation', function (Y) {
                 nameFilter = null,
                 range =  new Range(
                     (Y.Lang.isNumber(start) ? start : 0),
-                    (Y.Lang.isNumber(end) ? end : text.contentLength)
+                    (Y.Lang.isNumber(end) ? end : this.contentLength)
                 );
 
             if (Y.Lang.isFunction(filter)) {

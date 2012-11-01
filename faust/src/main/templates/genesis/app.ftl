@@ -105,7 +105,8 @@
 					.data(verseData)
 					.height(height / (verseData.length * 2))
 					.top(function(d) { return  (this.index * this.parent.height() / verseData.length) - this.height() / 2 })
-					.event("click", function(d) { Y.getLocation().assign(cp + "/transcript/" + verseData[this.index].transcript); })
+					/*.event("click", function(d) { Y.getLocation().assign(cp + "/transcript/" + verseData[this.index].transcript); })*/
+					.event("click", function(d) { Y.getLocation().assign(cp + verseData[this.index].source.replace('faust://xml', '', '')); })
 					.add(pv.Bar)
 					.data(function(m) { return m.intervals })
 					.left(function(d) { return lineScale(d.start) })

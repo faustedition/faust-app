@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -27,18 +28,25 @@ public class DocumentResource extends ServerResource {
 	private TemplateRepresentationFactory viewFactory;
 
 	private Document document;
+	
+	private FaustURI path;
 
 	public void setDocument(Document document) {
 		this.document = document;
 	}
 
+	public void setPath(FaustURI path) {
+		this.path = path;
+	}
+	
 	@Get("html")
 	public Representation overview() throws IOException {
 		Map<String, Object> viewModel = new HashMap<String, Object>();
 		viewModel.put("document", document);
 		viewModel.put("contents", document.getSortedContents());
+		viewModel.put("path", path.toString());
 
-		return viewFactory.create("document/document", getRequest().getClientInfo(), viewModel);
+		return viewFactory.create("document/document-app", getRequest().getClientInfo(), viewModel);
 	}
 
 	@Get("json")
@@ -55,20 +63,20 @@ public class DocumentResource extends ServerResource {
 
 				generator.writeStringField("type", unit.getType().name().toLowerCase());
 				generator.writeNumberField("order", unit.getOrder());
-
-				final GoddagTranscript transcript = unit.getTranscript();
-				if (transcript != null) {
+				generator.writeNumberField("id", unit.node.getId());
+//				final GoddagTranscript transcript = unit.getTranscript();
+				if (unit.getTranscriptSource() != null) {
 					generator.writeObjectFieldStart("transcript");
-					generator.writeStringField("type", transcript.getType().name().toLowerCase());
-					generator.writeStringField("source", transcript.getSource().toString());
-					if (transcript.getType() == TranscriptType.DOCUMENTARY) {
-						DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
-						generator.writeArrayFieldStart("facsimiles");
-						for (FaustURI facsimile : dt.getFacsimileReferences()) {
-							generator.writeString(facsimile.toString());
-						}
-						generator.writeEndArray();
-					}
+//					generator.writeStringField("type", transcript.getType().name().toLowerCase());
+					generator.writeStringField("source", unit.getTranscriptSource().toString());
+//					if (transcript.getType() == TranscriptType.DOCUMENTARY) {
+//						DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
+//						generator.writeArrayFieldStart("facsimiles");
+//						for (FaustURI facsimile : dt.getFacsimileReferences()) {
+//							generator.writeString(facsimile.toString());
+//						}
+//						generator.writeEndArray();
+//					}
 					generator.writeEndObject();
 				}
 
@@ -82,4 +90,6 @@ public class DocumentResource extends ServerResource {
 			}
 		};
 	}
+
+	
 }

@@ -6,6 +6,7 @@
 import csv
 import sys
 import string
+import datetime
 # import lxml.etree
 
 
@@ -69,11 +70,22 @@ def process_row(row, f):
 		from_date_given = from_day and from_month and from_year
 		to_date_given = to_day and to_month and to_year
 		if from_date_given or to_date_given:
+			one_day = datetime.timedelta(1)
+
+
+			
+
+
+
 			print '   <date',
 			if from_date_given:
-				print 'from="%04d-%02d-%02d"' % (int(from_year), int(from_month), int(from_day)),
+				datetime_from_date = datetime.datetime(int(from_year), int(from_month), int(from_day))
+				datetime_from_date = datetime_from_date + one_day
+				print 'notBefore="%04d-%02d-%02d"' % (datetime_from_date.year, datetime_from_date.month, datetime_from_date.day),
 			if to_date_given:
-				print 'to="%04d-%02d-%02d"' % (int(to_year), int(to_month), int(to_day)),
+				datetime_to_date = datetime.datetime(int(to_year), int(to_month), int(to_day))
+				datetime_to_date = datetime_to_date - one_day
+				print 'notAfter="%04d-%02d-%02d"' % (datetime_to_date.year, datetime_to_date.month, datetime_to_date.day),
 			print '>'
 			print '      <comment>%s</comment>' %  (composed_comment)
 			print '      %s%s%s' %  ('<source uri="', source, '"/>')
@@ -138,8 +150,11 @@ csvreader = csv.reader(sys.stdin)
 
 header(sys.stdout)
 
+# skip the headings line
+csvreader.next()
+
 for row in csvreader:
-	if string.find(row[6], "5. Akt") >= 0:
+#	if string.find(row[6], "5. Akt") >= 0:
 		process_row(row, sys.stdout)
 
 finish(sys.stdout)

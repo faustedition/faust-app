@@ -1,5 +1,7 @@
 package de.faustedition.reasoning;
 
+import ch.qos.logback.classic.Logger;
+
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
@@ -70,6 +72,9 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	
 	@Autowired
 	private FaustGraph faustGraph;
+	
+	@Autowired
+	private org.slf4j.Logger logger;
 
 	
 	final private Map<Inscription, Node> nodeMap = new HashMap<Inscription, Node>();
@@ -105,6 +110,8 @@ public class InscriptionPrecedenceResource extends ServerResource {
 		for (Inscription subject : inscriptions) {
 			for (Inscription object : inscriptions) {
 				if (InscriptionRelations.syntagmaticallyPrecedesByFirstLine(subject, object)) {
+//				if (InscriptionRelations.syntagmaticallyPrecedesByAverage(subject, object)) {
+				
 					syntagmaticPrecedence.relate(subject, object);
 				}
 				if (InscriptionRelations.exclusivelyContains(subject, object)) {
@@ -123,14 +130,38 @@ public class InscriptionPrecedenceResource extends ServerResource {
 			e.printStackTrace();
 		}
 	
-		precedence = new PremiseBasedRelation<Inscription> (premisesFromGeneticSources());
+		List<Premise<Inscription>> premises = new ArrayList<Premise<Inscription>>();
+//		premises.addAll(premisesFromGeneticSources());
+		premises.addAll(premisesFromInference());
+
+		precedence = new PremiseBasedRelation<Inscription> (premises);
+//		precedence = new LastPremiseRelation<Inscription> (premises);
+		
+		Relation<Inscription> test = Util.wrapTransitive(
+				new PremiseBasedRelation<Inscription> (premisesFromInference()
+							), inscriptions);
+
+		
+		Relation<Inscription> check = Util.wrapTransitive(
+				new PremiseBasedRelation<Inscription> (premisesFromGeneticSources()
+							), inscriptions);
+
+		logger.info("Genetic graph statistics: ");
+		logger.info( 
+				"  Coverage: " + Statistics.completeness(precedence, check, inscriptions) * 100 +
+				", Recall: " + Statistics.recall(precedence, check, inscriptions) * 100 +
+				", Accuracy : "+ Statistics.correctness(precedence, check, inscriptions) * 100
+
+				) ;
+		
 	}
 
+	@Get("txt")
 	public Representation dot() {
 		return new StringRepresentation(asDot());
 	}
 
-	@Get("svg")
+	@Get("svg|html")
 	public Representation svg() throws IOException, ExecutionException, InterruptedException {
 		final ExecutorService executorService = Executors.newCachedThreadPool();
 		final Process tred = new ProcessBuilder(environment.getRequiredProperty("graphviz.tred.path")).start();
@@ -199,7 +230,18 @@ public class InscriptionPrecedenceResource extends ServerResource {
 		final StringBuilder dot = new StringBuilder("digraph genetic_graph {\n");
 
 		for (Inscription inscription : inscriptions) {
-			dot.append(toLabel(inscription)).append(";\n");
+			dot.append(toLabel(inscription));
+
+			dot.append(" [label=\"");
+			dot.append(toLabel(inscription));
+			dot.append("\\n");
+			dot.append(inscription.first());
+			dot.append("...");
+			dot.append(inscription.last());			
+			dot.append("\"]");
+			
+			dot.append(";\n");
+
 		}
 
 		dot.append(" edge [");
@@ -219,6 +261,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 					dot.append(" [ ");
 					dot.append(" label=").append(premise);
 					dot.append(" color=").append("r_syn".equals(premise) ? "grey" : "black");
+					dot.append(" weight=").append("r_syn".equals(premise) ? "1" : "1");
 					dot.append(" ];\n");
 				}
 			}
@@ -234,8 +277,8 @@ public class InscriptionPrecedenceResource extends ServerResource {
 
 	private Set<Inscription> inscriptions;
 	private Relation<Inscription> syntagmaticPrecedence = Relations.newTransitiveRelation();
-	private Relation<Inscription> exclusiveContainment = MultimapBasedRelation.create();
-	private Relation<Inscription> paradigmaticContainment = MultimapBasedRelation.create();
+	private Relation<Inscription> exclusiveContainment = Relations.newTransitiveRelation();//MultimapBasedRelation.create();
+	private Relation<Inscription> paradigmaticContainment = Relations.newTransitiveRelation(); //MultimapBasedRelation.create();
 	private ImmutableRelation<Inscription> explicitPrecedence;
 	
 
@@ -246,11 +289,13 @@ public class InscriptionPrecedenceResource extends ServerResource {
 			Premise<Inscription> premise = new Premise<Inscription>() {
 				@Override
 				public String getName() {
+					String name;
 					try {
-					return geneticSource.getUri().toString().substring("faust://secondary/".length()).replaceAll("[:/]", "_");
+						name = geneticSource.getUri().toString().substring("faust://secondary/".length());
 					} catch (Exception e) {
-						return geneticSource.getUri().toString().replaceAll("[:/]", "_");
+						name = geneticSource.getUri().toString();
 					}
+					return name.replaceAll("[:/]", "_");
 				}
 				public boolean applies(Inscription i, Inscription j) {
 					
@@ -261,54 +306,54 @@ public class InscriptionPrecedenceResource extends ServerResource {
 		}
 		return result;
 	}
+
+	private List<Premise<Inscription>> premisesFromInference() {
+		ArrayList<Premise<Inscription>> result = new ArrayList<Premise<Inscription>>();
+
+		
+		
+		Premise<Inscription> rEcon = new Premise<Inscription>() {
+			@Override
+			public String getName() {
+				return "r_econ";
+			}
+
+			@Override
+			public boolean applies(Inscription i, Inscription j) {
+				return exclusiveContainment.areRelated(i, j);
+			}
+		};
+		
+		Premise<Inscription> rPcon = new PremiseBasedRelation.Premise<Inscription>() {
+			@Override
+			public String getName() {
+				return "r_pcon";
+			}
+
+			@Override
+			public boolean applies(Inscription i, Inscription j) {
+				return paradigmaticContainment.areRelated(j, i);
+			}
+		};
+		
+		Premise<Inscription> rSyn = new PremiseBasedRelation.Premise<Inscription>() {
+			@Override
+			public String getName() {
+				return "r_syn";
+			}
+
+			@Override
+			public boolean applies(Inscription i, Inscription j) {
+				return syntagmaticPrecedence.areRelated(i, j);
+			}
+		};
+
+		result.add(rPcon);
+		result.add(rEcon);
+		result.add(rSyn);		
 	
-//	@SuppressWarnings("unchecked")
-//	public PremiseBasedRelation<Inscription> precedence = new PremiseBasedRelation<Inscription>(
-//		new PremiseBasedRelation.Premise<Inscription>() {
-//			@Override
-//			public String getName() {
-//				return "r_exp";
-//			}
-//			
-//			@Override
-//			public boolean applies(Inscription i, Inscription j) {
-//				return explicitPrecedence.areRelated(i, j);
-//			}
-//		},	
-//		new PremiseBasedRelation.Premise<Inscription>() {
-//			@Override
-//			public String getName() {
-//				return "r_econ";
-//			}
-//
-//			@Override
-//			public boolean applies(Inscription i, Inscription j) {
-//				return exclusiveContainment.areRelated(i, j);
-//			}
-//		},
-//		new PremiseBasedRelation.Premise<Inscription>() {
-//			@Override
-//			public String getName() {
-//				return "r_pcon";
-//			}
-//
-//			@Override
-//			public boolean applies(Inscription i, Inscription j) {
-//				return paradigmaticContainment.areRelated(j, i);
-//			}
-//		},
-//		new PremiseBasedRelation.Premise<Inscription>() {
-//			@Override
-//			public String getName() {
-//				return "r_syn";
-//			}
-//
-//			@Override
-//			public boolean applies(Inscription i, Inscription j) {
-//				return syntagmaticPrecedence.areRelated(i, j);
-//			}
-//		}
-//	);
+	return result;	
+	}
 	
 	public PremiseBasedRelation<Inscription> precedence; 
 	

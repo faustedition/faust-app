@@ -5,7 +5,7 @@ YUI.GlobalConfig = {
     root: 'yui3/build/',
     groups: {
         faust: {
-            base: cp + '/js/',
+            base: cp + '/static/js/',
             combine: true,
             comboBase: cp + '/resources?',
             filter: "raw",
@@ -17,8 +17,10 @@ YUI.GlobalConfig = {
                 'util': { path: "faust/util/util.js"},
 				'document': { path: "faust/document/document.js" },
 				'document-view' : { path: 'faust/document/document-view.js' },
+				'document-yui-view' : { path: 'faust/document/document-yui-view.js' },
 				'document-view-svg' : { path: 'faust/document/document-view-svg.js' },
 				'document-controller' : { path: 'faust/document/document-controller.js' },
+				'document-ranges' : { path: 'faust/document/document-ranges.js' },
 				'document-model' : { path: 'faust/document/document-model.js' },
 				'materialunit' : { path: 'faust/document/materialunit.js' },
                 'protovis': { path: "protovis-r3.2.js"},

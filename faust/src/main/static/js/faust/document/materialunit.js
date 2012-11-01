@@ -15,7 +15,18 @@ YUI.add('materialunit', function (Y) {
 			Faust.io("goddag/" + this.transcript.source.encodedPath() + "?snapshot=true", function(data) {
 				callback(new Goddag.Graph(data));
 			});
+		},
+		
+		transcriptionFromRanges: function(callback) {
+			if (this.transcript == null) {
+				callback(); 
+				return; 
+			}
+			Faust.io("transcript/source/" + this.id, function(data) {
+				callback(data);
+			});
 		}
+		
 	};
 
 	Faust.Document = function() {};

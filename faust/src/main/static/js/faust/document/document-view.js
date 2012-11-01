@@ -3,8 +3,7 @@ DRAG_NS = "http://www.codedread.com/dragsvg";
 var faust_svg_root = null;
 var facsimileViewer;
 
-YUI.add('document-view', function (Y) {		
-	// TODO: cut dependencies to controller
+YUI.add('document-view', function (Y) {
 
 	console.log('document-view');
 	Faust.DocumentTranscriptCanvas =  function(node) {
@@ -74,7 +73,8 @@ YUI.add('document-view', function (Y) {
 			Faust.DocumentController.postBuildDeferred = [];
 			Faust.DocumentController.mainZone = null;
 			try {
-				this.view = Faust.DocumentController.buildVC(null, transcript.root("ge:document"));
+				//this.view = Faust.DocumentController.buildVC(null, transcript.root("ge:document"));
+				this.view = Faust.DocumentRanges.transcriptVC(transcript);
 				var containerElement = document.createElementNS(SVG_NS, "g");
 				containerElement.setAttribute("id", "transcript_container");
 				this.svgRoot.appendChild(containerElement);
@@ -138,13 +138,30 @@ YUI.add('document-view', function (Y) {
 
 	Faust.DocumentView = function(fd) {
 		this.fd = fd;
-
 		var pages = [];
-		var units = fd.descendants();
-		for (var uc = 0; uc < units.length; uc++)
-			if (units[uc].transcript && units[uc].transcript.facsimiles.length > 0)
-				pages.push(units[uc]);
 
+		//		var units = fd.descendants();
+//		for (var uc = 0; uc < units.length; uc++)
+//			if (units[uc].transcript && units[uc].transcript.facsimiles.length > 0)
+//				pages.push(units[uc]);
+
+		// traverse the document tree for pages
+//		function findPages(mu) {
+//			if (mu.descendants().length > 0)
+//				for (i=0; i < mu.descendants().length; i++)
+//					findPages(mu.descendants()[i]);
+//			if (mu.type === 'page')
+//				pages.push(mu);
+//		} 
+		
+		//findPages(fd);
+		
+		var descendants = fd.descendants();
+		for (i=0; i < descendants.length; i++)
+			if (descendants[i].type === 'page' && descendants[i].transcript)
+				pages.push(descendants[i]);
+		
+		
 		this.pages = pages;
 		this.currentPage = 0;
 		this.viewMode = "text-facsimile";
@@ -352,10 +369,10 @@ YUI.add('document-view', function (Y) {
 			var schemeAuth = location.href.slice(0, location.href.search(/[^\/]\/[^\/]/) + 1);
 			//var editxml = 'editxml://' + authority + '/xml/' + this.pages[this.currentPage].transcript.source.components[2];
 			
-			var sourceComponents = this.pages[this.currentPage].transcript.source.components;
-			var xmlsource = schemeAuth + '/' + sourceComponents[1] + '/' + sourceComponents[2]; 
-			if (Y.one('#edit-source'))
-				Y.one('#edit-source').set('href', xmlsource);
+//			var sourceComponents = this.pages[this.currentPage].transcript.source.components;
+//			var xmlsource = schemeAuth + '/' + sourceComponents[1] + '/' + sourceComponents[2]; 
+//			if (Y.one('#edit-source'))
+//				Y.one('#edit-source').set('href', xmlsource);
 			
 
 		},
@@ -413,7 +430,10 @@ YUI.add('document-view', function (Y) {
 
 			container.empty();
 			container.append('<div id="transcript-ajax" style="width:100%; height: 100%;"></div>');
-		    var image = '/facsimile/' + this.pages[this.currentPage].transcript.facsimiles[0].encodedPath();
+		    
+			/*
+			
+			var image = '/facsimile/' + this.pages[this.currentPage].transcript.facsimiles[0].encodedPath();
 			
 			// TODO change this back to local variable
 			facsimileViewer = new Y.Faust.FacsimileViewer({
@@ -426,21 +446,28 @@ YUI.add('document-view', function (Y) {
 			facsimileViewer.plug(Y.Faust.SvgPane);
 			facsimileViewer.render();
 
-
+			*/
 		},
 		renderTranscript: function() {
 			var container = Y.one("#transcript-text");
+			
+			//var text = Y.Node.create('<div>' + this.pages[this.currentPage].transcript.id + '</div>')
+			//container.insert (text);
+			
+			
+			
 			if (container == null) return;
 			var that = this;
-			this.pages[this.currentPage].transcription(function(t) {				
+			this.pages[this.currentPage].transcriptionFromRanges(function(t) {				
 				that.canvas = new Faust.DocumentTranscriptCanvas(container);
 				that.canvas.render(t);
 			});
+			
 		}
 	};
 }, '0.0', {
 	requires: ["node", "dom", "dom-screen", "event", "overlay", "scrollview", "dump",
 			   "async-queue", "resize", "io", "facsimile", "facsimile-svgpane",
-			   "document-model", "document-view-svg"]
+			   "document-model", "document-view-svg", "document-ranges"]
 });
 

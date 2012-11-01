@@ -8,10 +8,6 @@
 		| <a id="image-link" class="edit-permissions" href="${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}">Text-Image-Linking</a>
 		| <a id="edit-source" class="edit-permissions" href="">XML source</a>
 		</#if>
-		
-	</p>
-	<div id="error-display">	
-	</div>
 	<form>
 		<select name="transcript-view-mode" id="transcript-view-mode">
 			<option value="text-facsimile">Text/Faksimile</option>
@@ -23,6 +19,10 @@
 			<option value="no-overlay">Entzerrung</option>
 		</select>
 	</form>	
+		
+	</p>
+	<div id="error-display">	
+	</div>
 </div>
 <div id="transcript" class="yui3-g">
 	<div class="yui3-u-1-2">

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
 
 public abstract class AbstractDocumentFinder extends Finder {
@@ -34,14 +35,15 @@ public abstract class AbstractDocumentFinder extends Finder {
 
 			final DocumentPath docPath = getDocument(request);
 			final Document document = docPath.document;
-			final Deque<String> remainder = docPath.path;
+			final Deque<String> remainder = docPath.remainder;
+			final Deque<String> walked = docPath.walked;
 
 			if (document == null) {
 				return null;
 			}
 
 
-			return getResource(document, remainder);
+			return getResource(document, remainder, walked);
 
 
 		} catch (IllegalArgumentException e) {
@@ -57,23 +59,27 @@ public abstract class AbstractDocumentFinder extends Finder {
 		path.addFirst("document");
 
 		logger.debug("Finding document resource for " + path);
-		final FaustURI uri = xml.walk(path);
+		
+		Deque<String> walked = new ArrayDeque<String>();
+		final FaustURI uri = xml.walk(path, walked);
 
 		logger.debug("Finding document for " + uri);
-		return new DocumentPath(Document.findBySource(db, uri), path);
+		return new DocumentPath(Document.findBySource(db, uri), path, walked);
 	}
 
-	protected abstract ServerResource getResource(Document document, Deque<String> postfix);
+	protected abstract ServerResource getResource(Document document, Deque<String> postfix, Deque<String> walked);
 
 
     protected class DocumentPath {
-        public DocumentPath(Document document, Deque<String> path) {
+        public DocumentPath(Document document, Deque<String> path, Deque<String> walked) {
             this.document = document;
-            this.path = path;
+            this.remainder = path;
+            this.walked = walked;
         }
 
         public Document document;
-        public Deque<String> path;
+        public Deque<String> remainder;
+        public Deque<String> walked;
     }
 
 }

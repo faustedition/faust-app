@@ -29,7 +29,7 @@ public class InscriptionRelations {
 	}
 	
 	public static boolean syntagmaticallyPrecedesByFirstLine(Inscription i, Inscription j) {	
-		return (i.first() < j.first());
+		return (i.first() < j.first	());// && i.last() < j.last();
 	}
 	
 	public static boolean covers(Inscription i, Inscription j) {

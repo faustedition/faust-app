@@ -19,12 +19,12 @@ public class TranscriptViewResource extends TranscriptResource {
 
 	@Get("html")
 	public Representation page() throws IOException {
-		final Archive archive = document.getArchive();
+		final Archive archive = materialUnit.getArchive();
 		return templateFactory.create("transcript", getRequest().getClientInfo(), new ModelMap()
-			.addAttribute("id", document.node.getId())
+			.addAttribute("id", materialUnit.node.getId())
 			.addAttribute("archiveName", (archive == null ? null : archive.getName()))
 			.addAttribute("archiveId", (archive == null ? null : archive.getId()))
-			.addAttribute("waId", document.getMetadataValue("wa-id"))
-			.addAttribute("callnumber", document.getMetadataValue("callnumber")));
+			.addAttribute("waId", materialUnit.getMetadataValue("wa-id"))
+			.addAttribute("callnumber", materialUnit.getMetadataValue("callnumber")));
 	}
 }
