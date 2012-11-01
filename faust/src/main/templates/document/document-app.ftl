@@ -35,11 +35,16 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 			});
 			
 			var pages = this.get('pages');
+			
+			//container.append('<img src="${cp}/static/img/spinner.gif"></img>');
+
+			container.addClass('faust-ajax-loading');
 
 			pages[pagenum - 1].transcriptionFromRanges(function(t) {
 				//diplomaticTranscriptView.set('visComponent', Faust.DocumentRanges.transcriptVC(t));
 				diplomaticTranscriptView.set('transcript', t);
 				diplomaticTranscriptView.render();
+				container.removeClass('faust-ajax-loading');
 			});
 
 		},
