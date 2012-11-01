@@ -46,7 +46,10 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 		
 	} , {
 		ATTRS: {
-			pagenum: { validator: function(v) { return Y.Lang.isNumber(v) && (v >= 1); } },
+			pagenum: { 
+				validator: function(v) { return Y.Lang.isNumber(v) && (v >= 1); },
+				value: 1
+			},
 			transcriptData: null,
 			pages: null,
 			app: null
@@ -54,8 +57,8 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 	});
 	
 	Y.on("contentready", function() {
-
-		function _createDocumentUI(pages) {
+		
+		function _createDocumentUI(pages, app) {
 
 			var pageslider = new Y.Slider({
 				axis        : 'x',
@@ -73,9 +76,9 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 			
 
 
-			function navigateToPage(pagenum) {
-				window.location = cp +  '${path}'.replace('faust://', '/') + '/#' + pagenum;
-			}
+			// function navigateToPage(pagenum) {
+			// 	window.location = cp +  '${path}'.replace('faust://', '/') + '/#' + pagenum;
+			// }
 
 			function updatePagenumDisplay(e) {
 				pagenumDisplay.set('value', e.newVal);
@@ -84,12 +87,53 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 			pageslider.on('valueChange', updatePagenumDisplay);
 
 			pageslider.on('slideEnd', function(e){
-				navigateToPage(e.target.get('value'));
+				//navigateToPage(e.target.get('value'));
+				app.navigate('/' + e.target.get('value'));
 			});
+
+			
+
+
+			
+
+
+			new Y.Button({
+				srcNode: '#prev_page_button',
+				on: {
+					'click': function() {
+						app.navigate("/" + (parseInt(app.get('pagenum')) - 1));
+					}
+				}
+			}).render();
+
+			new Y.Button({
+				srcNode: '#next_page_button',
+				on: {
+					'click': function() {
+						app.navigate("/" + (parseInt(app.get('pagenum')) + 1));
+					}
+				}
+			}).render();
+
+			
+
+			function updateUI(e) {
+				var pagenum = app.get('pagenum');
+				pageslider.set('value', pagenum);
+				pagenumDisplay.set('value', pagenum);
+				
+				
+			}
+
+			app.after('faust:navigation-done', updateUI);
+
+
 		};
 
 
 		Y.on('faust:document-data-arrives', function(e) {
+
+
 
 			app = new Y.App({
 				container: '#document-app',
@@ -102,8 +146,8 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 				}
 			});
 			
-			app.route("", function() {
-				this.navigate("1");
+			app.route("/", function() {
+				this.navigate("/1");
 			});
 			
 			app.route("/:page", function(req) {
@@ -115,29 +159,12 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 							  },
 							  
 							  { transition: 'fade'});
+				this.fire('faust:navigation-done');
 			});
 			
 			app.set('fd', e.fd);
 
-			new Y.Button({
-				srcNode: '#prev_page_button',
-				on: {
-					'click': function() {
-						app.navigate("" + (parseInt(app.get('pagenum')) - 1));
-					}
-				}
-			}).render();
-
-			new Y.Button({
-				srcNode: '#next_page_button',
-				on: {
-					'click': function() {
-						app.navigate("" + (parseInt(app.get('pagenum')) + 1));
-					}
-				}
-			}).render();
-
-			app.navigate("1");
+			_createDocumentUI(e.pages, app);
 
 			app.render().dispatch();
 		});
@@ -150,7 +177,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 				if (descendants[i].type === 'page' && descendants[i].transcript)
 					pages.push(descendants[i]);
 
-			_createDocumentUI(pages);
+
 
 			Y.fire('faust:document-data-arrives', {
 				fd: fd,
