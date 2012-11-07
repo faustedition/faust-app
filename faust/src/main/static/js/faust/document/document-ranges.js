@@ -14,7 +14,11 @@ YUI.add('document-ranges', function (Y) {
 
 				var annotationCounter = 0;
 				
+				//map XML id to view component
 				var idMap = {};
+
+				//execute these after the build
+				var postBuildDeferred = [];
 
 				function qualifier(namespace) {
 					return function(name) {
@@ -30,10 +34,7 @@ YUI.add('document-ranges', function (Y) {
 					}
 				}
 
-				//execute these after the build
-				var postBuildDeferred = [];
-
-				function align(node, vc, postBuildDeferred) {
+				function align(node, vc) {
 					
 					var aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left",
 					                          "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];

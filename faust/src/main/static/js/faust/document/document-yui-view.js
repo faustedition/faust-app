@@ -39,8 +39,17 @@ YUI.add('document-yui-view', function (Y) {
 			svgCont.setAttribute("height", rootBBox.height);
 		},
 
+		center: function(svgRoot, container){
+			var cw = Y.one(container).getComputedStyle('width');
+			var rw = Y.one(svgRoot).getComputedStyle('width');
+			Y.one(svgRoot).setStyles({
+				'left': (parseInt(cw) - parseInt(rw)) / 2,
+				'position': 'relative'
+			});
+			
+		},
 
-		relayout: function(visComponent, svgRoot, innerContainer) {
+		relayout: function(visComponent, svgRoot, innerContainer, container) {
 
 			that = this;
 			aq = new Y.AsyncQueue();
@@ -53,7 +62,9 @@ YUI.add('document-yui-view', function (Y) {
 				},
 				{
 					fn : function() {
-						that.intoView(innerContainer, svgRoot)},
+						that.intoView(innerContainer, svgRoot);
+						that.center(svgRoot, container);
+					},
 					timeout: 0,
 					iterations: 1,
 					context: visComponent
@@ -102,7 +113,10 @@ YUI.add('document-yui-view', function (Y) {
 
 				// 	//FIXME calculate the required number of iterations
 				visComponent.render();
-				this.relayout(visComponent, svgRoot, innerContainer);
+				this.relayout(visComponent, svgRoot, innerContainer, container);
+				
+				//console.log('bp');
+				//this.center(svgRoot, container);
 				
 				// }
 				
