@@ -4,9 +4,45 @@ YUI.add('document-ranges', function (Y) {
 	console.log('document-ranges');
 
 	
-	Faust.DocumentRanges = {
+	Faust.Namespaces = function() {
 
-		FAUST_NS : 'http://www.faustedition.net/ns',
+		this.FAUST_NS = 'http://www.faustedition.net/ns';
+
+		this.nsMap = {};
+
+		this.prefixMap = {};
+
+		this.register = function(prefix, ns) {
+			this.nsMap[ns] = prefix;
+			this.prefixMap[prefix] = ns;
+		};
+		
+		this.prefixForm = function(qualifiedName) {
+			var nsEnd = qualifiedName.indexOf('}');
+			var ns = qualifiedName.slice(1, nsEnd);
+			var name = qualifiedName.slice(nsEnd);
+			var prefix = this.nsMap[ns];
+			return prefix + ':' + name;
+		};
+
+		this.qualifiedForm = function(prefixedName) {
+			var prefixEnd = prefixedName.indexOf(':');
+			var prefix = prefixedName.slice(0, prefixEnd);
+			var name = prefixedName.slice(prefixEnd + 1);
+			var ns = this.prefixMap[prefix];
+			return '{' + ns + '}' + name;			
+		};
+		
+		// qualifier: function(namespace) {
+		// 	return function(name) {
+		// 		return '{' + namespace + '}' + name;
+		// 	}
+		// }
+
+		this.register('f', this.FAUST_NS);
+	};
+
+	Faust.DocumentRanges = {
 		
 		transcriptVC: function(jsonRepresentation) {
 
@@ -20,11 +56,7 @@ YUI.add('document-ranges', function (Y) {
 			//execute these after the build
 			var postBuildDeferred = [];
 
-			function qualifier(namespace) {
-				return function(name) {
-					return '{' + namespace + '}' + name;
-				}
-			}
+			var namespaces = new Faust.Namespaces();
 			
 			function registerId(annotation, vc) {
 				xmlId = annotation.data["{http://www.w3.org/XML/1998/namespace}id"];
@@ -39,26 +71,24 @@ YUI.add('document-ranges', function (Y) {
 				var aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left",
 					                      "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
 
-				Y.each(aligningAttributes, function(a){
-					
-					var f_ns = qualifier(Faust.DocumentRanges.FAUST_NS);
-					
-					var qualifiedA = f_ns(a.slice(2));
+				Y.each(aligningAttributes, function(a){					
+					//var q = namespaces.qualifiedForm;
+					var qA = namespaces.qualifiedForm(a);
 					
 					
-					if (qualifiedA in node.data) {
+					if (qA in node.data) {
 						if (!vc) {
 							vc = new Faust.DefaultVC();
 						}
 						//FIXME id hash hack; do real resolution of references
-						var anchorId = node.data[qualifiedA].slice(1);
+						var anchorId = node.data[qA].slice(1);
 						var coordRot = a in {"f:at":1, "f:left":1, "f:left-right":1, "f:right":1, "f:right-left":1}? 0 : 90;
 						var alignName = coordRot == 0 ? "hAlign" : "vAlign";
 						var myJoint = a in {"f:left":1, "f:left-right":1, "f:top":1, "f:top-bottom":1}? 0 : 1;
 						var yourJoint = a in {"f:at":1, "f:left":1, "f:right-left":1, "f:top":1, "f:bottom-top":1}? 0 : 1;
 
-						if (f_ns("orient") in node.data)
-							myJoint = node.data[f_ns("orient")] == "left" ? 1 : 0;
+						if (namespaces.qualifiedForm("f:orient") in node.data)
+							myJoint = node.data[namespaces.qualifiedForm("f:orient")] == "left" ? 1 : 0;
 
 						postBuildDeferred.push(
 							function(){
