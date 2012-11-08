@@ -7,6 +7,7 @@ YUI.add('document-ranges', function (Y) {
 	Faust.Namespaces = function() {
 
 		this.FAUST_NS = 'http://www.faustedition.net/ns';
+		this.TEI_NS = 'http://www.tei-c.org/ns/1.0';
 
 		this.nsMap = {};
 
@@ -17,7 +18,7 @@ YUI.add('document-ranges', function (Y) {
 			this.prefixMap[prefix] = ns;
 		};
 		
-		this.prefixForm = function(qualifiedName) {
+		this.p = function(qualifiedName) {
 			var nsEnd = qualifiedName.indexOf('}');
 			var ns = qualifiedName.slice(1, nsEnd);
 			var name = qualifiedName.slice(nsEnd);
@@ -25,7 +26,7 @@ YUI.add('document-ranges', function (Y) {
 			return prefix + ':' + name;
 		};
 
-		this.qualifiedForm = function(prefixedName) {
+		this.q = function(prefixedName) {
 			var prefixEnd = prefixedName.indexOf(':');
 			var prefix = prefixedName.slice(0, prefixEnd);
 			var name = prefixedName.slice(prefixEnd + 1);
@@ -40,6 +41,8 @@ YUI.add('document-ranges', function (Y) {
 		// }
 
 		this.register('f', this.FAUST_NS);
+		this.register('tei', this.TEI_NS);
+
 	};
 
 	Faust.DocumentRanges = {
@@ -56,7 +59,8 @@ YUI.add('document-ranges', function (Y) {
 			//execute these after the build
 			var postBuildDeferred = [];
 
-			var namespaces = new Faust.Namespaces();
+			var ns = new Faust.Namespaces();
+			
 			
 			function registerId(annotation, vc) {
 				xmlId = annotation.data["{http://www.w3.org/XML/1998/namespace}id"];
@@ -71,9 +75,9 @@ YUI.add('document-ranges', function (Y) {
 				var aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left",
 					                      "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
 
-				Y.each(aligningAttributes, function(a){					
-					//var q = namespaces.qualifiedForm;
-					var qA = namespaces.qualifiedForm(a);
+				Y.each(aligningAttributes, function(a){									
+
+					var qA = ns.q(a);
 					
 					
 					if (qA in node.data) {
@@ -87,8 +91,8 @@ YUI.add('document-ranges', function (Y) {
 						var myJoint = a in {"f:left":1, "f:left-right":1, "f:top":1, "f:top-bottom":1}? 0 : 1;
 						var yourJoint = a in {"f:at":1, "f:left":1, "f:right-left":1, "f:top":1, "f:bottom-top":1}? 0 : 1;
 
-						if (namespaces.qualifiedForm("f:orient") in node.data)
-							myJoint = node.data[namespaces.qualifiedForm("f:orient")] == "left" ? 1 : 0;
+						if (ns.q("f:orient") in node.data)
+							myJoint = node.data[ns.q("f:orient")] == "left" ? 1 : 0;
 
 						postBuildDeferred.push(
 							function(){
@@ -131,7 +135,18 @@ YUI.add('document-ranges', function (Y) {
 			};
 			
 			function createZoneVC(zone, parentVC) {
-				return createVC (zone, parentVC, function() {return new Faust.Zone()});
+				var vc =  createVC (zone, parentVC, function() {return new Faust.Zone()});
+				
+				if ("rotate" in zone.data) 
+					vc.rotation = parseInt(zone.data["rotate"]);
+				// if ("tei:type" in zone.attrs && zone.attrs[ns.q("tei:type")] == "main") {
+				// 	if (Faust.DocumentController.mainZone != null)
+				// 		throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
+				// 	else
+				// 		Faust.DocumentController.mainZone = vc;
+
+				 
+				return vc;
 			};
 			
 			function createLineVC(line, parentVC) {
