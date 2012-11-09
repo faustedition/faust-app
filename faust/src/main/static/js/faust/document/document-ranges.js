@@ -81,7 +81,7 @@ YUI.add('document-ranges', function (Y) {
 				var aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left",
 					                      "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
 
-				Y.each(aligningAttributes, function(a){									
+				Y.each(aligningAttributes, function(a){
 
 					var qA = ns.q(a);
 					
@@ -112,8 +112,29 @@ YUI.add('document-ranges', function (Y) {
 				});
 			};				
 			
-			function createTextVC(content){
+			function createTextVC(annotation, transcript){
+				var content = annotation.of(transcript.content)
 				var textAttrs = {};
+
+				// Y.each(node.ancestors(), function(a) {
+				// 	var elem = a.node;
+				// 	if (elem.name == "f:hand") {
+				// 		textAttrs.hand = elem.attrs["f:id"];
+				// 	} else if (elem.name == "ge:rewrite") {
+				// 		textAttrs.rewrite = elem.attrs["ge:hand"];
+				// 	} else if (elem.name == "f:under") {
+				// 		textAttrs.under = true;
+				// 	} else if (elem.name == "f:over") {
+				// 		textAttrs.over = true;
+				// 	} else if (elem.name == "f:st") {
+				// 		textAttrs.strikethrough = true;
+				// 	} else if (elem.name == "tei:hi" && elem.attrs["tei:rend"].indexOf("underline") >= 0) {
+				// 		textAttrs.underline = true;
+				// 	} else if (elem.name == "ge:line") {
+				// 		textAttrs.fontsize = ((elem.attrs["ge:type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
+				// 	}
+				// });				
+
 				return new Faust.Text(content, textAttrs);		
 			};
 			
@@ -137,7 +158,6 @@ YUI.add('document-ranges', function (Y) {
 				align(annotation, vc, postBuildDeferred);
 				registerId(annotation, vc);
 				return vc;
-
 			};
 
 			function createZoneVC(zone, parentVC) {
@@ -157,8 +177,8 @@ YUI.add('document-ranges', function (Y) {
 				return vc;
 			};
 			
-			function createLineVC(line, parentVC) {
-				return createVC (line, parentVC, function() {return new Faust.Line({})});
+			function createLineVC(annotation, parentVC) {
+				return createVC (annotation, parentVC, function() {return new Faust.Line({})});
 			};
 			
 			transcript = Y.Faust.Text.create(jsonRepresentation);
@@ -171,7 +191,7 @@ YUI.add('document-ranges', function (Y) {
 				// only use content inside a line
 				if (transcript.find(p.start, p.end, 'line')[0]) {						
 					console.log(p.of(transcript.content));
-					var textVC = createTextVC(p.of(transcript.content));
+					var textVC = createTextVC(p, transcript);
 					
 					var structuralHierarchy = [{name:'zone', builder: createZoneVC},
 						                       {name:'line', builder: createLineVC}];

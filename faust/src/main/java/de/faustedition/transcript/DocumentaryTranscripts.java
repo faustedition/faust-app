@@ -1,5 +1,6 @@
 package de.faustedition.transcript;
 
+
 import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
 import static eu.interedition.text.TextConstants.TEI_NS;
 
@@ -12,6 +13,7 @@ import org.hibernate.Session;
 
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.xml.XMLStorage;
+import de.faustedition.transcript.input.HandsXMLTransformerModule;
 import eu.interedition.text.Name;
 import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
 import eu.interedition.text.xml.XMLTransformer;
@@ -41,7 +43,8 @@ public class DocumentaryTranscripts {
 		modules.add(new DefaultAnnotationXMLTransformerModule(1000, false));
 		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
 		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
-
+		modules.add(new HandsXMLTransformerModule());
+		
 		conf.addLineElement(new Name(TEI_SIG_GE, "document"));
 		conf.addLineElement(new Name(TEI_SIG_GE, "line"));
 
