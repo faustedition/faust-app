@@ -1,4 +1,4 @@
-SVG_NS = "http://www.w3.org/2000/svg";
+
 
 YUI.add('document-ranges', function (Y) {		
 	console.log('document-ranges');
@@ -8,6 +8,8 @@ YUI.add('document-ranges', function (Y) {
 
 		this.FAUST_NS = 'http://www.faustedition.net/ns';
 		this.TEI_NS = 'http://www.tei-c.org/ns/1.0';
+		this.SVG_NS = 'http://www.w3.org/2000/svg';
+		this.XML_NS = 'http://www.w3.org/XML/1998/namespace';
 
 		this.nsMap = {};
 
@@ -42,6 +44,9 @@ YUI.add('document-ranges', function (Y) {
 
 		this.register('f', this.FAUST_NS);
 		this.register('tei', this.TEI_NS);
+		this.register('svg', this.SVG_NS);
+		this.register('xml', this.XML_NS);
+
 
 	};
 
@@ -61,9 +66,10 @@ YUI.add('document-ranges', function (Y) {
 
 			var ns = new Faust.Namespaces();
 			
-			
+			var mainZoneVC = null;
+
 			function registerId(annotation, vc) {
-				xmlId = annotation.data["{http://www.w3.org/XML/1998/namespace}id"];
+				xmlId = annotation.data[ns.q('xml:id')];
 				if (xmlId) {
 					idMap[xmlId] = vc;
 					vc.xmlId = xmlId;
@@ -113,39 +119,41 @@ YUI.add('document-ranges', function (Y) {
 			
 			function existsVC (annotation) {
 				return VCs[annotation.__hash]; 
-			}
+			};
 			
 			function registerVC (annotation, vc) {
 				annotation.__hash = annotationCounter++;
 				VCs[annotation.__hash] = vc;					
-			}
-			
-			function createVC (annotation, parentVC, vcFactory) {
-				if (!existsVC (annotation)) {
-					var vc = vcFactory();
-					registerVC(annotation, vc);
-					parentVC.add(vc);
-					align(annotation, vc, postBuildDeferred);
-					registerId(annotation, vc);
-					return vc;
-				} else 
-					var vc = VCs[annotation.__hash]; 
-				//parentVC.add(vc);
-				return vc;
+			};
+
+			function getVC(annotation) {
+				return VCs[annotation.__hash]; 
 			};
 			
+			function createVC (annotation, parentVC, vcFactory) {
+				var vc = vcFactory();
+				registerVC(annotation, vc);
+				parentVC.add(vc);
+				align(annotation, vc, postBuildDeferred);
+				registerId(annotation, vc);
+				return vc;
+
+			};
+
 			function createZoneVC(zone, parentVC) {
-				var vc =  createVC (zone, parentVC, function() {return new Faust.Zone()});
+
+				var vc = createVC (zone, parentVC, function() {return new Faust.Zone()});
 				
+				if (zone.data["type"] === "main")  {
+					// A new main zone will be created, when one already exists
+					if (mainZoneVC != null)
+						throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
+					else  
+						mainZoneVC = vc;
+				}
+
 				if ("rotate" in zone.data) 
 					vc.rotation = parseInt(zone.data["rotate"]);
-				// if ("tei:type" in zone.attrs && zone.attrs[ns.q("tei:type")] == "main") {
-				// 	if (Faust.DocumentController.mainZone != null)
-				// 		throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
-				// 	else
-				// 		Faust.DocumentController.mainZone = vc;
-
-				 
 				return vc;
 			};
 			
@@ -157,12 +165,10 @@ YUI.add('document-ranges', function (Y) {
 			
 			var surfaceVC = new Faust.Surface();
 			
-			
-			
 			//for all partitions
 			Y.each(transcript.partition(), function(p) {
 				console.log (p.start + ' --- ' + p.end);
-				// only use content inside a zone
+				// only use content inside a line
 				if (transcript.find(p.start, p.end, 'line')[0]) {						
 					console.log(p.of(transcript.content));
 					var textVC = createTextVC(p.of(transcript.content));
@@ -175,8 +181,11 @@ YUI.add('document-ranges', function (Y) {
 					Y.each(structuralHierarchy, function(element) {
 						var annotations = transcript.find(p.start, p.end, element.name);
 						if (annotations.length > 0) {
-							var annotation = annotations[0];								
-							vc = element.builder(annotation, parent);
+							var annotation = annotations[0];
+							if (existsVC(annotation))
+								vc = getVC(annotation);
+							else
+								vc = element.builder(annotation, parent);
 							parent = vc;
 							
 						}
