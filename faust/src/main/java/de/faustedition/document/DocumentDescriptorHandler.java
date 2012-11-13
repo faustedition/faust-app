@@ -17,7 +17,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -153,12 +156,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			// String type = attributes.getValue("type");
 			// metadataKey = type == null ? localName : localName + "_" + type;
 			
-			
-			
-			
 			metadataKey = metadataKeyFromElement(localName, attributes);
-				
-				
 			
 			metadataValue = new StringBuilder();
 			if (valueAttribute.containsKey(localName))
@@ -192,6 +190,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			materialUnitStack.pop();
 		} else if ("metadata".equals(localName) && !materialUnitStack.isEmpty()) {
 			final MaterialUnit subject = materialUnitStack.peek();
+			calculateMetadata(subject);
 			for (Map.Entry<String, List<String>> metadataEntry : metadata.entrySet()) {
 				List<String> value = metadataEntry.getValue();
 				subject.setMetadata(convertMetadataKey(metadataEntry.getKey()),
@@ -220,6 +219,24 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			}
 			metadataKey = null;
 			metadataValue = null;
+		}
+	}
+
+	private void calculateMetadata(MaterialUnit subject) {
+		if (subject instanceof Document) {
+			
+			List<String> repositories = metadata.get("archive");
+			if (repositories == null || repositories.size() != 1) { 
+				throw new DocumentDescriptorInvalidException("Document descriptor for " + this.source + " invalid: Document must be in exactly one repository.");
+			} else {
+				HashSet<String> metadataKeys = Sets.newHashSet(metadata.keySet());
+				for(String key : metadataKeys) {
+					if (key.startsWith("callnumber." + repositories.get(0))) {
+						metadata.put("callnumber", Arrays.asList(metadata.get(key).get(0)));
+						// TODO: check number of idno type
+					}
+				}
+			}
 		}
 	}
 
@@ -257,4 +274,11 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			metadataValue.append(ch, start, length);
 		}
 	}
+
+	@Override
+	public void endDocument() throws SAXException {
+		document.getMetadata("");
+	}
+	
+	
 }

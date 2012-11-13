@@ -10,7 +10,7 @@ YUI.add('document-ranges', function (Y) {
 		this.TEI_NS = 'http://www.tei-c.org/ns/1.0';
 		this.SVG_NS = 'http://www.w3.org/2000/svg';
 		this.XML_NS = 'http://www.w3.org/XML/1998/namespace';
-
+		this.GE_NS = 'http://www.tei-c.org/ns/geneticEditions';
 		this.nsMap = {};
 
 		this.prefixMap = {};
@@ -46,6 +46,7 @@ YUI.add('document-ranges', function (Y) {
 		this.register('tei', this.TEI_NS);
 		this.register('svg', this.SVG_NS);
 		this.register('xml', this.XML_NS);
+		this.register('ge', this.GE_NS);
 
 
 	};
@@ -112,9 +113,49 @@ YUI.add('document-ranges', function (Y) {
 				});
 			};				
 			
-			function createTextVC(annotation, transcript){
-				var content = annotation.of(transcript.content)
+			function createTextVC(range, transcript){
+				var content = range.of(transcript.content)
 				var textAttrs = {};
+
+				var hands = transcript.find(range.start, range.end, ['hand']);
+				if (hands.length < 1)
+					throw (Faust.ENC_EXC_PREF + "No hand specified!");
+				if (hands.length > 1)
+					throw (Faust.ENC_EXC_PREF + "More than one hand specified!");
+
+				textAttrs.hand = hands[0].data['value'];
+				
+				var rewrites = transcript.find(range.start, range.end, [ns.q('ge:rewrite')]);
+				if (rewrites.length > 0) {
+					textAttrs.rewrite = rewrites[0].data['hand'];
+				}
+
+				var unders = transcript.find(range.start, range.end, [ns.q('f:under')]);
+				if (unders.length > 0) 
+					textAttrs.under = true;
+
+				var overs = transcript.find(range.start, range.end, [ns.q('f:over')]);
+				if (overs.length > 0) 
+					textAttrs.over = true;
+
+				var strikethroughs = transcript.find(range.start, range.end, [ns.q('f:st')]);
+				if (strikethroughs.length > 0) 
+					textAttrs.strikethrough = true;
+
+				var his = transcript.find(range.start, range.end, [ns.q('tei:hi')]);
+				Y.each(his, function(hi) {
+					if (hi.data['rend'])
+						if (hi.data['rend'].indexOf('underline') >= 0)
+							textAttrs.underline = true;
+				});
+				
+				var lines = transcript.find(range.start, range.end, ['line']);
+				Y.each (lines, function(l){
+					var line_type = l.data['type'] || '';
+					textAttrs.fontsize = line_type.indexOf('inter') >=0 ? 'small' : 'normal';
+				});
+				
+				
 
 				// Y.each(node.ancestors(), function(a) {
 				// 	var elem = a.node;
