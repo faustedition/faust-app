@@ -72,10 +72,6 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 			pageslider.render(pagesliderContainer);
 			pageslider.set('max', model.get('numberOfPages'));
 
-			// function navigateToPage(pagenum) {
-			// 	window.location = cp +  '${path}'.replace('faust://', '/') + '/#' + pagenum;
-			// }
-
 			function updatePagenumDisplay(n) {
 				pagenumDisplay.set('value', n);
 			}
@@ -205,9 +201,6 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 			});
 			
 			app.set('fd', e.fd);
-			
-			//_createDocumentUI(e.pages, app);
-			
 
 			var navigationView = new Y.NavigationView({
 				model: navigationModel,
