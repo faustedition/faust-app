@@ -7,19 +7,116 @@
 	<@faust.page title=title>
 	<div id="document-navigation" >
 
-	<div style="margin:3em 5em; width:600">
-	<button id="prev_page_button">&lt;</button>
-	${message("page_abbrev")}
-	<input id="pagenum-display" value="1" style="width: 2em; margin-right: 1em" readonly="readonly"></input>
-	<span id="pageslider"></span>
-	<button id="next_page_button">&gt;</button>
-	</div>
 
 	</div>
 	<div id="document-app" class="yui-u-1"></div>
 	<script type="text/javascript">
 
 YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "button", function(Y) {
+
+
+	Y.NavigationModel = Y.Base.create('navigationModel', Y.Model, [], {
+
+	}, {
+		ATTRS: {
+
+			numberOfPages: {
+				value: 1,
+				validator: function(value) {
+					return Y.Lang.isNumber(value);
+				}
+			},
+
+			pagenumber: {
+				value: 1,
+				validator: function(value) {
+					return Y.Lang.isNumber(value) && value > 0 && value <= this.get('numberOfPages');
+				}
+			},
+
+			viewMode: {
+				value: 'transcript',
+				validator: function(value) {
+					return Y.Lang.isNumber(value) && value in {'transcript':1, 'facsimile':1}
+				}
+			}
+		}
+	});
+
+
+	Y.NavigationView = Y.Base.create("navigation-view", Y.View, [], {
+		render: function() {
+			
+			var model = this.get('model');
+
+			var container = Y.one(this.get('container'));
+			container.append('<div style="margin:3em 5em; width:600">' +
+							 '   <button id="prev_page_button">&lt;</button>' +
+							 '   ${message("page_abbrev")}' +
+							 '   <input id="pagenum-display" value="1" style="width: 2em; margin-right: 1em" readonly="readonly"></input>' +
+							 '   <span id="pageslider"></span>' +
+							 '   <button id="next_page_button">&gt;</button>' +
+							 '</div>');
+			
+			var pageslider = new Y.Slider({
+				axis        : 'x',
+				min         : 1,
+				max         : 1,
+				value       : 1,
+				length      : 500
+			});
+
+			var pagenumDisplay = container.one('#pagenum-display');
+			var pagesliderContainer = container.one('#pageslider');
+
+			pageslider.render(pagesliderContainer);
+			pageslider.set('max', model.get('numberOfPages'));
+
+			// function navigateToPage(pagenum) {
+			// 	window.location = cp +  '${path}'.replace('faust://', '/') + '/#' + pagenum;
+			// }
+
+			function updatePagenumDisplay(n) {
+				pagenumDisplay.set('value', n);
+			}
+			
+			pageslider.on('valueChange', function(e) {
+				updatePagenumDisplay(e.newVal);
+			});
+			
+			model.after('pagenumberChange', function(e) {
+				updatePagenumDisplay(e.newVal);
+				pageslider.set('value', e.newVal);
+			});
+
+			pageslider.on('slideEnd', function(e){
+				
+				model.set('pagenumber', e.target.get('value'));
+				app.navigate('/' + model.get('pagenumber'));
+
+			});
+
+			new Y.Button({
+				srcNode: container.one('#prev_page_button'),
+				on: {
+					'click': function() {
+						app.navigate('/' + (parseInt(model.get('pagenumber')) - 1));
+					}
+				}
+			}).render();
+
+			new Y.Button({
+				srcNode: container.one('#next_page_button'),
+				on: {
+					'click': function() {
+						app.navigate('/' + (parseInt(model.get('pagenumber')) + 1));
+					}
+				}
+			}).render();
+
+		}
+	});
+
 	Y.DocumentView = Y.Base.create("document-view", Y.View, [], {
 		destructor: function() {
 			
@@ -63,82 +160,15 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 	
 	Y.on("contentready", function() {
 		
-		function _createDocumentUI(pages, app) {
 
-			var pageslider = new Y.Slider({
-				axis        : 'x',
-				min         : 1,
-				max         : 1,
-				value       : 1,
-				length      : 500
-			});
-
-			var pagenumDisplay = Y.one('#pagenum-display');
-			var pagesliderContainer = Y.one('#pageslider');
-
-			pageslider.render(pagesliderContainer);
-			pageslider.set('max', pages.length);
-			
-
-
-			// function navigateToPage(pagenum) {
-			// 	window.location = cp +  '${path}'.replace('faust://', '/') + '/#' + pagenum;
-			// }
-
-			function updatePagenumDisplay(e) {
-				pagenumDisplay.set('value', e.newVal);
-			}
-			
-			pageslider.on('valueChange', updatePagenumDisplay);
-
-			pageslider.on('slideEnd', function(e){
-				//navigateToPage(e.target.get('value'));
-				app.navigate('/' + e.target.get('value'));
-			});
-
-			
-
-
-			
-
-
-			new Y.Button({
-				srcNode: '#prev_page_button',
-				on: {
-					'click': function() {
-						app.navigate("/" + (parseInt(app.get('pagenum')) - 1));
-					}
-				}
-			}).render();
-
-			new Y.Button({
-				srcNode: '#next_page_button',
-				on: {
-					'click': function() {
-						app.navigate("/" + (parseInt(app.get('pagenum')) + 1));
-					}
-				}
-			}).render();
-
-			
-
-			function updateUI(e) {
-				var pagenum = app.get('pagenum');
-				pageslider.set('value', pagenum);
-				pagenumDisplay.set('value', pagenum);
-				
-				
-			}
-
-			app.after('faust:navigation-done', updateUI);
-
-
-		};
 
 		Y.one('#document-app').addClass('faust-ajax-loading');
 		Y.on('faust:document-data-arrives', function(e) {
 			Y.one('#document-app').removeClass('faust-ajax-loading');
 
+			var navigationModel = new Y.NavigationModel({
+				numberOfPages: e.pages.length				
+			});
 
 			app = new Y.App({
 				container: '#document-app',
@@ -148,7 +178,8 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 				serverRouting: false,
 				views: {
 					'document-view': { type: "DocumentView" }
-				}
+				},
+				model: navigationModel
 			});
 			
 			app.route("/", function() {
@@ -156,20 +187,34 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 			});
 			
 			app.route("/:page", function(req) {
-				app.set('pagenum', req.params.page);
-				this.showView("document-view", 
-							  { pagenum: parseInt(req.params.page),
-								fd: this.fd,
-								pages: e.pages,
-							  },
-							  
-							  { transition: 'fade'});
-				this.fire('faust:navigation-done');
+				var model = this.get('model');
+				var requestPagenum =  parseInt(req.params.page);
+				model.set('pagenumber', requestPagenum);
+				if (model.get('pagenumber') !== requestPagenum)
+					this.navigate("/" + model.get('pagenumber'));
+				else {
+					this.showView("document-view", 
+								  { pagenum: model.get('pagenumber'),
+									fd: this.fd,
+									pages: e.pages,
+								  },
+								  
+								  { transition: 'fade'});
+					this.fire('faust:navigation-done');
+				}
 			});
 			
 			app.set('fd', e.fd);
 			
-			_createDocumentUI(e.pages, app);
+			//_createDocumentUI(e.pages, app);
+			
+
+			var navigationView = new Y.NavigationView({
+				model: navigationModel,
+				container: Y.one('#document-navigation')
+			});
+			
+			navigationView.render();
 
 			app.render().dispatch();
 		});
@@ -181,8 +226,6 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 			for (i=0; i < descendants.length; i++)
 				if (descendants[i].type === 'page' && descendants[i].transcript)
 					pages.push(descendants[i]);
-
-
 
 			Y.fire('faust:document-data-arrives', {
 				fd: fd,
