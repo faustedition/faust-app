@@ -134,9 +134,9 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  var facsimileContainer = container.one('.facsimile-container');
 					  if (!facsimileContainer) {
 						  facsimileContainer = Y.Node.create(
-							  '<div class="facsimile-container yui3-panel-loading" >' + 
+							  '<div class="facsimile-container yui3-panel-loading">' + 
 								  '   <div class="yui3-widget-hd">Facsimile</div>' +
-								  '   <div class="yui3-widget-bd" style="overflow:auto">' +
+								  '   <div class="yui3-widget-bd" style="overflow:hidden">' +
 								  '   <div class="facsimileContent"></div></div>' +
 								  '   <div class="yui3-widget-ft"></div>' +
 								  '</div>' 
@@ -147,6 +147,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  var facsimilePanel = new Y.Panel({
 						  	  srcNode : facsimileContainer,
 						  	  width   : widthAvailable / 2,
+							  height  : 500,
 							  preventOverlap: true,
 						  	  align: {
 								  node: '#document-app',

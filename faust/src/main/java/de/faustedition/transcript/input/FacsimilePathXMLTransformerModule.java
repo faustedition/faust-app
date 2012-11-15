@@ -1,18 +1,7 @@
 package de.faustedition.transcript.input;
 
-import static eu.interedition.text.Annotation.JSON;
-
-import javax.xml.namespace.QName;
-
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.ObjectNode;
-
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
-import de.faustedition.xml.Namespaces;
-import eu.interedition.text.Annotation;
-import eu.interedition.text.Name;
-import eu.interedition.text.TextTarget;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.module.AbstractAnnotationXMLTransformerModule;
@@ -30,7 +19,9 @@ public class FacsimilePathXMLTransformerModule extends AbstractAnnotationXMLTran
 	@Override
 	public void end(XMLTransformer transformer, XMLEntity entity) {
 
-		if(entity.getName().getLocalName().equals("graphic") && !read) {
+		if(entity.getName().getLocalName().equals("graphic")  
+				&&	entity.getAttributes().has("mimeType")
+				&& !read) {
 			if(entity.getAttributes().has("url")) {
 				String url = entity.getAttributes().get("url").getTextValue();
 				try {
