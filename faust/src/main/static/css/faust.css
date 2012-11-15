@@ -15,7 +15,7 @@ table, td, th, tr { border: 0 }
 #footer { margin-top: 2em; font-size: smaller; text-align: center; }
 
 #main { padding: 0 1em;}
-#main.layout-wide { padding: 0 0;}
+#main.layout-wide { padding: 10 10;}
 
 .hidden { visibility: hidden; }
 
