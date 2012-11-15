@@ -89,10 +89,19 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		}
 	}
 
+	public FaustURI getFacsimile() {
+		final String uri = (String) node.getProperty(PREFIX + ".facsimile", null);
+		return (uri == null ? null :FaustURI.parse(uri));
+	}
+	
 	public Type getType() {
 		return getType(node);
 	}
 
+	public void setFacsimile(FaustURI uri) {
+		node.setProperty(PREFIX + ".facsimile", uri.toString());
+	}
+	
 	public void setType(Type type) {
 		node.setProperty(PREFIX + ".type", type.name().toLowerCase().replaceAll("_", "-"));
 	}

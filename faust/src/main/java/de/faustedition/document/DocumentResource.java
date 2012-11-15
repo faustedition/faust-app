@@ -78,6 +78,12 @@ public class DocumentResource extends ServerResource {
 //						generator.writeEndArray();
 //					}
 					generator.writeEndObject();
+					final FaustURI facsimile = unit.getFacsimile();
+					if (facsimile != null) 
+							generator.writeStringField("facsimile", facsimile.toString());
+					
+
+
 				}
 
 				generator.writeArrayFieldStart("contents");
