@@ -20,12 +20,13 @@ public class FacsimilePathXMLTransformerModule extends AbstractAnnotationXMLTran
 	public void end(XMLTransformer transformer, XMLEntity entity) {
 
 		if(entity.getName().getLocalName().equals("graphic")  
-				&&	entity.getAttributes().has("mimeType")
+				&&	!entity.getAttributes().has("mimeType")
 				&& !read) {
 			if(entity.getAttributes().has("url")) {
 				String url = entity.getAttributes().get("url").getTextValue();
 				try {
 					materialUnit.setFacsimile(FaustURI.parse(url));
+					read = true;
 				} catch (IllegalArgumentException e){
 					throw new TranscriptInvalidException("Invalid facsimile URI in transcript!");
 				}

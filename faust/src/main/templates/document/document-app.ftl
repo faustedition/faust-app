@@ -11,7 +11,7 @@
 
 
 
-	<@faust.page title=title header=header>
+	<@faust.page title=title header=header layout="wide">
 	<div id="document-navigation" style="height: 50px;">
 
 	</div>
@@ -228,25 +228,30 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  var facsimileContent = facsimileContainer.one('.facsimileContent');
 						  facsimileContent.empty();
 
-						  var facsimilePath = new Y.Faust.URI(this.get('pages')[pagenum-1].facsimile);						  
+						  var facsimilePath = this.get('pages')[pagenum-1].facsimile;
 
-						  facsimileContent.append('<div id="transcript-swf"></div>');
-						  swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
-						  	"transcript-swf",
-						  	"100%", "100%",
-						  	"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
-						  		server: Faust.FacsimileServer,
-						  		image: facsimilePath.encodedPath() + '.tif',
-						  		navigation: true,
-						  		//credit: "Copyright Digitale Faust-Edition"
-						  	}, {
-						  		scale: "noscale",
-						  		bgcolor: "#000000",
-						  		allowfullscreen: "true",
-						  		allowscriptaccess: "always",
-						  		wmode: "opaque"
-						  	});
+						  if (facsimilePath) {
+							  var facsimileURI = new Y.Faust.URI(facsimilePath);
 
+							  facsimileContent.append('<div id="transcript-swf"></div>');
+							  swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
+						  						 "transcript-swf",
+						  						 "100%", "100%",
+						  						 "9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
+						  							 server: Faust.FacsimileServer,
+						  							 image: facsimileURI.encodedPath() + '.tif',
+						  							 navigation: true,
+						  							 //credit: "Copyright Digitale Faust-Edition"
+						  						 }, {
+						  							 scale: "exactfit",
+						  							 bgcolor: "#000000",
+						  							 allowfullscreen: "true",
+						  							 allowscriptaccess: "always",
+						  							 wmode: "opaque"
+						  						 });
+						  } else {
+							  facsimileContent.append('<div>(none)</div>');
+						  }
 
 
 					  }
