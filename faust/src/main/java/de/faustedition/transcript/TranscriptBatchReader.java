@@ -17,6 +17,7 @@ import de.faustedition.Runtime;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
+import de.faustedition.transcript.input.TranscriptInvalidException;
 import de.faustedition.xml.XMLStorage;
 
 /**
@@ -71,6 +72,10 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 						if (logger.isWarnEnabled()) {
 							logger.warn("XML error while reading transcript from " + mu, e);
 						}
+					} catch (TranscriptInvalidException e) {
+						if (logger.isWarnEnabled()) {
+							logger.warn("Validation error while reading transcript from " + mu, e);
+						}						
 					}
 				}
 			});

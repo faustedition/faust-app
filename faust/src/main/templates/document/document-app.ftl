@@ -76,7 +76,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 			var pagenumDisplay = Y.one('#pagenum-display');
 			var pagesliderContainer = Y.one('#pageslider');
 
-			pageslider.render(pagesliderContainer);			
+			pageslider.render(pagesliderContainer);
 			pageslider.set('max', pages.length);
 			
 
@@ -135,9 +135,9 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 
 		};
 
-
+		Y.one('#document-app').addClass('faust-ajax-loading');
 		Y.on('faust:document-data-arrives', function(e) {
-
+			Y.one('#document-app').removeClass('faust-ajax-loading');
 
 
 			app = new Y.App({
@@ -168,7 +168,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view", "bu
 			});
 			
 			app.set('fd', e.fd);
-
+			
 			_createDocumentUI(e.pages, app);
 
 			app.render().dispatch();

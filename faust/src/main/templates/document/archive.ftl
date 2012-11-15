@@ -42,10 +42,10 @@
 				<td>${unit_index + 1}.</td>
 				<td>
 					<a href="${cp + unit.source.toString()?replace('faust://xml', '')}" title="${message('archive.goto_document')}">
-					${unit.toString()!"–"?html}
+					${unit.getMetadataValue("callnumber")!"–"?html}
 					</a>
 				</td>
-				<td>${unit.getMetadataValue("wa-id")!"–"?html}</td>
+				<td>${unit.getMetadataValue("callnumber.wa-faust")!"–"?html}</td>
 				<#if (unit_index % 2) == 1></tr></#if>
 				
 				<#if !unit_has_next && ((unit_index % 2) == 0)>
