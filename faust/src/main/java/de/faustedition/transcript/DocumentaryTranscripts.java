@@ -13,6 +13,7 @@ import org.hibernate.Session;
 
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.xml.XMLStorage;
+import de.faustedition.transcript.input.FacsimilePathXMLTransformerModule;
 import de.faustedition.transcript.input.HandsXMLTransformerModule;
 import eu.interedition.text.Name;
 import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
@@ -29,11 +30,11 @@ public class DocumentaryTranscripts {
 	
 	
 	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit) throws IOException, XMLStreamException {
-		XMLTransformer transformer = createXMLTransformer (session);
+		XMLTransformer transformer = createXMLTransformer (session, materialUnit);
 		return Transcript.read(session, xml, materialUnit, transformer);
 	}
 	
-	private static XMLTransformer createXMLTransformer(Session session) {
+	private static XMLTransformer createXMLTransformer(Session session, MaterialUnit materialUnit) {
 		final SimpleXMLTransformerConfiguration conf = new SimpleXMLTransformerConfiguration();
 
 		final List<XMLTransformerModule> modules = conf.getModules();
@@ -43,6 +44,7 @@ public class DocumentaryTranscripts {
 		modules.add(new DefaultAnnotationXMLTransformerModule(1000, false));
 		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
 		modules.add(new HandsXMLTransformerModule());
+		modules.add(new FacsimilePathXMLTransformerModule(materialUnit));
 		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
 
 		
