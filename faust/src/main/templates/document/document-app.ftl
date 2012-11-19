@@ -137,7 +137,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 							  '<div class="facsimile-container yui3-panel-loading">' + 
 								  '   <div class="yui3-widget-hd">Facsimile</div>' +
 								  '   <div class="yui3-widget-bd" style="overflow:hidden">' +
-								  '   <div class="facsimileContent"></div></div>' +
+								  '   <div class="facsimileContent" style="height: 500px"></div></div>' +
 								  '   <div class="yui3-widget-ft"></div>' +
 								  '</div>' 
 						  );
@@ -147,7 +147,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  var facsimilePanel = new Y.Panel({
 						  	  srcNode : facsimileContainer,
 						  	  width   : widthAvailable / 2,
-							  height  : 500,
+							  height  : 600,
 							  preventOverlap: true,
 						  	  align: {
 								  node: '#document-app',
@@ -160,7 +160,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  	  render  : true
 						  });
 
-						  facsimilePanel.plug(Y.Plugin.Drag);
+						  facsimilePanel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
 						  facsimilePanel.plug(Y.Plugin.Resize);
 
 						  this.set('facsimilePanel', facsimilePanel);
@@ -196,7 +196,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  	  render  : true
 						  });
 
-						  diplomaticPanel.plug(Y.Plugin.Drag);
+						  diplomaticPanel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
 						  diplomaticPanel.plug(Y.Plugin.Resize);
 
 						  this.set('diplomaticPanel', diplomaticPanel);
@@ -233,7 +233,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  if (facsimilePath) {
 							  var facsimileURI = new Y.Faust.URI(facsimilePath);
 
-							  facsimileContent.append('<div id="transcript-swf"></div>');
+							  facsimileContent.append('<div id="transcript-swf" style="height: 300px"></div>');
 							  swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
 						  						 "transcript-swf",
 						  						 "100%", "100%",
