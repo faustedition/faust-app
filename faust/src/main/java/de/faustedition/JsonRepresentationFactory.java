@@ -1,7 +1,6 @@
 package de.faustedition;
 
 import com.google.common.base.Throwables;
-import eu.interedition.text.json.map.TextModule;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.data.MediaType;

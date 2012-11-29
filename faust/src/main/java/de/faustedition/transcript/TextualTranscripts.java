@@ -38,9 +38,9 @@ public class TextualTranscripts {
 		modules.add(new LineElementXMLTransformerModule());
 		modules.add(new NotableCharacterXMLTransformerModule());
 		modules.add(new TextXMLTransformerModule());
-		modules.add(new DefaultAnnotationXMLTransformerModule(1000, false));
-		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
-		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
+		modules.add(new DefaultAnnotationXMLTransformerModule());
+		modules.add(new CLIXAnnotationXMLTransformerModule());
+		modules.add(new TEIAwareAnnotationXMLTransformerModule());
 
 		conf.addLineElement(new Name(TEI_NS, "text"));
 		conf.addLineElement(new Name(TEI_NS, "div"));

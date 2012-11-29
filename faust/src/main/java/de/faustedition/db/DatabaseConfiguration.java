@@ -3,10 +3,10 @@ package de.faustedition.db;
 import com.jolbox.bonecp.BoneCPDataSource;
 import de.faustedition.transcript.TranscribedVerseInterval;
 import de.faustedition.transcript.Transcript;
-import eu.interedition.text.Annotation;
+import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
-import eu.interedition.text.TextTarget;
+import eu.interedition.text.Anchor;
 import org.h2.Driver;
 import org.hibernate.SessionFactory;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -54,10 +54,10 @@ public class DatabaseConfiguration {
 	public SessionFactory sessionFactory() throws Exception {
 		return new LocalSessionFactoryBuilder(dataSource())
 			.addAnnotatedClasses(
-				Annotation.class,
+				Layer.class,
 				Name.class,
 				Text.class,
-				TextTarget.class,
+				Anchor.class,
 				Transcript.class,
 				TranscribedVerseInterval.class
 			).buildSessionFactory();

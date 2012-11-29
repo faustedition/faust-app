@@ -9,6 +9,8 @@ import com.google.common.collect.Sets;
 import de.faustedition.AbstractContextTest;
 import eu.interedition.text.*;
 import eu.interedition.text.Text;
+
+import org.codehaus.jackson.JsonNode;
 import org.hibernate.SessionFactory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +32,8 @@ public class SpeakerList extends AbstractContextTest {
 
 	@Test
 	public void listVerses() throws IOException {
-		Multimap<eu.interedition.text.Text, Annotation> speakers = HashMultimap.create();
-		for (Annotation annotation : annotationName(new Name(TextConstants.TEI_NS, "speaker")).iterate(sessionFactory.getCurrentSession())) {
+		Multimap<eu.interedition.text.Text, Layer<JsonNode>> speakers = HashMultimap.create();
+		for (Layer annotation : annotationName(new Name(TextConstants.TEI_NS, "speaker")).iterate(sessionFactory.getCurrentSession())) {
 			speakers.put(annotation.getTarget().getText(), annotation);
 		}
 
@@ -39,7 +41,7 @@ public class SpeakerList extends AbstractContextTest {
 
 		for (Text text : speakers.keySet()) {
 			final TreeSet<TextRange> ranges = Sets.newTreeSet();
-			for (Annotation annotation : speakers.get(text)) {
+			for (Layer<JsonNode> annotation : speakers.get(text)) {
 				ranges.add(annotation.getTarget());
 			}
 			Iterables.addAll(names, Iterables.transform(text.read(ranges).values(), new Function<String, String>() {

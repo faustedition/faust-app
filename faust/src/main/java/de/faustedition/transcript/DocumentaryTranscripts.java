@@ -6,18 +6,27 @@ import static eu.interedition.text.TextConstants.TEI_NS;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.codehaus.jackson.JsonNode;
 import org.hibernate.Session;
 
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.transcript.input.FacsimilePathXMLTransformerModule;
 import de.faustedition.transcript.input.HandsXMLTransformerModule;
+import eu.interedition.text.Anchor;
+import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
-import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
+import eu.interedition.text.TextRepository;
+import eu.interedition.text.simple.KeyValues;
+import eu.interedition.text.simple.SimpleLayer;
 import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.XMLTransformerConfiguration;
+import eu.interedition.text.xml.XMLTransformerConfigurationBase;
 import eu.interedition.text.xml.XMLTransformerModule;
 import eu.interedition.text.xml.module.CLIXAnnotationXMLTransformerModule;
 import eu.interedition.text.xml.module.DefaultAnnotationXMLTransformerModule;
@@ -35,17 +44,30 @@ public class DocumentaryTranscripts {
 	}
 	
 	private static XMLTransformer createXMLTransformer(Session session, MaterialUnit materialUnit) {
-		final SimpleXMLTransformerConfiguration conf = new SimpleXMLTransformerConfiguration();
+		
+		final XMLTransformerConfigurationBase conf = new XMLTransformerConfigurationBase<KeyValues>(repository) {
+
+	        @Override
+	        protected Layer<KeyValues> translate(Name name, Map<Name, Object> attributes, Set<Anchor> anchors) {
+	            final KeyValues kv = new KeyValues();
+	            for (Map.Entry<Name, Object> attr : attributes.entrySet()) {
+	                kv.put(attr.getKey().toString(), attr.getValue());
+	            }
+	            return new SimpleLayer<KeyValues>(name, "", kv, anchors);
+	        }
+	    };
+
+			
 
 		final List<XMLTransformerModule> modules = conf.getModules();
 		modules.add(new LineElementXMLTransformerModule());
 		modules.add(new NotableCharacterXMLTransformerModule());
 		modules.add(new TextXMLTransformerModule());
-		modules.add(new DefaultAnnotationXMLTransformerModule(1000, false));
-		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
-		modules.add(new HandsXMLTransformerModule());
+		modules.add(new DefaultAnnotationXMLTransformerModule());
+		modules.add(new CLIXAnnotationXMLTransformerModule());
+		modules.add(new HandsXMLTransformerModule(conf));
 		modules.add(new FacsimilePathXMLTransformerModule(materialUnit));
-		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
+		modules.add(new TEIAwareAnnotationXMLTransformerModule());
 
 		
 		conf.addLineElement(new Name(TEI_SIG_GE, "document"));

@@ -5,10 +5,12 @@ import com.google.common.base.Objects;
 import com.google.common.collect.*;
 import de.faustedition.VerseInterval;
 import de.faustedition.document.MaterialUnit;
-import eu.interedition.text.Annotation;
+import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.util.SQL;
+
+import org.codehaus.jackson.JsonNode;
 import org.hibernate.Session;
 import org.hibernate.annotations.Index;
 import org.hibernate.criterion.Restrictions;
@@ -94,7 +96,7 @@ public class TranscribedVerseInterval extends VerseInterval {
 		}
 
 		final SortedSet<Integer> verses = Sets.newTreeSet();
-		for (Annotation verse : and(text(transcript.getText()), annotationName(new Name(TextConstants.TEI_NS, "l"))).iterate(session)) {
+		for (Layer<JsonNode> verse : and(text(transcript.getText()), annotationName(new Name(TextConstants.TEI_NS, "l"))).iterate(session)) {
 			final Matcher verseNumberMatcher = VERSE_NUMBER_PATTERN.matcher(Objects.firstNonNull(verse.getData().path("n").getValueAsText(), ""));
 			while (verseNumberMatcher.find()) {
 				try {

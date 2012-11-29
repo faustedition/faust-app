@@ -8,9 +8,11 @@ import de.faustedition.JsonRepresentationFactory;
 import de.faustedition.xml.NodeListWrapper;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
-import eu.interedition.text.Annotation;
+import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
+
+import org.codehaus.jackson.JsonNode;
 import org.hibernate.Session;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -34,7 +36,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static eu.interedition.text.query.QueryCriteria.text;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -80,7 +81,7 @@ public class TranscriptSourceResource extends TranscriptResource {
 
 	@Get("txt")
 	public Representation plainText() throws IOException {
-		return new StringRepresentation(CharStreams.toString(transcript.getText().read()));
+		return new StringRepresentation(transcript.getText().read());
 	}
 
 	@Get("json")
@@ -89,15 +90,15 @@ public class TranscriptSourceResource extends TranscriptResource {
 		final Text text = transcript.getText();
 
 		final Map<String, Name> names = Maps.newHashMap();
-		final ArrayList<Annotation> annotations = Lists.newArrayList();
-		for (Annotation annotation : text(text).iterate(session)) {
+		final ArrayList<Layer<JsonNode>> annotations = Lists.newArrayList();
+		for (Layer<JsonNode> annotation : text(text).iterate(session)) {
 			final Name name = annotation.getName();
 			names.put(Long.toString(name.getId()), name);
 			annotations.add(annotation);
 		}
 		return jsonFactory.map(new ModelMap()
 			.addAttribute("text", text)
-			.addAttribute("textContent", CharStreams.toString(text.read()))
+			.addAttribute("textContent", text.read())
 			.addAttribute("names", names)
 			.addAttribute("annotations", annotations));
 	}

@@ -4,9 +4,9 @@ import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
-import eu.interedition.text.xml.module.AbstractAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.TextXMLTransformerModule;
 
-public class FacsimilePathXMLTransformerModule extends AbstractAnnotationXMLTransformerModule {
+public class FacsimilePathXMLTransformerModule extends TextXMLTransformerModule{
 
 	private boolean read = false;
 	private MaterialUnit materialUnit;
