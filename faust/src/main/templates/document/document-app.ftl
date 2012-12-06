@@ -120,19 +120,27 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 			  });
 
 			  Y.DocumentView = Y.Base.create("document-view", Y.View, [], {
+				  initializer: function() {
+					  this.get('model').after('change', this.render, this);
+					  this.get('container').after('change', function() {
+						  console.log('container changed');
+					  });
+					  console.log('init DocumentView');
+				  },
 				  destructor: function() {
-					  
+					  console.log('destroying DocumentView');
 					  this.get('diplomaticPanel') && this.get('diplomaticPanel').destroy();
 					  this.get('facsimilePanel') && this.get('facsimilePanel').destroy();
 					  this.get('container').empty();
 				  },
 				  render: function() {
-
+					  console.log('rendering DocumentView');
 					  var pagenum = this.get('model').get('pagenumber');
 					  var container = this.get('container');
 					  var widthAvailable = parseInt(Y.one('#document-app').getComputedStyle('width')) - 40;
-					  var facsimileContainer = container.one('.facsimile-container');
+					  var facsimileContainer = Y.one('.facsimile-container');
 					  if (!facsimileContainer) {
+						  console.log('Creating facsimileContainer');
 						  facsimileContainer = Y.Node.create(
 							  '<div class="facsimile-container yui3-panel-loading">' + 
 								  '   <div class="yui3-widget-hd">Facsimile</div>' +
@@ -141,8 +149,9 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 								  '   <div class="yui3-widget-ft"></div>' +
 								  '</div>' 
 						  );
-						  
+
 						  container.append(facsimileContainer);
+						  
 						  
 						  var facsimilePanel = new Y.Panel({
 						  	  srcNode : facsimileContainer,
@@ -168,7 +177,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  }
 
 					  
-					  var diplomaticContainer = container.one('.diplomatic-container');
+					  var diplomaticContainer = Y.one('.diplomatic-container');
 					  if (!diplomaticContainer) {
 						  diplomaticContainer = Y.Node.create(
 							  '<div class="diplomatic-container yui3-panel-loading" >' + 
@@ -199,11 +208,19 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  diplomaticPanel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
 						  diplomaticPanel.plug(Y.Plugin.Resize);
 
+						  diplomaticPanel.on('destroy', function() {
+							  console.log('destroying panel');
+						  });
+
 						  this.set('diplomaticPanel', diplomaticPanel);
+
+
+
 					  }
 
+
 					  function createDiplomaticTranscriptView() {
-					  
+
 						  diplomaticContainer.one('.diplomaticContent').empty();
 						  var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
 							  container: diplomaticContainer.one('.diplomaticContent'),
@@ -280,10 +297,13 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  container: '#document-app',
 						  root: cp +  '${path}'.replace('faust://', '/'),
 						  //linkSelector: ("#" + this.get("id") + " a"),
-						  transitions: true,
+						  transitions: false,
 						  serverRouting: false,
 						  views: {
-							  'document-view': { type: "DocumentView"}
+							  'document-view': {
+								  type: "DocumentView",
+								  preserve: true
+							  }
 						  },
 						  model: navigationModel
 					  });
@@ -308,8 +328,8 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 											},
 											
 											{ 
-												transition: 'fade',
-												update: true
+												transition: 'slideLeft',
+												update: false
 											});
 							  this.fire('faust:navigation-done');
 						  }

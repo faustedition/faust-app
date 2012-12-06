@@ -1,8 +1,6 @@
 
 
 YUI.add('document-ranges', function (Y) {		
-	console.log('document-ranges');
-
 	
 	Faust.Namespaces = function() {
 
@@ -228,10 +226,10 @@ YUI.add('document-ranges', function (Y) {
 			
 			//for all partitions
 			Y.each(transcript.partition(), function(p) {
-				console.log (p.start + ' --- ' + p.end);
+				// console.log (p.start + ' --- ' + p.end);
 				// only use content inside a line
 				if (transcript.find(p.start, p.end, 'line')[0]) {						
-					console.log(p.of(transcript.content));
+					// console.log(p.of(transcript.content));
 					var textVC = createTextVC(p, transcript);
 					
 					var structuralHierarchy = [{name:'zone', builder: createZoneVC},
