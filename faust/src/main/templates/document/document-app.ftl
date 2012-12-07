@@ -123,86 +123,131 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 				  initializer: function() {
 					  this.get('model').after('change', this.render, this);
 					  this.get('container').after('change', function() {
-						  console.log('container changed');
 					  });
-					  console.log('init DocumentView');
 				  },
 				  destructor: function() {
-					  console.log('destroying DocumentView');
 					  this.get('diplomaticPanel') && this.get('diplomaticPanel').destroy();
 					  this.get('facsimilePanel') && this.get('facsimilePanel').destroy();
 					  this.get('container').empty();
 				  },
+
+				  panel: function(name, title, attrs) {
+
+					  var container = this.get('container');
+					  var widthAvailable = parseInt(Y.one('#document-app').getComputedStyle('width')) - 40;
+
+ 					  panelContainer = Y.Node.create(
+						  '<div class="' + name + '-container yui3-panel-loading">' + 
+							  '   <div class="yui3-widget-hd">'+ title +'</div>' +
+							  '   <div class="yui3-widget-bd" style="overflow:hidden">' +
+							  '   <div class="'+ name +'Content"></div></div>' +
+							  '   <div class="yui3-widget-ft"></div>' +
+							  '</div>' 
+					  );
+
+					  container.append(panelContainer);
+					  
+					  
+					  panelAttrs = Y.merge({
+						  srcNode : panelContainer,
+						  width   : widthAvailable / 2,
+						  preventOverlap: true,
+						  zIndex: 100,
+						  render  : true
+					  }, attrs);
+
+					  var panel = new Y.Panel(panelAttrs);
+					  panel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
+					  panel.plug(Y.Plugin.Resize);
+					  return panel;
+				  },
+
+				  updateFacsimileView: function(){
+					  var facsimileContainer = Y.one('.facsimile-container');
+					  var facsimileContent = facsimileContainer.one('.facsimileContent');
+					  var pagenum = this.get('model').get('pagenumber');
+					  facsimileContent.empty();
+
+					  var facsimilePath = this.get('pages')[pagenum-1].facsimile;
+
+					  if (facsimilePath) {
+						  var facsimileURI = new Y.Faust.URI(facsimilePath);
+
+						  facsimileContent.append('<div id="transcript-swf" style="height: 300px"></div>');
+						  swfobject.switchOffAutoHideShow();
+						  swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
+						  					 "transcript-swf",
+						  					 "100%", "100%",
+						  					 "9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
+						  						 server: Faust.FacsimileServer,
+						  						 image: facsimileURI.encodedPath() + '.tif',
+						  						 navigation: true,
+						  						 //credit: "Copyright Digitale Faust-Edition"
+						  					 }, {
+						  						 scale: "exactfit",
+						  						 bgcolor: "#000000",
+						  						 allowfullscreen: "true",
+						  						 allowscriptaccess: "always",
+						  						 wmode: "opaque"
+						  					 });
+					  } else {
+						  facsimileContent.append('<div>(none)</div>');
+					  }
+				  },
+				  
+				  updateDiplomaticTranscriptView: function() {
+					  var pagenum = this.get('model').get('pagenumber');
+					  var diplomaticContainer = Y.one('.diplomatic-container');
+
+					  var diplomaticContent = diplomaticContainer.one('.diplomaticContent');
+
+					  var tmpHeight = diplomaticContent.getComputedStyle('height');
+					  
+					  diplomaticContent.empty();
+
+					  diplomaticContent.append('<div class="faust-ajax-loading ajax-placeholder" style="min-height: ' + tmpHeight + '"/>');
+
+					  this.get('pages')[pagenum - 1].transcriptionFromRanges(function(t) {
+
+
+						  diplomaticContent.one('.ajax-placeholder').remove(true);
+						  var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
+							  container: diplomaticContainer.one('.diplomaticContent'),
+							  visComponent: null,
+							  transcript: t
+						  });
+
+						  diplomaticTranscriptView.render();
+
+					  });
+				  },
+
+
 				  render: function() {
-					  console.log('rendering DocumentView');
 					  var pagenum = this.get('model').get('pagenumber');
 					  var container = this.get('container');
 					  var widthAvailable = parseInt(Y.one('#document-app').getComputedStyle('width')) - 40;
+
+
 					  var facsimileContainer = Y.one('.facsimile-container');
 					  if (!facsimileContainer) {
-						  console.log('Creating facsimileContainer');
-						  facsimileContainer = Y.Node.create(
-							  '<div class="facsimile-container yui3-panel-loading">' + 
-								  '   <div class="yui3-widget-hd">Facsimile</div>' +
-								  '   <div class="yui3-widget-bd" style="overflow:hidden">' +
-								  '   <div class="facsimileContent" style="height: 500px"></div></div>' +
-								  '   <div class="yui3-widget-ft"></div>' +
-								  '</div>' 
-						  );
-
-						  container.append(facsimileContainer);
-						  
-						  
-						  var facsimilePanel = new Y.Panel({
-						  	  srcNode : facsimileContainer,
-						  	  width   : widthAvailable / 2,
+						  facsimilePanel = this.panel('facsimile', 'Facsimile', {
 							  height  : 600,
-							  preventOverlap: true,
-						  	  align: {
+							  align: {
 								  node: '#document-app',
 								  points: [
 									  Y.WidgetPositionAlign.TL,
 									  Y.WidgetPositionAlign.TL
 								  ]
 							  },
-							  zIndex: 100,
-						  	  render  : true
 						  });
-
-						  facsimilePanel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
-						  facsimilePanel.plug(Y.Plugin.Resize);
-
 						  this.set('facsimilePanel', facsimilePanel);
-
-						  facsimilePanel.on('visibleChange', function(e) {
-							  if (e.newVal == false) {
-								  
-							  }
-							  else {
-								  
-							  }
-						  });
-
 					  }
 
-					  
 					  var diplomaticContainer = Y.one('.diplomatic-container');
 					  if (!diplomaticContainer) {
-						  diplomaticContainer = Y.Node.create(
-							  '<div class="diplomatic-container yui3-panel-loading" >' + 
-								  '   <div class="yui3-widget-hd">Transcript</div>' +
-								  '   <div class="yui3-widget-bd" style="overflow:auto">' +
-								  '   <div class="diplomaticContent"></div></div>' +
-								  '   <div class="yui3-widget-ft"></div>' +
-								  '</div>' 
-						  );
-						  
-						  container.append(diplomaticContainer);
-						  
-						  var diplomaticPanel = new Y.Panel({
-						  	  srcNode : diplomaticContainer,
-						  	  width   : widthAvailable / 2,
-							  preventOverlap: true,
+						  						  
+						  var diplomaticPanel = this.panel('diplomatic', 'Diplomatic', {
 							  align: {
 								  node: '#document-app',
 								  points: [
@@ -210,80 +255,16 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 									  Y.WidgetPositionAlign.TR
 								  ]
 							  },
-							  zIndex: 100,
-						  	  render  : true
-						  });
-
-						  diplomaticPanel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
-						  diplomaticPanel.plug(Y.Plugin.Resize);
-
-						  diplomaticPanel.on('destroy', function() {
-							  console.log('destroying panel');
 						  });
 
 						  this.set('diplomaticPanel', diplomaticPanel);
-
-
-
+						  diplomaticContainer = Y.one('.diplomatic-container');
 					  }
 
 
-					  function createDiplomaticTranscriptView() {
+					  this.updateFacsimileView();
 
-						  diplomaticContainer.one('.diplomaticContent').empty();
-						  var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
-							  container: diplomaticContainer.one('.diplomaticContent'),
-							  visComponent: null,
-							  transcript: null
-						  });
-						  
-						  //container.append('<img src="${cp}/static/img/spinner.gif"></img>');
-
-						  container.addClass('faust-ajax-loading');
-
-						  this.get('pages')[pagenum - 1].transcriptionFromRanges(function(t) {
-							  //diplomaticTranscriptView.set('visComponent', Faust.DocumentRanges.transcriptVC(t));
-							  diplomaticTranscriptView.set('transcript', t);
-							  diplomaticTranscriptView.render();
-							  container.removeClass('faust-ajax-loading');
-						  });
-					  };
-					  createDiplomaticTranscriptView.call(this);
-
-					  function createFacsimileView() {
-						  var facsimileContent = facsimileContainer.one('.facsimileContent');
-						  facsimileContent.empty();
-
-						  var facsimilePath = this.get('pages')[pagenum-1].facsimile;
-
-						  if (facsimilePath) {
-							  var facsimileURI = new Y.Faust.URI(facsimilePath);
-
-							  facsimileContent.append('<div id="transcript-swf" style="height: 300px"></div>');
-							  swfobject.switchOffAutoHideShow();
-							  swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
-						  						 "transcript-swf",
-						  						 "100%", "100%",
-						  						 "9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
-						  							 server: Faust.FacsimileServer,
-						  							 image: facsimileURI.encodedPath() + '.tif',
-						  							 navigation: true,
-						  							 //credit: "Copyright Digitale Faust-Edition"
-						  						 }, {
-						  							 scale: "exactfit",
-						  							 bgcolor: "#000000",
-						  							 allowfullscreen: "true",
-						  							 allowscriptaccess: "always",
-						  							 wmode: "opaque"
-						  						 });
-						  } else {
-							  facsimileContent.append('<div>(none)</div>');
-						  }
-
-
-					  }
-					  createFacsimileView.call(this);
-
+					  this.updateDiplomaticTranscriptView.call(this);
 				  },
 				  
 			  } , {
