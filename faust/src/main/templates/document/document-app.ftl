@@ -126,8 +126,8 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  });
 				  },
 				  destructor: function() {
-					  this.get('diplomaticPanel') && this.get('diplomaticPanel').destroy();
-					  this.get('facsimilePanel') && this.get('facsimilePanel').destroy();
+					  //this.get('diplomaticPanel') && this.get('diplomaticPanel').destroy();
+					  //this.get('facsimilePanel') && this.get('facsimilePanel').destroy();
 					  this.get('container').empty();
 				  },
 
@@ -152,7 +152,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  srcNode : panelContainer,
 						  width   : widthAvailable / 2,
 						  preventOverlap: true,
-						  zIndex: 100,
+						  zIndex: 10,
 						  render  : true
 					  }, attrs);
 
@@ -222,6 +222,28 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  });
 				  },
 
+				  updateStructureView: function() {
+					  
+				  },
+
+				  updateTextView: function() {
+					  var textContent = Y.one('.textContent');
+					  textContent.empty();
+					  this.get('fd').transcriptionFromRanges(function(t) {
+						  console.log(t);				
+						  var plainTextNode = textContent.append('<p></p>');
+						  Y.Array.each(t.textContent.split("\n"), function(line, n) {
+							  if (n > 0) {
+								  plainTextNode.append("<br>");
+							  }
+							  plainTextNode.append(Y.config.doc.createTextNode(line));
+						  });
+						  
+					  });
+						  
+
+				  },
+
 
 				  render: function() {
 					  var pagenum = this.get('model').get('pagenumber');
@@ -241,10 +263,9 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 								  ]
 							  },
 						  });
-						  this.set('facsimilePanel', facsimilePanel);
 					  }
 
-					  var diplomaticContainer = Y.one('.diplomatic-container');
+ 					  var diplomaticContainer = Y.one('.diplomatic-container');
 					  if (!diplomaticContainer) {
 						  						  
 						  var diplomaticPanel = this.panel('diplomatic', 'Diplomatic', {
@@ -256,15 +277,47 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 								  ]
 							  },
 						  });
+					  }
 
-						  this.set('diplomaticPanel', diplomaticPanel);
-						  diplomaticContainer = Y.one('.diplomatic-container');
+					  var structureContainer = Y.one('.structure-container');
+					  if (!structureContainer) {
+						  						  
+						  var diplomaticPanel = this.panel('structure', 'Structure', {
+							  zIndex: 11,
+							  align: {							
+							  	  node: '#document-app',
+							  	  points: [
+							  		  Y.WidgetPositionAlign.BR,
+							  		  Y.WidgetPositionAlign.BR
+							  	  ]
+							  },
+						  });
+
+					  }
+					  
+					  var textContainer = Y.one('.text-container');
+					  if (!textContainer) {
+						  						  
+						  var textPanel = this.panel('text', 'Text', {
+							  zIndex: 11,
+							  align: {							
+							  	  node: '#document-app',
+							  	  points: [
+							  		  Y.WidgetPositionAlign.BL,
+							  		  Y.WidgetPositionAlign.BL
+							  	  ]
+							  },
+						  });
+						  this.updateTextView();
 					  }
 
 
 					  this.updateFacsimileView();
 
-					  this.updateDiplomaticTranscriptView.call(this);
+					  this.updateDiplomaticTranscriptView();
+
+					  this.updateStructureView();
+					  
 				  },
 				  
 			  } , {
@@ -281,7 +334,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  Y.one('#document-app').removeClass('faust-ajax-loading');
 
 					  var navigationModel = new Y.NavigationModel({
-						  numberOfPages: e.pages.length				
+						  numberOfPages: e.pages.length	
 					  });
 
 					  app = new Y.App({
@@ -311,9 +364,10 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  if (model.get('pagenumber') !== requestPagenum)
 							  this.navigate("/" + model.get('pagenumber'));
 						  else {
-							  this.showView("document-view", 
+							  console.log('fd: ' + e.fd);
+							  this.showView("document-view",
 											{ pagenum: model.get('pagenumber'),
-											  fd: this.fd,
+											  fd: e.fd,
 											  pages: e.pages,
 											  model: model,
 											  
