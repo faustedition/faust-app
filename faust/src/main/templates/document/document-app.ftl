@@ -174,6 +174,15 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 						  this.set('facsimilePanel', facsimilePanel);
 
+						  facsimilePanel.on('visibleChange', function(e) {
+							  if (e.newVal == false) {
+								  
+							  }
+							  else {
+								  
+							  }
+						  });
+
 					  }
 
 					  
@@ -251,6 +260,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 							  var facsimileURI = new Y.Faust.URI(facsimilePath);
 
 							  facsimileContent.append('<div id="transcript-swf" style="height: 300px"></div>');
+							  swfobject.switchOffAutoHideShow();
 							  swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
 						  						 "transcript-swf",
 						  						 "100%", "100%",
@@ -298,6 +308,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  root: cp +  '${path}'.replace('faust://', '/'),
 						  //linkSelector: ("#" + this.get("id") + " a"),
 						  transitions: false,
+						  scrollToTop: false,
 						  serverRouting: false,
 						  views: {
 							  'document-view': {
