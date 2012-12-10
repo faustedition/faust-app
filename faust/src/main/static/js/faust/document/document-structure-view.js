@@ -31,8 +31,8 @@ YUI.add('document-structure-view', function (Y) {
 			//***** main *****
 
 			FaustStructure.render = function(document, container) {
-				paper = Raphael(container.getDOMNode(), x = 800, y = 600,
-								r = 100);
+				paper = Raphael(container.getDOMNode(), 800, 600,
+								100);
 
 				var envelope = new FaustStructure.Envelope();
 
@@ -56,7 +56,8 @@ YUI.add('document-structure-view', function (Y) {
 
 				//FaustStructure.displayMetadata(document.getElementById("metadata"), envelope.metadata);
 				
-				envelope.draw(envelope.width + minD, facsHeight + minD * 3);
+				//envelope.draw(envelope.width + minD, facsHeight + minD * 3);
+				envelope.draw(minD, facsHeight + minD * 3);
 
 
 			};
@@ -301,32 +302,32 @@ YUI.add('document-structure-view', function (Y) {
 
 					this.animate({"fill-opacity": .7}, 300, ">");
 					this.toFront();
-					if (this.topblatt) {
-						FaustStructure.setSrc(facsLefthand, this.topblatt.verso.metadata.digitalisat);
-						facsLefthand.show();
-					} else 
-						facsLefthand.hide();
+					// if (this.topblatt) {
+					// 	FaustStructure.setSrc(facsLefthand, this.topblatt.verso.metadata.digitalisat);
+					// 	facsLefthand.show();
+					// } else 
+					// 	facsLefthand.hide();
 
-					if (this.bottomblatt) {
-						FaustStructure.setSrc(facsRighthand, this.bottomblatt.recto.metadata.digitalisat);
-						facsRighthand.show();
-					} else 
-						facsRighthand.hide();
+					// if (this.bottomblatt) {
+					// 	FaustStructure.setSrc(facsRighthand, this.bottomblatt.recto.metadata.digitalisat);
+					// 	facsRighthand.show();
+					// } else 
+					// 	facsRighthand.hide();
 
 				}, function (event) {
 					this.animate({"fill-opacity": 0}, 300, ">");
 
-					if (lockButton.topblatt) {
-						FaustStructure.setSrc(facsLefthand, lockButton.topblatt.verso.metadata.digitalisat);
-						facsLefthand.show();
-					} else 
-						facsLefthand.hide();
+					// if (lockButton.topblatt) {
+					// 	FaustStructure.setSrc(facsLefthand, lockButton.topblatt.verso.metadata.digitalisat);
+					// 	facsLefthand.show();
+					// } else 
+					// 	facsLefthand.hide();
 
-					if (lockButton.bottomblatt) {
-						FaustStructure.setSrc(facsRighthand, lockButton.bottomblatt.recto.metadata.digitalisat);
-						facsRighthand.show();
-					} else 
-						facsRighthand.hide();
+					// if (lockButton.bottomblatt) {
+					// 	FaustStructure.setSrc(facsRighthand, lockButton.bottomblatt.recto.metadata.digitalisat);
+					// 	facsRighthand.show();
+					// } else 
+					// 	facsRighthand.hide();
 
 
 				});

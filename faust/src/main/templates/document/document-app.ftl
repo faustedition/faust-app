@@ -302,6 +302,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 							  	  ]
 							  },
 						  });
+						  this.updateStructureView();
 
 					  }
 					  
@@ -318,6 +319,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 							  	  ]
 							  },
 						  });
+						  
 						  this.updateTextView();
 					  }
 
@@ -326,7 +328,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 					  this.updateDiplomaticTranscriptView();
 
-					  this.updateStructureView();
+
 					  
 				  },
 				  
