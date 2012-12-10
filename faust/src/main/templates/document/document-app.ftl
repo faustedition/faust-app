@@ -6,6 +6,7 @@
 <#assign header>
 	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
+	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
 </#assign>
 
 
@@ -18,8 +19,8 @@
 	<div id="document-app" class="yui-u-1" style="min-height: 600px;"></div>
 	<script type="text/javascript">
 
-YUI().use("app", "node", "event", "slider", "document", "document-yui-view", 
-		  "button","panel", "dd-plugin", "resize-plugin", "util",
+YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
+		  "document-structure-view", "button","panel", "dd-plugin", "resize-plugin", "util",
 		  function(Y) {
 			  
 			  Y.NavigationModel = Y.Base.create('navigationModel', Y.Model, [], {
@@ -223,6 +224,15 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 				  },
 
 				  updateStructureView: function() {
+					  var structureContainer = Y.one('.structure-container');					  
+					  
+					  var structureView =  new Y.Faust.DocumentStructureView({
+						  container: structureContainer.one('.structureContent'),
+						  document: this.get('fd')
+					  });
+
+					  structureView.render();
+
 					  
 				  },
 
@@ -364,7 +374,6 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  if (model.get('pagenumber') !== requestPagenum)
 							  this.navigate("/" + model.get('pagenumber'));
 						  else {
-							  console.log('fd: ' + e.fd);
 							  this.showView("document-view",
 											{ pagenum: model.get('pagenumber'),
 											  fd: e.fd,
