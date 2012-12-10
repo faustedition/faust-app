@@ -78,9 +78,11 @@ YUI.add('document-structure-view', function (Y) {
 						childElement = new FaustStructure.Blatt();
 					if (childNode.type== "layer") 
 						childElement = new FaustStructure.Lage();
+					if (childNode.type== "patch") 
+						childElement = new FaustStructure.Anbringung();
 
 
-					if (childElement) {
+					if (childElement && element.children) {
 						element.children.push(childElement);
 						FaustStructure.structureFromMU(childElement, childNode);
 					}
