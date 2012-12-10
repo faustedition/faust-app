@@ -37,7 +37,9 @@ public class HandsXMLTransformerModule extends AbstractAnnotationXMLTransformerM
 			Annotation annotation = new Annotation(name, textTarget, data);
 
 			annotation.setData(data);
-			add(transformer, annotation);
+			
+			if (start != end)
+				add(transformer, annotation);
 		}
 	}
 
