@@ -171,7 +171,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 				  updateFacsimileView: function(){
 					  var facsimileContainer = Y.one('.facsimile-container');
-					  var facsimileContent = facsimileContainer.one('.facsimileContent');
+					  var facsimileContent = facsimileContainer.one('.yui3-widget-bd');
 					  var pagenum = this.get('model').get('pagenumber');
 					  facsimileContent.empty();
 
