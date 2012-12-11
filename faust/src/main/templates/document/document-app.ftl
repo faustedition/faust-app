@@ -57,12 +57,18 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  var model = this.get('model');
 
 					  var container = Y.one(this.get('container'));
+
+					  var old_version_cp = "https://faustedition.uni-wuerzburg.de/dev";
+					  var pathname = window.location.pathname;
+					  var old_version = old_version_cp + pathname.slice(pathname.indexOf('/document'))
+
 					  container.append('<div style="margin:3em 5em; width:600">' +
 									   '   <button id="prev_page_button">&lt;</button>' +
 									   '   ${message("page_abbrev")}' +
 									   '   <input id="pagenum-display" value="1" style="width: 2em; margin-right: 1em" readonly="readonly"></input>' +
 									   '   <span id="pageslider"></span>' +
 									   '   <button id="next_page_button">&gt;</button>' +
+									   '   <a href="' + old_version + '" style="margin-left: 100px">${message("document.old_version")}</a>' +
 									   '</div>');
 					  
 					  var pageslider = new Y.Slider({
@@ -263,7 +269,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 					  var facsimileContainer = Y.one('.facsimile-container');
 					  if (!facsimileContainer) {
-						  facsimilePanel = this.panel('facsimile', 'Facsimile', {
+						  facsimilePanel = this.panel('facsimile', '${message("document.facsimile")}', {
 							  height  : 600,
 							  align: {
 								  node: '#document-app',
@@ -278,7 +284,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
  					  var diplomaticContainer = Y.one('.diplomatic-container');
 					  if (!diplomaticContainer) {
 						  						  
-						  var diplomaticPanel = this.panel('diplomatic', 'Diplomatic', {
+						  var diplomaticPanel = this.panel('diplomatic', '${message("document.diplomatic_transcript")}', {
 							  align: {
 								  node: '#document-app',
 								  points: [
@@ -292,7 +298,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  var structureContainer = Y.one('.structure-container');
 					  if (!structureContainer) {
 						  						  
-						  var diplomaticPanel = this.panel('structure', 'Structure', {
+						  var diplomaticPanel = this.panel('structure', '${message("document.document_structure")}', {
 							  zIndex: 11,
 							  align: {							
 							  	  node: '#document-app',
@@ -309,7 +315,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  var textContainer = Y.one('.text-container');
 					  if (!textContainer) {
 						  						  
-						  var textPanel = this.panel('text', 'Text', {
+						  var textPanel = this.panel('text', '${message("document.document_text")}', {
 							  zIndex: 11,
 							  align: {							
 							  	  node: '#document-app',
