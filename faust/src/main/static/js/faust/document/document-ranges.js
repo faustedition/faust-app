@@ -118,8 +118,9 @@ YUI.add('document-ranges', function (Y) {
 				var hands = transcript.find(range.start, range.end, ['hand']);
 				if (hands.length < 1)
 					throw (Faust.ENC_EXC_PREF + "No hand specified!");
-				if (hands.length > 1)
+				if (hands.length > 1) {
 					throw (Faust.ENC_EXC_PREF + "More than one hand specified!");
+				}
 
 				textAttrs.hand = hands[0].data['value'];
 				
@@ -220,6 +221,10 @@ YUI.add('document-ranges', function (Y) {
 				return createVC (annotation, parentVC, function() {return new Faust.Line({})});
 			};
 			
+			function createAnchorVC(annotation, parentVC) {
+				return createVC (annotation, parentVC, function() {return new Faust.Text('',{})});
+			};
+
 			transcript = Y.Faust.Text.create(jsonRepresentation);
 			
 			var surfaceVC = new Faust.Surface();
@@ -228,12 +233,14 @@ YUI.add('document-ranges', function (Y) {
 			Y.each(transcript.partition(), function(p) {
 				// console.log (p.start + ' --- ' + p.end);
 				// only use content inside a line
-				if (transcript.find(p.start, p.end, 'line')[0]) {						
+				if (transcript.find(p.start, p.end, 'line')[0]) {	
 					// console.log(p.of(transcript.content));
 					var textVC = createTextVC(p, transcript);
 					
 					var structuralHierarchy = [{name:'zone', builder: createZoneVC},
-						                       {name:'line', builder: createLineVC}];
+						                       {name:'line', builder: createLineVC},
+											   {name:'anchor', builder: createAnchorVC},
+											   ];
 					var vc;
 					var parent = surfaceVC;
 					
@@ -251,6 +258,17 @@ YUI.add('document-ranges', function (Y) {
 					});
 					vc.add(textVC);
 				}
+
+				// check for empty elements
+
+				var annotationsAtStart = transcript.find(p.start, p.start);
+				Y.each(annotationsAtStart, function(annotation){
+					var range = annotation.target().range;
+					if (range.start === range.end) 
+						console.log(' ' + range.start + ' ' +  range.end + ' ' + annotation.name.localName);
+				});
+				
+
 				
 			});
 			
