@@ -9,6 +9,7 @@ table, td, th, tr { border: 0 }
 
 #header { margin-bottom: 1em;}
 #header a { font-weight: normal;  }
+#header h1 a { font-weight: bold;  }
 #header #quick-search { margin: 0; font-size: 138.1%; width: 20em }
 
 

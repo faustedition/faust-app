@@ -18,6 +18,7 @@ YUI.GlobalConfig = {
 				'document': { path: "faust/document/document.js" },
 				'document-view' : { path: 'faust/document/document-view.js' },
 				'document-yui-view' : { path: 'faust/document/document-yui-view.js' },
+				'document-structure-view' : { path: 'faust/document/document-structure-view.js' },
 				'document-view-svg' : { path: 'faust/document/document-view-svg.js' },
 				'document-controller' : { path: 'faust/document/document-controller.js' },
 				'document-ranges' : { path: 'faust/document/document-ranges.js' },
