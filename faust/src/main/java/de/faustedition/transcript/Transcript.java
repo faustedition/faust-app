@@ -26,6 +26,7 @@ import com.google.common.io.Closeables;
 
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
+import de.faustedition.transcript.input.TranscriptInvalidException;
 import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.Text;
 import eu.interedition.text.xml.XML;
@@ -136,6 +137,8 @@ public class Transcript {
 			xmlStream = xml.getInputSource(source).getByteStream();
 			xmlReader = XML.createXMLInputFactory().createXMLStreamReader(xmlStream);
 			return transformer.transform(Text.create(session, null, xmlReader));
+		} catch(IllegalArgumentException e) {
+			throw new TranscriptInvalidException(e);
 		} finally {
 			XML.closeQuietly(xmlReader);
 			Closeables.close(xmlStream, false);
