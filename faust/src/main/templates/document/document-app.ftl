@@ -169,6 +169,16 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  return panel;
 				  },
 
+				  addAjaxLoader: function(element) {					  
+					  var tmpHeight = Math.max(100, element.getComputedStyle('height'));
+					  element.empty();
+					  element.append('<div class="faust-ajax-loading ajax-placeholder" style="min-height: ' + tmpHeight + '"/>');
+				  },
+				  
+				  removeAjaxLoader: function(element) {
+					  element.one('.ajax-placeholder').remove(true);
+				  },
+
 				  updateFacsimileView: function(){
 					  var facsimileContainer = Y.one('.facsimile-container');
 					  var facsimileContent = facsimileContainer.one('.yui3-widget-bd');
@@ -207,17 +217,13 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  var diplomaticContainer = Y.one('.diplomatic-container');
 
 					  var diplomaticContent = diplomaticContainer.one('.diplomaticContent');
-
-					  var tmpHeight = diplomaticContent.getComputedStyle('height');
 					  
-					  diplomaticContent.empty();
+					  this.addAjaxLoader(diplomaticContent);
 
-					  diplomaticContent.append('<div class="faust-ajax-loading ajax-placeholder" style="min-height: ' + tmpHeight + '"/>');
-
+					  var that = this;
 					  this.get('pages')[pagenum - 1].transcriptionFromRanges(function(t) {
 
-
-						  diplomaticContent.one('.ajax-placeholder').remove(true);
+						  that.removeAjaxLoader(diplomaticContent);
 						  var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
 							  container: diplomaticContainer.one('.diplomaticContent'),
 							  visComponent: null,
@@ -244,9 +250,10 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 				  updateTextView: function() {
 					  var textContent = Y.one('.textContent');
-					  textContent.empty();
+					  this.addAjaxLoader(textContent);
+					  var that = this;
 					  this.get('fd').transcriptionFromRanges(function(t) {
-						  console.log(t);				
+						  that.removeAjaxLoader(textContent);
 						  var plainTextNode = textContent.append('<p></p>');
 						  Y.Array.each(t.textContent.split("\n"), function(line, n) {
 							  if (n > 0) {
@@ -326,6 +333,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 							  },
 						  });
 						  
+
 						  this.updateTextView();
 					  }
 

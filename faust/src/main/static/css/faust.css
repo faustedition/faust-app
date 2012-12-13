@@ -155,6 +155,12 @@ a.edit-permissions {
     border-radius: 0 0 2px 2px;
 }
 
+.text-container .textContent {
+	max-height: 600px;
+	overflow: auto
+}
+
+
 .faust-ajax-loading {
 	background-image: url('../img/spinner.gif');
 	background-repeat: no-repeat;
