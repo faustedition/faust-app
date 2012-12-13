@@ -52,15 +52,14 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 			  });
 
 			  Y.NavigationView = Y.Base.create("navigation-view", Y.View, [], {
+
+
 				  render: function() {
 					  
 					  var model = this.get('model');
 
 					  var container = Y.one(this.get('container'));
 
-					  var old_version_cp = "https://faustedition.uni-wuerzburg.de/dev";
-					  var pathname = window.location.pathname;
-					  var old_version = old_version_cp + pathname.slice(pathname.indexOf('/document'))
 
 					  container.append('<div style="margin:3em 5em; width:600">' +
 									   '   <button id="prev_page_button">&lt;</button>' +
@@ -68,7 +67,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 									   '   <input id="pagenum-display" value="1" style="width: 2em; margin-right: 1em" readonly="readonly"></input>' +
 									   '   <span id="pageslider"></span>' +
 									   '   <button id="next_page_button">&gt;</button>' +
-									   '   <a href="' + old_version + '" style="margin-left: 100px">${message("document.old_version")}</a>' +
+									   '   <a id="old_version_link" href="" style="margin-left: 100px">${message("document.old_version")}</a>' +
 									   '</div>');
 					  
 					  var pageslider = new Y.Slider({
@@ -267,6 +266,13 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 				  },
 
+				  updateOldVersionLink: function() {
+					  var old_version_cp = "https://faustedition.uni-wuerzburg.de/dev";
+					  var pathname = window.location.pathname;
+					  var hash = window.location.hash.replace("/","");
+					  var old_version = old_version_cp + pathname.slice(pathname.indexOf('/document')) + hash;
+					  Y.one("#old_version_link").setAttribute('href', old_version);
+				  },
 
 				  render: function() {
 					  var pagenum = this.get('model').get('pagenumber');
@@ -342,7 +348,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 					  this.updateDiplomaticTranscriptView();
 
-
+					  this.updateOldVersionLink();
 					  
 				  },
 				  
