@@ -6,7 +6,7 @@
 							
 								var lines = { 1: {start: 4613, end: 4727, title: 'Anmutige Gegend'},
 									    	  2: {start: 4728, end: 5064, title: 'Saal des Thrones'},
-										      3: {start: 5065, end: 5986, title: 'Weiläufiger Saal mit Nebengemächern'},
+										      3: {start: 5065, end: 5986, title: 'Weitläufiger Saal mit Nebengemächern'},
 										      4: {start: 5987, end: 6172, title: 'Lustgarten'},
 										      5: {start: 6173, end: 6306, title: 'Finstere Galerie'},
 										      6: {start: 6307, end: 6376, title: 'Hell erleuchtete Säle'},
@@ -42,7 +42,7 @@
 								scene_uis = svgdoc.getElementsByClassName('scene_ui');
 								ynodes = Y.Node.all(scene_uis);
 								
-								for (var i=1; i < 27; i++) {
+								for (var i=0; i < 27; i++) {
 									(function (){
 										var line = lines[i+1];
 										var start = line.start;
