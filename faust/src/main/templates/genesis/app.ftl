@@ -6,7 +6,7 @@
 	.title { text-align: center; font-size: 108%; }
 	.title li { display: inline-block; margin: 0 2em }
 	.scene-statistics { position: relative; width: 800px; height: 400px; }
-	.verse-chart { width: 800px; height: 600px; overflow: auto; }
+	.verse-chart { width: 800px; height: 400px; overflow: auto; }
 </style>
 <div id="genetic-analysis-app"></div>
 
