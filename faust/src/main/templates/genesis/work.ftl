@@ -78,9 +78,12 @@
 		Vermutlich im Frühjahr 1800 fiel die Entscheidung zugunsten einer Teilung des Werks, noch im selben Jahr 
 		entstand der Anfang der Helena-Dichtung. 1808 erschien „Faust. Eine Tragödie“, der Faust I, in der ersten bei Cotta erschienenen Gesamtausgabe. ...
 		</p>
-			<p style="margin-right: 1em">
-				
-				 Szenen sind von links nach rechts angeordnet, Jahre von unten nach oben. Grau zeigt die begonnene Arbeit an einer Szene an, Schwarz den Abschluss der Arbeit.  
+			<p style="margin-right: 1em; border: 1px solid black; padding: 0.3em;">
+			<strong><u>Legende</u></strong><br/>
+			<strong>Szenen</strong> sind als Spalten von links nach rechts angeordnet, 
+			<strong>Jahre</strong> von unten nach oben. 
+			Grau zeigt die <strong>begonnene Arbeit</strong> an einer Szene an, 
+			Schwarz den <strong>Abschluss der Arbeit</strong>.
 			</p>
 		</div>		
 				
