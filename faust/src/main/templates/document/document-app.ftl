@@ -1,13 +1,13 @@
-<#assign archiveId = document.getMetadataValue("archive")>
-<#assign callnumber = document.toString()>
-<#assign waId = document.getMetadataValue('wa-id')!"">
-<#assign title>${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
-<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
-<#assign header>
+	<#assign archiveId = document.getMetadataValue("archive")>
+	<#assign callnumber = document.toString()>
+	<#assign waId = document.getMetadataValue('wa-id')!"">
+	<#assign title>${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
+	<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
+	<#assign header>
 	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
-</#assign>
+	</#assign>
 
 
 
@@ -15,7 +15,7 @@
 	<@faust.page title=title header=header layout="wide">
 	<div id="document-navigation" style="height: 50px;">
 
-	</div>
+</div>
 	<div id="document-app" class="yui-u-1" style="min-height: 600px;"></div>
 	<script type="text/javascript">
 
@@ -61,13 +61,13 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  var container = Y.one(this.get('container'));
 
 
-					  container.append('<div style="margin:3em 5em; width:600">' +
+					  container.append('<div style="margin:0em 0em; width:600">' +
 									   '   <button id="prev_page_button">&lt;</button>' +
 									   '   ${message("page_abbrev")}' +
 									   '   <input id="pagenum-display" value="1" style="width: 2em; margin-right: 1em" readonly="readonly"></input>' +
 									   '   <span id="pageslider"></span>' +
 									   '   <button id="next_page_button">&gt;</button>' +
-									   '   <a id="old_version_link" href="" style="margin-left: 100px">${message("document.old_version")}</a>' +
+									   '   <span><a id="old_version_link" href="" style="margin-left: 2em">${message("document.old_version")}</a></span>' +
 									   '</div>');
 					  
 					  var pageslider = new Y.Slider({
@@ -130,6 +130,11 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  this.get('model').after('change', this.render, this);
 					  this.get('container').after('change', function() {
 					  });
+					  
+					  this.on('faust:navigation-done', function() {
+						  console.log('nav');
+					  });
+
 				  },
 				  destructor: function() {
 					  //this.get('diplomaticPanel') && this.get('diplomaticPanel').destroy();
@@ -150,7 +155,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 							  '   <div class="yui3-widget-ft"></div>' +
 							  '</div>' 
 					  );
-
+					  
 					  container.append(panelContainer);
 					  
 					  
@@ -251,27 +256,21 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  var textContent = Y.one('.textContent');
 					  this.addAjaxLoader(textContent);
 					  var that = this;
+
 					  this.get('fd').transcriptionFromRanges(function(t) {
-						  that.removeAjaxLoader(textContent);
-						  var plainTextNode = textContent.append('<p></p>');
-						  Y.Array.each(t.textContent.split("\n"), function(line, n) {
-							  if (n > 0) {
-								  plainTextNode.append("<br>");
-							  }
-							  plainTextNode.append(Y.config.doc.createTextNode(line));
-						  });
-						  
+						  window.setTimeout(function(){
+							  that.removeAjaxLoader(textContent);
+							  var plainTextNode = textContent.append('<p></p>');
+							  Y.Array.each(t.textContent.split("\n"), function(line, n) {
+								  if (n > 0) {
+									  plainTextNode.append("<br>");
+								  }
+								  plainTextNode.append(Y.config.doc.createTextNode(line));
+							  });
+						  }, 2000);	  							  
 					  });
-						  
 
-				  },
 
-				  updateOldVersionLink: function() {
-					  var old_version_cp = "https://faustedition.uni-wuerzburg.de/dev";
-					  var pathname = window.location.pathname;
-					  var hash = window.location.hash.replace("/","");
-					  var old_version = old_version_cp + pathname.slice(pathname.indexOf('/document')) + hash;
-					  Y.one("#old_version_link").setAttribute('href', old_version);
 				  },
 
 				  render: function() {
@@ -296,7 +295,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
  					  var diplomaticContainer = Y.one('.diplomatic-container');
 					  if (!diplomaticContainer) {
-						  						  
+						  
 						  var diplomaticPanel = this.panel('diplomatic', '${message("document.diplomatic_transcript")}', {
 							  align: {
 								  node: '#document-app',
@@ -310,7 +309,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 					  var structureContainer = Y.one('.structure-container');
 					  if (!structureContainer) {
-						  						  
+						  
 						  var diplomaticPanel = this.panel('structure', '${message("document.document_structure")}', {
 							  zIndex: 11,
 							  align: {							
@@ -327,7 +326,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  
 					  var textContainer = Y.one('.text-container');
 					  if (!textContainer) {
-						  						  
+						  
 						  var textPanel = this.panel('text', '${message("document.document_text")}', {
 							  zIndex: 11,
 							  align: {							
@@ -348,7 +347,7 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 					  this.updateDiplomaticTranscriptView();
 
-					  this.updateOldVersionLink();
+
 					  
 				  },
 				  
@@ -358,6 +357,8 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  model: null
 				  }
 			  });
+			  
+
 			  
 			  Y.on("contentready", function() {
 
@@ -413,17 +414,35 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  });
 					  
 					  app.set('fd', e.fd);
+					  
+					  var updateOldVersionLink = function() {
+						  var old_version_cp = "https://faustedition.uni-wuerzburg.de/dev";
+						  var pathname = window.location.pathname;
+						  var hash = window.location.hash.replace("/","");
+						  var old_version = old_version_cp + pathname.slice(pathname.indexOf('/document')) + hash;
+						  Y.one("#old_version_link").setAttribute('href', old_version);
+					  };
+					  
+					   app.after('faust:navigation-done', function() {
+					   		  updateOldVersionLink();
+					   });
 
 					  var navigationView = new Y.NavigationView({
 						  model: navigationModel,
 						  container: Y.one('#document-navigation')
 					  });
+
+					  
 					  
 					  navigationView.render();
 
 					  app.render().dispatch();
-				  });
 
+
+				  });
+				  
+				  
+				  
 				  Faust.Document.load(new Faust.URI("${document.source?js_string}"), function(fd) {
 
 					  var pages = [];
