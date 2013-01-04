@@ -18,7 +18,7 @@
 										      11: {start: 7249, end: 7494, title: 'Peneios'},
 										      12: {start: 7495, end: 8033, title: 'Am oberen Peneios'},
 										      13: {start: 8034, end: 8274, title: 'Felsbuchten des ägäischen Meers'},
-										      14: {start: 8275, end: 8487, title: 'Telcinen von Rhodos'},
+										      14: {start: 8275, end: 8487, title: 'Telchinen von Rhodos'},
 										      
 										      15: {start: 8488, end: 9126, title: 'Vor dem Palaste des Menelas zu Sparta'},
 										      16: {start: 9127, end: 9573, title: 'Innerer Burghof'},
