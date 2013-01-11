@@ -97,34 +97,50 @@ public class Transcript {
 		return Objects.toStringHelper(this).addValue(getSource()).toString();
 	}
 
-	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit, XMLTransformer transformer)
-		throws IOException, XMLStreamException {
-		final FaustURI source = materialUnit.getTranscriptSource();
-		Preconditions.checkArgument(source != null);
+	private static Transcript doRead(Session session, XMLStorage xml, FaustURI source, XMLTransformer transformer)
+	throws IOException, XMLStreamException {
+			Preconditions.checkArgument(source != null);
 
-		final String sourceURI = source.toString();
-		Transcript transcript = (Transcript) session.createCriteria(Transcript.class)
-			.add(Restrictions.eq("sourceURI", sourceURI))
-			.setLockMode(LockMode.UPGRADE_NOWAIT)
-			.uniqueResult();
-		if (transcript == null) {
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Creating transcript for {}", sourceURI);
+			final String sourceURI = source.toString();
+			Transcript transcript = (Transcript) session.createCriteria(Transcript.class)
+				.add(Restrictions.eq("sourceURI", sourceURI))
+				.setLockMode(LockMode.UPGRADE_NOWAIT)
+				.uniqueResult();
+			if (transcript == null) {
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Creating transcript for {}", sourceURI);
+				}
+				transcript = new Transcript();
+				
+				transcript.setSourceURI(sourceURI);
+
 			}
-			transcript = new Transcript();
-			transcript.setMaterialUnitId(materialUnit.node.getId());
-			transcript.setSourceURI(sourceURI);
-			session.save(transcript);
-		}
 
-		if (transcript.getText() == null) {
-			transcript.setText(readText(session, xml, source, transformer));
-			TranscribedVerseInterval.register(session, transcript);
-		}
+			if (transcript.getText() == null) {
+				transcript.setText(readText(session, xml, source, transformer));
+				TranscribedVerseInterval.register(session, transcript);
+			}
 
+			return transcript;
+	}
+	
+	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit, XMLTransformer transformer)
+	throws IOException, XMLStreamException {
+		final FaustURI source = materialUnit.getTranscriptSource();
+		Transcript transcript = doRead(session, xml, source, transformer);
+		transcript.setMaterialUnitId(materialUnit.node.getId());
+		session.save(transcript);
 		return transcript;
 	}
 
+	public static Transcript read(Session session, XMLStorage xml, FaustURI source, XMLTransformer transformer)
+	throws IOException, XMLStreamException {
+		Transcript transcript = doRead(session, xml, source, transformer);
+		session.save(transcript);
+		return transcript;
+	}
+	
+	
 	private static Text readText(Session session, XMLStorage xml, FaustURI source, XMLTransformer transformer) 
 		throws XMLStreamException, IOException {
 		if (LOG.isDebugEnabled()) {

@@ -8,10 +8,16 @@ import de.faustedition.Runtime;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.tei.WhitespaceUtil;
 import de.faustedition.xml.*;
+import eu.interedition.text.Anchor;
+import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
+import eu.interedition.text.TextRepository;
+import eu.interedition.text.simple.KeyValues;
+import eu.interedition.text.simple.SimpleLayer;
 import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.XMLTransformerConfigurationBase;
 import eu.interedition.text.xml.XMLTransformerModule;
 import eu.interedition.text.xml.module.*;
 import org.codehaus.stax2.XMLInputFactory2;
@@ -69,11 +75,26 @@ public class TextManager extends Runtime implements Runnable {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    @Autowired
+    private TextRepository<KeyValues> textRepo;
+    
     private SortedMap<FaustURI, String> tableOfContents;
 
 	@Transactional
 	public Set<FaustURI> feedDatabase() {
-		final SimpleXMLTransformerConfiguration conf = new SimpleXMLTransformerConfiguration();
+		
+		final XMLTransformerConfigurationBase conf = new XMLTransformerConfigurationBase<KeyValues>(textRepo) {
+
+	        @Override
+	        protected Layer<KeyValues> translate(Name name, Map<Name, Object> attributes, Set<Anchor> anchors) {
+	            final KeyValues kv = new KeyValues();
+	            for (Map.Entry<Name, Object> attr : attributes.entrySet()) {
+	                kv.put(attr.getKey().toString(), attr.getValue());
+	            }
+	            return new SimpleLayer<KeyValues>(name, "", kv, anchors);
+	        }
+	    };
+
 
 		final List<XMLTransformerModule> modules = conf.getModules();
 		modules.add(new LineElementXMLTransformerModule());
@@ -91,7 +112,7 @@ public class TextManager extends Runtime implements Runnable {
 		conf.addLineElement(new Name(TEI_NS, "lg"));
 		conf.addLineElement(new Name(TEI_NS, "l"));
 		conf.addLineElement(new Name(TEI_NS, "p"));
-		conf.addLineElement(new Name(null, "line"));
+		conf.addLineElement(new Name("", "line"));
 
 		conf.addContainerElement(new Name(TEI_NS, "text"));
 		conf.addContainerElement(new Name(TEI_NS, "div"));
@@ -107,7 +128,7 @@ public class TextManager extends Runtime implements Runnable {
 		conf.include(new Name(TEI_NS, "lem"));
 
 		final Session session = sessionFactory.getCurrentSession();
-		final XMLTransformer xmlTransformer = new XMLTransformer(session, conf);
+		final XMLTransformer xmlTransformer = new XMLTransformer(conf);
 
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Importing texts");
