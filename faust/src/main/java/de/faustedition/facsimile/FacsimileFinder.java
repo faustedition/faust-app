@@ -1,9 +1,11 @@
 package de.faustedition.facsimile;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
+import java.io.File;
+import java.io.IOException;
+
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
+
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Form;
@@ -15,8 +17,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.io.File;
-import java.io.IOException;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

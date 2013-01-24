@@ -1,16 +1,11 @@
 package edu.bath.transitivityutils;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.SetMultimap;
-import edu.bath.transitivityutils.DefaultTransitiveRelation;
-import edu.bath.transitivityutils.MergingIntervalSet;
-import edu.bath.transitivityutils.Navigator;
-import edu.bath.transitivityutils.Navigators;
-import edu.bath.transitivityutils.Relations;
-import edu.bath.transitivityutils.TransitiveRelation;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Random;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 
 class Perf {
 

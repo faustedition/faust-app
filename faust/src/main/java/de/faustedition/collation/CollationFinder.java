@@ -1,14 +1,13 @@
 package de.faustedition.collation;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.transcript.GoddagTranscript;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.goddag4j.Element;
 import org.goddag4j.GoddagTreeNode;
 import org.goddag4j.Text;
@@ -22,8 +21,16 @@ import org.restlet.resource.ServerResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.*;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.document.Document;
+import de.faustedition.document.MaterialUnit;
+import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.transcript.GoddagTranscript;
 
 @Component
 public class CollationFinder extends Finder {

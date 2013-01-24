@@ -5,8 +5,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.IterableWrapper;
 
-import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapperCollection;
 
 public class Archive extends NodeWrapperCollection<MaterialUnit> {

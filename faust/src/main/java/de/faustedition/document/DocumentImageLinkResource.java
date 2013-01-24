@@ -1,16 +1,19 @@
 package de.faustedition.document;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
-import de.faustedition.facsimile.FacsimileFinder;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.transcript.DocumentaryGoddagTranscript;
-import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.TranscriptType;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
-import de.faustedition.xml.XPathUtil;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.ext.xml.DomRepresentation;
@@ -31,18 +34,17 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
+import de.faustedition.facsimile.FacsimileFinder;
+import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.transcript.DocumentaryGoddagTranscript;
+import de.faustedition.transcript.GoddagTranscript;
+import de.faustedition.transcript.TranscriptType;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
+import de.faustedition.xml.XPathUtil;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)

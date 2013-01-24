@@ -1,14 +1,11 @@
 package de.faustedition.document;
 
+import java.util.Deque;
+
 import org.restlet.resource.ServerResource;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Queues;
-
 import de.faustedition.FaustURI;
-
-import java.net.URI;
-import java.util.Deque;
 
 @Component
 public class DocumentFinder extends AbstractDocumentFinder {

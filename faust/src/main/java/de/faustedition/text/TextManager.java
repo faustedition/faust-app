@@ -1,27 +1,23 @@
 package de.faustedition.text;
 
-import com.google.common.base.Strings;
-import com.google.common.io.Closeables;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.Runtime;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.tei.WhitespaceUtil;
-import de.faustedition.xml.*;
-import eu.interedition.text.Anchor;
-import eu.interedition.text.Layer;
-import eu.interedition.text.Name;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.h2.H2TextRepository;
-import eu.interedition.text.h2.LayerRelation;
-import eu.interedition.text.simple.KeyValues;
-import eu.interedition.text.simple.SimpleLayer;
-import eu.interedition.text.xml.XML;
-import eu.interedition.text.xml.XMLTransformer;
-import eu.interedition.text.xml.XMLTransformerConfigurationBase;
-import eu.interedition.text.xml.XMLTransformerModule;
-import eu.interedition.text.xml.module.*;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
+import static eu.interedition.text.TextConstants.TEI_NS;
+import static eu.interedition.text.TextConstants.XML_SOURCE_NAME;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -46,19 +42,35 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.*;
+import com.google.common.base.Strings;
+import com.google.common.io.Closeables;
 
-import static eu.interedition.text.TextConstants.XML_SOURCE_NAME;
-import static de.faustedition.xml.Namespaces.TEI_NS_URI;
-import static eu.interedition.text.TextConstants.TEI_NS;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.Runtime;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.tei.WhitespaceUtil;
+import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.MultiplexingContentHandler;
+import de.faustedition.xml.XMLFragmentFilter;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
+import eu.interedition.text.Anchor;
+import eu.interedition.text.Layer;
+import eu.interedition.text.Name;
+import eu.interedition.text.TextRepository;
+import eu.interedition.text.h2.H2TextRepository;
+import eu.interedition.text.h2.LayerRelation;
+import eu.interedition.text.xml.XML;
+import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.XMLTransformerConfigurationBase;
+import eu.interedition.text.xml.XMLTransformerModule;
+import eu.interedition.text.xml.module.CLIXAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.DefaultAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.LineElementXMLTransformerModule;
+import eu.interedition.text.xml.module.NotableCharacterXMLTransformerModule;
+import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.TextXMLTransformerModule;
 
 @Component
 public class TextManager extends Runtime implements Runnable {

@@ -1,26 +1,29 @@
 package de.faustedition.dataimport;
 
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.XMLConstants;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import javax.xml.XMLConstants;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static de.faustedition.xml.Namespaces.TEI_NS_URI;
 
 public class GeneticRelationScaffolder extends Runtime implements Runnable {
 

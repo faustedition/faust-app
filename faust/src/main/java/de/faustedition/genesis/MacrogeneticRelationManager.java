@@ -1,14 +1,12 @@
 package de.faustedition.genesis;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.document.Document;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.search.SearchResource;
-import de.faustedition.xml.Namespaces;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
@@ -19,15 +17,14 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.common.base.Objects;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.document.Document;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 
 @Component
 public class MacrogeneticRelationManager {

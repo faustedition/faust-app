@@ -1,8 +1,7 @@
 package de.faustedition;
 
-import com.google.common.base.Throwables;
-
-import eu.interedition.text.json.TextModule;
+import java.io.IOException;
+import java.io.Writer;
 
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -15,8 +14,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.io.IOException;
-import java.io.Writer;
+import com.google.common.base.Throwables;
+
+import eu.interedition.text.json.TextModule;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

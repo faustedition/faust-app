@@ -1,5 +1,31 @@
 package de.faustedition.tei;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+
+import javax.xml.XMLConstants;
+
+import org.apache.commons.mail.EmailException;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -9,26 +35,13 @@ import com.thaiopensource.validate.ValidateProperty;
 import com.thaiopensource.validate.Validator;
 import com.thaiopensource.validate.rng.SAXSchemaReader;
 import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
+
 import de.faustedition.EmailReporter;
 import de.faustedition.EmailReporter.ReportCreator;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
 import de.faustedition.xml.XMLStorage;
-import org.apache.commons.mail.EmailException;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.xml.sax.*;
-import org.xml.sax.helpers.XMLReaderFactory;
-
-import javax.xml.XMLConstants;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.util.*;
-import java.util.regex.Pattern;
 
 @Component
 public class TeiValidator extends Runtime implements Runnable, InitializingBean {

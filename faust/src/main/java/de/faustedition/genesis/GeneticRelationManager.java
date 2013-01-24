@@ -1,15 +1,15 @@
 package de.faustedition.genesis;
 
-import au.com.bytecode.opencsv.CSVReader;
-import de.faustedition.FaustURI;
-import de.faustedition.Runtime;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.text.Text;
-import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.TranscriptType;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.goddag4j.Element;
 import org.goddag4j.GoddagNode;
 import org.goddag4j.GoddagTreeNode;
@@ -23,15 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import au.com.bytecode.opencsv.CSVReader;
+import de.faustedition.FaustURI;
+import de.faustedition.Runtime;
+import de.faustedition.document.Document;
+import de.faustedition.document.MaterialUnit;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.text.Text;
+import de.faustedition.transcript.GoddagTranscript;
+import de.faustedition.transcript.TranscriptType;
 
 @Component
 public class GeneticRelationManager extends Runtime implements Runnable {

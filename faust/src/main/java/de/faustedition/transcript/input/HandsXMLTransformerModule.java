@@ -5,20 +5,13 @@ import java.util.HashSet;
 
 import javax.xml.namespace.QName;
 
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.ObjectNode;
-
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import de.faustedition.xml.Namespaces;
 import eu.interedition.text.Anchor;
-import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextRange;
-import eu.interedition.text.simple.SimpleLayer;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfiguration;

@@ -1,10 +1,11 @@
 package de.faustedition.graph;
 
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import javax.annotation.Nullable;
+
 import org.neo4j.graphdb.Node;
 
-import javax.annotation.Nullable;
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
 
 public abstract class NodeWrapper {
 

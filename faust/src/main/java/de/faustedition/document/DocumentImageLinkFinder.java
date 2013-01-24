@@ -1,9 +1,9 @@
 package de.faustedition.document;
 
+import java.util.Deque;
+
 import org.restlet.resource.ServerResource;
 import org.springframework.stereotype.Component;
-
-import java.util.Deque;
 
 @Component
 public class DocumentImageLinkFinder extends AbstractDocumentFinder {

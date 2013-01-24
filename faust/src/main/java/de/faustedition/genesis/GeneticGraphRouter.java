@@ -1,11 +1,14 @@
 package de.faustedition.genesis;
 
-import com.google.common.collect.Iterables;
-import de.faustedition.ApplicationContextFinder;
-import de.faustedition.document.Archive;
-import de.faustedition.document.Document;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.template.TemplateRepresentationFactory;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.xml.xpath.XPathExpressionException;
+
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -19,9 +22,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.util.*;
+import com.google.common.collect.Iterables;
+
+import de.faustedition.ApplicationContextFinder;
+import de.faustedition.document.Archive;
+import de.faustedition.document.Document;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.template.TemplateRepresentationFactory;
 
 @Component
 public class GeneticGraphRouter extends Router implements InitializingBean {

@@ -1,11 +1,10 @@
 package de.faustedition.document;
 
-import de.faustedition.FaustURI;
-import de.faustedition.JsonRespresentation;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.transcript.DocumentaryGoddagTranscript;
-import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.TranscriptType;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
+
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
@@ -14,11 +13,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import de.faustedition.FaustURI;
+import de.faustedition.JsonRespresentation;
+import de.faustedition.template.TemplateRepresentationFactory;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)

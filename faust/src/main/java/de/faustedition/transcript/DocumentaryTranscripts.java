@@ -28,8 +28,6 @@ import eu.interedition.text.Name;
 import eu.interedition.text.TextRepository;
 import eu.interedition.text.h2.H2TextRepository;
 import eu.interedition.text.h2.LayerRelation;
-import eu.interedition.text.simple.KeyValues;
-import eu.interedition.text.simple.SimpleLayer;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfigurationBase;
 import eu.interedition.text.xml.XMLTransformerModule;

@@ -1,15 +1,16 @@
 package de.faustedition.facsimile;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Iterators;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.Iterators;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

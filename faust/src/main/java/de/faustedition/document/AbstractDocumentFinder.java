@@ -1,7 +1,8 @@
 package de.faustedition.document;
 
-import de.faustedition.FaustURI;
-import de.faustedition.xml.XMLStorage;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -11,8 +12,8 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import de.faustedition.FaustURI;
+import de.faustedition.xml.XMLStorage;
 
 public abstract class AbstractDocumentFinder extends Finder {
 

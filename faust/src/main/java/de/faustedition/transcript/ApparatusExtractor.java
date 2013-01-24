@@ -5,7 +5,6 @@ import static de.faustedition.xml.Namespaces.TEI_NS_PREFIX;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.faustedition.xml.Namespaces;
 import org.goddag4j.Element;
 import org.goddag4j.GoddagNode;
 import org.goddag4j.visit.GoddagVisitor;
@@ -13,6 +12,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
 import com.google.common.collect.Lists;
+
+import de.faustedition.xml.Namespaces;
 
 public class ApparatusExtractor {
 

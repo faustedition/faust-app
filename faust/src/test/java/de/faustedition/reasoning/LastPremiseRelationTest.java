@@ -1,18 +1,15 @@
 package de.faustedition.reasoning;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.faustedition.reasoning.PremiseBasedRelation.Premise;
-
 import edu.bath.transitivityutils.Relation;
 
 public class LastPremiseRelationTest {

@@ -1,11 +1,13 @@
 package edu.bath.transitivityutils;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+
 import edu.bath.transitivityutils.OrderList.Node;
-import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * An interval set that supports adding intervals and testing whether a node belongs in any of them.

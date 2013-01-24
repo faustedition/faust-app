@@ -1,7 +1,6 @@
 package de.faustedition.transcript;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 
 import javax.persistence.Column;
@@ -30,11 +29,8 @@ import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.Layer;
-import eu.interedition.text.Name;
-import eu.interedition.text.Text;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.TextRepository;
-import eu.interedition.text.simple.KeyValues;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
 

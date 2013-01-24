@@ -1,23 +1,16 @@
 package de.faustedition.transcript;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
-import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.xml.NodeListWrapper;
-import de.faustedition.xml.XMLUtil;
-import de.faustedition.xml.XPathUtil;
-import eu.interedition.text.Layer;
-import eu.interedition.text.Name;
-import eu.interedition.text.Text;
-import eu.interedition.text.TextRepository;
+import static eu.interedition.text.Query.text;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+
+import javax.xml.stream.XMLStreamException;
 
 import org.codehaus.jackson.JsonNode;
 import org.hibernate.Session;
-import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.ext.xml.DomRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
@@ -27,17 +20,16 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
-import static eu.interedition.text.Query.text;
+import de.faustedition.JsonRepresentationFactory;
+import eu.interedition.text.Layer;
+import eu.interedition.text.Name;
+import eu.interedition.text.Text;
+import eu.interedition.text.TextRepository;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
