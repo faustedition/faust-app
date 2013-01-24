@@ -12,7 +12,6 @@ public class FacsimilePathXMLTransformerModule extends TextXMLTransformerModule{
 	private MaterialUnit materialUnit;
 
 	public FacsimilePathXMLTransformerModule(MaterialUnit materialUnit) {
-		super(1000, false);
 		this.materialUnit = materialUnit;
 	}
 
@@ -20,10 +19,10 @@ public class FacsimilePathXMLTransformerModule extends TextXMLTransformerModule{
 	public void end(XMLTransformer transformer, XMLEntity entity) {
 
 		if(entity.getName().getLocalName().equals("graphic")  
-				&&	!entity.getAttributes().has("mimeType")
+				&&	!entity.getAttributes().containsKey("mimeType")
 				&& !read) {
-			if(entity.getAttributes().has("url")) {
-				String url = entity.getAttributes().get("url").getTextValue();
+			if(entity.getAttributes().containsKey("url")) {
+				String url = entity.getAttributes().get("url").toString();
 				try {
 					materialUnit.setFacsimile(FaustURI.parse(url));
 					read = true;

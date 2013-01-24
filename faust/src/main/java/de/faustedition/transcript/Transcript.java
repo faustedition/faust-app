@@ -2,6 +2,7 @@ package de.faustedition.transcript;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.persistence.Transient;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.codehaus.jackson.JsonNode;
 import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -27,7 +29,12 @@ import com.google.common.io.Closeables;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.xml.XMLStorage;
+import eu.interedition.text.Layer;
+import eu.interedition.text.Name;
 import eu.interedition.text.Text;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
+import eu.interedition.text.simple.KeyValues;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
 
@@ -41,7 +48,7 @@ public class Transcript {
 
 	private long id;
 	private String sourceURI;
-	private Text text;
+	private Layer text;
 	private long materialUnitId;
 
 	@Id
@@ -84,11 +91,11 @@ public class Transcript {
 
 	@ManyToOne
 	@JoinColumn(name = "text_id")
-	public Text getText() {
+	public Layer<JsonNode> getText() {
 		return text;
 	}
 
-	public void setText(Text text) {
+	public void setText(Layer<JsonNode> text) {
 		this.text = text;
 	}
 
@@ -97,7 +104,7 @@ public class Transcript {
 		return Objects.toStringHelper(this).addValue(getSource()).toString();
 	}
 
-	private static Transcript doRead(Session session, XMLStorage xml, FaustURI source, XMLTransformer transformer)
+	private static Transcript doRead(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer transformer)
 	throws IOException, XMLStreamException {
 			Preconditions.checkArgument(source != null);
 
@@ -117,41 +124,43 @@ public class Transcript {
 			}
 
 			if (transcript.getText() == null) {
-				transcript.setText(readText(session, xml, source, transformer));
-				TranscribedVerseInterval.register(session, transcript);
+
+				transcript.setText(readText(session, xml, source, textRepo, transformer));
+				TranscribedVerseInterval.register(session, textRepo, transcript);
 			}
 
 			return transcript;
 	}
 	
-	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit, XMLTransformer transformer)
+	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit, TextRepository textRepo, XMLTransformer transformer)
 	throws IOException, XMLStreamException {
 		final FaustURI source = materialUnit.getTranscriptSource();
-		Transcript transcript = doRead(session, xml, source, transformer);
+
+		Transcript transcript = doRead(session, xml, source, textRepo, transformer);
 		transcript.setMaterialUnitId(materialUnit.node.getId());
 		session.save(transcript);
 		return transcript;
 	}
 
-	public static Transcript read(Session session, XMLStorage xml, FaustURI source, XMLTransformer transformer)
+	public static Transcript read(Session session, XMLStorage xml, FaustURI source, TextRepository textRepo, XMLTransformer transformer)
 	throws IOException, XMLStreamException {
-		Transcript transcript = doRead(session, xml, source, transformer);
+		Transcript transcript = doRead(session, xml, source, textRepo, transformer);
 		session.save(transcript);
 		return transcript;
 	}
 	
 	
-	private static Text readText(Session session, XMLStorage xml, FaustURI source, XMLTransformer transformer) 
+	private static Layer<JsonNode> readText(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer transformer) 
 		throws XMLStreamException, IOException {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Transforming XML transcript from {}", source);
 		}
-		InputStream xmlStream = null;
+		Reader xmlStream = null;
 		XMLStreamReader xmlReader = null;
 		try {
-			xmlStream = xml.getInputSource(source).getByteStream();
-			xmlReader = XML.createXMLInputFactory().createXMLStreamReader(xmlStream);
-			return transformer.transform(Text.create(session, null, xmlReader));
+			xmlStream = xml.getInputSource(source).getCharacterStream();
+			//xmlReader = XML.createXMLInputFactory().createXMLStreamReader(xmlStream);
+			return transformer.transform(textRepo.add(TextConstants.XML_TARGET_NAME, xmlStream, null));
 		} finally {
 			XML.closeQuietly(xmlReader);
 			Closeables.close(xmlStream, false);

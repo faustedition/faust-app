@@ -43,6 +43,9 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 	
 	@Autowired
 	private DocumentaryTranscripts documentaryTranscripts;
+	
+	@Autowired
+	private TextualTranscripts textualTranscripts;
 
 	@Override
 	public void run() {
@@ -63,7 +66,7 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 					try {
 						logger.debug("Reading transcript of {}", mu);
 						if (mu instanceof Document) 
-							TextualTranscripts.read(sessionFactory.getCurrentSession(), xml, mu);
+							textualTranscripts.read(sessionFactory.getCurrentSession(), xml, mu);
 						else
 							documentaryTranscripts.read(sessionFactory.getCurrentSession(), xml, mu);
 						

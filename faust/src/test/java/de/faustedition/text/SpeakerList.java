@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static eu.interedition.text.query.QueryCriteria.annotationName;
+import static eu.interedition.text.Query.name;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -30,11 +30,14 @@ public class SpeakerList extends AbstractContextTest {
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	@Autowired
+	private TextRepository<JsonNode> textRepo;
+	
 	@Test
 	public void listVerses() throws IOException {
 		Multimap<eu.interedition.text.Text, Layer<JsonNode>> speakers = HashMultimap.create();
-		for (Layer annotation : annotationName(new Name(TextConstants.TEI_NS, "speaker")).iterate(sessionFactory.getCurrentSession())) {
-			speakers.put(annotation.getTarget().getText(), annotation);
+		for (Layer annotation : textRepo.query(name(new Name(TextConstants.TEI_NS, "speaker")))) {
+			speakers.put(((Anchor)(annotation.getAnchors().iterator().next())).getText(), annotation);
 		}
 
 		SortedSet<String> names = Sets.newTreeSet();
@@ -42,7 +45,7 @@ public class SpeakerList extends AbstractContextTest {
 		for (Text text : speakers.keySet()) {
 			final TreeSet<TextRange> ranges = Sets.newTreeSet();
 			for (Layer<JsonNode> annotation : speakers.get(text)) {
-				ranges.add(annotation.getTarget());
+				ranges.add(annotation.getAnchors().iterator().next().getRange());
 			}
 			Iterables.addAll(names, Iterables.transform(text.read(ranges).values(), new Function<String, String>() {
 				@Override

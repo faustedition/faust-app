@@ -5,6 +5,7 @@ import com.google.common.io.Closeables;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
+import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.tei.WhitespaceUtil;
 import de.faustedition.xml.*;
@@ -12,14 +13,18 @@ import eu.interedition.text.Anchor;
 import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextRepository;
+import eu.interedition.text.h2.H2TextRepository;
+import eu.interedition.text.h2.LayerRelation;
 import eu.interedition.text.simple.KeyValues;
 import eu.interedition.text.simple.SimpleLayer;
-import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfigurationBase;
 import eu.interedition.text.xml.XMLTransformerModule;
 import eu.interedition.text.xml.module.*;
+
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
@@ -47,8 +52,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.*;
 
+import static eu.interedition.text.TextConstants.XML_SOURCE_NAME;
 import static de.faustedition.xml.Namespaces.TEI_NS_URI;
 import static eu.interedition.text.TextConstants.TEI_NS;
 
@@ -76,24 +84,27 @@ public class TextManager extends Runtime implements Runnable {
     private TransactionTemplate transactionTemplate;
 
     @Autowired
-    private TextRepository<KeyValues> textRepo;
+    private TextRepository<JsonNode> textRepo;
     
     private SortedMap<FaustURI, String> tableOfContents;
 
 	@Transactional
 	public Set<FaustURI> feedDatabase() {
 		
-		final XMLTransformerConfigurationBase conf = new XMLTransformerConfigurationBase<KeyValues>(textRepo) {
+		final Random random = new Random();
+					
+		final XMLTransformerConfigurationBase conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
 
-	        @Override
-	        protected Layer<KeyValues> translate(Name name, Map<Name, Object> attributes, Set<Anchor> anchors) {
-	            final KeyValues kv = new KeyValues();
-	            for (Map.Entry<Name, Object> attr : attributes.entrySet()) {
-	                kv.put(attr.getKey().toString(), attr.getValue());
-	            }
-	            return new SimpleLayer<KeyValues>(name, "", kv, anchors);
-	        }
-	    };
+			@Override
+			protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor> anchors) {
+
+				ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
+				JsonNode data = mapper.valueToTree(attributes);	         
+				return new LayerRelation<JsonNode>(name, anchors, data, random.nextLong(), (H2TextRepository<JsonNode>)textRepo);
+
+			}
+
+		};
 
 
 		final List<XMLTransformerModule> modules = conf.getModules();
@@ -133,11 +144,12 @@ public class TextManager extends Runtime implements Runnable {
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Importing texts");
 		for (FaustURI textSource : xml.iterate(new FaustURI(FaustAuthority.XML, "/text"))) {
-			InputStream xmlStream = null;
+			Reader xmlReader = null;
 			try {
 				logger.info("Importing text " + textSource);
-				xmlStream = xml.getInputSource(textSource).getByteStream();
-				final eu.interedition.text.Text xmlText = eu.interedition.text.Text.create(session, null, xmlInputFactory.createXMLStreamReader(xmlStream));
+				xmlReader = xml.getInputSource(textSource).getCharacterStream();
+				
+				final Layer xmlText = textRepo.add(XML_SOURCE_NAME, xmlReader, null);
 				final eu.interedition.text.Text text = xmlTransformer.transform(xmlText);
 			} catch (IOException e) {
 				logger.error("I/O error while adding text " + textSource, e);
@@ -146,7 +158,7 @@ public class TextManager extends Runtime implements Runnable {
 				logger.error("XML error while adding text " + textSource, e);
 				failed.add(textSource);
 			} finally {
-				Closeables.closeQuietly(xmlStream);
+				Closeables.closeQuietly(xmlReader);
 			}
 		}
 		return failed;

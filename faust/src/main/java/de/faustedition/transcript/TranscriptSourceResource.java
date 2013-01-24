@@ -11,6 +11,7 @@ import de.faustedition.xml.XPathUtil;
 import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
 import eu.interedition.text.Text;
+import eu.interedition.text.TextRepository;
 
 import org.codehaus.jackson.JsonNode;
 import org.hibernate.Session;
@@ -36,6 +37,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static eu.interedition.text.Query.text;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -46,14 +48,20 @@ public class TranscriptSourceResource extends TranscriptResource {
 
 	@Autowired
 	private JsonRepresentationFactory jsonFactory;
+	
+	@Autowired
+	private TextualTranscripts textualTranscripts;
 
+	@Autowired
+	private TextRepository<JsonNode> textRepo;
+	
 	private Transcript transcript;
-
+	
 	@Override
 	protected void doInit() throws ResourceException {
 		super.doInit();
 		try {
-			this.transcript = TextualTranscripts.read(sessionFactory.getCurrentSession(), xml, materialUnit);
+			this.transcript = textualTranscripts.read(sessionFactory.getCurrentSession(), xml, materialUnit);
 		} catch (XMLStreamException e) {
 			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
 		} catch (IOException e) {
@@ -64,19 +72,9 @@ public class TranscriptSourceResource extends TranscriptResource {
 
 	@Get("xml")
 	public Representation source() throws IOException, XMLStreamException, SAXException {
-		final Reader xmlReader = transcript.getText().getLayer().getTarget().getText().read().getInput();
-		try {
-			final org.w3c.dom.Document xml = XMLUtil.documentBuilder().parse(new InputSource(xmlReader));
-			for (Element handNote : new NodeListWrapper<Element>(XPathUtil.xpath("//tei:handNotes"), xml)) {
-				handNote.getParentNode().removeChild(handNote);
-			}
-			for (Element handNote : new NodeListWrapper<Element>(XPathUtil.xpath("//tei:charDecl"), xml)) {
-				handNote.getParentNode().removeChild(handNote);
-			}
-			return new DomRepresentation(MediaType.APPLICATION_XML, xml);
-		} finally {
-			Closeables.close(xmlReader, false);
-		}
+		Text xmlSourceText = transcript.getText().getAnchors().iterator().next().getText();
+		//FIXME How to do this properly?
+		return new StringRepresentation(xmlSourceText.read());
 	}
 
 	@Get("txt")
@@ -91,9 +89,9 @@ public class TranscriptSourceResource extends TranscriptResource {
 
 		final Map<String, Name> names = Maps.newHashMap();
 		final ArrayList<Layer<JsonNode>> annotations = Lists.newArrayList();
-		for (Layer<JsonNode> annotation : text(text).iterate(session)) {
+		for (Layer<JsonNode> annotation : textRepo.query(text(text))) {
 			final Name name = annotation.getName();
-			names.put(Long.toString(name.getId()), name);
+			names.put(Long.toString(name.hashCode()), name);
 			annotations.add(annotation);
 		}
 		return jsonFactory.map(new ModelMap()

@@ -8,6 +8,8 @@ import de.faustedition.document.MaterialUnit;
 import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
+import eu.interedition.text.simple.KeyValues;
 import eu.interedition.text.util.SQL;
 
 import org.codehaus.jackson.JsonNode;
@@ -27,9 +29,10 @@ import java.util.SortedSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static eu.interedition.text.query.QueryCriteria.and;
-import static eu.interedition.text.query.QueryCriteria.annotationName;
-import static eu.interedition.text.query.QueryCriteria.text;
+import static eu.interedition.text.Query.and;
+import static eu.interedition.text.Query.text;
+import static eu.interedition.text.Query.name;
+
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -90,14 +93,14 @@ public class TranscribedVerseInterval extends VerseInterval {
 		super.setEnd(end);
 	}
 
-	public static void register(Session session, Transcript transcript) {
+	public static void register(Session session, TextRepository<JsonNode> textRepo, Transcript transcript) {
 		for (TranscribedVerseInterval vi : registeredFor(session, transcript)) {
 			session.delete(vi);
 		}
 
 		final SortedSet<Integer> verses = Sets.newTreeSet();
-		for (Layer<JsonNode> verse : and(text(transcript.getText()), annotationName(new Name(TextConstants.TEI_NS, "l"))).iterate(session)) {
-			final Matcher verseNumberMatcher = VERSE_NUMBER_PATTERN.matcher(Objects.firstNonNull(verse.getData().path("n").getValueAsText(), ""));
+		for (Layer<JsonNode> verse : textRepo.query(and(text(transcript.getText()), name(new Name(TextConstants.TEI_NS, "l"))))) {
+			final Matcher verseNumberMatcher = VERSE_NUMBER_PATTERN.matcher(Objects.firstNonNull(verse.data().path("n").getValueAsText(), ""));
 			while (verseNumberMatcher.find()) {
 				try {
 					verses.add(Integer.parseInt(verseNumberMatcher.group()));
@@ -139,7 +142,9 @@ public class TranscribedVerseInterval extends VerseInterval {
 	}
 
 	public static Iterable<TranscribedVerseInterval> registeredFor(Session session, Transcript transcript) {
-		return SQL.iterate(session.createCriteria(TranscribedVerseInterval.class).add(Restrictions.eq("transcript", transcript)), TranscribedVerseInterval.class);
+		return SQL.iterate(
+				session.createCriteria(TranscribedVerseInterval.class).add(Restrictions.eq("transcript", transcript)), TranscribedVerseInterval.class
+				);
 	}
 
 	public static Iterable<TranscribedVerseInterval> all(Session session) {
