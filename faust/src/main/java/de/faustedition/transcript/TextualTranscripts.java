@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.faustedition.document.MaterialUnit;
+import de.faustedition.transcript.input.HandsXMLTransformerModule;
+import de.faustedition.transcript.input.StageXMLTransformerModule;
 import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.Anchor;
 import eu.interedition.text.Layer;
@@ -72,6 +74,7 @@ public class TextualTranscripts {
 		modules.add(new DefaultAnnotationXMLTransformerModule());
 		modules.add(new CLIXAnnotationXMLTransformerModule());
 		modules.add(new TEIAwareAnnotationXMLTransformerModule());
+		modules.add(new StageXMLTransformerModule());
 
 		conf.addLineElement(new Name(TEI_NS, "text"));
 		conf.addLineElement(new Name(TEI_NS, "div"));

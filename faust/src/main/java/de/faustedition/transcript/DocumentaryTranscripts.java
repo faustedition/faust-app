@@ -44,6 +44,9 @@ public class DocumentaryTranscripts {
 	@Autowired
 	private TextRepository<JsonNode> textRepo;
 	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
 	public Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit) throws IOException, XMLStreamException {
 		XMLTransformer transformer = createXMLTransformer (session, materialUnit);
 		return Transcript.read(session, xml, materialUnit, textRepo, transformer);
@@ -73,7 +76,7 @@ public class DocumentaryTranscripts {
 		modules.add(new TextXMLTransformerModule());
 		modules.add(new DefaultAnnotationXMLTransformerModule());
 		modules.add(new CLIXAnnotationXMLTransformerModule());
-		modules.add(new HandsXMLTransformerModule(conf));
+		modules.add(new HandsXMLTransformerModule(conf, objectMapper));
 		modules.add(new FacsimilePathXMLTransformerModule(materialUnit));
 		modules.add(new TEIAwareAnnotationXMLTransformerModule());
 

@@ -5,6 +5,10 @@ import java.util.HashSet;
 
 import javax.xml.namespace.QName;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -21,28 +25,27 @@ public class HandsXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T>
 
 	private long lastHandsChangeOffset = -1;
 	private String lastHandsChangeValue = null;
-	private XMLTransformerConfiguration conf;
+	private XMLTransformerConfiguration<JsonNode> conf;
+	private ObjectMapper objectMapper;
 
-	public HandsXMLTransformerModule(XMLTransformerConfiguration conf) {
+	public HandsXMLTransformerModule(XMLTransformerConfiguration<JsonNode> conf, ObjectMapper objectMapper) {
 		this.conf = conf;
+		this.objectMapper = objectMapper;
+
 	}
 
 	private void addHandAnnotation(XMLTransformer transformer) {
 
 		if(lastHandsChangeValue != null) {
 			
-			HashMap<Object, Object> data = Maps.newHashMap();
+			ObjectNode data = objectMapper.createObjectNode();
 			data.put("value", lastHandsChangeValue);
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "hand"));
 			long start = lastHandsChangeOffset;
 			long end = transformer.getTextOffset();
 			Anchor textTarget = new Anchor(transformer.getTarget(), 
 					new TextRange(start, end));
-			HashSet<Anchor> anchors = Sets.newHashSet(textTarget);
-			//Layer annotation = new SimpleLayer<JsonNode>(name, "", data, anchors);
-			
-			conf.xmlElement(name, data, textTarget);
-			//add(transformer, annotation);
+			conf.add(name, data, textTarget);
 		}
 	}
 

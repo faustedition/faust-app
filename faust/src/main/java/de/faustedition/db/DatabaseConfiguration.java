@@ -43,7 +43,7 @@ public class DatabaseConfiguration {
 
 		final BoneCPDataSource dataSource = new BoneCPDataSource();
 		dataSource.setDriverClass(Driver.class.getName());
-		dataSource.setJdbcUrl(database.toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";LOCK_TIMEOUT=10000");
+		dataSource.setJdbcUrl(database.toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";LOCK_TIMEOUT=30000");
 		dataSource.setUsername("sa");
 		dataSource.setPassword("");
 		dataSource.setMinConnectionsPerPartition(1);

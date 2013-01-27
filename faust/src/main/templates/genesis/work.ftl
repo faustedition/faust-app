@@ -6,7 +6,7 @@
 							
 								var lines = { 1: {start: 4613, end: 4727, title: 'Anmutige Gegend'},
 									    	  2: {start: 4728, end: 5064, title: 'Saal des Thrones'},
-										      3: {start: 5065, end: 5986, title: 'Weiläufiger Saal mit Nebengemächern'},
+										      3: {start: 5065, end: 5986, title: 'Weitläufiger Saal mit Nebengemächern'},
 										      4: {start: 5987, end: 6172, title: 'Lustgarten'},
 										      5: {start: 6173, end: 6306, title: 'Finstere Galerie'},
 										      6: {start: 6307, end: 6376, title: 'Hell erleuchtete Säle'},
@@ -18,7 +18,7 @@
 										      11: {start: 7249, end: 7494, title: 'Peneios'},
 										      12: {start: 7495, end: 8033, title: 'Am oberen Peneios'},
 										      13: {start: 8034, end: 8274, title: 'Felsbuchten des ägäischen Meers'},
-										      14: {start: 8275, end: 8487, title: 'Telcinen von Rhodos'},
+										      14: {start: 8275, end: 8487, title: 'Telchinen von Rhodos'},
 										      
 										      15: {start: 8488, end: 9126, title: 'Vor dem Palaste des Menelas zu Sparta'},
 										      16: {start: 9127, end: 9573, title: 'Innerer Burghof'},
@@ -42,7 +42,7 @@
 								scene_uis = svgdoc.getElementsByClassName('scene_ui');
 								ynodes = Y.Node.all(scene_uis);
 								
-								for (var i=1; i < 27; i++) {
+								for (var i=0; i < 27; i++) {
 									(function (){
 										var line = lines[i+1];
 										var start = line.start;
@@ -78,9 +78,12 @@
 		Vermutlich im Frühjahr 1800 fiel die Entscheidung zugunsten einer Teilung des Werks, noch im selben Jahr 
 		entstand der Anfang der Helena-Dichtung. 1808 erschien „Faust. Eine Tragödie“, der Faust I, in der ersten bei Cotta erschienenen Gesamtausgabe. ...
 		</p>
-			<p style="margin-right: 1em">
-				
-				 Szenen sind von links nach rechts angeordnet, Jahre von unten nach oben. Grau zeigt die begonnene Arbeit an einer Szene an, Schwarz den Abschluss der Arbeit.  
+			<p style="margin-right: 1em; border: 1px solid black; padding: 0.3em;">
+			<strong><u>Legende</u></strong><br/>
+			<strong>Szenen</strong> sind als Spalten von links nach rechts angeordnet, 
+			<strong>Jahre</strong> von unten nach oben. 
+			Grau zeigt die <strong>begonnene Arbeit</strong> an einer Szene an, 
+			Schwarz den <strong>Abschluss der Arbeit</strong>.
 			</p>
 		</div>		
 				

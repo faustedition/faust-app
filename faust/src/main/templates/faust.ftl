@@ -38,7 +38,7 @@
 <body class="yui3-skin-sam<#if layout?has_content> layout-${layout}</#if>">
 <div id="header">
 	<div style="float: right"><input title="${message('menu.search')}" id="quick-search" type="text" value=""/></div>
-	<h1><span class="color-1">Digitale Faustedition:&#160;</span>${title}</h1>
+	<h1><a href="${cp}/genesis/work" class="color-1">Digitale Faustedition</a>:&#160;${title}</h1>
 	<@topNavigation />
 </div>
 <div id="main" class="<#if layout?has_content>layout-${layout}</#if>">
@@ -75,7 +75,7 @@
 					<li class="yui3-menuitem"><a href="${cp}/document/faust/2.5/gsa_390883.xml" class="yui3-menuitem-content">${message("menu.demo.diplomatic-transcript_2")}</a></li>
 					<li class="yui3-menuitem"><a href="${cp}/structure/gsa/391282/391282-structure.xml" class="yui3-menuitem-content">${message("menu.demo.manuscript_description")}</a></li>
 					<li class="yui3-menuitem"><a href="${cp}/demo/genesis" class="yui3-menuitem-content">${message("menu.demo.genesis_1")}</a></li>
-					<li class="yui3-menuitem"><a href="${cp}/text/2-5-4.xml" class="yui3-menuitem-content">${message("menu.demo.genesis_2")}</a></li>
+					<!--<li class="yui3-menuitem"><a href="${cp}/text/2-5-4.xml" class="yui3-menuitem-content">${message("menu.demo.genesis_2")}</a></li>-->
                     <li class="yui3-menuitem"><a href="${cp}/demo/text-image-link" class="yui3-menuitem-content">${message("menu.demo.text_image_link")}</a></li>
 				</ul>
 				</div>
@@ -93,7 +93,7 @@
 				</div>
 				</div>
 			</li>
-			<li>
+			<!-- <li>
 				<a href="#texts" class="yui3-menu-label"><em>${message("menu.text")}</em></a>
 				<div id="texts" class="yui3-menu">
 				<div class="yui3-menu-content">
@@ -104,7 +104,8 @@
 				</ul>
 				</div>
 				</div>
-			</li>			
+			</li> -->			
+			<li class="yui3-menuitem"><a href="${cp}/genesis/work" class="yui3-menuitem-content">${message("menu.genesis")}</a></li>
 			</#if>
 			<li><a class="yui3-menu-label" href="${cp}/project/about"><em>${message("menu.project")}</em></a>
 				<div id="project" class="yui3-menu">
