@@ -15,6 +15,8 @@ import org.springframework.util.StopWatch;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -43,7 +45,13 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		for (final MaterialUnit mu : graph.getMaterialUnits()) {
+
+    final Deque<MaterialUnit> queue = new ArrayDeque<MaterialUnit>(graph.getMaterialUnits());
+		while (!queue.isEmpty()) {
+      final MaterialUnit mu = queue.pop();
+
+      queue.addAll(mu);
+
 			if (mu.getTranscriptSource() == null) {
 				continue;
 			}
