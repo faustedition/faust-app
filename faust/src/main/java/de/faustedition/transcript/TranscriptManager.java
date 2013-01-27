@@ -40,8 +40,15 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -97,18 +104,19 @@ public class TranscriptManager implements InitializingBean {
       LOG.debug("Transforming XML transcript from {}", source);
     }
 
-    Reader xmlStream = null;
-    XMLStreamReader xmlReader = null;
     try {
-      xmlStream = xml.getInputSource(source).getCharacterStream();
-      final Layer<JsonNode> sourceLayer = textRepository.add(TextConstants.XML_TARGET_NAME, xmlStream, null);
+      final StringWriter xmlString = new StringWriter();
+      TransformerFactory.newInstance().newTransformer().transform(
+              new SAXSource(xml.getInputSource(source)),
+              new StreamResult(xmlString)
+      );
+      final Layer<JsonNode> sourceLayer = textRepository.add(TextConstants.XML_TARGET_NAME, new StringReader(xmlString.toString()), null);
       final LayerNode<JsonNode> transcriptLayer = (LayerNode<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
       transcriptLayer.node.createRelationshipTo(materialUnit.node, TRANSCRIPT_RT);
     } catch (IllegalArgumentException e) {
       throw new TranscriptInvalidException(e);
-    } finally {
-      XML.closeQuietly(xmlReader);
-      Closeables.close(xmlStream, false);
+    } catch (TransformerException e) {
+      throw new TranscriptInvalidException(e);
     }
   }
 
