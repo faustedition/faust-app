@@ -16,20 +16,21 @@ import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfiguration;
 import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
+import org.codehaus.jackson.JsonNode;
 
-public class StageXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T> {
+public class StageXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode> {
 
 	private long lastStageChangeOffset = -1;
 	private String lastStageChangeValue = null;
-	private XMLTransformerConfiguration conf;
+	private XMLTransformerConfiguration<JsonNode> conf;
 
 
-	public StageXMLTransformerModule(XMLTransformerConfiguration conf) {
+	public StageXMLTransformerModule(XMLTransformerConfiguration<JsonNode> conf) {
 		this.conf = conf;
 	}
 
 	private static String STAGE_QNAME = "{" + TEI_SIG_GE + "}" +"stage"; 
-	private void addStageAnnotation(XMLTransformer transformer) {
+	private void addStageAnnotation(XMLTransformer<JsonNode> transformer) {
 
 		if(lastStageChangeValue != null) {
 
@@ -48,7 +49,7 @@ public class StageXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T>
 
 
 	@Override
-	public void start(XMLTransformer transformer, XMLEntity entity) {
+	public void start(XMLTransformer<JsonNode> transformer, XMLEntity entity) {
 
 		
 		if (entity.getAttributes().containsKey(STAGE_QNAME)) {
@@ -66,7 +67,7 @@ public class StageXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T>
 	
 
 		@Override
-		public void end(XMLTransformer transformer) {
+		public void end(XMLTransformer<JsonNode> transformer) {
 			// TODO having to call super is a bit unclean and non-obvious
 			addStageAnnotation(transformer);
 			super.end(transformer);

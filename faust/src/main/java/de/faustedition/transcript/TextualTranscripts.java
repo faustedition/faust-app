@@ -73,6 +73,7 @@ public class TextualTranscripts {
 		modules.add(new TextXMLTransformerModule<JsonNode>());
 		modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
 		modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
+    modules.add(new StageXMLTransformerModule(conf));
 		modules.add(new TEIAwareAnnotationXMLTransformerModule<JsonNode>());
 
 		conf.addLineElement(new Name(TEI_NS, "text"));
