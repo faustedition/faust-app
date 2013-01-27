@@ -14,10 +14,12 @@ import javax.persistence.Transient;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import de.faustedition.graph.NodeWrapper;
 import org.codehaus.jackson.JsonNode;
 import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +40,7 @@ import eu.interedition.text.xml.XMLTransformer;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Entity
-@Table(name = "faust_transcript")
-public class Transcript {
+public class Transcript extends NodeWrapper {
 	private static final Logger LOG = LoggerFactory.getLogger(Transcript.class);
 
 	private long id;
@@ -48,7 +48,11 @@ public class Transcript {
 	private Layer<JsonNode> text;
 	private long materialUnitId;
 
-	@Id
+  public Transcript(Node node) {
+    super(node);
+  }
+
+  @Id
 	@GeneratedValue
 	public long getId() {
 		return id;
@@ -114,7 +118,7 @@ public class Transcript {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("Creating transcript for {}", sourceURI);
 				}
-				transcript = new Transcript();
+				transcript = new Transcript(null);
 				
 				transcript.setSourceURI(sourceURI);
 
