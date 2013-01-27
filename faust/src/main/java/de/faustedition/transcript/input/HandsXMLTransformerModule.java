@@ -1,16 +1,13 @@
 package de.faustedition.transcript.input;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import de.faustedition.xml.Namespaces;
 import eu.interedition.text.Anchor;
@@ -26,26 +23,25 @@ public class HandsXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T>
 	private long lastHandsChangeOffset = -1;
 	private String lastHandsChangeValue = null;
 	private XMLTransformerConfiguration<JsonNode> conf;
-	private ObjectMapper objectMapper;
 
-	public HandsXMLTransformerModule(XMLTransformerConfiguration<JsonNode> conf, ObjectMapper objectMapper) {
+
+	public HandsXMLTransformerModule(XMLTransformerConfiguration<JsonNode> conf) {
 		this.conf = conf;
-		this.objectMapper = objectMapper;
-
 	}
 
 	private void addHandAnnotation(XMLTransformer transformer) {
 
 		if(lastHandsChangeValue != null) {
 			
-			ObjectNode data = objectMapper.createObjectNode();
-			data.put("value", lastHandsChangeValue);
+			Map<Name,Object> data = Maps.newHashMap();
+			data.put(new Name((String)null, "value"), lastHandsChangeValue);
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "hand"));
 			long start = lastHandsChangeOffset;
 			long end = transformer.getTextOffset();
 			Anchor textTarget = new Anchor(transformer.getTarget(), 
 					new TextRange(start, end));
-			conf.add(name, data, textTarget);
+			if (start != end)
+				conf.xmlElement(name, data, textTarget);
 		}
 	}
 

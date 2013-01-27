@@ -74,7 +74,7 @@ public class TextualTranscripts {
 		modules.add(new DefaultAnnotationXMLTransformerModule());
 		modules.add(new CLIXAnnotationXMLTransformerModule());
 		modules.add(new TEIAwareAnnotationXMLTransformerModule());
-		modules.add(new StageXMLTransformerModule());
+		modules.add(new StageXMLTransformerModule(conf));
 
 		conf.addLineElement(new Name(TEI_NS, "text"));
 		conf.addLineElement(new Name(TEI_NS, "div"));

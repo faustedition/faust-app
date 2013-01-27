@@ -1,30 +1,20 @@
 package de.faustedition.transcript.input;
 
-import static eu.interedition.text.Annotation.JSON;
 import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
 
 import java.util.HashMap;
-import java.util.HashSet;
-
 
 import javax.xml.namespace.QName;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.ObjectNode;
-
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import de.faustedition.xml.Namespaces;
 import eu.interedition.text.Anchor;
-import eu.interedition.text.Annotation;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextRange;
-import eu.interedition.text.TextTarget;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfiguration;
-import eu.interedition.text.xml.module.AbstractAnnotationXMLTransformerModule;
 import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
 
 public class StageXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T> {
@@ -43,16 +33,16 @@ public class StageXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T>
 
 		if(lastStageChangeValue != null) {
 
-			HashMap<Object, Object> data = Maps.newHashMap();
-			data.put("value", lastStageChangeValue);
+			HashMap<Name, Object> data = Maps.newHashMap();
+			data.put(new Name((String)null, "value"), lastStageChangeValue);
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "stage"));
 			long start = lastStageChangeOffset;
 			long end = transformer.getTextOffset();
 			Anchor textTarget = new Anchor(transformer.getTarget(), 
 					new TextRange(start, end));
-			HashSet<Anchor> anchors = Sets.newHashSet(textTarget);
 			
-			conf.xmlElement(name, data, textTarget);
+			if (start != end)
+				conf.xmlElement(name, data, textTarget);
 		}
 	}
 
@@ -60,13 +50,14 @@ public class StageXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T>
 	@Override
 	public void start(XMLTransformer transformer, XMLEntity entity) {
 
-		if (entity.getAttributes().has(STAGE_QNAME)) {
+		
+		if (entity.getAttributes().containsKey(STAGE_QNAME)) {
 			
 			addStageAnnotation(transformer);
 
-			JsonNode newAttribute = entity.getAttributes().get(STAGE_QNAME);
+			Object newAttribute = entity.getAttributes().get(STAGE_QNAME);
 
-			String newValue = newAttribute.getTextValue();
+			String newValue = (String) newAttribute;
 			lastStageChangeValue = newValue;
 			lastStageChangeOffset = transformer.getTextOffset();
 		}

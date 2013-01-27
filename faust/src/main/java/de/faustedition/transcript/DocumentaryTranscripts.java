@@ -76,7 +76,7 @@ public class DocumentaryTranscripts {
 		modules.add(new TextXMLTransformerModule());
 		modules.add(new DefaultAnnotationXMLTransformerModule());
 		modules.add(new CLIXAnnotationXMLTransformerModule());
-		modules.add(new HandsXMLTransformerModule(conf, objectMapper));
+		modules.add(new HandsXMLTransformerModule(conf));
 		modules.add(new FacsimilePathXMLTransformerModule(materialUnit));
 		modules.add(new TEIAwareAnnotationXMLTransformerModule());
 
