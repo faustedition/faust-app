@@ -27,11 +27,8 @@ public class JsonRepresentationFactory {
 	@Autowired
 	private TransactionTemplate transactionTemplate;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
-
-	public JsonRepresentationFactory() {
-		this.objectMapper.registerModule(new TextModule());
-	}
+  @Autowired
+	private ObjectMapper objectMapper;
 
 	public Representation map(Object object) {
 		return map(object, true);
