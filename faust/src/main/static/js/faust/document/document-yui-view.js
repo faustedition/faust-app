@@ -89,9 +89,6 @@ YUI.add('document-yui-view', function (Y) {
 			svgRoot.setAttribute("class", "diplomatic");
 			this._appendPatternDefs(svgRoot);
 			container.getDOMNode().appendChild(svgRoot);
-
-
-
 			
 
 			//var visComponent = this.get('visComponent');

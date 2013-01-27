@@ -1,12 +1,13 @@
-<#assign archiveId = document.getMetadataValue("archive")>
-<#assign callnumber = document.toString()>
-<#assign waId = document.getMetadataValue('wa-id')!"">
-<#assign title>${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
-<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
-<#assign header>
+	<#assign archiveId = document.getMetadataValue("archive")>
+	<#assign callnumber = document.toString()>
+	<#assign waId = document.getMetadataValue('wa-id')!"">
+	<#assign title>${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
+	<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
+	<#assign header>
 	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
-</#assign>
+	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
+	</#assign>
 
 
 
@@ -14,12 +15,13 @@
 	<@faust.page title=title header=header layout="wide">
 	<div id="document-navigation" style="height: 50px;">
 
-	</div>
+</div>
 	<div id="document-app" class="yui-u-1" style="min-height: 600px;"></div>
 	<script type="text/javascript">
 
-YUI().use("app", "node", "event", "slider", "document", "document-yui-view", 
-		  "button","panel", "dd-plugin", "resize-plugin", "util",
+YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
+		  "document-structure-view", "button","panel", "dd-plugin", "resize-plugin", "util",
+		  "document-text",
 		  function(Y) {
 			  
 			  Y.NavigationModel = Y.Base.create('navigationModel', Y.Model, [], {
@@ -51,17 +53,22 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 			  });
 
 			  Y.NavigationView = Y.Base.create("navigation-view", Y.View, [], {
+
+
 				  render: function() {
 					  
 					  var model = this.get('model');
 
 					  var container = Y.one(this.get('container'));
-					  container.append('<div style="margin:3em 5em; width:600">' +
+
+
+					  container.append('<div style="margin:0em 0em; width:600">' +
 									   '   <button id="prev_page_button">&lt;</button>' +
 									   '   ${message("page_abbrev")}' +
 									   '   <input id="pagenum-display" value="1" style="width: 2em; margin-right: 1em" readonly="readonly"></input>' +
 									   '   <span id="pageslider"></span>' +
 									   '   <button id="next_page_button">&gt;</button>' +
+									   '   <span><a id="old_version_link" href="" style="margin-left: 2em">${message("document.old_version")}</a></span>' +
 									   '</div>');
 					  
 					  var pageslider = new Y.Slider({
@@ -120,71 +127,172 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 			  });
 
 			  Y.DocumentView = Y.Base.create("document-view", Y.View, [], {
-				  destructor: function() {
+				  initializer: function() {
+					  this.get('model').after('change', this.render, this);
+					  this.get('container').after('change', function() {
+					  });
 					  
-					  this.get('diplomaticPanel') && this.get('diplomaticPanel').destroy();
-					  this.get('facsimilePanel') && this.get('facsimilePanel').destroy();
+					  this.on('faust:navigation-done', function() {
+						  console.log('nav');
+					  });
+
+				  },
+				  destructor: function() {
+					  //this.get('diplomaticPanel') && this.get('diplomaticPanel').destroy();
+					  //this.get('facsimilePanel') && this.get('facsimilePanel').destroy();
 					  this.get('container').empty();
 				  },
-				  render: function() {
 
+				  panel: function(name, title, attrs) {
+
+					  var container = this.get('container');
+					  var widthAvailable = parseInt(Y.one('#document-app').getComputedStyle('width')) - 40;
+
+ 					  panelContainer = Y.Node.create(
+						  '<div class="' + name + '-container yui3-panel-loading">' + 
+							  '   <div class="yui3-widget-hd">'+ title +'</div>' +
+							  '   <div class="yui3-widget-bd" style="overflow:hidden">' +
+							  '   <div class="'+ name +'Content"></div></div>' +
+							  '   <div class="yui3-widget-ft"></div>' +
+							  '</div>' 
+					  );
+					  
+					  container.append(panelContainer);
+					  
+					  
+					  panelAttrs = Y.merge({
+						  srcNode : panelContainer,
+						  width   : widthAvailable / 2,
+						  preventOverlap: true,
+						  zIndex: 10,
+						  render  : true
+					  }, attrs);
+
+					  var panel = new Y.Panel(panelAttrs);
+					  panel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
+					  panel.plug(Y.Plugin.Resize);
+					  return panel;
+				  },
+
+				  addAjaxLoader: function(element) {					  
+					  var tmpHeight = Math.max(100, element.getComputedStyle('height'));
+					  element.empty();
+					  element.append('<div class="faust-ajax-loading ajax-placeholder" style="min-height: ' + tmpHeight + '"/>');
+				  },
+				  
+				  removeAjaxLoader: function(element) {
+					  element.one('.ajax-placeholder').remove(true);
+				  },
+
+				  updateFacsimileView: function(){
+					  var facsimileContainer = Y.one('.facsimile-container');
+					  var facsimileContent = facsimileContainer.one('.yui3-widget-bd');
+					  var pagenum = this.get('model').get('pagenumber');
+					  facsimileContent.empty();
+
+					  var facsimilePath = this.get('pages')[pagenum-1].facsimile;
+
+					  if (facsimilePath) {
+						  var facsimileURI = new Y.Faust.URI(facsimilePath);
+
+						  facsimileContent.append('<div id="transcript-swf" style="height: 300px"></div>');
+						  swfobject.switchOffAutoHideShow();
+						  swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
+						  					 "transcript-swf",
+						  					 "100%", "100%",
+						  					 "9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
+						  						 server: Faust.FacsimileServer,
+						  						 image: facsimileURI.encodedPath() + '.tif',
+						  						 navigation: true,
+						  						 //credit: "Copyright Digitale Faust-Edition"
+						  					 }, {
+						  						 scale: "exactfit",
+						  						 bgcolor: "#000000",
+						  						 allowfullscreen: "true",
+						  						 allowscriptaccess: "always",
+						  						 wmode: "opaque"
+						  					 });
+					  } else {
+						  facsimileContent.append('<div>(none)</div>');
+					  }
+				  },
+				  
+				  updateDiplomaticTranscriptView: function() {
+					  var pagenum = this.get('model').get('pagenumber');
+					  var diplomaticContainer = Y.one('.diplomatic-container');
+
+					  var diplomaticContent = diplomaticContainer.one('.diplomaticContent');
+					  
+					  this.addAjaxLoader(diplomaticContent);
+
+					  var that = this;
+					  this.get('pages')[pagenum - 1].transcriptionFromRanges(function(t) {
+
+						  that.removeAjaxLoader(diplomaticContent);
+						  var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
+							  container: diplomaticContainer.one('.diplomaticContent'),
+							  visComponent: null,
+							  transcript: t
+						  });
+
+						  diplomaticTranscriptView.render();
+
+					  });
+				  },
+
+				  updateStructureView: function() {
+					  var structureContainer = Y.one('.structure-container');					  
+					  
+					  var structureView =  new Y.Faust.DocumentStructureView({
+						  container: structureContainer.one('.structureContent'),
+						  document: this.get('fd')
+					  });
+
+					  structureView.render();
+
+					  
+				  },
+
+				  updateTextView: function() {
+					  var textContent = Y.one('.textContent');
+					  this.addAjaxLoader(textContent);
+					  var that = this;
+
+
+					  this.get('fd').transcriptionFromRanges(function(t) {
+						  window.setTimeout(function(){
+							  that.removeAjaxLoader(textContent);
+							  textContent.append(DocumentText.renderText(t));
+						  }, 2000);	  							  
+					  });
+
+
+				  },
+
+				  render: function() {
 					  var pagenum = this.get('model').get('pagenumber');
 					  var container = this.get('container');
 					  var widthAvailable = parseInt(Y.one('#document-app').getComputedStyle('width')) - 40;
-					  var facsimileContainer = container.one('.facsimile-container');
+
+
+					  var facsimileContainer = Y.one('.facsimile-container');
 					  if (!facsimileContainer) {
-						  facsimileContainer = Y.Node.create(
-							  '<div class="facsimile-container yui3-panel-loading">' + 
-								  '   <div class="yui3-widget-hd">Facsimile</div>' +
-								  '   <div class="yui3-widget-bd" style="overflow:hidden">' +
-								  '   <div class="facsimileContent" style="height: 500px"></div></div>' +
-								  '   <div class="yui3-widget-ft"></div>' +
-								  '</div>' 
-						  );
-						  
-						  container.append(facsimileContainer);
-						  
-						  var facsimilePanel = new Y.Panel({
-						  	  srcNode : facsimileContainer,
-						  	  width   : widthAvailable / 2,
+						  facsimilePanel = this.panel('facsimile', '${message("document.facsimile")}', {
 							  height  : 600,
-							  preventOverlap: true,
-						  	  align: {
+							  align: {
 								  node: '#document-app',
 								  points: [
 									  Y.WidgetPositionAlign.TL,
 									  Y.WidgetPositionAlign.TL
 								  ]
 							  },
-							  zIndex: 100,
-						  	  render  : true
 						  });
-
-						  facsimilePanel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
-						  facsimilePanel.plug(Y.Plugin.Resize);
-
-						  this.set('facsimilePanel', facsimilePanel);
-
 					  }
 
-					  
-					  var diplomaticContainer = container.one('.diplomatic-container');
+ 					  var diplomaticContainer = Y.one('.diplomatic-container');
 					  if (!diplomaticContainer) {
-						  diplomaticContainer = Y.Node.create(
-							  '<div class="diplomatic-container yui3-panel-loading" >' + 
-								  '   <div class="yui3-widget-hd">Transcript</div>' +
-								  '   <div class="yui3-widget-bd" style="overflow:auto">' +
-								  '   <div class="diplomaticContent"></div></div>' +
-								  '   <div class="yui3-widget-ft"></div>' +
-								  '</div>' 
-						  );
 						  
-						  container.append(diplomaticContainer);
-						  
-						  var diplomaticPanel = new Y.Panel({
-						  	  srcNode : diplomaticContainer,
-						  	  width   : widthAvailable / 2,
-							  preventOverlap: true,
+						  var diplomaticPanel = this.panel('diplomatic', '${message("document.diplomatic_transcript")}', {
 							  align: {
 								  node: '#document-app',
 								  points: [
@@ -192,71 +300,51 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 									  Y.WidgetPositionAlign.TR
 								  ]
 							  },
-							  zIndex: 100,
-						  	  render  : true
 						  });
-
-						  diplomaticPanel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
-						  diplomaticPanel.plug(Y.Plugin.Resize);
-
-						  this.set('diplomaticPanel', diplomaticPanel);
 					  }
 
-					  function createDiplomaticTranscriptView() {
+					  var structureContainer = Y.one('.structure-container');
+					  if (!structureContainer) {
+						  
+						  var diplomaticPanel = this.panel('structure', '${message("document.document_structure")}', {
+							  zIndex: 11,
+							  align: {							
+							  	  node: '#document-app',
+							  	  points: [
+							  		  Y.WidgetPositionAlign.BR,
+							  		  Y.WidgetPositionAlign.BR
+							  	  ]
+							  },
+						  });
+						  this.updateStructureView();
+
+					  }
 					  
-						  diplomaticContainer.one('.diplomaticContent').empty();
-						  var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
-							  container: diplomaticContainer.one('.diplomaticContent'),
-							  visComponent: null,
-							  transcript: null
+					  var textContainer = Y.one('.text-container');
+					  if (!textContainer) {
+						  
+						  var textPanel = this.panel('text', '${message("document.document_text")}', {
+							  zIndex: 11,
+							  align: {							
+							  	  node: '#document-app',
+							  	  points: [
+							  		  Y.WidgetPositionAlign.BL,
+							  		  Y.WidgetPositionAlign.BL
+							  	  ]
+							  },
 						  });
 						  
-						  //container.append('<img src="${cp}/static/img/spinner.gif"></img>');
 
-						  container.addClass('faust-ajax-loading');
-
-						  this.get('pages')[pagenum - 1].transcriptionFromRanges(function(t) {
-							  //diplomaticTranscriptView.set('visComponent', Faust.DocumentRanges.transcriptVC(t));
-							  diplomaticTranscriptView.set('transcript', t);
-							  diplomaticTranscriptView.render();
-							  container.removeClass('faust-ajax-loading');
-						  });
-					  };
-					  createDiplomaticTranscriptView.call(this);
-
-					  function createFacsimileView() {
-						  var facsimileContent = facsimileContainer.one('.facsimileContent');
-						  facsimileContent.empty();
-
-						  var facsimilePath = this.get('pages')[pagenum-1].facsimile;
-
-						  if (facsimilePath) {
-							  var facsimileURI = new Y.Faust.URI(facsimilePath);
-
-							  facsimileContent.append('<div id="transcript-swf" style="height: 300px"></div>');
-							  swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf", 
-						  						 "transcript-swf",
-						  						 "100%", "100%",
-						  						 "9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
-						  							 server: Faust.FacsimileServer,
-						  							 image: facsimileURI.encodedPath() + '.tif',
-						  							 navigation: true,
-						  							 //credit: "Copyright Digitale Faust-Edition"
-						  						 }, {
-						  							 scale: "exactfit",
-						  							 bgcolor: "#000000",
-						  							 allowfullscreen: "true",
-						  							 allowscriptaccess: "always",
-						  							 wmode: "opaque"
-						  						 });
-						  } else {
-							  facsimileContent.append('<div>(none)</div>');
-						  }
-
-
+						  this.updateTextView();
 					  }
-					  createFacsimileView.call(this);
 
+
+					  this.updateFacsimileView();
+
+					  this.updateDiplomaticTranscriptView();
+
+
+					  
 				  },
 				  
 			  } , {
@@ -266,6 +354,8 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 				  }
 			  });
 			  
+
+			  
 			  Y.on("contentready", function() {
 
 				  Y.one('#document-app').addClass('faust-ajax-loading');
@@ -273,17 +363,21 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  Y.one('#document-app').removeClass('faust-ajax-loading');
 
 					  var navigationModel = new Y.NavigationModel({
-						  numberOfPages: e.pages.length				
+						  numberOfPages: e.pages.length	
 					  });
 
 					  app = new Y.App({
 						  container: '#document-app',
 						  root: cp +  '${path}'.replace('faust://', '/'),
 						  //linkSelector: ("#" + this.get("id") + " a"),
-						  transitions: true,
+						  transitions: false,
+						  scrollToTop: false,
 						  serverRouting: false,
 						  views: {
-							  'document-view': { type: "DocumentView"}
+							  'document-view': {
+								  type: "DocumentView",
+								  preserve: true
+							  }
 						  },
 						  model: navigationModel
 					  });
@@ -299,34 +393,52 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 						  if (model.get('pagenumber') !== requestPagenum)
 							  this.navigate("/" + model.get('pagenumber'));
 						  else {
-							  this.showView("document-view", 
+							  this.showView("document-view",
 											{ pagenum: model.get('pagenumber'),
-											  fd: this.fd,
+											  fd: e.fd,
 											  pages: e.pages,
 											  model: model,
 											  
 											},
 											
 											{ 
-												transition: 'fade',
-												update: true
+												transition: 'slideLeft',
+												update: false
 											});
 							  this.fire('faust:navigation-done');
 						  }
 					  });
 					  
 					  app.set('fd', e.fd);
+					  
+					  var updateOldVersionLink = function() {
+						  var old_version_cp = "https://faustedition.uni-wuerzburg.de/dev";
+						  var pathname = window.location.pathname;
+						  var hash = window.location.hash.replace("/","");
+						  var old_version = old_version_cp + pathname.slice(pathname.indexOf('/document')) + hash;
+						  Y.one("#old_version_link").setAttribute('href', old_version);
+					  };
+					  
+					   app.after('faust:navigation-done', function() {
+					   		  updateOldVersionLink();
+					   });
 
 					  var navigationView = new Y.NavigationView({
 						  model: navigationModel,
 						  container: Y.one('#document-navigation')
 					  });
+
+					  
 					  
 					  navigationView.render();
 
 					  app.render().dispatch();
-				  });
 
+
+				  });
+				  
+				  
+				  
 				  Faust.Document.load(new Faust.URI("${document.source?js_string}"), function(fd) {
 
 					  var pages = [];

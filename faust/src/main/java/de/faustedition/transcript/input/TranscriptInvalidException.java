@@ -7,4 +7,8 @@ public class TranscriptInvalidException extends RuntimeException {
 	public TranscriptInvalidException(String msg) {
 		super(msg);
 	}
+	
+	public TranscriptInvalidException(Throwable e) {
+		super(e);
+	}
 }

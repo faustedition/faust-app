@@ -44,6 +44,9 @@ public class DocumentaryTranscripts {
 	@Autowired
 	private TextRepository<JsonNode> textRepo;
 	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
 	public Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit) throws IOException, XMLStreamException {
 		XMLTransformer<JsonNode> transformer = createXMLTransformer (session, materialUnit);
 		return Transcript.read(session, xml, materialUnit, textRepo, transformer);

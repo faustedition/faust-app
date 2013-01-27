@@ -2,6 +2,7 @@ package de.faustedition.transcript.input;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -24,6 +25,7 @@ public class HandsXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 	private String lastHandsChangeValue = null;
 	private XMLTransformerConfiguration<JsonNode> conf;
 
+
 	public HandsXMLTransformerModule(XMLTransformerConfiguration<JsonNode> conf) {
 		this.conf = conf;
 	}
@@ -32,17 +34,15 @@ public class HandsXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 
 		if(lastHandsChangeValue != null) {
 			
-			HashMap<Name, Object> data = Maps.newHashMap();
-			data.put(new Name((String) null, "value"), lastHandsChangeValue);
+			Map<Name,Object> data = Maps.newHashMap();
+			data.put(new Name((String)null, "value"), lastHandsChangeValue);
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "hand"));
 			long start = lastHandsChangeOffset;
 			long end = transformer.getTextOffset();
 			Anchor textTarget = new Anchor(transformer.getTarget(), 
 					new TextRange(start, end));
-			//Layer annotation = new SimpleLayer<JsonNode>(name, "", data, anchors);
-			
-			conf.xmlElement(name, data, textTarget);
-			//add(transformer, annotation);
+			if (start != end)
+				conf.xmlElement(name, data, textTarget);
 		}
 	}
 
