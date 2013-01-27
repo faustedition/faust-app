@@ -21,6 +21,7 @@
 
 YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 		  "document-structure-view", "button","panel", "dd-plugin", "resize-plugin", "util",
+		  "document-text",
 		  function(Y) {
 			  
 			  Y.NavigationModel = Y.Base.create('navigationModel', Y.Model, [], {
@@ -257,16 +258,11 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  this.addAjaxLoader(textContent);
 					  var that = this;
 
+
 					  this.get('fd').transcriptionFromRanges(function(t) {
 						  window.setTimeout(function(){
 							  that.removeAjaxLoader(textContent);
-							  var plainTextNode = textContent.append('<p></p>');
-							  Y.Array.each(t.textContent.split("\n"), function(line, n) {
-								  if (n > 0) {
-									  plainTextNode.append("<br>");
-								  }
-								  plainTextNode.append(Y.config.doc.createTextNode(line));
-							  });
+							  textContent.append(DocumentText.renderText(t));
 						  }, 2000);	  							  
 					  });
 

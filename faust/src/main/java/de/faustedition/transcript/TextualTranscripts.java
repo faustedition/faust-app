@@ -11,6 +11,8 @@ import javax.xml.stream.XMLStreamException;
 import org.hibernate.Session;
 
 import de.faustedition.document.MaterialUnit;
+import de.faustedition.transcript.input.HandsXMLTransformerModule;
+import de.faustedition.transcript.input.StageXMLTransformerModule;
 import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.Name;
 import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
@@ -40,6 +42,7 @@ public class TextualTranscripts {
 		modules.add(new TextXMLTransformerModule());
 		modules.add(new DefaultAnnotationXMLTransformerModule(1000, false));
 		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
+		modules.add(new StageXMLTransformerModule());
 		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
 
 		conf.addLineElement(new Name(TEI_NS, "text"));

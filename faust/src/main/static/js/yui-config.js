@@ -23,6 +23,7 @@ YUI.GlobalConfig = {
 				'document-controller' : { path: 'faust/document/document-controller.js' },
 				'document-ranges' : { path: 'faust/document/document-ranges.js' },
 				'document-model' : { path: 'faust/document/document-model.js' },
+				'document-text' : { path: 'faust/document/document-text.js' },
 				'materialunit' : { path: 'faust/document/materialunit.js' },
                 'protovis': { path: "protovis-r3.2.js"},
                 'search': { path: "faust/search/search.js"},
