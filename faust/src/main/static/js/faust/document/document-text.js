@@ -11,8 +11,10 @@ YUI.add('document-text', function (Y) {
 
 		forAnnotationStartDo: function (annotationName, partition, f) {
 			var annotations = transcript.find(partition.start, partition.end, [annotationName]);
-			if ((annotations.length > 0) && (annotations[0].start === partition.start))  {
-				f(annotations[0]);
+			if (annotations.length > 0)  {
+				if (annotations[0].targets[0].range.start === partition.start) {
+					f(annotations[0]);
+				}
 			}
 		},
 
@@ -61,6 +63,13 @@ YUI.add('document-text', function (Y) {
 						partitionNode.setStyle('text-decoration', 'line-through');
 					});
 
+					forAnnotationDo('add', p, function() {
+						partitionNode.wrap('<sup/>');
+						//partitionNode.insert('</sup>', 'after');
+						
+					});
+
+
 					forAnnotationDo('speaker', p, function() {
 						partitionNode.setStyle('font-weight', 'bold');
 					});
@@ -81,6 +90,12 @@ YUI.add('document-text', function (Y) {
 						// partitionNode.insert('>', 'after');
 						partitionNode.setStyle('color', stageColor(stageName));
 						partitionNode.setAttribute('title', stageName);
+					});
+
+					forAnnotationStartDo('l', p, function(a) {
+						var lineNum = a.data['n'];
+						partitionNode.insert('<small style="color: grey;"> ' + parseInt(lineNum) + ' </small>', 'before');
+
 					});
 				
 				});
