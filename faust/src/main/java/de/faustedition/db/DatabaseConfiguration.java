@@ -64,8 +64,8 @@ public class DatabaseConfiguration {
 				Anchor.class,
 				Transcript.class,
 				TranscribedVerseInterval.class
-								*/
-      ).buildSessionFactory();
+				*/
+			).buildSessionFactory();
 	}
 
 	@Bean
