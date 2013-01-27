@@ -57,7 +57,7 @@ public class DatabaseConfiguration {
 	public SessionFactory sessionFactory() throws Exception {
 		return new LocalSessionFactoryBuilder(dataSource())
 			.addAnnotatedClasses(
-					/*
+              /*
 				Layer.class,
 				Name.class,
 				Text.class,

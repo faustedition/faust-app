@@ -8,9 +8,9 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 
+import eu.interedition.text.Anchor;
+import eu.interedition.text.TextConstants;
 import org.codehaus.jackson.JsonNode;
-import org.hibernate.Session;
-import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
@@ -28,7 +28,6 @@ import com.google.common.collect.Maps;
 import de.faustedition.JsonRepresentationFactory;
 import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
-import eu.interedition.text.Text;
 import eu.interedition.text.TextRepository;
 
 /**
@@ -42,53 +41,47 @@ public class TranscriptSourceResource extends TranscriptResource {
 	private JsonRepresentationFactory jsonFactory;
 	
 	@Autowired
-	private TextualTranscripts textualTranscripts;
+	private TranscriptManager transcriptManager;
 
 	@Autowired
 	private TextRepository<JsonNode> textRepo;
 	
-	private Transcript transcript;
+	private Layer<JsonNode> transcript;
 	
 	@Override
 	protected void doInit() throws ResourceException {
 		super.doInit();
-		try {
-			this.transcript = textualTranscripts.read(sessionFactory.getCurrentSession(), xml, materialUnit);
-		} catch (XMLStreamException e) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
-		} catch (IOException e) {
-			throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
-		}
-
+    this.transcript = transcriptManager.find(materialUnit);
 	}
 
 	@Get("xml")
 	public Representation source() throws IOException, XMLStreamException, SAXException {
-		Text xmlSourceText = transcript.getText().getAnchors().iterator().next().getText();
-		//FIXME How to do this properly?
-		return new StringRepresentation(xmlSourceText.read());
+    for (Anchor anchor : transcript.getAnchors()) {
+      final Layer<?> text = (Layer<?>) anchor.getText();
+      if (TextConstants.XML_SOURCE_NAME.equals(text.getName())) {
+        return new StringRepresentation(text.read());
+      }
+    }
+		return null;
 	}
 
 	@Get("txt")
 	public Representation plainText() throws IOException {
-		return new StringRepresentation(transcript.getText().read());
+		return new StringRepresentation(transcript.read());
 	}
 
 	@Get("json")
 	public Representation model() throws IOException {
-		final Session session = sessionFactory.getCurrentSession();
-		final Text text = transcript.getText();
-
 		final Map<String, Name> names = Maps.newHashMap();
 		final ArrayList<Layer<JsonNode>> annotations = Lists.newArrayList();
-		for (Layer<JsonNode> annotation : textRepo.query(text(text))) {
+		for (Layer<JsonNode> annotation : textRepo.query(text(transcript))) {
 			final Name name = annotation.getName();
 			names.put(Long.toString(name.hashCode()), name);
 			annotations.add(annotation);
 		}
 		return jsonFactory.map(new ModelMap()
-			.addAttribute("text", text)
-			.addAttribute("textContent", text.read())
+			.addAttribute("text", transcript)
+			.addAttribute("textContent", transcript.read())
 			.addAttribute("names", names)
 			.addAttribute("annotations", annotations));
 	}

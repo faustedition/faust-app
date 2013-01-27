@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Component
-public class TextRepositoryFactoryBean extends AbstractFactoryBean<TextRepository<JsonNode>> {
+public class TextRepositoryFactoryBean extends AbstractFactoryBean<Neo4jTextRepository<JsonNode>> {
 
   @Autowired
   private FaustGraph faustGraph;
@@ -23,11 +23,11 @@ public class TextRepositoryFactoryBean extends AbstractFactoryBean<TextRepositor
 
   @Override
   public Class<?> getObjectType() {
-    return TextRepository.class;
+    return Neo4jTextRepository.class;
   }
 
   @Override
-  protected TextRepository<JsonNode> createInstance() throws Exception {
+  protected Neo4jTextRepository<JsonNode> createInstance() throws Exception {
     return new Neo4jTextRepository<JsonNode>(JsonNode.class, new JacksonDataNodeMapper<JsonNode>(objectMapper), faustGraph.getDb(), false);
   }
 }
