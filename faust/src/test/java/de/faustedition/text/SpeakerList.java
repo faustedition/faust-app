@@ -43,8 +43,8 @@ public class SpeakerList extends AbstractContextTest {
 	@Test
 	public void listVerses() throws IOException {
 		Multimap<eu.interedition.text.Text, Layer<JsonNode>> speakers = HashMultimap.create();
-		for (Layer annotation : textRepo.query(name(new Name(TextConstants.TEI_NS, "speaker")))) {
-			speakers.put(((Anchor)(annotation.getAnchors().iterator().next())).getText(), annotation);
+		for (Layer<JsonNode> annotation : textRepo.query(name(new Name(TextConstants.TEI_NS, "speaker")))) {
+			speakers.put(annotation.getAnchors().iterator().next().getText(), annotation);
 		}
 
 		SortedSet<String> names = Sets.newTreeSet();

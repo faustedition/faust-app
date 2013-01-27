@@ -43,16 +43,16 @@ public class TextualTranscripts {
 	
 	
 	public Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit) throws IOException, XMLStreamException {
-		XMLTransformer transformer = createXMLTransformer (session);
+		XMLTransformer<JsonNode> transformer = createXMLTransformer (session);
 		return Transcript.read(session, xml, materialUnit, textRepo, transformer);
 	}
 	
-	private XMLTransformer createXMLTransformer(Session session) {
+	private XMLTransformer<JsonNode> createXMLTransformer(Session session) {
 
 		
 		final Random random = new Random();
 		
-		final XMLTransformerConfigurationBase conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
+		final XMLTransformerConfigurationBase<JsonNode> conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
 
 	        @Override
 	        protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor> anchors) {
@@ -65,13 +65,13 @@ public class TextualTranscripts {
 	    };
 
 
-		final List<XMLTransformerModule> modules = conf.getModules();
-		modules.add(new LineElementXMLTransformerModule());
-		modules.add(new NotableCharacterXMLTransformerModule());
-		modules.add(new TextXMLTransformerModule());
-		modules.add(new DefaultAnnotationXMLTransformerModule());
-		modules.add(new CLIXAnnotationXMLTransformerModule());
-		modules.add(new TEIAwareAnnotationXMLTransformerModule());
+		final List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
+		modules.add(new LineElementXMLTransformerModule<JsonNode>());
+		modules.add(new NotableCharacterXMLTransformerModule<JsonNode>());
+		modules.add(new TextXMLTransformerModule<JsonNode>());
+		modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
+		modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
+		modules.add(new TEIAwareAnnotationXMLTransformerModule<JsonNode>());
 
 		conf.addLineElement(new Name(TEI_NS, "text"));
 		conf.addLineElement(new Name(TEI_NS, "div"));
@@ -100,7 +100,7 @@ public class TextualTranscripts {
 
 		conf.include(new Name(TEI_NS, "lem"));
 
-		return new XMLTransformer(conf);
+		return new XMLTransformer<JsonNode>(conf);
 
 	}
 

@@ -16,29 +16,29 @@ import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfiguration;
 import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
+import org.codehaus.jackson.JsonNode;
 
-public class HandsXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T> {
+public class HandsXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode> {
 
 	private long lastHandsChangeOffset = -1;
 	private String lastHandsChangeValue = null;
-	private XMLTransformerConfiguration conf;
+	private XMLTransformerConfiguration<JsonNode> conf;
 
-	public HandsXMLTransformerModule(XMLTransformerConfiguration conf) {
+	public HandsXMLTransformerModule(XMLTransformerConfiguration<JsonNode> conf) {
 		this.conf = conf;
 	}
 
-	private void addHandAnnotation(XMLTransformer transformer) {
+	private void addHandAnnotation(XMLTransformer<JsonNode> transformer) {
 
 		if(lastHandsChangeValue != null) {
 			
-			HashMap<Object, Object> data = Maps.newHashMap();
-			data.put("value", lastHandsChangeValue);
+			HashMap<Name, Object> data = Maps.newHashMap();
+			data.put(new Name((String) null, "value"), lastHandsChangeValue);
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "hand"));
 			long start = lastHandsChangeOffset;
 			long end = transformer.getTextOffset();
 			Anchor textTarget = new Anchor(transformer.getTarget(), 
 					new TextRange(start, end));
-			HashSet<Anchor> anchors = Sets.newHashSet(textTarget);
 			//Layer annotation = new SimpleLayer<JsonNode>(name, "", data, anchors);
 			
 			conf.xmlElement(name, data, textTarget);
@@ -48,7 +48,7 @@ public class HandsXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T>
 
 
 	@Override
-	public void start(XMLTransformer<T> transformer, XMLEntity entity) {
+	public void start(XMLTransformer<JsonNode> transformer, XMLEntity entity) {
 
 		if(entity.getName().getLocalName().equals("handShift")) {
 
@@ -68,7 +68,7 @@ public class HandsXMLTransformerModule<T> extends XMLTransformerModuleAdapter<T>
 	
 
 		@Override
-		public void end(XMLTransformer transformer) {
+		public void end(XMLTransformer<JsonNode> transformer) {
 			// TODO having to call super is a bit unclean and non-obvious
 			addHandAnnotation(transformer);
 			super.end(transformer);

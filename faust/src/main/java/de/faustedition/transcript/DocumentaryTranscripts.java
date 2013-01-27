@@ -45,15 +45,15 @@ public class DocumentaryTranscripts {
 	private TextRepository<JsonNode> textRepo;
 	
 	public Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit) throws IOException, XMLStreamException {
-		XMLTransformer transformer = createXMLTransformer (session, materialUnit);
+		XMLTransformer<JsonNode> transformer = createXMLTransformer (session, materialUnit);
 		return Transcript.read(session, xml, materialUnit, textRepo, transformer);
 	}
 	
-	private XMLTransformer createXMLTransformer(Session session, MaterialUnit materialUnit) {
+	private XMLTransformer<JsonNode> createXMLTransformer(Session session, MaterialUnit materialUnit) {
 		
 		final Random random = new Random();
 		
-		final XMLTransformerConfigurationBase conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
+		final XMLTransformerConfigurationBase<JsonNode> conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
 
 	        @Override
 	        protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor> anchors) {
@@ -67,15 +67,15 @@ public class DocumentaryTranscripts {
 
 			
 
-		final List<XMLTransformerModule> modules = conf.getModules();
-		modules.add(new LineElementXMLTransformerModule());
-		modules.add(new NotableCharacterXMLTransformerModule());
-		modules.add(new TextXMLTransformerModule());
-		modules.add(new DefaultAnnotationXMLTransformerModule());
-		modules.add(new CLIXAnnotationXMLTransformerModule());
+		final List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
+		modules.add(new LineElementXMLTransformerModule<JsonNode>());
+		modules.add(new NotableCharacterXMLTransformerModule<JsonNode>());
+		modules.add(new TextXMLTransformerModule<JsonNode>());
+		modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
+		modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
 		modules.add(new HandsXMLTransformerModule(conf));
 		modules.add(new FacsimilePathXMLTransformerModule(materialUnit));
-		modules.add(new TEIAwareAnnotationXMLTransformerModule());
+		modules.add(new TEIAwareAnnotationXMLTransformerModule<JsonNode>());
 
 		
 		conf.addLineElement(new Name(TEI_SIG_GE, "document"));
@@ -89,7 +89,7 @@ public class DocumentaryTranscripts {
 		conf.addContainerElement(new Name(TEI_NS, "zone"));
 
 		conf.exclude(new Name(TEI_NS, "teiHeader"));
-		return new XMLTransformer(conf);
+		return new XMLTransformer<JsonNode>(conf);
 	}
 
 }

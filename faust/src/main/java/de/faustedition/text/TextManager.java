@@ -105,7 +105,7 @@ public class TextManager extends Runtime implements Runnable {
 		
 		final Random random = new Random();
 					
-		final XMLTransformerConfigurationBase conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
+		final XMLTransformerConfigurationBase<JsonNode> conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
 
 			@Override
 			protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor> anchors) {
@@ -119,13 +119,13 @@ public class TextManager extends Runtime implements Runnable {
 		};
 
 
-		final List<XMLTransformerModule> modules = conf.getModules();
-		modules.add(new LineElementXMLTransformerModule());
-		modules.add(new NotableCharacterXMLTransformerModule());
-		modules.add(new TextXMLTransformerModule());
-		modules.add(new DefaultAnnotationXMLTransformerModule());
-		modules.add(new CLIXAnnotationXMLTransformerModule());
-		modules.add(new TEIAwareAnnotationXMLTransformerModule());
+		final List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
+		modules.add(new LineElementXMLTransformerModule<JsonNode>());
+		modules.add(new NotableCharacterXMLTransformerModule<JsonNode>());
+		modules.add(new TextXMLTransformerModule<JsonNode>());
+		modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
+		modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
+		modules.add(new TEIAwareAnnotationXMLTransformerModule<JsonNode>());
 
 		conf.addLineElement(new Name(TEI_NS, "div"));
 		conf.addLineElement(new Name(TEI_NS, "head"));
@@ -151,7 +151,7 @@ public class TextManager extends Runtime implements Runnable {
 		conf.include(new Name(TEI_NS, "lem"));
 
 		final Session session = sessionFactory.getCurrentSession();
-		final XMLTransformer xmlTransformer = new XMLTransformer(conf);
+		final XMLTransformer<JsonNode> xmlTransformer = new XMLTransformer<JsonNode>(conf);
 
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Importing texts");
@@ -161,7 +161,7 @@ public class TextManager extends Runtime implements Runnable {
 				logger.info("Importing text " + textSource);
 				xmlReader = xml.getInputSource(textSource).getCharacterStream();
 				
-				final Layer xmlText = textRepo.add(XML_SOURCE_NAME, xmlReader, null);
+				final Layer<JsonNode> xmlText = textRepo.add(XML_SOURCE_NAME, xmlReader, null);
 				final eu.interedition.text.Text text = xmlTransformer.transform(xmlText);
 			} catch (IOException e) {
 				logger.error("I/O error while adding text " + textSource, e);

@@ -44,7 +44,7 @@ public class Transcript {
 
 	private long id;
 	private String sourceURI;
-	private Layer text;
+	private Layer<JsonNode> text;
 	private long materialUnitId;
 
 	@Id
@@ -100,7 +100,7 @@ public class Transcript {
 		return Objects.toStringHelper(this).addValue(getSource()).toString();
 	}
 
-	private static Transcript doRead(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer transformer)
+	private static Transcript doRead(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer<JsonNode> transformer)
 	throws IOException, XMLStreamException {
 			Preconditions.checkArgument(source != null);
 
@@ -128,7 +128,7 @@ public class Transcript {
 			return transcript;
 	}
 	
-	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit, TextRepository textRepo, XMLTransformer transformer)
+	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit, TextRepository<JsonNode> textRepo, XMLTransformer<JsonNode> transformer)
 	throws IOException, XMLStreamException {
 		final FaustURI source = materialUnit.getTranscriptSource();
 
@@ -138,7 +138,7 @@ public class Transcript {
 		return transcript;
 	}
 
-	public static Transcript read(Session session, XMLStorage xml, FaustURI source, TextRepository textRepo, XMLTransformer transformer)
+	public static Transcript read(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer<JsonNode> transformer)
 	throws IOException, XMLStreamException {
 		Transcript transcript = doRead(session, xml, source, textRepo, transformer);
 		session.save(transcript);
@@ -146,7 +146,7 @@ public class Transcript {
 	}
 	
 	
-	private static Layer<JsonNode> readText(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer transformer) 
+	private static Layer<JsonNode> readText(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer<JsonNode> transformer)
 		throws XMLStreamException, IOException {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Transforming XML transcript from {}", source);

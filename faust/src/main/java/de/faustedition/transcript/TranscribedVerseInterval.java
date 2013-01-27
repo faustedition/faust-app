@@ -113,7 +113,7 @@ public class TranscribedVerseInterval extends VerseInterval {
 
 		final SortedSet<Integer> verses = Sets.newTreeSet();
 		for (Layer<JsonNode> verse : textRepo.query(and(text(transcript.getText()), name(new Name(TextConstants.TEI_NS, "l"))))) {
-			final Matcher verseNumberMatcher = VERSE_NUMBER_PATTERN.matcher(Objects.firstNonNull(verse.data().path("n").getValueAsText(), ""));
+			final Matcher verseNumberMatcher = VERSE_NUMBER_PATTERN.matcher(Objects.firstNonNull(verse.data().path("n").getTextValue(), ""));
 			while (verseNumberMatcher.find()) {
 				try {
 					verses.add(Integer.parseInt(verseNumberMatcher.group()));
