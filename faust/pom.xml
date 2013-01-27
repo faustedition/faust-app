@@ -43,7 +43,35 @@
 			<artifactId>guava</artifactId>
 			<version>11.0.2</version>
 		</dependency>
-        <dependency>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j</artifactId>
+      <version>1.8</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-cypher</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-graph-matching</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-graph-algo</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-jmx</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-udc</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
@@ -94,12 +122,6 @@
 			<artifactId>org.restlet.ext.simple</artifactId>
             <version>${restlet.version}</version>
         </dependency>
-		<dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j</artifactId>
-			<version>1.2.M04</version>
-			<type>pom</type>
-		</dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
