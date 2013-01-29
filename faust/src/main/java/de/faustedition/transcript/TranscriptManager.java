@@ -102,7 +102,7 @@ public class TranscriptManager implements InitializingBean {
 
 			@Override
 			protected Layer<JsonNode> translate(Name name, Map<Name, String> attributes, Set<Anchor<JsonNode>> anchors) {
-				return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors);
+				return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors, null);
 			}
 		}, materialUnit);
 
