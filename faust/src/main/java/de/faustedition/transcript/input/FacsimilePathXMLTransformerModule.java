@@ -22,12 +22,12 @@ public class FacsimilePathXMLTransformerModule extends XMLTransformerModuleAdapt
 		if (read || !entity.getName().getLocalName().equals("graphic") || entity.getAttributes().containsKey(new Name("mimeType"))) {
 			return;
 		}
-		final Object url = entity.getAttributes().get(new Name("url"));
+		final String url = entity.getAttributes().get(new Name("url"));
 		if (url == null) {
 			return;
 		}
 		try {
-			materialUnit.setFacsimile(FaustURI.parse(url.toString()));
+			materialUnit.setFacsimile(FaustURI.parse(url));
 			read = true;
 		} catch (IllegalArgumentException e){
 			throw new TranscriptInvalidException("Invalid facsimile URI in transcript!");

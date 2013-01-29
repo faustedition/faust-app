@@ -6,6 +6,7 @@ import static eu.interedition.text.TextConstants.XML_SOURCE_NAME;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -108,7 +109,7 @@ public class TextManager extends Runtime implements Runnable {
 		final XMLTransformerConfigurationBase<JsonNode> conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
 
 			@Override
-			protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor<JsonNode>> anchors) {
+			protected Layer<JsonNode> translate(Name name, Map<Name, String> attributes, Set<Anchor<JsonNode>> anchors) {
 
 				ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
 				JsonNode data = mapper.valueToTree(attributes);	         
@@ -161,7 +162,7 @@ public class TextManager extends Runtime implements Runnable {
 				logger.info("Importing text " + textSource);
 				xmlReader = xml.getInputSource(textSource).getCharacterStream();
 				
-				final Layer<JsonNode> xmlText = textRepo.add(XML_SOURCE_NAME, xmlReader, null);
+				final Layer<JsonNode> xmlText = textRepo.add(XML_SOURCE_NAME, xmlReader, null, Collections.<Anchor<JsonNode>>emptySet());
 				final eu.interedition.text.Text text = xmlTransformer.transform(xmlText);
 			} catch (IOException e) {
 				logger.error("I/O error while adding text " + textSource, e);

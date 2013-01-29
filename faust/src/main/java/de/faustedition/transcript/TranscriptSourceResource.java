@@ -41,19 +41,8 @@ public class TranscriptSourceResource extends TranscriptResource {
 	private JsonRepresentationFactory jsonFactory;
 	
 	@Autowired
-	private TranscriptManager transcriptManager;
-
-	@Autowired
 	private TextRepository<JsonNode> textRepo;
 	
-	private Layer<JsonNode> transcript;
-	
-	@Override
-	protected void doInit() throws ResourceException {
-		super.doInit();
-    this.transcript = transcriptManager.find(materialUnit);
-	}
-
 	@Get("xml")
 	public Representation source() throws IOException, XMLStreamException, SAXException {
     for (Anchor<JsonNode> anchor : transcript.getAnchors()) {

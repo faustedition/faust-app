@@ -34,8 +34,8 @@ public class HandsXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 
 		if(lastHandsChangeValue != null) {
 			
-			Map<Name,Object> data = Maps.newHashMap();
-			data.put(new Name((String)null, "value"), lastHandsChangeValue);
+			Map<Name,String> data = Maps.newHashMap();
+			data.put(new Name("value"), lastHandsChangeValue);
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "hand"));
 			long start = lastHandsChangeOffset;
 			long end = transformer.getTextOffset();
@@ -54,7 +54,7 @@ public class HandsXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 
 			addHandAnnotation(transformer);
 
-			Object newAttribute = entity.getAttributes().get(new Name((String)null, "new"));
+			Object newAttribute = entity.getAttributes().get(new Name("new"));
 
 			if (newAttribute == null)
 				throw new TranscriptInvalidException("Element handShift doesn't have a 'new' attribute.");

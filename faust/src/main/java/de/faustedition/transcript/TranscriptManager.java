@@ -2,7 +2,6 @@ package de.faustedition.transcript;
 
 import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
-import com.google.common.io.Closeables;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
@@ -19,7 +18,6 @@ import eu.interedition.text.TextConstants;
 import eu.interedition.text.neo4j.LayerNode;
 import eu.interedition.text.neo4j.Neo4jTextRepository;
 import eu.interedition.text.simple.SimpleLayer;
-import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfigurationBase;
 import eu.interedition.text.xml.XMLTransformerModule;
@@ -39,16 +37,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -63,122 +59,129 @@ import static org.neo4j.graphdb.Direction.INCOMING;
 @Component
 public class TranscriptManager implements InitializingBean {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TranscriptManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(TranscriptManager.class);
 
-  public static final FaustRelationshipType TRANSCRIPT_RT = new FaustRelationshipType("transcribes");
+	public static final FaustRelationshipType TRANSCRIPT_RT = new FaustRelationshipType("transcribes");
 
-  @Autowired
-  private Neo4jTextRepository<JsonNode> textRepository;
+	@Autowired
+	private Neo4jTextRepository<JsonNode> textRepository;
 
-  @Autowired
-  private FaustGraph faustGraph;
+	@Autowired
+	private XMLStorage xml;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+	@Autowired
+	private FaustGraph faustGraph;
 
-  private TreeMultimap<Short, MaterialUnit> transcribedVerseIndex = TreeMultimap.create(Ordering.natural(), new Comparator<MaterialUnit>() {
-    @Override
-    public int compare(MaterialUnit o1, MaterialUnit o2) {
-      final long idDiff = o1.node.getId() - o2.node.getId();
-      return (idDiff == 0 ? 0 : (idDiff < 0 ? -1 : 1));
-    }
-  });
+	@Autowired
+	private ObjectMapper objectMapper;
 
-  public Layer<JsonNode> find(MaterialUnit materialUnit) {
-    final Relationship rel = materialUnit.node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
-    return (rel == null ? null : new LayerNode<JsonNode>(textRepository, rel.getStartNode()));
-  }
+	private TreeMultimap<Short, MaterialUnit> transcribedVerseIndex = TreeMultimap.create(Ordering.natural(), new Comparator<MaterialUnit>() {
+		@Override
+		public int compare(MaterialUnit o1, MaterialUnit o2) {
+			final long idDiff = o1.node.getId() - o2.node.getId();
+			return (idDiff == 0 ? 0 : (idDiff < 0 ? -1 : 1));
+		}
+	});
 
-  public void read(XMLStorage xml, MaterialUnit materialUnit) throws IOException, XMLStreamException {
-    final XMLTransformerConfigurationBase<JsonNode> conf = configure(new XMLTransformerConfigurationBase<JsonNode>(textRepository) {
+	public Layer<JsonNode> find(MaterialUnit materialUnit) throws IOException, XMLStreamException {
+		final Relationship rel = materialUnit.node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
+		return (rel == null ? read(materialUnit) : new LayerNode<JsonNode>(textRepository, rel.getStartNode()));
+	}
 
-      @Override
-      protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor<JsonNode>> anchors) {
-        return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors);
-      }
-    }, materialUnit);
+	LayerNode<JsonNode> read(MaterialUnit materialUnit) throws IOException, XMLStreamException {
+		final FaustURI source = materialUnit.getTranscriptSource();
+		if (source == null) {
+			return null;
+		}
 
-    final FaustURI source = materialUnit.getTranscriptSource();
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Transforming XML transcript from {}", source);
+		}
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Transforming XML transcript from {}", source);
-    }
+		final XMLTransformerConfigurationBase<JsonNode> conf = configure(new XMLTransformerConfigurationBase<JsonNode>(textRepository) {
 
-    try {
-      final StringWriter xmlString = new StringWriter();
-      TransformerFactory.newInstance().newTransformer().transform(
-              new SAXSource(xml.getInputSource(source)),
-              new StreamResult(xmlString)
-      );
-      final Layer<JsonNode> sourceLayer = textRepository.add(TextConstants.XML_TARGET_NAME, new StringReader(xmlString.toString()), null);
-      final LayerNode<JsonNode> transcriptLayer = (LayerNode<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
-      transcriptLayer.node.createRelationshipTo(materialUnit.node, TRANSCRIPT_RT);
-    } catch (IllegalArgumentException e) {
-      throw new TranscriptInvalidException(e);
-    } catch (TransformerException e) {
-      throw new TranscriptInvalidException(e);
-    }
-  }
+			@Override
+			protected Layer<JsonNode> translate(Name name, Map<Name, String> attributes, Set<Anchor<JsonNode>> anchors) {
+				return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors);
+			}
+		}, materialUnit);
 
-  protected XMLTransformerConfigurationBase<JsonNode> configure(XMLTransformerConfigurationBase<JsonNode> conf, MaterialUnit materialUnit) {
-    conf.addLineElement(new Name(TEI_NS, "text"));
-    conf.addLineElement(new Name(TEI_NS, "div"));
-    conf.addLineElement(new Name(TEI_NS, "head"));
-    conf.addLineElement(new Name(TEI_NS, "sp"));
-    conf.addLineElement(new Name(TEI_NS, "stage"));
-    conf.addLineElement(new Name(TEI_NS, "speaker"));
-    conf.addLineElement(new Name(TEI_NS, "lg"));
-    conf.addLineElement(new Name(TEI_NS, "l"));
-    conf.addLineElement(new Name(TEI_NS, "p"));
-    conf.addLineElement(new Name(TEI_NS, "ab"));
-    conf.addLineElement(new Name(TEI_NS, "line"));
-    conf.addLineElement(new Name(TEI_SIG_GE, "document"));
+		try {
+			final StringWriter xmlString = new StringWriter();
+			TransformerFactory.newInstance().newTransformer().transform(
+					new SAXSource(xml.getInputSource(source)),
+					new StreamResult(xmlString)
+			);
+			final Layer<JsonNode> sourceLayer = textRepository.add(TextConstants.XML_TARGET_NAME, new StringReader(xmlString.toString()), null, Collections.<Anchor<JsonNode>>emptySet());
+			final LayerNode<JsonNode> transcriptLayer = (LayerNode<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
+			transcriptLayer.node.createRelationshipTo(materialUnit.node, TRANSCRIPT_RT);
+			return transcriptLayer;
+		} catch (IllegalArgumentException e) {
+			throw new TranscriptInvalidException(e);
+		} catch (TransformerException e) {
+			throw new TranscriptInvalidException(e);
+		}
+	}
 
-    conf.addContainerElement(new Name(TEI_NS, "text"));
-    conf.addContainerElement(new Name(TEI_NS, "div"));
-    conf.addContainerElement(new Name(TEI_NS, "lg"));
-    conf.addContainerElement(new Name(TEI_NS, "subst"));
-    conf.addContainerElement(new Name(TEI_NS, "choice"));
-    conf.addContainerElement(new Name(TEI_NS, "zone"));
+	protected XMLTransformerConfigurationBase<JsonNode> configure(XMLTransformerConfigurationBase<JsonNode> conf, MaterialUnit materialUnit) {
+		conf.addLineElement(new Name(TEI_NS, "text"));
+		conf.addLineElement(new Name(TEI_NS, "div"));
+		conf.addLineElement(new Name(TEI_NS, "head"));
+		conf.addLineElement(new Name(TEI_NS, "sp"));
+		conf.addLineElement(new Name(TEI_NS, "stage"));
+		conf.addLineElement(new Name(TEI_NS, "speaker"));
+		conf.addLineElement(new Name(TEI_NS, "lg"));
+		conf.addLineElement(new Name(TEI_NS, "l"));
+		conf.addLineElement(new Name(TEI_NS, "p"));
+		conf.addLineElement(new Name(TEI_NS, "ab"));
+		conf.addLineElement(new Name(TEI_NS, "line"));
+		conf.addLineElement(new Name(TEI_SIG_GE, "document"));
 
-    conf.exclude(new Name(TEI_NS, "teiHeader"));
-    conf.exclude(new Name(TEI_NS, "front"));
-    conf.exclude(new Name(TEI_NS, "fw"));
-    conf.exclude(new Name(TEI_NS, "app"));
+		conf.addContainerElement(new Name(TEI_NS, "text"));
+		conf.addContainerElement(new Name(TEI_NS, "div"));
+		conf.addContainerElement(new Name(TEI_NS, "lg"));
+		conf.addContainerElement(new Name(TEI_NS, "subst"));
+		conf.addContainerElement(new Name(TEI_NS, "choice"));
+		conf.addContainerElement(new Name(TEI_NS, "zone"));
 
-    conf.include(new Name(TEI_NS, "lem"));
+		conf.exclude(new Name(TEI_NS, "teiHeader"));
+		conf.exclude(new Name(TEI_NS, "front"));
+		conf.exclude(new Name(TEI_NS, "fw"));
+		conf.exclude(new Name(TEI_NS, "app"));
 
-    final List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
-    modules.add(new LineElementXMLTransformerModule<JsonNode>());
-    modules.add(new NotableCharacterXMLTransformerModule<JsonNode>());
-    modules.add(new TextXMLTransformerModule<JsonNode>());
-    modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
-    modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
+		conf.include(new Name(TEI_NS, "lem"));
 
-    switch (materialUnit.getType()) {
-      case ARCHIVALDOCUMENT:
-      case DOCUMENT:
-        modules.add(new StageXMLTransformerModule(conf));
-        break;
-      case PAGE:
-        modules.add(new HandsXMLTransformerModule(conf));
-        modules.add(new FacsimilePathXMLTransformerModule(materialUnit));
-        break;
-    }
+		final List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
+		modules.add(new LineElementXMLTransformerModule<JsonNode>());
+		modules.add(new NotableCharacterXMLTransformerModule<JsonNode>());
+		modules.add(new TextXMLTransformerModule<JsonNode>());
+		modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
+		modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
 
-    modules.add(new TEIAwareAnnotationXMLTransformerModule<JsonNode>());
+		switch (materialUnit.getType()) {
+			case ARCHIVALDOCUMENT:
+			case DOCUMENT:
+				modules.add(new StageXMLTransformerModule(conf));
+				break;
+			case PAGE:
+				modules.add(new HandsXMLTransformerModule(conf));
+				modules.add(new FacsimilePathXMLTransformerModule(materialUnit));
+				break;
+		}
 
-    return conf;
-  }
+		modules.add(new TEIAwareAnnotationXMLTransformerModule<JsonNode>());
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    Executors.newSingleThreadExecutor().submit(new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
+		return conf;
+	}
 
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-      }
-    });
-  }
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Executors.newSingleThreadExecutor().submit(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+
+				return null;  //To change body of implemented methods use File | Settings | File Templates.
+			}
+		});
+	}
 }

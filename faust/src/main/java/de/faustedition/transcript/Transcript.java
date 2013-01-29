@@ -2,6 +2,7 @@ package de.faustedition.transcript;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import de.faustedition.graph.NodeWrapper;
+import eu.interedition.text.Anchor;
 import org.codehaus.jackson.JsonNode;
 import org.hibernate.LockMode;
 import org.hibernate.Session;
@@ -161,7 +163,7 @@ public class Transcript extends NodeWrapper {
 		try {
 			xmlStream = xml.getInputSource(source).getCharacterStream();
 			//xmlReader = XML.createXMLInputFactory().createXMLStreamReader(xmlStream);
-			return transformer.transform(textRepo.add(TextConstants.XML_TARGET_NAME, xmlStream, null));
+			return transformer.transform(textRepo.add(TextConstants.XML_TARGET_NAME, xmlStream, null, Collections.<Anchor<JsonNode>>emptySet()));
 		} catch(IllegalArgumentException e) {
 			throw new TranscriptInvalidException(e);
 		} finally {

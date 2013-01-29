@@ -33,8 +33,8 @@ public class StageXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 
 	private void addStageAnnotation(XMLTransformer<JsonNode> transformer) {
 		if (lastStageChangeValue != null) {
-			HashMap<Name, Object> data = Maps.newHashMap();
-			data.put(new Name((String) null, "value"), lastStageChangeValue);
+			HashMap<Name, String> data = Maps.newHashMap();
+			data.put(new Name("value"), lastStageChangeValue);
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "stage"));
 			long start = lastStageChangeOffset;
 			long end = transformer.getTextOffset();
@@ -51,11 +51,7 @@ public class StageXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 	public void start(XMLTransformer<JsonNode> transformer, XMLEntity entity) {
 		if (entity.getAttributes().containsKey(STAGE_QNAME)) {
 			addStageAnnotation(transformer);
-
-			Object newAttribute = entity.getAttributes().get(STAGE_QNAME);
-
-			String newValue = (String) newAttribute;
-			lastStageChangeValue = newValue;
+			lastStageChangeValue = entity.getAttributes().get(STAGE_QNAME);
 			lastStageChangeOffset = transformer.getTextOffset();
 		}
 	}

@@ -60,7 +60,7 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					try {
 						logger.debug("Reading transcript of {}", mu);
-            transcriptManager.read(xml, mu);
+            			transcriptManager.read(mu);
 					} catch (IOException e) {
 						if (logger.isWarnEnabled()) {
 							logger.warn("I/O error while reading transcript from " + mu, e);

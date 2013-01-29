@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -33,6 +35,7 @@ import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLBaseTracker;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
+import sun.util.LocaleServiceProviderPool;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -40,6 +43,8 @@ import de.faustedition.xml.XMLUtil;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DocumentDescriptorHandler extends DefaultHandler {
+
+	private static final Logger LOG = LoggerFactory.getLogger(DocumentDescriptorHandler.class);
 
 	@Autowired
 	private FaustGraph graph;
@@ -93,6 +98,9 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			XMLUtil.saxParser().parse(xmlSource, this);
 			if (document != null) {
 				document.index();
+			}
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Read " + source + " into " + document + "[" +  document.node.getId() + "]");
 			}
 			return document;
 		} finally {
