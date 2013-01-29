@@ -5,9 +5,10 @@ import de.faustedition.document.MaterialUnit;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.module.TextXMLTransformerModule;
+import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
 import org.codehaus.jackson.JsonNode;
 
-public class FacsimilePathXMLTransformerModule extends TextXMLTransformerModule<JsonNode> {
+public class FacsimilePathXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode> {
 
 	private boolean read = false;
 	private MaterialUnit materialUnit;
