@@ -29,7 +29,7 @@ public class StageXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 		this.conf = conf;
 	}
 
-	private static String STAGE_QNAME = "{" + TEI_SIG_GE + "}" +"stage"; 
+	private static Name STAGE_QNAME = new Name(TEI_SIG_GE , "stage"); 
 	private void addStageAnnotation(XMLTransformer<JsonNode> transformer) {
 
 		if(lastStageChangeValue != null) {

@@ -54,7 +54,7 @@ public class HandsXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 
 			addHandAnnotation(transformer);
 
-			Object newAttribute = entity.getAttributes().get("new");
+			Object newAttribute = entity.getAttributes().get(new Name((String)null, "new"));
 
 			if (newAttribute == null)
 				throw new TranscriptInvalidException("Element handShift doesn't have a 'new' attribute.");
