@@ -32,6 +32,12 @@
 			<groupId>org.goddag4j</groupId>
 			<artifactId>goddag4j</artifactId>
 			<version>1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.neo4j</groupId>
+					<artifactId>neo4j-kernel</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
         <dependency>
             <groupId>eu.interedition</groupId>
