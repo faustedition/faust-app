@@ -56,8 +56,8 @@ public class TranscriptSourceResource extends TranscriptResource {
 
 	@Get("xml")
 	public Representation source() throws IOException, XMLStreamException, SAXException {
-    for (Anchor anchor : transcript.getAnchors()) {
-      final Layer<?> text = (Layer<?>) anchor.getText();
+    for (Anchor<JsonNode> anchor : transcript.getAnchors()) {
+      final Layer<JsonNode> text = anchor.getText();
       if (TextConstants.XML_SOURCE_NAME.equals(text.getName())) {
         return new StringRepresentation(text.read());
       }

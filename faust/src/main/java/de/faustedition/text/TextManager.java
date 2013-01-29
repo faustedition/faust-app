@@ -108,7 +108,7 @@ public class TextManager extends Runtime implements Runnable {
 		final XMLTransformerConfigurationBase<JsonNode> conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
 
 			@Override
-			protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor> anchors) {
+			protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor<JsonNode>> anchors) {
 
 				ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
 				JsonNode data = mapper.valueToTree(attributes);	         

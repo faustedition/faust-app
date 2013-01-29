@@ -93,7 +93,7 @@ public class TranscriptManager implements InitializingBean {
     final XMLTransformerConfigurationBase<JsonNode> conf = configure(new XMLTransformerConfigurationBase<JsonNode>(textRepository) {
 
       @Override
-      protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor> anchors) {
+      protected Layer<JsonNode> translate(Name name, Map<Name, Object> attributes, Set<Anchor<JsonNode>> anchors) {
         return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors);
       }
     }, materialUnit);

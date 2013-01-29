@@ -39,7 +39,7 @@ public class StageXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "stage"));
 			long start = lastStageChangeOffset;
 			long end = transformer.getTextOffset();
-			Anchor textTarget = new Anchor(transformer.getTarget(), 
+			Anchor<JsonNode> textTarget = new Anchor<JsonNode>(transformer.getTarget(),
 					new TextRange(start, end));
 			
 			if (start != end)
