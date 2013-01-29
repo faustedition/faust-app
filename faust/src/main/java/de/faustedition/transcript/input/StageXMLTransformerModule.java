@@ -29,19 +29,18 @@ public class StageXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 		this.conf = conf;
 	}
 
-	private static Name STAGE_QNAME = new Name(TEI_SIG_GE , "stage"); 
+	private static Name STAGE_QNAME = new Name(TEI_SIG_GE, "stage");
+
 	private void addStageAnnotation(XMLTransformer<JsonNode> transformer) {
-
-		if(lastStageChangeValue != null) {
-
+		if (lastStageChangeValue != null) {
 			HashMap<Name, Object> data = Maps.newHashMap();
-			data.put(new Name((String)null, "value"), lastStageChangeValue);
+			data.put(new Name((String) null, "value"), lastStageChangeValue);
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "stage"));
 			long start = lastStageChangeOffset;
 			long end = transformer.getTextOffset();
 			Anchor<JsonNode> textTarget = new Anchor<JsonNode>(transformer.getTarget(),
 					new TextRange(start, end));
-			
+
 			if (start != end)
 				conf.xmlElement(name, data, textTarget);
 		}
@@ -50,10 +49,7 @@ public class StageXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 
 	@Override
 	public void start(XMLTransformer<JsonNode> transformer, XMLEntity entity) {
-
-		
 		if (entity.getAttributes().containsKey(STAGE_QNAME)) {
-			
 			addStageAnnotation(transformer);
 
 			Object newAttribute = entity.getAttributes().get(STAGE_QNAME);
@@ -62,15 +58,12 @@ public class StageXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 			lastStageChangeValue = newValue;
 			lastStageChangeOffset = transformer.getTextOffset();
 		}
-	}		
+	}
 
-	
 
-		@Override
-		public void end(XMLTransformer<JsonNode> transformer) {
-			// TODO having to call super is a bit unclean and non-obvious
-			addStageAnnotation(transformer);
-			super.end(transformer);
-		}
-	
+	@Override
+	public void end(XMLTransformer<JsonNode> transformer) {
+		addStageAnnotation(transformer);
+	}
+
 }
