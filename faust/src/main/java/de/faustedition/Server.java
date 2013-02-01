@@ -61,11 +61,11 @@ public class Server extends Runtime implements Runnable, InitializingBean {
 	private void scheduleTasks() throws Exception {
 		final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-		logger.info("Scheduling TEI P5 encoding validator for daily execution; starting in one hour from now");
-		executor.scheduleAtFixedRate(validator, 1, 24, TimeUnit.HOURS);
-
-		logger.info("Scheduling transcript batch reader for hourly execution; starting in two minutes now");
-		executor.scheduleAtFixedRate(transcriptBatchReader, 55, 55, TimeUnit.MINUTES);
+//		logger.info("Scheduling TEI P5 encoding validator for daily execution; starting in one hour from now");
+//		executor.scheduleAtFixedRate(validator, 1, 24, TimeUnit.HOURS);
+//
+//		logger.info("Scheduling transcript batch reader for hourly execution; starting in two minutes now");
+//		executor.scheduleAtFixedRate(transcriptBatchReader, 55, 55, TimeUnit.MINUTES);
 	}
 
 	private void startWebserver() throws Exception {
