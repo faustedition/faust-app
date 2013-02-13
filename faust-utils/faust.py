@@ -57,6 +57,10 @@ def transcript_files():
 def document_files():
 	return [f for f in xml_files() if relative_path(f).startswith("document/")]
 
+def metadata_files():
+	return [f for f in xml_files() if relative_path(f).startswith("metadata/")]
+
+
 def is_tei_document(xml_file):
 	"""Determines whether a XML file is a TEI document by checking the namespace of the first element encountered"""
 	for event, element in lxml.etree.iterparse(xml_file):
