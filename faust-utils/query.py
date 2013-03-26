@@ -34,7 +34,12 @@ def list_matches (files, xpath):
 			sys.stderr.write("XML syntax error: " + file + "\n")
 	return map(matches_in_file, files)
 
-
+def show_matches (matches_in_files):
+	for (file, matches) in [mf for mf in matches_in_files if mf]:
+		if matches:
+			print file
+			for match in matches:
+				print " " + str(match.attrib.get('n'))
 
 def non_wellformed (files):
 	''' List non-wellformed xml files. '''
@@ -212,9 +217,12 @@ if __name__ == "__main__":
 # =========
 
 # ==== look for lines with soon, then instant revision ====
-	for (file, matches) in list_matches(faust.transcript_files(), '//tei:p[./descendant::*[@f:revType="soon"]/following-sibling::*[@f:revType="instant"]]'):
-		if matches:
-			print file
-			# for match in matches:
-				# print " " + str(match)
-			
+ 	# for (file, matches) in list_matches(faust.transcript_files(), '//tei:p[./descendant::*[@f:revType="soon"]/following-sibling::*[@f:revType="instant"]]'):
+	# 	if matches:
+	# 		print file
+	# 		# for match in matches:
+	# 			# print " " + str(match)
+# =======			
+	
+	# in which manuscripts are the line numbers not in final order (schroer)
+	show_matches(list_matches(faust.transcript_files(), "//tei:l[number(@n) <  number(./preceding::tei:l[1]/@n)]"))
