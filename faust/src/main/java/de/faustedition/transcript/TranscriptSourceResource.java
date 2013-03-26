@@ -59,7 +59,7 @@ public class TranscriptSourceResource extends TranscriptResource {
 		return new StringRepresentation(transcript.read());
 	}
 
-	@Get("json")
+	//@Get("json")
 	public Representation model() throws IOException {
 		final Map<String, Name> names = Maps.newHashMap();
 		final ArrayList<Layer<JsonNode>> annotations = Lists.newArrayList();
@@ -74,4 +74,21 @@ public class TranscriptSourceResource extends TranscriptResource {
 			.addAttribute("names", names)
 			.addAttribute("annotations", annotations));
 	}
+
+	@Get("json")
+	public Representation compactModel() throws IOException {
+		final Map<String, Name> names = Maps.newHashMap();
+		final ArrayList<Layer<JsonNode>> annotations = Lists.newArrayList();
+		for (Layer<JsonNode> annotation : textRepo.query(text(transcript))) {
+			final Name name = annotation.getName();
+			names.put(Long.toString(name.hashCode()), name);
+			annotations.add(annotation);
+		}
+		return jsonFactory.map(new ModelMap()
+			.addAttribute("text", transcript)
+			.addAttribute("textContent", transcript.read())
+			.addAttribute("names", names)
+			.addAttribute("annotations", annotations));
+	}
+
 }

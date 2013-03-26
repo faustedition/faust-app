@@ -17,5 +17,6 @@ public class CustomNamespaceMap extends NamespaceMap implements Namespaces {
 		put(URI.create(Namespaces.TEI_SIG_GE_URI), TEI_SIG_GE_PREFIX);
 		put(URI.create(Namespaces.SVG_NS_URI), SVG_NS_PREFIX);
 		put(URI.create(Namespaces.XLINK_NS_URI), XLINK_NS_PREFIX);
+		put(URI.create(Namespaces.XML_NS_URI), XML_NS_PREFIX);
 	}
 }
