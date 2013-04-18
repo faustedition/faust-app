@@ -18,7 +18,7 @@ YUI.add('document-model', function (Y) {
 			return result;
 		},
 		initViewComponent: function() {
-			this.parent = null;
+			//this.parent = null;
 			this.pos = -1;
 			this.children = [];			
 			

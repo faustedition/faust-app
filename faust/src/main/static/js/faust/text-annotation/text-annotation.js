@@ -44,9 +44,11 @@ YUI.add('text-annotation', function (Y) {
     });
 
     Y.extend(Text, Object, {
-        partition: function () {
-            var offsets = [];
-            Y.Array.each(this.annotations, function (a) {
+        partition: function (annotations) {
+			var partitioningAnnotations = annotations ? annotations : this.annotations;
+            var offsets = [0, this.content.length];
+
+            Y.Array.each(partitioningAnnotations, function (a) {
                 Y.Array.each(a.targets, function (t) {
                     if (t.text == this) {
                         var range = t.range;
@@ -55,6 +57,7 @@ YUI.add('text-annotation', function (Y) {
                     }
                 }, this);
             }, this);
+
             offsets.sort(function (a, b) {
                 return a - b;
             });

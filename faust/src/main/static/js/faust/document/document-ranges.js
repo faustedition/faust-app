@@ -229,65 +229,73 @@ YUI.add('document-ranges', function (Y) {
 			
 			var surfaceVC = new Faust.Surface();
 			
-			//for all partitions
-			Y.each(transcript.partition(), function(p) {
-				// console.log (p.start + ' --- ' + p.end);
-				// only use content inside a line
-				if (transcript.find(p.start, p.end, 'line')[0]) {	
-					// console.log(p.of(transcript.content));
-					var textVC = createTextVC(p, transcript);
-					
-					var structuralHierarchy = [{name:'zone', builder: createZoneVC},
-						                       {name:'line', builder: createLineVC},
-											   {name:'anchor', builder: createAnchorVC},
-											   ];
-					var vc;
-					var parent = surfaceVC;
-					
-					Y.each(structuralHierarchy, function(element) {
-						var annotations = transcript.find(p.start, p.end, element.name);
-						if (annotations.length > 0) {
-							var annotation = annotations[0];
-							if (existsVC(annotation))
-								vc = getVC(annotation);
-							else
-								vc = element.builder(annotation, parent);
-							parent = vc;
-							
-						}
+			function constructSequentially() {
+
+				//for all partitions
+				Y.each(transcript.partition(), function(p) {
+					// console.log (p.start + ' --- ' + p.end);
+					// only use content inside a line
+					if (transcript.find(p.start, p.end, 'line')[0]) {	
+						// console.log(p.of(transcript.content));
+						var textVC = createTextVC(p, transcript);
+						
+						var structuralHierarchy = [{name:'zone', builder: createZoneVC},
+												   {name:'line', builder: createLineVC},
+												   {name:'anchor', builder: createAnchorVC},
+												  ];
+						var vc;
+						var parent = surfaceVC;
+						
+						Y.each(structuralHierarchy, function(element) {
+							var annotations = transcript.find(p.start, p.end, element.name);
+							if (annotations.length > 0) {
+								var annotation = annotations[0];
+								if (existsVC(annotation))
+									vc = getVC(annotation);
+								else
+									vc = element.builder(annotation, parent);
+								parent = vc;
+								
+							}
+						});
+						vc.add(textVC);
+					}
+
+					// check for empty elements
+
+					var annotationsAtStart = transcript.find(p.start, p.start);
+					Y.each(annotationsAtStart, function(annotation){
+						var range = annotation.target().range;
+						if (range.start === range.end) 
+							console.log(' ' + range.start + ' ' +  range.end + ' ' + annotation.name.localName);
 					});
-					vc.add(textVC);
-				}
+					
 
-				// check for empty elements
-
-				var annotationsAtStart = transcript.find(p.start, p.start);
-				Y.each(annotationsAtStart, function(annotation){
-					var range = annotation.target().range;
-					if (range.start === range.end) 
-						console.log(' ' + range.start + ' ' +  range.end + ' ' + annotation.name.localName);
+					
 				});
-				
+			};
 
-				
-			});
+
+			//constructSequentially();
+
+			var structuralHierarchy = [{name:'zone', builder: createZoneVC},
+										   {name:'line', builder: createLineVC},
+										   {name:'anchor', builder: createAnchorVC},
+										  ];
+
+			var structuralNames = structuralHierarchy.map(function(x) {return x.name});
+
+
+			function constructRecursively(transcript, start, end, exclude, parentVC) {
+
+				var tree = new Y.Faust.AdhocTree(transcript, structuralNames);
+				console.log("tree: " + tree);
+			};
+
 			
-			
-			//				Y.Array.each(transcript.find(null, null, ['line']), function(line) {				
-			//					var linetextVC = createTextVC(line.target().textContent());
-			//					var lineVC = new Faust.Line({});
-			//					
-			//					//find the zone of the line
-			//					
-			//					var linestart = line.target().range.start;
-			//					var lineend = line.target().range.end;
-			//					
-			//					var zone = transcript.find(linestart, lineend, 'zone')[0];
-			//					var zoneVC = createZoneVC(zone);			
-			//					lineVC.add(linetextVC);
-			//					zoneVC.add(lineVC);
-			//					
-			//				});
+
+			constructRecursively(transcript, 0, transcript.content.length, [], surfaceVC);
+			//constructSequentially();
 			
 			
 			Y.each(postBuildDeferred, function(f) {f.apply(this)});
@@ -297,7 +305,7 @@ YUI.add('document-ranges', function (Y) {
 	};
 	
 }, '0.0', {
-	requires: ["document-model", "text-annotation"]
+	requires: ["adhoc-tree", "document-model", "text-annotation"]
 });
 
 
