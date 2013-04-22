@@ -139,6 +139,14 @@ YUI.add('adhoc-tree', function (Y) {
 
 	Y.extend(AnnotationNode, AdhocNode, {
 
+		_textNodesForPartitions: function(start, end, parent) {
+			var partitions = transcript.partition(this.filter(), start, end);
+			var textNodes = Y.Array.map(partitions, function(partition) {
+				return new TextNode(new Y.Faust.Range(partition.start, partition.end), parent);
+			});
+			return textNodes;
+		},
+
 		_iterateChildren: function(start, end, annotationStack) {
 			var result = [];
 			var from = start;
@@ -154,9 +162,8 @@ YUI.add('adhoc-tree', function (Y) {
 					var annotationEnd = annotation.targets[0].range.end;
 					if (prefixEnd > prefixStart) {
 						// there is text content before the next sibling node
-						var textNode = new TextNode(new Y.Faust.Range(prefixStart, prefixEnd), this);
-						result.push(textNode);
-
+						var textNodes = this._textNodesForPartitions(prefixStart, prefixEnd, this);
+						result = result.concat(textNodes);
 					} 
 					annotationStack.push(annotation);
 					var annotationNode = new AnnotationNode(annotation, this);
@@ -164,9 +171,9 @@ YUI.add('adhoc-tree', function (Y) {
 					from = annotationEnd;
 				} else {
 					// text node
-					if (from < end) {
-						var textNode = new TextNode(new Y.Faust.Range(from, end), this);
-						result.push(textNode);
+					if (from < end) {					
+						var textNodes = this._textNodesForPartitions(from, end, this);
+						result = result.concat(textNodes);
 					}
 					return result;
 				}
