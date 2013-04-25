@@ -76,6 +76,12 @@ YUI.add('document-yui-view', function (Y) {
 
 		render: function() {
 			var container = this.get('container');
+			
+			
+			var transcriptSource = '/' + cp + this.get('source').components[1] + '/' + this.get('source').components[2];
+			this.editortoolbar = Y.Node.create('<div id="editor-toolbar"><a href="' + transcriptSource  + '">(XML source)</a></div>');
+			container.appendChild(this.editortoolbar);
+
 			this.errorDisplay = Y.Node.create('<div id="error-display"></div>');
 			container.appendChild(this.errorDisplay);
 			var svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
