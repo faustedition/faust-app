@@ -18,27 +18,27 @@ YUI.add('document-adhoc-tree', function (Y) {
 			// Text factory; the current model only delivers text nodes, some additional elements (gaps, insertion marks) need 
 			// to be delivered to know their tree context (hands...) for visualisation
 			var createText = function(content, node){
+				if (content.length < 1) throw "Cannot create empty text!";
 				var textAttrs = {};
-				Y.each(node.ancestors(), function(a) {
-/*					var elem = a.node;
-					if (elem.name == "f:hand") {
-						textAttrs.hand = elem.attrs["f:id"];
-					} else if (elem.name == "ge:rewrite") {
-						textAttrs.rewrite = elem.attrs["ge:hand"];
-					} else if (elem.name == "f:under") {
+				var annotations = transcript.find(node.range.start, node.range.end);
+				Y.each(annotations, function(a) {
+					if (a.name.localName == "hand") {
+						textAttrs.hand = a.data["value"];
+					} else if (a.name.localName == "rewrite") {
+						textAttrs.rewrite = a.data["hand"];
+					} else if (a.name.localName == "under") {
 						textAttrs.under = true;
-					} else if (elem.name == "f:over") {
+					} else if (a.name.localName == "over") {
 						textAttrs.over = true;
-					} else if (elem.name == "f:st") {
+					} else if (a.name.localName == "st") {
 						textAttrs.strikethrough = true;
-					} else if (elem.name == "tei:hi" && elem.attrs["tei:rend"].indexOf("underline") >= 0) {
+					} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].indexOf("underline") >= 0) {
 						textAttrs.underline = true;
-					} else if (elem.name == "ge:line") {
-						textAttrs.fontsize = ((elem.attrs["ge:type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
+					} else if (a.name.localName == "line") {
+						textAttrs.fontsize = ((a.data["type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
 					}
-*/
-				});	
-			
+
+				});				
 				return new Faust.Text(content, textAttrs);				
 			};
 
@@ -149,7 +149,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 					if (parent.elementName === "zone")
 						vc = new Faust.Line([]);
 					else
-						vc = createText("", node);
+						vc = new Faust.Text("", {});
 					
 					
 				} else if (node.name().localName == "f:ins" && node.data()["f:orient"] == "right") {

@@ -140,7 +140,7 @@ YUI.add('adhoc-tree', function (Y) {
 	Y.extend(AnnotationNode, AdhocNode, {
 
 		_textNodesForPartitions: function(start, end, parent) {
-			var partitions = transcript.partition(this.filter(), start, end);
+			var partitions = transcript.partition(null, start, end);
 			var textNodes = Y.Array.map(partitions, function(partition) {
 				return new TextNode(new Y.Faust.Range(partition.start, partition.end), parent);
 			});
