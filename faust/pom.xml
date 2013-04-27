@@ -41,8 +41,8 @@
 		</dependency>
         <dependency>
             <groupId>eu.interedition</groupId>
-            <artifactId>text</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <artifactId>text-core</artifactId>
+            <version>1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
 			<groupId>com.google.guava</groupId>
@@ -108,6 +108,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>1.6.2</version>
 		</dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.10</version>
+        </dependency>
 		<dependency>
 			<groupId>org.restlet.jse</groupId>
 			<artifactId>org.restlet</artifactId>
@@ -201,20 +206,6 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-        	<groupId>eu.interedition</groupId>
-        	<artifactId>text-core</artifactId>
-        	<version>2.0-SNAPSHOT</version>
-        	<type>jar</type>
-        	<scope>compile</scope>
-        </dependency>
-        <dependency>
-        	<groupId>eu.interedition</groupId>
-        	<artifactId>text-server</artifactId>
-        	<version>2.0-SNAPSHOT</version>
-        	<type>jar</type>
-        	<scope>compile</scope>
-        </dependency>
 	</dependencies>
 	<build>
 		<resources>
