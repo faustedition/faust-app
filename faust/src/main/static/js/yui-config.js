@@ -1,21 +1,23 @@
 YUI.GlobalConfig = {
     debug: false,
-    combine: true,
+    combine: false,
     comboBase: cp + '/resources?',
     root: 'yui3/build/',
     groups: {
         faust: {
             base: cp + '/static/js/',
-            combine: true,
+            combine: false,
             comboBase: cp + '/resources?',
             filter: "raw",
             root: 'js/',
             modules: {
+                'adhoc-tree': { path: 'faust/text-annotation/adhoc-tree.js'},
                 'facsimile': { path: 'faust/facsimile/facsimile.js'},
                 'facsimile-svgpane': { path: 'faust/facsimile/facsimile-svgpane.js' },
                 'facsimile-highlightpane': { path: 'faust/facsimile/facsimile-highlightpane.js' },
                 'util': { path: "faust/util/util.js"},
 				'document': { path: "faust/document/document.js" },
+				'document-adhoc-tree' : { path: 'faust/document/document-adhoc-tree.js' },
 				'document-view' : { path: 'faust/document/document-view.js' },
 				'document-yui-view' : { path: 'faust/document/document-yui-view.js' },
 				'document-structure-view' : { path: 'faust/document/document-structure-view.js' },

@@ -44,30 +44,43 @@ YUI.add('text-annotation', function (Y) {
     });
 
     Y.extend(Text, Object, {
-        partition: function () {
-            var offsets = [];
-            Y.Array.each(this.annotations, function (a) {
+        partition: function (annotations, start, end) {
+			var partitioningAnnotations = annotations ? annotations : this.annotations;
+			var partitionsStart = start ? start : 0;
+			var partitionsEnd = end ? end : this.content.length;
+            var offsets = [partitionsStart, partitionsEnd];
+
+            Y.Array.each(partitioningAnnotations, function (a) {
                 Y.Array.each(a.targets, function (t) {
                     if (t.text == this) {
                         var range = t.range;
-                        if (offsets.indexOf(range.start) < 0) offsets.push(range.start);
-                        if (offsets.indexOf(range.end) < 0) offsets.push(range.end);
+                        if (offsets.indexOf(range.start) < 0 
+							&& range.start >= partitionsStart 
+							&& range.start <= partitionsEnd)
+							offsets.push(range.start);
+                        if (offsets.indexOf(range.end) < 0
+							&& range.end >= partitionsStart
+							&& range.end <= partitionsEnd)						
+							offsets.push(range.end);
                     }
                 }, this);
             }, this);
+
             offsets.sort(function (a, b) {
                 return a - b;
             });
 
-            if (offsets.length == 0 || offsets[0] > this.range.start) offsets.unshift(this.range.start);
-            if (offsets.length == 1 || offsets[offsets.length - 1] < this.range.end) offsets.push(this.range.end);
+            //if (offsets.length == 0 || offsets[0] > this.range.start) offsets.unshift(this.range.start);
+            //if (offsets.length == 1 || offsets[offsets.length - 1] < this.range.end) offsets.push(this.range.end);
 
             var partitions = [];
-            var start = -1;
-            Y.Array.each(offsets, function (end) {
-                if (start >= 0) partitions.push(new Range(start, end));
-                start = end;
+            var rangeStart = -1;
+            Y.Array.each(offsets, function (rangeEnd) {
+                if (rangeStart >= 0) partitions.push(new Range(rangeStart, rangeEnd));
+                rangeStart = rangeEnd;
             });
+
+			
             return partitions;
         },
         find: function (start, end, filter) {

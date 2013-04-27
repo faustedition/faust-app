@@ -18,14 +18,14 @@ YUI.add('document-model', function (Y) {
 			return result;
 		},
 		initViewComponent: function() {
-			this.parent = null;
+			//this.parent = null;
 			this.pos = -1;
 			this.children = [];			
 			
-			this.x = null;
-			this.y = null;
-			this.width = null;
-			this.height = null;
+			this.x = 0;
+			this.y = 0;
+			this.width = 0;
+			this.height = 0;
 			//this.hAlign = null;
 			//this.vAlign = null;
 		},

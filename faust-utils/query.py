@@ -57,7 +57,7 @@ def unique_values(files, xpath):
 	for f in files:
 		try:
 			xml = lxml.etree.parse(f)
-			results = faust.xpath(xpath)(xml)
+			results = [result.tag for result in faust.xpath(xpath)(xml)]
 			unique = unique.union(results)
 		except lxml.etree.XMLSyntaxError:
 			sys.stderr.write("XML syntax error: " + f + "\n")
@@ -225,4 +225,5 @@ if __name__ == "__main__":
 # =======			
 	
 	# in which manuscripts are the line numbers not in final order (schroer)
-	show_matches(list_matches(faust.transcript_files(), "//tei:l[number(@n) <  number(./preceding::tei:l[1]/@n)]"))
+	# show_matches(list_matches(faust.transcript_files(), "//tei:l[number(@n) <  number(./preceding::tei:l[1]/@n)]"))
+	for val in unique_values (faust.transcript_files(), "//ge:document//*"): print val

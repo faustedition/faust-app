@@ -51,7 +51,7 @@ public class Server extends Runtime implements Runnable, InitializingBean {
 		try {
 			logger.info("Starting Faust-Edition with profiles " + Iterables.toString(Arrays.asList(environment.getActiveProfiles())));
 
-			scheduleTasks();
+			//scheduleTasks();
 			startWebserver();
 
 		} catch (Exception e) {
@@ -67,7 +67,7 @@ public class Server extends Runtime implements Runnable, InitializingBean {
 		executor.scheduleAtFixedRate(validator, 1, 24, TimeUnit.HOURS);
 
 		logger.info("Scheduling transcript batch reader for hourly execution; starting in two minutes now");
-		executor.scheduleAtFixedRate(transcriptBatchReader, 55, 55, TimeUnit.MINUTES);
+		executor.scheduleAtFixedRate(transcriptBatchReader, 1, 55, TimeUnit.MINUTES);
 	}
 
 	private void startWebserver() throws Exception {
