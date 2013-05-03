@@ -1,10 +1,11 @@
 package edu.bath.transitivityutils;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 
 /**
  * A doubly-linked circular list, where pairs of elements can be tested for precedence in

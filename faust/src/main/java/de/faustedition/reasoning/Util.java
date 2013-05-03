@@ -3,7 +3,6 @@ package de.faustedition.reasoning;
 import java.util.Set;
 
 import edu.bath.transitivityutils.ImmutableRelation;
-import edu.bath.transitivityutils.Relation;
 import edu.bath.transitivityutils.Relations;
 import edu.bath.transitivityutils.TransitiveRelation;
 

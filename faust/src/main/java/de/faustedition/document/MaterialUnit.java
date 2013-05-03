@@ -1,25 +1,23 @@
 package de.faustedition.document;
 
-import static de.faustedition.transcript.GoddagTranscript.TRANSCRIPT_RT;
-import static org.neo4j.graphdb.Direction.INCOMING;
-import static org.neo4j.graphdb.Direction.OUTGOING;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.transcript.GoddagTranscript;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import static de.faustedition.transcript.GoddagTranscript.TRANSCRIPT_RT;
+import static org.neo4j.graphdb.Direction.INCOMING;
+import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
 
@@ -93,7 +91,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		final String uri = (String) node.getProperty(PREFIX + ".facsimile", null);
 		return (uri == null ? null :FaustURI.parse(uri));
 	}
-	
+
 	public Type getType() {
 		return getType(node);
 	}

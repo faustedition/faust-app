@@ -1,11 +1,15 @@
 package de.faustedition.tei;
 
-import com.google.common.base.Throwables;
-import de.faustedition.FaustURI;
-import de.faustedition.JsonRespresentation;
-import de.faustedition.transcript.TranscriptType;
-import de.faustedition.xml.CustomNamespaceMap;
-import de.faustedition.xml.XMLUtil;
+import static org.restlet.data.MediaType.APPLICATION_XML;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Iterator;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.stream.StreamResult;
+
 import org.goddag4j.Element;
 import org.goddag4j.MultiRootedTree;
 import org.goddag4j.io.GoddagJSONWriter;
@@ -23,14 +27,13 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Iterator;
+import com.google.common.base.Throwables;
 
-import static org.restlet.data.MediaType.APPLICATION_XML;
+import de.faustedition.FaustURI;
+import de.faustedition.JsonRespresentation;
+import de.faustedition.transcript.TranscriptType;
+import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.XMLUtil;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)

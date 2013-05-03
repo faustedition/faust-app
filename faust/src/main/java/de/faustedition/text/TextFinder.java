@@ -1,7 +1,7 @@
 package de.faustedition.text;
 
-import de.faustedition.FaustURI;
-import de.faustedition.xml.XMLStorage;
+import java.util.Deque;
+
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Finder;
@@ -11,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.Deque;
+import de.faustedition.FaustURI;
+import de.faustedition.xml.XMLStorage;
 
 @Component
 public class TextFinder extends Finder {

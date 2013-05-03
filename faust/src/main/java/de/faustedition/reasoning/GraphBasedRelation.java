@@ -6,7 +6,6 @@ import org.neo4j.graphdb.Node;
 
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
-
 import edu.bath.transitivityutils.ImmutableRelation;
 
 public class GraphBasedRelation<E> implements ImmutableRelation<E> {

@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import de.faustedition.xml.Namespaces;
 import org.goddag4j.Element;
 import org.goddag4j.Text;
 import org.goddag4j.visit.GoddagVisitor;
@@ -17,6 +16,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
 import de.faustedition.FaustURI;
+import de.faustedition.xml.Namespaces;
 
 public class DocumentaryGoddagTranscript extends GoddagTranscript {
 

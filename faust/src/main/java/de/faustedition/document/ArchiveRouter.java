@@ -1,13 +1,16 @@
 package de.faustedition.document;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Iterables;
-import de.faustedition.ApplicationContextFinder;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.xml.NodeListWrapper;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import static de.faustedition.xml.XPathUtil.xpath;
+
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.xml.xpath.XPathExpression;
+
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -22,11 +25,15 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import javax.xml.xpath.XPathExpression;
-import java.io.IOException;
-import java.util.*;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 
-import static de.faustedition.xml.XPathUtil.xpath;
+import de.faustedition.ApplicationContextFinder;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.xml.NodeListWrapper;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 
 @Component
 public class ArchiveRouter extends Router implements InitializingBean {

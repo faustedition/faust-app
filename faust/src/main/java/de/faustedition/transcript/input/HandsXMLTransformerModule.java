@@ -1,63 +1,65 @@
 package de.faustedition.transcript.input;
 
-import static eu.interedition.text.Annotation.JSON;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.ObjectNode;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import de.faustedition.xml.Namespaces;
-import eu.interedition.text.Annotation;
+import eu.interedition.text.Anchor;
 import eu.interedition.text.Name;
-import eu.interedition.text.TextTarget;
+import eu.interedition.text.TextRange;
 import eu.interedition.text.xml.XMLEntity;
 import eu.interedition.text.xml.XMLTransformer;
-import eu.interedition.text.xml.module.AbstractAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.XMLTransformerConfiguration;
+import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
+import org.codehaus.jackson.JsonNode;
 
-public class HandsXMLTransformerModule extends AbstractAnnotationXMLTransformerModule {
+public class HandsXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode> {
 
 	private long lastHandsChangeOffset = -1;
 	private String lastHandsChangeValue = null;
+	private XMLTransformerConfiguration<JsonNode> conf;
 
-	public HandsXMLTransformerModule() {
-		super(1000, false);
+
+	public HandsXMLTransformerModule(XMLTransformerConfiguration<JsonNode> conf) {
+		this.conf = conf;
 	}
 
-	private void addHandAnnotation(XMLTransformer transformer) {
+	private void addHandAnnotation(XMLTransformer<JsonNode> transformer) {
 
 		if(lastHandsChangeValue != null) {
-
-			ObjectNode data = JSON.createObjectNode();
-			data.put("value", lastHandsChangeValue);
+			
+			Map<Name,String> data = Maps.newHashMap();
+			data.put(new Name("value"), lastHandsChangeValue);
 			Name name = new Name(new QName(Namespaces.FAUST_NS_URI, "hand"));
 			long start = lastHandsChangeOffset;
 			long end = transformer.getTextOffset();
-			TextTarget textTarget = new TextTarget(transformer.getTarget(), start, end);
-			Annotation annotation = new Annotation(name, textTarget, data);
-
-			annotation.setData(data);
-			
+			Anchor<JsonNode> textTarget = new Anchor<JsonNode>(transformer.getTarget(),
+					new TextRange(start, end));
 			if (start != end)
-				add(transformer, annotation);
+				conf.xmlElement(name, data, textTarget);
 		}
 	}
 
 
 	@Override
-	public void start(XMLTransformer transformer, XMLEntity entity) {
+	public void start(XMLTransformer<JsonNode> transformer, XMLEntity entity) {
 
 		if(entity.getName().getLocalName().equals("handShift")) {
 
 			addHandAnnotation(transformer);
 
-
-			JsonNode newAttribute = entity.getAttributes().get("new");
+			Object newAttribute = entity.getAttributes().get(new Name("new"));
 
 			if (newAttribute == null)
 				throw new TranscriptInvalidException("Element handShift doesn't have a 'new' attribute.");
 
-			String newValue = newAttribute.getTextValue();
+			String newValue = (String) newAttribute;
 			lastHandsChangeValue = newValue;
 			lastHandsChangeOffset = transformer.getTextOffset();
 		}
@@ -66,7 +68,7 @@ public class HandsXMLTransformerModule extends AbstractAnnotationXMLTransformerM
 	
 
 		@Override
-		public void end(XMLTransformer transformer) {
+		public void end(XMLTransformer<JsonNode> transformer) {
 			// TODO having to call super is a bit unclean and non-obvious
 			addHandAnnotation(transformer);
 			super.end(transformer);

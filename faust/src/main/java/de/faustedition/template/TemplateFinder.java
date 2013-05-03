@@ -1,5 +1,7 @@
 package de.faustedition.template;
 
+import java.io.IOException;
+
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.ext.freemarker.TemplateRepresentation;
@@ -10,8 +12,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Component
 public class TemplateFinder extends Finder implements InitializingBean {

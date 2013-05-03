@@ -64,9 +64,7 @@ YUI.add('document-text', function (Y) {
 					});
 
 					forAnnotationDo('add', p, function() {
-						partitionNode.wrap('<sup/>');
-						//partitionNode.insert('</sup>', 'after');
-						
+						partitionNode.wrap('<sup/>');						
 					});
 
 

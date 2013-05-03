@@ -1,13 +1,7 @@
 package de.faustedition.tei;
 
-import de.faustedition.FaustURI;
-import de.faustedition.text.Text;
-import de.faustedition.text.TextGeneticJSONEnhancer;
-import de.faustedition.text.TextManager;
-import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.TranscriptType;
-import de.faustedition.transcript.GoddagTranscriptManager;
-import de.faustedition.xml.XMLStorage;
+import java.util.Deque;
+
 import org.goddag4j.MultiRootedTree;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -20,7 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.Deque;
+import de.faustedition.FaustURI;
+import de.faustedition.text.Text;
+import de.faustedition.text.TextGeneticJSONEnhancer;
+import de.faustedition.text.TextManager;
+import de.faustedition.transcript.GoddagTranscript;
+import de.faustedition.transcript.GoddagTranscriptManager;
+import de.faustedition.transcript.TranscriptType;
+import de.faustedition.xml.XMLStorage;
 
 @Component
 public class GoddagFinder extends Finder {

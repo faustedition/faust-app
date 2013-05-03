@@ -3,15 +3,11 @@ package de.faustedition.document;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.collect.Iterables;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -20,14 +16,16 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexManager;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
 
 import de.faustedition.FaustURI;
 import de.faustedition.genesis.MacrogeneticRelationManager;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.NodeWrapper;
-import org.neo4j.graphdb.index.Index;
-import org.neo4j.graphdb.index.IndexManager;
-import org.springframework.transaction.annotation.Transactional;
 
 public class Document extends MaterialUnit {
 	private static final String PREFIX = FaustGraph.PREFIX + ".document";

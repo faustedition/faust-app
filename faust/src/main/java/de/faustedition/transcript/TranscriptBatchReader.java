@@ -1,10 +1,10 @@
 package de.faustedition.transcript;
 
-import java.io.IOException;
-
-import javax.xml.stream.XMLStreamException;
-
-import org.hibernate.SessionFactory;
+import de.faustedition.Runtime;
+import de.faustedition.document.MaterialUnit;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.transcript.input.TranscriptInvalidException;
+import de.faustedition.xml.XMLStorage;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +13,10 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StopWatch;
 
-import de.faustedition.Runtime;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.transcript.input.TranscriptInvalidException;
-import de.faustedition.xml.XMLStorage;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -33,13 +31,13 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 	private TransactionTemplate transactionTemplate;
 
 	@Autowired
-	private SessionFactory sessionFactory;
-
-	@Autowired
 	private XMLStorage xml;
 
 	@Autowired
 	private Logger logger;
+	
+	@Autowired
+	private TranscriptManager transcriptManager;
 
 	@Override
 	public void run() {
@@ -47,10 +45,13 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		for (final MaterialUnit mu : graph.getMaterialUnits()) {
-//			if ((mu instanceof Document)) {
-//				continue;
-//			}
+
+    final Deque<MaterialUnit> queue = new ArrayDeque<MaterialUnit>(graph.getMaterialUnits());
+		while (!queue.isEmpty()) {
+      final MaterialUnit mu = queue.pop();
+
+      queue.addAll(mu);
+
 			if (mu.getTranscriptSource() == null) {
 				continue;
 			}
@@ -59,11 +60,7 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					try {
 						logger.debug("Reading transcript of {}", mu);
-						if (mu instanceof Document) 
-							TextualTranscripts.read(sessionFactory.getCurrentSession(), xml, mu);
-						else
-							DocumentaryTranscripts.read(sessionFactory.getCurrentSession(), xml, mu);
-						
+            			transcriptManager.read(mu);
 					} catch (IOException e) {
 						if (logger.isWarnEnabled()) {
 							logger.warn("I/O error while reading transcript from " + mu, e);

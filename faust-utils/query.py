@@ -8,7 +8,6 @@ import sys
 import faust
 import lxml.etree
 import re
-import textwrap
 
 kodiert_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='kodiert']"
 encoded_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='encoded']"
@@ -33,9 +32,14 @@ def list_matches (files, xpath):
 			return [file, faust.xpath(xpath)(xml)]
 		except lxml.etree.XMLSyntaxError:
 			sys.stderr.write("XML syntax error: " + file + "\n")
-	return [entry for entry in map(matches_in_file, files) if entry != None]
+	return map(matches_in_file, files)
 
-
+def show_matches (matches_in_files):
+	for (file, matches) in [mf for mf in matches_in_files if mf]:
+		if matches:
+			print file
+			for match in matches:
+				print " " + str(match.attrib.get('n'))
 
 def non_wellformed (files):
 	''' List non-wellformed xml files. '''
@@ -53,7 +57,7 @@ def unique_values(files, xpath):
 	for f in files:
 		try:
 			xml = lxml.etree.parse(f)
-			results = faust.xpath(xpath)(xml)
+			results = [result.tag for result in faust.xpath(xpath)(xml)]
 			unique = unique.union(results)
 		except lxml.etree.XMLSyntaxError:
 			sys.stderr.write("XML syntax error: " + f + "\n")
@@ -213,90 +217,13 @@ if __name__ == "__main__":
 # =========
 
 # ==== look for lines with soon, then instant revision ====
-	# for (file, matches) in list_matches(faust.transcript_files(), '//tei:p[./descendant::*[@f:revType="soon"]/following-sibling::*[@f:revType="instant"]]'):
+ 	# for (file, matches) in list_matches(faust.transcript_files(), '//tei:p[./descendant::*[@f:revType="soon"]/following-sibling::*[@f:revType="instant"]]'):
 	# 	if matches:
 	# 		print file
 	# 		# for match in matches:
 	# 			# print " " + str(match)
-
-# check metadata
-	structure_elems = ['archivalDocument', 'sheet', 'leaf', 'disjunctLeaf', 'page', 'patch', 'patchSurface']
-	metadata_fields = [
-
-		# Dokumenteigenschaften
-		('repository', ['typed']),
-		('subRepository', []),
-		('collection', []),
-		('idno', ['typed']),
-		('textTranscript', ['uri']),
-		('classification', ['typed']),
-		('history', []),
-		('container', []),
-		('binding', []),
-		('numbering', []),
-		('condition', []),
-
-		# Blatteigenschaften
-		('dimensions', []),
-		('format', ['typed']),
-		('bindingMaterial', []),
-		('stabMark', []),
-		('leafCondition', []),
-		('edges', ['typed']),
-
-		# Papiereigenschaften
-		('paperType', ['typed']),
-		('paperColour', []),
-		('chainLines', []),
-		('paperMill', []),
-		('watermarkID', []),
-		('countermarkID', []),
-
-		# Seiteneigenschaften
-		('docTranscript', ['uri']),
-		('references', []),
-
-		# Anbringungseigenschaften
-		('patchDimensions', []),
-		('patchType', ['typed']),
-		('patchPaperType', ['typed']),
-		('patchPaperColour', []),
-		('patchChainLines', []),
-		('patchPaperMill', []),
-		('patchWatermarkID', []),
-		('patchCountermarkID', []),
-		('patchReferences', ['uri']),
-		]
-
-
-	def note_for_structure_element(structure_elem):
-		return ('note FOR STRUCTURE ELEMENT ' + structure_elem, '//f:' + structure_elem + '/f:metadata/f:note[not(./preceding-sibling::*)]')
-
-	def note_for_metadata_field(elem):
-		return ('note FOR METADATA FIELD ' + elem, '//f:note[./preceding-sibling::f:' + elem + ']')
-
-	def metadata_field(elem):
-		return ('CONTENT OF METADATA FIELD ' + elem, '//f:' + elem)
+# =======			
 	
-	
-	fields = map(note_for_structure_element, structure_elems)
-	fields = fields + map(note_for_metadata_field, [x[0] for x in metadata_fields])
-	fields = fields + map(metadata_field, [x[0] for x in metadata_fields if not ('uri' in x[1] or 'typed' in x[1])])
-	
-	leave_out = ['none', 'n.s.']
-	for fieldname, xpath in fields:
-		print '# ', fieldname, ''
-		print
-		match_list = list_matches(faust.document_files(), xpath)
-		for (f, matches) in match_list:
-			if matches:
-				print '    ', f[f.find('/xml/'):]
-				for match in matches:
-					if match != None:
-						result =  lxml.etree.tostring(match, method='text', encoding='utf8').strip() 
-						if result != '' and result not in leave_out:
-							print
-							for line in textwrap.wrap(result, 75,  initial_indent='        ', subsequent_indent='        '):
-								print line
-							print
-			
+	# in which manuscripts are the line numbers not in final order (schroer)
+	# show_matches(list_matches(faust.transcript_files(), "//tei:l[number(@n) <  number(./preceding::tei:l[1]/@n)]"))
+	for val in unique_values (faust.transcript_files(), "//ge:document//*"): print val

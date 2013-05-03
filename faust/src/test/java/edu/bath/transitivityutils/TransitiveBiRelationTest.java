@@ -1,9 +1,9 @@
 package edu.bath.transitivityutils;
 
-import org.junit.Ignore;
+import static edu.bath.transitivityutils.RelationAssertions.assertBiRelations;
+import static org.junit.Assert.assertSame;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static edu.bath.transitivityutils.RelationAssertions.*;
 
 /**
  *

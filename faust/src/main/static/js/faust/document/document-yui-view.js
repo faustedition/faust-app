@@ -76,6 +76,12 @@ YUI.add('document-yui-view', function (Y) {
 
 		render: function() {
 			var container = this.get('container');
+			
+			
+			var transcriptSource = '/' + cp + this.get('source').components[1] + '/' + this.get('source').components[2];
+			this.editortoolbar = Y.Node.create('<div id="editor-toolbar"><a href="' + transcriptSource  + '">(XML source)</a></div>');
+			container.appendChild(this.editortoolbar);
+
 			this.errorDisplay = Y.Node.create('<div id="error-display"></div>');
 			container.appendChild(this.errorDisplay);
 			var svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -98,12 +104,14 @@ YUI.add('document-yui-view', function (Y) {
 			mainZone = null;
 
 			try {
-				var visComponent = Faust.DocumentRanges.transcriptVC(this.get('transcript'));
+				//var visComponent = Faust.DocumentRanges.transcriptVC(this.get('transcript'));
+				var documentBuilder = new Y.Faust.DocumentAdhocTree();
+				var visComponent = documentBuilder.transcriptVC(this.get('transcript'));
 				var innerContainer = document.createElementNS(SVG_NS, "g");
 				innerContainer.setAttribute("id", "transcript_container");
 				visComponent.svgCont = innerContainer;
 				svgRoot.appendChild(innerContainer);
-				Y.each(Faust.DocumentController.postBuildDeferred, function(f) {f.apply(this)});
+				Y.each(documentBuilder.postBuildDeferred, function(f) {f.apply(this)});
 				//this.alignMainZone();
 				while (innerContainer.hasChildNodes()) 
 					this.innerContainer.removeChild(innerContainer.firstChild);
@@ -158,7 +166,7 @@ YUI.add('document-yui-view', function (Y) {
 	});
 	
 }, '0.0', {
-	requires: ['view', 'node']
+	requires: ['view', 'node', 'document-adhoc-tree']
 });
 
 /*

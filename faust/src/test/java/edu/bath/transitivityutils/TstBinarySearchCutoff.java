@@ -1,10 +1,9 @@
 package edu.bath.transitivityutils;
 
-import edu.bath.transitivityutils.MergingIntervalSet;
-import edu.bath.transitivityutils.OrderList;
-import edu.bath.transitivityutils.OrderList.Node;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.bath.transitivityutils.OrderList.Node;
 
 public class TstBinarySearchCutoff {
     static final int CUTOFF = 10;

@@ -1,9 +1,13 @@
 package edu.bath.transitivityutils;
 
-import com.google.common.collect.ImmutableSetMultimap;
+import static edu.bath.transitivityutils.RelationAssertions.assertRelations;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import static edu.bath.transitivityutils.RelationAssertions.*;
-import static org.junit.Assert.*;
+
+import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  *

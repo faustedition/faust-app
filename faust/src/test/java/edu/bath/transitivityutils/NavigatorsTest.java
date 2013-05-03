@@ -1,13 +1,16 @@
 package edu.bath.transitivityutils;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.Serializable;
+import java.util.Set;
+
+import org.junit.Test;
+
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import java.io.Serializable;
-import java.util.Set;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

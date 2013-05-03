@@ -1,6 +1,12 @@
 package de.faustedition;
 
-import com.google.common.collect.Iterables;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Logger;
+
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
@@ -8,12 +14,7 @@ import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.support.ResourcePropertySource;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Logger;
+import com.google.common.collect.Iterables;
 
 public abstract class Runtime {
 

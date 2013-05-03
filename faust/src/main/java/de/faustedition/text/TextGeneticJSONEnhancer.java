@@ -1,8 +1,13 @@
 package de.faustedition.text;
 
-import com.google.common.base.Objects;
-import de.faustedition.document.Document;
-import de.faustedition.genesis.GeneticRelationManager;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.codehaus.jackson.JsonGenerator;
 import org.goddag4j.Element;
 import org.goddag4j.GoddagNode.NodeType;
@@ -13,8 +18,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.*;
+import com.google.common.base.Objects;
+
+import de.faustedition.document.Document;
+import de.faustedition.genesis.GeneticRelationManager;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)

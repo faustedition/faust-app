@@ -13,7 +13,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
-import de.faustedition.xml.Namespaces;
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
@@ -25,6 +24,7 @@ import org.w3c.dom.NodeList;
 
 import com.google.common.base.Throwables;
 
+import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XPathUtil;
 
 /**

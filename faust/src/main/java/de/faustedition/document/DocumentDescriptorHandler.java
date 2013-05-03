@@ -1,12 +1,19 @@
 package de.faustedition.document;
 
-import de.faustedition.FaustURI;
-import de.faustedition.document.MaterialUnit.Type;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.transcript.GoddagTranscriptManager;
-import de.faustedition.transcript.TranscriptType;
-import de.faustedition.xml.*;
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -16,16 +23,19 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import java.io.IOException;
-import java.util.*;
+import de.faustedition.FaustURI;
+import de.faustedition.document.MaterialUnit.Type;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.transcript.GoddagTranscriptManager;
+import de.faustedition.transcript.TranscriptType;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLBaseTracker;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
+import sun.util.LocaleServiceProviderPool;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -33,6 +43,8 @@ import java.util.*;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DocumentDescriptorHandler extends DefaultHandler {
+
+	private static final Logger LOG = LoggerFactory.getLogger(DocumentDescriptorHandler.class);
 
 	@Autowired
 	private FaustGraph graph;
@@ -86,6 +98,9 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			XMLUtil.saxParser().parse(xmlSource, this);
 			if (document != null) {
 				document.index();
+			}
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Read " + source + " into " + document + "[" +  document.node.getId() + "]");
 			}
 			return document;
 		} finally {

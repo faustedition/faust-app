@@ -1,11 +1,12 @@
 package de.faustedition;
 
-import de.faustedition.transcript.GoddagTranscriptManager;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import de.faustedition.transcript.GoddagTranscriptManager;
 
 @Component
 public class HTokenizer extends Runtime implements Runnable {

@@ -1,7 +1,5 @@
 package de.faustedition.xml;
 
-import com.google.common.base.Throwables;
-
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;

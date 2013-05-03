@@ -1,13 +1,14 @@
 package edu.bath.transitivityutils;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 
 /**
  * An ad-hoc implementation of depth-first search.

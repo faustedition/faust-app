@@ -1,24 +1,9 @@
 package de.faustedition;
 
-import de.faustedition.collation.CollationFinder;
-import de.faustedition.db.TransactionFilter;
-import de.faustedition.document.ArchiveRouter;
-import de.faustedition.document.DocumentRouter;
-import de.faustedition.facsimile.FacsimileFinder;
-import de.faustedition.genesis.GeneticGraphRouter;
-import de.faustedition.reasoning.InscriptionPrecedenceResource;
-import de.faustedition.search.SearchResource;
-import de.faustedition.security.LdapSecurityStore;
-import de.faustedition.security.SecurityConstants;
-import de.faustedition.structure.StructureFinder;
-import de.faustedition.tei.GoddagFinder;
-import de.faustedition.template.TemplateFinder;
-import de.faustedition.text.TextFinder;
-import de.faustedition.transcript.SceneStatisticsResource;
-import de.faustedition.transcript.TranscriptViewResource;
-import de.faustedition.transcript.TranscriptSourceResource;
-import de.faustedition.transcript.VerseStatisticsResource;
-import de.faustedition.xml.XMLFinder;
+import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
+
+import java.util.List;
+
 import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -45,9 +30,25 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.util.List;
-
-import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
+import de.faustedition.collation.CollationFinder;
+import de.faustedition.db.TransactionFilter;
+import de.faustedition.document.ArchiveRouter;
+import de.faustedition.document.DocumentRouter;
+import de.faustedition.facsimile.FacsimileFinder;
+import de.faustedition.genesis.GeneticGraphRouter;
+import de.faustedition.reasoning.InscriptionPrecedenceResource;
+import de.faustedition.search.SearchResource;
+import de.faustedition.security.LdapSecurityStore;
+import de.faustedition.security.SecurityConstants;
+import de.faustedition.structure.StructureFinder;
+import de.faustedition.tei.GoddagFinder;
+import de.faustedition.template.TemplateFinder;
+import de.faustedition.text.TextFinder;
+import de.faustedition.transcript.SceneStatisticsResource;
+import de.faustedition.transcript.TranscriptSourceResource;
+import de.faustedition.transcript.TranscriptViewResource;
+import de.faustedition.transcript.VerseStatisticsResource;
+import de.faustedition.xml.XMLFinder;
 
 @Component
 public class FaustApplication extends Application implements InitializingBean {
@@ -184,7 +185,7 @@ public class FaustApplication extends Application implements InitializingBean {
 	public static class EntryPageRedirectionResource extends ServerResource {
 		@Override
 		protected Representation doHandle() throws ResourceException {
-			getResponse().redirectTemporary(new Reference(getReference(), "genesis/work"));
+			getResponse().redirectTemporary(new Reference(getReference(), "archive/"));
 			return null;
 		}
 	}

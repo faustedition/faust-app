@@ -1,11 +1,18 @@
 package de.faustedition.transcript;
 
-import com.google.common.collect.Iterables;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.tei.WhitespaceUtil;
-import de.faustedition.xml.*;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_SIG_GE_URI;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -20,17 +27,18 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import com.google.common.collect.Iterables;
 
-import static de.faustedition.xml.Namespaces.TEI_NS_URI;
-import static de.faustedition.xml.Namespaces.TEI_SIG_GE_URI;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.tei.WhitespaceUtil;
+import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.MultiplexingContentHandler;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLFragmentFilter;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 
 @Component
 public class GoddagTranscriptManager {

@@ -226,13 +226,16 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  this.addAjaxLoader(diplomaticContent);
 
 					  var that = this;
-					  this.get('pages')[pagenum - 1].transcriptionFromRanges(function(t) {
+					  var page = this.get('pages')[pagenum -1];
+					  var source = page.transcript.source;
+					  page.transcriptionFromRanges(function(t) {
 
 						  that.removeAjaxLoader(diplomaticContent);
 						  var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
 							  container: diplomaticContainer.one('.diplomaticContent'),
 							  visComponent: null,
-							  transcript: t
+							  transcript: t,
+							  source: source
 						  });
 
 						  diplomaticTranscriptView.render();

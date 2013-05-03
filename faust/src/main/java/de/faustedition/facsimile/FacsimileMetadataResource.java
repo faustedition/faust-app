@@ -1,8 +1,14 @@
 package de.faustedition.facsimile;
 
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Map;
+
+import javax.imageio.ImageReader;
+
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
@@ -10,10 +16,7 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
-import javax.imageio.ImageReader;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

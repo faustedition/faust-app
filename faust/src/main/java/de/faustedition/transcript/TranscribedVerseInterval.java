@@ -1,14 +1,28 @@
 package de.faustedition.transcript;
 
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.collect.*;
-import de.faustedition.VerseInterval;
-import de.faustedition.document.MaterialUnit;
-import eu.interedition.text.Annotation;
-import eu.interedition.text.Name;
-import eu.interedition.text.TextConstants;
-import eu.interedition.text.util.SQL;
+import static eu.interedition.text.Query.and;
+import static eu.interedition.text.Query.name;
+import static eu.interedition.text.Query.text;
+
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.codehaus.jackson.JsonNode;
+import org.hibernate.Criteria;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.annotations.Index;
 import org.hibernate.criterion.Restrictions;
@@ -17,17 +31,21 @@ import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import javax.persistence.*;
-import javax.persistence.Table;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
 
-import static eu.interedition.text.query.QueryCriteria.and;
-import static eu.interedition.text.query.QueryCriteria.annotationName;
-import static eu.interedition.text.query.QueryCriteria.text;
+import de.faustedition.VerseInterval;
+import de.faustedition.document.MaterialUnit;
+import eu.interedition.text.Layer;
+import eu.interedition.text.Name;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
+
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -88,14 +106,14 @@ public class TranscribedVerseInterval extends VerseInterval {
 		super.setEnd(end);
 	}
 
-	public static void register(Session session, Transcript transcript) {
+	public static void register(Session session, TextRepository<JsonNode> textRepo, Transcript transcript) {
 		for (TranscribedVerseInterval vi : registeredFor(session, transcript)) {
 			session.delete(vi);
 		}
 
 		final SortedSet<Integer> verses = Sets.newTreeSet();
-		for (Annotation verse : and(text(transcript.getText()), annotationName(new Name(TextConstants.TEI_NS, "l"))).iterate(session)) {
-			final Matcher verseNumberMatcher = VERSE_NUMBER_PATTERN.matcher(Objects.firstNonNull(verse.getData().path("n").getValueAsText(), ""));
+		for (Layer<JsonNode> verse : textRepo.query(and(text(transcript.getText()), name(new Name(TextConstants.TEI_NS, "l"))))) {
+			final Matcher verseNumberMatcher = VERSE_NUMBER_PATTERN.matcher(Objects.firstNonNull(verse.data().path("n").getTextValue(), ""));
 			while (verseNumberMatcher.find()) {
 				try {
 					verses.add(Integer.parseInt(verseNumberMatcher.group()));
@@ -136,16 +154,37 @@ public class TranscribedVerseInterval extends VerseInterval {
 		}
 	}
 
+	public static <T> Iterable<T> iterateResults(final Criteria c, Class<T> type) {
+		return new Iterable<T>() {
+			@Override
+			public Iterator<T> iterator() {
+				return new AbstractIterator<T>() {
+
+					final ScrollableResults results = c.scroll(ScrollMode.FORWARD_ONLY);
+
+					@Override
+					@SuppressWarnings("unchecked")
+					protected T computeNext() {
+						return (results.next() ? (T) results.get()[0]: endOfData());
+					}
+				};
+			}
+		};
+	}
+
+
 	public static Iterable<TranscribedVerseInterval> registeredFor(Session session, Transcript transcript) {
-		return SQL.iterate(session.createCriteria(TranscribedVerseInterval.class).add(Restrictions.eq("transcript", transcript)), TranscribedVerseInterval.class);
+		return iterateResults(
+				session.createCriteria(TranscribedVerseInterval.class).add(Restrictions.eq("transcript", transcript)), TranscribedVerseInterval.class
+				);
 	}
 
 	public static Iterable<TranscribedVerseInterval> all(Session session) {
-		return SQL.iterate(session.createCriteria(TranscribedVerseInterval.class), TranscribedVerseInterval.class);
+		return iterateResults(session.createCriteria(TranscribedVerseInterval.class), TranscribedVerseInterval.class);
 	}
 
 	public static Iterable<TranscribedVerseInterval> forInterval(Session session, VerseInterval verseInterval) {
-		return SQL.iterate(session.createCriteria(TranscribedVerseInterval.class)
+		return iterateResults(session.createCriteria(TranscribedVerseInterval.class)
 			.add(Restrictions.lt("start", verseInterval.getEnd()))
 			.add(Restrictions.gt("end", verseInterval.getStart())),
 			TranscribedVerseInterval.class);

@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import javax.xml.transform.stream.StreamSource;
 
-import net.sf.saxon.FeatureKeys;
+import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.Serializer;

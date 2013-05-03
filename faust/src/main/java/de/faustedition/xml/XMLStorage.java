@@ -1,17 +1,5 @@
 package de.faustedition.xml;
 
-import com.google.common.base.Preconditions;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import org.neo4j.helpers.collection.IterableWrapper;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-
-import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,6 +8,21 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.xml.transform.TransformerException;
+
+import org.neo4j.helpers.collection.IterableWrapper;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import com.google.common.base.Preconditions;
+
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
 
 @Component
 public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
