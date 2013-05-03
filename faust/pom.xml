@@ -140,8 +140,6 @@
 			<artifactId>jing</artifactId>
 			<version>20030619</version>
 		</dependency>
-		<!-- <dependency> <groupId>com.hp.hpl.jena</groupId> <artifactId>jena</artifactId> <version>2.6.3</version> </dependency> <dependency> 
-			<groupId>org.freemarker</groupId> <artifactId>freemarker</artifactId> <version>2.3.16</version> </dependency> -->
         <dependency>
             <groupId>net.middell</groupId>
             <artifactId>combo-resource</artifactId>
