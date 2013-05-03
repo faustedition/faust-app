@@ -15,8 +15,8 @@ YUI.add('adhoc-tree', function (Y) {
 		}
 	};
 
-	// is a descendant of b?
-	function _isXMLDescendent(a,b) {
+	// is a following b in document order?
+	function _isFollowing(a,b) {
 		return _sortXMLNodeValues(a.data['xml:node'], b.data['xml:node']) === 1 ? true : false;
 	};
 	
@@ -68,13 +68,18 @@ YUI.add('adhoc-tree', function (Y) {
 
 	function _outermostAnnotation(transcript, start, end, filter, exclude, parent) {
 
+		//var ancestorsAndSelf = parent.ancestors().push(parent);
 		var outermostAnnotations = _outermostAnnotations(transcript, start, end, filter, exclude);
 
-		if (outermostAnnotations.length === 0)
+		var includedAnnotations = Y.Array.filter(outermostAnnotations, function(annotation) {
+			return exclude.indexOf(annotation) < 0;
+		});
+
+		if (includedAnnotations.length === 0)
 			return null;
 
-		var descendants = Y.Array.filter(outermostAnnotations, function(annotation){
-			return _isXMLDescendent(annotation, parent);
+		var descendants = Y.Array.filter(includedAnnotations, function(annotation){
+			return _isFollowing(annotation, parent);
 		});
 		
 		var sortedByNesting = descendants.sort(_sortByXMLNodeData);
@@ -184,10 +189,11 @@ YUI.add('adhoc-tree', function (Y) {
 			return this.annotation.data;
 		},
 		children: function() {
-			var ancestorAnnotations = Y.Array.map([this].concat(this.ancestors()), function(node) {return node.annotation});
-			var annotationStack = Y.Array.filter(ancestorAnnotations, function(annotation){return annotation});
+			var ancestorAnnotationCandidates = Y.Array.map([this].concat(this.ancestors()), function(node) {return node.annotation});
+			//ancestorAnnotationCandidates = ancestorAnnotationCandidates.push(this.annotation);
+			var ancestorAnnotations = Y.Array.filter(ancestorAnnotationCandidates, function(annotation){return annotation});
 			var range = this.annotation.targets[0].range;
-			return this._iterateChildren(range.start, range.end, annotationStack);
+			return this._iterateChildren(range.start, range.end, ancestorAnnotations);
 		},
 		name: function() {
 			return this.annotation.name;

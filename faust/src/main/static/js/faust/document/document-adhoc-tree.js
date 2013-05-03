@@ -271,7 +271,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 			transcript = Y.Faust.Text.create(jsonRepresentation);
 
 			var tree = new Y.Faust.AdhocTree(transcript, structuralNames);
-			console.log("tree: " + tree);
+			//console.log("tree: " + tree);
 
 			var surfaceVC = new Faust.Surface();
 			this.buildVC(surfaceVC, tree);
