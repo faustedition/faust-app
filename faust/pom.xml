@@ -211,6 +211,9 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
+            <resource>
+                <directory>src/main/config</directory>
+            </resource>
 		</resources>
 		<testResources>
 			<testResource>
@@ -225,84 +228,81 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
-					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.4.3</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>de.faustedition.Server</mainClass>
-							<addClasspath>true</addClasspath>
-						</manifest>
-					</archive>
-					<excludes>
-						<exclude>**/config-development.properties</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2-beta-3</version>
-				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/app.xml</descriptor>
-					</descriptors>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>1.2.2</version>
+                <configuration>
+                    <repositoryLayout>flat</repositoryLayout>
+                    <repositoryName>lib</repositoryName>
+                    <useAsterikClassPath>true</useAsterikClassPath>
+                    <extraJvmArguments>-Dfile.encoding=UTF-8 -Xmx512m</extraJvmArguments>
+                    <programs>
+                    <!--
+                        <program>
+                            <mainClass>de.faustedition.Server</mainClass>
+                            <name>faust-server</name>
+                        </program>
+                    -->
+                    </programs>
+                    <daemons>
+                        <daemon>
+                            <id>faust-server</id>
+                            <mainClass>de.faustedition.Server</mainClass>
+                            <jvmSettings>
+                                <maxMemorySize>512M</maxMemorySize>
+                                <systemProperties>
+                                    <systemProperty>file.encoding=UTF-8</systemProperty>
+                                    <systemProperty>java.util.logging.config.file=etc/logging.properties</systemProperty>
+                                </systemProperties>
+                            </jvmSettings>
+                            <generatorConfigurations>
+                                <generatorConfiguration>
+                                    <generator>jsw</generator>
+                                    <includes>
+                                        <include>linux-x86-64</include>
+                                    </includes>
+                                    <configuration>
+                                        <property>
+                                            <name>configuration.directory.in.classpath.first</name>
+                                            <value>etc</value>
+                                        </property>
+                                    </configuration>
+                                </generatorConfiguration>
+                            </generatorConfigurations>
+                            <platforms>
+                                <platform>jsw</platform>
+                            </platforms>
+                        </daemon>
+                    </daemons>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>app-assemble</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                            <goal>generate-daemons</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/app.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 	<repositories>
-		<repository>
-			<id>faustedition</id>
-			<url>https://faustedition.uni-wuerzburg.de/nexus/content/groups/public</url>
-		</repository>
-		<repository>
-			<id>dh-releases</id>
-			<url>http://gregor.middell.net/maven/content/repositories/dh-releases</url>
-		</repository>
-		<repository>
-			<id>dh-snapshots</id>
-			<url>http://gregor.middell.net/maven/content/repositories/dh-snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>interedition-releases</id>
-            <url>http://gregor.middell.net/maven/content/repositories/interedition-releases</url>
-        </repository>
-        <repository>
-            <id>interedition-snapshots</id>
-            <url>http://gregor.middell.net/maven/content/repositories/interedition-snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>gregor-middell-releases</id>
-            <url>http://gregor.middell.net/maven/content/repositories/releases</url>
-        </repository>
 		<repository>
 			<id>restlet</id>
 			<url>http://maven.restlet.org</url>
@@ -323,17 +323,8 @@
             </snapshots>
         </repository>
     </repositories>
-	<distributionManagement>
-		<repository>
-			<id>faustedition-releases</id>
-			<url>https://faustedition.uni-wuerzburg.de/nexus/content/repositories/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>faustedition-snapshots</id>
-			<url>https://faustedition.uni-wuerzburg.de/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>3.1.0.RELEASE</spring.version>
         <restlet.version>2.0.12</restlet.version>
         <slf4j.version>1.6.4</slf4j.version>
