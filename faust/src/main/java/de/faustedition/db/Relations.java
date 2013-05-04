@@ -3,7 +3,6 @@ package de.faustedition.db;
 import com.jolbox.bonecp.BoneCPDataSource;
 import org.h2.Driver;
 import org.h2.tools.Console;
-import org.h2.tools.Shell;
 
 import javax.sql.DataSource;
 import java.io.File;
