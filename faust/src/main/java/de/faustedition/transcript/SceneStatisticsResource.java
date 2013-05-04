@@ -1,12 +1,10 @@
 package de.faustedition.transcript;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import de.faustedition.JsonRepresentationFactory;
+import de.faustedition.VerseInterval;
+import de.faustedition.document.MaterialUnit;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -18,12 +16,11 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.VerseInterval;
-import de.faustedition.document.MaterialUnit;
+import javax.sql.DataSource;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -33,7 +30,7 @@ import de.faustedition.document.MaterialUnit;
 public class SceneStatisticsResource extends ServerResource {
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private DataSource dataSource;
 
 	@Autowired
 	private GraphDatabaseService graphDb;
@@ -59,11 +56,9 @@ public class SceneStatisticsResource extends ServerResource {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
 		}
 
-		final Session session = sessionFactory.getCurrentSession();
-		final Map<MaterialUnit, Collection<TranscribedVerseInterval>> intervalIndex = TranscribedVerseInterval.indexByMaterialUnit(graphDb, TranscribedVerseInterval.all(session)).asMap();
-		for (Map.Entry<MaterialUnit, Collection<TranscribedVerseInterval>> indexEntry : intervalIndex.entrySet()) {
+        for (Map.Entry<MaterialUnit, Collection<VerseInterval>> indexEntry : TranscribedVerseInterval.byMaterialUnit(dataSource, graphDb, 0, Integer.MAX_VALUE).entrySet()) {
 			for (VerseInterval sceneInterval : sceneStatistics.keySet()) {
-				for (TranscribedVerseInterval documentInterval : indexEntry.getValue()) {
+				for (VerseInterval documentInterval : indexEntry.getValue()) {
 					if (sceneInterval.overlapsWith(documentInterval)) {
 						sceneStatistics.put(sceneInterval, sceneStatistics.get(sceneInterval) + 1);
 						break;

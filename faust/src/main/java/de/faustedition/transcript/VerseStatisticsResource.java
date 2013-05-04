@@ -1,13 +1,20 @@
 package de.faustedition.transcript;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import com.google.common.base.Function;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Ordering;
+import de.faustedition.JsonRepresentationFactory;
+import de.faustedition.VerseInterval;
+import de.faustedition.db.Relations;
+import de.faustedition.db.Tables;
+import de.faustedition.document.Document;
+import de.faustedition.document.MaterialUnit;
+import org.jooq.Record;
+import org.jooq.impl.Factory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -20,16 +27,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
-
-import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.VerseInterval;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
+import javax.annotation.Nullable;
+import javax.sql.DataSource;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -39,14 +41,14 @@ import de.faustedition.document.MaterialUnit;
 public class VerseStatisticsResource extends ServerResource {
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private DataSource dataSource;
 
 	@Autowired
 	private GraphDatabaseService graphDb;
 
 	@Autowired
 	private JsonRepresentationFactory jsonRepresentationFactory;
-	private ImmutableMap<MaterialUnit,Collection<TranscribedVerseInterval>> verseStatistics;
+	private Map<MaterialUnit,Collection<VerseInterval>> verseStatistics;
 	private int from;
 	private int to;
 
@@ -58,9 +60,7 @@ public class VerseStatisticsResource extends ServerResource {
 		if (from >= to) {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid interval");
 		}
-
-		final Session session = sessionFactory.getCurrentSession();
-		verseStatistics = TranscribedVerseInterval.indexByMaterialUnit(graphDb, TranscribedVerseInterval.forInterval(session, new VerseInterval(null, from, to))).asMap();
+		verseStatistics = TranscribedVerseInterval.byMaterialUnit(dataSource, graphDb, from, to);
 	}
 
 	@Get("json")
@@ -74,7 +74,7 @@ public class VerseStatisticsResource extends ServerResource {
 		});
 		for (String documentDesc : Ordering.natural().immutableSortedCopy(documentIndex.keySet())) {
 			final List<Map<String, Object>> intervals = Lists.newLinkedList();
-			for (TranscribedVerseInterval interval : Ordering.from(VerseInterval.INTERVAL_COMPARATOR).immutableSortedCopy(verseStatistics.get(documentIndex.get(documentDesc)))) {
+			for (VerseInterval interval : Ordering.from(VerseInterval.INTERVAL_COMPARATOR).immutableSortedCopy(verseStatistics.get(documentIndex.get(documentDesc)))) {
 				intervals.add(new ModelMap()
 					.addAttribute("start", Math.max(from, interval.getStart()))
 					.addAttribute("end", Math.min(to, interval.getEnd()))

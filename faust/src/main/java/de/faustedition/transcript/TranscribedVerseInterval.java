@@ -1,118 +1,85 @@
 package de.faustedition.transcript;
 
-import static eu.interedition.text.Query.and;
-import static eu.interedition.text.Query.name;
-import static eu.interedition.text.Query.text;
-
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.codehaus.jackson.JsonNode;
-import org.hibernate.Criteria;
-import org.hibernate.ScrollMode;
-import org.hibernate.ScrollableResults;
-import org.hibernate.Session;
-import org.hibernate.annotations.Index;
-import org.hibernate.criterion.Restrictions;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimaps;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-
 import de.faustedition.VerseInterval;
+import de.faustedition.db.Relations;
+import de.faustedition.db.Tables;
+import de.faustedition.db.tables.records.TranscribedVerseIntervalRecord;
+import de.faustedition.db.tables.records.TranscriptRecord;
 import de.faustedition.document.MaterialUnit;
 import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.TextRepository;
+import org.codehaus.jackson.JsonNode;
+import org.jooq.Record;
+import org.jooq.impl.Factory;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static eu.interedition.text.Query.and;
+import static eu.interedition.text.Query.name;
+import static eu.interedition.text.Query.text;
 
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Entity
-@Table(name = "faust_transcribed_verse_interval")
-public class TranscribedVerseInterval extends VerseInterval {
+public class TranscribedVerseInterval {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TranscribedVerseInterval.class);
+
 	private static final Pattern VERSE_NUMBER_PATTERN = Pattern.compile("[0-9]+");
 
-	private long id;
-	private Transcript transcript;
+    public static Map<MaterialUnit, Collection<VerseInterval>> byMaterialUnit(final DataSource dataSource, final GraphDatabaseService graphDb, final int from, final int to) {
+        return Relations.execute(dataSource, new Relations.Transaction<Map<MaterialUnit, Collection<VerseInterval>>>() {
+            @Override
+            public Map<MaterialUnit, Collection<VerseInterval>> execute(Factory db) throws Exception {
+                final Multimap<MaterialUnit, VerseInterval> statistics = HashMultimap.create();
+                for (Record record : db
+                        .select(Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_START, Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_END, Tables.TRANSCRIPT.MATERIAL_UNIT_ID)
+                        .from(Tables.TRANSCRIBED_VERSE_INTERVAL)
+                        .join(Tables.TRANSCRIPT).on(Tables.TRANSCRIPT.ID.eq(Tables.TRANSCRIBED_VERSE_INTERVAL.TRANSCRIPT_ID))
+                        .where(Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_START.lt(to))
+                        .and(Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_END.gt(from))
+                        .and(Tables.TRANSCRIPT.MATERIAL_UNIT_ID.isNotNull())
+                        .fetch()) {
+                    statistics.put(
+                            MaterialUnit.forNode(graphDb.getNodeById(record.getValue(Tables.TRANSCRIPT.MATERIAL_UNIT_ID))),
+                            new VerseInterval(
+                                    null,
+                                    record.getValue(Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_START),
+                                    record.getValue(Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_END)
+                            )
+                    );
+                }
+                return statistics.asMap();
+            }
+        });
+    }
 
-	@Id
-	@GeneratedValue
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	@Transient
-	@Override
-	public String getName() {
-		return super.getName();
-	}
-
-	@ManyToOne
-	@JoinColumn(name = "transcript_id", nullable = false)
-	public Transcript getTranscript() {
-		return transcript;
-	}
-
-	public void setTranscript(Transcript transcript) {
-		this.transcript = transcript;
-	}
-
-
-	@Index(name = "verse_start_end", columnNames = {"verse_start, verse_end"})
-	@Column(name = "verse_start", nullable = false)
-	public int getStart() {
-		return super.getStart();
-	}
-
-	public void setStart(int start) {
-		super.setStart(start);
-	}
-
-	@Column(name="verse_end", nullable = false)
-	public int getEnd() {
-		return super.getEnd();
-	}
-
-	public void setEnd(int end) {
-		super.setEnd(end);
-	}
-
-	public static void register(Session session, TextRepository<JsonNode> textRepo, Transcript transcript) {
-		for (TranscribedVerseInterval vi : registeredFor(session, transcript)) {
-			session.delete(vi);
-		}
+	public static void register(Factory db, TextRepository<JsonNode> textRepo, TranscriptRecord transcript) {
+        // delete existing intervals
+        db.delete(Tables.TRANSCRIBED_VERSE_INTERVAL)
+                .where(Tables.TRANSCRIBED_VERSE_INTERVAL.TRANSCRIPT_ID.eq(transcript.getId()))
+                .execute();
 
 		final SortedSet<Integer> verses = Sets.newTreeSet();
-		for (Layer<JsonNode> verse : textRepo.query(and(text(transcript.getText()), name(new Name(TextConstants.TEI_NS, "l"))))) {
+		for (Layer<JsonNode> verse : textRepo.query(and(text(textRepo.findByIdentifier(transcript.getTextId())), name(new Name(TextConstants.TEI_NS, "l"))))) {
 			final Matcher verseNumberMatcher = VERSE_NUMBER_PATTERN.matcher(Objects.firstNonNull(verse.data().path("n").getTextValue(), ""));
 			while (verseNumberMatcher.find()) {
 				try {
@@ -122,7 +89,8 @@ public class TranscribedVerseInterval extends VerseInterval {
 			}
 		}
 
-		int start = -1;
+        final List<TranscribedVerseIntervalRecord> intervals = Lists.newLinkedList();
+        int start = -1;
 		int next = -1;
 		for (Iterator<Integer> it = verses.iterator(); it.hasNext(); ) {
 			final Integer verse = it.next();
@@ -130,11 +98,11 @@ public class TranscribedVerseInterval extends VerseInterval {
 				next++;
 			} else if (verse > next) {
 				if (start >= 0) {
-					final TranscribedVerseInterval vi = new TranscribedVerseInterval();
-					vi.setTranscript(transcript);
-					vi.setStart(start);
-					vi.setEnd(next);
-					session.save(vi);
+					final TranscribedVerseIntervalRecord vi = new TranscribedVerseIntervalRecord();
+					vi.setTranscriptId(transcript);
+                    vi.setVerseStart(start);
+                    vi.setVerseEnd(next);
+                    intervals.add(new TranscribedVerseIntervalRecord());
 				}
 
 				start = verse;
@@ -142,62 +110,17 @@ public class TranscribedVerseInterval extends VerseInterval {
 			}
 
 			if (!it.hasNext() && start >= 0) {
-				final TranscribedVerseInterval vi = new TranscribedVerseInterval();
-				vi.setTranscript(transcript);
-				vi.setStart(start);
-				vi.setEnd(verse + 1);
-				session.save(vi);
+                final TranscribedVerseIntervalRecord vi = new TranscribedVerseIntervalRecord();
+                vi.setTranscriptId(transcript);
+                vi.setVerseStart(start);
+                vi.setVerseEnd(verse + 1);
+                intervals.add(new TranscribedVerseIntervalRecord());
 			}
 		}
+        db.batchStore(intervals).execute();
+
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Registered verse intervals {} for {}", Iterables.toString(registeredFor(session, transcript)), transcript);
+			LOG.debug("Registered verse {} interval(s) for {}", intervals.size(), transcript);
 		}
-	}
-
-	public static <T> Iterable<T> iterateResults(final Criteria c, Class<T> type) {
-		return new Iterable<T>() {
-			@Override
-			public Iterator<T> iterator() {
-				return new AbstractIterator<T>() {
-
-					final ScrollableResults results = c.scroll(ScrollMode.FORWARD_ONLY);
-
-					@Override
-					@SuppressWarnings("unchecked")
-					protected T computeNext() {
-						return (results.next() ? (T) results.get()[0]: endOfData());
-					}
-				};
-			}
-		};
-	}
-
-
-	public static Iterable<TranscribedVerseInterval> registeredFor(Session session, Transcript transcript) {
-		return iterateResults(
-				session.createCriteria(TranscribedVerseInterval.class).add(Restrictions.eq("transcript", transcript)), TranscribedVerseInterval.class
-				);
-	}
-
-	public static Iterable<TranscribedVerseInterval> all(Session session) {
-		return iterateResults(session.createCriteria(TranscribedVerseInterval.class), TranscribedVerseInterval.class);
-	}
-
-	public static Iterable<TranscribedVerseInterval> forInterval(Session session, VerseInterval verseInterval) {
-		return iterateResults(session.createCriteria(TranscribedVerseInterval.class)
-			.add(Restrictions.lt("start", verseInterval.getEnd()))
-			.add(Restrictions.gt("end", verseInterval.getStart())),
-			TranscribedVerseInterval.class);
-	}
-
-	public static ImmutableListMultimap<MaterialUnit, TranscribedVerseInterval> indexByMaterialUnit(final GraphDatabaseService db, Iterable<TranscribedVerseInterval> intervals) {
-		return Multimaps.index(intervals, new Function<TranscribedVerseInterval, MaterialUnit>() {
-
-			@Override
-			public MaterialUnit apply(@Nullable TranscribedVerseInterval input) {
-				final Node materialUnitNode = db.getNodeById(input.getTranscript().getMaterialUnitId());
-				return MaterialUnit.forNode(materialUnitNode);
-			}
-		});
 	}
 }

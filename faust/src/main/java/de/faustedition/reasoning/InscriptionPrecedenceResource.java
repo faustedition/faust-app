@@ -1,51 +1,10 @@
 package de.faustedition.reasoning;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import javax.annotation.Nullable;
-
-import org.hibernate.SessionFactory;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.restlet.data.MediaType;
-import org.restlet.representation.OutputRepresentation;
-import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.Get;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
-
 import de.faustedition.FaustURI;
 import de.faustedition.VerseInterval;
 import de.faustedition.document.MaterialUnit;
@@ -56,6 +15,41 @@ import de.faustedition.transcript.TranscribedVerseInterval;
 import edu.bath.transitivityutils.ImmutableRelation;
 import edu.bath.transitivityutils.Relation;
 import edu.bath.transitivityutils.Relations;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.restlet.data.MediaType;
+import org.restlet.representation.OutputRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.Get;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.ServerResource;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import javax.sql.DataSource;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -68,7 +62,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	private GraphDatabaseService graphDb;
 
 	@Autowired
-	private SessionFactory sessionFactory;
+	private DataSource dataSource;
 
 	@Autowired
 	private Environment environment;
@@ -77,7 +71,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	private FaustGraph faustGraph;
 	
 	@Autowired
-	private org.slf4j.Logger logger;
+	private Logger logger;
 
 	
 	final private Map<Inscription, Node> nodeMap = new HashMap<Inscription, Node>();
@@ -87,29 +81,21 @@ public class InscriptionPrecedenceResource extends ServerResource {
 		super.doInit();
 
 		final VerseInterval verseInterval = VerseInterval.fromRequestAttibutes(getRequestAttributes());
-		final Multimap<String, TranscribedVerseInterval> intervalIndex = Multimaps.index(TranscribedVerseInterval.forInterval(sessionFactory.getCurrentSession(), verseInterval), new Function<TranscribedVerseInterval, String>() {		
-			@Override
-			public String apply(@Nullable TranscribedVerseInterval input) {
-				final Node materialUnitNode = graphDb.getNodeById(input.getTranscript().getMaterialUnitId());
-				final String sigil = MaterialUnit.forNode(materialUnitNode).toString(); // + "_" + materialUnitNode.getId();
-				return sigil;
-			}
+		final Map<MaterialUnit, Collection<VerseInterval>> intervalIndex = TranscribedVerseInterval.byMaterialUnit(dataSource, graphDb, verseInterval.getStart(), verseInterval.getEnd());
 
-		});
-
-		inscriptions = Sets.newHashSet();
-		for (String sigil : Ordering.natural().immutableSortedCopy(intervalIndex.keySet())) {
-			final Inscription inscription = new Inscription(sigil);
-			for (TranscribedVerseInterval interval : intervalIndex.get(sigil)) {
+        inscriptions = Sets.newHashSet();
+        for (Map.Entry<MaterialUnit, Collection<VerseInterval>> intervals : intervalIndex.entrySet()) {
+            final MaterialUnit materialUnit = intervals.getKey();
+            final String sigil = materialUnit.toString();
+            final Inscription inscription = new Inscription(sigil);
+			for (VerseInterval interval : intervals.getValue()) {
 				inscription.addInterval(interval.getStart(), interval.getEnd());
 			}
 			Preconditions.checkState(!inscription.isEmpty());
 			inscriptions.add(inscription);
-			long materialUnitId = intervalIndex.get(sigil).iterator().next().getTranscript().getMaterialUnitId();
-			Node node = graphDb.getNodeById(materialUnitId);
-			nodeMap.put(inscription, node);
-			
+			nodeMap.put(inscription, materialUnit.node);
 		}
+
 		for (Inscription subject : inscriptions) {
 			for (Inscription object : inscriptions) {
 				if (InscriptionRelations.syntagmaticallyPrecedesByFirstLine(subject, object)) {
