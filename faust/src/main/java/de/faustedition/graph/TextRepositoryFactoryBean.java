@@ -1,6 +1,5 @@
 package de.faustedition.graph;
 
-import eu.interedition.text.TextRepository;
 import eu.interedition.text.json.JacksonDataNodeMapper;
 import eu.interedition.text.neo4j.Neo4jTextRepository;
 import org.codehaus.jackson.JsonNode;

@@ -1,17 +1,15 @@
 package de.faustedition.xml;
 
-import java.net.URI;
+import com.google.common.base.Preconditions;
+
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
-
-import com.google.common.base.Preconditions;
 
 public class CustomNamespaceContext implements NamespaceContext {
 	private Map<String, String> prefixToNamespaceUri = new HashMap<String, String>();

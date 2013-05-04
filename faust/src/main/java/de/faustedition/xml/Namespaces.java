@@ -21,8 +21,4 @@ public interface Namespaces {
 
 	String XLINK_NS_URI = "http://www.w3.org/1999/xlink";
 	String XLINK_NS_PREFIX = "xlink";
-	
-	String XML_NS_URI = "http://www.w3.org/XML/1998/namespace";
-	String XML_NS_PREFIX= "xml";
-	
 }
