@@ -39,18 +39,7 @@ public class DatabaseConfiguration {
 
 	@Bean
 	public DataSource dataSource() throws Exception {
-		final File database = environment.getRequiredProperty("db.home", File.class);
-
-		final BoneCPDataSource dataSource = new BoneCPDataSource();
-		dataSource.setDriverClass(Driver.class.getName());
-		dataSource.setJdbcUrl(database.toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";LOCK_TIMEOUT=30000");
-		dataSource.setUsername("sa");
-		dataSource.setPassword("");
-		dataSource.setMinConnectionsPerPartition(1);
-		dataSource.setMaxConnectionsPerPartition(20);
-		dataSource.setReleaseHelperThreads(0);
-		dataSource.setDisableConnectionTracking(true);
-		return dataSource;
+        return Relations.createDataSource(environment.getRequiredProperty("db.home", File.class));
 	}
 
 	@Bean
