@@ -101,10 +101,10 @@ public class CustomNamespaceContext implements NamespaceContext {
 	public static final CustomNamespaceContext INSTANCE = new CustomNamespaceContext();
 
 	static {
-        INSTANCE.bindNamespaceUri(Namespaces.FAUST_NS_URI, Namespaces.FAUST_NS_PREFIX);
-        INSTANCE.bindNamespaceUri(Namespaces.TEI_NS_URI, Namespaces.TEI_NS_PREFIX);
-        INSTANCE.bindNamespaceUri(Namespaces.TEI_SIG_GE_URI, Namespaces.TEI_SIG_GE_PREFIX);
-        INSTANCE.bindNamespaceUri(Namespaces.SVG_NS_URI, Namespaces.SVG_NS_PREFIX);
-        INSTANCE.bindNamespaceUri(Namespaces.XLINK_NS_URI, Namespaces.XLINK_NS_PREFIX);
+        INSTANCE.bindNamespaceUri(Namespaces.FAUST_NS_PREFIX, Namespaces.FAUST_NS_URI);
+        INSTANCE.bindNamespaceUri(Namespaces.TEI_NS_PREFIX, Namespaces.TEI_NS_URI);
+        INSTANCE.bindNamespaceUri(Namespaces.TEI_SIG_GE_PREFIX, Namespaces.TEI_SIG_GE_URI);
+        INSTANCE.bindNamespaceUri(Namespaces.SVG_NS_PREFIX, Namespaces.SVG_NS_URI);
+        INSTANCE.bindNamespaceUri(Namespaces.XLINK_NS_PREFIX, Namespaces.XLINK_NS_URI);
 	}
 }
