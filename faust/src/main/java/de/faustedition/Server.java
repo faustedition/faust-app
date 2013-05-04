@@ -1,10 +1,7 @@
 package de.faustedition;
 
-import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.collect.Iterables;
+import de.faustedition.transcript.TranscriptBatchReader;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 import org.restlet.util.ClientList;
@@ -13,10 +10,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import com.google.common.collect.Iterables;
-
-import de.faustedition.tei.TeiValidator;
-import de.faustedition.transcript.TranscriptBatchReader;
+import java.util.Arrays;
 
 @org.springframework.stereotype.Component
 public class Server extends Runtime implements Runnable, InitializingBean {
@@ -28,12 +22,6 @@ public class Server extends Runtime implements Runnable, InitializingBean {
 
 	@Autowired
 	private Logger logger;
-
-	@Autowired
-	private TeiValidator validator;
-
-	@Autowired
-	private TranscriptBatchReader transcriptBatchReader;
 
 	private String contextPath;
 
@@ -51,23 +39,12 @@ public class Server extends Runtime implements Runnable, InitializingBean {
 		try {
 			logger.info("Starting Faust-Edition with profiles " + Iterables.toString(Arrays.asList(environment.getActiveProfiles())));
 
-			//scheduleTasks();
 			startWebserver();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
-	}
-
-	private void scheduleTasks() throws Exception {
-		final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-
-		logger.info("Scheduling TEI P5 encoding validator for daily execution; starting in one hour from now");
-		executor.scheduleAtFixedRate(validator, 1, 24, TimeUnit.HOURS);
-
-		logger.info("Scheduling transcript batch reader for hourly execution; starting in two minutes now");
-		executor.scheduleAtFixedRate(transcriptBatchReader, 1, 55, TimeUnit.MINUTES);
 	}
 
 	private void startWebserver() throws Exception {

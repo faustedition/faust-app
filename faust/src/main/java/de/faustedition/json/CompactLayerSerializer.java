@@ -1,21 +1,19 @@
 package de.faustedition.json;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import de.faustedition.xml.CustomNamespaceContext;
+import eu.interedition.text.Layer;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.node.ObjectNode;
 
-import de.faustedition.xml.CustomNamespaceMap;
-import eu.interedition.text.Layer;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -32,7 +30,7 @@ class CompactLayerSerializer extends JsonSerializer<Layer> {
     	if (nsEnd >= 0) {
     		String ns = attributeName.substring(1, nsEnd);
     		String simpleName = attributeName.substring(nsEnd + 1);
-    		String prefix = CustomNamespaceMap.INSTANCE.get(URI.create(ns));
+    		String prefix = CustomNamespaceContext.INSTANCE.getPrefix(ns);
     		return prefix + ":" + simpleName;
     	} else {
     		return attributeName;

@@ -31,7 +31,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import de.faustedition.collation.CollationFinder;
 import de.faustedition.db.TransactionFilter;
 import de.faustedition.document.ArchiveRouter;
 import de.faustedition.document.DocumentRouter;
@@ -42,9 +41,7 @@ import de.faustedition.search.SearchResource;
 import de.faustedition.security.LdapSecurityStore;
 import de.faustedition.security.SecurityConstants;
 import de.faustedition.structure.StructureFinder;
-import de.faustedition.tei.GoddagFinder;
 import de.faustedition.template.TemplateFinder;
-import de.faustedition.text.TextFinder;
 import de.faustedition.transcript.SceneStatisticsResource;
 import de.faustedition.transcript.TranscriptSourceResource;
 import de.faustedition.transcript.TranscriptViewResource;
@@ -77,14 +74,8 @@ public class FaustApplication extends Application implements InitializingBean {
 	@Autowired
 	private DocumentRouter documentRouter;
 
-	@Autowired
-	private GoddagFinder goddagFinder;
-
-    	@Autowired
-    	private FacsimileFinder facsimileFinder;
-
-	@Autowired
-	private TextFinder textFinder;
+    @Autowired
+    private FacsimileFinder facsimileFinder;
 
 	@Autowired
 	private XMLFinder xmlFinder;
@@ -94,9 +85,6 @@ public class FaustApplication extends Application implements InitializingBean {
 
 	@Autowired
 	private LdapSecurityStore ldapSecurityStore;
-
-	@Autowired
-	private CollationFinder collationFinder;
 
 	private File staticResourcePath;
 
@@ -113,7 +101,6 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.setDefaultMatchingMode(Template.MODE_STARTS_WITH);
 
 		router.attach("archive/", secured(transactional(archiveRouter)));
-		router.attach("collation/", secured(transactional(collationFinder)));
         	router.attach("demo/", secured(transactional(templateFinder)));
         	router.attach("document/", secured(transactional(documentRouter)));
         	router.attach("facsimile/", facsimileFinder);
@@ -124,12 +111,10 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("genesis/app/", secured(templateFinder));
 		router.attach("genesis/", secured(transactional(geneticGraphRouter)));
 		
-		router.attach("goddag/", secured(transactional(goddagFinder)));
         	router.attach("project/", templateFinder);
         	router.attach("static/", new Directory(getContext().createChildContext(), staticResourcePath.toURI().toString()));
 		router.attach("search/{term}", secured(transactional(contextResource(SearchResource.class))));
         	router.attach("structure/", secured(transactional(structureFinder)));
-        	router.attach("text/", secured(transactional(textFinder)));
 		router.attach("transcript/by-scene/{part}", secured(transactional(contextResource(SceneStatisticsResource.class))));
 		router.attach("transcript/by-verse/{from}/{to}", secured(transactional(contextResource(VerseStatisticsResource.class))));
 		router.attach("transcript/source/{id}", secured(transactional(contextResource(TranscriptSourceResource.class))));

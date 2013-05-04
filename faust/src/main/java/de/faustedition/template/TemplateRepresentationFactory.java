@@ -25,7 +25,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
 import de.faustedition.FaustURI;
-import de.faustedition.text.TextManager;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -38,9 +37,6 @@ public class TemplateRepresentationFactory {
 
 	@Autowired
 	private Configuration configuration;
-
-	@Autowired
-	private TextManager textManager;
 
 	public TemplateRepresentation create(String path, ClientInfo client) throws IOException {
 		return create(path, client, new HashMap<String, Object>());
@@ -69,14 +65,6 @@ public class TemplateRepresentationFactory {
 			LOG.trace("Putting message resource bundle '{}' into model (requested locale '{}')", messages.getLocale(), locale);
 		}
 		model.put("message", messages);
-
-		final SortedMap<String, String> textTableOfContents = new TreeMap<String, String>();
-		for (Map.Entry<FaustURI, String> tocEntry : textManager.tableOfContents().entrySet()) {
-			final String textUriPath = tocEntry.getKey().getPath();
-			final String textName = textUriPath.substring("/text/".length(), textUriPath.length() - ".xml".length());
-			textTableOfContents.put(textName, tocEntry.getValue());
-		}
-		model.put("textToc", textTableOfContents);
 
 		TemplateRepresentation representation = new TemplateRepresentation(template, model, MediaType.TEXT_HTML);
 		representation.setLanguages(Collections.singletonList(language));

@@ -29,13 +29,11 @@ import com.google.common.collect.Sets;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit.Type;
 import de.faustedition.graph.FaustGraph;
-import de.faustedition.transcript.GoddagTranscriptManager;
 import de.faustedition.transcript.TranscriptType;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLBaseTracker;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
-import sun.util.LocaleServiceProviderPool;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -48,9 +46,6 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 
 	@Autowired
 	private FaustGraph graph;
-
-	@Autowired
-	private GoddagTranscriptManager transcriptManager;
 
 	@Autowired
 	private GraphDatabaseService db;
@@ -187,7 +182,6 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 					final MaterialUnit unit = materialUnitStack.peek();
 					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
 					unit.setTranscriptSource(transcriptSource);
-					unit.setTranscript(transcriptManager.find(transcriptSource, type));
 				}
 			}
 

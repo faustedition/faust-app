@@ -1,19 +1,13 @@
 package de.faustedition.document;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
+import de.faustedition.facsimile.FacsimileFinder;
+import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
+import de.faustedition.xml.XPathUtil;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.ext.xml.DomRepresentation;
@@ -34,17 +28,18 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
-import de.faustedition.facsimile.FacsimileFinder;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.transcript.DocumentaryGoddagTranscript;
-import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.TranscriptType;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
-import de.faustedition.xml.XPathUtil;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
@@ -111,7 +106,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 	@Put("svg")
 	public String store(InputRepresentation data) throws SAXException, IOException, TransformerException, XPathExpressionException, URISyntaxException {
 		final org.w3c.dom.Document svg = XMLUtil.parse(data.getStream());
-		final FaustURI transcriptURI = transcript().getSource();
+		final FaustURI transcriptURI = page().getTranscriptSource();
 		final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
 
 		IdGenerator newIds = new IdGenerator() {
@@ -188,8 +183,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 		viewModel.put("document", document);
 		viewModel.put("pageNum", pageNum);
 
-		final String facsimileUrl = URLEncoder.encode(facsimileUrl()
-			+ "&SDS=0,90&CNT=1.0&WID=800&QLT=90&CVT=jpeg", "UTF-8");
+		final String facsimileUrl = URLEncoder.encode(facsimileUrl() + "&SDS=0,90&CNT=1.0&WID=800&QLT=90&CVT=jpeg", "UTF-8");
 		viewModel.put("facsimileUrl", facsimileUrl);
 
 		return viewFactory.create("document/imagelink", getRequest()
@@ -207,42 +201,12 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 		return (MaterialUnit) contents[pageNum - 1];
 	}
 
-	private DocumentaryGoddagTranscript transcript() {
-
-		final MaterialUnit mu = page();
-		final GoddagTranscript transcript = mu.getTranscript();
-
-		if (transcript == null) {
-			return null;
-		}
-		if (transcript.getType() != TranscriptType.DOCUMENTARY) {
-			return null;
-		}
-		final DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
-		if (dt.getFacsimileReferences().isEmpty()) {
-			return null;
-		}
-		return dt;
-	}
-
-	protected String facsimileUrl() {
-		final DocumentaryGoddagTranscript dt = transcript();
-		if (dt == null) {
-			final String msg = "There is no documentary transcript for this page!";
-			throw new ResourceException(new Status(404), msg);
-		}
-		final FaustURI facsimileURI = dt.getFacsimileReferences().first();
-		return String.format(imageUrlTemplate, facsimileURI.getPath()
-			.replaceAll("^/", ""));
-	}
-
 	@Get("svg")
 	public Representation graphic() throws ResourceException, IOException,
 		SAXException, XPathExpressionException, URISyntaxException {
 
-		final FaustURI transcriptURI = transcript().getSource();
-		final org.w3c.dom.Document source = XMLUtil.parse(xml
-			.getInputSource(transcriptURI));
+		final FaustURI transcriptURI = page().getTranscriptSource();
+		final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
 
 		// Check if the transcript has image links attached
 		final URI linkDataURI = XMLDocumentImageLinker.linkDataURI(source);
@@ -296,11 +260,9 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 	}
 
 	@Get("json")
-	public Representation documentStructure() throws SAXException, IOException,
-		XPathExpressionException {
-		final FaustURI transcriptURI = transcript().getSource();
-		final org.w3c.dom.Document source = XMLUtil.parse(xml
-			.getInputSource(transcriptURI));
+	public Representation documentStructure() throws SAXException, IOException, XPathExpressionException {
+		final FaustURI transcriptURI = page().getTranscriptSource();
+		final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
 		final XPathExpression xp = XPathUtil.xpath(GE_LINE_XP);
 
 		return new OutputRepresentation(MediaType.APPLICATION_JSON) {
@@ -311,37 +273,11 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 		};
 	}
 
-//	@Put("json")
-//	public String storeStructure(InputRepresentation data) throws JsonParseException, IOException {
-//		
-//		
-//		
-//		JsonParser parser = new JsonFactory().createJsonParser(data.getStream());
-//		
-//		
-//		parser.nextToken(); //Start object
-//		while (parser.nextToken() != JsonToken.END_OBJECT) {
-//			String rootFieldname = parser.getCurrentName();
-//			if (rootFieldname != "lines")
-//				throw new IllegalArgumentException("Not a valid document content description!");
-//			parser.nextToken(); //Start object
-//			while (parser.nextToken() != JsonToken.END_OBJECT) {
-//				String namefield = parser.getCurrentName();
-//				parser.nextToken(); //move to value
-//				if ("id".equals(namefield)) {
-//				} else if ("".equals(namefield)) {
-//					
-//				} else if ("".equals(namefield)) {
-//					
-//				}
-//			}
-//		}
-//		parser.close();
-//		
-//		
-//		//FIXME
-//		return "{}";
-//	}
+    private MaterialUnit transcript() {
+        return page();
+    }
 
-
+    protected String facsimileUrl() {
+        return String.format(imageUrlTemplate, page().getFacsimile().getPath().replaceAll("^/", ""));
+    }
 }

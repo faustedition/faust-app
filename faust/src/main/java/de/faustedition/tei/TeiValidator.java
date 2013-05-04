@@ -43,7 +43,6 @@ import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
 import de.faustedition.xml.XMLStorage;
 
-@Component
 public class TeiValidator extends Runtime implements Runnable, InitializingBean {
 	private static final URL SCHEMA_RESOURCE = TeiValidator.class.getResource("/faust-tei.rng");
 
