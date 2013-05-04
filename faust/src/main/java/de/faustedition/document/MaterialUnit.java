@@ -118,7 +118,15 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 	public void setTranscriptSource(FaustURI source) {
 		node.setProperty(PREFIX + ".transcript", source.toString());
 	}
-	
+
+    public long getTranscriptId() {
+        return (Long) node.getProperty(PREFIX + ".transcript-id", 0L);
+    }
+
+    public void setTranscriptId(long id) {
+        node.setProperty(PREFIX + ".transcript-id", id);
+    }
+
 	public String getMetadataValue(String key) {
 		final String[] metadata = getMetadata(key);
 		return (metadata == null ? null : metadata[0]);

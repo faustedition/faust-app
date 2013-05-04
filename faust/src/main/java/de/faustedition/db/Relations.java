@@ -117,7 +117,7 @@ public class Relations {
     }
 
     protected static String jdbcUrl(File path) {
-        return path.toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";LOCK_TIMEOUT=30000";
+        return path.toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";SCHEMA=FAUST;LOCK_TIMEOUT=30000";
     }
 
 }

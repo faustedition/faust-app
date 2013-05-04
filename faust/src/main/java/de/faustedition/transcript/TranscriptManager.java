@@ -4,8 +4,6 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.transcript.input.FacsimilePathXMLTransformerModule;
 import de.faustedition.transcript.input.HandsXMLTransformerModule;
 import de.faustedition.transcript.input.StageXMLTransformerModule;
@@ -15,8 +13,8 @@ import eu.interedition.text.Anchor;
 import eu.interedition.text.Layer;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextConstants;
-import eu.interedition.text.neo4j.LayerNode;
-import eu.interedition.text.neo4j.Neo4jTextRepository;
+import eu.interedition.text.h2.H2TextRepository;
+import eu.interedition.text.h2.LayerRelation;
 import eu.interedition.text.simple.SimpleLayer;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfigurationBase;
@@ -29,10 +27,8 @@ import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
 import eu.interedition.text.xml.module.TextXMLTransformerModule;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,28 +45,20 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
 
 import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
 import static eu.interedition.text.TextConstants.TEI_NS;
-import static org.neo4j.graphdb.Direction.INCOMING;
 
 @Component
-public class TranscriptManager implements InitializingBean {
+public class TranscriptManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TranscriptManager.class);
 
-	public static final FaustRelationshipType TRANSCRIPT_RT = new FaustRelationshipType("transcribes");
-
 	@Autowired
-	private Neo4jTextRepository<JsonNode> textRepository;
+	private H2TextRepository<JsonNode> textRepository;
 
 	@Autowired
 	private XMLStorage xml;
-
-	@Autowired
-	private FaustGraph faustGraph;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -84,11 +72,11 @@ public class TranscriptManager implements InitializingBean {
 	});
 
 	public Layer<JsonNode> find(MaterialUnit materialUnit) throws IOException, XMLStreamException {
-		final Relationship rel = materialUnit.node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
-		return (rel == null ? read(materialUnit) : new LayerNode<JsonNode>(textRepository, rel.getStartNode()));
+        final long transcriptId = materialUnit.getTranscriptId();
+        return (transcriptId == 0 ? read(materialUnit) : textRepository.findByIdentifier(transcriptId));
 	}
 
-	LayerNode<JsonNode> read(MaterialUnit materialUnit) throws IOException, XMLStreamException {
+	LayerRelation<JsonNode> read(MaterialUnit materialUnit) throws IOException, XMLStreamException {
 		final FaustURI source = materialUnit.getTranscriptSource();
 		if (source == null) {
 			return null;
@@ -113,8 +101,8 @@ public class TranscriptManager implements InitializingBean {
 					new StreamResult(xmlString)
 			);
 			final Layer<JsonNode> sourceLayer = textRepository.add(TextConstants.XML_TARGET_NAME, new StringReader(xmlString.toString()), null, Collections.<Anchor<JsonNode>>emptySet());
-			final LayerNode<JsonNode> transcriptLayer = (LayerNode<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
-			transcriptLayer.node.createRelationshipTo(materialUnit.node, TRANSCRIPT_RT);
+			final LayerRelation<JsonNode> transcriptLayer = (LayerRelation<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
+            materialUnit.setTranscriptId(transcriptLayer.getId());
 			return transcriptLayer;
 		} catch (IllegalArgumentException e) {
 			throw new TranscriptInvalidException(e);
@@ -172,16 +160,5 @@ public class TranscriptManager implements InitializingBean {
 		modules.add(new TEIAwareAnnotationXMLTransformerModule<JsonNode>());
 
 		return conf;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Executors.newSingleThreadExecutor().submit(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-
-				return null;  //To change body of implemented methods use File | Settings | File Templates.
-			}
-		});
 	}
 }
