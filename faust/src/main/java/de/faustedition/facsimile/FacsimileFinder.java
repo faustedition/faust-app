@@ -86,7 +86,7 @@ public class FacsimileFinder extends Finder implements InitializingBean {
 		this.fileExtension = environment.getRequiredProperty("facsimile.extension", String.class);
 		this.defaultFacsimile = environment.getProperty("facsimile.default", File.class);
 
-		Assert.isTrue(home.isDirectory(), home + " is not a directory");
+		Assert.isTrue(home.isDirectory() || home.mkdirs(), home + " is not a directory");
 		Assert.isTrue(defaultFacsimile == null || defaultFacsimile.isFile(), defaultFacsimile + " is not a file");
 
 		this.tileCache = cacheManager.addCacheIfAbsent(FACSIMILE_TILE_CACHE);
