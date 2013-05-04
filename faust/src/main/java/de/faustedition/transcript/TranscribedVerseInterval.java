@@ -2,13 +2,11 @@ package de.faustedition.transcript;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import de.faustedition.VerseInterval;
 import de.faustedition.db.Relations;
 import de.faustedition.db.Tables;
-import de.faustedition.db.tables.records.TranscribedVerseIntervalRecord;
 import de.faustedition.db.tables.records.TranscriptRecord;
 import de.faustedition.document.MaterialUnit;
 import eu.interedition.text.Layer;
@@ -16,8 +14,9 @@ import eu.interedition.text.Name;
 import eu.interedition.text.TextConstants;
 import eu.interedition.text.TextRepository;
 import org.codehaus.jackson.JsonNode;
+import org.jooq.BatchBindStep;
+import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.impl.Factory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.regex.Matcher;
@@ -48,9 +46,9 @@ public class TranscribedVerseInterval {
     public static Map<MaterialUnit, Collection<VerseInterval>> byMaterialUnit(final DataSource dataSource, final GraphDatabaseService graphDb, final int from, final int to) {
         return Relations.execute(dataSource, new Relations.Transaction<Map<MaterialUnit, Collection<VerseInterval>>>() {
             @Override
-            public Map<MaterialUnit, Collection<VerseInterval>> execute(Factory db) throws Exception {
+            public Map<MaterialUnit, Collection<VerseInterval>> execute(DSLContext sql) throws Exception {
                 final Multimap<MaterialUnit, VerseInterval> statistics = HashMultimap.create();
-                for (Record record : db
+                for (Record record : sql
                         .select(Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_START, Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_END, Tables.TRANSCRIPT.MATERIAL_UNIT_ID)
                         .from(Tables.TRANSCRIBED_VERSE_INTERVAL)
                         .join(Tables.TRANSCRIPT).on(Tables.TRANSCRIPT.ID.eq(Tables.TRANSCRIBED_VERSE_INTERVAL.TRANSCRIPT_ID))
@@ -72,7 +70,7 @@ public class TranscribedVerseInterval {
         });
     }
 
-	public static void register(Factory db, TextRepository<JsonNode> textRepo, TranscriptRecord transcript) {
+	public static void register(DSLContext db, TextRepository<JsonNode> textRepo, TranscriptRecord transcript) {
         // delete existing intervals
         db.delete(Tables.TRANSCRIBED_VERSE_INTERVAL)
                 .where(Tables.TRANSCRIBED_VERSE_INTERVAL.TRANSCRIPT_ID.eq(transcript.getId()))
@@ -89,7 +87,13 @@ public class TranscribedVerseInterval {
 			}
 		}
 
-        final List<TranscribedVerseIntervalRecord> intervals = Lists.newLinkedList();
+        final BatchBindStep insertBatch = db.batch(db.insertInto(
+                Tables.TRANSCRIBED_VERSE_INTERVAL,
+                Tables.TRANSCRIBED_VERSE_INTERVAL.TRANSCRIPT_ID,
+                Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_START,
+                Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_END
+        ));
+
         int start = -1;
 		int next = -1;
 		for (Iterator<Integer> it = verses.iterator(); it.hasNext(); ) {
@@ -98,11 +102,7 @@ public class TranscribedVerseInterval {
 				next++;
 			} else if (verse > next) {
 				if (start >= 0) {
-					final TranscribedVerseIntervalRecord vi = new TranscribedVerseIntervalRecord();
-					vi.setTranscriptId(transcript);
-                    vi.setVerseStart(start);
-                    vi.setVerseEnd(next);
-                    intervals.add(new TranscribedVerseIntervalRecord());
+                    insertBatch.bind(transcript.getId(), start, next);
 				}
 
 				start = verse;
@@ -110,17 +110,14 @@ public class TranscribedVerseInterval {
 			}
 
 			if (!it.hasNext() && start >= 0) {
-                final TranscribedVerseIntervalRecord vi = new TranscribedVerseIntervalRecord();
-                vi.setTranscriptId(transcript);
-                vi.setVerseStart(start);
-                vi.setVerseEnd(verse + 1);
-                intervals.add(new TranscribedVerseIntervalRecord());
+                insertBatch.bind(transcript.getId(), start, verse + 1);
 			}
 		}
-        db.batchStore(intervals).execute();
 
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("Registered verse {} interval(s) for {}", intervals.size(), transcript);
+        final int count = insertBatch.execute().length;
+
+        if (LOG.isDebugEnabled()) {
+			LOG.debug("Registered verse {} interval(s) for {}", count, transcript);
 		}
 	}
 }

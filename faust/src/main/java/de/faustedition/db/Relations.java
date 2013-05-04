@@ -5,8 +5,9 @@ import com.google.common.base.Throwables;
 import com.jolbox.bonecp.BoneCPDataSource;
 import org.h2.Driver;
 import org.h2.tools.Console;
+import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
-import org.jooq.impl.Factory;
+import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -31,7 +32,7 @@ public class Relations {
 
     public static abstract class Transaction<T> {
 
-        public abstract T execute(Factory db) throws Exception;
+        public abstract T execute(DSLContext sql) throws Exception;
 
         public boolean rollsBackOn(Exception e) {
             return true;
@@ -64,7 +65,7 @@ public class Relations {
                     LOG.log(Level.FINE, "Opened connection for {0}", tx);
                 }
 
-                final T result = tx.execute(new Factory(connection, SQLDialect.H2));
+                final T result = tx.execute(DSL.using(connection, SQLDialect.H2));
 
                 connection.commit();
                 if (LOG.isLoggable(Level.FINE)) {

@@ -147,7 +147,7 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>2.6.0</version>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -229,7 +229,7 @@
             <plugin>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
-                <version>2.6.0</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -264,7 +264,6 @@
                         <generate>
                             <deprecated>false</deprecated>
                             <instanceFields>true</instanceFields>
-                            <pojos>true</pojos>
                         </generate>
                         <target>
                             <packageName>de.faustedition.db</packageName>

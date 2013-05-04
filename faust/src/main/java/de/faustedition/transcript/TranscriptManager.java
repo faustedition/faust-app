@@ -103,6 +103,7 @@ public class TranscriptManager {
 			final Layer<JsonNode> sourceLayer = textRepository.add(TextConstants.XML_TARGET_NAME, new StringReader(xmlString.toString()), null, Collections.<Anchor<JsonNode>>emptySet());
 			final LayerRelation<JsonNode> transcriptLayer = (LayerRelation<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
             materialUnit.setTranscriptId(transcriptLayer.getId());
+
 			return transcriptLayer;
 		} catch (IllegalArgumentException e) {
 			throw new TranscriptInvalidException(e);

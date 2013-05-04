@@ -18,7 +18,7 @@ import eu.interedition.text.TextRepository;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
 import org.codehaus.jackson.JsonNode;
-import org.jooq.impl.Factory;
+import org.jooq.DSLContext;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,9 +94,9 @@ public class Transcript extends NodeWrapper {
         Preconditions.checkArgument(source != null);
         return Relations.execute(dataSource, new Relations.Transaction<TranscriptRecord>() {
             @Override
-            public TranscriptRecord execute(Factory db) throws Exception {
+            public TranscriptRecord execute(DSLContext sql) throws Exception {
                 final String sourceURI = source.toString();
-                TranscriptRecord transcriptRecord = db.selectFrom(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.SOURCE_URI.eq(sourceURI)).fetchOne();
+                TranscriptRecord transcriptRecord = sql.selectFrom(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.SOURCE_URI.eq(sourceURI)).fetchOne();
                 if (transcriptRecord == null) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Creating transcript for {}", sourceURI);
@@ -115,7 +115,7 @@ public class Transcript extends NodeWrapper {
 
                 if (text != null) {
                     // the text of the transcript has been read, register its verse intervals
-                    TranscribedVerseInterval.register(db, textRepo, transcriptRecord);
+                    TranscribedVerseInterval.register(sql, textRepo, transcriptRecord);
                 }
 
                 return transcriptRecord;
