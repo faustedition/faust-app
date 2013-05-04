@@ -2,6 +2,7 @@ package de.faustedition;
 
 import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
 
+import java.io.File;
 import java.util.List;
 
 import org.restlet.Application;
@@ -97,11 +98,11 @@ public class FaustApplication extends Application implements InitializingBean {
 	@Autowired
 	private CollationFinder collationFinder;
 
-	private String staticResourcePath;
+	private File staticResourcePath;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.staticResourcePath = environment.getRequiredProperty("static.home");
+		this.staticResourcePath = environment.getRequiredProperty("static.home", File.class);
 		this.getMetadataService().setDefaultCharacterSet(CharacterSet.UTF_8);
 	}
 
@@ -125,7 +126,7 @@ public class FaustApplication extends Application implements InitializingBean {
 		
 		router.attach("goddag/", secured(transactional(goddagFinder)));
         	router.attach("project/", templateFinder);
-        	router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
+        	router.attach("static/", new Directory(getContext().createChildContext(), staticResourcePath.toURI().toString()));
 		router.attach("search/{term}", secured(transactional(contextResource(SearchResource.class))));
         	router.attach("structure/", secured(transactional(structureFinder)));
         	router.attach("text/", secured(transactional(textFinder)));
