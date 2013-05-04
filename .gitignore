@@ -1,3 +1,4 @@
 target
 faust/data
+faust/faust.properties
 *.iml
