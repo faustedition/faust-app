@@ -1,7 +1,6 @@
 package de.faustedition;
 
 import com.google.common.collect.Iterables;
-import de.faustedition.transcript.TranscriptBatchReader;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 import org.restlet.util.ClientList;
