@@ -29,6 +29,6 @@ public class TextRepositoryFactoryBean extends AbstractFactoryBean<H2TextReposit
 
   @Override
   protected H2TextRepository<JsonNode> createInstance() throws Exception {
-    return new H2TextRepository<JsonNode>(JsonNode.class, new JacksonDataStreamMapper<JsonNode>(objectMapper), dataSource, false);
+    return new H2TextRepository<JsonNode>(JsonNode.class, new JacksonDataStreamMapper<JsonNode>(objectMapper), dataSource, true);
   }
 }
