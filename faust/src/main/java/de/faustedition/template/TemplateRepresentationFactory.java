@@ -71,22 +71,4 @@ public class TemplateRepresentationFactory {
 
 		return representation;
 	}
-
-	public static class TextTableOfContentsEntry {
-		private final String path;
-		private final String title;
-
-		public TextTableOfContentsEntry(String path, String title) {
-			this.path = path;
-			this.title = title;
-		}
-
-		public String getPath() {
-			return path;
-		}
-
-		public String getTitle() {
-			return title;
-		}
-	}
 }
