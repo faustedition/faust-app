@@ -1,4 +1,4 @@
-package de.faustedition;
+package de.faustedition.resource;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,12 +8,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import net.middell.combo.FileBasedTextResourceCollection;
-import net.middell.combo.TextResource;
-import net.middell.combo.TextResourceCollection;
-import net.middell.combo.TextResourceCombo;
-import net.middell.combo.TextResourceResolver;
 
 import org.restlet.Request;
 import org.restlet.Response;

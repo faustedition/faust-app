@@ -5,6 +5,7 @@ import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
 import java.io.File;
 import java.util.List;
 
+import de.faustedition.resource.ComboResourceFinder;
 import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
