@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import de.faustedition.VerseInterval;
 import de.faustedition.db.Relations;
 import de.faustedition.db.Tables;
+import de.faustedition.db.tables.records.TranscribedVerseIntervalRecord;
 import de.faustedition.db.tables.records.TranscriptRecord;
 import de.faustedition.document.MaterialUnit;
 import eu.interedition.text.Layer;
@@ -16,6 +17,7 @@ import eu.interedition.text.TextRepository;
 import org.codehaus.jackson.JsonNode;
 import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
+import org.jooq.InsertValuesStep3;
 import org.jooq.Record;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
@@ -87,12 +89,12 @@ public class TranscribedVerseInterval {
 			}
 		}
 
-        final BatchBindStep insertBatch = db.batch(db.insertInto(
+        InsertValuesStep3<TranscribedVerseIntervalRecord,Long,Integer,Integer> insertBatch = db.insertInto(
                 Tables.TRANSCRIBED_VERSE_INTERVAL,
                 Tables.TRANSCRIBED_VERSE_INTERVAL.TRANSCRIPT_ID,
                 Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_START,
                 Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_END
-        ));
+        );
 
         int start = -1;
 		int next = -1;
@@ -102,7 +104,7 @@ public class TranscribedVerseInterval {
 				next++;
 			} else if (verse > next) {
 				if (start >= 0) {
-                    insertBatch.bind(transcript.getId(), start, next);
+                    insertBatch.values(transcript.getId(), start, next);
 				}
 
 				start = verse;
@@ -110,14 +112,14 @@ public class TranscribedVerseInterval {
 			}
 
 			if (!it.hasNext() && start >= 0) {
-                insertBatch.bind(transcript.getId(), start, verse + 1);
+                insertBatch.values(transcript.getId(), start, verse + 1);
 			}
 		}
 
-        final int count = insertBatch.execute().length;
+        final int count = insertBatch.execute();
 
         if (LOG.isDebugEnabled()) {
-			LOG.debug("Registered verse {} interval(s) for {}", count, transcript);
+			LOG.debug("Registered verse {} interval(s) for {}", count, transcript.getSourceUri());
 		}
 	}
 }

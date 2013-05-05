@@ -41,7 +41,7 @@ public abstract class TranscriptResource extends ServerResource {
 		final String nodeId = Objects.firstNonNull((String) getRequest().getAttributes().get("id"), "-1");
 		try {
 			this.materialUnit = MaterialUnit.forNode(db.getNodeById(Long.parseLong(nodeId)));
-			this.transcript = transcriptManager.find(materialUnit);
+			this.transcript = transcriptManager.textOf(transcriptManager.transcriptOf(materialUnit));
 			if (transcript == null) {
 				throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, materialUnit.toString());
 			}

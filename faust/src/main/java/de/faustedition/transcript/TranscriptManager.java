@@ -1,13 +1,13 @@
 package de.faustedition.transcript;
 
-import com.google.common.collect.Ordering;
-import com.google.common.collect.TreeMultimap;
 import de.faustedition.FaustURI;
+import de.faustedition.db.Relations;
+import de.faustedition.db.Tables;
+import de.faustedition.db.tables.records.TranscriptRecord;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.transcript.input.FacsimilePathXMLTransformerModule;
 import de.faustedition.transcript.input.HandsXMLTransformerModule;
 import de.faustedition.transcript.input.StageXMLTransformerModule;
-import de.faustedition.transcript.input.TranscriptInvalidException;
 import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.Anchor;
 import eu.interedition.text.Layer;
@@ -27,13 +27,14 @@ import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
 import eu.interedition.text.xml.module.TextXMLTransformerModule;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
@@ -41,7 +42,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +54,9 @@ public class TranscriptManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TranscriptManager.class);
 
+    @Autowired
+    private DataSource dataSource;
+
 	@Autowired
 	private H2TextRepository<JsonNode> textRepository;
 
@@ -63,54 +66,61 @@ public class TranscriptManager {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	private TreeMultimap<Short, MaterialUnit> transcribedVerseIndex = TreeMultimap.create(Ordering.natural(), new Comparator<MaterialUnit>() {
-		@Override
-		public int compare(MaterialUnit o1, MaterialUnit o2) {
-			final long idDiff = o1.node.getId() - o2.node.getId();
-			return (idDiff == 0 ? 0 : (idDiff < 0 ? -1 : 1));
-		}
-	});
 
-	public Layer<JsonNode> find(MaterialUnit materialUnit) throws IOException, XMLStreamException {
-        final long transcriptId = materialUnit.getTranscriptId();
-        return (transcriptId == 0 ? read(materialUnit) : textRepository.findByIdentifier(transcriptId));
-	}
+    public Layer<JsonNode> textOf(TranscriptRecord transcript) {
+        final Long textId = (transcript == null ? null : transcript.getTextId());
+        return (textId == null ? null : textRepository.findByIdentifier(textId));
 
-	LayerRelation<JsonNode> read(MaterialUnit materialUnit) throws IOException, XMLStreamException {
-		final FaustURI source = materialUnit.getTranscriptSource();
-		if (source == null) {
-			return null;
-		}
+    }
 
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("Transforming XML transcript from {}", source);
-		}
+	public TranscriptRecord transcriptOf(final MaterialUnit materialUnit) throws IOException, XMLStreamException {
+        final FaustURI source = materialUnit.getTranscriptSource();
+        if (source == null) {
+            return null;
+        }
 
-		final XMLTransformerConfigurationBase<JsonNode> conf = configure(new XMLTransformerConfigurationBase<JsonNode>(textRepository) {
+        return Relations.execute(dataSource, new Relations.Transaction<TranscriptRecord>() {
+            @Override
+            public TranscriptRecord execute(DSLContext sql) throws Exception {
+                TranscriptRecord transcriptRecord = sql.selectFrom(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.MATERIAL_UNIT_ID.eq(materialUnit.node.getId())).fetchOne();
+                if (transcriptRecord != null) {
+                    return transcriptRecord;
+                }
 
-			@Override
-			protected Layer<JsonNode> translate(Name name, Map<Name, String> attributes, Set<Anchor<JsonNode>> anchors) {
-				return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors, null);
-			}
-		}, materialUnit);
+                transcriptRecord = sql.newRecord(Tables.TRANSCRIPT);
+                transcriptRecord.setMaterialUnitId(materialUnit.node.getId());
+                transcriptRecord.setSourceUri(source.toString());
 
-		try {
-			final StringWriter xmlString = new StringWriter();
-			TransformerFactory.newInstance().newTransformer().transform(
-					new SAXSource(xml.getInputSource(source)),
-					new StreamResult(xmlString)
-			);
-			final Layer<JsonNode> sourceLayer = textRepository.add(TextConstants.XML_TARGET_NAME, new StringReader(xmlString.toString()), null, Collections.<Anchor<JsonNode>>emptySet());
-			final LayerRelation<JsonNode> transcriptLayer = (LayerRelation<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
-            materialUnit.setTranscriptId(transcriptLayer.getId());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Transforming XML transcript from {}", source);
+                }
 
-			return transcriptLayer;
-		} catch (IllegalArgumentException e) {
-			throw new TranscriptInvalidException(e);
-		} catch (TransformerException e) {
-			throw new TranscriptInvalidException(e);
-		}
-	}
+                final XMLTransformerConfigurationBase<JsonNode> conf = configure(new XMLTransformerConfigurationBase<JsonNode>(textRepository) {
+
+                    @Override
+                    protected Layer<JsonNode> translate(Name name, Map<Name, String> attributes, Set<Anchor<JsonNode>> anchors) {
+                        return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors, null);
+                    }
+                }, materialUnit);
+
+                final StringWriter xmlString = new StringWriter();
+                TransformerFactory.newInstance().newTransformer().transform(
+                        new SAXSource(xml.getInputSource(source)),
+                        new StreamResult(xmlString)
+                );
+
+                final Layer<JsonNode> sourceLayer = textRepository.add(TextConstants.XML_TARGET_NAME, new StringReader(xmlString.toString()), null, Collections.<Anchor<JsonNode>>emptySet());
+                final LayerRelation<JsonNode> transcriptLayer = (LayerRelation<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
+
+                transcriptRecord.setTextId(transcriptLayer.getId());
+                transcriptRecord.store();
+
+                TranscribedVerseInterval.register(sql, textRepository, transcriptRecord);
+
+                return transcriptRecord;
+            }
+        });
+    }
 
 	protected XMLTransformerConfigurationBase<JsonNode> configure(XMLTransformerConfigurationBase<JsonNode> conf, MaterialUnit materialUnit) {
 		conf.addLineElement(new Name(TEI_NS, "text"));
