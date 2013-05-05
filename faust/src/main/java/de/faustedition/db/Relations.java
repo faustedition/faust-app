@@ -105,6 +105,7 @@ public class Relations {
         dataSource.setMaxConnectionsPerPartition(20);
         dataSource.setReleaseHelperThreads(0);
         dataSource.setDisableConnectionTracking(true);
+        dataSource.setLogStatementsEnabled(Logger.getLogger(BoneCPDataSource.class.getPackage().getName()).isLoggable(Level.FINE));
         return dataSource;
     }
 
@@ -118,7 +119,7 @@ public class Relations {
     }
 
     protected static String jdbcUrl(File path) {
-        return path.toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";SCHEMA=FAUST;LOCK_TIMEOUT=30000";
+        return path.toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";SCHEMA=FAUST";
     }
 
 }
