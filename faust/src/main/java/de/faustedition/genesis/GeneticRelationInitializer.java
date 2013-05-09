@@ -13,7 +13,7 @@ import org.springframework.util.StopWatch;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.xml.XMLStorage;
 
 @Component
@@ -23,19 +23,10 @@ public class GeneticRelationInitializer implements InitializingBean {
 	public static final FaustURI GENETIC_BASE_URI = new FaustURI(FaustAuthority.XML, "/genesis");
 
 	@Autowired
-	private FaustGraph graph;
-
-	@Autowired
-	private XMLStorage xml;
-
-	@Autowired
 	private Logger logger;
 
 	@Autowired
 	private TransactionTemplate transactionTemplate;
-
-	@Autowired
-	private ApplicationContext applicationContext;
 
 	@Autowired
 	private MacrogeneticRelationManager macrogeneticRelationManager;

@@ -28,7 +28,7 @@ import com.google.common.collect.Sets;
 
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit.Type;
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.transcript.TranscriptType;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLBaseTracker;
@@ -45,15 +45,10 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DocumentDescriptorHandler.class);
 
 	@Autowired
-	private FaustGraph graph;
-
-	@Autowired
-	private GraphDatabaseService db;
-
-	@Autowired
 	private XMLStorage xml;
 
-	private FaustURI source;
+    private Graph graph;
+    private FaustURI source;
 	private XMLBaseTracker baseTracker;
 	private MaterialUnitCollection materialUnitCollection;
 
@@ -81,27 +76,22 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		valueAttribute.put("textTranscript", "uri");
 		valueAttribute.put("docTranscript", "uri");
 	}
-	
-	
-	public Document handle(FaustURI source) throws IOException, SAXException {
+
+
+    public Document handle(Graph graph, FaustURI source) throws IOException, SAXException {
+        this.graph = graph;
 		this.source = source;
 		this.baseTracker = new XMLBaseTracker(source.toString());
 		this.materialUnitCollection = graph.getMaterialUnits();
 
-		final InputSource xmlSource = xml.getInputSource(source);
-		try {
-			XMLUtil.saxParser().parse(xmlSource, this);
-			if (document != null) {
-				document.index();
-			}
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Read " + source + " into " + document + "[" +  document.node.getId() + "]");
-			}
-			return document;
-		} finally {
-			xmlSource.getByteStream().close();
-		}
-
+        XMLUtil.saxParser().parse(xml.getInputSource(source), this);
+        if (document != null) {
+            document.index();
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Read " + source + " into " + document + "[" +  document.node.getId() + "]");
+        }
+        return document;
 	}
 
 	@Override
@@ -134,10 +124,10 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 				switch (type) {
 					case DOCUMENT:
 					case ARCHIVALDOCUMENT:
-						unit = new Document(db.createNode(), type, source);
+						unit = new Document(graph.db().createNode(), type, source);
 						break;
 					default:
-						unit = new MaterialUnit(db.createNode(), type);
+						unit = new MaterialUnit(graph.db().createNode(), type);
 				}
 
 

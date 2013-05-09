@@ -5,13 +5,13 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.IterableWrapper;
 
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapperCollection;
 
 public class Archive extends NodeWrapperCollection<MaterialUnit> {
 	private static final FaustRelationshipType IN_ARCHIVE_RT = new FaustRelationshipType("in-archive");
-	private static final String PREFIX = FaustGraph.PREFIX + ".archive";
+	private static final String PREFIX = Graph.PREFIX + ".archive";
 
 	public Archive(Node node) {
 		super(node, MaterialUnit.class, IN_ARCHIVE_RT);

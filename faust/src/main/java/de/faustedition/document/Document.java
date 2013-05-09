@@ -24,11 +24,11 @@ import com.google.common.collect.Iterables;
 
 import de.faustedition.FaustURI;
 import de.faustedition.genesis.MacrogeneticRelationManager;
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.graph.NodeWrapper;
 
 public class Document extends MaterialUnit {
-	private static final String PREFIX = FaustGraph.PREFIX + ".document";
+	private static final String PREFIX = Graph.PREFIX + ".document";
 
 	private static final String SOURCE_KEY = PREFIX + ".source";
 	private static final String URI_KEY = PREFIX + "uri";

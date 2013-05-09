@@ -9,7 +9,7 @@ import de.faustedition.FaustURI;
 import de.faustedition.VerseInterval;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.genesis.GeneticSource;
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.reasoning.PremiseBasedRelation.Premise;
 import de.faustedition.transcript.TranscribedVerseInterval;
 import edu.bath.transitivityutils.ImmutableRelation;
@@ -68,7 +68,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	private Environment environment;
 	
 	@Autowired
-	private FaustGraph faustGraph;
+	private Graph graph;
 	
 	@Autowired
 	private Logger logger;
@@ -273,7 +273,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 
 	private List<Premise<Inscription>> premisesFromGeneticSources() {
 		List<Premise<Inscription>> result = new ArrayList<Premise<Inscription>>();
-		for (final GeneticSource geneticSource : faustGraph.getGeneticSources()) {
+		for (final GeneticSource geneticSource : graph.getGeneticSources()) {
 			final GraphBasedRelation<Inscription> gbr = new GraphBasedRelation<Inscription>(nodeMap, geneticSource.getUri());
 			Premise<Inscription> premise = new Premise<Inscription>() {
 				@Override

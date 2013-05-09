@@ -5,7 +5,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapperCollection;
 import org.neo4j.graphdb.Node;
@@ -14,7 +14,6 @@ import org.neo4j.graphdb.Relationship;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
@@ -23,7 +22,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		ARCHIVALDOCUMENT, DOCUMENT, SHEET, LEAF, DISJUNCTLEAF, PAGE, PATCH, PATCHSURFACE
 	}
 
-	protected static final String PREFIX = FaustGraph.PREFIX + ".material-unit";
+	protected static final String PREFIX = Graph.PREFIX + ".material-unit";
 	protected static final String METADATA_PREFIX = PREFIX + ".metadata.";
 
 	private static final FaustRelationshipType MATERIAL_PART_OF_RT = new FaustRelationshipType("is-material-part-of");

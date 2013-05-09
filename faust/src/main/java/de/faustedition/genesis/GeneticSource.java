@@ -4,12 +4,12 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.graph.NodeWrapper;
 
 public class GeneticSource extends NodeWrapper {
 
-	public static final String PREFIX = FaustGraph.PREFIX + ".geneticSource";
+	public static final String PREFIX = Graph.PREFIX + ".geneticSource";
 	public static final String SOURCE_KEY = PREFIX + ".source";
 	public static final String URI_KEY = PREFIX + ".uri";
 

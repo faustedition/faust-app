@@ -7,7 +7,7 @@ public class FaustRelationshipType implements RelationshipType {
 	private final String name;
 
 	public FaustRelationshipType(String name) {
-		this.name = FaustGraph.PREFIX + "." + name;
+		this.name = Graph.PREFIX + "." + name;
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import javax.xml.xpath.XPathExpressionException;
 
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -27,7 +28,7 @@ import com.google.common.collect.Iterables;
 import de.faustedition.ApplicationContextFinder;
 import de.faustedition.document.Archive;
 import de.faustedition.document.Document;
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.template.TemplateRepresentationFactory;
 
 @Component
@@ -51,42 +52,46 @@ public class GeneticGraphRouter extends Router implements InitializingBean {
 		private TemplateRepresentationFactory viewFactory;
 
 		@Autowired
-		private FaustGraph graph;
+		private GraphDatabaseService graphDatabaseService;
 
 		@Get
 		public Representation render() throws IOException, XPathExpressionException, SAXException {
-			final Map<String, Object> model = new HashMap<String, Object>();
-			final String filter = (String) getRequestAttributes().get("filter");
+            return Graph.execute(graphDatabaseService, new Graph.Transaction<Representation>() {
+                @Override
+                public Representation execute(Graph graph) throws Exception {
+                    final Map<String, Object> model = new HashMap<String, Object>();
+                    final String filter = (String) getRequestAttributes().get("filter");
 
-			if (filter == null) {
-
-
-				final SortedSet<Document> archivalUnits = new TreeSet<Document>(new Comparator<Document>() {
-					@Override
-					public int compare(Document o1, Document o2) {
-						final String o1cn = o1.getMetadataValue("callnumber");
-						final String o2cn = o2.getMetadataValue("callnumber");
-						return (o1cn == null || o2cn == null) ? 0 : o1cn.compareTo(o2cn);
-					}
-				});
+                    if (filter == null) {
 
 
-				for (Archive archive : graph.getArchives()) {
-					for (Document document : Iterables.filter(archive, Document.class)) {
-						//temporallyPrecedes = document.geneticallyRelatedTo(MacrogeneticRelationManager.TEMP_PRE_REL);
-						archivalUnits.add(document);
-					}
-						
+                        final SortedSet<Document> archivalUnits = new TreeSet<Document>(new Comparator<Document>() {
+                            @Override
+                            public int compare(Document o1, Document o2) {
+                                final String o1cn = o1.getMetadataValue("callnumber");
+                                final String o2cn = o2.getMetadataValue("callnumber");
+                                return (o1cn == null || o2cn == null) ? 0 : o1cn.compareTo(o2cn);
+                            }
+                        });
 
-					//Iterables.addAll(archivalUnits, Iterables.filter(archive, Document.class));
-				}
-				model.put("archivalUnits", archivalUnits);
-				return viewFactory.create("genesis/graph", getRequest().getClientInfo(), model);
-			}
 
-			getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND, filter);
-			return null;
+                        for (Archive archive : graph.getArchives()) {
+                            for (Document document : Iterables.filter(archive, Document.class)) {
+                                //temporallyPrecedes = document.geneticallyRelatedTo(MacrogeneticRelationManager.TEMP_PRE_REL);
+                                archivalUnits.add(document);
+                            }
 
+
+                            //Iterables.addAll(archivalUnits, Iterables.filter(archive, Document.class));
+                        }
+                        model.put("archivalUnits", archivalUnits);
+                        return viewFactory.create("genesis/graph", getRequest().getClientInfo(), model);
+                    }
+
+                    getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND, filter);
+                    return null;
+                }
+            });
 		}
 	}
 }

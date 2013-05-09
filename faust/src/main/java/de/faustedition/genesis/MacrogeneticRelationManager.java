@@ -20,7 +20,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLStorage;
@@ -43,7 +43,7 @@ public class MacrogeneticRelationManager {
 	private GraphDatabaseService db;
 	
 	@Autowired
-	private FaustGraph faustGraph;
+	private Graph graph;
 
 	@Autowired
 	private Logger logger;
@@ -65,7 +65,7 @@ public class MacrogeneticRelationManager {
             }
 		}
 		logger.debug("Found genetic sources: ");
-		for (GeneticSource gs :faustGraph.getGeneticSources())
+		for (GeneticSource gs : graph.getGeneticSources())
 			logger.debug(gs.getUri().toString());
 		return failed;
 	};
@@ -120,7 +120,7 @@ public class MacrogeneticRelationManager {
 		XMLUtil.saxParser().parse(xml.getInputSource(source), new DefaultHandler() {
 
 			private MGRelationship relationship = null;
-			private GeneticSourceCollection geneticSources = faustGraph.getGeneticSources();
+			private GeneticSourceCollection geneticSources = graph.getGeneticSources();
 			private ArrayList<FaustURI> geneticSourceURIs = new ArrayList<FaustURI>();
 			
 

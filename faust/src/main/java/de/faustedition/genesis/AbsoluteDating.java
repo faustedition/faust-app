@@ -4,14 +4,14 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 
-import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.Graph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapper;
 import de.faustedition.graph.NodeWrapperCollection;
 
 public class AbsoluteDating extends NodeWrapper {
 
-	public static final String PREFIX = FaustGraph.PREFIX + ".absolute-dating";
+	public static final String PREFIX = Graph.PREFIX + ".absolute-dating";
 	public static final String FROM_KEY = PREFIX + ".from";
 	public static final String TO_KEY = PREFIX + ".to";
 	public static final String NOT_BEFORE_KEY = PREFIX + ".not-before";
