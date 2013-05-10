@@ -71,16 +71,17 @@ public abstract class AbstractDocumentFinder extends Finder {
 	protected abstract ServerResource getResource(Document document, Deque<String> postfix, Deque<String> walked);
 
 
-    protected class DocumentPath {
+    protected static class DocumentPath {
+        Document document;
+        Deque<String> remainder;
+        Deque<String> walked;
+
         public DocumentPath(Document document, Deque<String> path, Deque<String> walked) {
             this.document = document;
             this.remainder = path;
             this.walked = walked;
         }
 
-        public Document document;
-        public Deque<String> remainder;
-        public Deque<String> walked;
     }
 
 }

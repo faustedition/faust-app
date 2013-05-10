@@ -95,7 +95,7 @@ public class Relations {
         }
     }
 
-    public static DataSource createDataSource(File path) {
+    public static BoneCPDataSource createDataSource(File path) {
         final BoneCPDataSource dataSource = new BoneCPDataSource();
         dataSource.setDriverClass(DRIVER_CLASS_NAME);
         dataSource.setJdbcUrl(jdbcUrl(path));

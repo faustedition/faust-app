@@ -4,7 +4,7 @@
 		| <a id="transcript-browse" class="disabled" href="" title="${message('transcript.browse')}">${message('transcript.browse')}</a>
 		| <a id="transcript-structure" class="disabled" href="" title="${message('transcript.structure')}">${message('transcript.structure')}</a>
 		| <a id="transcript-next-page" class="disabled" href="" class="disabled" title="${message('transcript.next_page')}">${message('transcript.next_page')}</a>
-		<#if roles?seq_contains("editor")>
+		<#if roles?seq_contains("editor") || roles?seq_contains("staff")>
 		| <a id="image-link" class="edit-permissions" href="${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}">Text-Image-Linking</a>
 		| <a id="edit-source" class="edit-permissions" href="">XML source</a>
 		</#if>

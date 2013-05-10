@@ -24,22 +24,18 @@ import com.google.common.base.Preconditions;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 
-@Component
-public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
+public class XMLStorage implements Iterable<FaustURI> {
 	private final Pattern xmlFilenamePattern = Pattern.compile("[^\\.]+\\.[xX][mM][lL]$");
 
-	@Autowired
-	private Environment environment;
 
-	private File storageDirectory;
-	private String storagePath;
+	private final File storageDirectory;
+	private final String storagePath;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.storageDirectory = environment.getRequiredProperty("xml.home", File.class);
-		Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getAbsolutePath() + " is a directory");
-		this.storagePath = storageDirectory.getAbsolutePath();
-	}
+
+    public XMLStorage(File storageDirectory) {
+        this.storageDirectory = storageDirectory;
+        this.storagePath = storageDirectory.getAbsolutePath();
+    }
 
 	@Override
 	public Iterator<FaustURI> iterator() {

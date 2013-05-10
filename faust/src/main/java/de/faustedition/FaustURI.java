@@ -6,12 +6,15 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
 public class FaustURI implements Comparable<FaustURI> {
 	public static final String FAUST_SCHEME = "faust";
 
-	private URI uri;
+    private  static final Joiner PATH_JOINER = Joiner.on("/");
+
+    private URI uri;
 
 	public FaustURI(FaustAuthority authority, String path) {
 		try {
@@ -25,15 +28,10 @@ public class FaustURI implements Comparable<FaustURI> {
 		setURI(uri);
 	}
 
-	public static FaustURI fromDeque(Deque<String> path) {
-		final FaustAuthority authority = FaustAuthority.valueOf(path.pop().toUpperCase());
-		String remainder = "";
-		for (final String s: path) {
-			remainder = remainder.concat("/").concat(s);
-		}
-		return new FaustURI(authority, remainder);
-	}
-	
+    public FaustURI(FaustAuthority authority, Deque<String> path) {
+        this(authority, "/" + PATH_JOINER.join(path));
+    }
+
 	protected void setURI(URI uri) {
 		Preconditions.checkArgument(FAUST_SCHEME.equals(uri.getScheme()));
 		Preconditions.checkNotNull(uri.getPath());

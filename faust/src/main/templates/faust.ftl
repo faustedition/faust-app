@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html class="yui3-loading">
 <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>Digitale Faust-Edition: ${title}</title>
 	<link rel="stylesheet" type="text/css" href="<@resources [
         "yui3/build/cssreset/reset-min.css",
@@ -65,7 +66,7 @@
 <div id="top-navigation" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav" style="clear: both">
 	<div class="yui3-menu-content">
 		<ul class="first-of-type">
-			<#if roles?seq_contains("editor") || roles?seq_contains("external")>
+			<#if roles?seq_contains("editor") || roles?seq_contains("external") || roles?seq_contains("staff")>
 			<li>
 				<a href="#demo" class="yui3-menu-label"><em>${message("menu.demo")}</em></a>
 				<div id="demo" class="yui3-menu">
@@ -118,7 +119,7 @@
 			<li class="yui3-menuitem"><a href="${cp}/project/contact" class="yui3-menuitem-content">${message("menu.contact")}</a></li>
 			<li class="yui3-menuitem"><a href="${cp}/project/imprint" class="yui3-menuitem-content">${message("menu.imprint")}</a></li>
 			<li class="yui3-menuitem"><a href="/intern/" class="yui3-menuitem-content">${message("menu.restricted")}</a></li>
-			<#if !roles?seq_contains("editor") && !roles?seq_contains("external")>
+			<#if !roles?seq_contains("editor") && !roles?seq_contains("external") && !roles?seq_contains("staff")>
 			<li class="yui3-menuitem"><a href="${cp}/login" class="yui3-menuitem-content">Login</a></li>
 			</#if>
 		</ul>

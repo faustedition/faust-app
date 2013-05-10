@@ -3,7 +3,7 @@ package de.faustedition.document;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
-import de.faustedition.facsimile.FacsimileFinder;
+import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.template.TemplateRepresentationFactory;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
@@ -31,6 +31,7 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -54,10 +55,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 	private TemplateRepresentationFactory viewFactory;
 
 	@Autowired
-	private IIPInfo iipInfo;
-
-	@Autowired
-	private FacsimileFinder facsimileFinder;
+	private InternetImageServer imageServer;
 
 	@Autowired
 	private XMLStorage xml;
@@ -232,23 +230,13 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 		} else {
 			logger.debug(transcriptURI + " doesn't have image-text links yet");
 
-			iipInfo.retrieve(facsimileUrl());
-			final int width = iipInfo.getWidth();
-			final int height = iipInfo.getHeight();
-
-			/*
-			final DocumentaryTranscript dt = transcript();
-			final FaustURI facsimileURI = dt.getFacsimileReferences().first();
-			final Dimension facsimileDimension = new FacsimileTile(facsimileFinder.findFacsimile(facsimileURI.getPath())).getDimension();
-			final int width = (int) Math.floor(facsimileDimension.getWidth());
-			final int height = (int) Math.floor(facsimileDimension.getHeight());
-			*/
+            final Dimension dimension = imageServer.dimensionOf(facsimileUrl());
 			return new WriterRepresentation(MediaType.IMAGE_SVG) {
 
 				@Override
 				public void write(Writer writer) throws IOException {
-					writer.write("<svg width=\"" + width + "\" height=\""
-						+ height
+					writer.write("<svg width=\"" + dimension.getWidth() + "\" height=\""
+						+ dimension.getHeight()
 						+ "\" xmlns=\"http://www.w3.org/2000/svg\">");
 					writer.write(" <g>");
 					writer.write("  <title>Layer 1</title>");
@@ -277,7 +265,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
         return page();
     }
 
-    protected String facsimileUrl() {
-        return String.format(imageUrlTemplate, page().getFacsimile().getPath().replaceAll("^/", ""));
+    protected FaustURI facsimileUrl() {
+        return page().getFacsimile();
     }
 }

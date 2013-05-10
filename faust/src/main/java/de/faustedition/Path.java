@@ -1,16 +1,9 @@
 package de.faustedition;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Objects;
 import org.restlet.data.Reference;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import java.util.ArrayDeque;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -18,12 +11,7 @@ import com.google.common.collect.Lists;
 public class Path extends ArrayDeque<String> {
 
 	public Path(String path) {
-		super(Lists.newArrayList(Iterables.filter(Arrays.asList(path.replaceAll("^/+", "").replaceAll("/+$", "").split("/+")), new Predicate<String>() {
-			@Override
-			public boolean apply(@Nullable String input) {
-				return !input.isEmpty();
-			}
-		})));
+        super(WebApplication.pathDeque(path));
 	}
 
 	public Path(Reference reference) {

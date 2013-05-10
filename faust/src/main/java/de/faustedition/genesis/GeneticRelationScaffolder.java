@@ -1,37 +1,40 @@
-package de.faustedition.dataimport;
+package de.faustedition.genesis;
 
-import static de.faustedition.xml.Namespaces.TEI_NS_URI;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.inject.Guice;
+import de.faustedition.ConfigurationModule;
+import de.faustedition.DataStoreModule;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
+import de.faustedition.xml.XPathUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.inject.Inject;
+import javax.xml.XMLConstants;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.XMLConstants;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+public class GeneticRelationScaffolder implements Runnable {
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
+	private final XMLStorage xml;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.Runtime;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
-import de.faustedition.xml.XPathUtil;
+    @Inject
+    public GeneticRelationScaffolder(XMLStorage xml) {
+        this.xml = xml;
+    }
 
-public class GeneticRelationScaffolder extends Runtime implements Runnable {
-
-	@Autowired
-	private XMLStorage xml;
-
-	public static void main(String[] args) throws Exception {
-		main(GeneticRelationScaffolder.class, args);
+    public static void main(String[] args) throws Exception {
+        Guice.createInjector(new ConfigurationModule(), new DataStoreModule()).getInstance(GeneticRelationScaffolder.class).run();
 	}
 
 	@Override
@@ -102,10 +105,8 @@ public class GeneticRelationScaffolder extends Runtime implements Runnable {
 				System.out.printf("%s ==> %s\n", Joiner.on(", ").join(intervals), textSource);
 				xml.put(textSource, text);
 			}
-			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.exit(1);
 		}
 	}
 

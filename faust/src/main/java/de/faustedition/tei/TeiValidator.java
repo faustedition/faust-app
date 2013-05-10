@@ -1,5 +1,31 @@
 package de.faustedition.tei;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.inject.Guice;
+import com.thaiopensource.util.PropertyMapBuilder;
+import com.thaiopensource.validate.Schema;
+import com.thaiopensource.validate.ValidateProperty;
+import com.thaiopensource.validate.Validator;
+import com.thaiopensource.validate.rng.SAXSchemaReader;
+import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
+import de.faustedition.ConfigurationModule;
+import de.faustedition.DataStoreModule;
+import de.faustedition.EmailReporter;
+import de.faustedition.EmailReporter.ReportCreator;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.xml.XMLStorage;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+import javax.inject.Inject;
+import javax.xml.XMLConstants;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -10,70 +36,27 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import javax.xml.XMLConstants;
-
-import org.apache.commons.mail.EmailException;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.thaiopensource.util.PropertyMapBuilder;
-import com.thaiopensource.validate.Schema;
-import com.thaiopensource.validate.ValidateProperty;
-import com.thaiopensource.validate.Validator;
-import com.thaiopensource.validate.rng.SAXSchemaReader;
-import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
-
-import de.faustedition.EmailReporter;
-import de.faustedition.EmailReporter.ReportCreator;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.Runtime;
-import de.faustedition.xml.XMLStorage;
-
-public class TeiValidator extends Runtime implements Runnable, InitializingBean {
+public class TeiValidator implements Runnable {
 	private static final URL SCHEMA_RESOURCE = TeiValidator.class.getResource("/faust-tei.rng");
 
-	@Autowired
-	private XMLStorage xml;
+	private final XMLStorage xml;
+    private final EmailReporter reporter;
+	private final Logger logger;
 
-	@Autowired
-	private Logger logger;
+    @Inject
+    public TeiValidator(XMLStorage xml, EmailReporter reporter, Logger logger) {
+        this.xml = xml;
+        this.reporter = reporter;
+        this.logger = logger;
+    }
 
-	@Autowired
-	private EmailReporter reporter;
-
-	private Schema schema;
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		final CustomErrorHandler errorHandler = new CustomErrorHandler();
-
-		final PropertyMapBuilder builder = errorHandler.configurationWithErrorHandler();
-		builder.put(ValidateProperty.XML_READER_CREATOR, new Sax2XMLReaderCreator());
-
-		this.schema = SAXSchemaReader.getInstance().createSchema(new InputSource(SCHEMA_RESOURCE.toString()),
-			builder.toPropertyMap());
-		Preconditions.checkState(errorHandler.getErrors().isEmpty(), "No errors in schema");
-
-		logger.info("Initialized RelaxNG-based TEI validator from " + SCHEMA_RESOURCE);
-	}
-
-	public List<String> validate(FaustURI uri) throws SAXException, IOException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Validating via RelaxNG: " + uri);
+	public List<String> validate(Schema schema, FaustURI uri) throws SAXException, IOException {
+		if (logger.isLoggable(Level.FINE)) {
+			logger.fine("Validating via RelaxNG: " + uri);
 		}
 		final CustomErrorHandler errorHandler = new CustomErrorHandler();
 		final Validator validator = schema.createValidator(errorHandler.configurationWithErrorHandler().toPropertyMap());
@@ -85,30 +68,40 @@ public class TeiValidator extends Runtime implements Runnable, InitializingBean 
 		return errorHandler.getErrors();
 	}
 
-	public boolean isValid(FaustURI uri) throws SAXException, IOException {
-		return validate(uri).isEmpty();
+	public boolean isValid(Schema schema, FaustURI uri) throws SAXException, IOException {
+		return validate(schema, uri).isEmpty();
 	}
 
-	public static void main(String[] args) throws IOException {
-		main(TeiValidator.class, args);
-	}
+	public static void main(String[] args) {
+        Guice.createInjector(new ConfigurationModule(), new DataStoreModule()).getInstance(TeiValidator.class).run();
+    }
 
 	@Override
 	public void run() {
 		try {
-			final SortedSet<FaustURI> xmlErrors = new TreeSet<FaustURI>();
+            final CustomErrorHandler errorHandler = new CustomErrorHandler();
+
+            final PropertyMapBuilder builder = errorHandler.configurationWithErrorHandler();
+            builder.put(ValidateProperty.XML_READER_CREATOR, new Sax2XMLReaderCreator());
+
+            final Schema schema = SAXSchemaReader.getInstance().createSchema(new InputSource(SCHEMA_RESOURCE.toString()), builder.toPropertyMap());
+            Preconditions.checkState(errorHandler.getErrors().isEmpty(), "No errors in schema");
+
+            logger.info("Initialized RelaxNG-based TEI validator from " + SCHEMA_RESOURCE);
+
+            final SortedSet<FaustURI> xmlErrors = new TreeSet<FaustURI>();
 			final SortedMap<FaustURI, String> teiErrors = new TreeMap<FaustURI, String>();
 			for (FaustURI source : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
 				try {
-					final List<String> errors = validate(source);
+					final List<String> errors = validate(schema, source);
 					if (!errors.isEmpty()) {
 						teiErrors.put(source, Joiner.on("\n").join(errors));
 					}
 				} catch (SAXException e) {
-					logger.debug("XML error while validating transcript: " + source, e);
+					logger.log(Level.SEVERE, "XML error while validating transcript: " + source, e);
 					xmlErrors.add(source);
 				} catch (IOException e) {
-					logger.warn("I/O error while validating transcript: " + source, e);
+                    logger.log(Level.WARNING, "I/O error while validating transcript: " + source, e);
 				}
 			}
 
@@ -139,7 +132,7 @@ public class TeiValidator extends Runtime implements Runnable, InitializingBean 
 					}
 				}
 			});
-		} catch (EmailException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
