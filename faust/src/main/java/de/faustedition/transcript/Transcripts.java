@@ -30,9 +30,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerFactory;
@@ -49,22 +49,23 @@ import java.util.Set;
 import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
 import static eu.interedition.text.TextConstants.TEI_NS;
 
-@Component
-public class TranscriptManager {
+@Singleton
+public class Transcripts {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TranscriptManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Transcripts.class);
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
+	private final H2TextRepository<JsonNode> textRepository;
+	private final XMLStorage xml;
+	private final ObjectMapper objectMapper;
 
-	@Autowired
-	private H2TextRepository<JsonNode> textRepository;
-
-	@Autowired
-	private XMLStorage xml;
-
-	@Autowired
-	private ObjectMapper objectMapper;
+    @Inject
+    public Transcripts(DataSource dataSource, H2TextRepository<JsonNode> textRepository, XMLStorage xml, ObjectMapper objectMapper) {
+        this.dataSource = dataSource;
+        this.textRepository = textRepository;
+        this.xml = xml;
+        this.objectMapper = objectMapper;
+    }
 
 
     public Layer<JsonNode> textOf(TranscriptRecord transcript) {
