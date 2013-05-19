@@ -1,5 +1,19 @@
 package de.faustedition.document;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import de.faustedition.FaustURI;
+import de.faustedition.document.MaterialUnit.Type;
+import de.faustedition.graph.Graph;
+import de.faustedition.transcript.TranscriptType;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLBaseTracker;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -10,42 +24,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-
-import de.faustedition.FaustURI;
-import de.faustedition.document.MaterialUnit.Type;
-import de.faustedition.graph.Graph;
-import de.faustedition.transcript.TranscriptType;
-import de.faustedition.xml.Namespaces;
-import de.faustedition.xml.XMLBaseTracker;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
 */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public class DocumentDescriptorHandler extends DefaultHandler {
+public class DocumentDescriptorParser extends DefaultHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DocumentDescriptorHandler.class);
-
-	@Autowired
-	private XMLStorage xml;
+	private static final Logger LOG = Logger.getLogger(DocumentDescriptorParser.class.getName());
 
     private Graph graph;
     private FaustURI source;
@@ -60,37 +47,46 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 	private String metadataKey;
 	private StringBuilder metadataValue;
 
-	private static final Set<String> materialUnitNames = ImmutableSet.of("archivalDocument",
-			"sheet", "leaf", "disjunctLeaf", "page", "patch", "patchSurface");
+	private static final Set<String> materialUnitNames = ImmutableSet.of(
+            "archivalDocument",
+			"sheet",
+            "leaf",
+            "disjunctLeaf",
+            "page",
+            "patch",
+            "patchSurface"
+    );
 	
-	private static final Map<String, String> legacyNames;
+	private static final Map<String, String> legacyNames = new HashMap<String, String>();
 	static {
-		legacyNames = new HashMap<String, String>();
 		legacyNames.put("idno", "callnumber");
 		legacyNames.put("repository", "archive");
 	}
 	
-	private static final Map<String, String> valueAttribute;
+	private static final Map<String, String> valueAttribute = new HashMap<String, String>();;
 	static {
-		valueAttribute = new HashMap<String, String>();
 		valueAttribute.put("textTranscript", "uri");
 		valueAttribute.put("docTranscript", "uri");
 	}
 
 
-    public Document handle(Graph graph, FaustURI source) throws IOException, SAXException {
+    public Document parse(XMLStorage xml, Graph graph, FaustURI source) throws IOException, SAXException {
         this.graph = graph;
 		this.source = source;
 		this.baseTracker = new XMLBaseTracker(source.toString());
 		this.materialUnitCollection = graph.getMaterialUnits();
 
         XMLUtil.saxParser().parse(xml.getInputSource(source), this);
-        if (document != null) {
-            document.index();
+        if (document == null) {
+            return null;
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Read " + source + " into " + document + "[" +  document.node.getId() + "]");
+
+        document.index();
+
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Read " + source + " into " + document + "[" +  document.node.getId() + "]");
         }
+
         return document;
 	}
 
@@ -221,12 +217,12 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		}
 	}
 
-	private void calculateMetadata(MaterialUnit subject) {
+	private void calculateMetadata(MaterialUnit subject) throws SAXException {
 		if (subject instanceof Document) {
 			
 			List<String> repositories = metadata.get("archive");
 			if (repositories == null || repositories.size() != 1) { 
-				throw new DocumentDescriptorInvalidException("Document descriptor for " + this.source + " invalid: Document must be in exactly one repository.");
+				throw new SAXException("Document descriptor for " + this.source + " invalid: Document must be in exactly one repository.");
 			} else {
 				HashSet<String> metadataKeys = Sets.newHashSet(metadata.keySet());
 				for(String key : metadataKeys) {

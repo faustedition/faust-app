@@ -2,6 +2,8 @@ package de.faustedition.document;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
 import de.faustedition.WebApplication;
 import de.faustedition.graph.Graph;
 import de.faustedition.template.Templates;
@@ -34,6 +36,8 @@ import static de.faustedition.xml.XPathUtil.xpath;
 @Singleton
 public class ArchiveResource {
 
+    public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
+
     private final XMLStorage xmlStorage;
     private final GraphDatabaseService graphDatabaseService;
     private final Templates templates;
@@ -50,7 +54,7 @@ public class ArchiveResource {
         return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
             @Override
             public Response execute(Graph graph) throws Exception {
-                final org.w3c.dom.Document archives = XMLUtil.parse(xmlStorage.getInputSource(ArchiveInitializer.ARCHIVE_DESCRIPTOR_URI));
+                final org.w3c.dom.Document archives = XMLUtil.parse(xmlStorage.getInputSource(ARCHIVE_DESCRIPTOR_URI));
 
                 final Map<String, Object> model = new HashMap<String, Object>();
                 model.put("archives", archives.getDocumentElement());
@@ -66,7 +70,7 @@ public class ArchiveResource {
             return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
                 @Override
                 public Response execute(Graph graph) throws Exception {
-                    final org.w3c.dom.Document archives = XMLUtil.parse(xmlStorage.getInputSource(ArchiveInitializer.ARCHIVE_DESCRIPTOR_URI));
+                    final org.w3c.dom.Document archives = XMLUtil.parse(xmlStorage.getInputSource(ARCHIVE_DESCRIPTOR_URI));
                     final Archive archive = graph.getArchives().findById(id);
                     if (archive == null) {
                         throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());

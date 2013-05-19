@@ -261,10 +261,6 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 		};
 	}
 
-    private MaterialUnit transcript() {
-        return page();
-    }
-
     protected FaustURI facsimileUrl() {
         return page().getFacsimile();
     }

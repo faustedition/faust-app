@@ -1,5 +1,6 @@
 package de.faustedition;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
@@ -14,6 +15,8 @@ import java.util.Deque;
 public class WebApplication {
 
     private static final Splitter PATH_SPLITTER = Splitter.on('/').omitEmptyStrings();
+    private  static final Joiner PATH_JOINER = Joiner.on("/");
+
 
     public static RuntimeException propagateExceptions(Throwable t) throws WebApplicationException {
         final Throwable rootCause = Throwables.getRootCause(t);
@@ -27,4 +30,7 @@ public class WebApplication {
         return pathDeque;
     }
 
+    public static String path(Deque<String> pathDeque) {
+        return PATH_JOINER.join(pathDeque);
+    }
 }

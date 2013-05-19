@@ -1,4 +1,4 @@
-package de.faustedition;
+package de.faustedition.text;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -20,9 +20,6 @@ public class VerseInterval {
 	protected String name;
 	protected int start;
 	protected int end;
-
-	public VerseInterval() {
-	}
 
 	public VerseInterval(String name, int start, int end) {
 		this.name = name;
@@ -79,12 +76,8 @@ public class VerseInterval {
 		return scenes;
 	}
 
-	public static VerseInterval fromRequestAttibutes(Map<String, Object> requestAttributes) throws ResourceException {
+	public static VerseInterval fromRequestAttibutes(int part, int actOrScene, int scene) throws ResourceException {
 		try {
-			final int part = Integer.parseInt((String) requestAttributes.get("part"));
-			final int actOrScene = Integer.parseInt(Objects.firstNonNull((String) requestAttributes.get("act_scene"), "0"));
-			final int scene = Integer.parseInt(Objects.firstNonNull((String) requestAttributes.get("scene"), "0"));
-
 			switch (part) {
 				case 0:
 				case 1:

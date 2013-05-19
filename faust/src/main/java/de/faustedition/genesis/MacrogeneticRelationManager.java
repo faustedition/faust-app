@@ -1,32 +1,29 @@
 package de.faustedition.genesis;
 
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.document.Document;
+import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.graph.Graph;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Relationship;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Relationship;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.document.Document;
-import de.faustedition.graph.Graph;
-import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.xml.Namespaces;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
-
-@Component
 public class MacrogeneticRelationManager {
 
 
@@ -36,70 +33,60 @@ public class MacrogeneticRelationManager {
 	public static final FaustURI MACROGENETIC_URI = new FaustURI(FaustAuthority.XML, "/genesis/");
 	
 	public static final String SOURCE_PROPERTY = "source";
-	@Autowired
-	private XMLStorage xml;
 
-	@Autowired
-	private GraphDatabaseService db;
-	
-	@Autowired
-	private Graph graph;
+	private final XMLStorage xml;
+	private final GraphDatabaseService db;
+	private final Logger logger;
 
-	@Autowired
-	private Logger logger;
+    @Inject
+    public MacrogeneticRelationManager(XMLStorage xml, GraphDatabaseService db, Logger logger) {
+        this.xml = xml;
+        this.db = db;
+        this.logger = logger;
+    }
 
-    @Transactional
-	public Set<FaustURI> feedGraph() {
+	public Set<FaustURI> feedGraph(Graph graph) {
 		logger.info("Feeding macrogenetic data into graph");
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		for (final FaustURI macrogeneticFile: xml.iterate(new FaustURI(FaustAuthority.XML, "/macrogenesis"))) {
             try {
-                logger.debug("Parsing macrogenetic file " + macrogeneticFile);
-                evaluate(macrogeneticFile);
+                logger.fine("Parsing macrogenetic file " + macrogeneticFile);
+                logger.fine("Adding macrogenetic relations from " + macrogeneticFile);
+                parse(macrogeneticFile, graph);
             } catch (SAXException e) {
-                logger.error("XML error while adding macrogenetic file " + macrogeneticFile, e);
+                logger.log(Level.SEVERE, "XML error while adding macrogenetic file " + macrogeneticFile, e);
                 failed.add(macrogeneticFile);
             } catch (IOException e) {
-                logger.error("I/O error while adding macrogenetic file " + macrogeneticFile, e);
+                logger.log(Level.SEVERE, "I/O error while adding macrogenetic file " + macrogeneticFile, e);
                 failed.add(macrogeneticFile);
             }
 		}
-		logger.debug("Found genetic sources: ");
+		logger.fine("Found genetic sources: ");
 		for (GeneticSource gs : graph.getGeneticSources())
-			logger.debug(gs.getUri().toString());
+			logger.fine(gs.getUri().toString());
 		return failed;
 	};
 
-	private void evaluate(FaustURI source) throws SAXException, IOException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Adding macrogenetic relations from " + source);
-		}
-
-		parse(source);
-            
-		
-	}
-	
 	private void setRelationship(MGRelationship r, FaustURI source, FaustURI geneticSource) {
 		Document from = Document.findByUri(db, r.from);
 		if (from == null) {
-			logger.warn(r.from + " unknown, but referenced in " + source);
+			logger.warning(r.from + " unknown, but referenced in " + source);
 			return;
 		}
 
 		Document to = Document.findByUri(db, r.to);
 		if (to == null) {
-			logger.warn(r.to + " unknown, but referenced in " + source);
+			logger.warning(r.to + " unknown, but referenced in " + source);
 			return;
 		}
 		
-        logger.debug("Adding: " + r.from + " ---" + r.type.name() + "---> " + r.to);
+        logger.fine("Adding: " + r.from + " ---" + r.type.name() + "---> " + r.to);
         try {
         	Relationship rel =  from.node.createRelationshipTo(to.node, r.type);
         	rel.setProperty(SOURCE_PROPERTY, source.toString());
         	rel.setProperty(Document.GENETIC_SOURCE_PROPERTY, geneticSource.toString());
         } catch (Exception e) {
-        	logger.warn("Could not create relationship " + r.from + " ---" + r.type.name() + "---> " + r.to + ". Reason: " + e.getMessage());
+        	logger.warning("Could not create relationship " + r.from + " ---" + r.type.name() + "---> " + r.to + ". Reason: " + e.getMessage());
         }
 	}
 
@@ -113,7 +100,7 @@ public class MacrogeneticRelationManager {
 		}
 	}
 
-	public void parse(final FaustURI source) throws SAXException, IOException {
+	public void parse(final FaustURI source, final Graph graph) throws SAXException, IOException {
 
 
 		//final Set<MGRelationship> relationships = new HashSet<MGRelationship>();
@@ -136,7 +123,7 @@ public class MacrogeneticRelationManager {
 					} else if("temp-syn".equals(attributes.getValue("name"))) {
 						type = TEMP_SYN_REL;
 					}  else {
-						logger.warn("The relation " + attributes.getValue("name") + " is unknown.");
+						logger.warning("The relation " + attributes.getValue("name") + " is unknown.");
 						type = null;
 					}
 					this.relationship = new MGRelationship(null, null, type);
@@ -148,9 +135,9 @@ public class MacrogeneticRelationManager {
 								try {
 									relationship.from = new FaustURI(new URI(itemURI));
 								} catch (URISyntaxException e) {
-									logger.warn("Invalid URI '" + itemURI);
+									logger.warning("Invalid URI '" + itemURI);
 								} catch (IllegalArgumentException e) {
-									logger.warn("Invalid Faust URI " + itemURI);
+									logger.warning("Invalid Faust URI " + itemURI);
 								} 
 								
 							} else {
@@ -158,13 +145,13 @@ public class MacrogeneticRelationManager {
 								try {
 									relationship.to = new FaustURI(new URI(itemURI));
 								} catch (URISyntaxException e) {
-									logger.warn("Invalid URI '" + itemURI);
+									logger.warning("Invalid URI '" + itemURI);
 								} catch (IllegalArgumentException e) {
-									logger.warn("Invalid Faust URI " + itemURI);
+									logger.warning("Invalid Faust URI " + itemURI);
 								}
 
 								if (relationship.to != null && relationship.type != null) {
-									logger.debug("Parsed: " + relationship.from + " ---" + relationship.type.name() + "---> " + relationship.to);
+									logger.fine("Parsed: " + relationship.from + " ---" + relationship.type.name() + "---> " + relationship.to);
 
 //									for (FaustURI geneticSourceURI: geneticSourceURIs) {
 //										setRelationship(relationship, source, geneticSourceURI);
@@ -195,9 +182,9 @@ public class MacrogeneticRelationManager {
 								geneticSources.add(new GeneticSource(db, new FaustURI(new URI(sourceURI))));
 							geneticSourceURIs.add(new FaustURI(new URI(sourceURI)));
 						} catch (URISyntaxException e) {
-							logger.warn("Invalid URI '" + sourceURI);
+							logger.warning("Invalid URI '" + sourceURI);
 						} catch (IllegalArgumentException e) {
-							logger.warn("Invalid Faust URI " + sourceURI);
+							logger.warning("Invalid Faust URI " + sourceURI);
 						}
 					}
 				}	
