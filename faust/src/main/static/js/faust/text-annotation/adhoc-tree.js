@@ -145,7 +145,7 @@ YUI.add('adhoc-tree', function (Y) {
 	Y.extend(AnnotationNode, AdhocNode, {
 
 		_textNodesForPartitions: function(start, end, parent) {
-			var partitions = transcript.partition(null, start, end);
+			var partitions = this.transcript().partition(null, start, end);
 			var textNodes = Y.Array.map(partitions, function(partition) {
 				return new TextNode(new Y.Faust.Range(partition.start, partition.end), parent);
 			});
@@ -158,7 +158,7 @@ YUI.add('adhoc-tree', function (Y) {
 			var to = end;
 			while (true) {
 
-				var annotation = _outermostAnnotation(transcript, from, end, this.filter(), annotationStack, this.annotation);
+				var annotation = _outermostAnnotation(this.transcript(), from, end, this.filter(), annotationStack, this.annotation);
 				if (annotation) {
 
 					// there is a sibling non-text node
