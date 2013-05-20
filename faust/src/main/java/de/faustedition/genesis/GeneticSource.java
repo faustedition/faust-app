@@ -7,6 +7,8 @@ import de.faustedition.FaustURI;
 import de.faustedition.graph.Graph;
 import de.faustedition.graph.NodeWrapper;
 
+import java.net.URI;
+
 public class GeneticSource extends NodeWrapper {
 
 	public static final String PREFIX = Graph.PREFIX + ".geneticSource";
@@ -27,6 +29,6 @@ public class GeneticSource extends NodeWrapper {
 	}
 
 	public FaustURI getUri() {
-		return FaustURI.parse((String) node.getProperty(URI_KEY));
+		return new FaustURI(URI.create((String) node.getProperty(URI_KEY)));
 	}
 }

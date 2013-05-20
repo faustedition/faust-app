@@ -1,9 +1,9 @@
 package de.faustedition.document;
 
 import de.faustedition.FaustURI;
-import de.faustedition.WebApplication;
+import de.faustedition.http.WebApplication;
 import de.faustedition.graph.Graph;
-import de.faustedition.template.Templates;
+import de.faustedition.Templates;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;

@@ -2,7 +2,7 @@ package de.faustedition;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import de.faustedition.json.CompactTextModule;
+import de.faustedition.http.CompactTextModule;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.inject.Singleton;

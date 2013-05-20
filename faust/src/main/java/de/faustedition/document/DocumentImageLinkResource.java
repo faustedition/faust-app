@@ -4,7 +4,7 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.Graph;
-import de.faustedition.template.Templates;
+import de.faustedition.Templates;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;

@@ -13,7 +13,8 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.server.impl.container.filter.NormalizeFilter;
-import de.faustedition.json.ObjectMapperMessageBodyReaderWriter;
+import de.faustedition.http.CrossOriginResourceSharingContainerFilter;
+import de.faustedition.http.ObjectMapperMessageBodyReaderWriter;
 
 import javax.inject.Singleton;
 import javax.ws.rs.ext.Provider;

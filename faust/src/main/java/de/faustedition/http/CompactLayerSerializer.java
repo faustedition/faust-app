@@ -1,4 +1,4 @@
-package de.faustedition.json;
+package de.faustedition.http;
 
 import de.faustedition.xml.CustomNamespaceContext;
 import eu.interedition.text.Layer;

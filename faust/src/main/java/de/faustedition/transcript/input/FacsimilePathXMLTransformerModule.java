@@ -8,6 +8,8 @@ import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
 import org.codehaus.jackson.JsonNode;
 
+import java.net.URI;
+
 public class FacsimilePathXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode> {
 
 	private boolean read = false;
@@ -27,7 +29,7 @@ public class FacsimilePathXMLTransformerModule extends XMLTransformerModuleAdapt
 			return;
 		}
 		try {
-			materialUnit.setFacsimile(FaustURI.parse(url));
+			materialUnit.setFacsimile(new FaustURI(URI.create(url)));
 			read = true;
 		} catch (IllegalArgumentException e){
 			throw new TranscriptInvalidException("Invalid facsimile URI in transcript!");

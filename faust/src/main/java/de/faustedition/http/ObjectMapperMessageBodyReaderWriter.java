@@ -1,4 +1,4 @@
-package de.faustedition.json;
+package de.faustedition.http;
 
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import org.codehaus.jackson.map.ObjectMapper;

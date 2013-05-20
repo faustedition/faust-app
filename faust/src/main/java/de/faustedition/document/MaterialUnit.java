@@ -11,6 +11,7 @@ import de.faustedition.graph.NodeWrapperCollection;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
+import java.net.URI;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -86,7 +87,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 
 	public FaustURI getFacsimile() {
 		final String uri = (String) node.getProperty(PREFIX + ".facsimile", null);
-		return (uri == null ? null :FaustURI.parse(uri));
+		return (uri == null ? null : new FaustURI(URI.create(uri)));
 	}
 
 	public Type getType() {
@@ -111,7 +112,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 
 	public FaustURI getTranscriptSource() {
 		final String uri = (String) node.getProperty(PREFIX + ".transcript", null);
-		return (uri == null ? null :FaustURI.parse(uri));
+		return (uri == null ? null : new FaustURI(URI.create(uri)));
 	}
 
 	public void setTranscriptSource(FaustURI source) {

@@ -1,4 +1,4 @@
-package de.faustedition;
+package de.faustedition.http;
 
 import com.google.common.base.Objects;
 import com.sun.jersey.spi.container.ContainerRequest;

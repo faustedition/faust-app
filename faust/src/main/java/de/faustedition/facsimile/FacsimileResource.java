@@ -3,7 +3,7 @@ package de.faustedition.facsimile;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
-import de.faustedition.WebApplication;
+import de.faustedition.http.WebApplication;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;

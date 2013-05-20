@@ -13,6 +13,7 @@ import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -91,7 +92,7 @@ public class XMLStorage implements Iterable<FaustURI> {
 			if (walked != null)
 				walked.add(next);
 			if (isDirectory(nextURI)) {
-				uri = FaustURI.parse(nextURI.toString() + "/");
+				uri = new FaustURI(URI.create(nextURI.toString() + "/"));
 				continue;
 			} else if (isResource(nextURI)) {
 				uri = nextURI;

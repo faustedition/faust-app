@@ -1,9 +1,10 @@
-package de.faustedition;
+package de.faustedition.http;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
+import de.faustedition.Server;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;

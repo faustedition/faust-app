@@ -1,13 +1,9 @@
 package de.faustedition;
 
+import com.google.common.base.Preconditions;
+
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 
 public class FaustURI implements Comparable<FaustURI> {
 	public static final String FAUST_SCHEME = "faust";
@@ -16,7 +12,7 @@ public class FaustURI implements Comparable<FaustURI> {
 
 	public FaustURI(FaustAuthority authority, String path) {
 		try {
-			setURI(new URI(FAUST_SCHEME, authority.name().toLowerCase(), path, null));
+			setURI(new URI(FAUST_SCHEME, authority.name().toLowerCase(), "/" + path.replaceAll("^/+", ""), null));
 		} catch (URISyntaxException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -26,21 +22,12 @@ public class FaustURI implements Comparable<FaustURI> {
 		setURI(uri);
 	}
 
-    public FaustURI(FaustAuthority authority, Deque<String> path) {
-        this(authority, "/" + WebApplication.path(path));
-    }
-
 	protected void setURI(URI uri) {
 		Preconditions.checkArgument(FAUST_SCHEME.equals(uri.getScheme()));
 		Preconditions.checkNotNull(uri.getPath());
 		Preconditions.checkNotNull(uri.getAuthority());
 		Preconditions.checkNotNull(FaustAuthority.valueOf(uri.getAuthority().toUpperCase()));
 		this.uri = uri;
-	}
-
-	public static FaustURI parse(String uriStr) {
-		return new FaustURI(URI.create(uriStr));
-
 	}
 
 	public FaustAuthority getAuthority() {
@@ -121,9 +108,5 @@ public class FaustURI implements Comparable<FaustURI> {
 		final String basename = uriPath.substring(basenameStart + 1, basenameEnd);
 		final String folderName = uriPath.substring(folderNameStart + 1, basenameStart);
 		return basename.equalsIgnoreCase(folderName);
-	}
-
-	public static Deque<String> toPathDeque(String path) {
-		return new ArrayDeque<String>(Arrays.asList(path.replaceAll("^/+", "").replaceAll("/+$", "").split("/+")));
 	}
 }

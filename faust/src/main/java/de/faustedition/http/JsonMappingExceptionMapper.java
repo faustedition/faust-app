@@ -1,4 +1,4 @@
-package de.faustedition.json;
+package de.faustedition.http;
 
 import org.codehaus.jackson.map.JsonMappingException;
 

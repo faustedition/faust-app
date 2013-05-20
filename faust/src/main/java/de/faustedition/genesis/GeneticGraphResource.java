@@ -2,19 +2,17 @@ package de.faustedition.genesis;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import de.faustedition.WebApplication;
+import de.faustedition.http.WebApplication;
 import de.faustedition.document.Archive;
 import de.faustedition.document.Document;
 import de.faustedition.graph.Graph;
-import de.faustedition.template.Templates;
+import de.faustedition.Templates;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;

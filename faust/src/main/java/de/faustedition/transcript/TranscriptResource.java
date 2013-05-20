@@ -2,11 +2,11 @@ package de.faustedition.transcript;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import de.faustedition.WebApplication;
+import de.faustedition.http.WebApplication;
 import de.faustedition.document.Archive;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.Graph;
-import de.faustedition.template.Templates;
+import de.faustedition.Templates;
 import eu.interedition.text.Anchor;
 import eu.interedition.text.Layer;
 import eu.interedition.text.Name;

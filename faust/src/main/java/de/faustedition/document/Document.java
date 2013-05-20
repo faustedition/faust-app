@@ -50,7 +50,7 @@ public class Document extends MaterialUnit {
 	}
 
 	public FaustURI getSource() {
-		return FaustURI.parse((String) node.getProperty(SOURCE_KEY));
+		return new FaustURI(URI.create((String) node.getProperty(SOURCE_KEY)));
 	}
 
 	public void setSource(FaustURI uri) {

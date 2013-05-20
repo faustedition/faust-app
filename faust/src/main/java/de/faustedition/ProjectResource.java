@@ -1,7 +1,6 @@
 package de.faustedition;
 
 import com.google.common.collect.Maps;
-import de.faustedition.template.Templates;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

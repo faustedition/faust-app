@@ -1,4 +1,4 @@
-package de.faustedition.json;
+package de.faustedition.http;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

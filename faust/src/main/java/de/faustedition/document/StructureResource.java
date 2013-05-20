@@ -3,8 +3,8 @@ package de.faustedition.document;
 import com.google.common.collect.Maps;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.WebApplication;
-import de.faustedition.template.Templates;
+import de.faustedition.http.WebApplication;
+import de.faustedition.Templates;
 import de.faustedition.xml.XMLStorage;
 
 import javax.inject.Inject;
@@ -43,7 +43,7 @@ public class StructureResource {
         pathDeque.addFirst("archival");
         pathDeque.addFirst("structure");
 
-        final FaustURI uri = new FaustURI(FaustAuthority.XML, pathDeque);
+        final FaustURI uri = new FaustURI(FaustAuthority.XML, WebApplication.path(pathDeque));
         if (!xml.isResource(uri)) {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(uri.toString()).build());
         }
