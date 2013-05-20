@@ -1,20 +1,10 @@
 package de.faustedition.document;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import com.google.common.collect.Maps;
-import de.faustedition.WebApplication;
-
-import de.faustedition.template.Templates;
-import org.restlet.resource.Finder;
-import org.restlet.resource.ServerResource;
-
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
+import de.faustedition.WebApplication;
+import de.faustedition.template.Templates;
 import de.faustedition.xml.XMLStorage;
 
 import javax.inject.Inject;
@@ -28,6 +18,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.util.Deque;
+import java.util.Map;
 
 
 @Path("/structure")

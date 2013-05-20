@@ -1,17 +1,12 @@
 package de.faustedition.text;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-
-import org.restlet.data.Status;
-import org.restlet.resource.ResourceException;
-
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import java.util.Comparator;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -76,30 +71,26 @@ public class VerseInterval {
 		return scenes;
 	}
 
-	public static VerseInterval fromRequestAttibutes(int part, int actOrScene, int scene) throws ResourceException {
-		try {
-			switch (part) {
-				case 0:
-				case 1:
-					if (actOrScene == 0) {
-						return VerseInterval.ofPart(part);
-					}
-					return VerseInterval.ofScene(part, actOrScene);
-				case 2:
-					if (actOrScene == 0) {
-						return VerseInterval.ofPart(part);
-					}
-					if (scene == 0) {
-						return VerseInterval.ofAct(part, actOrScene);
-					} else {
-						return VerseInterval.ofScene(part, actOrScene, scene);
-					}
-				default:
-					throw new IllegalArgumentException("Part " + part);
-			}
-		} catch (IllegalArgumentException e) {
-			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
-		}
+	public static VerseInterval fromRequestAttibutes(int part, int actOrScene, int scene) {
+        switch (part) {
+            case 0:
+            case 1:
+                if (actOrScene == 0) {
+                    return VerseInterval.ofPart(part);
+                }
+                return VerseInterval.ofScene(part, actOrScene);
+            case 2:
+                if (actOrScene == 0) {
+                    return VerseInterval.ofPart(part);
+                }
+                if (scene == 0) {
+                    return VerseInterval.ofAct(part, actOrScene);
+                } else {
+                    return VerseInterval.ofScene(part, actOrScene, scene);
+                }
+            default:
+                throw new IllegalArgumentException("Part " + part);
+        }
 	}
 
 	public static VerseInterval ofPart(int part) {

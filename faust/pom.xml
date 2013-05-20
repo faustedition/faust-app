@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.faustedition</groupId>
-	<artifactId>faust</artifactId>
-	<version>1.3-SNAPSHOT</version>
-	<name>Digitale Faust-Edition</name>
-	<packaging>jar</packaging>
-	<dependencies>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>de.faustedition</groupId>
+    <artifactId>faust</artifactId>
+    <version>1.3-SNAPSHOT</version>
+    <name>Digitale Faust-Edition</name>
+    <packaging>jar</packaging>
+    <dependencies>
         <dependency>
             <groupId>javax.media</groupId>
             <artifactId>jai_core</artifactId>
@@ -24,10 +24,10 @@
             <version>1.1</version>
         </dependency>
         <dependency>
-			<groupId>de.faustedition</groupId>
-			<artifactId>faust-schema</artifactId>
-			<version>1.3</version>
-		</dependency>
+            <groupId>de.faustedition</groupId>
+            <artifactId>faust-schema</artifactId>
+            <version>1.3</version>
+        </dependency>
         <dependency>
             <groupId>eu.interedition</groupId>
             <artifactId>text-core</artifactId>
@@ -40,10 +40,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>14.0.1</version>
-		</dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>14.0.1</version>
+        </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
@@ -64,106 +64,42 @@
             <artifactId>jersey-grizzly2</artifactId>
             <version>${jersey.version}</version>
         </dependency>
-
         <dependency>
-      <groupId>org.neo4j</groupId>
-      <artifactId>neo4j</artifactId>
-      <version>1.8</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.neo4j</groupId>
-          <artifactId>neo4j-cypher</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.neo4j</groupId>
-          <artifactId>neo4j-graph-matching</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.neo4j</groupId>
-          <artifactId>neo4j-graph-algo</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.neo4j</groupId>
-          <artifactId>neo4j-jmx</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.neo4j</groupId>
-          <artifactId>neo4j-udc</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+            <version>1.8</version>
             <exclusions>
                 <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-cypher</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-graph-matching</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-graph-algo</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-jmx</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-udc</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-    <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-            <version>${spring.version}</version>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>1.6.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>2.2</version>
-        </dependency>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>1.6.2</version>
-		</dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.9.10</version>
-        </dependency>
-		<dependency>
-			<groupId>org.restlet.jse</groupId>
-			<artifactId>org.restlet</artifactId>
-			<version>${restlet.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.restlet.jse</groupId>
-			<artifactId>org.restlet.ext.freemarker</artifactId>
-            <version>${restlet.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.restlet.jse</groupId>
-			<artifactId>org.restlet.ext.xml</artifactId>
-            <version>${restlet.version}</version>
-        </dependency>
-		<dependency>
-			<groupId>org.restlet.jse</groupId>
-			<artifactId>org.restlet.ext.simple</artifactId>
-            <version>${restlet.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache-core</artifactId>
-            <version>2.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
@@ -181,20 +117,25 @@
             <version>0.7.1.RELEASE</version>
         </dependency>
         <dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-email</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>thaiopensource</groupId>
-			<artifactId>jing</artifactId>
-			<version>20030619</version>
-		</dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.19</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>thaiopensource</groupId>
+            <artifactId>jing</artifactId>
+            <version>20030619</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -211,37 +152,37 @@
             <version>${slf4j.version}</version>
         </dependency>
         <dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
             <resource>
                 <directory>src/main/config</directory>
             </resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<filtering>true</filtering>
-			</testResource>
-		</testResources>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
@@ -264,7 +205,9 @@
                 <configuration>
                     <jdbc>
                         <driver>org.h2.Driver</driver>
-                        <url>jdbc:h2://${project.basedir}/data/relations;INIT=RUNSCRIPT FROM '${project.basedir}/src/main/resources/db-schema.sql'</url>
+                        <url>jdbc:h2://${project.basedir}/data/relations;INIT=RUNSCRIPT FROM
+                            '${project.basedir}/src/main/resources/db-schema.sql'
+                        </url>
                         <user>sa</user>
                         <password></password>
                     </jdbc>
@@ -298,12 +241,12 @@
                     <useAsterikClassPath>true</useAsterikClassPath>
                     <extraJvmArguments>-Dfile.encoding=UTF-8 -Xmx512m</extraJvmArguments>
                     <programs>
-                    <!--
-                        <program>
-                            <mainClass>de.faustedition.Server</mainClass>
-                            <name>faust-server</name>
-                        </program>
-                    -->
+                        <!--
+                            <program>
+                                <mainClass>de.faustedition.Server</mainClass>
+                                <name>faust-server</name>
+                            </program>
+                        -->
                     </programs>
                     <daemons>
                         <daemon>
@@ -313,7 +256,8 @@
                                 <maxMemorySize>512M</maxMemorySize>
                                 <systemProperties>
                                     <systemProperty>file.encoding=UTF-8</systemProperty>
-                                    <systemProperty>java.util.logging.config.file=etc/logging.properties</systemProperty>
+                                    <systemProperty>java.util.logging.config.file=etc/logging.properties
+                                    </systemProperty>
                                 </systemProperties>
                             </jvmSettings>
                             <generatorConfigurations>
@@ -358,13 +302,13 @@
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
-		</plugins>
-	</build>
-	<repositories>
-		<repository>
-			<id>restlet</id>
-			<url>http://maven.restlet.org</url>
-		</repository>
+        </plugins>
+    </build>
+    <repositories>
+        <repository>
+            <id>restlet</id>
+            <url>http://maven.restlet.org</url>
+        </repository>
         <repository>
             <id>osgeo-geotools</id>
             <url>http://download.osgeo.org/webdav/geotools/</url>

@@ -2,13 +2,9 @@ package de.faustedition.transcript;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import de.faustedition.text.VerseInterval;
 import de.faustedition.document.MaterialUnit;
+import de.faustedition.text.VerseInterval;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.restlet.data.Status;
-import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
-import org.restlet.resource.ResourceException;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -25,7 +21,7 @@ import java.util.SortedMap;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Path("/transcript/by-scene/")
+@Path("/transcript/by-scene/{part}")
 public class SceneStatisticsResource {
 
 	private final DataSource dataSource;
@@ -37,9 +33,7 @@ public class SceneStatisticsResource {
         this.graphDatabaseService = graphDatabaseService;
     }
 
-
     @GET
-    @Path("{part}")
     @Produces(MediaType.APPLICATION_JSON)
 	public List<Map<String, Object>> sceneStatistics(@PathParam("part") int part) {
         final SortedMap<VerseInterval,Integer> sceneStatistics = Maps.newTreeMap(VerseInterval.INTERVAL_COMPARATOR);

@@ -15,9 +15,6 @@ import eu.interedition.text.h2.H2TextRepository;
 import org.codehaus.jackson.JsonNode;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
-import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
-import org.springframework.ui.ModelMap;
 import org.xml.sax.InputSource;
 
 import javax.inject.Inject;

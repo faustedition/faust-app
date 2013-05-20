@@ -6,8 +6,6 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.WebApplication;
 import de.faustedition.graph.Graph;
-import org.restlet.data.Status;
-import org.restlet.resource.ResourceException;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

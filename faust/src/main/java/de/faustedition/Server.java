@@ -12,13 +12,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@org.springframework.stereotype.Component
 public class Server extends AbstractIdleService {
 
     private static final Logger LOG = Logger.getLogger(Server.class.getName());

@@ -1,21 +1,13 @@
 package de.faustedition.search;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-
-import de.faustedition.graph.Graph;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.restlet.resource.ServerResource;
-
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import de.faustedition.document.Document;
+import de.faustedition.graph.Graph;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -24,6 +16,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

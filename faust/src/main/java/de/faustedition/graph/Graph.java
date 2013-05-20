@@ -9,14 +9,12 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-import org.springframework.stereotype.Component;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
-@Component
 public class Graph {
     private static final Logger LOG = Logger.getLogger(Graph.class.getName());
 
