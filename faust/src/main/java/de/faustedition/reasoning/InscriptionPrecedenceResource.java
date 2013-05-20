@@ -80,14 +80,15 @@ public class InscriptionPrecedenceResource {
     }
 
     @Path("/{part}/{act_scene}")
-    public void act(@PathParam("part") int part, @PathParam("act_scene") int act) {
+    public String act(@PathParam("part") int part, @PathParam("act_scene") int act) {
         final VerseInterval verseInterval = VerseInterval.fromRequestAttibutes(part, act, 0);
-
+        return null;
     }
 
     @Path("/{part}/{act_scene}/{scene}")
-    public void scene(@PathParam("part") int part, @PathParam("act_scene") int act, @PathParam("scene") int scene) {
+    public String scene(@PathParam("part") int part, @PathParam("act_scene") int act, @PathParam("scene") int scene) {
         final VerseInterval verseInterval = VerseInterval.fromRequestAttibutes(part, act, scene);
+        return null;
     }
 
     Map<Inscription, Node> nodeMap(VerseInterval verseInterval) {

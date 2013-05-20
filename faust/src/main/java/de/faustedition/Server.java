@@ -21,7 +21,7 @@ public class Server extends AbstractIdleService {
 
     private static final Logger LOG = Logger.getLogger(Server.class.getName());
 
-    private Set<Service> services = Sets.newHashSet();
+    private final Set<Service> services = Sets.newHashSet();
     private Injector injector;
 
     /**

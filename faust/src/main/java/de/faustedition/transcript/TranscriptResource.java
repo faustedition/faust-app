@@ -18,6 +18,7 @@ import org.neo4j.graphdb.NotFoundException;
 import org.xml.sax.InputSource;
 
 import javax.inject.Inject;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -60,6 +61,7 @@ public class TranscriptResource {
         this.templates = templates;
     }
 
+    @GET
     @Path("/{id}")
     public Response page(@PathParam("id") final long id, @Context final Request request, @Context final SecurityContext sc) {
         return Graph.execute(db, new Graph.Transaction<Response>() {
@@ -84,6 +86,7 @@ public class TranscriptResource {
         });
     }
 
+    @GET
     @Path("/source/{id}")
     @Produces(MediaType.APPLICATION_XML)
     public Source xml(@PathParam("id") final long id) {
@@ -106,6 +109,7 @@ public class TranscriptResource {
         }
     }
 
+    @GET
     @Path("/source/{id}")
     @Produces(MediaType.TEXT_PLAIN)
     public String plainText(@PathParam("id") final long id) {
@@ -121,6 +125,7 @@ public class TranscriptResource {
         }
     }
 
+    @GET
     @Path("/source/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> json(@PathParam("id") final long id) {
