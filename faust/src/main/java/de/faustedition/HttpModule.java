@@ -40,16 +40,12 @@ public class HttpModule extends AbstractModule {
     private final File templateDirectory;
     private final boolean authDisabled;
 
-    public HttpModule(int httpPort, String contextPath, boolean authDisabled) {
+    public HttpModule(int httpPort, String contextPath, File staticDirectory, File templateDirectory, boolean authDisabled) {
         this.httpPort = httpPort;
         this.contextPath = contextPath;
+        this.staticDirectory = staticDirectory;
+        this.templateDirectory = templateDirectory;
         this.authDisabled = authDisabled;
-
-        this.staticDirectory = new File(System.getProperty("faust.static", "static"));
-        this.templateDirectory = new File(System.getProperty("faust.templates", "templates"));
-
-        Preconditions.checkArgument(staticDirectory.isDirectory(), staticDirectory + " is not a directory");
-        Preconditions.checkArgument(templateDirectory.isDirectory(), templateDirectory + " is not a directory");
     }
 
     @Override

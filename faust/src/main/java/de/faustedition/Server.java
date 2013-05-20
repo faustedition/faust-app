@@ -30,7 +30,10 @@ public class Server extends AbstractIdleService {
     private final String contextPath;
     private final int httpPort;
     private final boolean authDisabled;
+
     private final File dataDirectory;
+    private final File staticDirectory;
+    private final File templateDirectory;
 
     private final Set<Service> services = Sets.newHashSet();
 
@@ -42,7 +45,12 @@ public class Server extends AbstractIdleService {
         this.authDisabled = commandLine.hasOption("n");
 
         this.dataDirectory = new File(commandLine.getOptionValue("d", "data"));
+        this.staticDirectory = new File(System.getProperty("faust.static", "static"));
+        this.templateDirectory = new File(System.getProperty("faust.templates", "templates"));
+
         Preconditions.checkArgument(dataDirectory.isDirectory(), dataDirectory + " is not a directory");
+        Preconditions.checkArgument(staticDirectory.isDirectory(), staticDirectory + " is not a directory");
+        Preconditions.checkArgument(templateDirectory.isDirectory(), templateDirectory + " is not a directory");
     }
 
     /**
@@ -90,7 +98,7 @@ public class Server extends AbstractIdleService {
                 new ThreadingModule(),
                 new MarshallingModule(),
                 new DataModule(dataDirectory),
-                new HttpModule(httpPort, contextPath, authDisabled)
+                new HttpModule(httpPort, contextPath, staticDirectory, templateDirectory, authDisabled)
         );
 
         final Class<?> thisClass = getClass();

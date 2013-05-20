@@ -55,12 +55,12 @@
             <outputDirectory>etc</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>src/main</directory>
-            <outputDirectory />
-            <includes>
-                <include>templates/**/*</include>
-                <include>static/**/*</include>
-            </includes>
+            <directory>static</directory>
+            <outputDirectory>static</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>templates</directory>
+            <outputDirectory>templates</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
