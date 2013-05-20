@@ -13,7 +13,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.sql.DataSource;
 import java.io.File;
@@ -23,8 +22,13 @@ import java.util.logging.Logger;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class DataStoreModule extends AbstractModule {
-    private static final Logger LOG = Logger.getLogger(DataStoreModule.class.getName());
+public class DataModule extends AbstractModule {
+    private static final Logger LOG = Logger.getLogger(DataModule.class.getName());
+    private final File dataDirectory;
+
+    public DataModule(File dataDirectory) {
+        this.dataDirectory = dataDirectory;
+    }
 
     @Override
     protected void configure() {
@@ -32,8 +36,8 @@ public class DataStoreModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public DataSource relationalDataSource(@Named("data.home") String dataPath) {
-        final BoneCPDataSource dataSource = Relations.createDataSource(dataDir(dataPath));
+    public DataSource relationalDataSource() {
+        final BoneCPDataSource dataSource = Relations.createDataSource(dataDirectory);
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
@@ -48,8 +52,8 @@ public class DataStoreModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public GraphDatabaseService graphDataSource(@Named("data.home") String dataPath) {
-        final EmbeddedGraphDatabase graphDatabase = new EmbeddedGraphDatabase(new File(dataDir(dataPath), "graph").getPath());
+    public GraphDatabaseService graphDataSource() {
+        final EmbeddedGraphDatabase graphDatabase = new EmbeddedGraphDatabase(new File(dataDirectory, "graph").getPath());
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
@@ -70,19 +74,11 @@ public class DataStoreModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public XMLStorage xmlStorage(@Named("data.home") String dataPath) {
-        final File xmlDir = new File(dataDir(dataPath), "xml");
+    public XMLStorage xmlStorage() {
+        final File xmlDir = new File(dataDirectory, "xml");
         if (!xmlDir.isDirectory() && !xmlDir.mkdirs()) {
             throw new ProvisionException(xmlDir + " is not a directory");
         }
         return new XMLStorage(xmlDir);
-    }
-
-    protected synchronized File dataDir(String dataPath) {
-        final File dataDir = new File(dataPath);
-        if (!dataDir.isDirectory() && !dataDir.mkdirs()) {
-            throw new ProvisionException(dataDir + " is not a directory");
-        }
-        return dataDir;
     }
 }
