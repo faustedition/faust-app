@@ -4,10 +4,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.http.WebApplication;
-import de.faustedition.graph.Graph;
 import de.faustedition.Templates;
-import de.faustedition.xml.NodeListWrapper;
+import de.faustedition.graph.Graph;
+import de.faustedition.http.WebApplication;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPath;
@@ -24,7 +23,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import javax.xml.xpath.XPathExpression;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,8 +83,10 @@ public class ArchiveResource {
                     });
                     Iterables.addAll(archivalUnits, Iterables.filter(archive, Document.class));
 
-                    final XPathExpression xpathById = XPath.compile("/f:archives/f:archive[@id='" + id + "']");
-                    final Element archiveData = new NodeListWrapper<Element>(xpathById, archives).singleResult(Element.class);
+                    final Element archiveData = Iterables.get(Iterables.filter(
+                            XPath.nodes("/f:archives/f:archive[@id='" + id + "']", archives),
+                            Element.class),
+                            0, null);
                     if (archiveData == null) {
                         throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
                     }

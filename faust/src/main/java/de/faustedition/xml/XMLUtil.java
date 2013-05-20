@@ -27,13 +27,17 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.AbstractIterator;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -141,8 +145,26 @@ public class XMLUtil {
 		return documentBuilder().parse(inputSource);
 	}
 
+    public static Iterable<Node> iterate(final NodeList list) {
+        return new Iterable<Node>() {
+            @Override
+            public Iterator<Node> iterator() {
+                return new AbstractIterator<Node>() {
+
+                    private final int length = list.getLength();
+                    private int nc = 0;
+
+                    @Override
+                    protected Node computeNext() {
+                        return ((nc < length) ? list.item(nc++) : endOfData());
+                    }
+                };
+            }
+        };
+    }
+
 	public static boolean hasText(Element element) throws XPathExpressionException, DOMException {
-		for (Node textNode : new NodeListWrapper<Node>(XPath.compile(".//text()"), element)) {
+		for (Node textNode : XPath.nodes(".//text()", element)) {
 			String textContent = textNode.getTextContent();
 			if (textContent != null && textContent.trim().length() > 0) {
 				return true;
@@ -187,7 +209,7 @@ public class XMLUtil {
 
 	public static List<Element> getChildElements(Element parent) {
 		List<Element> children = new ArrayList<Element>();
-		for (Node node : new NodeListWrapper<Node>(parent.getChildNodes())) {
+		for (Node node : iterate(parent.getChildNodes())) {
 			if (Node.ELEMENT_NODE == node.getNodeType()) {
 				children.add((Element) node);
 			}
@@ -230,7 +252,7 @@ public class XMLUtil {
 			for (int ac = 0; ac < attributes.getLength(); ac++) {
 				stripped.getAttributes().setNamedItem(stripNamespace(attributes.item(ac)));
 			}
-			for (Node child : new NodeListWrapper<Node>(node.getChildNodes())) {
+			for (Node child : iterate(node.getChildNodes())) {
 				stripped.appendChild(stripNamespace(child));
 			}
 		} else if (Node.ATTRIBUTE_NODE == node.getNodeType()) {

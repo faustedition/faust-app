@@ -12,7 +12,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.XMLConstants;
-import javax.xml.xpath.XPathExpressionException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;

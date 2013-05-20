@@ -6,7 +6,6 @@ import com.google.common.collect.Maps;
 import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
-import de.faustedition.User;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -14,9 +13,6 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
@@ -43,11 +39,12 @@ public class Templates extends Configuration {
             .add()
             .build();
 
-    public Templates(String contextPath, File templateDirectory) {
+    public Templates(String contextPath, File templateDirectory, boolean development) {
         super();
         try {
             setSharedVariable("cp", contextPath);
             setSharedVariable("facsimilieIIPUrl", InternetImageServer.BASE_URI.toString());
+            setSharedVariable("debug", development);
             setAutoIncludes(Collections.singletonList("/header.ftl"));
             setDefaultEncoding("UTF-8");
             setOutputEncoding("UTF-8");

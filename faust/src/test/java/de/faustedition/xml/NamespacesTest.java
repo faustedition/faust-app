@@ -6,8 +6,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class CustomNamespaceContextTest {
-    private NamespaceContext nsCtx = CustomNamespaceContext.INSTANCE;
+public class NamespacesTest {
+    private NamespaceContext nsCtx = Namespaces.INSTANCE;
 
     @Test
     public void retrieveNamespacesByPrefix() {

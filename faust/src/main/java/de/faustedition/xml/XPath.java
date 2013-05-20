@@ -16,7 +16,7 @@ public class XPath {
 	public static XPathExpression compile(String xpath) {
         try {
             javax.xml.xpath.XPath xp = XPathFactory.newInstance().newXPath();
-            xp.setNamespaceContext(CustomNamespaceContext.INSTANCE);
+            xp.setNamespaceContext(Namespaces.INSTANCE);
             return xp.compile(xpath);
         } catch (XPathExpressionException e) {
             throw Throwables.propagate(e);

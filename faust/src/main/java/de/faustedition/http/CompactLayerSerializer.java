@@ -1,6 +1,6 @@
 package de.faustedition.http;
 
-import de.faustedition.xml.CustomNamespaceContext;
+import de.faustedition.xml.Namespaces;
 import eu.interedition.text.Layer;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
@@ -30,7 +30,7 @@ class CompactLayerSerializer extends JsonSerializer<Layer> {
     	if (nsEnd >= 0) {
     		String ns = attributeName.substring(1, nsEnd);
     		String simpleName = attributeName.substring(nsEnd + 1);
-    		String prefix = CustomNamespaceContext.INSTANCE.getPrefix(ns);
+    		String prefix = Namespaces.INSTANCE.getPrefix(ns);
     		return prefix + ":" + simpleName;
     	} else {
     		return attributeName;

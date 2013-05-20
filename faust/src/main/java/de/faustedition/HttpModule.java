@@ -38,14 +38,14 @@ public class HttpModule extends AbstractModule {
     private final String contextPath;
     private final File staticDirectory;
     private final File templateDirectory;
-    private final boolean authDisabled;
+    private final boolean development;
 
-    public HttpModule(int httpPort, String contextPath, File staticDirectory, File templateDirectory, boolean authDisabled) {
+    public HttpModule(int httpPort, String contextPath, File staticDirectory, File templateDirectory, boolean development) {
         this.httpPort = httpPort;
         this.contextPath = contextPath;
         this.staticDirectory = staticDirectory;
         this.templateDirectory = templateDirectory;
-        this.authDisabled = authDisabled;
+        this.development = development;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class HttpModule extends AbstractModule {
         final Map<String,Object> config = Maps.newHashMap();
         config.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, Arrays.asList(
                 new NormalizeFilter(),
-                new SecurityRequestFilter(authDisabled)
+                new SecurityRequestFilter(development)
         ));
         config.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, Arrays.asList(
                 new CrossOriginResourceSharingContainerFilter()
@@ -110,7 +110,7 @@ public class HttpModule extends AbstractModule {
     @Provides
     @Singleton
     public Templates templates() {
-        return new Templates(contextPath, templateDirectory);
+        return new Templates(contextPath, templateDirectory, development);
     }
 
     @Provides

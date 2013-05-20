@@ -29,7 +29,7 @@ public class Server extends AbstractIdleService {
 
     private final String contextPath;
     private final int httpPort;
-    private final boolean authDisabled;
+    private final boolean development;
 
     private final File dataDirectory;
     private final File staticDirectory;
@@ -42,7 +42,7 @@ public class Server extends AbstractIdleService {
     public Server(CommandLine commandLine) {
         this.contextPath = commandLine.getOptionValue("cp", "");
         this.httpPort = Integer.parseInt(commandLine.getOptionValue("p", "8080"));
-        this.authDisabled = commandLine.hasOption("n");
+        this.development = commandLine.hasOption("n");
 
         this.dataDirectory = new File(commandLine.getOptionValue("d", "data"));
         this.staticDirectory = new File(System.getProperty("faust.static", "static"));
@@ -98,7 +98,7 @@ public class Server extends AbstractIdleService {
                 new ThreadingModule(),
                 new MarshallingModule(),
                 new DataModule(dataDirectory),
-                new HttpModule(httpPort, contextPath, staticDirectory, templateDirectory, authDisabled)
+                new HttpModule(httpPort, contextPath, staticDirectory, templateDirectory, development)
         );
 
         final Class<?> thisClass = getClass();
@@ -154,6 +154,6 @@ public class Server extends AbstractIdleService {
         OPTIONS.addOption("cp", "context-path", true, "URL context path under which to serve the edition; default: ''");
         OPTIONS.addOption("p", "port", true, "port on which the server listens for HTTP requests; default: 8080");
         OPTIONS.addOption("d", "data", true, "Path to data directory; default: 'data'");
-        OPTIONS.addOption("n", "noauth", false, "Disable LDAP authentication; enabled by default");
+        OPTIONS.addOption("n", "dev", false, "Development mode; disable LDAP authentication etc.");
     }
 }
