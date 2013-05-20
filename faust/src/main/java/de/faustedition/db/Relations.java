@@ -119,7 +119,7 @@ public class Relations {
     }
 
     protected static String jdbcUrl(File path) {
-        return path.toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";SCHEMA=FAUST";
+        return new File(path, "relations").toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";SCHEMA=FAUST";
     }
 
 }

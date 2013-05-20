@@ -1,6 +1,5 @@
 package de.faustedition.http;
 
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -11,33 +10,22 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.File;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Singleton
 @Server.Component
 public class HttpService extends AbstractIdleService {
 
     private HttpServer httpServer;
 
-    @Inject
-    public HttpService(ResourceConfig resourceConfig,
-                       @Named("server.port") int port,
-                       @Named("ctx.path") String contextPath,
-                       @Named("static.home") String staticPath) {
-
-        Preconditions.checkArgument(new File(staticPath).isDirectory(), staticPath);
-
+    public HttpService(ResourceConfig resourceConfig, int port, String contextPath, File staticDirectory) {
         this.httpServer = HttpServer.createSimpleServer(null, port);
 
         final HttpHandler httpHandler = ContainerFactory.createContainer(HttpHandler.class, resourceConfig);
         final ServerConfiguration config = httpServer.getServerConfiguration();
-        config.addHttpHandler(new CustomStaticHttpHandler(staticPath, contextPath + "/static"), contextPath + "/static/*");
+        config.addHttpHandler(new CustomStaticHttpHandler(staticDirectory.getPath(), contextPath + "/static"), contextPath + "/static/*");
         config.addHttpHandler(httpHandler, contextPath + "/*");
     }
 

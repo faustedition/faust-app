@@ -1,16 +1,12 @@
 package de.faustedition.facsimile;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import de.faustedition.http.WebApplication;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -23,13 +19,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayDeque;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Random;
 
 /**
@@ -39,33 +31,15 @@ import java.util.Random;
 public class FacsimileResource {
 
     private static final int TILE_SIZE = 256;
-    private static final String IMAGE_FILE_EXTENSION = ".tif";
 
-    private final File facsimileDir;
+    private final FacsimileStore facsimileStore;
 
     private BufferedImage fallbackImage;
 
     @Inject
-    public FacsimileResource(@Named("data.home") String dataPath) {
-        this.facsimileDir = new File(dataPath, "facsimile");
-        Preconditions.checkArgument(this.facsimileDir.isDirectory() || this.facsimileDir.mkdirs(), facsimileDir + " is not a directory");
-
-        boolean facsimilesAvailable = false;
-        final Queue<File> directories = new ArrayDeque<File>(Collections.singleton(facsimileDir));
-        while (!directories.isEmpty()) {
-            for (File file : directories.remove().listFiles()) {
-                if (file.isDirectory()) {
-                    directories.add(file);
-                } else if (file.isFile() && file.getName().endsWith(IMAGE_FILE_EXTENSION)) {
-                    facsimilesAvailable = true;
-                    break;
-                }
-            }
-            if (facsimilesAvailable) {
-                break;
-            }
-        }
-        if (!facsimilesAvailable) {
+    public FacsimileResource(FacsimileStore facsimileStore) {
+        this.facsimileStore = facsimileStore;
+        if (facsimileStore.isEmpty()) {
             final int width = 3 * TILE_SIZE;
             final int height = 4 * TILE_SIZE;
             this.fallbackImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
@@ -93,7 +67,7 @@ public class FacsimileResource {
         } else {
             ImageReader reader = null;
             try {
-                reader = reader(path);
+                reader = facsimileStore.reader(WebApplication.path(WebApplication.pathDeque(path)));
                 metadata.put("width", reader.getWidth(0));
                 metadata.put("height", reader.getHeight(0));
                 metadata.put("maxZoom", reader.getNumImages(true) - 1);
@@ -122,7 +96,7 @@ public class FacsimileResource {
         if (image == null) {
             ImageReader reader = null;
             try {
-                    reader = reader(path);
+                    reader = facsimileStore.reader(WebApplication.path(WebApplication.pathDeque(path)));
                     final int index = Math.max(0, Math.min(zoom, reader.getNumImages(true) - 1));
                     final ImageReadParam parameters = reader.getDefaultReadParam();
                     parameters.setSourceRegion(clip(x, y, TILE_SIZE, TILE_SIZE, reader.getWidth(index), reader.getHeight(index)));
@@ -158,26 +132,4 @@ public class FacsimileResource {
         height = Math.min(maxHeight - y, Math.max(1, height));
         return new Rectangle(x, y, width, height);
     }
-
-    protected ImageReader reader(String path) throws IOException {
-        final File facsimile = new File(facsimileDir, WebApplication.path(WebApplication.pathDeque(path)) + IMAGE_FILE_EXTENSION);
-        if (!facsimile.isFile() || !isInHome(facsimile)) {
-            throw new WebApplicationException(Response.status(javax.ws.rs.core.Response.Status.NOT_FOUND).entity(path).build());
-        }
-        final ImageInputStream imageInputStream = ImageIO.createImageInputStream(facsimile);
-        final ImageReader imageReader = Iterators.get(ImageIO.getImageReaders(imageInputStream), 0);
-        imageReader.setInput(imageInputStream);
-        return imageReader;
-    }
-
-    protected boolean isInHome(File file) {
-		File parent = file.getParentFile();
-		while (parent != null) {
-			if (parent.equals(facsimileDir)) {
-				return true;
-			}
-			parent = parent.getParentFile();
-		}
-		return false;
-	}
 }

@@ -2,15 +2,11 @@ package de.faustedition.resource;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.io.CharStreams;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -27,20 +23,15 @@ import java.util.List;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Path("/resources")
-@Singleton
 public class ComboResource {
 
 	private final TextResourceResolver resolver;
 
-    @Inject
-    public ComboResource(@Named("ctx.path") String contextPath, @Named("static.home") String staticPath) {
-        final File staticHome = new File(staticPath);
-        Preconditions.checkArgument(staticHome.isDirectory(), staticPath);
-
+    public ComboResource(String contextPath, File staticDirectory) {
         this.resolver = new TextResourceResolver();
-        FileBasedTextResourceCollection.register(resolver, "yui3/", new File(staticHome, "yui3"), contextPath + "/static/yui3", Charset.forName("UTF-8"), 86400);
-        FileBasedTextResourceCollection.register(resolver, "css/", new File(staticHome, "css"), contextPath + "/static/css/", Charset.forName("UTF-8"), 0);
-        FileBasedTextResourceCollection.register(resolver, "js/", new File(staticHome, "js"), contextPath + "/static/js/", Charset.forName("UTF-8"), 0);
+        FileBasedTextResourceCollection.register(resolver, "yui3/", new File(staticDirectory, "yui3"), contextPath + "/static/yui3", Charset.forName("UTF-8"), 86400);
+        FileBasedTextResourceCollection.register(resolver, "css/", new File(staticDirectory, "css"), contextPath + "/static/css/", Charset.forName("UTF-8"), 0);
+        FileBasedTextResourceCollection.register(resolver, "js/", new File(staticDirectory, "js"), contextPath + "/static/js/", Charset.forName("UTF-8"), 0);
     }
 
 

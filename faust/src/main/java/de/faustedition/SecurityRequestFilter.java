@@ -3,7 +3,6 @@ package de.faustedition;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import com.sun.jersey.core.util.Base64;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -45,8 +44,7 @@ public class SecurityRequestFilter implements ContainerRequestFilter {
 
     private boolean authDisabled;
 
-    @Inject
-    public SecurityRequestFilter(@Named("auth.disable") boolean authDisabled) {
+    public SecurityRequestFilter(boolean authDisabled) {
         this.authDisabled = authDisabled;
     }
 

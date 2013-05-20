@@ -14,7 +14,6 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import java.awt.Dimension;
@@ -30,19 +29,19 @@ import java.util.regex.Pattern;
 @Singleton
 public class InternetImageServer {
 
+    public static final URI BASE_URI = URI.create("https://faustedition.uni-wuerzburg.de/images/iipsrv.fcgi");
+
     private static final Splitter LINE_SPLITTER = Splitter.on(Pattern.compile("[\n\r]+")).omitEmptyStrings().trimResults();
 
     private static final Pattern IMAGE_DIMENSION_PATTERN = Pattern.compile("([0-9]+)\\s+([0-9]+)");
 
-    private final URI uri;
     private final ClientConfig clientConfig;
     private final Logger logger;
 
     private final Cache<FaustURI, Map<String, String>> imageInfoCache = CacheBuilder.newBuilder().build();
 
     @Inject
-    public InternetImageServer(@Named("facsimile.iip.url") String url, ClientConfig clientConfig, Logger logger) {
-        this.uri = URI.create(url);
+    public InternetImageServer(ClientConfig clientConfig, Logger logger) {
         this.clientConfig = clientConfig;
         this.logger = logger;
     }
@@ -90,7 +89,7 @@ public class InternetImageServer {
     public UriBuilder uriFor(FaustURI facsimile) {
         Preconditions.checkArgument(facsimile.getAuthority() == FaustAuthority.FACSIMILE);
         final String imagePath = facsimile.getPath().replaceAll("^/+", "") + ".tif";
-        return UriBuilder.fromUri(uri).queryParam("FIF", imagePath);
+        return UriBuilder.fromUri(BASE_URI).queryParam("FIF", imagePath);
     }
 
     public Dimension dimensionOf(FaustURI facsimile) {

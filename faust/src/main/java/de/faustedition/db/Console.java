@@ -1,7 +1,5 @@
 package de.faustedition.db;
 
-import de.faustedition.Configuration;
-
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,7 +13,7 @@ public class Console {
 
     public static void main(String... args) {
         try {
-            Relations.console(new File(Configuration.read().getProperty("db.home")));
+            Relations.console(new File(args.length > 0 ? args[0] : "data"));
         } catch (Exception e) {
             LOG.log(Level.SEVERE, e.getMessage(), e);
         }

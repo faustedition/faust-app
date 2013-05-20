@@ -69,14 +69,12 @@ public class InscriptionPrecedenceResource {
 
 
     @Inject
-    public InscriptionPrecedenceResource(GraphDatabaseService graphDb, DataSource dataSource, Logger logger,
-                                         @Named("graphviz.tred.path") String tredPath,
-                                         @Named("graphviz.dot.path") String dotPath) {
+    public InscriptionPrecedenceResource(GraphDatabaseService graphDb, DataSource dataSource, Logger logger) {
         this.graphDb = graphDb;
         this.dataSource = dataSource;
         this.logger = logger;
-        this.tredPath = tredPath;
-        this.dotPath = dotPath;
+        this.tredPath = System.getProperty("faust.tred", "/usr/bin/tred");
+        this.dotPath = System.getProperty("faust.dot", "/usr/bin/dot");
     }
 
     @Path("/{part}/{act_scene}")

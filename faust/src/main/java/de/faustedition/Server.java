@@ -1,5 +1,6 @@
 package de.faustedition;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.ClassPath;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -7,8 +8,12 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
+import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -22,8 +27,23 @@ public class Server extends AbstractIdleService {
 
     private static final Logger LOG = Logger.getLogger(Server.class.getName());
 
+    private final String contextPath;
+    private final int httpPort;
+    private final boolean authDisabled;
+    private final File dataDirectory;
+
     private final Set<Service> services = Sets.newHashSet();
+
     private Injector injector;
+
+    public Server(CommandLine commandLine) {
+        this.contextPath = commandLine.getOptionValue("cp", "");
+        this.httpPort = Integer.parseInt(commandLine.getOptionValue("p", "8080"));
+        this.authDisabled = commandLine.hasOption("n");
+
+        this.dataDirectory = new File(commandLine.getOptionValue("d", "data"));
+        Preconditions.checkArgument(dataDirectory.isDirectory(), dataDirectory + " is not a directory");
+    }
 
     /**
      * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -35,7 +55,13 @@ public class Server extends AbstractIdleService {
 
     public static void main(String... args) {
         try {
-            final Server server = new Server();
+            final CommandLine commandLine = new GnuParser().parse(OPTIONS, args);
+            if (commandLine.hasOption("h")) {
+                new HelpFormatter().printHelp(78, "faust-server [<options>]", "", OPTIONS, "");
+                return;
+            }
+
+            final Server server = new Server(commandLine);
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -61,11 +87,10 @@ public class Server extends AbstractIdleService {
     @Override
     protected void startUp() throws Exception {
         injector = Guice.createInjector(
-                new ConfigurationModule(),
                 new ThreadingModule(),
-                new DataStoreModule(),
                 new MarshallingModule(),
-                new HttpModule()
+                new DataModule(dataDirectory),
+                new HttpModule(httpPort, contextPath, authDisabled)
         );
 
         final Class<?> thisClass = getClass();
@@ -117,17 +142,10 @@ public class Server extends AbstractIdleService {
     static final Options OPTIONS = new Options();
 
     static {
-        OPTIONS.addOption("h", "help", false, "print usage instructions (which your are looking at right now)");
-        /*
-        OPTIONS.addOption("o", "output", true, "output file; '-' for standard output (default)");
-        OPTIONS.addOption("ie", "input-encoding", true, "charset to use for decoding non-XML witnesses; default: UTF-8");
-        OPTIONS.addOption("oe", "output-encoding", true, "charset to use for encoding the output; default: UTF-8");
-        OPTIONS.addOption("xml", "xml-mode", false, "witnesses are treated as XML documents");
-        OPTIONS.addOption("xp", "xpath", true, "XPath 1.0 expression evaluating to tokens of XML witnesses; default: '//text()'");
-        OPTIONS.addOption("a", "algorithm", true, "progressive alignment algorithm to use 'dekker' (default), 'medite', 'needleman-wunsch'");
-        OPTIONS.addOption("t", "tokenized", false, "consecutive matches of tokens will *not* be joined to segments");
-        OPTIONS.addOption("f", "format", true, "result/output format: 'json', 'csv', 'dot', 'graphml', 'tei'");
-        OPTIONS.addOption("s", "script", true, "ECMA/JavaScript resource with functions to be plugged into the alignment algorithm");
-        */
+        OPTIONS.addOption("h", "help", false, "print usage instructions");
+        OPTIONS.addOption("cp", "context-path", true, "URL context path under which to serve the edition; default: ''");
+        OPTIONS.addOption("p", "port", true, "port on which the server listens for HTTP requests; default: 8080");
+        OPTIONS.addOption("d", "data", true, "Path to data directory; default: 'data'");
+        OPTIONS.addOption("n", "noauth", false, "Disable LDAP authentication; enabled by default");
     }
 }

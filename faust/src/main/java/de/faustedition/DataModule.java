@@ -5,6 +5,7 @@ import com.google.inject.Provides;
 import com.google.inject.ProvisionException;
 import com.jolbox.bonecp.BoneCPDataSource;
 import de.faustedition.db.Relations;
+import de.faustedition.facsimile.FacsimileStore;
 import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.h2.H2TextRepository;
 import eu.interedition.text.json.JacksonDataStreamMapper;
@@ -24,6 +25,7 @@ import java.util.logging.Logger;
  */
 public class DataModule extends AbstractModule {
     private static final Logger LOG = Logger.getLogger(DataModule.class.getName());
+
     private final File dataDirectory;
 
     public DataModule(File dataDirectory) {
@@ -52,6 +54,12 @@ public class DataModule extends AbstractModule {
 
     @Provides
     @Singleton
+    public FacsimileStore facsimileStore() {
+        return new FacsimileStore(dataSubDirectory("facsimile"));
+    }
+
+    @Provides
+    @Singleton
     public GraphDatabaseService graphDataSource() {
         final EmbeddedGraphDatabase graphDatabase = new EmbeddedGraphDatabase(new File(dataDirectory, "graph").getPath());
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -75,10 +83,14 @@ public class DataModule extends AbstractModule {
     @Provides
     @Singleton
     public XMLStorage xmlStorage() {
-        final File xmlDir = new File(dataDirectory, "xml");
-        if (!xmlDir.isDirectory() && !xmlDir.mkdirs()) {
-            throw new ProvisionException(xmlDir + " is not a directory");
+        return new XMLStorage(dataSubDirectory("xml"));
+    }
+
+    protected File dataSubDirectory(String name) {
+        final File subDirectory = new File(dataDirectory, name);
+        if (!subDirectory.isDirectory() && !subDirectory.mkdirs()) {
+            throw new ProvisionException(subDirectory + " is not a directory");
         }
-        return new XMLStorage(xmlDir);
+        return subDirectory;
     }
 }

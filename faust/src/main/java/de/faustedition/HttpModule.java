@@ -14,10 +14,13 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.server.impl.container.filter.NormalizeFilter;
 import de.faustedition.http.CrossOriginResourceSharingContainerFilter;
+import de.faustedition.http.HttpService;
 import de.faustedition.http.ObjectMapperMessageBodyReaderWriter;
+import de.faustedition.resource.ComboResource;
 
 import javax.inject.Singleton;
 import javax.ws.rs.ext.Provider;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -31,19 +34,38 @@ public class HttpModule extends AbstractModule {
 
     private static final Logger LOG = Logger.getLogger(HttpModule.class.getName());
 
+    private final int httpPort;
+    private final String contextPath;
+    private final File staticDirectory;
+    private final File templateDirectory;
+    private final boolean authDisabled;
+
+    public HttpModule(int httpPort, String contextPath, boolean authDisabled) {
+        this.httpPort = httpPort;
+        this.contextPath = contextPath;
+        this.authDisabled = authDisabled;
+
+        this.staticDirectory = new File(System.getProperty("faust.static", "static"));
+        this.templateDirectory = new File(System.getProperty("faust.templates", "templates"));
+
+        Preconditions.checkArgument(staticDirectory.isDirectory(), staticDirectory + " is not a directory");
+        Preconditions.checkArgument(templateDirectory.isDirectory(), templateDirectory + " is not a directory");
+    }
+
     @Override
     protected void configure() {
     }
 
+
     @Provides
     @Singleton
-    public ResourceConfig resourceConfig(Injector injector) throws Exception {
+    public HttpService httpService(Injector injector) throws Exception {
         final DefaultResourceConfig rc = new DefaultResourceConfig();
 
         final Map<String,Object> config = Maps.newHashMap();
         config.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, Arrays.asList(
                 new NormalizeFilter(),
-                injector.getInstance(SecurityRequestFilter.class)
+                new SecurityRequestFilter(authDisabled)
         ));
         config.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, Arrays.asList(
                 new CrossOriginResourceSharingContainerFilter()
@@ -86,7 +108,19 @@ public class HttpModule extends AbstractModule {
 
         //singletons.add(new InstrumentedResourceMethodDispatchAdapter());
 
-        return rc;
+        return new HttpService(rc, httpPort, contextPath, staticDirectory);
+    }
+
+    @Provides
+    @Singleton
+    public Templates templates() {
+        return new Templates(contextPath, templateDirectory);
+    }
+
+    @Provides
+    @Singleton
+    public ComboResource comboResource() {
+        return new ComboResource(contextPath, staticDirectory);
     }
 
     @Provides

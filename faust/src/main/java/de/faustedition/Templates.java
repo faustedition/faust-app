@@ -3,6 +3,7 @@ package de.faustedition;
 import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
+import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
 import de.faustedition.User;
@@ -34,7 +35,6 @@ import java.util.ResourceBundle;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Singleton
 public class Templates extends Configuration {
 
     private static final List<Variant> VARIANTS = Variant.VariantListBuilder.newInstance()
@@ -43,21 +43,18 @@ public class Templates extends Configuration {
             .add()
             .build();
 
-    @Inject
-    public Templates(@Named("ctx.path") String contextPath,
-                     @Named("template.home") String templatePath,
-                     @Named("facsimile.iip.url") String facsimileServerUrl) {
+    public Templates(String contextPath, File templateDirectory) {
         super();
         try {
             setSharedVariable("cp", contextPath);
-            setSharedVariable("facsimilieIIPUrl", facsimileServerUrl);
+            setSharedVariable("facsimilieIIPUrl", InternetImageServer.BASE_URI.toString());
             setAutoIncludes(Collections.singletonList("/header.ftl"));
             setDefaultEncoding("UTF-8");
             setOutputEncoding("UTF-8");
             setURLEscapingCharset("UTF-8");
             setStrictSyntaxMode(true);
             setWhitespaceStripping(true);
-            setTemplateLoader(new FileTemplateLoader(new File(templatePath)));
+            setTemplateLoader(new FileTemplateLoader(templateDirectory));
             setObjectWrapper(new CustomObjectWrapper());
         } catch (TemplateModelException e) {
             throw Throwables.propagate(e);
