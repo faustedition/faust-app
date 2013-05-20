@@ -160,7 +160,7 @@ public class InscriptionPrecedenceResource {
     }
 
     @GET
-    @Produces({"image/svg", MediaType.TEXT_HTML})
+    @Produces({"image/svg+xml", MediaType.TEXT_HTML})
     public StreamingOutput svg() throws IOException, ExecutionException, InterruptedException {
         final ExecutorService executorService = Executors.newCachedThreadPool();
         final Process tred = new ProcessBuilder(tredPath).start();

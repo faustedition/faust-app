@@ -69,6 +69,10 @@ public class FaustURI implements Comparable<FaustURI> {
 		return uri.hashCode();
 	}
 
+    public URI toURI() {
+        return uri;
+    }
+
 	@Override
 	public String toString() {
 		return uri.toString();

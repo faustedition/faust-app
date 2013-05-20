@@ -9,7 +9,7 @@ import de.faustedition.FaustURI;
 import de.faustedition.xml.NodeListWrapper;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
-import de.faustedition.xml.XPathUtil;
+import de.faustedition.xml.XPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -35,7 +35,7 @@ public class TextSplitter implements Runnable {
     @Override
 	public void run() {
 		try {
-			XPathExpression bodyXP = XPathUtil.xpath("//tei:body");
+			XPathExpression bodyXP = XPath.compile("//tei:body");
 			for (FaustURI text : xml.iterate(new FaustURI(FaustAuthority.XML, "/text"))) {
 				final String uriPath = text.getPath();
 				final int prefix = Integer.parseInt(uriPath.substring(uriPath.lastIndexOf("_") + 1, uriPath.length() - 4));
@@ -54,7 +54,7 @@ public class TextSplitter implements Runnable {
 	protected void exportDivs(Stack<Integer> path, Element context) throws XPathExpressionException, IOException, TransformerException {
 		int divCount = 0;
 		if (path.size() < 3) {
-			for (Element div : new NodeListWrapper<Element>(XPathUtil.xpath("./tei:div"), context)) {
+			for (Element div : new NodeListWrapper<Element>(XPath.compile("./tei:div"), context)) {
 				path.push(++divCount);
 				exportDivs(path, div);
 				path.pop();
@@ -67,7 +67,7 @@ public class TextSplitter implements Runnable {
 			for (Node rootNode : new NodeListWrapper<Node>(baseDocument.getChildNodes())) {
 				document.appendChild(document.adoptNode(rootNode.cloneNode(false)));
 			}
-			final XPathExpression headerXP = XPathUtil.xpath("//tei:teiHeader");
+			final XPathExpression headerXP = XPath.compile("//tei:teiHeader");
 			final Element header = new NodeListWrapper<Element>(headerXP, baseDocument).singleResult(Element.class);
 			final Element root = document.getDocumentElement();
 			root.appendChild(document.adoptNode(header.cloneNode(true)));

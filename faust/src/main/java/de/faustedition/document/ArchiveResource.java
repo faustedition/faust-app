@@ -10,6 +10,7 @@ import de.faustedition.template.Templates;
 import de.faustedition.xml.NodeListWrapper;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
+import de.faustedition.xml.XPath;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.w3c.dom.Element;
 
@@ -29,8 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import static de.faustedition.xml.XPathUtil.xpath;
 
 @Path("/archive")
 @Singleton
@@ -86,7 +85,7 @@ public class ArchiveResource {
                     });
                     Iterables.addAll(archivalUnits, Iterables.filter(archive, Document.class));
 
-                    final XPathExpression xpathById = xpath("/f:archives/f:archive[@id='" + id + "']");
+                    final XPathExpression xpathById = XPath.compile("/f:archives/f:archive[@id='" + id + "']");
                     final Element archiveData = new NodeListWrapper<Element>(xpathById, archives).singleResult(Element.class);
                     if (archiveData == null) {
                         throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());

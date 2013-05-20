@@ -9,8 +9,7 @@ import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.NodeListWrapper;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
-import de.faustedition.xml.XPathUtil;
-import org.springframework.stereotype.Component;
+import de.faustedition.xml.XPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,9 +39,9 @@ public class TeiTemplater implements Runnable {
     @Override
 	public void run() {
 		try {
-			final XPathExpression piXP = XPathUtil.xpath("/processing-instruction()");
-			final XPathExpression handNotesXP = XPathUtil.xpath("//tei:teiHeader/tei:profileDesc/tei:handNotes");
-			final XPathExpression charDeclXP = XPathUtil.xpath("//tei:teiHeader/tei:encodingDesc/tei:charDecl");
+			final XPathExpression piXP = XPath.compile("/processing-instruction()");
+			final XPathExpression handNotesXP = XPath.compile("//tei:teiHeader/tei:profileDesc/tei:handNotes");
+			final XPathExpression charDeclXP = XPath.compile("//tei:teiHeader/tei:encodingDesc/tei:charDecl");
 
 			final Document template = XMLUtil.parse(xml.getInputSource(TEMPLATE_SOURCE));
 

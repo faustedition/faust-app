@@ -1,8 +1,5 @@
 package de.faustedition.document;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Throwables;
-import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.WebApplication;
 import de.faustedition.graph.Graph;
@@ -19,17 +16,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -49,28 +41,6 @@ public class DocumentResource {
         this.templates = templates;
     }
 
-    @Path("/imagelink/{path: .+?}")
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    public Response imageLinks(@PathParam("path") final String path, @Context final Request request, @Context final SecurityContext sc) {
-        return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
-            @Override
-            public Response execute(Graph graph) throws Exception {
-                final Deque<String> pathDeque = WebApplication.pathDeque(path);
-
-                final int page = Integer.parseInt(Objects.firstNonNull(pathDeque.pollLast(), "1"));
-                final Document document = document(graph, toSource(pathDeque));
-
-                final Map<String, Object> viewModel = new HashMap<String, Object>();
-                viewModel.put("pageNum", page);
-                viewModel.put("document", document);
-                viewModel.put("facsimileUrl", facsimileUrl(document, page));
-
-                return templates.render("document/imagelink", viewModel, request, sc);
-            }
-        });
-    }
-
     @Path("/styles")
     @GET
     public Response styles(@Context final Request request, @Context final SecurityContext sc) {
@@ -85,12 +55,12 @@ public class DocumentResource {
             return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
                 @Override
                 public Response execute(Graph graph) throws Exception {
-                    final FaustURI uri = toSource(path);
-                    final Document document = document(graph, uri);
+                    final Document document = DocumentPage.fromPath(path, graph).getDocument();
+
                     final Map<String, Object> viewModel = new HashMap<String, Object>();
                     viewModel.put("document", document);
                     viewModel.put("contents", document.getSortedContents());
-                    viewModel.put("path", uri);
+                    viewModel.put("path", document.getSource().toString());
 
                     return templates.render("document/document-app", viewModel, request, sc);
                 }
@@ -109,7 +79,7 @@ public class DocumentResource {
 
                 @Override
                 public JsonNode execute(Graph graph) throws Exception {
-                    return toJson(document(graph, toSource(path)));
+                    return toJson(DocumentPage.fromPath(path, graph).getDocument());
                 }
 
                 protected JsonNode toJson(MaterialUnit unit) throws IOException {
@@ -141,32 +111,6 @@ public class DocumentResource {
             });
         } catch (Throwable t) {
             throw WebApplication.propagateExceptions(t);
-        }
-    }
-
-    protected FaustURI toSource(Deque<String> path){
-        final Deque<String> pathDeque = new ArrayDeque<String>(path);
-        pathDeque.addFirst("document");
-        return new FaustURI(FaustAuthority.XML, pathDeque);
-    }
-
-    protected FaustURI toSource(String path) {
-        return toSource(WebApplication.pathDeque(path));
-    }
-
-    protected Document document(Graph graph, FaustURI uri) throws WebApplicationException {
-        final Document document = Document.findBySource(graph.db(), uri);
-        if (document == null) {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(uri.toString()).build());
-        }
-        return document;
-    }
-
-    protected String facsimileUrl(Document document, int page) {
-        try {
-            return URLEncoder.encode("&SDS=0,90&CNT=1.0&WID=800&QLT=90&CVT=jpeg", "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw Throwables.propagate(e);
         }
     }
 }

@@ -1,5 +1,15 @@
 package de.faustedition.xml;
 
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import javax.annotation.Nullable;
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,21 +18,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import javax.xml.transform.TransformerException;
-
-import org.neo4j.helpers.collection.IterableWrapper;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-
-import com.google.common.base.Preconditions;
-
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
 
 public class XMLStorage implements Iterable<FaustURI> {
 	private final Pattern xmlFilenamePattern = Pattern.compile("[^\\.]+\\.[xX][mM][lL]$");
@@ -51,8 +46,14 @@ public class XMLStorage implements Iterable<FaustURI> {
 	protected Iterable<FaustURI> iterate(File base) {
 		final List<File> files = new LinkedList<File>();
 		listRecursively(files, base);
-		return new FileToUriWrapper(files);
-	}
+        return Iterables.transform(files, new Function<File, FaustURI>() {
+            @Nullable
+            @Override
+            public FaustURI apply(@Nullable File input) {
+                return toUri(input);
+            }
+        });
+    }
 
 	private void listRecursively(List<File> contents, File base) {
 		for (File contained : base.listFiles()) {
@@ -130,15 +131,4 @@ public class XMLStorage implements Iterable<FaustURI> {
 		return file.getAbsolutePath().startsWith(storagePath);
 	}
 
-	private class FileToUriWrapper extends IterableWrapper<FaustURI, File> {
-
-		private FileToUriWrapper(Iterable<File> iterableToWrap) {
-			super(iterableToWrap);
-		}
-
-		@Override
-		protected FaustURI underlyingObjectToObject(File file) {
-			return toUri(file);
-		}
-	}
 }

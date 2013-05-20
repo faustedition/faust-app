@@ -16,6 +16,7 @@ import de.faustedition.FaustURI;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.ws.rs.core.UriBuilder;
 import java.awt.Dimension;
 import java.net.URI;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class InternetImageServer {
     private final ClientConfig clientConfig;
     private final Logger logger;
 
-    private final Cache<String, Map<String, String>> imageInfoCache = CacheBuilder.newBuilder().build();
+    private final Cache<FaustURI, Map<String, String>> imageInfoCache = CacheBuilder.newBuilder().build();
 
     @Inject
     public InternetImageServer(@Named("facsimile.iip.url") String url, ClientConfig clientConfig, Logger logger) {
@@ -47,19 +48,17 @@ public class InternetImageServer {
     }
 
     public Map<String, String> imageInfo(final FaustURI facsimile) {
-        Preconditions.checkArgument(facsimile.getAuthority() == FaustAuthority.FACSIMILE);
-        final String imagePath = facsimile.getPath().replaceAll("^/+", "") + ".tif";
         try {
-            return imageInfoCache.get(imagePath, new Callable<Map<String, String>>() {
+            return imageInfoCache.get(facsimile, new Callable<Map<String, String>>() {
                 @Override
                 public Map<String, String> call() throws Exception {
-                    final String imageInfoBody = Client.create(clientConfig).resource(uri)
-                            .queryParam("FIF", imagePath)
-                            .queryParam("obj", "IIP,1.0")
+                    final URI uri = uriFor(facsimile).queryParam("obj", "IIP,1.0")
                             .queryParam("obj", "Max-size")
                             .queryParam("obj", "Tile-size")
                             .queryParam("obj", "Resolution-number")
-                            .get(String.class);
+                            .build();
+
+                    final String imageInfoBody = Client.create(clientConfig).resource(uri).get(String.class);
 
                     final Map<String, String> imageInfo = Maps.newHashMap();
                     for (String line : LINE_SPLITTER.split(imageInfoBody)) {
@@ -86,6 +85,12 @@ public class InternetImageServer {
         } catch (ExecutionException e) {
             throw Throwables.propagate(Throwables.getRootCause(e));
         }
+    }
+
+    public UriBuilder uriFor(FaustURI facsimile) {
+        Preconditions.checkArgument(facsimile.getAuthority() == FaustAuthority.FACSIMILE);
+        final String imagePath = facsimile.getPath().replaceAll("^/+", "") + ".tif";
+        return UriBuilder.fromUri(uri).queryParam("FIF", imagePath);
     }
 
     public Dimension dimensionOf(FaustURI facsimile) {

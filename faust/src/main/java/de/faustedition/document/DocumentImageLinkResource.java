@@ -2,266 +2,181 @@ package de.faustedition.document;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
 import de.faustedition.facsimile.InternetImageServer;
-import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.graph.Graph;
+import de.faustedition.template.Templates;
+import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
-import de.faustedition.xml.XPathUtil;
-import org.restlet.data.MediaType;
-import org.restlet.data.Status;
-import org.restlet.ext.xml.DomRepresentation;
-import org.restlet.representation.InputRepresentation;
-import org.restlet.representation.OutputRepresentation;
-import org.restlet.representation.Representation;
-import org.restlet.representation.WriterRepresentation;
-import org.restlet.resource.Get;
-import org.restlet.resource.Put;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
+import javax.xml.transform.dom.DOMSource;
 import java.awt.Dimension;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public class DocumentImageLinkResource extends ServerResource implements InitializingBean {
+@Path("/document/imagelink/{path: .+?}")
+@Singleton
+public class DocumentImageLinkResource {
 
-	private static final String GE_LINE_XP = "//ge:line";
+    private final GraphDatabaseService graphDatabaseService;
+    private final XMLStorage xml;
+	private final Templates templates;
+	private final InternetImageServer imageServer;
+	private final Logger logger;
 
-	@Autowired
-	private Environment environment;
-
-	@Autowired
-	private TemplateRepresentationFactory viewFactory;
-
-	@Autowired
-	private InternetImageServer imageServer;
-
-	@Autowired
-	private XMLStorage xml;
-
-	@Autowired
-	private Logger logger;
-
-	private String imageUrlTemplate;
-	private Document document;
-	private int pageNum;
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.imageUrlTemplate = environment.getRequiredProperty("facsimile.iip.url") + "?FIF=%s.tif";
-
-	}
-
-	public class NullOutputStream extends OutputStream {
-		@Override
-		public void write(int b) throws IOException {
-		}
-	}
-
-
-	private class LineIdGenerator extends XMLDocumentImageLinker.IdGenerator {
-
-		private int index = 0;
-
-		@Override
-		public String next() {
-			return String.format("lineNumber%d", index++);
-		}
-	}
-
-	public void setDocument(Document document, int page) {
-		this.document = document;
-		this.pageNum = page;
-	}
-
-	private void writeSVGImageLinks(final org.w3c.dom.Document svg, URI linkDataURI) throws TransformerException {
-		FaustURI linkDataFaustURI = new FaustURI(linkDataURI);
-		logger.debug("Writing image-text-link data to " + linkDataFaustURI);
-		xml.put(linkDataFaustURI, svg);
-	}
-
-	@Put("svg")
-	public String store(InputRepresentation data) throws SAXException, IOException, TransformerException, XPathExpressionException, URISyntaxException {
-		final org.w3c.dom.Document svg = XMLUtil.parse(data.getStream());
-		final FaustURI transcriptURI = page().getTranscriptSource();
-		final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
-
-		IdGenerator newIds = new IdGenerator() {
-
-			/**
-			 * Maps a number to a string of lowercase alphabetic characters, 
-			 * which act as digits to base 26. (a, b, c, ..., aa, ab, ac, ...) 
-			 * @param n
-			 * @return
-			 */
-			private String alphabetify(int n) {
-				if (n > 25)
-					return alphabetify(n / 26 - 1) + alphabetify(n % 26);
-				else
-					return "" + (char) (n + 97);
-
-			}
-
-
-			private int index = 0;
-
-			@Override
-			public String next() {
-				return String.format("l%s", alphabetify(index++));
-			}
-		};
-
-		javax.xml.xpath.XPathExpression lines = XPathUtil.xpath(this.GE_LINE_XP);
-
-		boolean hasSourceChanged = XMLDocumentImageLinker.link(source, new LineIdGenerator(), lines, svg, newIds);
-		if (hasSourceChanged)
-			logger.debug("Added new xml:ids to " + transcriptURI);
-
-
-		// Check if the transcript has image links attached
-		URI linkDataURI = XMLDocumentImageLinker.linkDataURI(source);
-
-		if (linkDataURI != null) {
-			// we already have a file, do nothing
-
-		} else {
-			logger.debug("Adding new image-text-link to " + transcriptURI);
-
-			// generate random URI
-
-			String uuid = UUID.randomUUID().toString();
-			linkDataURI = new URI(FaustURI.FAUST_SCHEME, FaustAuthority.XML
-				.name().toLowerCase(),
-				"/image-text-links/" + uuid + ".svg", null);
-
-
-			XMLDocumentImageLinker.insertLinkURI(source, linkDataURI);
-			hasSourceChanged = true;
-		}
-
-		// write the image links file		
-		writeSVGImageLinks(svg, linkDataURI);
-
-		if (hasSourceChanged) {
-			// write the modified transcript
-			logger.debug("Writing " + transcriptURI);
-			xml.put(transcriptURI, source);
-		}
-
-
-		// FIXME
-		return "<svg></svg>";
-	}
-
-
-	@Get("html")
-	public Representation overview() throws IOException {
-		final Map<String, Object> viewModel = new HashMap<String, Object>();
-		viewModel.put("document", document);
-		viewModel.put("pageNum", pageNum);
-
-		final String facsimileUrl = URLEncoder.encode(facsimileUrl() + "&SDS=0,90&CNT=1.0&WID=800&QLT=90&CVT=jpeg", "UTF-8");
-		viewModel.put("facsimileUrl", facsimileUrl);
-
-		return viewFactory.create("document/imagelink", getRequest()
-			.getClientInfo(), viewModel);
-	}
-
-	protected MaterialUnit page() {
-
-		final Object[] contents = document.getSortedContents().toArray();
-		if (pageNum < 1 || contents.length < pageNum) {
-			final String msg = "Request for page " + pageNum + "; there are " + contents.length + " pages.";
-			throw new ResourceException(new Status(404), msg);
-		}
-
-		return (MaterialUnit) contents[pageNum - 1];
-	}
-
-	@Get("svg")
-	public Representation graphic() throws ResourceException, IOException,
-		SAXException, XPathExpressionException, URISyntaxException {
-
-		final FaustURI transcriptURI = page().getTranscriptSource();
-		final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
-
-		// Check if the transcript has image links attached
-		final URI linkDataURI = XMLDocumentImageLinker.linkDataURI(source);
-		if (linkDataURI != null) {
-			logger.debug(transcriptURI
-				+ " has image-text links, loading");
-
-			org.w3c.dom.Document svg = XMLUtil.parse(xml
-				.getInputSource(new FaustURI(linkDataURI)));
-
-			// adjust the links in the xp
-			final XPathExpression xp = XPathUtil.xpath(this.GE_LINE_XP);
-
-			XMLDocumentImageLinker.enumerateTarget(source, svg, xp, new LineIdGenerator(), new NullOutputStream());
-
-			// FIXME what if the image size changes? Change the size of the SVG? 
-			// Scale it? Leave it alone?
-			return new DomRepresentation(MediaType.IMAGE_SVG, svg);
-			// return new SaxRepresentation(MediaType.IMAGE_SVG,
-			// XMLUtil.parse(xml.getInputSource(linkDataURI)));
-
-
-		} else {
-			logger.debug(transcriptURI + " doesn't have image-text links yet");
-
-            final Dimension dimension = imageServer.dimensionOf(facsimileUrl());
-			return new WriterRepresentation(MediaType.IMAGE_SVG) {
-
-				@Override
-				public void write(Writer writer) throws IOException {
-					writer.write("<svg width=\"" + dimension.getWidth() + "\" height=\""
-						+ dimension.getHeight()
-						+ "\" xmlns=\"http://www.w3.org/2000/svg\">");
-					writer.write(" <g>");
-					writer.write("  <title>Layer 1</title>");
-					writer.write(" </g>");
-					writer.write("</svg>");
-				}
-			};
-		}
-	}
-
-	@Get("json")
-	public Representation documentStructure() throws SAXException, IOException, XPathExpressionException {
-		final FaustURI transcriptURI = page().getTranscriptSource();
-		final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
-		final XPathExpression xp = XPathUtil.xpath(GE_LINE_XP);
-
-		return new OutputRepresentation(MediaType.APPLICATION_JSON) {
-			@Override
-			public void write(OutputStream outputStream) throws IOException {
-				XMLDocumentImageLinker.enumerateTarget(source, null, xp, new LineIdGenerator(), outputStream);
-			}
-		};
-	}
-
-    protected FaustURI facsimileUrl() {
-        return page().getFacsimile();
+    @Inject
+    public DocumentImageLinkResource(GraphDatabaseService graphDatabaseService, XMLStorage xml, Templates templates, InternetImageServer imageServer, Logger logger) {
+        this.graphDatabaseService = graphDatabaseService;
+        this.xml = xml;
+        this.templates = templates;
+        this.imageServer = imageServer;
+        this.logger = logger;
     }
+
+    @GET
+    public Response page(@PathParam("path") final String path, @Context final Request request, @Context final SecurityContext sc) throws IOException {
+        return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
+            @Override
+            public Response execute(Graph graph) throws Exception {
+                final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
+                final Map<String, Object> viewModel = new HashMap<String, Object>();
+                viewModel.put("pageNum", documentPage.getPage());
+                viewModel.put("document", documentPage.getDocument());
+                viewModel.put("facsimileUrl", imageServer.uriFor(documentPage.materialUnit().getFacsimile())
+                        .queryParam("SDS", "0,90")
+                        .queryParam("CNT", "1.0")
+                        .queryParam("WID", "800")
+                        .queryParam("QLT", "90")
+                        .queryParam("CVT", "jpeg")
+                        .build().toString());
+
+                return templates.render("document/imagelink", viewModel, request, sc);
+            }
+        });
+    }
+
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, Object> readLinkData(@PathParam("path") final String path) throws SAXException, IOException {
+        return Graph.execute(graphDatabaseService, new Graph.Transaction<Map<String, Object>>() {
+            @Override
+            public Map<String, Object> execute(Graph graph) throws Exception {
+                final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
+                final FaustURI transcriptURI = documentPage.materialUnit().getTranscriptSource();
+                final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
+                return DocumentImageLinks.read(source, null);
+            }
+        });
+    }
+
+    @GET
+    @Produces(DocumentImageLinks.IMAGE_SVG_TYPE)
+    public Source readLinkMap(@PathParam("path") final String path) throws IOException, SAXException {
+        return Graph.execute(graphDatabaseService, new Graph.Transaction<Source>() {
+            @Override
+            public Source execute(Graph graph) throws Exception {
+                final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
+                final MaterialUnit page = documentPage.materialUnit();
+                final FaustURI transcriptURI = page.getTranscriptSource();
+
+                final org.w3c.dom.Document transcript = XMLUtil.parse(xml.getInputSource(transcriptURI));
+
+                final URI linkDataURI = DocumentImageLinks.readLinkDataURI(transcript);
+                org.w3c.dom.Document svg;
+                if (linkDataURI == null) {
+                    logger.fine(transcriptURI + " doesn't have image-text links yet");
+
+                    final Dimension dimension = imageServer.dimensionOf(page.getFacsimile());
+
+                    svg = XMLUtil.documentBuilder().newDocument();
+
+                    final Element root = (Element) svg.appendChild(svg.createElementNS(Namespaces.SVG_NS_URI, "svg"));
+                    root.setAttribute("width", Long.toString(Math.round(dimension.getWidth())));
+                    root.setAttribute("height", Long.toString(Math.round(dimension.getHeight())));
+
+                    final Node g = root.appendChild(svg.createElementNS(Namespaces.SVG_NS_URI, "g"));
+                    g.appendChild(svg.createElementNS(Namespaces.SVG_NS_URI, "title")).setTextContent("Layer 1");
+                } else {
+                    logger.fine(transcriptURI + " has image-text links, loading");
+                    svg = XMLUtil.parse(xml.getInputSource(new FaustURI(linkDataURI)));
+
+                    // adjust the links
+                    DocumentImageLinks.read(transcript, svg);
+                }
+
+                // FIXME what if the image size changes? Change the size of the SVG?
+                // Scale it? Leave it alone?
+                return new DOMSource(svg);
+            }
+        });
+    }
+
+    @PUT
+    @Consumes(DocumentImageLinks.IMAGE_SVG_TYPE)
+	public String write(@PathParam("path") final String path, final InputStream svgStream) throws SAXException, IOException, TransformerException {
+        return Graph.execute(graphDatabaseService, new Graph.Transaction<String>() {
+            @Override
+            public String execute(Graph graph) throws Exception {
+                final FaustURI transcriptURI = DocumentPage.fromPath(path, graph).materialUnit().getTranscriptSource();
+
+                final org.w3c.dom.Document svg = XMLUtil.parse(svgStream);
+                final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
+
+                boolean hasSourceChanged = DocumentImageLinks.write(source, svg);
+                if (hasSourceChanged) {
+                    logger.fine("Added new xml:ids to " + transcriptURI);
+                }
+
+
+                // Check if the transcript has image links attached
+                URI linkDataURI = DocumentImageLinks.readLinkDataURI(source);
+                if (linkDataURI == null) {
+                    // generate random URI
+                    linkDataURI = new FaustURI(FaustAuthority.XML, "/image-text-links/" + UUID.randomUUID() + ".svg").toURI();
+
+                    logger.fine("Adding new image-text-link to " + transcriptURI);
+                    DocumentImageLinks.writeLinkDataURI(source, linkDataURI);
+                    hasSourceChanged = true;
+                }
+
+                // write the image links file
+                logger.fine("Writing image-text-link data to " + linkDataURI);
+                xml.put(new FaustURI(linkDataURI), svg);
+
+                if (hasSourceChanged) {
+                    // write the modified transcript
+                    logger.fine("Writing " + transcriptURI);
+                    xml.put(transcriptURI, source);
+                }
+
+                // FIXME
+                return "<svg></svg>";
+            }
+        });
+	}
 }
