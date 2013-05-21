@@ -38,7 +38,7 @@ public class SearchResource {
     @Path("/{query}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-	public Map<String,Object> searchResults(@PathParam("query") final String query) {
+	public Map<String,Object> searchResults(@PathParam("query") final String query) throws Exception {
         return Graph.execute(graphDatabaseService, new Graph.Transaction<Map<String, Object>>() {
             @Override
             public Map<String, Object> execute(Graph graph) throws Exception {

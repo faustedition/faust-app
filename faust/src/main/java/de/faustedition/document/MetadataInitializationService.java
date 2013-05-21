@@ -8,16 +8,12 @@ import de.faustedition.FaustURI;
 import de.faustedition.Server;
 import de.faustedition.db.Relations;
 import de.faustedition.db.Tables;
-import de.faustedition.document.ArchiveDescriptorParser;
-import de.faustedition.document.ArchiveResource;
-import de.faustedition.document.DocumentDescriptorParser;
 import de.faustedition.genesis.MacrogeneticRelationManager;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.xml.sax.SAXException;
 
 import javax.inject.Inject;
@@ -34,7 +30,6 @@ public class MetadataInitializationService extends AbstractIdleService {
 
     private final XMLStorage xml;
     private final DataSource dataSource;
-    private final GraphDatabaseService graphDatabaseService;
     private final Logger logger;
     private final ObjectMapper objectMapper;
     private final MacrogeneticRelationManager macrogeneticRelationManager;
@@ -42,13 +37,11 @@ public class MetadataInitializationService extends AbstractIdleService {
     @Inject
     public MetadataInitializationService(XMLStorage xml,
                                          DataSource dataSource,
-                                         GraphDatabaseService graphDatabaseService,
                                          ObjectMapper objectMapper,
                                          MacrogeneticRelationManager macrogeneticRelationManager,
                                          Logger logger) {
         this.xml = xml;
         this.dataSource = dataSource;
-        this.graphDatabaseService = graphDatabaseService;
         this.objectMapper = objectMapper;
         this.macrogeneticRelationManager = macrogeneticRelationManager;
         this.logger = logger;

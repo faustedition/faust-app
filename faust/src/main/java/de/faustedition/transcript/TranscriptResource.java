@@ -63,7 +63,7 @@ public class TranscriptResource {
 
     @GET
     @Path("/{id}")
-    public Response page(@PathParam("id") final long id, @Context final Request request, @Context final SecurityContext sc) {
+    public Response page(@PathParam("id") final long id, @Context final Request request, @Context final SecurityContext sc) throws Exception {
         return Graph.execute(db, new Graph.Transaction<Response>() {
             @Override
             public Response execute(Graph graph) throws Exception {

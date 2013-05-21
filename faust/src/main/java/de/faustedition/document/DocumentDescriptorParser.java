@@ -24,6 +24,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -130,9 +131,26 @@ public class DocumentDescriptorParser extends DefaultHandler {
                     final String archiveId = unitData.path("archive").asText();
                     if (!archiveId.isEmpty()) {
                         document.setArchiveId(Preconditions.checkNotNull(archiveIds.get(archiveId), archiveId));
-                        document.setMetadata(objectMapper.writeValueAsString(unitData));
-                        document.store();
                     }
+                    final String callNumberPrefix = "callnumber" + (archiveId.isEmpty() ? "" : "." + archiveId);
+                    final String waIdPrefix = "callnumber.wa-";
+
+                    String callnumber = null;
+                    String waId = null;
+                    for (Iterator<Map.Entry<String,JsonNode>> it = unitData.getFields(); it.hasNext(); ) {
+                        final Map.Entry<String, JsonNode> metadata = it.next();
+                        final String metadataKey = metadata.getKey();
+                        if (metadataKey.startsWith(callNumberPrefix)) {
+                            callnumber = Strings.emptyToNull(metadata.getValue().asText());
+                        } else if (metadataKey.startsWith(waIdPrefix)) {
+                            waId = Strings.emptyToNull(metadata.getValue().asText());
+                        }
+                    }
+
+                    document.setMetadata(objectMapper.writeValueAsString(unitData));
+                    document.setCallnumber(callnumber);
+                    document.setWaId(waId);
+                    document.store();
                 }
 
                 Long transcriptId = null;

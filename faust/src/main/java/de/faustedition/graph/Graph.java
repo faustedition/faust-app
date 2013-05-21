@@ -29,48 +29,44 @@ public class Graph {
 
 	private final GraphDatabaseService db;
 
-    public static <T> T execute(GraphDatabaseService db, final Transaction<T> tx) {
+    public static <T> T execute(GraphDatabaseService db, final Transaction<T> tx) throws Exception {
         Stopwatch sw = null;
         org.neo4j.graphdb.Transaction transaction = null;
         try {
-            try {
+            if (LOG.isLoggable(Level.FINE)) {
+                sw = new Stopwatch();
+                sw.start();
+            }
+
+            transaction = db.beginTx();
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "Started transaction for {0}", tx);
+            }
+
+            final T result = tx.execute(new Graph(db));
+
+            transaction.success();
+            if (LOG.isLoggable(Level.FINE)) {
+                sw.stop();
+                LOG.log(Level.FINE, "Committed transaction for {0} after {1}", new Object[] { tx, sw });
+            }
+
+            return result;
+        } catch (Exception e) {
+            if (transaction != null && tx.rollsBackOn(e)) {
+                transaction.failure();
                 if (LOG.isLoggable(Level.FINE)) {
-                    sw = new Stopwatch();
-                    sw.start();
-                }
-
-                transaction = db.beginTx();
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.log(Level.FINE, "Started transaction for {0}", tx);
-                }
-
-                final T result = tx.execute(new Graph(db));
-
-                transaction.success();
-                if (LOG.isLoggable(Level.FINE)) {
-                    sw.stop();
-                    LOG.log(Level.FINE, "Committed transaction for {0} after {1}", new Object[] { tx, sw });
-                }
-
-                return result;
-            } catch (Exception e) {
-                if (transaction != null && tx.rollsBackOn(e)) {
-                    transaction.failure();
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.log(Level.FINE, "Rolled back transaction for " + tx, e);
-                    }
-                }
-                throw e;
-            } finally {
-                if (transaction != null) {
-                    transaction.finish();
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.log(Level.FINE, "Finished transaction for {0}", tx);
-                    }
+                    LOG.log(Level.FINE, "Rolled back transaction for " + tx, e);
                 }
             }
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw e;
+        } finally {
+            if (transaction != null) {
+                transaction.finish();
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Finished transaction for {0}", tx);
+                }
+            }
         }
     }
 

@@ -58,7 +58,7 @@ public class DocumentImageLinkResource {
     }
 
     @GET
-    public Response page(@PathParam("path") final String path, @Context final Request request, @Context final SecurityContext sc) throws IOException {
+    public Response page(@PathParam("path") final String path, @Context final Request request, @Context final SecurityContext sc) throws Exception {
         return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
             @Override
             public Response execute(Graph graph) throws Exception {
@@ -82,7 +82,7 @@ public class DocumentImageLinkResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> readLinkData(@PathParam("path") final String path) throws SAXException, IOException {
+    public Map<String, Object> readLinkData(@PathParam("path") final String path) throws Exception {
         return Graph.execute(graphDatabaseService, new Graph.Transaction<Map<String, Object>>() {
             @Override
             public Map<String, Object> execute(Graph graph) throws Exception {
@@ -96,7 +96,7 @@ public class DocumentImageLinkResource {
 
     @GET
     @Produces(DocumentImageLinks.IMAGE_SVG_TYPE)
-    public Source readLinkMap(@PathParam("path") final String path) throws IOException, SAXException {
+    public Source readLinkMap(@PathParam("path") final String path) throws Exception {
         return Graph.execute(graphDatabaseService, new Graph.Transaction<Source>() {
             @Override
             public Source execute(Graph graph) throws Exception {
@@ -138,7 +138,7 @@ public class DocumentImageLinkResource {
 
     @PUT
     @Consumes(DocumentImageLinks.IMAGE_SVG_TYPE)
-	public String write(@PathParam("path") final String path, final InputStream svgStream) throws SAXException, IOException, TransformerException {
+	public String write(@PathParam("path") final String path, final InputStream svgStream) throws Exception {
         return Graph.execute(graphDatabaseService, new Graph.Transaction<String>() {
             @Override
             public String execute(Graph graph) throws Exception {

@@ -1,21 +1,18 @@
-	<#assign archiveId = document.getMetadataValue("archive")>
-	<#assign callnumber = document.toString()>
-	<#assign waId = document.getMetadataValue('wa-id')!"">
-	<#assign title>${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
-	<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
-	<#assign header>
+<#assign archiveId = document.getMetadataValue("archive")>
+<#assign callnumber = document.toString()>
+<#assign waId = document.getMetadataValue('wa-id')!"">
+<#assign title>${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
+<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
+<#assign header>
 	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
-	</#assign>
-
-
-
-
-	<@faust.page title=title header=header layout="wide">
-	<div id="document-navigation" style="height: 50px;">
-
-</div>
+    <script type="text/javascript">
+        var metadata = ${document.METADATA};
+    </script>
+</#assign>
+<@faust.page title=title header=header layout="wide">
+	<div id="document-navigation" style="height: 50px;"></div>
 	<div id="document-app" class="yui-u-1" style="min-height: 600px;"></div>
 	<script type="text/javascript">
 
@@ -462,4 +459,4 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 
 
 </script>
-	</@faust.page>
+</@faust.page>
