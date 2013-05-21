@@ -208,7 +208,7 @@
                             <includes>.*</includes>
                             <excludes></excludes>
                             <dateAsTimestamp>true</dateAsTimestamp>
-                            <inputSchema>FAUST</inputSchema>
+                            <inputSchema>PUBLIC</inputSchema>
                         </database>
                         <generate>
                             <deprecated>false</deprecated>

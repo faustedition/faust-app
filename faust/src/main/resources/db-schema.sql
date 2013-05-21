@@ -1,7 +1,3 @@
-create schema if not exists faust;
-
-set schema faust;
-
 create sequence if not exists interedition_text_id;
 
 create table if not exists interedition_name (
@@ -30,10 +26,10 @@ create index if not exists interedition_text_range on interedition_text_anchor (
 
 create table if not exists transcript (
   id bigint identity,
-  source_uri varchar(100) not null,
-  material_unit_id bigint not null,
+  source_uri varchar(150) not null,
+  last_read timestamp,
   text_id bigint,
-  unique(source_uri),
+  unique (source_uri),
   foreign key (text_id) references interedition_text_layer (id)
 );
 
@@ -43,4 +39,35 @@ create table if not exists transcribed_verse_interval (
   verse_end int not null,
   foreign key (transcript_id) references transcript (id),
   unique (transcript_id, verse_start, verse_end)
+);
+
+create table if not exists archive (
+  id bigint identity,
+  label varchar(50) not null,
+  name varchar(100) not null,
+  institution varchar(100) not null,
+  department varchar(100) null,
+  city varchar(100) not null,
+  country_code char(2) not null,
+  country varchar(100) not null,
+  url varchar(100) not null,
+  location_lat double not null,
+  location_lng double not null,
+  unique (label)
+);
+
+create table if not exists document (
+  id bigint identity,
+  descriptor_uri varchar(100) not null,
+  archive_id bigint,
+  metadata clob,
+  foreign key (archive_id) references archive (id)
+);
+
+create table if not exists material_unit (
+  id bigint identity,
+  document_id bigint not null,
+  document_order int not null,
+  transcript_id bigint,
+  foreign key (document_id) references document (id)
 );

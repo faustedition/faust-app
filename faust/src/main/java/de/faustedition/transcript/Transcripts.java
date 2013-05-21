@@ -83,13 +83,12 @@ public class Transcripts {
         return Relations.execute(dataSource, new Relations.Transaction<TranscriptRecord>() {
             @Override
             public TranscriptRecord execute(DSLContext sql) throws Exception {
-                TranscriptRecord transcriptRecord = sql.selectFrom(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.MATERIAL_UNIT_ID.eq(materialUnit.node.getId())).fetchOne();
+                TranscriptRecord transcriptRecord = sql.selectFrom(Tables.TRANSCRIPT).fetchOne();
                 if (transcriptRecord != null) {
                     return transcriptRecord;
                 }
 
                 transcriptRecord = sql.newRecord(Tables.TRANSCRIPT);
-                transcriptRecord.setMaterialUnitId(materialUnit.node.getId());
                 transcriptRecord.setSourceUri(source.toString());
 
                 if (LOG.isDebugEnabled()) {

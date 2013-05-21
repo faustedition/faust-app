@@ -2,8 +2,12 @@ package de.faustedition.db;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
+import com.google.common.io.Closer;
 import com.jolbox.bonecp.BoneCPDataSource;
 import org.h2.Driver;
+import org.h2.engine.Database;
 import org.h2.tools.Console;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -11,8 +15,18 @@ import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -109,6 +123,88 @@ public class Relations {
         return dataSource;
     }
 
+    public static DataSource init(DataSource dataSource) throws IOException, SQLException {
+        final Closer closer = Closer.create();
+        try {
+            restore(dataSource, closer.register(new InputStreamReader(
+                    Relations.class.getResourceAsStream("/db-schema.sql"),
+                    Charset.forName("UTF-8")
+            )));
+            return dataSource;
+        } finally {
+            closer.close();
+        }
+    }
+
+    public static void backup(DataSource dataSource, Writer to) throws SQLException, IOException {
+        Connection connection = null;
+        PreparedStatement script = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dataSource.getConnection();
+            script = connection.prepareStatement("SCRIPT DROP BLOCKSIZE 10485760");
+            resultSet = script.executeQuery();
+            while (resultSet.next()) {
+                final Reader scriptReader = resultSet.getCharacterStream(1);
+                try {
+                    CharStreams.copy(scriptReader, to);
+                } finally {
+                    Closeables.close(scriptReader, false);
+                }
+                to.write("\n");
+            }
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (script != null) {
+                script.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        }
+    }
+
+    public static void restore(DataSource dataSource, File from, Charset charset) throws SQLException {
+        Connection connection = null;
+        Statement runScript = null;
+        ResultSet resultSet = null;
+        try {
+            connection = dataSource.getConnection();
+            runScript = connection.createStatement();
+            runScript.executeUpdate(String.format("RUNSCRIPT FROM '%s' CHARSET '%s'", from.getPath(), charset.name()));
+        } finally {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (runScript != null) {
+                runScript.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        }
+    }
+
+    public static void restore(DataSource dataSource, Reader from) throws IOException, SQLException {
+        final File restoreSql = File.createTempFile(Relations.class.getName() + ".restore", ".sql");
+        restoreSql.deleteOnExit();
+
+        try {
+            final Charset charset = Charset.forName("UTF-8");
+            Writer tempWriter = null;
+            try {
+                CharStreams.copy(from, tempWriter = new OutputStreamWriter(new FileOutputStream(restoreSql), charset));
+            } finally {
+                Closeables.close(tempWriter, false);
+            }
+            restore(dataSource, restoreSql, charset);
+        } finally {
+            restoreSql.delete();
+        }
+    }
+
     public static void console(File path) throws SQLException {
         Console.main(
                 "-driver", DRIVER_CLASS_NAME,
@@ -119,7 +215,7 @@ public class Relations {
     }
 
     protected static String jdbcUrl(File path) {
-        return new File(path, "relations").toURI().toString().replaceAll("^file:", "jdbc:h2://") + ";SCHEMA=FAUST";
+        return new File(path, "relations").toURI().toString().replaceAll("^file:", "jdbc:h2://");
     }
 
 }
