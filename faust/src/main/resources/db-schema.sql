@@ -60,6 +60,8 @@ create table if not exists document (
   id bigint identity,
   descriptor_uri varchar(100) not null,
   archive_id bigint,
+  callnumber varchar(50),
+  wa_id varchar(50),
   metadata clob,
   foreign key (archive_id) references archive (id)
 );
