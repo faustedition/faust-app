@@ -5,9 +5,7 @@ YUI({
 	   'test-adhoc-tree',
 	   function (Y) {
 
-		   Y.Test.Runner.add(Y.FaustTest.AdhocTreeTest);
-
-
+		   Y.Test.Runner.add(Y.FaustTest.adhocTreeTestSuite);
 
 		   new Y.Test.Console({
 			   filters: {

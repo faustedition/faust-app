@@ -1,5 +1,7 @@
 YUI.add('test-adhoc-tree', function (Y) {
 
+	var adhocTreeTestSuite = new Y.Test.Suite('AdhocTree Test Suite');
+
 	function structurallyEqual(node1, node2) {
 		if (node1 instanceof Y.Faust.TextNode || Y.Lang.isString(node1)) {
 			var text1 = node1 instanceof Y.Faust.TextNode ? node1.content() : node1;
@@ -23,118 +25,251 @@ YUI.add('test-adhoc-tree', function (Y) {
 		return true;
 	};
 
-	var AdhocTreeTest = new Y.Test.Case({
+	var isDescendantTest = new Y.Test.Case({
 
-		name: "Ranges to Goddag",
+		name: 'Test for isDecendant()',
 		
-		text: 
-		{
-			"annotations": [
-				{
-					"d": {
-						"xml:node": "1",
+		testIsDescendant : function() {
+			Y.assert(Y.Faust.XMLNodeUtils.isDescendant('1/1','1'), 'child 1');
+			Y.assert(Y.Faust.XMLNodeUtils.isDescendant('2/1','1'), 'child 2');
+			Y.assert(Y.Faust.XMLNodeUtils.isDescendant('2/2/1','1'), 'grandchild');
+			Y.assert(!Y.Faust.XMLNodeUtils.isDescendant('2','1'), 'sibling');
+			Y.assert(!Y.Faust.XMLNodeUtils.isDescendant('1','1/1'), 'parent');
+		}
+
+	});
+	
+	adhocTreeTestSuite.add(isDescendantTest);										  
+
+	var basicTest = new Y.Test.Case({
+
+		name: 'Basic Adhoc Tree',
+		
+		text: Y.Faust.Text.create(
+			{
+				'annotations': [
+					{
+						'd': {
+							'xml:node': '1',
+						}, 
+						'id': 1, 
+						'n': 1, 
+						't': [
+							[
+								1, 
+								24, 
+								1000
+							]
+						]
 					}, 
-					"id": 1, 
-					"n": 1, 
-					"t": [
+					{
+						'd': {
+							'xml:node': '1/1'
+						}, 
+						'id': 2, 
+						'n': 2, 
+						't': [
+							[
+								3, 
+								6, 
+								1000
+							]
+						]
+					}, 
+					{
+						'd': {
+							'xml:node': '2/1'
+						}, 
+						'id': 3, 
+						'n': 3, 
+						't': [
+							[
+								20, 
+								23, 
+								1000
+							]
+						]
+					}, 
+
+				], 
+
+				'names': {
+ 					'1': [
+						'http://interedition.eu/ns', 
+						'element_a'
+					], 
+					'2': [
+						'http://interedition.eu/ns', 
+						'element_b'
+					], 
+					'3': [
+						'http://interedition.eu/ns', 
+						'element_c'
+					], 
+					'100': [
+						'http://interedition.eu/ns', 
+						'text'
+					], 
+
+				}, 
+				'text': {
+					'd': {},
+					'id': 1000, 
+					'n': 100, 
+					't': [
 						[
-							1, 
-							24, 
+							0,
+							25, 
 							1000
 						]
 					]
 				}, 
-				{
-					"d": {
-						"xml:node": "1/1"
-					}, 
-					"id": 2, 
-					"n": 2, 
-					"t": [
-						[
-							3, 
-							6, 
-							1000
-						]
-					]
-				}, 
-				{
-					"d": {
-						"xml:node": "2/1"
-					}, 
-					"id": 3, 
-					"n": 3, 
-					"t": [
-						[
-							20, 
-							23, 
-							1000
-						]
-					]
-				}, 
+				'textContent': 'x<a<b> example text <c>>x'
+			}),
 
-			], 
+		expected : { name: {localName: 'treeRoot'},
+					 children: [ 
+						 'x',
+						 { name: {localName: 'element_a'},
+						   children: [
+							   '<a',
+ 							   { name:{localName: 'element_b'},
+								 children:['<b>'] },
+							   ' example text ',
+							   { name:{localName: 'element_c'},
+								 children:['<c>']},
+							   '>'
+						   ]},
+						 'x'
+					 ]},
 
-			"names": {
- 				"1": [
-					"http://interedition.eu/ns", 
-					"element_a"
-				], 
-				"2": [
-					"http://interedition.eu/ns", 
-					"element_b"
-				], 
-				"3": [
-					"http://interedition.eu/ns", 
-					"element_c"
-				], 
-				"100": [
-					"http://interedition.eu/ns", 
-					"text"
-				], 
+		
+		testTree : function () {
 
-			}, 
-			"text": {
-				"d": {},
-				"id": 1000, 
-				"n": 100, 
-				"t": [
-					[
-						0,
-						25, 
-						1000
-					]
-				]
-			}, 
-			"textContent": "x<a<b> example text <c>>x"
-		},
-
-		testSimpleTree : function () {
-			var text = Y.Faust.Text.create(this.text);
-			var tree = new Y.Faust.AdhocTree(text, 
+			var tree = new Y.Faust.AdhocTree(this.text, 
 											 ['element_a',
 											  'element_b', 
 											  'element_c']);
 
-			var expected = { name: {localName: "treeRoot"},
-						 children: [ 
-							 "x",
-							 { name: {localName: "element_a"},
-							   children: [
-								   "<a",
- 								   { name:{localName: "element_b"},
-									 children:["<b>"] },
-								   " example text ",
-								   { name:{localName: "element_c"},
-									 children:["<c>"]},
-								   ">"
-							   ]},
-							 "x"
-						 ]};
 
-			Y.assert(structurallyEqual(tree, expected), "adhoctree test");
+			Y.assert(structurallyEqual(tree, this.expected), 'adhoctree test');
 		},
 	});
+
+	adhocTreeTestSuite.add(basicTest);
+
+	var emptyTest = new Y.Test.Case({
+
+		name: 'Empty Adhoc Tree',
+		
+		text: Y.Faust.Text.create(
+			{
+				'annotations': [
+					{
+						'd': {
+							'xml:node': '1',
+						}, 
+						'id': 1, 
+						'n': 1, 
+						't': [
+							[
+								0, 
+								0, 
+								1000
+							]
+						]
+					},
+					{
+						'd': {
+							'xml:node': '1/1'
+						}, 
+						'id': 2, 
+						'n': 2, 
+						't': [
+							[
+								0, 
+								0, 
+								1000
+							]
+						]
+					}, 
+					{
+						'd': {
+							'xml:node': '2/1'
+						}, 
+						'id': 3, 
+						'n': 3, 
+						't': [
+							[
+								0, 
+								0, 
+								1000
+							]
+						]
+					}, 
+
+				], 
+
+				'names': {
+ 					'1': [
+						'http://interedition.eu/ns', 
+						'element_a'
+					], 
+					'2': [
+						'http://interedition.eu/ns', 
+						'element_b'
+					], 
+					'3': [
+						'http://interedition.eu/ns', 
+						'element_c'
+					], 
+					'100': [
+						'http://interedition.eu/ns', 
+						'text'
+					], 
+
+				}, 
+				'text': {
+					'd': {},
+					'id': 1000, 
+					'n': 100, 
+					't': [
+						[
+							0,
+							25, 
+							1000
+						]
+					]
+				}, 
+				'textContent': ''
+			}),
+
+		expected : { name: {localName: 'treeRoot'},
+					 children: [ 
+						 { name: {localName: 'element_a'},
+						   children: [
+ 							   { name:{localName: 'element_b'},
+								 children:[] },
+							   { name:{localName: 'element_c'},
+								 children:[]},
+						   ]},
+					 ]},
+
+		
+		testTree : function () {
+
+			var tree = new Y.Faust.AdhocTree(this.text, 
+											 ['element_a',
+											  'element_b', 
+											  'element_c']);
+
+
+			Y.assert(structurallyEqual(tree, this.expected), 'test an empty tree');
+		},
+	});
+
+	adhocTreeTestSuite.add(emptyTest);
+
 
 	var r2gTestCase = new Y.Test.Case({
 
@@ -1395,7 +1530,7 @@ YUI.add('test-adhoc-tree', function (Y) {
 	});
 
 	Y.mix(Y.namespace("FaustTest"), {
-        AdhocTreeTest: AdhocTreeTest,
+        adhocTreeTestSuite: adhocTreeTestSuite,
     });
 
 }, '0.0', {

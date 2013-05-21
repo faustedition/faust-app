@@ -1,27 +1,45 @@
 YUI.add('adhoc-tree', function (Y) {
-	
-	function _sortXMLNodeValues(a,b) {
-		var aNode = a.split('/').reverse();
-		var bNode = b.split('/').reverse();
-		if (bNode[0].length === 0)
-			return 1;
-		for (i=0; true; i++) {
-			if (!aNode[i])
-				return -1;
-			if (!bNode[i])
-				return 1;
-			if (aNode[i] < bNode[i])
-				return -2;				
-		}
-	};
 
-	// is a following b in document order?
-	function _isFollowing(a,b) {
-		return _sortXMLNodeValues(a.data['xml:node'], b.data['xml:node']) === 1 ? true : false;
-	};
-	
-	function _sortByXMLNodeData(a, b) {
-		return _sortXMLNodeValues(a.data['xml:node'], b.data['xml:node']);
+ 	var XMLNodeUtils = {
+		sortXMLNodeValues : function(a,b) {
+			var aNode = a.split('/').reverse();
+			var bNode = b.split('/').reverse();
+			if (bNode[0].length === 0)
+				return 1;
+			for (var i=0; true; i++) {
+				if (!aNode[i])
+					return -1;
+				if (!bNode[i])
+					return 1;
+				if (aNode[i] < bNode[i])
+					return -2;				
+			}
+		},
+
+		// is a descendant of b in document order?
+		isDescendant : function(a, b) {
+			var aNode = a.split('/').reverse();
+			var bNode = b.split('/').reverse();
+			if (aNode[0].length === 0)
+				return false;
+			for (var i=0; true; i++) {
+				if (!aNode[i])
+					return false;
+				if (!bNode[i])
+					return true;
+				if (aNode[i] != bNode[i])
+					return false;				
+			}		
+		},
+
+		// is a following b in document order?
+		isFollowing : function(a,b) {
+			return XMLNodeUtils.sortXMLNodeValues(a.data['xml:node'], b.data['xml:node']) === 1 ? true : false;
+		},
+		
+		sortByXMLNodeData : function(a, b) {
+			return XMLNodeUtils.sortXMLNodeValues(a.data['xml:node'], b.data['xml:node']);
+		}
 	};
 
 	function _sortByRange(a, b) {
@@ -31,7 +49,7 @@ YUI.add('adhoc-tree', function (Y) {
 			return a.targets[0].range.start - b.targets[0].range.start;
 	};
 
-	function _outermostAnnotations(transcript, start, end, filter, exclude) {
+	function _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude) {
 		
 		var allAnnotations = transcript.find (start, end, filter);
 		
@@ -44,7 +62,7 @@ YUI.add('adhoc-tree', function (Y) {
 
 		// assuming annotations ordered by start position
 
-		var smallestStart = includedAnnotations[0].targets[0].range.start;		
+		var smallestStart = includedAnnotations[0].targets[0].range.start;
 
 		var firstAnnotations = Y.Array.filter(includedAnnotations, function(annotation) {
 			return annotation.targets[0].range.start === smallestStart;
@@ -58,34 +76,45 @@ YUI.add('adhoc-tree', function (Y) {
 			return Math.max(x,y)
 		});
 
-		var outermostAnnotations = Y.Array.filter(firstAnnotations, function(annotation){
+		var nextOutermostAnnotationCandidates = Y.Array.filter(firstAnnotations, function(annotation){
 			return annotation.targets[0].range.end === greatestEnd;
 		});
 
-		return outermostAnnotations;
+		return nextOutermostAnnotationCandidates;
 
 	};
 
-	function _outermostAnnotation(transcript, start, end, filter, exclude, parent) {
+	function _nextOutermostAnnotation(transcript, start, end, filter, siblings, ancestors, parent) {
 
-		//var ancestorsAndSelf = parent.ancestors().push(parent);
-		var outermostAnnotations = _outermostAnnotations(transcript, start, end, filter, exclude);
+		var exclude = ancestors.concat(siblings);
 
-		var includedAnnotations = Y.Array.filter(outermostAnnotations, function(annotation) {
+		var nextOutermostAnnotationCandidates = _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude);
+
+		var includedAnnotations = Y.Array.filter(nextOutermostAnnotationCandidates, function(annotation) {
 			return exclude.indexOf(annotation) < 0;
 		});
 
 		if (includedAnnotations.length === 0)
 			return null;
 
-		var descendants = Y.Array.filter(includedAnnotations, function(annotation){
-			return _isFollowing(annotation, parent);
+ 		var descendants = Y.Array.filter(includedAnnotations, function(annotation){
+			return XMLNodeUtils.isDescendant(annotation.data['xml:node'], parent.data['xml:node']);
 		});
 		
-		var sortedByNesting = descendants.sort(_sortByXMLNodeData);
+
+		// filter out descendents of siblings; necessary with empty elements
+
+		var nonDescendantsOfSiblings = Y.Array.filter(descendants, function(annotation){
+			for (var i=0; i < siblings.length; i++ ) {
+				if (XMLNodeUtils.isDescendant(annotation.data['xml:node'], siblings[i].data['xml:node']))
+					return false;
+			}
+			return true;
+		});
+
+		var sortedByNesting = nonDescendantsOfSiblings.sort(XMLNodeUtils.sortByXMLNodeData);
 
 		return sortedByNesting.length > 0 ? sortedByNesting[0] : null;
-		
 	}
 
 	function AdhocNode(parent) {
@@ -152,13 +181,13 @@ YUI.add('adhoc-tree', function (Y) {
 			return textNodes;
 		},
 
-		_iterateChildren: function(start, end, annotationStack) {
+		_iterateChildren: function(start, end, ancestors) {
+			var siblings = [];
 			var result = [];
 			var from = start;
 			var to = end;
 			while (true) {
-
-				var annotation = _outermostAnnotation(this.transcript(), from, end, this.filter(), annotationStack, this.annotation);
+				var annotation = _nextOutermostAnnotation(this.transcript(), from, end, this.filter(), siblings, ancestors, this.annotation);
 				if (annotation) {
 
 					// there is a sibling non-text node
@@ -170,7 +199,7 @@ YUI.add('adhoc-tree', function (Y) {
 						var textNodes = this._textNodesForPartitions(prefixStart, prefixEnd, this);
 						result = result.concat(textNodes);
 					} 
-					annotationStack.push(annotation);
+					siblings.push(annotation);
 					var annotationNode = new AnnotationNode(annotation, this);
 					result.push(annotationNode);
 					from = annotationEnd;
@@ -238,7 +267,8 @@ YUI.add('adhoc-tree', function (Y) {
 	Y.mix(Y.namespace("Faust"), {
         AdhocTree: AdhocTree,
         TextNode: TextNode,
-        AnnotationNode: AnnotationNode
+        AnnotationNode: AnnotationNode,
+		XMLNodeUtils: XMLNodeUtils
     });
 }, '0.0', {
     requires: ["text-annotation", "array"]
