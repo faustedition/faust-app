@@ -4,9 +4,7 @@ import de.faustedition.Templates;
 import de.faustedition.db.Relations;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.DocumentRecord;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.jooq.DSLContext;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -43,19 +41,14 @@ public class DocumentResource {
         return Relations.execute(dataSource, new Relations.Transaction<Response>() {
             @Override
             public Response execute(DSLContext sql) throws Exception {
-                final DocumentRecord document = document(sql, id);
+                final DocumentRecord document = sql.selectFrom(Tables.DOCUMENT).where(Tables.DOCUMENT.ID.eq(id)).fetchOne();
+                if (document == null) {
+                    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(Long.toString(id)).build());
+                }
                 final Map<String, Object> viewModel = new HashMap<String, Object>();
                 viewModel.put("document", document.intoMap());
                 return templates.render("document/document", viewModel, request, sc);
             }
         });
-    }
-
-    protected DocumentRecord document(DSLContext sql, long id) {
-        final DocumentRecord document = sql.selectFrom(Tables.DOCUMENT).where(Tables.DOCUMENT.ID.eq(id)).fetchOne();
-        if (document == null) {
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(Long.toBinaryString(id)).build());
-        }
-        return document;
     }
 }
