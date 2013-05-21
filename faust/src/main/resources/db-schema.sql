@@ -71,5 +71,14 @@ create table if not exists material_unit (
   document_id bigint not null,
   document_order int not null,
   transcript_id bigint,
-  foreign key (document_id) references document (id)
+  foreign key (document_id) references document (id),
+  unique (document_id, document_order)
 );
+
+create table if not exists facsimile (
+  material_unit_id bigint not null,
+  facsimile_order int not null,
+  path varchar(150) not null,
+  foreign key (material_unit_id) references material_unit (id),
+  unique (material_unit_id, facsimile_order)
+)

@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.DocumentRecord;
@@ -11,6 +13,8 @@ import de.faustedition.db.tables.records.MaterialUnitRecord;
 import de.faustedition.db.tables.records.TranscriptRecord;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLBaseTracker;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
@@ -22,11 +26,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -47,6 +54,7 @@ public class DocumentDescriptorParser extends DefaultHandler {
     );
 
     private final DSLContext sql;
+    private final XMLStorage xml;
     private final ObjectMapper objectMapper;
     private final Map<String, Long> archiveIds;
     private final FaustURI source;
@@ -61,8 +69,9 @@ public class DocumentDescriptorParser extends DefaultHandler {
     private int materialUnitCounter;
     private boolean inMetadataSection;
 
-    public DocumentDescriptorParser(DSLContext sql, ObjectMapper objectMapper, Map<String, Long> archiveIds, FaustURI source) {
+    public DocumentDescriptorParser(DSLContext sql, XMLStorage xml, ObjectMapper objectMapper, Map<String, Long> archiveIds, FaustURI source) {
         this.sql = sql;
+        this.xml = xml;
         this.objectMapper = objectMapper;
         this.archiveIds = archiveIds;
         this.source = source;
@@ -125,54 +134,84 @@ public class DocumentDescriptorParser extends DefaultHandler {
 		}
 
 		if (MATERIAL_UNIT_NAMES.contains(localName)) {
-            try {
-                final ObjectNode unitData = unitStack.pop();
-                if (unitStack.isEmpty()) {
-                    final String archiveId = unitData.path("archive").asText();
-                    if (!archiveId.isEmpty()) {
-                        document.setArchiveId(Preconditions.checkNotNull(archiveIds.get(archiveId), archiveId));
-                    }
-                    final String callNumberPrefix = "callnumber" + (archiveId.isEmpty() ? "" : "." + archiveId);
-                    final String waIdPrefix = "callnumber.wa-";
+            final ObjectNode unitData = unitStack.pop();
+            if (unitStack.isEmpty()) {
+                final String archiveId = unitData.path("archive").asText();
+                if (!archiveId.isEmpty()) {
+                    document.setArchiveId(Preconditions.checkNotNull(archiveIds.get(archiveId), archiveId));
+                }
+                final String callNumberPrefix = "callnumber" + (archiveId.isEmpty() ? "" : "." + archiveId);
+                final String waIdPrefix = "callnumber.wa-";
 
-                    String callnumber = null;
-                    String waId = null;
-                    for (Iterator<Map.Entry<String,JsonNode>> it = unitData.getFields(); it.hasNext(); ) {
-                        final Map.Entry<String, JsonNode> metadata = it.next();
-                        final String metadataKey = metadata.getKey();
-                        if (metadataKey.startsWith(callNumberPrefix)) {
-                            callnumber = Strings.emptyToNull(metadata.getValue().asText());
-                        } else if (metadataKey.startsWith(waIdPrefix)) {
-                            waId = Strings.emptyToNull(metadata.getValue().asText());
-                        }
+                String callnumber = null;
+                String waId = null;
+                for (Iterator<Map.Entry<String,JsonNode>> it = unitData.getFields(); it.hasNext(); ) {
+                    final Map.Entry<String, JsonNode> metadata = it.next();
+                    final String metadataKey = metadata.getKey();
+                    if (metadataKey.startsWith(callNumberPrefix)) {
+                        callnumber = Strings.emptyToNull(metadata.getValue().asText());
+                    } else if (metadataKey.startsWith(waIdPrefix)) {
+                        waId = Strings.emptyToNull(metadata.getValue().asText());
                     }
+                }
+                document.setCallnumber(callnumber);
+                document.setWaId(waId);
 
+                try {
                     document.setMetadata(objectMapper.writeValueAsString(unitData));
-                    document.setCallnumber(callnumber);
-                    document.setWaId(waId);
-                    document.store();
+                } catch (IOException e) {
+                    throw Throwables.propagate(e);
                 }
 
-                Long transcriptId = null;
-                if (unitData.has("transcriptSource")) {
-                    final String transcriptSource = unitData.remove("transcriptSource").asText();
-                    final Record1<Long> transcript = sql.select(Tables.TRANSCRIPT.ID).from(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.SOURCE_URI.eq(transcriptSource)).fetchOne();
-                    if (transcript == null) {
-                        final TranscriptRecord transcriptRecord = sql.newRecord(Tables.TRANSCRIPT);
-                        transcriptRecord.setSourceUri(transcriptSource);
-                        transcriptRecord.store();
-                        transcriptId = transcriptRecord.getId();
-                    } else {
-                        transcriptId = transcript.getValue(Tables.TRANSCRIPT.ID);
-                    }
+                document.store();
+            }
+
+            final List<String> facsimiles = Lists.newLinkedList();
+            Long transcriptId = null;
+            if (unitData.has("transcriptSource")) {
+                final String transcriptSource = unitData.remove("transcriptSource").asText();
+                final Record1<Long> transcript = sql.select(Tables.TRANSCRIPT.ID).from(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.SOURCE_URI.eq(transcriptSource)).fetchOne();
+                if (transcript == null) {
+                    final TranscriptRecord transcriptRecord = sql.newRecord(Tables.TRANSCRIPT);
+                    transcriptRecord.setSourceUri(transcriptSource);
+                    transcriptRecord.store();
+                    transcriptId = transcriptRecord.getId();
+                } else {
+                    transcriptId = transcript.getValue(Tables.TRANSCRIPT.ID);
                 }
-                final MaterialUnitRecord unit = sql.newRecord(Tables.MATERIAL_UNIT);
-                unit.setDocumentId(document.getId());
-                unit.setDocumentOrder(unitData.path("order").asInt());
-                unit.setTranscriptId(transcriptId);
-                unit.store();
-            } catch (IOException e) {
-                throw Throwables.propagate(e);
+
+                try {
+                    final FacsimileReferenceCollector facsimileReferenceCollector = new FacsimileReferenceCollector();
+                    XMLUtil.saxParser().parse(
+                            xml.getInputSource(new FaustURI(URI.create(transcriptSource))),
+                            facsimileReferenceCollector
+                    );
+                    facsimiles.addAll(facsimileReferenceCollector.facsimileReferences);
+                } catch (IOException e) {
+                    LOG.log(Level.WARNING, "I/O error while extracting facsimile references from " + transcriptSource, e);
+                } catch (SAXException e) {
+                    LOG.log(Level.WARNING, "XML error while extracting facsimile references from " + transcriptSource, e);
+                }
+            }
+
+            final MaterialUnitRecord unit = sql.newRecord(Tables.MATERIAL_UNIT);
+            unit.setDocumentId(document.getId());
+            unit.setDocumentOrder(unitData.path("order").asInt());
+            unit.setTranscriptId(transcriptId);
+            unit.store();
+
+            int facsimileOrder = 0;
+            for (String facsimile : facsimiles) {
+                sql.insertInto(
+                        Tables.FACSIMILE,
+                        Tables.FACSIMILE.MATERIAL_UNIT_ID,
+                        Tables.FACSIMILE.FACSIMILE_ORDER,
+                        Tables.FACSIMILE.PATH
+                ).values(
+                        unit.getId(),
+                        facsimileOrder++,
+                        facsimile
+                ).execute();
             }
         } else if (inMetadataSection && "metadata".equals(localName)) {
 			inMetadataSection = false;
@@ -229,5 +268,28 @@ public class DocumentDescriptorParser extends DefaultHandler {
             converted.append(current);
         }
         return converted.toString();
+    }
+
+    private class FacsimileReferenceCollector extends DefaultHandler {
+
+        private List<String> facsimileReferences = Lists.newLinkedList();
+
+        @Override
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+            if (!localName.equals("graphic") || !Strings.nullToEmpty(attributes.getValue("mimeType")).trim().isEmpty()) {
+                return;
+            }
+            final String url = Strings.nullToEmpty(attributes.getValue("url")).trim();
+            if (url.isEmpty()) {
+                return;
+            }
+            try {
+                final FaustURI facsimileReference = new FaustURI(URI.create(url));
+                Preconditions.checkArgument(facsimileReference.getAuthority() == FaustAuthority.FACSIMILE);
+                facsimileReferences.add(facsimileReference.getPath().replaceAll("^/++", ""));
+            } catch (IllegalArgumentException e) {
+                LOG.warning("Invalid facsimile reference '" + url + "' in " + source);
+            }
+        }
     }
 }

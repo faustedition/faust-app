@@ -71,7 +71,7 @@ public class MetadataInitializationService extends AbstractIdleService {
                             logger.fine("Importing document " + documentDescriptor);
                             XMLUtil.saxParser().parse(
                                     xml.getInputSource(documentDescriptor),
-                                    new DocumentDescriptorParser(sql, objectMapper, archiveIds, documentDescriptor)
+                                    new DocumentDescriptorParser(sql, xml, objectMapper, archiveIds, documentDescriptor)
                             );
                         } catch (SAXException e) {
                             logger.log(Level.SEVERE, "XML error while adding document " + documentDescriptor, e);
