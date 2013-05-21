@@ -1,15 +1,22 @@
 YUI.add('test-adhoc-tree', function (Y) {
 
 	function structurallyEqual(node1, node2) {
-		if (node1 instanceof Y.Faust.TextNode)
-			return node1.content === node2.content;
+		if (node1 instanceof Y.Faust.TextNode || Y.Lang.isString(node1)) {
+			var text1 = node1 instanceof Y.Faust.TextNode ? node1.content() : node1;
+			var text2 = node2 instanceof Y.Faust.TextNode ? node2.content() : node2;
+			return text1 === text2;
+		}
 
-		var nameEqual = node1.annotation.name.localName === node2.annotation.name.localName;
-		var children1 = node1.children();
-		var children2 = node2.children();
+		var name1 = node1.annotation ? node1.annotation.name.localName : node1.name.localName;
+		var name2 = node2.annotation ? node2.annotation.name.localName : node2.name.localName;
+		if (!name1 === name2)
+			return false;
+
+		var children1 = Y.Lang.isFunction(node1.children) ? node1.children() : node1.children;
+		var children2 = Y.Lang.isFunction(node2.children) ? node2.children() : node2.children;
 		if (children1.length !== children2.length)
 			return false;
-		for (i=0; i < children1.length; i++) {
+		for (var i=0; i < children1.length; i++) {
 			if (!structurallyEqual(children1[i], children2[i]))
 				return false;
 		}
@@ -31,8 +38,8 @@ YUI.add('test-adhoc-tree', function (Y) {
 					"n": 1, 
 					"t": [
 						[
-							0, 
-							25, 
+							1, 
+							24, 
 							1000
 						]
 					]
@@ -46,7 +53,7 @@ YUI.add('test-adhoc-tree', function (Y) {
 					"t": [
 						[
 							3, 
-							5, 
+							6, 
 							1000
 						]
 					]
@@ -99,10 +106,8 @@ YUI.add('test-adhoc-tree', function (Y) {
 					]
 				]
 			}, 
-			"textContent": " [a[b] example text [c]] "
+			"textContent": "x<a<b> example text <c>>x"
 		},
-
-
 
 		testSimpleTree : function () {
 			var text = Y.Faust.Text.create(this.text);
@@ -110,9 +115,24 @@ YUI.add('test-adhoc-tree', function (Y) {
 											 ['element_a',
 											  'element_b', 
 											  'element_c']);
-			expected = {};
-			console.log(tree);
-			Y.assert(structurallyEqual(tree, tree), "adhoctree test");
+
+			var expected = { name: {localName: "treeRoot"},
+						 children: [ 
+							 "x",
+							 { name: {localName: "element_a"},
+							   children: [
+								   "<a",
+ 								   { name:{localName: "element_b"},
+									 children:["<b>"] },
+								   " example text ",
+								   { name:{localName: "element_c"},
+									 children:["<c>"]},
+								   ">"
+							   ]},
+							 "x"
+						 ]};
+
+			Y.assert(structurallyEqual(tree, expected), "adhoctree test");
 		},
 	});
 
@@ -121,7 +141,6 @@ YUI.add('test-adhoc-tree', function (Y) {
 		name: "Ranges to Goddag",
 
 		testRangesToGoddag : function () {
-			//Y.assert(this.ranges != this.goddag, "Testing the testing");
 			console.log('running a test');
 			Y.assert(false, "bla test");
 			
@@ -1380,5 +1399,5 @@ YUI.add('test-adhoc-tree', function (Y) {
     });
 
 }, '0.0', {
-    requires: ["adhoc-tree", "text-annotation"]
+    requires: ["adhoc-tree", "text-annotation", "yui-base"]
 });

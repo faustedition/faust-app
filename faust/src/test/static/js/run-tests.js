@@ -9,7 +9,11 @@ YUI({
 
 
 
-		   new Y.Test.Console({}).render('#test_console');
+		   new Y.Test.Console({
+			   filters: {
+				   pass: true
+			   }
+		   }).render('#test_console');
 
 		   Y.one('#run').on('click', function(e){
 			   Y.Test.Runner.run();

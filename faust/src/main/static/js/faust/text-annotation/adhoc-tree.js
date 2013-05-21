@@ -219,13 +219,11 @@ YUI.add('adhoc-tree', function (Y) {
 				}]
 			}],
 			name: new Y.Faust.Name("http://interedition.eu/ns", "treeRoot"),
-			// root element
 			data: {'xml:node': ''}
 		};
 		AdhocTree.superclass.constructor.call(this, mockAnnotation);
 		this._transcript = transcript;
-		this._filter = filter;
-		
+		this._filter = filter;		
 	}
 	
 	Y.extend(AdhocTree, AnnotationNode, {
