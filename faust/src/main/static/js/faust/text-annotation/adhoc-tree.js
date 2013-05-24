@@ -1,7 +1,7 @@
 YUI.add('adhoc-tree', function (Y) {
 
  	var XMLNodeUtils = {
-		sortXMLNodeValues : function(a,b) {
+		documentOrderSort : function(a,b) {
 			var aNode = a.split('/').reverse();
 			var bNode = b.split('/').reverse();
 			if (bNode[0].length === 0)
@@ -13,6 +13,8 @@ YUI.add('adhoc-tree', function (Y) {
 					return 1;
 				if (aNode[i] < bNode[i])
 					return -2;				
+				if (aNode[i] > bNode[i])
+					return 2;				
 			}
 		},
 
@@ -34,11 +36,11 @@ YUI.add('adhoc-tree', function (Y) {
 
 		// is a following b in document order?
 		isFollowing : function(a,b) {
-			return XMLNodeUtils.sortXMLNodeValues(a.data['xml:node'], b.data['xml:node']) === 1 ? true : false;
+			return XMLNodeUtils.documentOrderSort(a.data['xml:node'], b.data['xml:node']) > 0 ? true : false;
 		},
 		
 		sortByXMLNodeData : function(a, b) {
-			return XMLNodeUtils.sortXMLNodeValues(a.data['xml:node'], b.data['xml:node']);
+			return XMLNodeUtils.documentOrderSort(a.data['xml:node'], b.data['xml:node']);
 		}
 	};
 
@@ -49,12 +51,12 @@ YUI.add('adhoc-tree', function (Y) {
 			return a.targets[0].range.start - b.targets[0].range.start;
 	};
 
-	function _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude) {
+	function _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude, parent) {
 		
 		var allAnnotations = transcript.find (start, end, filter);
 		
 		var includedAnnotations = Y.Array.filter(allAnnotations, function(annotation) {
-			return exclude.indexOf(annotation) < 0;
+			return exclude.indexOf(annotation) < 0 && XMLNodeUtils.isDescendant(annotation.data['xml:node'], parent.data['xml:node']);
 		});
 
 		if (includedAnnotations.length === 0)
@@ -80,7 +82,8 @@ YUI.add('adhoc-tree', function (Y) {
 			return annotation.targets[0].range.end === greatestEnd;
 		});
 
-		return nextOutermostAnnotationCandidates;
+		//return nextOutermostAnnotationCandidates;
+		return firstAnnotations.sort(XMLNodeUtils.sortByXMLNodeData);
 
 	};
 
@@ -88,7 +91,7 @@ YUI.add('adhoc-tree', function (Y) {
 
 		var exclude = ancestors.concat(siblings);
 
-		var nextOutermostAnnotationCandidates = _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude);
+		var nextOutermostAnnotationCandidates = _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude, parent);
 
 		var includedAnnotations = Y.Array.filter(nextOutermostAnnotationCandidates, function(annotation) {
 			return exclude.indexOf(annotation) < 0;

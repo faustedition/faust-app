@@ -36,9 +36,9 @@ YUI.add('document-text', function (Y) {
 				}
 				else {
 					stageColors.uniqueStageCount++;
-					console.log("Number of stages:" + stageColors.uniqueStageCount);
+					//console.log("Number of stages:" + stageColors.uniqueStageCount);
 					var index = stageColors.uniqueStageCount % stageColors.colors.length;
-					console.log('index: ' + index);
+					//console.log('index: ' + index);
 					stageColors.map[stageName] = stageColors.colors[index];
 					return stageColors.map[stageName];
 				}

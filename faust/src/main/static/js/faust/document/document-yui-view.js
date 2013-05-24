@@ -99,10 +99,6 @@ YUI.add('document-yui-view', function (Y) {
 
 			//var visComponent = this.get('visComponent');
 
-			idMap = {};
-			postBuildDeferred = [];
-			mainZone = null;
-
 			try {
 				//var visComponent = Faust.DocumentRanges.transcriptVC(this.get('transcript'));
 				var documentBuilder = new Y.Faust.DocumentAdhocTree();
@@ -111,7 +107,7 @@ YUI.add('document-yui-view', function (Y) {
 				innerContainer.setAttribute("id", "transcript_container");
 				visComponent.svgCont = innerContainer;
 				svgRoot.appendChild(innerContainer);
-				Y.each(documentBuilder.postBuildDeferred, function(f) {f.apply(this)});
+
 				//this.alignMainZone();
 				while (innerContainer.hasChildNodes()) 
 					this.innerContainer.removeChild(innerContainer.firstChild);
