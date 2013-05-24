@@ -2,8 +2,8 @@ YUI.add('adhoc-tree', function (Y) {
 
  	var XMLNodeUtils = {
 		documentOrderSort : function(a,b) {
-			var aNode = a.split('/').reverse();
-			var bNode = b.split('/').reverse();
+			var aNode = a.data['xml:node'].split('/').reverse();
+			var bNode = b.data['xml:node'].split('/').reverse();
 			if (bNode[0].length === 0)
 				return 1;
 			for (var i=0; true; i++) {
@@ -20,8 +20,8 @@ YUI.add('adhoc-tree', function (Y) {
 
 		// is a descendant of b in document order?
 		isDescendant : function(a, b) {
-			var aNode = a.split('/').reverse();
-			var bNode = b.split('/').reverse();
+			var aNode = a.data['xml:node'].split('/').reverse();
+			var bNode = b.data['xml:node'].split('/').reverse();
 			if (aNode[0].length === 0)
 				return false;
 			for (var i=0; true; i++) {
@@ -36,11 +36,11 @@ YUI.add('adhoc-tree', function (Y) {
 
 		// is a following b in document order?
 		isFollowing : function(a,b) {
-			return XMLNodeUtils.documentOrderSort(a.data['xml:node'], b.data['xml:node']) > 0 ? true : false;
+			return XMLNodeUtils.documentOrderSort(a, b) > 0 ? true : false;
 		},
 		
 		sortByXMLNodeData : function(a, b) {
-			return XMLNodeUtils.documentOrderSort(a.data['xml:node'], b.data['xml:node']);
+			return XMLNodeUtils.documentOrderSort(a, b);
 		}
 	};
 
@@ -56,7 +56,7 @@ YUI.add('adhoc-tree', function (Y) {
 		var allAnnotations = transcript.find (start, end, filter);
 		
 		var includedAnnotations = Y.Array.filter(allAnnotations, function(annotation) {
-			return exclude.indexOf(annotation) < 0 && XMLNodeUtils.isDescendant(annotation.data['xml:node'], parent.data['xml:node']);
+			return exclude.indexOf(annotation) < 0 && XMLNodeUtils.isDescendant(annotation, parent);
 		});
 
 		if (includedAnnotations.length === 0)
@@ -101,7 +101,7 @@ YUI.add('adhoc-tree', function (Y) {
 			return null;
 
  		var descendants = Y.Array.filter(includedAnnotations, function(annotation){
-			return XMLNodeUtils.isDescendant(annotation.data['xml:node'], parent.data['xml:node']);
+			return XMLNodeUtils.isDescendant(annotation, parent);
 		});
 		
 
@@ -109,7 +109,7 @@ YUI.add('adhoc-tree', function (Y) {
 
 		var nonDescendantsOfSiblings = Y.Array.filter(descendants, function(annotation){
 			for (var i=0; i < siblings.length; i++ ) {
-				if (XMLNodeUtils.isDescendant(annotation.data['xml:node'], siblings[i].data['xml:node']))
+				if (XMLNodeUtils.isDescendant(annotation, siblings[i]))
 					return false;
 			}
 			return true;

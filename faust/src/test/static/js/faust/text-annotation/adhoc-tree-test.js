@@ -25,16 +25,20 @@ YUI.add('test-adhoc-tree', function (Y) {
 		return true;
 	};
 
+	function a(nodeData) {
+		return { data: { 'xml:node': nodeData } }
+	};
+
 	var isDescendantTest = new Y.Test.Case({
 
 		name: 'Test for isDecendant()',
 		
 		testIsDescendant : function() {
-			Y.assert(Y.Faust.XMLNodeUtils.isDescendant('1/1','1'), 'child 1');
-			Y.assert(Y.Faust.XMLNodeUtils.isDescendant('2/1','1'), 'child 2');
-			Y.assert(Y.Faust.XMLNodeUtils.isDescendant('2/2/1','1'), 'grandchild');
-			Y.assert(!Y.Faust.XMLNodeUtils.isDescendant('2','1'), 'sibling');
-			Y.assert(!Y.Faust.XMLNodeUtils.isDescendant('1','1/1'), 'parent');
+			Y.assert(Y.Faust.XMLNodeUtils.isDescendant( a('1/1'), a('1')), 'child 1');
+			Y.assert(Y.Faust.XMLNodeUtils.isDescendant( a('2/1'), a('1')), 'child 2');
+			Y.assert(Y.Faust.XMLNodeUtils.isDescendant( a('2/2/1'), a('1')), 'grandchild');
+			Y.assert(!Y.Faust.XMLNodeUtils.isDescendant( a('2'), a('1')), 'sibling');
+			Y.assert(!Y.Faust.XMLNodeUtils.isDescendant( a('1'), a('1/1')), 'parent');
 		}
 
 	});
@@ -46,11 +50,12 @@ YUI.add('test-adhoc-tree', function (Y) {
 		name: 'Test for documentOrderSort()',
 		
 		testDocumentOrderSort : function() {
-			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort('1','2') < 0, 'a is following sibling of b');
-			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort('2','1') > 0, 'b is following sibling of a');
-			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort('2/1','1') > 0, 'a is child of b');
-			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort('1','2/1') < 0, 'b is child of a');
-			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort('3/2/1','1') > 0, 'a is descendant of b');
+
+			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('1'), a('2')) < 0, 'x is following sibling of y');
+			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('2'), a('1')) > 0, 'y is following sibling of x');
+			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('2/1'), a('1')) > 0, 'x is child of y');
+			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('1'), a('2/1')) < 0, 'y is child of x');
+			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('3/2/1'), a('1')) > 0, 'x is descendant of y');
 		}
 
 	});
