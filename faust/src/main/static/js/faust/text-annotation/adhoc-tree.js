@@ -243,16 +243,13 @@ YUI.add('adhoc-tree', function (Y) {
 	});
 
 	function AdhocTree(transcript, filter) {
-		var mockAnnotation = {
-			targets: [{
-				ranges: [{
-					start: 0,
-					end: transcript.content.length
-				}]
-			}],
-			name: new Y.Faust.Name("http://interedition.eu/ns", "treeRoot"),
-			data: {'xml:node': ''}
-		};
+
+		var mockAnnotation = new Y.Faust.Annotation(new Y.Faust.Name("http://interedition.eu/ns", "treeRoot"),
+													{'xml:node': ''},
+													[new Y.Faust.TextTarget(transcript,
+																		   new Y.Faust.Range(0, transcript.content.length))]
+		 										   );												
+													
 		AdhocTree.superclass.constructor.call(this, mockAnnotation);
 		this._transcript = transcript;
 		this._filter = filter;		

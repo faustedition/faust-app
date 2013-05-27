@@ -17,10 +17,10 @@ YUI.add('document-adhoc-tree', function (Y) {
 
 			// Text factory; the current model only delivers text nodes, some additional elements (gaps, insertion marks) need 
 			// to be delivered to know their tree context (hands...) for visualisation
-			var createText = function(content, node){
+			var createText = function(content, start, end){
 				if (content.length < 1) throw "Cannot create empty text!";
 				var textAttrs = {};
-				var annotations = transcript.find(node.range.start, node.range.end);
+				var annotations = transcript.find(start, end);
 				Y.each(annotations, function(a) {
 					if (a.name.localName == "hand") {
 						textAttrs.hand = a.data["value"];
@@ -43,8 +43,11 @@ YUI.add('document-adhoc-tree', function (Y) {
 			};
 
 			if ((node instanceof Y.Faust.TextNode) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
-				vc = createText(node.content(), node);
+				vc = createText(node.content(), node.range.start, node.range.end);
 			} else if (node instanceof Y.Faust.AnnotationNode) {
+				var annotationStart = node.annotation.target().range.start;
+				var annotationEnd = node.annotation.target().range.end;
+
 				if (node.name().localName in {"document":1, "treeRoot":1} ) {
 					vc = new Faust.Surface();
 				} else if (node.name().localName === "surface") {
@@ -105,20 +108,22 @@ YUI.add('document-adhoc-tree', function (Y) {
 							for (var nrChars=2; nrChars < node.data()["quantity"]; nrChars++) {
 								representation += gapUncertainChar;  
 							}
-							vc = createText (representation + gapChar, node);															
+							vc = createText (representation + gapChar, 
+											 annotationStart,
+											 annotationEnd);															
 						} else if (node.data()['quantity']) {
 							var representation = '';
 							for (var nrChars=0; nrChars < node.data()["quantity"]; nrChars++) {
 								//representation += '\u2715'; //capital X
 								representation += gapChar; // small X
 							}
-							vc = createText (representation, node);							
+							vc = createText (representation, annotationStart, annotationEnd);							
 						} else if(node.data()['atLeast']) {
 							var representation = gapChar;
 							for (var nrChars=2; nrChars < node.data()["atLeast"]; nrChars++) {
 								representation += gapUncertainChar;  
 							}
-							vc = createText (representation + gapChar, node);							
+							vc = createText (representation + gapChar, annotationStart, annotationEnd);							
 
 						} else {
 							throw (Faust.ENC_EXC_PREF + "Please specify either @qunatity or @atLeast");
@@ -127,7 +132,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 					default: 
 						throw (Faust.ENC_EXC_PREF + "Invalid unit for gap element! Use 'chars'!");
 					}
-				} else if (node.name().localName == "f:hspace") {
+				} else if (node.name().localName == "hspace") {
 					switch (node.data()["unit"]) {
 					case "chars":
 						if (node.data()['quantity']) {
@@ -138,10 +143,10 @@ YUI.add('document-adhoc-tree', function (Y) {
 					default: 
 						throw (Faust.ENC_EXC_PREF + "Invalid unit for hspace element! Use 'chars'!");
 					}
-				}  else if (node.name().localName == "f:grLine") {
+				}  else if (node.name().localName == "grLine") {
 					if (node.data()['f:style'] == 'curly')
 						vc = new Faust.GrLine();
-				} else if (node.name().localName == "f:grBrace") {
+				} else if (node.name().localName == "grBrace") {
 					//vc = new Faust.GBrace();
 				} else if (node.name().localName == "anchor") {
 					//use empty text element as an anchor
@@ -152,10 +157,10 @@ YUI.add('document-adhoc-tree', function (Y) {
 						vc = new Faust.Text("", {});
 					
 					
-				} else if (node.name().localName == "f:ins" && node.data()["f:orient"] == "right") {
+				} else if (node.name().localName == "ins" && node.data()["f:orient"] == "right") {
 					vc = new Faust.DefaultVC();
 					//Einweisungszeichen
-					vc.add (createText("\u2308", node));
+					vc.add (createText("\u2308", annotationStart, annotationEnd));
 					// Default Elements
 				} else if (node.name().localName in {'treeRoot':1, 'anchor':1}) {
 					vc = new Faust.DefaultVC();
@@ -235,7 +240,10 @@ YUI.add('document-adhoc-tree', function (Y) {
 			// After all children, TODO move this into appropriate classes
 			if (node.name && node.name().localName == "ins" && node.data()["f:orient"] == "left") {
 				// Einweisungszeichen
-				vc.add (createText("\u2309", node));
+				var annotationStart = node.annotation.target().range.start;
+				var annotationEnd = node.annotation.target().range.end;
+				
+				vc.add (createText("\u2309", annotationStart, annotationEnd));
 			}
 
 			return vc;
@@ -265,7 +273,9 @@ YUI.add('document-adhoc-tree', function (Y) {
 								   'rdg',
 								   'lem',
 								   'anchor',
-								   'note']
+								   'note',
+								   'ins'
+								  ]
 
 			transcript = Y.Faust.Text.create(jsonRepresentation);
 
