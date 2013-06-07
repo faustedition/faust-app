@@ -66,8 +66,8 @@ YUI.add('document-adhoc-tree', function (Y) {
 
 				} else if (node.name().localName === "line") {
 					var lineAttrs = {};
-					var rendition = node.data()["ge:rend"] || "";
-					if (rendition.indexOf("center") >= 0) {
+					var rendition = node.data()["rend"] || "";
+					if (rendition.indexOf("centered") >= 0) {
 						lineAttrs.center = true;
 					} else if (rendition.indexOf("indent") >= 0) {
 						var start = rendition.indexOf("indent-");
@@ -198,14 +198,13 @@ YUI.add('document-adhoc-tree', function (Y) {
 					}						
 				});
 				
-				// TODO redundant with line properties
 				// TODO special treatment of zones
-				if ("ge:rend" in node.data()) {
-					if (node.data()["ge:rend"] == "right") {
+				if ("rend" in node.data()) {
+					if (node.data()["rend"] == "right") {
 				 		vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 1, 1, Faust.Align.REND_ATTR));
-					} else if (node.data()["ge:rend"] == "left") {
+					} else if (node.data()["rend"] == "left") {
 				 		vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0, 0, Faust.Align.REND_ATTR));
-					} else if (node.data()["ge:rend"] == "center") {
+					} else if (node.data()["rend"] == "centered") {
 				 		vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0.5, 0.5, Faust.Align.REND_ATTR));
 					}
 
@@ -216,7 +215,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 			if (vc != null) {
 
 				// annotate the vc with the original element name
-		 		// vc.elementName = node.name().localName;
+		 		// vc.elementName = node.name() ? node.name().localName : "";
 				
 				if (parent != null ) { // && parent !== this) {
 					parent.add(vc);
@@ -274,7 +273,9 @@ YUI.add('document-adhoc-tree', function (Y) {
 								   'lem',
 								   'anchor',
 								   'note',
-								   'ins'
+								   'ins',
+								   'grBrace',
+								   'gap'
 								  ]
 
 			transcript = Y.Faust.Text.create(jsonRepresentation);

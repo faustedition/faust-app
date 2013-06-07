@@ -206,9 +206,7 @@ YUI.add('document-model', function (Y) {
 	};
  	Faust.Line.prototype.defaultAligns = function () {
 			
- 		if ("center" in this.lineAttrs) 
- 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0.5, 0.5, Faust.Align.REND_ATTR));
- 		else if ("indent" in this.lineAttrs) 
+		if ("indent" in this.lineAttrs) 
  			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, this.lineAttrs["indent"], Faust.Align.INDENT_ATTR));
 		else
  			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));

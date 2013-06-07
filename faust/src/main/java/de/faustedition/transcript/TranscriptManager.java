@@ -146,7 +146,6 @@ public class TranscriptManager implements InitializingBean {
 
 		conf.exclude(new Name(TEI_NS, "teiHeader"));
 		conf.exclude(new Name(TEI_NS, "front"));
-		conf.exclude(new Name(TEI_NS, "fw"));
 		conf.exclude(new Name(TEI_NS, "app"));
 
 		conf.include(new Name(TEI_NS, "lem"));
