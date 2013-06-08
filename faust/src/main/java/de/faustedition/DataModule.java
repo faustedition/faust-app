@@ -5,7 +5,9 @@ import com.google.inject.Provides;
 import com.google.inject.ProvisionException;
 import com.jolbox.bonecp.BoneCPDataSource;
 import de.faustedition.db.Relations;
+import de.faustedition.facsimile.DefaultFacsimileStore;
 import de.faustedition.facsimile.FacsimileStore;
+import de.faustedition.facsimile.MockFacsimileStore;
 import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.h2.H2TextRepository;
 import eu.interedition.text.json.JacksonDataStreamMapper;
@@ -19,6 +21,9 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +62,7 @@ public class DataModule extends AbstractModule {
     @Provides
     @Singleton
     public FacsimileStore facsimileStore() {
-        return new FacsimileStore(dataSubDirectory("facsimile"));
+        return (facsimilesAvailable() ? new DefaultFacsimileStore(dataSubDirectory("facsimile")) : new MockFacsimileStore());
     }
 
     @Provides
@@ -94,5 +99,19 @@ public class DataModule extends AbstractModule {
             throw new ProvisionException(subDirectory + " is not a directory");
         }
         return subDirectory;
+    }
+
+    protected boolean facsimilesAvailable() {
+        final Queue<File> directories = new ArrayDeque<File>(Collections.singleton(dataSubDirectory("facsimile")));
+        while (!directories.isEmpty()) {
+            for (File file : directories.remove().listFiles()) {
+                if (file.isDirectory()) {
+                    directories.add(file);
+                } else if (file.isFile() && file.getName().endsWith(FacsimileStore.IMAGE_FILE_EXTENSION)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
