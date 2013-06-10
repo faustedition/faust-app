@@ -53,11 +53,17 @@ YUI.add('document-yui-view', function (Y) {
 
 			that = this;
 			aq = new Y.AsyncQueue();
+			var layoutAndCenter = function() {
+				that.intoView(innerContainer, svgRoot);
+				that.center(svgRoot, container);
+				visComponent.layout();
+			};
+
 			aq.add(
 				{
-					fn : visComponent.layout,
-					timeout: 10,
-					iterations: 5,
+					fn : layoutAndCenter, //visComponent.layout,
+					timeout: 100,
+					iterations: 10,
 					context: visComponent
 				},
 				{

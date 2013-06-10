@@ -361,6 +361,8 @@ YUI.add('document-model', function (Y) {
 	Faust.Align['7'] = 'INDENT_ATTR';
 	Faust.Align.EXPLICIT = 10;	
 	Faust.Align['10'] = 'EXPLICIT';
+	Faust.Align.MAIN_ZONE = 15;	
+	Faust.Align['15'] = 'MAIN_ZONE';
 
 	
 	Faust.Align.prototype.align = function() {
@@ -379,9 +381,7 @@ YUI.add('document-model', function (Y) {
 	
 	Faust.AbsoluteAlign.prototype.align = function() {
 		this.me.setCoord(this.coordinate, this.coordRotation);
-	}
-	
-	
+	}	
 	
 	Faust.Dimensions = function() {};
 

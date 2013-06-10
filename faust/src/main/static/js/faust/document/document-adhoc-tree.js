@@ -59,8 +59,12 @@ YUI.add('document-adhoc-tree', function (Y) {
 					if ("type" in node.data() && node.data()["type"] == "main") {
 						if (this.mainZone != null)
 							throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
-						else
+						else {
 							this.mainZone = vc;
+							// main zone is absolutely anchored
+							vc.setAlign('hAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
+							vc.setAlign('vAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
+						}
 					} 
 					
 
