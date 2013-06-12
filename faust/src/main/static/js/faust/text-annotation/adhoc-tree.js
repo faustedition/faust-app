@@ -2,8 +2,8 @@ YUI.add('adhoc-tree', function (Y) {
 
  	var XMLNodeUtils = {
 		documentOrderSort : function(a,b) {
-			var aNode = a.data['xml:node'].split('/').reverse();
-			var bNode = b.data['xml:node'].split('/').reverse();
+			var aNode = a.data['xml:node'].split('/').reverse().map(function(x){return parseInt(x)});
+			var bNode = b.data['xml:node'].split('/').reverse().map(function(x){return parseInt(x)});
 			if (bNode[0].length === 0)
 				return 1;
 			for (var i=0; true; i++) {
@@ -20,8 +20,8 @@ YUI.add('adhoc-tree', function (Y) {
 
 		// is a descendant of b in document order?
 		isDescendant : function(a, b) {
-			var aNode = a.data['xml:node'].split('/').reverse();
-			var bNode = b.data['xml:node'].split('/').reverse();
+			var aNode = a.data['xml:node'].split('/').reverse().map(function(x){return parseInt(x)});
+			var bNode = b.data['xml:node'].split('/').reverse().map(function(x){return parseInt(x)});
 			if (aNode[0].length === 0)
 				return false;
 			for (var i=0; true; i++) {

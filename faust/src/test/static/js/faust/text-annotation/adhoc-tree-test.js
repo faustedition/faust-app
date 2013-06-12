@@ -56,6 +56,11 @@ YUI.add('test-adhoc-tree', function (Y) {
 			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('2/1'), a('1')) > 0, 'x is child of y');
 			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('1'), a('2/1')) < 0, 'y is child of x');
 			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('3/2/1'), a('1')) > 0, 'x is descendant of y');
+
+			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('100/4/2/6/2'), a('98/4/2/6/2')) > 0, 'real world example 1');
+			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('98/4/2/6/2'), a('100/4/2/6/2')) < 0, 'real world example 2');
+			Y.assert(Y.Faust.XMLNodeUtils.documentOrderSort( a('2/98/4/2/6/2'), a('100/4/2/6/2')) < 0, 'real world example 3');
+
 		}
 
 	});
@@ -189,7 +194,7 @@ YUI.add('test-adhoc-tree', function (Y) {
 				'annotations': [
 					{
 						'd': {
-							'xml:node': '0'
+							'xml:node': '1'
 						}, 
 						'id': 0, 
 						'n': 4, 
@@ -203,7 +208,7 @@ YUI.add('test-adhoc-tree', function (Y) {
 					}, 
 					{
 						'd': {
-							'xml:node': '1',
+							'xml:node': '2',
 						}, 
 						'id': 1, 
 						'n': 1, 
@@ -217,7 +222,7 @@ YUI.add('test-adhoc-tree', function (Y) {
 					},
 					{
 						'd': {
-							'xml:node': '1/1'
+							'xml:node': '1/2'
 						}, 
 						'id': 2, 
 						'n': 2, 
@@ -231,7 +236,7 @@ YUI.add('test-adhoc-tree', function (Y) {
 					}, 
 					{
 						'd': {
-							'xml:node': '2/1'
+							'xml:node': '2/2'
 						}, 
 						'id': 3, 
 						'n': 3, 
@@ -245,7 +250,7 @@ YUI.add('test-adhoc-tree', function (Y) {
 					}, 
 					{
 						'd': {
-							'xml:node': '3'
+							'xml:node': '4'
 						}, 
 						'id': 4, 
 						'n': 4, 
@@ -442,6 +447,185 @@ YUI.add('test-adhoc-tree', function (Y) {
 	});
 
 	adhocTreeTestSuite.add(emptyParentSiblingTest);
+
+	var realWorldTreeTest = new Y.Test.Case({
+
+		name: 'Real World Tree Test',
+		
+		text: Y.Faust.Text.create(
+			{
+				'annotations': [
+					{
+						'd': {
+							'xml:node': '1',
+						}, 
+						'id': 1, 
+						'n': 1, 
+						't': [
+							[
+								0, 
+								2, 
+								1000
+							]
+						]
+					}, 
+					{
+						'd': {
+							'xml:node': '1/1'
+						}, 
+						'id': 2, 
+						'n': 2, 
+						't': [
+							[
+								0, 
+								1, 
+								1000
+							]
+						]
+					}, 
+ 					{
+						'd': {
+							'xml:node': '2/1'
+						}, 
+						'id': 3, 
+						'n': 2, 
+						't': [
+							[
+								1, 
+								1, 
+								1000
+							]
+						]
+					}, 
+					{
+						'd': {
+							'xml:node': '1/2/1'
+						}, 
+						'id': 4, 
+						'n': 3, 
+						't': [
+							[
+								1, 
+								1, 
+								1000
+							]
+						]
+					}, 
+
+					{
+						'd': {
+							'xml:node': '2/2/1'
+						}, 
+						'id': 5, 
+						'n': 4, 
+						't': [
+							[
+								1, 
+								1, 
+								1000
+							]
+						]
+					}, 
+
+					{
+						'd': {
+							'xml:node': '3/1'
+						}, 
+						'id': 6, 
+						'n': 2, 
+						't': [
+							[
+								1, 
+								2, 
+								1000
+							]
+						]
+					}, 
+
+					{
+						'd': {
+							'xml:node': '1/3/1'
+						}, 
+						'id': 7, 
+						'n': 3, 
+						't': [
+							[
+								1, 
+								1, 
+								1000
+							]
+						]
+					}, 
+
+
+				], 
+
+				'names': {
+ 					'1': [
+						'http://interedition.eu/ns', 
+						'element_a'
+					], 
+					'2': [
+						'http://interedition.eu/ns', 
+						'element_b'
+					], 
+					'3': [
+						'http://interedition.eu/ns', 
+						'element_c'
+					], 
+					'4': [
+						'http://interedition.eu/ns', 
+						'element_d'
+					], 
+
+				}, 
+				'text': {
+					'd': {},
+					'id': 1000, 
+					'n': 100, 
+					't': [
+						[
+							0,
+							25, 
+							1000
+						]
+					]
+				}, 
+				'textContent': 'xy'
+			}),
+
+		expected : 
+		{name: {localName: 'treeRoot'}, children: [
+			{name: {localName: 'element_a'}, children: [	
+				{name: {localName: 'element_b'}, children: [
+					"x"
+				]},
+				{name: {localName: 'element_b'}, children: [
+					{name: {localName: 'element_c'}, children: []},
+					{name: {localName: 'element_d'}, children: []},
+				]},
+				{name: {localName: 'element_b'}, children: [
+					{name: {localName: 'element_c'}, children: []},
+					'y'
+				]},
+			]},
+		]},
+
+		
+		testRealWorldTree : function () {
+
+			var tree = new Y.Faust.AdhocTree(this.text, 
+											 ['element_a',
+											  'element_b', 
+											  'element_c',
+											  'element_d']);
+
+
+			Y.assert(structurallyEqual(tree, this.expected), 'real world tree fails');
+		},
+	});
+
+	adhocTreeTestSuite.add(realWorldTreeTest);
 
 
 	Y.mix(Y.namespace("FaustTest"), {

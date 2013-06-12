@@ -8,7 +8,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 	
 	Y.extend(DocumentAdhocTree, Object, {
 	
-		buildVC: function(parent, tree) {
+		buildVC: function(parent, tree, text) {
 			
 			if (tree == null) return null;
 			var vc = null;
@@ -20,7 +20,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 			var createText = function(content, start, end){
 				if (content.length < 1) throw "Cannot create empty text!";
 				var textAttrs = {};
-				var annotations = transcript.find(start, end);
+				var annotations = text.find(start, end);
 				Y.each(annotations, function(a) {
 					if (a.name.localName == "hand") {
 						textAttrs.hand = a.data["value"];
@@ -238,7 +238,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 
 			var that = this;
 			if (!nodeIsInvisible)
-				Y.each(tree.children(), function(c) { that.buildVC(parent, c); });
+				Y.each(tree.children(), function(c) { that.buildVC(parent, c, text); });
 			
 			// After all children, TODO move this into appropriate classes
 			if (node.name && node.name().localName == "ins" && node.data()["f:orient"] == "left") {
@@ -282,13 +282,16 @@ YUI.add('document-adhoc-tree', function (Y) {
 								   'gap'
 								  ]
 
-			transcript = Y.Faust.Text.create(jsonRepresentation);
+			var text = Y.Faust.Text.create(jsonRepresentation);
 
-			var tree = new Y.Faust.AdhocTree(transcript, structuralNames);
+			var tree = new Y.Faust.AdhocTree(text, structuralNames);
 			console.log("tree: " + tree);
 
 			var surfaceVC = new Faust.Surface();
-			this.buildVC(surfaceVC, tree);
+			this.buildVC(surfaceVC, tree, text);
+
+			//global for debugging
+			debugText = text;
 
 			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
 
