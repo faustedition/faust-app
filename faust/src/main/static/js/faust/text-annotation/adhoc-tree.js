@@ -233,7 +233,8 @@ YUI.add('adhoc-tree', function (Y) {
 		toString : function() {
 			var result = "";
 			var name = this.name().localName;
-			result = result + (name ? '<' + name + '>': '');
+			var node = this.data()['xml:node'] ? ' ' + this.data()['xml:node'] + ' ' : '';
+			result = result + (name ? '<' + name + node + '>': '');
 			Y.Array.each(this.children(), function(child){
 				result = result + child.toString();
 			});

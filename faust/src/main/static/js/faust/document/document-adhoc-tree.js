@@ -20,7 +20,10 @@ YUI.add('document-adhoc-tree', function (Y) {
 			var createText = function(content, start, end){
 				if (content.length < 1) throw "Cannot create empty text!";
 				var textAttrs = {};
-				var annotations = text.find(start, end);
+				var annotations = text.find(start, end)
+					//ignore empty annotations at the borders
+					.filter(function(x){var r = x.target().range; return r.start !== r.end});
+
 				Y.each(annotations, function(a) {
 					if (a.name.localName == "hand") {
 						textAttrs.hand = a.data["value"];
