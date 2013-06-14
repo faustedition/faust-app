@@ -18,7 +18,7 @@ YUI.add('adhoc-tree', function (Y) {
 			}
 		},
 
-		// is a descendant of b in document order?
+		// is a descendant of b in document?
 		isDescendant : function(a, b) {
 			var aNode = a.data['xml:node'].split('/').reverse().map(function(x){return parseInt(x)});
 			var bNode = b.data['xml:node'].split('/').reverse().map(function(x){return parseInt(x)});
@@ -37,12 +37,9 @@ YUI.add('adhoc-tree', function (Y) {
 		// is a following b in document order?
 		isFollowing : function(a,b) {
 			return XMLNodeUtils.documentOrderSort(a, b) > 0 ? true : false;
-		},
-		
-		sortByXMLNodeData : function(a, b) {
-			return XMLNodeUtils.documentOrderSort(a, b);
-		}
+		},		
 	};
+
 
 	function _sortByRange(a, b) {
 		if (a.targets[0].range.start === b.targets[0].range.start)
@@ -51,12 +48,15 @@ YUI.add('adhoc-tree', function (Y) {
 			return a.targets[0].range.start - b.targets[0].range.start;
 	};
 
-	function _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude, parent) {
-		
+	function _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude, parent,
+												documentOrderSort, isDescendant) {
+
 		var allAnnotations = transcript.find (start, end, filter);
+
 		
 		var includedAnnotations = Y.Array.filter(allAnnotations, function(annotation) {
-			return exclude.indexOf(annotation) < 0 && XMLNodeUtils.isDescendant(annotation, parent);
+
+			return exclude.indexOf(annotation) < 0 && isDescendant(annotation, parent);
 		});
 
 		if (includedAnnotations.length === 0)
@@ -83,15 +83,17 @@ YUI.add('adhoc-tree', function (Y) {
 		});
 
 		//return nextOutermostAnnotationCandidates;
-		return firstAnnotations.sort(XMLNodeUtils.sortByXMLNodeData);
+		return firstAnnotations.sort(documentOrderSort);
 
 	};
 
-	function _nextOutermostAnnotation(transcript, start, end, filter, siblings, ancestors, parent) {
+	function _nextOutermostAnnotation(transcript, start, end, filter, siblings, ancestors, parent,
+									  documentOrderSort, isDescendant) {
 
 		var exclude = ancestors.concat(siblings);
 
-		var nextOutermostAnnotationCandidates = _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude, parent);
+		var nextOutermostAnnotationCandidates = _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude, parent,
+																				   documentOrderSort, isDescendant);
 
 		var includedAnnotations = Y.Array.filter(nextOutermostAnnotationCandidates, function(annotation) {
 			return exclude.indexOf(annotation) < 0;
@@ -101,7 +103,7 @@ YUI.add('adhoc-tree', function (Y) {
 			return null;
 
  		var descendants = Y.Array.filter(includedAnnotations, function(annotation){
-			return XMLNodeUtils.isDescendant(annotation, parent);
+			return isDescendant(annotation, parent);
 		});
 		
 
@@ -109,13 +111,13 @@ YUI.add('adhoc-tree', function (Y) {
 
 		var nonDescendantsOfSiblings = Y.Array.filter(descendants, function(annotation){
 			for (var i=0; i < siblings.length; i++ ) {
-				if (XMLNodeUtils.isDescendant(annotation, siblings[i]))
+				if (isDescendant(annotation, siblings[i]))
 					return false;
 			}
 			return true;
 		});
 
-		var sortedByNesting = nonDescendantsOfSiblings.sort(XMLNodeUtils.sortByXMLNodeData);
+		var sortedByNesting = nonDescendantsOfSiblings.sort(documentOrderSort);
 
 		return sortedByNesting.length > 0 ? sortedByNesting[0] : null;
 	}
@@ -184,13 +186,15 @@ YUI.add('adhoc-tree', function (Y) {
 			return textNodes;
 		},
 
-		_iterateChildren: function(start, end, ancestors) {
+		_iterateChildren: function(start, end, ancestors, documentOrderSort, isDescendant) {
 			var siblings = [];
 			var result = [];
 			var from = start;
 			var to = end;
 			while (true) {
-				var annotation = _nextOutermostAnnotation(this.transcript(), from, end, this.filter(), siblings, ancestors, this.annotation);
+				var annotation = _nextOutermostAnnotation(this.transcript(), from, end, this.filter(), siblings, 
+														  ancestors, this.annotation,
+														  documentOrderSort, isDescendant);
 				if (annotation) {
 
 					// there is a sibling non-text node
@@ -225,7 +229,9 @@ YUI.add('adhoc-tree', function (Y) {
 			//ancestorAnnotationCandidates = ancestorAnnotationCandidates.push(this.annotation);
 			var ancestorAnnotations = Y.Array.filter(ancestorAnnotationCandidates, function(annotation){return annotation});
 			var range = this.annotation.targets[0].range;
-			return this._iterateChildren(range.start, range.end, ancestorAnnotations);
+			return this._iterateChildren(range.start, range.end, ancestorAnnotations, 
+										 this._getAncestorProperty('_documentOrderSort'),
+										 this._getAncestorProperty('_isDescendant'));
 		},
 		name: function() {
 			return this.annotation.name;
@@ -243,7 +249,7 @@ YUI.add('adhoc-tree', function (Y) {
 		}
 	});
 
-	function AdhocTree(transcript, filter) {
+	function AdhocTree(transcript, filter, documentOrderSort, isDescendant) {
 
 		var mockAnnotation = new Y.Faust.Annotation(new Y.Faust.Name("http://interedition.eu/ns", "treeRoot"),
 													{'xml:node': ''},
@@ -254,11 +260,15 @@ YUI.add('adhoc-tree', function (Y) {
 		AdhocTree.superclass.constructor.call(this, mockAnnotation);
 		this._transcript = transcript;
 		this._filter = filter;		
+		this._documentOrderSort = documentOrderSort;
+		this._isDescendant = isDescendant;
 	}
 	
 	Y.extend(AdhocTree, AnnotationNode, {
 		children: function() {
-			return this._iterateChildren(0, this.transcript().content.length, []);
+			return this._iterateChildren(0, this.transcript().content.length, [],
+										 this._getAncestorProperty('_documentOrderSort'),
+										 this._getAncestorProperty('_isDescendant'));
 		},
 		data: function() {
 			return {};

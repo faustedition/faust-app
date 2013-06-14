@@ -176,7 +176,9 @@ YUI.add('test-adhoc-tree', function (Y) {
 			var tree = new Y.Faust.AdhocTree(this.text, 
 											 ['element_a',
 											  'element_b', 
-											  'element_c']);
+											  'element_c'],											
+ 											 Y.Faust.XMLNodeUtils.documentOrderSort,
+											 Y.Faust.XMLNodeUtils.isDescendant);
 
 
 			Y.assert(structurallyEqual(tree, this.expected), 'adhoctree test');
@@ -325,7 +327,9 @@ YUI.add('test-adhoc-tree', function (Y) {
 											 ['element_a',
 											  'element_b', 
 											  'element_c',
-											  'element_d']);
+											  'element_d'],
+ 											 Y.Faust.XMLNodeUtils.documentOrderSort,
+											 Y.Faust.XMLNodeUtils.isDescendant);
 
 
 			Y.assert(structurallyEqual(tree, this.expected), 'test an empty tree');
@@ -439,7 +443,9 @@ YUI.add('test-adhoc-tree', function (Y) {
 			var tree = new Y.Faust.AdhocTree(this.text, 
 											 ['element_a',
 											  'element_b', 
-											  'element_c']);
+											  'element_c'],
+ 											 Y.Faust.XMLNodeUtils.documentOrderSort,
+											 Y.Faust.XMLNodeUtils.isDescendant);
 
 
 			Y.assert(structurallyEqual(tree, this.expected), 'empty siblings of the parent are not nested correctly');
@@ -618,7 +624,9 @@ YUI.add('test-adhoc-tree', function (Y) {
 											 ['element_a',
 											  'element_b', 
 											  'element_c',
-											  'element_d']);
+											  'element_d'],
+ 											 Y.Faust.XMLNodeUtils.documentOrderSort,
+											 Y.Faust.XMLNodeUtils.isDescendant);
 
 
 			Y.assert(structurallyEqual(tree, this.expected), 'real world tree fails');
