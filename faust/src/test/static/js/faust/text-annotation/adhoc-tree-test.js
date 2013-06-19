@@ -426,7 +426,7 @@ YUI.add('test-adhoc-tree', function (Y) {
 
 		expected : { name: {localName: 'treeRoot'},
 					 children: [
-						 { name: {localName: 'element_a'},
+ 						 { name: {localName: 'element_a'},
 						   children: []},
  						 { name:{localName: 'element_b'},
 						   children:[
@@ -453,6 +453,141 @@ YUI.add('test-adhoc-tree', function (Y) {
 	});
 
 	adhocTreeTestSuite.add(emptyParentSiblingTest);
+
+	var siblingDescendantTest = new Y.Test.Case({
+
+		name: 'Sibling Descendant Test',
+		
+		text: Y.Faust.Text.create(
+			{
+				'annotations': [
+					{
+						'd': {
+							'xml:node': '1',
+						}, 
+						'id': 1, 
+						'n': 1, 
+						't': [
+							[
+								0, 
+								0, 
+								1000
+							]
+						]
+					}, 
+					{
+						'd': {
+							'xml:node': '1/1',
+						}, 
+						'id': 1, 
+						'n': 3, 
+						't': [
+							[
+								0, 
+								0, 
+								1000
+							]
+						]
+					}, 
+
+					{
+						'd': {
+							'xml:node': '2'
+						}, 
+						'id': 2, 
+						'n': 2, 
+						't': [
+							[
+								1, 
+								2, 
+								1000
+							]
+						]
+					}, 
+					{
+						'd': {
+							'xml:node': '1/2'
+						}, 
+						'id': 1, 
+						'n': 3, 
+						't': [
+							[
+								2, 
+								2, 
+								1000
+							]
+						]
+					}, 
+
+				], 
+
+				'names': {
+ 					'1': [
+						'http://interedition.eu/ns', 
+						'element_a'
+					], 
+					'2': [
+						'http://interedition.eu/ns', 
+						'element_b'
+					], 
+					'3': [
+						'http://interedition.eu/ns', 
+						'element_c'
+					], 
+					'100': [
+						'http://interedition.eu/ns', 
+						'text'
+					], 
+
+				}, 
+				'text': {
+					'd': {},
+					'id': 1000, 
+					'n': 100, 
+					't': [
+						[
+							0,
+							25, 
+							1000
+						]
+					]
+				}, 
+				'textContent': 'wxyz'
+			}),
+
+		expected : { name: {localName: 'treeRoot'},
+					 children: [
+ 						 { name: {localName: 'element_a'},
+						   children: [
+							   { name: {localName: 'element_c'},
+								 children: []},							  
+						   ]},
+						 'w',
+ 						 { name:{localName: 'element_b'},
+						   children:[
+							   'x',
+							   { name:{localName: 'element_c'},
+								 children:[]},
+						   ] },
+						 'yz'
+					 ]},
+
+		
+		testSiblingDescenadant : function () {
+
+			var tree = new Y.Faust.AdhocTree(this.text, 
+											 ['element_a',
+											  'element_b', 
+											  'element_c'],
+ 											 Y.Faust.XMLNodeUtils.documentOrderSort,
+											 Y.Faust.XMLNodeUtils.isDescendant);
+
+			Y.assert(structurallyEqual(tree, this.expected), 'sibling descendant interference');
+		},
+	});
+
+	adhocTreeTestSuite.add(siblingDescendantTest);
+
 
 	var realWorldTreeTest = new Y.Test.Case({
 

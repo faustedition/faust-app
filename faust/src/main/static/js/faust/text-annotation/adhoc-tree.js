@@ -48,15 +48,24 @@ YUI.add('adhoc-tree', function (Y) {
 			return a.targets[0].range.start - b.targets[0].range.start;
 	};
 
-	function _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude, parent,
+	function _nextOutermostAnnotationCandidates(transcript, start, end, filter, siblings, ancestors, parent,
 												documentOrderSort, isDescendant) {
 
 		var allAnnotations = transcript.find (start, end, filter);
-
 		
 		var includedAnnotations = Y.Array.filter(allAnnotations, function(annotation) {
 
-			return exclude.indexOf(annotation) < 0 && isDescendant(annotation, parent);
+			//exclude children of exclude too!
+			var descendantOrSelfOfExcluded = false;
+			Y.Array.each(siblings, function(sibling){
+				descendantOrSelfOfExcluded = isDescendant(annotation, sibling) || descendantOrSelfOfExcluded;
+			});
+			
+			var exclude = ancestors.concat(siblings);
+			
+			return exclude.indexOf(annotation) < 0 && isDescendant(annotation, parent) && !descendantOrSelfOfExcluded;
+
+			// return exclude.indexOf(annotation) < 0 && isDescendant(annotation, parent);
 		});
 
 		if (includedAnnotations.length === 0)
@@ -90,10 +99,10 @@ YUI.add('adhoc-tree', function (Y) {
 	function _nextOutermostAnnotation(transcript, start, end, filter, siblings, ancestors, parent,
 									  documentOrderSort, isDescendant) {
 
-		var exclude = ancestors.concat(siblings);
-
-		var nextOutermostAnnotationCandidates = _nextOutermostAnnotationCandidates(transcript, start, end, filter, exclude, parent,
+		var nextOutermostAnnotationCandidates = _nextOutermostAnnotationCandidates(transcript, start, end, filter, siblings, ancestors, parent,
 																				   documentOrderSort, isDescendant);
+
+		var exclude = ancestors.concat(siblings);
 
 		var includedAnnotations = Y.Array.filter(nextOutermostAnnotationCandidates, function(annotation) {
 			return exclude.indexOf(annotation) < 0;
