@@ -90,6 +90,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 						lineAttrs.between = true;
 
 					vc = new Faust.Line(lineAttrs);
+					
 
 				} else if (node.name().localName == "vspace") {
 					//TODO real implementation, non-integer values
@@ -250,6 +251,11 @@ YUI.add('document-adhoc-tree', function (Y) {
 				var annotationEnd = node.annotation.target().range.end;
 				
 				vc.add (createText("\u2309", annotationStart, annotationEnd));
+			}
+
+			// space at the beginning of each line, to give empty lines height
+			if (node.name && node.name().localName == "line") {
+				vc.add (createText(" ", annotationStart, annotationEnd));
 			}
 
 			return vc;
