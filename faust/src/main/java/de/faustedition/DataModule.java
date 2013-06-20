@@ -46,17 +46,7 @@ public class DataModule extends AbstractModule {
     @Provides
     @Singleton
     public DataSource relationalDataSource() throws IOException, SQLException {
-        final DataSource dataSource = Relations.init(Relations.createDataSource(dataDirectory));
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Closing database connection pool " + dataSource);
-                }
-                ((BoneCPDataSource) dataSource).close();
-            }
-        }));
-        return dataSource;
+        return Relations.init(Relations.createDataSource(dataDirectory, true));
     }
 
     @Provides

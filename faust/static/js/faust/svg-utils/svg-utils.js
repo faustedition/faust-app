@@ -35,6 +35,7 @@ YUI.add('svg-utils', function (Y) {
 		while (element.firstChild) {
 			element.removeChild(element.firstChild);
 		}
+        return element;
 	}
 	
 	// An implementation of getScreenBBox, by Antoine Quint, modiefied by Moritz Wissenbach

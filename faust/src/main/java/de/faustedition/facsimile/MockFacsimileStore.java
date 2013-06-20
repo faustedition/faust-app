@@ -22,11 +22,11 @@ public class MockFacsimileStore implements FacsimileStore {
 
     @Override
     public BufferedImage tile(String path, int zoom, int x, int y) throws IOException, IllegalArgumentException {
-        final BufferedImage tile = new BufferedImage(TILE_SIZE, TILE_SIZE, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage tile = new BufferedImage(TILE_SIZE, TILE_SIZE, BufferedImage.TYPE_INT_RGB);
         final Graphics2D g = (Graphics2D) tile.getGraphics();
-        g.setColor(new Color(128, 128, 128, 128));
-        g.setPaint(new Color(128, 128, 128, 128));
-        g.setBackground(new Color(0, 0, 0, 128));
+        g.setColor(Color.LIGHT_GRAY);
+        g.setPaint(Color.LIGHT_GRAY);
+        g.setBackground(Color.BLACK);
         g.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{2.0f}, 0.0f));
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g.setFont(g.getFont().deriveFont(TILE_SIZE / 10.0f));

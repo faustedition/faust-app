@@ -1,7 +1,7 @@
 <@faust.page title="Text/Bild-Verlinkung">
 
 <div class="yui3-g">
-    <div class="yui3-u-2-3"><div id="facsimile-view"></div></div>
+    <div class="yui3-u-2-3"><div id="facsimile-view" style="width: 600px; height: 600px"></div></div>
     <div class="yui3-u-1-3">
         <div style="padding: 1em">
             <h2>Transkript</h2>
@@ -25,16 +25,24 @@
     </div>
 </div>
 <script type="text/javascript">
-    YUI().use("facsimile", "facsimile-highlightpane", "event", "dump", function (Y) {
-        facsimileViewer = new Y.Faust.FacsimileViewer({
-            srcNode: "#facsimile-view",
-			src: "/facsimile/gsa/391098/391098_0001",
-            view: { x: 0, y: 0, width: 600, height: 600 }
+    YUI().use("facsimile", "event", "node", function (Y) {
+        Y.on("domready", function() {
+            new Y.Faust.FacsimileWidget({
+                viewSize: {
+                    width: 600,
+                    height: 500
+                },
+                imageSize: {
+                    width: 1000,
+                    height: 1500
+                },
+                zoom: 3,
+                maxZoom: 4
+            }).render("#facsimile-view");
         });
 
-        facsimileViewer.render();
-		facsimileViewer.plug(Y.Faust.HighlightPane);
 
+        /*
         var coords = {
             "line-1": { x: 1700, y: 2300, width: 700, height: 400 },
             "line-2": { x: 1600, y: 2600, width: 1000, height: 400 },
@@ -44,6 +52,7 @@
         Y.one("#lines").delegate("click", function(e) {
             facsimileViewer.highlight.highlightArea(coords[e.target.get("id")]);
         }, "p");
+        */
     });
 </script>
 </@faust.page>

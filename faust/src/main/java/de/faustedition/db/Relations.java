@@ -109,7 +109,7 @@ public class Relations {
         }
     }
 
-    public static BoneCPDataSource createDataSource(File path) {
+    public static BoneCPDataSource createDataSource(File path, boolean registerShutdownHook) {
         final BoneCPDataSource dataSource = new BoneCPDataSource();
         dataSource.setDriverClass(DRIVER_CLASS_NAME);
         dataSource.setJdbcUrl(jdbcUrl(path));
@@ -120,6 +120,17 @@ public class Relations {
         dataSource.setReleaseHelperThreads(0);
         dataSource.setDisableConnectionTracking(true);
         dataSource.setLogStatementsEnabled(Logger.getLogger(BoneCPDataSource.class.getPackage().getName()).isLoggable(Level.FINE));
+        if (registerShutdownHook) {
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.fine("Closing database connection pool " + dataSource);
+                    }
+                    dataSource.close();
+                }
+            }));
+        }
         return dataSource;
     }
 
