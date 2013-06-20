@@ -255,7 +255,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 
 			// space at the beginning of each line, to give empty lines height
 			if (node.name && node.name().localName == "line") {
-				vc.add (createText(" ", annotationStart, annotationEnd));
+				vc.add (createText("\u00a0", annotationStart, annotationEnd));
 			}
 
 			return vc;
@@ -296,7 +296,6 @@ YUI.add('document-adhoc-tree', function (Y) {
 			var tree = new Y.Faust.AdhocTree(text, structuralNames,
 											 Y.Faust.XMLNodeUtils.documentOrderSort,
 											 Y.Faust.XMLNodeUtils.isDescendant
-
 											);
 			console.log("tree: " + tree);
 

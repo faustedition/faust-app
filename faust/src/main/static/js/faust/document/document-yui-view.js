@@ -62,8 +62,8 @@ YUI.add('document-yui-view', function (Y) {
 			aq.add(
 				{
 					fn : layoutAndCenter, //visComponent.layout,
-					timeout: 100,
-					iterations: 10,
+					timeout: 10,
+					iterations: 5,
 					context: visComponent
 				},
 				{
