@@ -2,7 +2,9 @@ package de.faustedition.transcript;
 
 import static eu.interedition.text.Query.text;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 
 import de.faustedition.JsonRepresentationFactory;
 import eu.interedition.text.Layer;
@@ -84,6 +87,9 @@ public class TranscriptSourceResource extends TranscriptResource {
 			names.put(Long.toString(name.hashCode()), name);
 			annotations.add(annotation);
 		}
+		
+		Files.write(transcript.read(), new File("/tmp/faustdebug"), Charset.forName("UTF-8"));
+		
 		return jsonFactory.map(new ModelMap()
 			.addAttribute("text", transcript)
 			.addAttribute("textContent", transcript.read())
