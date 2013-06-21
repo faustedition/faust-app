@@ -88,8 +88,6 @@ public class TranscriptSourceResource extends TranscriptResource {
 			annotations.add(annotation);
 		}
 		
-		Files.write(transcript.read(), new File("/tmp/faustdebug"), Charset.forName("UTF-8"));
-		
 		return jsonFactory.map(new ModelMap()
 			.addAttribute("text", transcript)
 			.addAttribute("textContent", transcript.read())
