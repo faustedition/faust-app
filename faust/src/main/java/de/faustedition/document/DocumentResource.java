@@ -5,7 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.restlet.data.CharacterSet;
+import org.restlet.data.Form;
+import org.restlet.data.Language;
+import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +48,25 @@ public class DocumentResource extends ServerResource {
 		viewModel.put("contents", document.getSortedContents());
 		viewModel.put("path", path.toString());
 
-		return viewFactory.create("document/document-app", getRequest().getClientInfo(), viewModel);
+		Map<String, String> params = this.getRequest().getResourceRef().getQueryAsForm().getValuesMap();
+		if ("transcript-bare".equals(params.get("view"))) {
+			return viewFactory.create("document/document-transcript-bare", getRequest().getClientInfo(), viewModel);
+		} else {				
+			return viewFactory.create("document/document-app", getRequest().getClientInfo(), viewModel);
+		}
 	}
-
+	
+	@Get("svg")
+	public Representation graphic() {
+		String result = "<xml version=\"1.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">"
+			+ "<script type=\"text/javascript\" ></script>"
+			+ "</svg>";
+		
+		
+		return new StringRepresentation(result, MediaType.IMAGE_SVG,
+				Language.DEFAULT, CharacterSet.UTF_8);
+	}
+	
 	@Get("json")
 	public Representation documentStructure() {
 		return new JsonRespresentation() {
@@ -59,6 +80,9 @@ public class DocumentResource extends ServerResource {
 				generator.writeStartObject();
 
 				generator.writeStringField("type", unit.getType().name().toLowerCase());
+				if (unit instanceof Document) {
+					generator.writeStringField("name", unit.toString());
+				}
 				generator.writeNumberField("order", unit.getOrder());
 				generator.writeNumberField("id", unit.node.getId());
 //				final GoddagTranscript transcript = unit.getTranscript();

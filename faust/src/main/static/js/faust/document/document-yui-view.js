@@ -1,5 +1,16 @@
+Faust.LayoutPreferences = {
+	
+	overlay : "overlay",
+	
+};
+
+
 YUI.add('document-yui-view', function (Y) {
+
+
 	var DiplomaticTranscriptView = Y.Base.create("diplomatic-transcript-view", Y.View, [], {
+
+
 		
 		destructor: function() {
 			
@@ -71,9 +82,16 @@ YUI.add('document-yui-view', function (Y) {
 						that.intoView(innerContainer, svgRoot);
 						that.center(svgRoot, container);
 					},
-					timeout: 0,
+					timeout: 10,
 					iterations: 1,
 					context: visComponent
+				},
+				{
+					fn: function() {
+						Y.fire('faust:transcript-layout-done', {});						
+					},
+					timeout: 10,
+					iterations: 1
 				}
 			);
 			aq.run();
@@ -82,8 +100,7 @@ YUI.add('document-yui-view', function (Y) {
 
 		render: function() {
 			var container = this.get('container');
-			
-			
+						
 			var transcriptSource = '/' + cp + this.get('source').components[1] + '/' + this.get('source').components[2];
 			this.editortoolbar = Y.Node.create('<div id="editor-toolbar"><a href="' + transcriptSource  + '">(XML source)</a></div>');
 			container.appendChild(this.editortoolbar);
@@ -92,7 +109,7 @@ YUI.add('document-yui-view', function (Y) {
 			container.appendChild(this.errorDisplay);
 			var svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 			//faust_svg_root = this.svgRoot;
-			svgRoot.setAttribute("xmlns:drag", DRAG_NS);
+			//svgRoot.setAttribute("xmlns:drag", DRAG_NS);
 			var that = this;
 			//addDragEventListener(DRAGMOVE, function(){
 			//	var innerContainer = document.getElementById("transcript_container");
@@ -168,7 +185,7 @@ YUI.add('document-yui-view', function (Y) {
 	});
 	
 }, '0.0', {
-	requires: ['view', 'node', 'document-adhoc-tree']
+	requires: ['view', 'node', 'document-model', 'document-adhoc-tree', 'document-view-svg', 'async-queue']
 });
 
 /*
