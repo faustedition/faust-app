@@ -1,6 +1,4 @@
-YUI.add('document-model', function (Y) {		
-
-	console.log('document-model');
+YUI.add('document-model', function (Y) {
 
 	Faust.ENC_EXC_PREF = "ENCODING ERROR: ";
 	
@@ -147,12 +145,7 @@ YUI.add('document-model', function (Y) {
 	Faust.BreakingVC = function() {
 		this.initViewComponent();		
 	};
-	
-//	Faust.BreakingVC.prototype.render = function() {
-//
-//		Y.each(this.children, function(c) { c.render(); });
-//	};
- 	
+	 	
 	Faust.BreakingVC.prototype.defaultAligns = function () {
 		
 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
@@ -200,10 +193,8 @@ YUI.add('document-model', function (Y) {
 		this.lineAttrs = lineAttrs;
 	};
 	Faust.Line.prototype.dimension = function() {
-		//this.height = 20;
-		//this.width = 0;
-		//Y.each(this.children, function(c) { this.width += c.width; }, this);
 	};
+
  	Faust.Line.prototype.defaultAligns = function () {
 			
 		if ("indent" in this.lineAttrs) 
@@ -303,21 +294,6 @@ YUI.add('document-model', function (Y) {
 		this.width = 40;
 		this.height = 20;
 	};
-//	Faust.GLine.prototype.position = function() {
-//		var prev = this.previous();
-//		if (prev) {
-//			if (prev instanceof Faust.Text) {
-//				this.x = prev.x + prev.width;
-//				this.y = prev.y;				
-//			} else {
-//				this.x = prev.x;
-//				this.y = prev.y + prev.height;
-//			}
-//		} else {
-//			this.x = this.parent.x;
-//			this.y = this.parent.y;			
-//		}
-//	};
 	Y.augment(Faust.GLine, Faust.ViewComponent);
 
 	Faust.GBrace = function() {
@@ -327,21 +303,6 @@ YUI.add('document-model', function (Y) {
 		this.width = 40;
 		this.height = 20;
 	};
-//	Faust.GBrace.prototype.position = function() {
-//		var prev = this.previous();
-//		if (prev) {
-//			if (prev instanceof Faust.Text) {
-//				this.x = prev.x + prev.width;
-//				this.y = prev.y;				
-//			} else {
-//				this.x = prev.x;
-//				this.y = prev.y + prev.height;
-//			}
-//		} else {
-//			this.x = this.parent.x;
-//			this.y = this.parent.y;			
-//		}
-//	};
 	Y.augment(Faust.GBrace, Faust.ViewComponent);
 
 	Faust.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {

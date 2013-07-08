@@ -139,7 +139,6 @@ YUI.add('document-yui-view', function (Y) {
 				visComponent.render();
 				this.relayout(visComponent, svgRoot, innerContainer, container);
 				
-				//console.log('bp');
 				//this.center(svgRoot, container);
 				
 				// }

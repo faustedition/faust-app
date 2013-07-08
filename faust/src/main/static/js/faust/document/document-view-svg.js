@@ -23,9 +23,6 @@ YUI.add('document-view-svg', function (Y) {
 	};
 	
 	Faust.ViewComponent.prototype.setCoord = function(coord, coordRotation) {
-		//var ctm = this.view.getCTM();
-		//var ctmTransform = this.view.viewportElement.createSVGTransformFromMatrix(ctm);
-		//var ctmTransformInv = this.view.viewportElement.createSVGTransformFromMatrix(ctm.inverse());
 		
 		var myRot = this.globalRotation();
 		var myRotMx = this.view.viewportElement.createSVGMatrix().rotate(myRot);
@@ -138,14 +135,7 @@ YUI.add('document-view-svg', function (Y) {
 		view.setAttribute('class', 'DefaultVC');
 		return view;
 	};
-	
-	
-	
-	//Faust.DefaultVC.prototype.render = function() {
-		//this.view = createView();
-		//Y.each(this.children, function(c) { c.render(); });
-	//};
-	
+		
 	Y.augment(Faust.Line, Faust.ViewComponent);
 
 

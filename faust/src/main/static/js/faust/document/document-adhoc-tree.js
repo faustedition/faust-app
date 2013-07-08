@@ -263,13 +263,6 @@ YUI.add('document-adhoc-tree', function (Y) {
 		
 		transcriptVC: function(jsonRepresentation) {
 			
-			// var structuralHierarchy = [{name:'zone', builder: null},
-			// 						   {name:'line', builder: null},
-			// 						   {name:'anchor', builder: null},
-			// 						  ];
-
-			// var structuralNames = structuralHierarchy.map(function(x) {return x.name});
-
 			var structuralNames = ['surface',
 								   'vspace', 
 								   'div',
@@ -297,7 +290,6 @@ YUI.add('document-adhoc-tree', function (Y) {
 											 Y.Faust.XMLNodeUtils.documentOrderSort,
 											 Y.Faust.XMLNodeUtils.isDescendant
 											);
-			console.log("tree: " + tree);
 
 			var surfaceVC = new Faust.Surface();
 			this.buildVC(surfaceVC, tree, text);
