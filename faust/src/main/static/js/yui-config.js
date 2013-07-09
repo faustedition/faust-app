@@ -17,6 +17,7 @@ YUI.GlobalConfig = {
                 'facsimile-highlightpane': { path: 'faust/facsimile/facsimile-highlightpane.js' },
                 'util': { path: "faust/util/util.js"},
 				'document-adhoc-tree' : { path: 'faust/document/document-adhoc-tree.js' },
+				'document-configuration-faust' : { path: 'faust/document/document-configuration-faust.js' },
 				'document-yui-view' : { path: 'faust/document/document-yui-view.js' },
 				'document-structure-view' : { path: 'faust/document/document-structure-view.js' },
 				'document-view-svg' : { path: 'faust/document/document-view-svg.js' },

@@ -184,7 +184,8 @@ YUI.add('document-yui-view', function (Y) {
 	});
 	
 }, '0.0', {
-	requires: ['view', 'node', 'document-model', 'document-adhoc-tree', 'document-view-svg', 'async-queue']
+	requires: ['view', 'node', 'document-model', 'document-adhoc-tree', 'document-configuration-faust',
+			   'document-view-svg', 'async-queue']
 });
 
 /*
