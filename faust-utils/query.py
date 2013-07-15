@@ -4,10 +4,7 @@
 # Run XPath queries over all files
 #
 
-import sys
-import faust
-import lxml.etree
-import re
+import sys, faust, lxml.etree, re, os.path
 
 kodiert_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='kodiert']"
 encoded_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='encoded']"
@@ -226,4 +223,21 @@ if __name__ == "__main__":
 	
 	# in which manuscripts are the line numbers not in final order (schroer)
 	# show_matches(list_matches(faust.transcript_files(), "//tei:l[number(@n) <  number(./preceding::tei:l[1]/@n)]"))
-	for val in unique_values (faust.transcript_files(), "//ge:document//*"): print val
+#	for val in unique_values (faust.transcript_files(), "//ge:document//*"): print val
+
+	# === find transcripts that get rendered with the current software
+
+	all_documents = set(map (os.path.dirname, faust.transcript_files()))
+	bad_documents = set(map (os.path.dirname, matches(faust.transcript_files(), """
+	  //@rotate |
+          //@rend |
+          //ge:line |
+          //tei:change//text()[contains(., 'deleatur')]
+             """)))
+	
+	for d in all_documents.difference(bad_documents):
+		print '/'.join(d.split('/')[-2:])
+
+	
+	
+
