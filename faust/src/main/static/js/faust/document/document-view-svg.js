@@ -220,7 +220,9 @@ YUI.add('document-view-svg', function (Y) {
 		}
 		if ("underline" in this.textAttrs) {
 			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
+			this.view.setAttribute('class', 'underline');
 			this.svgContainer().appendChild(this.underline);
+
 		}
 		this.rotate(this.rotation);	
 		Y.each(this.children, function(c) { c.render(); });		
