@@ -3,7 +3,6 @@ YUI.add('document-configuration-faust', function (Y) {
 	// A configuration defines how markup is rendered by providing handler
 	// functions in Y.Faust.DocumentConfiguration.
 
-	console.log('document-configuration-faust');
 	Y.mix(Y.namespace("Faust"), {
         DocumentConfiguration: 	 {
 			names: {
@@ -170,6 +169,26 @@ YUI.add('document-configuration-faust', function (Y) {
 					vc: function(node, text, layoutState) {
 						// TODO make invisible
 						return new Faust.Text("", {});					
+					}
+				},
+				'ins': {
+					vc: function(node, text, layoutState) {
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						var vc = new Faust.DefaultVC();						
+						//Einweisungszeichen
+						if (node.data()["f:orient"] === "right") {
+							vc.add (Y.Faust.DocumentLayout.createText("\u2308", annotationStart, annotationEnd, text));
+						}
+						return vc;
+					},
+					end: function(node, text, layoutState) {
+						if (node.data()["f:orient"] == "left") {
+							// Einweisungszeichen
+							var annotationStart = node.annotation.target().range.start;
+							var annotationEnd = node.annotation.target().range.end;
+							this.add (Y.Faust.DocumentLayout.createText("\u2309", annotationStart, annotationEnd, text));
+						}
 					}
 				}
 			}

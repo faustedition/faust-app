@@ -46,12 +46,11 @@ YUI.add('document-adhoc-tree', function (Y) {
 	
 	Y.extend(DocumentAdhocTree, Object, {
 
-
-		buildVC: function(parent, tree, text) {
+		buildVC: function(parent, node, text) {
 			
-			if (tree == null) return null;
+			if (node == null) return null;
 			var vc = null;
-			var node = tree;
+
 
 			if ((node instanceof Y.Faust.TextNode) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
 				vc = Y.Faust.DocumentLayout.createText(node.content(), node.range.start, node.range.end, text);
@@ -67,12 +66,6 @@ YUI.add('document-adhoc-tree', function (Y) {
 						vc = nameHandler.vc(node, text, this);
 					}
 				}
-
-				if (node.name().localName == "ins" && node.data()["f:orient"] == "right") {
-					vc = new Faust.DefaultVC();
-					//Einweisungszeichen
-					vc.add (Y.Faust.DocumentLayout.createText("\u2308", annotationStart, annotationEnd, text));
-				} 
 
 				aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left", "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
 				
@@ -140,22 +133,25 @@ YUI.add('document-adhoc-tree', function (Y) {
 
 			var that = this;
 
-			Y.each(tree.children(), function(c) { that.buildVC(parent, c, text); });
+			Y.each(node.children(), function(c) { that.buildVC(parent, c, text); });
 			
-			// After all children, TODO move this into appropriate classes
-			if (node.name && node.name().localName == "ins" && node.data()["f:orient"] == "left") {
-				// Einweisungszeichen
-				var annotationStart = node.annotation.target().range.start;
-				var annotationEnd = node.annotation.target().range.end;
+			if (node instanceof Y.Faust.AnnotationNode) {
+
+				// space at the beginning of each line, to give empty lines height
+				if (node.name().localName == "line") {
+					vc.add (Y.Faust.DocumentLayout.createText("\u00a0", annotationStart, annotationEnd, text));
+				}
+
+				// 'end' callback after all children are constructed
+				// with the vc for 'this'
 				
-				vc.add (Y.Faust.DocumentLayout.createText("\u2309", annotationStart, annotationEnd, text));
+				if (node.name().localName in Y.Faust.DocumentConfiguration.names) {
+					var nameHandler = Y.Faust.DocumentConfiguration.names[node.name().localName];
+					if (nameHandler.end) {
+						nameHandler.end.call(vc, node, text, this);
+					}
+				}
 			}
-
-			// space at the beginning of each line, to give empty lines height
-			if (node.name && node.name().localName == "line") {
-				vc.add (Y.Faust.DocumentLayout.createText("\u00a0", annotationStart, annotationEnd, text));
-			}
-
 			return vc;
 		},
 		
