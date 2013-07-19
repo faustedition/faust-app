@@ -99,7 +99,7 @@ if __name__ == "__main__":
 		# print f
 	# for f in matches(faust.transcript_files(), 
 	#		 """//tei:choice/text()[contains(., ' ') or contains(., '\t') or contains(., '\n')]"""):	print f
-	for f in matches(faust.transcript_files(), u"//text()[contains(.,'\x84') or contains(.,'\x93')]"):	print f
+	# for f in matches(faust.transcript_files(), u"//text()[contains(.,'\x84') or contains(.,'\x93')]"):	print f
 	# for val in unique_values (faust.transcript_files(), "//tei:facsimile/tei:graphic/@url"): print val
 	# for f in matches(faust.transcript_files(), "count(//tei:facsimile/tei:graphic/@url) > 1"): print f
 	# not_available_xp = "not (" + kodiert_xp + " or " + encoded_xp + " or " + deleatur_xp +  " )"
@@ -228,16 +228,19 @@ if __name__ == "__main__":
 
 # === find the subset of  manuscripts that doesn't contain certain markup
 
-	# all_documents = set(map (os.path.dirname, faust.transcript_files()))
-	# bad_documents = set(map (os.path.dirname, matches(faust.transcript_files(), """
-	#   //@rotate |
-        #   //@rend |
-        #   //ge:line |
-        #   //tei:change//text()[contains(., 'deleatur')]
-        #      """)))
+	all_documents = set(map (os.path.dirname, faust.transcript_files()))
+	bad_documents = set(map (os.path.dirname, matches(faust.transcript_files(), """
+           //tei:change//text()[contains(., 'deleatur')] |
+	   //@rotate |
+           //*[@type=='inter'] |
+           //ge:line |
+           //ge:patch |
+           //@f:pos |
+           //
+              """)))
 	
-	# for d in all_documents.difference(bad_documents):
-	# 	print '/'.join(d.split('/')[-2:])
+	for d in all_documents.difference(bad_documents):
+	 	print '/'.join(d.split('/')[-2:])
 
 	
 	
