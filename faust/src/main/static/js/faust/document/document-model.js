@@ -199,6 +199,8 @@ YUI.add('document-model', function (Y) {
 			
 		if ("indent" in this.lineAttrs) 
  			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, this.lineAttrs["indent"], Faust.Align.INDENT_ATTR));
+		else if ("indentCenter" in this.lineAttrs)
+			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0.5, this.lineAttrs["indentCenter"], Faust.Align.INDENT_CENTER_ATTR));
 		else
  			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 
@@ -320,6 +322,8 @@ YUI.add('document-model', function (Y) {
 	Faust.Align['5'] = 'REND_ATTR';
 	Faust.Align.INDENT_ATTR = 7;
 	Faust.Align['7'] = 'INDENT_ATTR';
+	Faust.Align.INDENT_ATTR = 7;
+	Faust.Align['8'] = 'INDENT_CENTER_ATTR';
 	Faust.Align.EXPLICIT = 10;	
 	Faust.Align['10'] = 'EXPLICIT';
 	Faust.Align.MAIN_ZONE = 15;	

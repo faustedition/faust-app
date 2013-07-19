@@ -51,7 +51,12 @@ YUI.add('document-configuration-faust', function (Y) {
 						var rendition = node.data()["rend"] || "";
 						if (rendition.indexOf("centered") >= 0) {
 							lineAttrs.center = true;
-						} else if (rendition.indexOf("indent") >= 0) {
+						} 
+						else if (rendition.indexOf("indent-center") >=0) {
+							var start = rendition.indexOf("indent-center-");
+							lineAttrs.indentCenter = parseInt(rendition.substring(start + 14, rendition.length)) / 100.0;
+						}
+						else if (rendition.indexOf("indent") >= 0) {
 							var start = rendition.indexOf("indent-");
 							lineAttrs.indent = parseInt(rendition.substring(start + 7, rendition.length)) / 100.0;
 						}
