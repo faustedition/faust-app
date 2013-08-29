@@ -28,6 +28,7 @@ YUI.GlobalConfig = {
                 'search': { path: "faust/search/search.js"},
 				'svg-utils' : { path: "faust/svg-utils/svg-utils.js"},
                 'text-annotation': { path: "faust/text-annotation/text-annotation.js"},
+				'text-display': { path: "faust/text-display/text-display.js"},
                 'text-index': { path: 'faust/text-annotation/text-index.js'}
             }
         }
