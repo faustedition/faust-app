@@ -58,7 +58,7 @@ public class DocumentResource extends ServerResource {
 	
 	@Get("svg")
 	public Representation graphic() {
-		String result = "<xml version=\"1.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">"
+		String result = "<xml version=\"1open.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">"
 			+ "<script type=\"text/javascript\" ></script>"
 			+ "</svg>";
 		

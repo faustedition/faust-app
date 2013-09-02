@@ -49,6 +49,7 @@ import de.faustedition.transcript.TranscriptSourceResource;
 import de.faustedition.transcript.TranscriptViewResource;
 import de.faustedition.transcript.VerseStatisticsResource;
 import de.faustedition.xml.XMLFinder;
+import de.faustedition.xml.XMLQueryResource;
 
 @Component
 public class FaustApplication extends Application implements InitializingBean {
@@ -137,6 +138,7 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
 		router.attach("resources", comboResourceFinder);
+		router.attach("xml-query", secured(transactional(contextResource(XMLQueryResource.class))));
 
 		if (environment.acceptsProfiles("development", "test")) {
 			final Filter dummyAuthenticator = new Filter() {
