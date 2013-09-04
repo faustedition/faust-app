@@ -162,3 +162,7 @@
 	</#list>
 </li>
 </#macro>
+
+<#function resolveUri uri>
+	<#return cp + uri?replace("faust://", "/")>
+</#function>

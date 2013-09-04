@@ -35,7 +35,7 @@
 		<#if mode = "xml" || mode = "files">
 		<#if (files?size = 0)><h3>Nothing found.</h3></#if>	
 		<#list files as file>
-				<h3>${file.url}</h3>
+				<h3><a target="_blank" href="${faust.resolveUri(file.uri)}">${file.uri}</a></h3>
 				<p>
 				  <#if file.results?? && mode = "xml">
 				     <#list file.results as node>

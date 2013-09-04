@@ -113,7 +113,7 @@ public class XMLQueryResource extends ServerResource {
 
 		for (FaustURI uri : xmlStorage.iterate(new FaustURI(FaustAuthority.XML, "/" + folder + "/"))) {
 			Map<String, Object> entry = Maps.<String, Object>newHashMap();
-			entry.put("url", uri.toString());
+			entry.put("uri", uri.toString());
 			org.w3c.dom.Document document;
 			try {
 				document = XMLUtil.parse(xmlStorage.getInputSource(uri));
