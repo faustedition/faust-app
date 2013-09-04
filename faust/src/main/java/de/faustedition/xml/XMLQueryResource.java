@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -108,12 +110,14 @@ public class XMLQueryResource extends ServerResource {
 		if (LOG.isInfoEnabled()) {
 			LOG.info("XPath query for '{}'", queryExpression);
 		}
+		
 		XPathExpression xpath = XPathUtil.xpath(queryExpression);
 		final List<Map<String, Object>> files = Lists.newArrayList();
 
 		for (FaustURI uri : xmlStorage.iterate(new FaustURI(FaustAuthority.XML, "/" + folder + "/"))) {
 			Map<String, Object> entry = Maps.<String, Object>newHashMap();
 			entry.put("uri", uri.toString());
+			uri.resolve("");
 			org.w3c.dom.Document document;
 			try {
 				document = XMLUtil.parse(xmlStorage.getInputSource(uri));

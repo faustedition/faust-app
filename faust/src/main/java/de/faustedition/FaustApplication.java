@@ -138,7 +138,7 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
 		router.attach("resources", comboResourceFinder);
-		router.attach("xml-query", secured(transactional(contextResource(XMLQueryResource.class))));
+		router.attach("xml-query", staffOnly(contextResource(XMLQueryResource.class)));
 
 		if (environment.acceptsProfiles("development", "test")) {
 			final Filter dummyAuthenticator = new Filter() {
@@ -176,6 +176,14 @@ public class FaustApplication extends Application implements InitializingBean {
 		authorizer.getAuthorizedRoles().add(SecurityConstants.ADMIN_ROLE);
 		authorizer.getAuthorizedRoles().add(SecurityConstants.EDITOR_ROLE);
 		authorizer.getAuthorizedRoles().add(SecurityConstants.EXTERNAL_ROLE);
+		authorizer.setNext(resource);
+		return authorizer;
+	}
+
+	private Restlet staffOnly(Restlet resource) {
+		final RoleAuthorizer authorizer = new RoleAuthorizer();
+		authorizer.getAuthorizedRoles().add(SecurityConstants.ADMIN_ROLE);
+		authorizer.getAuthorizedRoles().add(SecurityConstants.EDITOR_ROLE);
 		authorizer.setNext(resource);
 		return authorizer;
 	}
