@@ -6,7 +6,7 @@
 <@faust.page title=title css=css header=header>
 	
 	<div>
-		<form action="/xml-query" method="get">
+		<form action="." method="get">
 		<fieldset>
 		<legend>Folder</legend>
 		<input type="radio" name="folder" value="transcript"<#if folder?? && folder="transcript">checked="true"</#if>>transcript</input>
