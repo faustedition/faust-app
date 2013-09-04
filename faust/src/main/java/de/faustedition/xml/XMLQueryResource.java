@@ -80,13 +80,13 @@ public class XMLQueryResource extends ServerResource {
 				if (mode == Mode.XML || mode == Mode.FILES) {
 					viewModel.put("files", files);
 				} else if (mode == Mode.VALUES) {
-					Set<String> uniqueValues = Sets.newHashSet();
+					Set<String> uniqueValues = Sets.newTreeSet();
 					for (Map<String,Object> file : files) {
 						if (file.containsKey("results")) {
 							uniqueValues.addAll((List<String>)file.get("results"));
 						}
 					}
-					viewModel.put("values", uniqueValues);
+					viewModel.put("values", uniqueValues.toArray());
 				}
 				if (mode != null)
 					viewModel.put("mode", mode.toString().toLowerCase());
