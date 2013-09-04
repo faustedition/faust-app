@@ -37,8 +37,8 @@ public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.storageDirectory = environment.getRequiredProperty("xml.home", File.class);
-		Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getAbsolutePath() + " is a directory");
-		this.storagePath = storageDirectory.getAbsolutePath();
+		Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getCanonicalPath() + " is a directory");
+		this.storagePath = storageDirectory.getCanonicalPath();
 	}
 
 	@Override
@@ -53,6 +53,7 @@ public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 	}
 
 	protected Iterable<FaustURI> iterate(File base) {
+		Preconditions.checkArgument(isInStore(base), base.getAbsolutePath() + " is not in XML storage");
 		final List<File> files = new LinkedList<File>();
 		listRecursively(files, base);
 		return new FileToUriWrapper(files);
@@ -119,19 +120,30 @@ public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 	protected File toFile(FaustURI uri) {
 		Preconditions.checkArgument(FaustAuthority.XML == uri.getAuthority(), uri + " not valid");
 		final File file = new File(storageDirectory, uri.getPath());
-		final String filePath = file.getAbsolutePath();
-		Preconditions.checkArgument(filePath.startsWith(storagePath), filePath + " is not in XML storage");
+		try {
+			Preconditions.checkArgument(isInStore(file), file.getCanonicalPath() + " is not in XML storage");
+		} catch (IOException e) {
+			throw new IllegalArgumentException(file.getAbsolutePath() + " is not in XML storage", e);
+		}
 		return file;
 	}
 
 	protected FaustURI toUri(File file) {
-		final String filePath = file.getAbsolutePath();
-		Preconditions.checkArgument(isInStore(file), filePath + " not in XML store");
-		return new FaustURI(FaustAuthority.XML, filePath.substring(storagePath.length()));
+		try {
+			final String filePath = file.getCanonicalPath();
+			Preconditions.checkArgument(isInStore(file), filePath + " not in XML store");
+			return new FaustURI(FaustAuthority.XML, filePath.substring(storagePath.length()));
+		} catch (IOException e) {
+			throw new IllegalArgumentException(file.getAbsolutePath() + " is not in XML storage", e);
+		}
 	}
 
 	protected boolean isInStore(File file) {
-		return file.getAbsolutePath().startsWith(storagePath);
+		try {
+			return file.getCanonicalPath().startsWith(storagePath);
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 	private class FileToUriWrapper extends IterableWrapper<FaustURI, File> {

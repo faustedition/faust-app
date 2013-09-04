@@ -1,24 +1,14 @@
 package de.faustedition.xml;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -32,10 +22,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
@@ -59,25 +50,53 @@ public class XMLQueryResource extends ServerResource {
 	private TemplateRepresentationFactory viewFactory;
 
 	private String queryExpression;
+	private String folder;
+
+	private enum Mode {
+		XML, VALUES, FILES
+	}
+
+	private Mode mode;
 
 	@Override
 	protected void doInit() throws ResourceException {
 		super.doInit();
 		queryExpression = getQuery().getFirstValue("xpath");
+		folder = getQuery().getFirstValue("folder") != null ? getQuery().getFirstValue("folder") : "transcript";
+		if (folder != null && !xmlStorage.isDirectory(new FaustURI(FaustAuthority.XML, "/" + folder + "/")))
+			throw new IllegalArgumentException("Invalid folder: " + folder);
+		mode = getQuery().getFirstValue("mode") != null ?
+				Mode.valueOf(getQuery().getFirstValue("mode").toUpperCase()) :
+					Mode.XML;
 	}
 
 
 	@Get("html")
-	public Representation overview() throws IOException {
+	public Representation queryForm() throws IOException {
 		Map<String, Object> viewModel = new HashMap<String, Object>();
-		viewModel.put("results", query());
-		Map<String, String> params = this.getRequest().getResourceRef().getQueryAsForm().getValuesMap();
-		return viewFactory.create("xml-query", getRequest().getClientInfo(), viewModel);
+		List<Map<String, Object>> files = queryExpression != null ? 
+				query() : Lists.<Map<String,Object>>newArrayList();
+				viewModel.put("folder", folder);
+				viewModel.put("xpath", queryExpression);
+				if (mode == Mode.XML || mode == Mode.FILES) {
+					viewModel.put("files", files);
+				} else if (mode == Mode.VALUES) {
+					Set<String> uniqueValues = Sets.newHashSet();
+					for (Map<String,Object> file : files) {
+						if (file.containsKey("results")) {
+							uniqueValues.addAll((List<String>)file.get("results"));
+						}
+					}
+					viewModel.put("values", uniqueValues);
+				}
+				if (mode != null)
+					viewModel.put("mode", mode.toString().toLowerCase());
+				return viewFactory.create("xml-query", getRequest().getClientInfo(), viewModel);
 	}
 
 
 	@Get("json")
-	public Representation results() {
+	public Representation queryResults() {
 
 		final List<Map<String, Object>> results = query();
 		return jsonFactory.map(results, false);
@@ -90,51 +109,31 @@ public class XMLQueryResource extends ServerResource {
 			LOG.info("XPath query for '{}'", queryExpression);
 		}
 		XPathExpression xpath = XPathUtil.xpath(queryExpression);
-		final List<Map<String, Object>> results = Lists.newArrayList();
+		final List<Map<String, Object>> files = Lists.newArrayList();
 
-		for (FaustURI uri : xmlStorage.iterate(new FaustURI(FaustAuthority.XML, "/transcript/"))) {
+		for (FaustURI uri : xmlStorage.iterate(new FaustURI(FaustAuthority.XML, "/" + folder + "/"))) {
 			Map<String, Object> entry = Maps.<String, Object>newHashMap();
 			entry.put("url", uri.toString());
 			org.w3c.dom.Document document;
 			try {
 				document = XMLUtil.parse(xmlStorage.getInputSource(uri));
 				NodeList xpathResultNodes = (NodeList) xpath.evaluate(document, XPathConstants.NODESET);
-				List<Object> xpathResults = new ArrayList<Object>(xpathResultNodes.getLength());
+				List<String> xpathResults = new ArrayList<String>(xpathResultNodes.getLength());
 				for (int i=0; i < xpathResultNodes.getLength(); i++) {
-					try {
-						Node node = xpathResultNodes.item(i);
-						StringWriter writer = new StringWriter();
-						Transformer transformer;
-						transformer = TransformerFactory.newInstance().newTransformer();
-						transformer.transform(new DOMSource(node), new StreamResult(writer));
-						String xml = writer.toString();
-						xpathResults.add(xml);
-					} catch (TransformerConfigurationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (TransformerFactoryConfigurationError e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (TransformerException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
+					Node node = xpathResultNodes.item(i);
+					xpathResults.add(XMLUtil.toString(node));
 
+				}
 				if (!xpathResults.isEmpty()) {
 					entry.put("results", xpathResults);
-					results.add(entry);
 				}
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (XPathExpressionException e) {
-
+			} catch (Exception e) {
+				entry.put("error", e.toString());
+			} finally {
+				if (entry.containsKey("results") || entry.containsKey("error"))
+					files.add(entry);
 			}
 		}
-		return results;
+		return files;
 	}
 }

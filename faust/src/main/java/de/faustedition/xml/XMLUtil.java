@@ -11,6 +11,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -107,17 +108,26 @@ public class XMLUtil {
 	}
 
 	public static void serialize(Node node, Writer writer) throws TransformerException {
-		transformerFactory().newTransformer().transform(new DOMSource(node), new StreamResult(writer));
+		Transformer transformer = transformerFactory().newTransformer();
+		Properties outputProperties = new Properties();
+		outputProperties.setProperty("method", "xml");
+		outputProperties.setProperty("omit-xml-declaration", "yes");
+		transformer.setOutputProperties(outputProperties);
+		transformer.transform(new DOMSource(node), new StreamResult(writer));
 	}
 
 	public static void serialize(Node node, File file) throws TransformerException {
 		transformerFactory().newTransformer().transform(new DOMSource(node), new StreamResult(file));
 	}
-
+	
 	public static String toString(Node node) throws TransformerException {
-		StringWriter out = new StringWriter();
-		serialize(node, out);
-		return out.toString();
+		if (node.getNodeValue() != null)
+			return node.getNodeValue();
+		else {
+			StringWriter out = new StringWriter();
+			serialize(node, out);
+			return out.toString();
+		}
 	}
 
 	public static boolean isSpacePreserved(Node node) {
