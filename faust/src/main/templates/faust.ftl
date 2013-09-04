@@ -133,7 +133,7 @@
 				<div id="restricted" class="yui3-menu">
 				<div class="yui3-menu-content">
 				<ul>
-					<li class="yui3-menuitem"><a href="/xml-query/" class="yui3-menuitem-content">XML Query</a></li>
+					<li class="yui3-menuitem"><a href="${cp}/xml-query/" class="yui3-menuitem-content">XML Query</a></li>
 				</ul>
 				</div>
 				</div>
