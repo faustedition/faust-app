@@ -129,6 +129,8 @@
 			</li>
 			<li class="yui3-menuitem"><a href="${cp}/project/contact" class="yui3-menuitem-content">${message("menu.contact")}</a></li>
 			<li class="yui3-menuitem"><a href="${cp}/project/imprint" class="yui3-menuitem-content">${message("menu.imprint")}</a></li>
+			
+			<@restricted>
 			<li><a class="yui3-menu-label" href="#restricted"><em>${message("menu.restricted")}</em></a>
 				<div id="restricted" class="yui3-menu">
 				<div class="yui3-menu-content">
@@ -138,7 +140,7 @@
 				</div>
 				</div>
 			</li>
-
+			</@restricted>
 
 			<#if !roles?seq_contains("editor") && !roles?seq_contains("external")>
 			<li class="yui3-menuitem"><a href="${cp}/login" class="yui3-menuitem-content">Login</a></li>
@@ -171,6 +173,12 @@
 	</#if>
 	</#list>
 </li>
+</#macro>
+
+<#macro restricted>
+	<#if roles?seq_contains("editor") || roles?seq_contains("admin")>
+		<#nested>
+	</#if>
 </#macro>
 
 <#function resolveUri uri>
