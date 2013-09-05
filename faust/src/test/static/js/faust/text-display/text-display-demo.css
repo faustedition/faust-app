@@ -29,3 +29,10 @@
 .stage-2{
 	color: green;
 }
+
+.linenum{
+	display: inline-block;
+	font-size: small;
+	color: grey;
+	width: 3em;
+}
