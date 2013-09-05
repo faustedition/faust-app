@@ -1,1 +1,31 @@
 /* TODO: test stylesheet*/
+
+.del {
+	text-decoration: line-through;
+}
+
+.add {
+	vertical-align: super;
+}
+
+.speaker {
+	font-weight: bold;
+}
+
+.expan-first:before, .ex-first:before{
+	content: "[";
+}
+
+.expan-last:after, .ex-last:after{
+	content: "]";
+}
+
+.stage-0{
+	color: red;
+}
+.stage-1{
+	color: blue;
+}
+.stage-2{
+	color: green;
+}
