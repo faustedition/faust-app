@@ -1,32 +1,32 @@
 /* TODO: test stylesheet*/
 
-.del {
+.ann-del {
 	text-decoration: line-through;
 }
 
-.add {
+.ann-add {
 	vertical-align: super;
 }
 
-.speaker {
+.ann-speaker {
 	font-weight: bold;
 }
 
-.expan-first:before, .ex-first:before{
+.ann-expan-first:before, .ann-ex-first:before{
 	content: "[";
 }
 
-.expan-last:after, .ex-last:after{
+.ann-expan-last:after, .ann-ex-last:after{
 	content: "]";
 }
 
-.stage-0{
+.ann-stage-0{
 	color: red;
 }
-.stage-1{
+.ann-stage-1{
 	color: blue;
 }
-.stage-2{
+.ann-stage-2{
 	color: green;
 }
 

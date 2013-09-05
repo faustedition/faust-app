@@ -26,7 +26,7 @@
 
 		var createTextDisplay = function(id, o) {
 			var text = Y.Faust.Text.create(Y.JSON.parse(o.responseText));
-			var view = new Y.Faust.TextDisplayView({container: '#text-container', text: text});
+			var view = new Y.Faust.TextDisplayView({container: '#text-container', text: text, cssPrefix: "ann-"});
 			view.render();
 
 			
