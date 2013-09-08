@@ -93,7 +93,9 @@ YUI.add('text-annotation', function (Y) {
 		},
 
 		/**
-		 * Partitions range from start to end and maps annotations to corresponding partitions.
+		 * Partitions text range from start to end and maps annotations to corresponding partitions.
+		 * @param start Integer
+		 * @param end Integer
 		 * @param annotations [Annotation]
 		 * @return [AnnotatedRange]
 		 */
@@ -109,21 +111,24 @@ YUI.add('text-annotation', function (Y) {
 			});
 				
 			
-			Y.Array.each(annotations, function(annotation) {
-				Y.Array.each(annotation.targets, function(target) {
-					if(target.text == this)
-					{
-						Y.Array.each(partitions, function(partition){
-							if(partition.range.overlapsWith(target.range))
-								partition.annotations.push(annotation);
-						});
-					}
+			Y.Array.each(partitions, function(partition){
+				Y.Array.each(this.find(partition.range.start, partition.range.end), function(annotation){
+					partition.annotations.push(annotation);
 				}, this);
 			}, this);
 			
 			return partitions;
 		},
 
+		/**
+		 * Find all annotations applying (partly) to [start, end] optionally filtered by filter.
+		 * @param start Integer
+		 * @param end Integer
+		 * @param filter Annotation filter.
+		 *               If String, this is matched against the annotations local name,
+		 *               if [String], this must contain the annotations local name,
+		 *               if function(Annotation) this is used as predicate.
+		 */
 		find: function (start, end, filter) {
 			var result = [],
 				nameFilter = null,
