@@ -4,12 +4,15 @@ YUI.add('text-display', function (Y) {
 		/**
 		 * Outputs an HTML representation of the text to the container
 		 */
-		render : function() {
+		render : function(start, end) {
 			var text = this.get('text');
 			var container = this.get('container');
 			var prefix = this.get('cssPrefix');
+			
+			start = start || 0;
+			end = end || text.contentLength;
 
-			var partitions = text.applyAnnotations();
+			var partitions = text.applyAnnotations(null, start, end);
 			
 			function stageNum(name){
 				stageNum.stages = stageNum.stages || {};
@@ -45,6 +48,7 @@ YUI.add('text-display', function (Y) {
 						var name = prefix + annotation.name.localName;
 						
 						partitionNode.addClass(name);
+						partitionNode.addClass(prefix + annotation.id);
 						
 						if(isFirst(annotation))
 							partitionNode.addClass(name + '-first');

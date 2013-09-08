@@ -21,10 +21,11 @@ YUI.add('text-annotation', function (Y) {
 	};
 
 	var UNKNOWN_NAME = new Name(null, "");
-	var Annotation = function (name, data, targets) {
+	var Annotation = function (name, data, targets, id) {
 		this.name = name || UNKNOWN_NAME;
 		this.data = data || {};
 		this.targets = targets || [];
+		this.id = id || NaN;
 	};
 	Y.extend(Annotation, Object, {
 		target: function () {
@@ -212,7 +213,7 @@ YUI.add('text-annotation', function (Y) {
 			text.annotations = Y.Array.map(data.annotations, function (a) {
 				var annotation = new Annotation(names[a.n], a.d, Y.Array.map(a.t, function (target) {
 					return new TextTarget((target[2] == text.id ? text : target[2]), new Range(target[0], target[1]));
-				}));
+				}), a.id);
 
 				text.rangeIndex.insert(annotation);
 
