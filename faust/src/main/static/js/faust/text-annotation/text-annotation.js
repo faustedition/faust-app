@@ -63,18 +63,16 @@ YUI.add('text-annotation', function (Y) {
 				Y.Array.each(a.targets, function (t) {
 					if (t.text == this) {
 						var range = t.range;
-						if (offsets.indexOf(range.start) < 0 
-							&& range.start >= partitionsStart 
-							&& range.start <= partitionsEnd)
+						if(range.start < partitionsEnd && range.end > partitionsStart)
+						{
 							offsets.push(range.start);
-						if (offsets.indexOf(range.end) < 0
-							&& range.end >= partitionsStart
-							&& range.end <= partitionsEnd)						
 							offsets.push(range.end);
+						}
 					}
 				}, this);
 			}, this);
 
+			offsets = Y.Array.dedupe(offsets);
 			offsets.sort(function (a, b) {
 				return a - b;
 			});
