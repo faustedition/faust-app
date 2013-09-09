@@ -43,25 +43,27 @@ YUI.add('text-display', function (Y) {
 					var lineNode = Y.config.doc.createTextNode(line);
 					partitionNode.append(lineNode);
 					
+					var classes = [];
 					Y.Array.each(partition.annotations, function(annotation, annotationNum){
 						
 						var name = prefix + annotation.name.localName;
 						
-						partitionNode.addClass(name);
-						partitionNode.addClass(prefix + annotation.id);
+						classes.push(name);
+						classes.push(prefix + annotation.id);
 						
 						if(isFirst(annotation))
-							partitionNode.addClass(name + '-first');
+							classes.push(name + '-first');
 						if(isLast(annotation))
-							partitionNode.addClass(name + '-last');
+							classes.push(name + '-last');
 						
 						if(annotation.name.localName == 'stage')
-							partitionNode.addClass(name + '-' + stageNum(annotation.data['value']));
+							classes.push(name + '-' + stageNum(annotation.data['value']));
 						
 						if(annotation.name.localName == 'l' && isFirst(annotation))
 							partitionNode.insert('<span class="linenum">'+parseInt(annotation.data['n'])+'</span>', lineNode);
 
 					});
+					partitionNode.addClass(classes.join(' '));
 				});
 			});
 		}
