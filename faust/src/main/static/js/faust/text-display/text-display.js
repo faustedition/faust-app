@@ -27,6 +27,7 @@ YUI.add('text-display', function (Y) {
 			var text = this.get('text');
 			var container = this.get('container');
 			var prefix = this.get('cssPrefix');
+			var callback = this.get('renderCallback');
 			
 			start = start || 0;
 			end = end || text.contentLength;
@@ -34,7 +35,7 @@ YUI.add('text-display', function (Y) {
 			var partitions = text.applyAnnotations(null, start, end);
 			
 			Y.Array.each(partitions, function(partition, i, partitions){
-				var partitionNode = Y.Node.create('<span></span>')
+				var partitionNode = Y.Node.create('<span></span>'); //quite expensive
 				container.append(partitionNode);
 				var lineNumNode = null;
 				
@@ -70,7 +71,7 @@ YUI.add('text-display', function (Y) {
 						if(last)
 							classes.push(name + '-last');
 						
-						classes = classes.concat(this.get('renderCallback')(annotation, prefix, partitionNode, lineNode, first, last));
+						classes = classes.concat(callback(annotation, prefix, partitionNode, lineNode, first, last));
 					}, this);
 					partitionNode.addClass(classes.join(' '));
 				}, this);
