@@ -10,6 +10,7 @@
 "yui3/build/cssbase/base-min.css"
 ] />" />
     <link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css"/>
+    <link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript.css"/>
 
     <script type="text/javascript">
     var cp = '${cp?js_string}';

@@ -1,0 +1,37 @@
+/* Diplomatic transcript */
+
+@font-face {
+  font-family: faust-serif;
+  src: url(../fonts/GenBkBasR.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: faust-sans-serif;
+  src: url(../fonts/RopaSans-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: faust-monospace;
+  src: url(../fonts/UbuntuMono-Regular.ttf) format("truetype");
+}
+
+svg.diplomatic {
+  font-family: faust-serif, serif; 
+}
+
+#error-display {
+  background-color: red;
+  color: white; 
+}
+
+g.Zone {
+  cursor: move;
+  -moz-user-select: none;-webkit-user-select: none;
+}
+
+g.Zone:hover {
+  stroke: black;
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+}
+ 

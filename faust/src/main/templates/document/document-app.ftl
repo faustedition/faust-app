@@ -5,7 +5,8 @@
 	<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
 	<#assign header>
 	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
-	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-text.css" />
+	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-text.css"/>
+    <link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript.css"/>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
 	</#assign>
