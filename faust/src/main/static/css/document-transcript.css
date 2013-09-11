@@ -1,5 +1,7 @@
 /* Diplomatic transcript */
 
+/* Custom fonts */
+
 @font-face {
   font-family: faust-serif;
   src: url(../fonts/GenBkBasR.ttf) format("truetype");
@@ -15,6 +17,9 @@
   src: url(../fonts/UbuntuMono-Regular.ttf) format("truetype");
 }
 
+
+/* global */
+
 svg.diplomatic {
   font-family: faust-serif, serif; 
 }
@@ -24,14 +29,64 @@ svg.diplomatic {
   color: white; 
 }
 
-g.Zone {
+/* Drag 'n drop of zones */
+
+svg.diplomatic g.Zone {
   cursor: move;
   -moz-user-select: none;-webkit-user-select: none;
 }
 
-g.Zone:hover {
+svg.diplomatic g.Zone:hover {
   stroke: black;
   stroke-opacity: 0.3;
   stroke-width: 1;
 }
  
+/* Text */
+
+svg.diplomatic .text {
+  font-size: 11pt;
+  font-family: faust-sans-serif, sans-serif;
+  fill: black;
+}
+
+svg.diplomatic .hand-g {
+	font-family: faust-serif, serif;
+}
+
+svg.diplomatic .hand-xx {
+	font-family: faust-monospace, monospace;
+} 
+
+svg.diplomatic .material-bl {
+	fill: darkgrey;
+}
+
+svg.diplomatic Line.material-bl {
+	stroke: darkgrey;
+}
+
+svg.diplomatic .material-t {
+	fill: black;
+}
+
+svg.diplomatic Line.material-t {
+	stroke: black;
+}
+
+svg.diplomatic .rewrite {
+	font-weight: bold;
+}
+
+svg.diplomatic .under {
+	opacity: 0.5;
+}
+
+svg.diplomatic .over {
+	font-weight: "bold";
+}
+
+svg.diplomatic .small {
+	font-size: 9pt;
+}
+

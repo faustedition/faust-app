@@ -176,7 +176,7 @@ YUI.add('document-view-svg', function (Y) {
 
 	Faust.Text.prototype.createView = function() {
 		var text = this.svgDocument().createElementNS(SVG_NS, "text");
-		this.setStyles(text);
+		this.setClasses(text);
 		text.appendChild(this.svgDocument().createTextNode(this.text));
 		return text;
 	};
@@ -204,7 +204,9 @@ YUI.add('document-view-svg', function (Y) {
 			this.underline.setAttribute("x2", this.x + this.width);
 			this.underline.setAttribute("y1", this.y);
 			this.underline.setAttribute("y2", this.y);
-			this.underline.setAttribute("stroke", this.handColor());
+			//this.underline.setAttribute("stroke", this.handColor());
+			this.underline.setAttribute("class", this.computeClasses());
+
 			this.underline.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
 	};

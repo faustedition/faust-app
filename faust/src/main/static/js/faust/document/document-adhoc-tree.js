@@ -12,9 +12,9 @@ YUI.add('document-adhoc-tree', function (Y) {
 
 			Y.each(annotations, function(a) {
 				if (a.name.localName == "hand") {
-					textAttrs.hand = a.data["value"];
-				} else if (a.name.localName == "rewrite") {
-					textAttrs.rewrite = a.data["hand"];
+					textAttrs.hand = a.data["value"].substring(1);
+				} else if (a.name.localName == "rewrite" && a.data["hand"]) {
+					textAttrs.rewrite = a.data["hand"].substring(1);
 				} else if (a.name.localName == "under") {
 					textAttrs.under = true;
 				} else if (a.name.localName == "over") {

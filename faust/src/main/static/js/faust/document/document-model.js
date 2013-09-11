@@ -93,17 +93,17 @@ YUI.add('document-model', function (Y) {
 			this.hAlign.align();
 			this.vAlign.align();
 		},
-		computeStyles: function() { 
-			return {}; 
+		computeClasses: function() { 
+			return []; 
 		},
-		setStyles: function(view) {
-			var styles = this.computeStyles();
-			if (styles) {
-				var stylesStr = "";
-				for (style in styles) {
-					stylesStr += (stylesStr.length == 0 ? "" : "; ") + (style + ": " + styles[style]);
+		setClasses: function(view) {
+			var classes = this.computeClasses();
+			if (classes) {
+				var classesStr = " ";
+				for (c in classes) {
+					classesStr += classes[c] + " ";
 				}
-				view.setAttribute("style", stylesStr);
+				view.setAttribute("class", classesStr);
 			}			
 		},
 		rotX: function() {return 0 + this.globalRotation()},
@@ -239,47 +239,44 @@ YUI.add('document-model', function (Y) {
 		else
 			return this.textAttrs["hand"];
 	};
-	Faust.Text.prototype.handColor = function() {
-		var hand = this.getHand();
-		if (hand.indexOf("_bl") >= 0) {
-			return "darkgrey";
-		} else if (hand.indexOf("_t") >= 0) {
-			return "black";
-		} else {
-			return "black";
-		}
+
+	Faust.Text.prototype.getWriter = function() {
+		return this.getHand().split('_')[0];
 	};
-	Faust.Text.prototype.computeStyles = function() {
-		var styles = { "font-size": "11pt" };
+
+	Faust.Text.prototype.getMaterial = function() {
+		return this.getHand().split('_')[1];
+	};
+
+	Faust.Text.prototype.getScript = function() {
+		return this.getHand().split('_')[2];
+	}
+
+
+ 		Faust.Text.prototype.computeClasses = function() {
+		var classes = ["text"];
 		for (attr in this.textAttrs) {
 			if (attr == "hand") {
-				styles["fill"] = this.handColor();
-				var hand = this.getHand();
-				if (hand.indexOf("g_") >= 0) {
-					// TODO temp solution, Firefox can only display italics,
-					// Webkit only small-caps
-					//styles["font-variant"] = "small-caps";
-					//styles["font-style"] = "italic";
-					styles["font-family"] = "faust-serif";
-				} else if (hand.indexOf("xx_") >= 0) {
-					styles["font-family"] = "faust-monospace";
-				} else {
-					styles["font-family"] = "faust-sans-serif";
-				}
+				if (this.getWriter())
+					classes.push("hand-" + this.getWriter());
+				if (this.getMaterial())
+					classes.push("material-" + this.getMaterial());
+				if (this.getScript())
+					classes.push("script-" + this.getScript());
 			} else if (attr == "rewrite") {
-				styles["font-weight"] = "bold";
+				classes.push("rewrite");
 			} else if (attr == "under") {
-				styles["opacity"] = "0.5";
+				classes.push("under");
 			} else if (attr == "over") {
-				styles["font-weight"] = "bold";
+				classes.push("over");
 			} else if (attr == "fontsize") {
 				var size = this.textAttrs["fontsize"];
 				if (size == "small") {
-					styles["font-size"] = "9pt";
+					classes.push("small");
 				}
 			}
 		}
-		return styles;
+		return classes;
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 	
