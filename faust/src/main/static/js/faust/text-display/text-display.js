@@ -58,7 +58,7 @@ YUI.add('text-display', function (Y) {
 					var classes = [];
 					for(var id in partition.annotations)
 					{
-						annotation = partition.annotations[id];
+						var annotation = partition.annotations[id];
 						var name = prefix + annotation.name.localName;
 						
 						classes.push(name);

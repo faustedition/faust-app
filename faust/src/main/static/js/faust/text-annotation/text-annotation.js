@@ -25,7 +25,7 @@ YUI.add('text-annotation', function (Y) {
 		this.name = name || UNKNOWN_NAME;
 		this.data = data || {};
 		this.targets = targets || [];
-		this.id = id || NaN;
+		this.id = (id !== undefined) ? id : NaN;
 	};
 	Y.extend(Annotation, Object, {
 		target: function () {
