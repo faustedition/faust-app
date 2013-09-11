@@ -45,11 +45,11 @@ YUI.add('text-annotation', function (Y) {
 	});
 	
 	/**
-	 * Represents a range with corresponding annotations
+	 * Represents a range with corresponding annotations in format {id : annotation}
 	 */
 	var AnnotatedRange = function(range, annotations) {
 		this.range = range;
-		this.annotations = annotations || [];
+		this.annotations = annotations || {};
 	}
 
 	Y.extend(Text, Object, {
@@ -111,7 +111,7 @@ YUI.add('text-annotation', function (Y) {
 			
 			Y.Array.each(partitions, function(partition){
 				Y.Array.each(this.find(partition.range.start, partition.range.end), function(annotation){
-					partition.annotations.push(annotation);
+					partition.annotations[annotation.id] = annotation;
 				}, this);
 			}, this);
 			
