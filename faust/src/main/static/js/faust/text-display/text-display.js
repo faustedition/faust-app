@@ -39,13 +39,13 @@ YUI.add('text-display', function (Y) {
 				container.append(partitionNode);
 				var lineNumNode = null;
 				
-				function isFirst(annotation)
+				function isFirst(annotationId)
 				{
-					return i == 0 || Y.Array.indexOf(partitions[i-1].annotations, annotation) == -1;
+					return i == 0 || partitions[i-1].annotations[annotationId] === undefined;
 				}
-				function isLast(annotation)
+				function isLast(annotationId)
 				{
-					return i+1 == partitions.length || Y.Array.indexOf(partitions[i+1].annotations, annotation) == -1;
+					return i+1 == partitions.length || partitions[i+1].annotations[annotationId] === undefined;
 				}
 				
 				Y.Array.each(partition.range.of(text.content).split('\n'), function(line, n) {
@@ -56,15 +56,16 @@ YUI.add('text-display', function (Y) {
 					partitionNode.append(lineNode);
 					
 					var classes = [];
-					Y.Array.each(partition.annotations, function(annotation, annotationNum){
-						
+					for(var id in partition.annotations)
+					{
+						var annotation = partition.annotations[id];
 						var name = prefix + annotation.name.localName;
 						
 						classes.push(name);
-						classes.push(prefix + annotation.id);
+						classes.push(prefix + id);
 						
-						var first = isFirst(annotation);
-						var last = isLast(annotation);
+						var first = isFirst(id);
+						var last = isLast(id);
 						
 						if(first)
 							classes.push(name + '-first');
@@ -72,7 +73,7 @@ YUI.add('text-display', function (Y) {
 							classes.push(name + '-last');
 						
 						classes = classes.concat(callback(annotation, prefix, partitionNode, lineNode, first, last));
-					}, this);
+					}
 					partitionNode.addClass(classes.join(' '));
 				}, this);
 			}, this);
