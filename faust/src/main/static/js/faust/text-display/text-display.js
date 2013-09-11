@@ -22,17 +22,17 @@ YUI.add('text-display', function (Y) {
 	var TextDisplayView = Y.Base.create('textDisplayView', Y.View, [], {
 		/**
 		 * Outputs an HTML representation of the text to the container
+		 * @param range Y.Faust.Range Text range to render
 		 */
-		render : function(start, end) {
+		render : function(range) {
 			var text = this.get('text');
 			var container = this.get('container');
 			var prefix = this.get('cssPrefix');
 			var callback = this.get('renderCallback');
 			
-			start = start || 0;
-			end = end || text.contentLength;
+			range = range || new Y.Faust.Range(0, text.contentLength);
 
-			var partitions = text.applyAnnotations(null, start, end);
+			var partitions = text.applyAnnotations(null, range.start, range.end);
 			
 			Y.Array.each(partitions, function(partition, i, partitions){
 				var partitionNode = Y.Node.create('<span></span>'); //quite expensive
