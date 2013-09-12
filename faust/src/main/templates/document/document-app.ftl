@@ -265,6 +265,26 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  var that = this;
 
 
+					  function stageNum(name){
+						  stageNum.stages = stageNum.stages || {};
+						  stageNum.stagecount = stageNum.stagecount || 0;
+						  if(stageNum.stages[name] === undefined)
+							  stageNum.stages[name] = stageNum.stagecount++;
+						  return stageNum.stages[name];
+					  };
+
+					  var handleSpecialAnnotations = function(annotation, prefix, partitionNode, lineNode, isFirst, isLast)
+					  {
+						  
+						  if(annotation.name.localName == 'stage')
+							  return [prefix + 'stage-' + stageNum(annotation.data['value'])];
+						  
+						  if(annotation.name.localName == 'l' && isFirst)
+							  partitionNode.insert('<span class="linenum">'+parseInt(annotation.data['n'])+'</span>', lineNode);
+						  
+						  return [];
+					  };
+		
 					  this.get('fd').transcriptionFromRanges(function(t) {
 						  window.setTimeout(function(){
 							  that.removeAjaxLoader(textContent);
@@ -273,7 +293,8 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 							  var textDisplay = new Y.Faust.TextDisplayView({
 							  	  container: textContent,
 								  text: text,
-								  cssPrefix: 'ann-'});
+								  cssPrefix: 'ann-',
+								  renderCallback: handleSpecialAnnotations});
 							  textDisplay.render();
 						  }, 2000);	  							  
 					  });
