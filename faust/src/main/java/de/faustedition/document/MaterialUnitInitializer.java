@@ -64,7 +64,9 @@ public class MaterialUnitInitializer implements InitializingBean {
 			} catch (IOException e) {
 				logger.error("I/O error while adding document " + documentDescriptor, e);
 			} catch (DocumentDescriptorInvalidException e) {
-				logger.error("Metadata descriptor invalid for document " + documentDescriptor, e);				
+				logger.error("Metadata descriptor invalid for document " + documentDescriptor, e);
+			} catch (Exception e) {
+				logger.error("Error while importing document " + documentDescriptor, e);
 			}
 		}
 		sw.stop();
