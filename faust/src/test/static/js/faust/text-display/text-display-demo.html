@@ -24,12 +24,30 @@
 <script type="text/javascript">
  	YUI().use("text-display", "text-annotation", "base", "io", "json", function (Y) {
 
+ 	
+		function stageNum(name){
+			stageNum.stages = stageNum.stages || {};
+			stageNum.stagecount = stageNum.stagecount || 0;
+			if(stageNum.stages[name] === undefined)
+				stageNum.stages[name] = stageNum.stagecount++;
+			return stageNum.stages[name];
+		}
+		var handleSpecialAnnotations = function(annotation, prefix, partitionNode, lineNode, isFirst, isLast)
+		{
+			
+			if(annotation.name.localName == 'stage')
+				return [prefix + 'stage-' + stageNum(annotation.data['value'])];
+			
+			if(annotation.name.localName == 'l' && isFirst)
+				partitionNode.insert('<span class="linenum">'+parseInt(annotation.data['n'])+'</span>', lineNode);
+			
+			return [];
+		}
+		
 		var createTextDisplay = function(id, o) {
 			var text = Y.Faust.Text.create(Y.JSON.parse(o.responseText));
-			var view = new Y.Faust.TextDisplayView({container: '#text-container', text: text, cssPrefix: "ann-"});
+			var view = new Y.Faust.TextDisplayView({container: '#text-container', text: text, cssPrefix: 'ann-', renderCallback: handleSpecialAnnotations});
 			view.render();
-
-			
 		};
 
 		Y.io("1280.json", {

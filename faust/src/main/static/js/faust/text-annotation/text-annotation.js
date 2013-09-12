@@ -21,10 +21,11 @@ YUI.add('text-annotation', function (Y) {
 	};
 
 	var UNKNOWN_NAME = new Name(null, "");
-	var Annotation = function (name, data, targets) {
+	var Annotation = function (name, data, targets, id) {
 		this.name = name || UNKNOWN_NAME;
 		this.data = data || {};
 		this.targets = targets || [];
+		this.id = (id !== undefined) ? id : NaN;
 	};
 	Y.extend(Annotation, Object, {
 		target: function () {
@@ -44,11 +45,11 @@ YUI.add('text-annotation', function (Y) {
 	});
 	
 	/**
-	 * Represents a range with corresponding annotations
+	 * Represents a range with corresponding annotations in format {id : annotation}
 	 */
 	var AnnotatedRange = function(range, annotations) {
 		this.range = range;
-		this.annotations = annotations || [];
+		this.annotations = annotations || {};
 	}
 
 	Y.extend(Text, Object, {
@@ -62,18 +63,15 @@ YUI.add('text-annotation', function (Y) {
 				Y.Array.each(a.targets, function (t) {
 					if (t.text == this) {
 						var range = t.range;
-						if (offsets.indexOf(range.start) < 0 
-							&& range.start >= partitionsStart 
-							&& range.start <= partitionsEnd)
+						if(range.start > partitionsStart && range.start < partitionsEnd)
 							offsets.push(range.start);
-						if (offsets.indexOf(range.end) < 0
-							&& range.end >= partitionsStart
-							&& range.end <= partitionsEnd)						
+						if(range.end > partitionsStart && range.end < partitionsEnd)
 							offsets.push(range.end);
 					}
 				}, this);
 			}, this);
 
+			offsets = Y.Array.dedupe(offsets);
 			offsets.sort(function (a, b) {
 				return a - b;
 			});
@@ -93,7 +91,9 @@ YUI.add('text-annotation', function (Y) {
 		},
 
 		/**
-		 * Partitions range from start to end and maps annotations to corresponding partitions.
+		 * Partitions text range from start to end and maps annotations to corresponding partitions.
+		 * @param start Integer
+		 * @param end Integer
 		 * @param annotations [Annotation]
 		 * @return [AnnotatedRange]
 		 */
@@ -109,21 +109,24 @@ YUI.add('text-annotation', function (Y) {
 			});
 				
 			
-			Y.Array.each(annotations, function(annotation) {
-				Y.Array.each(annotation.targets, function(target) {
-					if(target.text == this)
-					{
-						Y.Array.each(partitions, function(partition){
-							if(partition.range.overlapsWith(target.range))
-								partition.annotations.push(annotation);
-						});
-					}
+			Y.Array.each(partitions, function(partition){
+				Y.Array.each(this.find(partition.range.start, partition.range.end), function(annotation){
+					partition.annotations[annotation.id] = annotation;
 				}, this);
 			}, this);
 			
 			return partitions;
 		},
 
+		/**
+		 * Find all annotations applying (partly) to [start, end] optionally filtered by filter.
+		 * @param start Integer
+		 * @param end Integer
+		 * @param filter Annotation filter.
+		 *               If String, this is matched against the annotations local name,
+		 *               if [String], this must contain the annotations local name,
+		 *               if function(Annotation) this is used as predicate.
+		 */
 		find: function (start, end, filter) {
 			var result = [],
 				nameFilter = null,
@@ -207,7 +210,7 @@ YUI.add('text-annotation', function (Y) {
 			text.annotations = Y.Array.map(data.annotations, function (a) {
 				var annotation = new Annotation(names[a.n], a.d, Y.Array.map(a.t, function (target) {
 					return new TextTarget((target[2] == text.id ? text : target[2]), new Range(target[0], target[1]));
-				}));
+				}), a.id);
 
 				text.rangeIndex.insert(annotation);
 
