@@ -26,6 +26,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit.Type;
 import de.faustedition.graph.FaustGraph;
@@ -174,9 +175,11 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			metadataKey = metadataKeyFromElement(localName, attributes);
 			
 			metadataValue = new StringBuilder();
-			if (valueAttribute.containsKey(localName))
-				metadataValue.append(attributes.getValue(valueAttribute.get(localName)));
-
+			if (valueAttribute.containsKey(localName)) {
+				String attributeVal = attributes.getValue(valueAttribute.get(localName));
+				metadataValue.append(attributeVal != null ? attributeVal : "none");
+			}
+			
 			// TODO: transcript uris as regular metadata
 			
 			if (localName == "textTranscript" || localName == "docTranscript") {
@@ -185,7 +188,12 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 				final String transcript = metadataValue.toString();
 				if (transcript != null) {
 					final MaterialUnit unit = materialUnitStack.peek();
-					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
+					final FaustURI transcriptSource;
+					if (!transcript.equals("none")) {
+						transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
+					} else {
+						transcriptSource = new FaustURI(FaustAuthority.SELF, "/none/");
+					}
 					unit.setTranscriptSource(transcriptSource);
 					unit.setTranscript(transcriptManager.find(transcriptSource, type));
 				}

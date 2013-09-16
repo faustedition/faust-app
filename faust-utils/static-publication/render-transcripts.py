@@ -2,10 +2,29 @@ import requests, urllib, os, os.path, sys, tempfile, shutil
 from subprocess import call, check_call
 
 manuscript_urls = [
-    # 'http://localhost:8080/document/faust/2.5/gsa_390883.xml',
-    'http://localhost:8080/document/archival/fdh_frankfurt/Hs-6626.xml',
-    'http://localhost:8080/document/faust/2.1/gsa_390143.xml',
-    #'http://localhost:8080/document/faust/2/gsa_391098.xml'
+    # "artige Handschriften"
+
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_390140.xml',
+    'http://localhost:8080/faustedition/document//faust/2.4/gsa_390595.xml',
+    'http://localhost:8080/faustedition/document//faust/2.5/gsa_390183.xml',
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_391369.xml',
+    'http://localhost:8080/faustedition/document//verschiedenes/gsa_390875.xml',
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_391532.xml',
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_391374.xml',
+    'http://localhost:8080/faustedition/document//faust/2.2/gsa_390835.xml',
+    'http://localhost:8080/faustedition/document//verschiedenes/gsa_390076.xml',
+    'http://localhost:8080/faustedition/document//faust/2.4/gsa_390017.xml',
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_390403.xml',
+    'http://localhost:8080/faustedition/document//faust/2.4/gsa_390157.xml',
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_389808.xml',
+    'http://localhost:8080/faustedition/document//faust/2.1/gsa_390689.xml',
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_390093.xml',
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_390900.xml',
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_390826.xml',
+    'http://localhost:8080/faustedition/document//faust/1/gsa_390822.xml',
+    'http://localhost:8080/faustedition/document//faust/2/gsa_390777.xml',
+    'http://localhost:8080/faustedition/document//paralipomena/gsa_391371.xml',
+    'http://localhost:8080/faustedition/document//faust/2.2/gsa_390773.xml'
     ]
 
 latex_header = """\\documentclass[11pt]{book} 
@@ -18,6 +37,8 @@ latex_header = """\\documentclass[11pt]{book}
 \\date{\\today} 
 \\maketitle
 \\frontmatter 
+\\setcounter{secnumdepth}{0}
+\\setcounter{tocdepth}{1}
 \\tableofcontents 
 \\mainmatter 
 \\chapter{Handschriften}
@@ -33,6 +54,7 @@ latex_footer = """
 def extract_pages(mu):
     result = [];
     if mu['type'] == 'page':
+        # print "   seite: " + str(mu['transcript'] if 'transcript' in mu else '--')
         result.append(mu)
     for child in mu['contents']:
         result.extend(extract_pages(child))
@@ -58,21 +80,31 @@ def render_document(url, tmp_dir):
     for (i, page_url) in enumerate(get_pageurls(url)):
         #pagenumbers starting from 1
         pagenum = i + 1 
-        out_filepath = generate_out_filepath(url, tmp_dir)
+        out_filepath = generate_out_filepath(page_url, tmp_dir)
         print "rendering page ", pagenum, ": ", page_url
         if not os.path.exists(out_filepath):
+            print "   (rendering to      " + out_filepath  + ")"
             check_call(['phantomjs', 'render-transcript.js', url + '?view=transcript-bare#' + str(i+1), out_filepath]) 
         else:
-            print "(already exists)"
+            print "   (already exists at " + out_filepath + ")"
         
 def generate_latex(manuscript_urls, tmp_dir):
     result = ''
     for url in manuscript_urls:
         doc_name = get_doc_name(url)
+        result = result + '\clearpage\n'
         result = result + '\section{' + doc_name + '}\n'
-        for page_url in get_pageurls(url):
-            result = result + '\clearpage\n'
-            result = result + '\includegraphics[width=\\textwidth,height=\\textheight,keepaspectratio]{' + generate_out_filepath(page_url, tmp_dir)  +'}\n'
+        for (i, page_url) in enumerate(get_pageurls(url)):
+            pagenum = i + 1
+            if pagenum > 1:
+                result = result + '\clearpage\n'
+            result = result + '\subsection{Seite ' + str(pagenum) + "}\n"
+            result = result + '\\vfill{}\n'
+            # TODO hack
+            if "self/none"  in page_url:
+                result = result + "[Leere Seite]"
+            else: 
+                result = result + '\includegraphics[width=\\textwidth,height=\\textheight,keepaspectratio]{' + generate_out_filepath(page_url, tmp_dir)  +'}\n'
     return result
 
 
@@ -95,13 +127,17 @@ latex_tmp_dir = tempfile.mkdtemp()
 latex_filename = os.path.join(latex_tmp_dir, 'faust.tex')
 latex_out = open(latex_filename, 'w')
 
+print "writing latex to " + latex_filename
 latex_out.write(latex_header)
 latex_out.write(generate_latex(manuscript_urls, tmp_dir))
 latex_out.write(latex_footer)
+latex_out.close()
 
 os.chdir(latex_tmp_dir)
-check_call(['pdflatex', latex_filename])
-shutil.copyfile(latex_filename, pdf_result)
+# twice for toc indexing
+check_call(['pdflatex', '-output-directory ' + latex_tmp_dir, latex_filename])
+check_call(['pdflatex', '-output-directory ' + latex_tmp_dir, latex_filename])
+shutil.copyfile(os.path.join(latex_tmp_dir, "faust.pdf"), pdf_result)
 
 
 

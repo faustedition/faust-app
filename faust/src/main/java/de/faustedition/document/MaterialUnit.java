@@ -192,26 +192,30 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 	public String toString() {
 
 		final String waFaust = getMetadataValue("callnumber.wa-faust");
-		if (!Strings.isNullOrEmpty(waFaust) && !"-".equals(waFaust)) {
+		if (!Strings.isNullOrEmpty(waFaust) && !"none".equals(waFaust)) {
 			return waFaust;
 		}
 
-		final String gsaOld = getMetadataValue("callnumber.gsa-old");
-		if (!Strings.isNullOrEmpty(gsaOld) && !"-".equals(gsaOld)) {
+		final String gsaNew = getMetadataValue("callnumber.gsa_2");
+		if (!Strings.isNullOrEmpty(gsaNew) && !"none".equals(gsaNew)) {
+			return gsaNew;
+		}
+		
+		final String gsaOld = getMetadataValue("callnumber.gsa_1");
+		if (!Strings.isNullOrEmpty(gsaOld) && !"none".equals(gsaOld)) {
 			return gsaOld;
 		}
 		
 		final String waId = getMetadataValue("wa-id");
-		if (!Strings.isNullOrEmpty(waId) && !"-".equals(waId)) {
+		if (!Strings.isNullOrEmpty(waId) && !"none".equals(waId)) {
 			return waId;
 		}
 		
 		final String callnumber = getMetadataValue("callnumber");
-		if (!Strings.isNullOrEmpty(callnumber) && !"-".equals(callnumber)) {
+		if (!Strings.isNullOrEmpty(callnumber) && !"none".equals(callnumber)) {
 			return new StringBuilder(getArchive().getId()).append("/").append(callnumber).toString();
 		}
 		
-
 		final FaustURI transcriptSource = getTranscriptSource();
 		if (transcriptSource != null) {
 			return transcriptSource.getFilename();
