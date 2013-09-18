@@ -96,16 +96,6 @@ YUI.add('document-model', function (Y) {
 		computeClasses: function() { 
 			return []; 
 		},
-		setClasses: function(view) {
-			var classes = this.computeClasses();
-			if (classes) {
-				var classesStr = " ";
-				for (c in classes) {
-					classesStr += classes[c] + " ";
-				}
-				view.setAttribute("class", classesStr);
-			}			
-		},
 		rotX: function() {return 0 + this.globalRotation()},
 		rotY: function() {return 90 + this.globalRotation()},
 		
@@ -254,7 +244,7 @@ YUI.add('document-model', function (Y) {
 
 
  		Faust.Text.prototype.computeClasses = function() {
-		var classes = ["text"];
+		var classes = [""];
 		for (attr in this.textAttrs) {
 			if (attr == "hand") {
 				if (this.getWriter())
@@ -276,7 +266,7 @@ YUI.add('document-model', function (Y) {
 				}
 			}
 		}
-		return classes;
+		return classes.reduce(function (x,y) {return x + " " + y});
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 	

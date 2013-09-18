@@ -176,7 +176,7 @@ YUI.add('document-view-svg', function (Y) {
 
 	Faust.Text.prototype.createView = function() {
 		var text = this.svgDocument().createElementNS(SVG_NS, "text");
-		this.setClasses(text);
+		text.setAttribute("class", "text " + this.computeClasses());
 		text.appendChild(this.svgDocument().createTextNode(this.text));
 		return text;
 	};
@@ -198,6 +198,13 @@ YUI.add('document-view-svg', function (Y) {
 			//this.strikethrough.transform.baseVal = this.view.transform.baseVal;
 			this.strikethrough.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
+
+		var bbox = this.view.getBBox();
+		this.bgBox.setAttribute("x", bbox.x);
+		this.bgBox.setAttribute("y", bbox.y);
+		this.bgBox.setAttribute("height", bbox.height);
+		this.bgBox.setAttribute("width", bbox.width);
+		this.bgBox.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		
 		if (this.underline) {
 			this.underline.setAttribute("x1", this.x);
@@ -213,16 +220,28 @@ YUI.add('document-view-svg', function (Y) {
 
 
 	Faust.Text.prototype.render = function() {
+
+		this.bgBox = this.svgDocument().createElementNS(SVG_NS, "rect");
+		this.svgContainer().appendChild(this.bgBox);
+		this.bgBox.setAttribute("class", "bgBox " + this.computeClasses());
+							   
+
+
 		this.view = this.createView();
 		this.svgContainer().appendChild(this.view);
 		var textBox = this.view.getBBox();
+		
+
+
+
 		if ("strikethrough" in this.textAttrs) {
 			this.strikethrough = this.svgDocument().createElementNS(SVG_NS, "line");
 			this.svgContainer().appendChild(this.strikethrough);
 		}
 		if ("underline" in this.textAttrs) {
 			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
-			this.view.setAttribute('class', 'underline');
+			this.view.setAttribute("class", 
+								   this.view.getAttribute("class") + " underline");
 			this.svgContainer().appendChild(this.underline);
 
 		}
@@ -233,7 +252,7 @@ YUI.add('document-view-svg', function (Y) {
 
 	Faust.GrLine.prototype.createView = function() {
 		this.zoneSpanning = this.svgDocument().createElementNS(SVG_NS, 'rect');
-		this.zoneSpanning.setAttribute('fill', 'url(#curlyLinePattern)');
+		this.zoneSpanning.setAttribute('fill', 'url(#curlyLinePattern');
 		this.zoneSpanning.setAttribute('width', '100');
 		this.svgContainer().appendChild(this.zoneSpanning);
 		
