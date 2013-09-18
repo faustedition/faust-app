@@ -44,13 +44,6 @@ YUI.add('text-annotation', function (Y) {
 		}
 	});
 	
-	/**
-	 * Represents a range with corresponding annotations in format {id : annotation}
-	 */
-	var AnnotatedRange = function(range, annotations) {
-		this.range = range;
-		this.annotations = annotations || {};
-	}
 
 	Y.extend(Text, Object, {
 		partition: function (annotations, start, end) {
@@ -86,34 +79,6 @@ YUI.add('text-annotation', function (Y) {
 				rangeStart = rangeEnd;
 			});
 
-			
-			return partitions;
-		},
-
-		/**
-		 * Partitions text range from start to end and maps annotations to corresponding partitions.
-		 * @param start Integer
-		 * @param end Integer
-		 * @param annotations [Annotation]
-		 * @return [AnnotatedRange]
-		 */
-		applyAnnotations: function(annotations, start, end) {
-			annotations = annotations || this.annotations;
-			start = start || 0;
-			end = end || this.content.length;
-
-			var partitions = this.partition(annotations, start, end);
-
-			Y.Array.each(partitions, function(element, index, array){
-				array[index] = new AnnotatedRange(element);
-			});
-				
-			
-			Y.Array.each(partitions, function(partition){
-				Y.Array.each(this.find(partition.range.start, partition.range.end), function(annotation){
-					partition.annotations[annotation.id] = annotation;
-				}, this);
-			}, this);
 			
 			return partitions;
 		},

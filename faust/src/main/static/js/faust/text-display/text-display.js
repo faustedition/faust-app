@@ -32,23 +32,16 @@ YUI.add('text-display', function (Y) {
 			
 			range = range || new Y.Faust.Range(0, text.contentLength);
 
-			var partitions = text.applyAnnotations(null, range.start, range.end);
+			var partitions = text.partition(null, range.start, range.end);
 			
 			Y.Array.each(partitions, function(partition, i, partitions){
 				var partitionNode = Y.Node.create('<span></span>'); //quite expensive
 				container.append(partitionNode);
 				var lineNumNode = null;
 				
-				function isFirst(annotationId)
-				{
-					return i == 0 || partitions[i-1].annotations[annotationId] === undefined;
-				}
-				function isLast(annotationId)
-				{
-					return i+1 == partitions.length || partitions[i+1].annotations[annotationId] === undefined;
-				}
+				var annotations = text.find(partition.start, partition.end);
 				
-				Y.Array.each(partition.range.of(text.content).split('\n'), function(line, n) {
+				Y.Array.each(partition.of(text.content).split('\n'), function(line, n) {
 					if(n > 0)
 						partitionNode.append('<br>');
 					
@@ -56,16 +49,15 @@ YUI.add('text-display', function (Y) {
 					partitionNode.append(lineNode);
 					
 					var classes = [];
-					for(var id in partition.annotations)
-					{
-						var annotation = partition.annotations[id];
+					Y.Array.each(annotations, function(annotation){
+
 						var name = prefix + annotation.name.localName;
 						
 						classes.push(name);
-						classes.push(prefix + id);
+						classes.push(prefix + annotation.id);
 						
-						var first = isFirst(id);
-						var last = isLast(id);
+						var first = (i == 0 || annotation.targetIn(text).range.start == partition.start);
+						var last = (i+1 == partitions.length || annotation.targetIn(text).range.end == partition.end);
 						
 						if(first)
 							classes.push(name + '-first');
@@ -73,7 +65,7 @@ YUI.add('text-display', function (Y) {
 							classes.push(name + '-last');
 						
 						classes = classes.concat(callback(annotation, prefix, partitionNode, lineNode, first, last));
-					}
+					});
 					partitionNode.addClass(classes.join(' '));
 				}, this);
 			}, this);
