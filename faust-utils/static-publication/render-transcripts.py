@@ -27,12 +27,12 @@ manuscript_urls = [
     'http://localhost:8080/faustedition/document//faust/2.2/gsa_390773.xml'
     ]
 
-latex_header = """\\documentclass[11pt]{book} 
+latex_header = """\\documentclass[11pt,oneside]{book} 
 \\usepackage{makeidx}
 \\usepackage{graphicx}
 \\usepackage[german]{babel} 
 \\begin{document} 
-\\author{Johann Wolfgang von Goethe} 
+\\author{Johann Wolfgang Goethe} 
 \\title{Faust. Historisch-kritische Ausgabe} 
 \\date{\\today} 
 \\maketitle
