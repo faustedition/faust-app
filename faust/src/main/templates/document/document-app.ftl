@@ -7,6 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-text.css"/>
     <link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript.css"/>
+    <link rel="stylesheet" type="text/css" id="style-document-transcript-highlight-hands" href="${cp}/static/css/document-transcript-highlight-hands.css"/>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
 	</#assign>
@@ -26,7 +27,9 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 		 // "document-text",
 		 "text-display",
 		  function(Y) {
-			  
+		  
+		  	  Y.StyleSheet('#style-document-transcript-highlight-hands').disable();
+
 			  Y.NavigationModel = Y.Base.create('navigationModel', Y.Model, [], {
 				  
 			  }, {

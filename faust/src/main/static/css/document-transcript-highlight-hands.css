@@ -1,0 +1,8 @@
+svg.diplomatic .bgBox {
+	fill-opacity: .5;
+	fill: yellow;
+}
+
+svg.diplomatic .bgBox.hand-g {
+	fill: Aqua;
+}

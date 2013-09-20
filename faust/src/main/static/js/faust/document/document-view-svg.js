@@ -161,8 +161,21 @@ YUI.add('document-view-svg', function (Y) {
 		result.appendChild(box0);
 		result.setAttribute('class', 'Zone');
 		result.setAttributeNS(DRAG_NS, 'drag:enable', 'true');
+
+		var sheet = Y.StyleSheet('#style-document-transcript-highlight-hands');
 		
-			return result;
+		Y.one(result).on("mouseenter", function () {
+			//Y.all('.bgBox').transition('fadeIn');
+			sheet.enable();
+		});
+
+		Y.one(result).on("mouseleave", function () {
+			//Y.all('.bgBox').transition('fadeOut');
+			sheet.disable();
+		});
+
+		return result;
+		
 	};
 	Y.augment(Faust.Zone, Faust.ViewComponent);
 
@@ -380,5 +393,5 @@ YUI.add('document-view-svg', function (Y) {
 	};
 	
 }, '0.0', {
-	requires: ["node", "dom", "event", "document-model"]
+	requires: ["node", "dom", "event", "document-model", "event-mouseenter", "stylesheet", "transition"]
 });

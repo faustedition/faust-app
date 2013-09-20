@@ -58,15 +58,6 @@ svg.diplomatic .text.hand-xx {
 	font-family: faust-monospace, monospace;
 }
 
-svg.diplomatic .bgBox {
-	fill-opacity: .5;
-	fill: yellow;
-}
-
-svg.diplomatic .bgBox.hand-g {
-	fill: Aqua;
-}
-
 svg.diplomatic .text.material-bl {
 	fill: darkgrey;
 }
@@ -98,4 +89,9 @@ svg.diplomatic .text.over {
 svg.diplomatic .text.small {
 	font-size: 9pt;
 }
+
+svg.diplomatic .bgBox {
+	fill: none;
+}
+
 
