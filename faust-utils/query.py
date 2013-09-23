@@ -43,7 +43,7 @@ def non_wellformed (files):
 	def is_not_well (file):
 		try:
 			xml = lxml.etree.parse(file)
-		except lxml.etree.XMLSyntaxError as e:
+		except lxml.etree.XMLSyntaxError:
 			return True
 		return False
 	return filter(is_not_well, files)

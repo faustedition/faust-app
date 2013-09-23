@@ -1,7 +1,8 @@
 import query, faust, os.path, sys, os, shutil
+from bn import relpath
 
 def destination(file):
-    rel_f = os.path.relpath(file, faust.xml_dir)
+    rel_f = relpath(file, faust.xml_dir)
     return os.path.join(faust.xml_dir, 'attic', rel_f)
 
 if __name__ == "__main__":
