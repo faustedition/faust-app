@@ -19,7 +19,7 @@
 		</fieldset>
 		<fieldset>
 		<legend>XPath Expression</legend>
-		<input name="xpath" value="${(xpath!"")?html}"></input>
+		<input name="xpath" value="${(xpath!"")?html}" style="width: 100%;"></input>
 		</fieldset>
 		<fieldset>
 		<legend>Display Mode</legend>
