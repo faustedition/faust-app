@@ -25,7 +25,7 @@
 YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 		  "document-structure-view", "button","panel", "dd-plugin", "resize-plugin", "util",
 		 // "document-text",
-		 "text-display",
+		 "text-display", "stylesheet",
 		  function(Y) {
 		  
 		  	  Y.StyleSheet('#style-document-transcript-highlight-hands').disable();
