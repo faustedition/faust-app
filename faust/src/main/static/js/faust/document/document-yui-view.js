@@ -101,7 +101,7 @@ YUI.add('document-yui-view', function (Y) {
 		render: function() {
 			var container = this.get('container');
 						
-			var transcriptSource = '/' + cp + this.get('source').components[1] + '/' + this.get('source').components[2];
+			var transcriptSource = cp + '/' + this.get('source').components[1] + '/' + this.get('source').components[2];
 			this.editortoolbar = Y.Node.create('<div id="editor-toolbar"><a href="' + transcriptSource  + '">(XML source)</a></div>');
 			container.appendChild(this.editortoolbar);
 
