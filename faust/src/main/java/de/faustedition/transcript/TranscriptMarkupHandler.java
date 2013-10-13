@@ -78,7 +78,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
 
     @Override
     public boolean hasNext() {
-        if (super.hasNext()) {
+        if (buf.isEmpty() && super.hasNext()) {
             final Token next = super.next();
             if (next instanceof AnnotationStart) {
                 final ObjectNode data = ((AnnotationStart) next).getData();
@@ -116,13 +116,16 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
                 }
             }
             buf.add(next);
-        } else {
+        }
+
+        if (buf.isEmpty()) {
             handEnd();
             stageEnd();
             facsimileEnd();
+            return false;
         }
 
-        return !buf.isEmpty();
+        return true;
     }
 
     private void facsimileEnd() {
