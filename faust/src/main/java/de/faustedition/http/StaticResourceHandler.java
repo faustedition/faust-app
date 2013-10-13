@@ -6,9 +6,6 @@ import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.Weigher;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
@@ -25,7 +22,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Deque;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,11 +33,6 @@ public class StaticResourceHandler implements Inflector<ContainerRequestContext,
 
     private final File rootFile;
     private final String resourceRoot;
-
-    private final Cache<String, TimestampedByteSource> cache = CacheBuilder.newBuilder()
-            .weigher(BYTE_SOURCE_WEIGHER)
-            .maximumWeight(10485760)
-            .build();
 
     private final Date configurationDate = new Date();
 
@@ -66,23 +57,17 @@ public class StaticResourceHandler implements Inflector<ContainerRequestContext,
             final String path = containerRequestContext.getUriInfo().getPathParameters().getFirst("path");
             final String fileExtension = Files.getFileExtension(path);
 
-            TimestampedByteSource source = cache.get(path, new Callable<TimestampedByteSource>() {
-                @Override
-                public TimestampedByteSource call() throws Exception {
-                    TimestampedByteSource source = findSource(path);
-                    if (source == null && "css".equals(fileExtension)) {
-                        // try to find a LESS source for a CSS resource
-                        TimestampedByteSource lessSource = findSource(path.replaceAll("\\.css$", ".less"));
-                        if (lessSource != null) {
-                            source = new de.faustedition.http.StaticResourceHandler.LessSource(lessSource);
-                        }
-                    }
-                    if (source == null) {
-                        throw new WebApplicationException(Response.Status.NOT_FOUND);
-                    }
-                    return source;
+            TimestampedByteSource source = findSource(path);
+            if (source == null && "css".equals(fileExtension)) {
+                // try to find a LESS source for a CSS resource
+                TimestampedByteSource lessSource = findSource(path.replaceAll("\\.css$", ".less"));
+                if (lessSource != null) {
+                    source = new LessSource(lessSource);
                 }
-            });
+            }
+            if (source == null) {
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
             final Date lastModified = source.lastModified();
             Response.ResponseBuilder rb = containerRequestContext.getRequest().evaluatePreconditions(lastModified);
             if (rb == null) {
@@ -200,20 +185,4 @@ public class StaticResourceHandler implements Inflector<ContainerRequestContext,
             }
         }
     }
-
-    private static final Weigher<String, TimestampedByteSource> BYTE_SOURCE_WEIGHER = new Weigher<String, TimestampedByteSource>() {
-        @Override
-        public int weigh(String key, TimestampedByteSource value) {
-            if (value instanceof FileSource) {
-                return (int) ((FileSource)value).file.length();
-            }
-            try {
-                return (int) value.byteSource().size();
-            } catch (IOException e) {
-            }
-            return 0;
-        }
-    };
-
-
 }
