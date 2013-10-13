@@ -120,17 +120,7 @@
 			</li>
 			<li class="yui3-menuitem"><a href="${cp}/project/contact" class="yui3-menuitem-content">${message("menu.contact")}</a></li>
 			<li class="yui3-menuitem"><a href="${cp}/project/imprint" class="yui3-menuitem-content">${message("menu.imprint")}</a></li>
-			<li class="yui3-menuitem"><a href="/intern/" class="yui3-menuitem-content">${message("menu.restricted")}</a></li>
-			
-			<li><a class="yui3-menu-label" href="#restricted"><em>${message("menu.restricted")}</em></a>
-				<div id="restricted" class="yui3-menu">
-				<div class="yui3-menu-content">
-				<ul>
-					<li class="yui3-menuitem"><a href="${cp}/xml-query/" class="yui3-menuitem-content">XML Query</a></li>
-				</ul>
-				</div>
-				</div>
-			</li>
+            <li class="yui3-menuitem"><a href="${cp}/xml-query/" class="yui3-menuitem-content">XML Query</a></li>
 		</ul>
 	</div>
 </div>	
