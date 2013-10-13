@@ -81,7 +81,11 @@ public class TranscribedVerseIntervalCollector extends ForwardingIterator<Token>
             database.transaction(new Database.TransactionCallback<Object>() {
                 @Override
                 public Object doInTransaction(DSLContext sql) throws Exception {
-                    InsertValuesStep3<TranscribedVerseIntervalRecord, Long, Integer, Integer> insertBatch = sql.insertInto(
+                    sql.delete(Tables.TRANSCRIBED_VERSE_INTERVAL)
+                            .where(Tables.TRANSCRIBED_VERSE_INTERVAL.TRANSCRIPT_ID.eq(transcriptId))
+                            .execute();
+
+                    final InsertValuesStep3<TranscribedVerseIntervalRecord, Long, Integer, Integer> insertBatch = sql.insertInto(
                             Tables.TRANSCRIBED_VERSE_INTERVAL,
                             Tables.TRANSCRIBED_VERSE_INTERVAL.TRANSCRIPT_ID,
                             Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_START,
