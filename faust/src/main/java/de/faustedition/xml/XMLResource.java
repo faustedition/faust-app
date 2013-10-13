@@ -2,7 +2,7 @@ package de.faustedition.xml;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.http.WebApplication;
+import de.faustedition.http.HTTP;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,7 +30,7 @@ public class XMLResource {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public SAXSource xml(@PathParam("path") final String path) throws IOException {
-        final FaustURI uri = new FaustURI(FaustAuthority.XML, WebApplication.path(WebApplication.pathDeque(path)));
+        final FaustURI uri = new FaustURI(FaustAuthority.XML, HTTP.normalizePath(path));
         if (!xml.isResource(uri)) {
             throw new WebApplicationException(javax.ws.rs.core.Response.status(javax.ws.rs.core.Response.Status.NOT_FOUND).entity(uri.toString()).build());
         }

@@ -19,8 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.util.HashMap;
-import java.util.Map;
 
 @Path("/document/{id}")
 @Singleton
@@ -45,9 +43,7 @@ public class DocumentResource {
                 if (document == null) {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(Long.toString(id)).build());
                 }
-                final Map<String, Object> viewModel = new HashMap<String, Object>();
-                viewModel.put("document", document.intoMap());
-                return templates.render("document/document", viewModel, request, sc);
+                return templates.render(new Templates.ViewAndModel("document/document").add("document", document.intoMap()), request);
             }
         });
     }

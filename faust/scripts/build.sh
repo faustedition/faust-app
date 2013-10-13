@@ -1,3 +1,3 @@
 #!/bin/bash
 #
-mvn -DskipTests clean package assembly:single
+mvn -DskipTests clean package

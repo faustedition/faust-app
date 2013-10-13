@@ -1,6 +1,5 @@
 package de.faustedition.document;
 
-import com.google.common.collect.Maps;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Templates;
@@ -18,9 +17,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import java.util.HashMap;
-import java.util.Map;
 
 @Path("/archive")
 @Singleton
@@ -38,20 +34,19 @@ public class ArchiveResource {
     }
 
     @GET
-    public Response index(@Context final Request request, @Context final SecurityContext sc) {
+    public Response index(@Context final Request request) {
         return Relations.execute(dataSource, new Relations.Transaction<Response>() {
             @Override
             public Response execute(DSLContext sql) throws Exception {
-                final Map<String, Object> model = new HashMap<String, Object>();
-                model.put("archives", sql.selectFrom(Tables.ARCHIVE).orderBy(Tables.ARCHIVE.NAME.asc()).fetchMaps());
-                return templates.render("document/archives", model, request, sc);
+                return templates.render(new Templates.ViewAndModel("document/archives")
+                        .add("archives", sql.selectFrom(Tables.ARCHIVE).orderBy(Tables.ARCHIVE.NAME.asc()).fetchMaps()), request);
             }
         });
     }
 
     @Path("/{id}")
     @GET
-    public Response archive(@PathParam("id") final String id, @Context final Request request, @Context final SecurityContext sc) {
+    public Response archive(@PathParam("id") final String id, @Context final Request request) {
         return Relations.execute(dataSource, new Relations.Transaction<Response>() {
             @Override
             public Response execute(DSLContext sql) throws Exception {
@@ -60,15 +55,15 @@ public class ArchiveResource {
                     return Response.status(Response.Status.NOT_FOUND).entity(id).build();
                 }
 
-                final Map<String, Object> model = Maps.newHashMap();
-                model.put("archive", archive.intoMap());
-                model.put("documents", sql
-                        .select(Tables.DOCUMENT.ID, Tables.DOCUMENT.CALLNUMBER, Tables.DOCUMENT.WA_ID)
-                        .from(Tables.DOCUMENT)
-                        .where(Tables.DOCUMENT.ARCHIVE_ID.eq(archive.getId()))
-                        .orderBy(Tables.DOCUMENT.CALLNUMBER.asc())
-                        .fetchMaps());
-                return templates.render("document/archive", model, request, sc);
+                return templates.render(new Templates.ViewAndModel("document/archive")
+                        .add("archive", archive.intoMap())
+                        .add("documents", sql
+                                .select(Tables.DOCUMENT.ID, Tables.DOCUMENT.CALLNUMBER, Tables.DOCUMENT.WA_ID)
+                                .from(Tables.DOCUMENT)
+                                .where(Tables.DOCUMENT.ARCHIVE_ID.eq(archive.getId()))
+                                .orderBy(Tables.DOCUMENT.CALLNUMBER.asc())
+                                .fetchMaps()
+                        ), request);
             }
         });
     }

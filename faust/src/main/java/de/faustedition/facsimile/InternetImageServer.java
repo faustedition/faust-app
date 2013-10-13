@@ -8,13 +8,12 @@ import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.config.ClientConfig;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.UriBuilder;
 import java.awt.Dimension;
 import java.net.URI;
@@ -31,19 +30,16 @@ public class InternetImageServer {
 
     public static final URI BASE_URI = URI.create("https://faustedition.uni-wuerzburg.de/images/iipsrv.fcgi");
 
+    private static final Logger LOG = Logger.getLogger(InternetImageServer.class.getName());
+
     private static final Splitter LINE_SPLITTER = Splitter.on(Pattern.compile("[\n\r]+")).omitEmptyStrings().trimResults();
 
     private static final Pattern IMAGE_DIMENSION_PATTERN = Pattern.compile("([0-9]+)\\s+([0-9]+)");
 
-    private final ClientConfig clientConfig;
-    private final Logger logger;
-
     private final Cache<FaustURI, Map<String, String>> imageInfoCache = CacheBuilder.newBuilder().build();
 
     @Inject
-    public InternetImageServer(ClientConfig clientConfig, Logger logger) {
-        this.clientConfig = clientConfig;
-        this.logger = logger;
+    public InternetImageServer() {
     }
 
     public Map<String, String> imageInfo(final FaustURI facsimile) {
@@ -57,7 +53,7 @@ public class InternetImageServer {
                             .queryParam("obj", "Resolution-number")
                             .build();
 
-                    final String imageInfoBody = Client.create(clientConfig).resource(uri).get(String.class);
+                    final String imageInfoBody = ClientBuilder.newClient().target(uri).request().get(String.class);
 
                     final Map<String, String> imageInfo = Maps.newHashMap();
                     for (String line : LINE_SPLITTER.split(imageInfoBody)) {
@@ -68,8 +64,8 @@ public class InternetImageServer {
                         imageInfo.put(line.substring(0, separatorIdx), line.substring(separatorIdx + 1));
                     }
 
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.log(Level.FINE, Joiner.on(" => ").join(facsimile, imageInfo));
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.log(Level.FINE, Joiner.on(" => ").join(facsimile, imageInfo));
                     }
 
                     for (Map.Entry<String, String> info : imageInfo.entrySet()) {

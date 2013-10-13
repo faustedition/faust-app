@@ -3,7 +3,6 @@ package de.faustedition.tei;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.inject.Guice;
 import com.thaiopensource.util.PropertyMapBuilder;
 import com.thaiopensource.validate.IncorrectSchemaException;
 import com.thaiopensource.validate.Schema;
@@ -11,14 +10,11 @@ import com.thaiopensource.validate.ValidateProperty;
 import com.thaiopensource.validate.Validator;
 import com.thaiopensource.validate.rng.SAXSchemaReader;
 import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
-import de.faustedition.DataModule;
+import dagger.ObjectGraph;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
+import de.faustedition.ServerModule;
 import de.faustedition.xml.XMLStorage;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -26,9 +22,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import javax.inject.Inject;
 import javax.xml.XMLConstants;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -44,36 +38,21 @@ import java.util.regex.Pattern;
 
 public class TeiValidator {
 
-    private final XMLStorage xml;
-    private final Logger logger;
-
-    @Inject
-    public TeiValidator(XMLStorage xml, Logger logger) {
-        this.xml = xml;
-        this.logger = logger;
-    }
+    private static final Logger LOG = Logger.getLogger(TeiValidator.class.getName());
 
     public static void main(String[] args) {
         try {
-            final CommandLine commandLine = new GnuParser().parse(OPTIONS, args);
-            if (commandLine.hasOption("h")) {
-                new HelpFormatter().printHelp(78, "faust-server [<options>]", "", OPTIONS, "");
-                return;
-            }
-
-            final File dataDirectory = new File(commandLine.getOptionValue("d", "data"));
-            final URI schema = commandLine.hasOption("s") ? URI.create(commandLine.getOptionValue("s")) : null;
-
-            Preconditions.checkArgument(dataDirectory.isDirectory(), dataDirectory + " is not a directory");
-            Preconditions.checkArgument(schema != null, "No schema URI given");
-
-            Guice.createInjector(new DataModule(dataDirectory)).getInstance(TeiValidator.class).validate(schema);
+            final ServerModule serverModule = ServerModule.fromCommandLineArgs(args);
+            validate(
+                    URI.create(serverModule.getConfiguration().property("faust.schema_uri")),
+                    ObjectGraph.create(serverModule).get(XMLStorage.class)
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void validate(URI schemaSource) throws SAXException, IOException, IncorrectSchemaException {
+    public static void validate(URI schemaSource, XMLStorage xmlStorage) throws SAXException, IOException, IncorrectSchemaException {
         final CustomErrorHandler errorHandler = new CustomErrorHandler();
 
         final PropertyMapBuilder builder = errorHandler.configurationWithErrorHandler();
@@ -82,21 +61,24 @@ public class TeiValidator {
         final Schema schema = SAXSchemaReader.getInstance().createSchema(new InputSource(schemaSource.toString()), builder.toPropertyMap());
         Preconditions.checkState(errorHandler.getErrors().isEmpty(), "No errors in schema");
 
-        logger.info("Initialized RelaxNG-based TEI validator from " + schemaSource);
+        LOG.info("Initialized RelaxNG-based TEI validator from " + schemaSource);
 
         final SortedSet<FaustURI> xmlErrors = new TreeSet<FaustURI>();
         final SortedMap<FaustURI, String> teiErrors = new TreeMap<FaustURI, String>();
-        for (FaustURI source : xml.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
+        for (FaustURI source : xmlStorage.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
             try {
-                final List<String> errors = validate(schema, source);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Validating via RelaxNG: " + source);
+                }
+                final List<String> errors = validate(schema, xmlStorage.getInputSource(source));
                 if (!errors.isEmpty()) {
                     teiErrors.put(source, Joiner.on("\n").join(errors));
                 }
             } catch (SAXException e) {
-                logger.log(Level.SEVERE, "XML error while validating transcript: " + source, e);
+                LOG.log(Level.SEVERE, "XML error while validating transcript: " + source, e);
                 xmlErrors.add(source);
             } catch (IOException e) {
-                logger.log(Level.WARNING, "I/O error while validating transcript: " + source, e);
+                LOG.log(Level.WARNING, "I/O error while validating transcript: " + source, e);
             }
         }
 
@@ -124,32 +106,21 @@ public class TeiValidator {
         }
     }
 
-    public List<String> validate(Schema schema, FaustURI uri) throws SAXException, IOException {
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Validating via RelaxNG: " + uri);
-        }
+    public static List<String> validate(Schema schema, InputSource xml) throws SAXException, IOException {
         final CustomErrorHandler errorHandler = new CustomErrorHandler();
         final Validator validator = schema.createValidator(errorHandler.configurationWithErrorHandler().toPropertyMap());
 
         final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
         xmlReader.setContentHandler(validator.getContentHandler());
-        xmlReader.parse(xml.getInputSource(uri));
+        xmlReader.parse(xml);
 
         return errorHandler.getErrors();
     }
 
-    public boolean isValid(Schema schema, FaustURI uri) throws SAXException, IOException {
-        return validate(schema, uri).isEmpty();
+    public boolean isValid(Schema schema, InputSource xml) throws SAXException, IOException {
+        return validate(schema, xml).isEmpty();
     }
 
-
-    static final Options OPTIONS = new Options();
-
-    static {
-        OPTIONS.addOption("h", "help", false, "print usage instructions");
-        OPTIONS.addOption("s", "schema", true, "Schema URI");
-        OPTIONS.addOption("d", "data", true, "Path to data directory; default: 'data'");
-    }
 
     private static class CustomErrorHandler implements ErrorHandler {
         private static final Pattern XMLNS_ATTR_URI_PATTERN = Pattern.compile(Pattern
@@ -190,6 +161,4 @@ public class TeiValidator {
             register(exception);
         }
     }
-
-    ;
 }

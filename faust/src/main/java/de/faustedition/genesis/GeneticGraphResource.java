@@ -1,12 +1,11 @@
 package de.faustedition.genesis;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import de.faustedition.http.WebApplication;
+import de.faustedition.Templates;
 import de.faustedition.document.Archive;
 import de.faustedition.document.Document;
 import de.faustedition.graph.Graph;
-import de.faustedition.Templates;
+import de.faustedition.http.HTTP;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import javax.inject.Inject;
@@ -16,10 +15,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -37,43 +33,37 @@ public class GeneticGraphResource {
     }
 
     @GET
-    public Response index(@Context final Request request, @Context final SecurityContext sc) {
-        try {
-            return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
-                @Override
-                public Response execute(Graph graph) throws Exception {
-                    final Map<String, Object> model = new HashMap<String, Object>();
-                    final SortedSet<Document> archivalUnits = new TreeSet<Document>(new Comparator<Document>() {
-                        @Override
-                        public int compare(Document o1, Document o2) {
-                            final String o1cn = o1.getMetadataValue("callnumber");
-                            final String o2cn = o2.getMetadataValue("callnumber");
-                            return (o1cn == null || o2cn == null) ? 0 : o1cn.compareTo(o2cn);
-                        }
-                    });
-                    for (Archive archive : graph.getArchives()) {
-                        for (Document document : Iterables.filter(archive, Document.class)) {
-                            //temporallyPrecedes = document.geneticallyRelatedTo(MacrogeneticRelationManager.TEMP_PRE_REL);
-                            archivalUnits.add(document);
-                        }
-                        //Iterables.addAll(archivalUnits, Iterables.filter(archive, Document.class));
+    public Response index(@Context final Request request) throws Exception {
+        return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
+            @Override
+            public Response execute(Graph graph) throws Exception {
+                final SortedSet<Document> archivalUnits = new TreeSet<Document>(new Comparator<Document>() {
+                    @Override
+                    public int compare(Document o1, Document o2) {
+                        final String o1cn = o1.getMetadataValue("callnumber");
+                        final String o2cn = o2.getMetadataValue("callnumber");
+                        return (o1cn == null || o2cn == null) ? 0 : o1cn.compareTo(o2cn);
                     }
-                    model.put("archivalUnits", archivalUnits);
-                    return templates.render("genesis/graph", model, request, sc);
+                });
+                for (Archive archive : graph.getArchives()) {
+                    for (Document document : Iterables.filter(archive, Document.class)) {
+                        //temporallyPrecedes = document.geneticallyRelatedTo(MacrogeneticRelationManager.TEMP_PRE_REL);
+                        archivalUnits.add(document);
+                    }
+                    //Iterables.addAll(archivalUnits, Iterables.filter(archive, Document.class));
                 }
-            });
-        } catch (Throwable t) {
-            throw WebApplication.propagateExceptions(t);
-        }
+                return templates.render(new Templates.ViewAndModel("genesis/graph").add("archivalUnits", archivalUnits), request);
+            }
+        });
     }
 
     @Path("/work/")
-    public Response work(@Context final Request request, @Context final SecurityContext sc) {
-        return templates.render("genesis/work", Maps.<String, Object>newHashMap(), request, sc);
+    public Response work(@Context final Request request) {
+        return templates.render(new Templates.ViewAndModel("genesis/work"), request);
     }
 
     @Path("/app/")
-    public Response app(@Context final Request request, @Context final SecurityContext sc) {
-        return templates.render("genesis/app", Maps.<String, Object>newHashMap(), request, sc);
+    public Response app(@Context final Request request) {
+        return templates.render(new Templates.ViewAndModel("genesis/app"), request);
     }
 }

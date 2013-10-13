@@ -67,8 +67,7 @@ public class Relations {
         try {
             try {
                 if (LOG.isLoggable(Level.FINE)) {
-                    sw = new Stopwatch();
-                    sw.start();
+                    sw = Stopwatch.createStarted();
                 }
 
                 connection = ds.getConnection();
@@ -117,7 +116,6 @@ public class Relations {
         dataSource.setPassword(DB_PASSWORD);
         dataSource.setMinConnectionsPerPartition(1);
         dataSource.setMaxConnectionsPerPartition(20);
-        dataSource.setReleaseHelperThreads(0);
         dataSource.setDisableConnectionTracking(true);
         dataSource.setLogStatementsEnabled(Logger.getLogger(BoneCPDataSource.class.getPackage().getName()).isLoggable(Level.FINE));
         if (registerShutdownHook) {

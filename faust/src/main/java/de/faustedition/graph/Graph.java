@@ -1,7 +1,6 @@
 package de.faustedition.graph;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Throwables;
 import de.faustedition.document.ArchiveCollection;
 import de.faustedition.document.MaterialUnitCollection;
 import de.faustedition.genesis.GeneticSourceCollection;
@@ -34,8 +33,7 @@ public class Graph {
         org.neo4j.graphdb.Transaction transaction = null;
         try {
             if (LOG.isLoggable(Level.FINE)) {
-                sw = new Stopwatch();
-                sw.start();
+                sw = Stopwatch.createStarted();
             }
 
             transaction = db.beginTx();

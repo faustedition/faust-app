@@ -1,5 +1,6 @@
 package de.faustedition.document;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -11,7 +12,6 @@ import de.faustedition.db.Tables;
 import de.faustedition.genesis.MacrogeneticRelationManager;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 import org.xml.sax.SAXException;
@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-@Server.Component
 public class MetadataInitializationService extends AbstractIdleService {
     public static final FaustURI DOCUMENT_BASE_URI = new FaustURI(FaustAuthority.XML, "/document");
 
@@ -52,7 +51,7 @@ public class MetadataInitializationService extends AbstractIdleService {
         Relations.execute(dataSource, new Relations.Transaction<Object>() {
             @Override
             public Object execute(final DSLContext sql) throws Exception {
-                final Stopwatch sw = new Stopwatch().start();
+                final Stopwatch sw = Stopwatch.createStarted();
 
                 if (sql.selectCount().from(Tables.ARCHIVE).fetchOne().value1() == 0) {
                     XMLUtil.saxParser().parse(

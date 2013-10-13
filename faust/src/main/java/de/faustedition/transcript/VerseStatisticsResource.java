@@ -20,6 +20,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +44,9 @@ public class VerseStatisticsResource {
     @Produces(MediaType.APPLICATION_JSON)
 	public List<Map<String, Object>> verseStatistics(@PathParam("from") int from, @PathParam("to") int to) {
         Preconditions.checkArgument(from >= to, "Invalid interval");
-        final Map<MaterialUnit, Collection<VerseInterval>> verseStatistics = TranscribedVerseInterval.byMaterialUnit(dataSource, graphDb, from, to);
+        //final Map<MaterialUnit, Collection<VerseInterval>> verseStatistics = TranscribedVerseIntervalCollector.byMaterialUnit(dataSource, graphDb, from, to);
+        // FIXME: query!
+        final Map<MaterialUnit, Collection<VerseInterval>> verseStatistics = Collections.emptyMap();
         final List<Map<String, Object>> chartData = Lists.newLinkedList();
         final ImmutableMap<String, MaterialUnit> documentIndex = Maps.uniqueIndex(verseStatistics.keySet(), new Function<MaterialUnit, String>() {
             @Override

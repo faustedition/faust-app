@@ -2,36 +2,35 @@ package de.faustedition;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
-import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.Variant;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Templates extends Configuration {
+public class Templates extends freemarker.template.Configuration {
 
     private static final List<Variant> VARIANTS = Variant.VariantListBuilder.newInstance()
             .mediaTypes(MediaType.TEXT_HTML_TYPE)
@@ -39,19 +38,26 @@ public class Templates extends Configuration {
             .add()
             .build();
 
-    public Templates(String contextPath, File templateDirectory, boolean development) {
+    @Inject
+    public Templates(Configuration configuration) {
         super();
         try {
-            setSharedVariable("cp", contextPath);
-            setSharedVariable("facsimilieIIPUrl", InternetImageServer.BASE_URI.toString());
-            setSharedVariable("debug", development);
+            final String templateRootPath = configuration.property("faust.template_root");
+            setTemplateLoader(templateRootPath.isEmpty()
+                    ? new ClassTemplateLoader(getClass(), "/template")
+                    : new FileTemplateLoader(new File(templateRootPath))
+            );
+            setSharedVariable("cp", configuration.property("faust.context_path"));
+            setSharedVariable("yp", configuration.property("faust.yui_path"));
+            setSharedVariable("facsimileIIPUrl", InternetImageServer.BASE_URI.toString());
+            setSharedVariable("debug", Boolean.parseBoolean(configuration.property("faust.development_mode")));
+
             setAutoIncludes(Collections.singletonList("/header.ftl"));
             setDefaultEncoding("UTF-8");
             setOutputEncoding("UTF-8");
             setURLEscapingCharset("UTF-8");
-            setStrictSyntaxMode(true);
             setWhitespaceStripping(true);
-            setTemplateLoader(new FileTemplateLoader(templateDirectory));
+
             setObjectWrapper(new CustomObjectWrapper());
         } catch (TemplateModelException e) {
             throw Throwables.propagate(e);
@@ -60,15 +66,14 @@ public class Templates extends Configuration {
         }
     }
 
-    public Response render(String name, Map<String, Object> model, Request request, SecurityContext sc) {
+    public Response render(ViewAndModel viewAndModel, Request request) {
         try {
             final Variant variant = Objects.firstNonNull(request.selectVariant(VARIANTS), VARIANTS.get(0));
 
-            model.put("roles", sc == null ? Collections.<String>emptySet() : ((User) sc.getUserPrincipal()).getRoles());
-            model.put("message", ResourceBundle.getBundle("messages", variant.getLanguage()));
+            viewAndModel.put("message", ResourceBundle.getBundle("messages", variant.getLanguage()));
 
             final StringWriter entity = new StringWriter();
-            getTemplate(name + ".ftl").process(model, entity);
+            getTemplate(viewAndModel.getViewName() + ".ftl").process(viewAndModel, entity);
 
             return Response.ok().variant(variant).entity(entity.toString()).build();
         } catch (TemplateException e) {
@@ -78,8 +83,22 @@ public class Templates extends Configuration {
         }
     }
 
-    public Response render(String name, Request request, SecurityContext sc) {
-        return render(name, Maps.<String, Object>newHashMap(), request, sc);
+    public static class ViewAndModel extends HashMap<String, Object> {
+
+        private final String viewName;
+
+        public ViewAndModel(String viewName) {
+            this.viewName = viewName;
+        }
+
+        public ViewAndModel add(String key, Object value) {
+            put(key, value);
+            return this;
+        }
+
+        public String getViewName() {
+            return viewName;
+        }
     }
 
     public static class CustomObjectWrapper extends DefaultObjectWrapper {
@@ -101,4 +120,6 @@ public class Templates extends Configuration {
             return super.unwrap(model, hint);
         }
     }
+
+
 }

@@ -2,16 +2,15 @@ package de.faustedition.document;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
+import de.faustedition.Templates;
 import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.Graph;
-import de.faustedition.Templates;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,15 +24,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import java.awt.Dimension;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -42,39 +37,39 @@ import java.util.logging.Logger;
 @Singleton
 public class DocumentImageLinkResource {
 
+    private static final Logger LOG = Logger.getLogger(DocumentImageLinkResource.class.getName());
+
     private final GraphDatabaseService graphDatabaseService;
     private final XMLStorage xml;
 	private final Templates templates;
 	private final InternetImageServer imageServer;
-	private final Logger logger;
 
     @Inject
-    public DocumentImageLinkResource(GraphDatabaseService graphDatabaseService, XMLStorage xml, Templates templates, InternetImageServer imageServer, Logger logger) {
+    public DocumentImageLinkResource(GraphDatabaseService graphDatabaseService, XMLStorage xml, Templates templates, InternetImageServer imageServer) {
         this.graphDatabaseService = graphDatabaseService;
         this.xml = xml;
         this.templates = templates;
         this.imageServer = imageServer;
-        this.logger = logger;
     }
 
     @GET
-    public Response page(@PathParam("path") final String path, @Context final Request request, @Context final SecurityContext sc) throws Exception {
+    @Produces(MediaType.TEXT_HTML)
+    public Response page(@PathParam("path") final String path, @Context final Request request) throws Exception {
         return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
             @Override
             public Response execute(Graph graph) throws Exception {
                 final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
-                final Map<String, Object> viewModel = new HashMap<String, Object>();
-                viewModel.put("pageNum", documentPage.getPage());
-                viewModel.put("document", documentPage.getDocument());
-                viewModel.put("facsimileUrl", imageServer.uriFor(documentPage.materialUnit().getFacsimile())
-                        .queryParam("SDS", "0,90")
-                        .queryParam("CNT", "1.0")
-                        .queryParam("WID", "800")
-                        .queryParam("QLT", "90")
-                        .queryParam("CVT", "jpeg")
-                        .build().toString());
-
-                return templates.render("document/imagelink", viewModel, request, sc);
+                return templates.render(new Templates.ViewAndModel("document/imagelink")
+                        .add("pageNum", documentPage.getPage())
+                        .add("document", documentPage.getDocument())
+                        .add("facsimileUrl", imageServer.uriFor(documentPage.materialUnit().getFacsimile())
+                                .queryParam("SDS", "0,90")
+                                .queryParam("CNT", "1.0")
+                                .queryParam("WID", "800")
+                                .queryParam("QLT", "90")
+                                .queryParam("CVT", "jpeg")
+                                .build().toString()),
+                        request);
             }
         });
     }
@@ -109,7 +104,7 @@ public class DocumentImageLinkResource {
                 final URI linkDataURI = DocumentImageLinks.readLinkDataURI(transcript);
                 org.w3c.dom.Document svg;
                 if (linkDataURI == null) {
-                    logger.fine(transcriptURI + " doesn't have image-text links yet");
+                    LOG.fine(transcriptURI + " doesn't have image-text links yet");
 
                     final Dimension dimension = imageServer.dimensionOf(page.getFacsimile());
 
@@ -122,7 +117,7 @@ public class DocumentImageLinkResource {
                     final Node g = root.appendChild(svg.createElementNS(Namespaces.SVG_NS_URI, "g"));
                     g.appendChild(svg.createElementNS(Namespaces.SVG_NS_URI, "title")).setTextContent("Layer 1");
                 } else {
-                    logger.fine(transcriptURI + " has image-text links, loading");
+                    LOG.fine(transcriptURI + " has image-text links, loading");
                     svg = XMLUtil.parse(xml.getInputSource(new FaustURI(linkDataURI)));
 
                     // adjust the links
@@ -149,7 +144,7 @@ public class DocumentImageLinkResource {
 
                 boolean hasSourceChanged = DocumentImageLinks.write(source, svg);
                 if (hasSourceChanged) {
-                    logger.fine("Added new xml:ids to " + transcriptURI);
+                    LOG.fine("Added new xml:ids to " + transcriptURI);
                 }
 
 
@@ -159,18 +154,18 @@ public class DocumentImageLinkResource {
                     // generate random URI
                     linkDataURI = new FaustURI(FaustAuthority.XML, "/image-text-links/" + UUID.randomUUID() + ".svg").toURI();
 
-                    logger.fine("Adding new image-text-link to " + transcriptURI);
+                    LOG.fine("Adding new image-text-link to " + transcriptURI);
                     DocumentImageLinks.writeLinkDataURI(source, linkDataURI);
                     hasSourceChanged = true;
                 }
 
                 // write the image links file
-                logger.fine("Writing image-text-link data to " + linkDataURI);
+                LOG.fine("Writing image-text-link data to " + linkDataURI);
                 xml.put(new FaustURI(linkDataURI), svg);
 
                 if (hasSourceChanged) {
                     // write the modified transcript
-                    logger.fine("Writing " + transcriptURI);
+                    LOG.fine("Writing " + transcriptURI);
                     xml.put(transcriptURI, source);
                 }
 

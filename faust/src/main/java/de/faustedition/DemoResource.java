@@ -1,8 +1,6 @@
 package de.faustedition;
 
 
-import com.google.common.collect.Maps;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -11,7 +9,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -29,7 +26,7 @@ public class DemoResource {
 
     @Path("/{page}")
     @GET
-    public Response page(@PathParam("page") final String page, @Context Request request, @Context SecurityContext sc) {
-        return templates.render("demo/" + page, Maps.<String, Object>newHashMap(), request, sc);
+    public Response page(@PathParam("page") final String page, @Context Request request) {
+        return templates.render(new Templates.ViewAndModel("demo/" + page), request);
     }
 }

@@ -13,7 +13,7 @@ import de.faustedition.genesis.GeneticSource;
 import de.faustedition.graph.Graph;
 import de.faustedition.reasoning.PremiseBasedRelation.Premise;
 import de.faustedition.text.VerseInterval;
-import de.faustedition.transcript.TranscribedVerseInterval;
+import de.faustedition.transcript.TranscribedVerseIntervalCollector;
 import edu.bath.transitivityutils.ImmutableRelation;
 import edu.bath.transitivityutils.Relation;
 import edu.bath.transitivityutils.Relations;
@@ -21,7 +21,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.sql.DataSource;
 import javax.ws.rs.GET;
@@ -38,6 +37,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,8 +92,9 @@ public class InscriptionPrecedenceResource {
     Map<Inscription, Node> nodeMap(VerseInterval verseInterval) {
         final Map<Inscription, Node> nodeMap = Maps.newHashMap();
 
-        final Map<MaterialUnit, Collection<VerseInterval>> intervalIndex = TranscribedVerseInterval.byMaterialUnit(dataSource, graphDb, verseInterval.getStart(), verseInterval.getEnd());
-        for (Map.Entry<MaterialUnit, Collection<VerseInterval>> intervals : intervalIndex.entrySet()) {
+        // FIXME: query
+        //final Map<MaterialUnit, Collection<VerseInterval>> intervalIndex = TranscribedVerseIntervalCollector.byMaterialUnit(dataSource, graphDb, verseInterval.getStart(), verseInterval.getEnd());
+        for (Map.Entry<MaterialUnit, Collection<VerseInterval>> intervals : Collections.<MaterialUnit, Collection<VerseInterval>>emptyMap().entrySet()) {
             final MaterialUnit materialUnit = intervals.getKey();
             final String sigil = materialUnit.toString();
             final Inscription inscription = new Inscription(sigil);
@@ -219,7 +220,7 @@ public class InscriptionPrecedenceResource {
 
             @Override
             public void write(OutputStream output) throws IOException, WebApplicationException {
-                ByteStreams.copy(resultBuf.getSupplier(), output);
+                resultBuf.asByteSource().copyTo(output);
                 resultBuf.reset();
             }
         };

@@ -1,10 +1,9 @@
 package de.faustedition.document;
 
-import com.google.common.collect.Maps;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.http.WebApplication;
 import de.faustedition.Templates;
+import de.faustedition.http.HTTP;
 import de.faustedition.xml.XMLStorage;
 
 import javax.inject.Inject;
@@ -16,10 +15,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import java.util.Deque;
-import java.util.Map;
 
 
 @Path("/structure")
@@ -38,19 +36,16 @@ public class StructureResource {
     @Path("/{path: .+?}")
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response structure(@PathParam("path") final String path, @Context final javax.ws.rs.core.Request request, @Context final SecurityContext sc) {
-        final Deque<String> pathDeque = WebApplication.pathDeque(path);
+    public Response structure(@PathParam("path") final String path, @Context final Request request) {
+        final Deque<String> pathDeque = HTTP.pathDeque(path);
         pathDeque.addFirst("archival");
         pathDeque.addFirst("structure");
 
-        final FaustURI uri = new FaustURI(FaustAuthority.XML, WebApplication.path(pathDeque));
+        final FaustURI uri = new FaustURI(FaustAuthority.XML, HTTP.joinPath(pathDeque));
         if (!xml.isResource(uri)) {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(uri.toString()).build());
         }
 
-        final Map<String, Object> viewModel = Maps.newHashMap();
-        viewModel.put("uri", uri);
-
-        return templates.render("structure/structure", viewModel, request, sc);
+        return templates.render(new Templates.ViewAndModel("structure/structure").add("uri", uri), request);
     }
 }

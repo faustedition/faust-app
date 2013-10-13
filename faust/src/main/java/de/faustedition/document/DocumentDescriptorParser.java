@@ -1,5 +1,9 @@
 package de.faustedition.document;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -15,10 +19,6 @@ import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLBaseTracker;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.ObjectNode;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.xml.sax.Attributes;
@@ -145,7 +145,7 @@ public class DocumentDescriptorParser extends DefaultHandler {
 
                 String callnumber = null;
                 String waId = null;
-                for (Iterator<Map.Entry<String,JsonNode>> it = unitData.getFields(); it.hasNext(); ) {
+                for (Iterator<Map.Entry<String,JsonNode>> it = unitData.fields(); it.hasNext(); ) {
                     final Map.Entry<String, JsonNode> metadata = it.next();
                     final String metadataKey = metadata.getKey();
                     if (metadataKey.startsWith(callNumberPrefix)) {

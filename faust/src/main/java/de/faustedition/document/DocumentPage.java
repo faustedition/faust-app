@@ -4,7 +4,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.http.WebApplication;
+import de.faustedition.http.HTTP;
 import de.faustedition.graph.Graph;
 
 import javax.ws.rs.WebApplicationException;
@@ -22,7 +22,7 @@ public class DocumentPage {
 
 
     public static DocumentPage fromPath(String path, Graph graph) throws WebApplicationException {
-        final Deque<String> pathDeque = WebApplication.pathDeque(path);
+        final Deque<String> pathDeque = HTTP.pathDeque(path);
 
         int page;
         try {
@@ -33,7 +33,7 @@ public class DocumentPage {
         }
 
         pathDeque.addFirst("document");
-        final FaustURI documentUri = new FaustURI(FaustAuthority.XML, WebApplication.path(pathDeque));
+        final FaustURI documentUri = new FaustURI(FaustAuthority.XML, HTTP.joinPath(pathDeque));
         final Document document = Document.findBySource(graph.db(), documentUri);
         if (document == null) {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(documentUri.toString()).build());
