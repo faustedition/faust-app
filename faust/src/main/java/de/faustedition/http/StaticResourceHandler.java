@@ -1,8 +1,20 @@
 package de.faustedition.http;
 
+import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.LessCompiler;
+import com.github.sommeri.less4j.LessSource;
+import com.github.sommeri.less4j.core.DefaultLessCompiler;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
+import com.google.common.io.ByteSource;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharSource;
+import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import org.glassfish.grizzly.http.util.MimeType;
 import org.glassfish.jersey.process.Inflector;
 import org.glassfish.jersey.server.model.Resource;
@@ -16,11 +28,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Deque;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class StaticResourceHandler implements Inflector<ContainerRequestContext, Response> {
+    private static final Logger LOG = Logger.getLogger(StaticResourceHandler.class.getName());
 
     private final File rootFile;
     private final String resourceRoot;
@@ -45,42 +60,135 @@ public class StaticResourceHandler implements Inflector<ContainerRequestContext,
     public Response apply(ContainerRequestContext containerRequestContext) {
         try {
             final String path = containerRequestContext.getUriInfo().getPathParameters().getFirst("path");
+            final String fileExtension = Files.getFileExtension(path);
 
-            // try to find resource in filesystem
-            if (rootFile != null) {
-                final Deque<String> pathDeque = HTTP.pathDeque(path);
-                File file = rootFile;
-                while (file != null && !pathDeque.isEmpty()) {
-                    final File child = new File(file, pathDeque.remove());
-                    if (child.exists() && child.getParentFile().equals(file)) {
-                        file = child;
-                    } else {
-                        file = null;
+            TimestampedByteSource source = findSource(path);
+            if (source == null && "css".equals(fileExtension)) {
+                // try to find a LESS source for a CSS resource
+                TimestampedByteSource lessSource = findSource(path.replaceAll("\\.css$", ".less"));
+                if (lessSource != null) {
+                    source = new LessSource(lessSource);
+                }
+            }
+
+            if (source == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            final Date lastModified = source.lastModified();
+            Response.ResponseBuilder rb = containerRequestContext.getRequest().evaluatePreconditions(lastModified);
+            if (rb == null) {
+                rb = Response.ok(source.byteSource().openBufferedStream());
+            }
+            return rb.type(MimeType.get(fileExtension, "application/octet-stream")).lastModified(lastModified).build();
+        } catch (Throwable t) {
+            Throwables.propagateIfInstanceOf(Throwables.getRootCause(t), WebApplicationException.class);
+            throw new WebApplicationException(t, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    protected TimestampedByteSource findSource(String path) {
+        // try to find resource in filesystem
+        if (rootFile != null) {
+            final Deque<String> pathDeque = HTTP.pathDeque(path);
+            File file = rootFile;
+            while (file != null && !pathDeque.isEmpty()) {
+                final File child = new File(file, pathDeque.remove());
+                if (child.exists() && child.getParentFile().equals(file)) {
+                    file = child;
+                } else {
+                    file = null;
+                }
+            }
+            if (file != null && file.isFile()) {
+                return new FileSource(file);
+            }
+        }
+
+        // try to find resource in classpath
+        if (resourceRoot != null) {
+            final URL resource = getClass().getResource(resourceRoot + "/" + path);
+            if (resource != null) {
+                return new ClasspathSource(resource);
+            }
+        }
+
+        return null;
+    }
+
+    private static interface TimestampedByteSource {
+        Date lastModified();
+
+        ByteSource byteSource();
+    }
+
+    private class FileSource implements TimestampedByteSource {
+
+        private final File file;
+
+        private FileSource(File file) {
+            this.file = file;
+        }
+
+        @Override
+        public Date lastModified() {
+            return new Date(file.lastModified());
+        }
+
+        @Override
+        public ByteSource byteSource() {
+            return Files.asByteSource(file);
+        }
+    }
+
+    private class ClasspathSource implements TimestampedByteSource {
+
+        private final URL resource;
+
+        private ClasspathSource(URL resource) {
+            this.resource = resource;
+        }
+
+        @Override
+        public Date lastModified() {
+            return configurationDate;
+        }
+
+        @Override
+        public ByteSource byteSource() {
+            return Resources.asByteSource(resource);
+        }
+    }
+
+    private class LessSource implements TimestampedByteSource {
+
+        private final TimestampedByteSource source;
+
+        private LessSource(TimestampedByteSource source) {
+            this.source = source;
+        }
+
+        @Override
+        public Date lastModified() {
+            return source.lastModified();
+        }
+
+        @Override
+        public ByteSource byteSource() {
+            try {
+                final LessCompiler.CompilationResult compiledLess = new DefaultLessCompiler().compile(
+                        source.byteSource().asCharSource(Charsets.UTF_8).read()
+                );
+                if (LOG.isLoggable(Level.WARNING)) {
+                    for (LessCompiler.Problem lessProblem : compiledLess.getWarnings()) {
+                        LOG.log(Level.WARNING, lessProblem.getMessage());
                     }
                 }
-                if (file != null && file.isFile()) {
-                    final Date lastModified = new Date(file.lastModified());
-                    return Objects.firstNonNull(
-                            containerRequestContext.getRequest().evaluatePreconditions(lastModified),
-                            Response.ok(file)
-                    ).type(MimeType.get(Files.getFileExtension(path), "application/octet-stream")).lastModified(lastModified).build();
-                }
+                return ByteSource.wrap(compiledLess.getCss().getBytes(Charsets.UTF_8));
+            } catch (Less4jException e) {
+                throw Throwables.propagate(e);
+            } catch (IOException e) {
+                throw Throwables.propagate(e);
             }
-
-            // try to find resource in classpath
-            if (resourceRoot != null) {
-                final URL resource = getClass().getResource(resourceRoot + "/" + path);
-                if (resource != null) {
-                    return Objects.firstNonNull(
-                            containerRequestContext.getRequest().evaluatePreconditions(configurationDate),
-                            Response.ok(resource.openStream())
-                    ).type(MimeType.get(Files.getFileExtension(path), "application/octet-stream")).lastModified(configurationDate).build();
-                }
-            }
-
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } catch (IOException e) {
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
 }

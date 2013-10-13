@@ -50,7 +50,7 @@ public class XMLQueryResource {
         this.templates = templates;
     }
 
-	@GET
+    @GET
     @Produces(MediaType.TEXT_HTML)
 	public Response queryForm(@Context Request request,
                               @QueryParam("xpath") @DefaultValue("") String xpath,
