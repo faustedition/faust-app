@@ -1,7 +1,9 @@
 package de.faustedition;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closer;
@@ -57,9 +59,11 @@ public class Configuration extends Properties {
                     configurationValues.put(key, configurationEntry.getValue().toString().replaceAll("[\n\r]+", " "));
                     keyColumnWidth = Math.max(keyColumnWidth, key.length());
                 }
-                final String configFormat = ("%-" + keyColumnWidth + "s => %s");
                 for (Map.Entry<String, String> configurationEntry : configurationValues.entrySet()) {
-                    LOG.config(String.format(configFormat, configurationEntry.getKey(), configurationEntry.getValue()));
+                    LOG.log(Level.CONFIG, Joiner.on(" => ").join(
+                            Strings.padEnd(configurationEntry.getKey(), keyColumnWidth, ' '),
+                            configurationEntry.getValue()
+                    ));
                 }
 
             }

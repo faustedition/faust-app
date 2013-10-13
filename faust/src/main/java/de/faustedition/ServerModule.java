@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Module
+@Module(library = true)
 public class ServerModule {
 
     private static final Logger LOG = Logger.getLogger(ServerModule.class.getName());

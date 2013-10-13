@@ -59,8 +59,8 @@ public class HttpService extends AbstractIdleService {
                     resourceConfig.register(component);
                     Preconditions.checkState(resourceMappings.put(path, component) == null, path);
                 } else {
-                    if (LOG.isLoggable(Level.INFO)) {
-                        LOG.log(Level.INFO, "Adding {0} provider {1}", new Object[] {
+                    if (LOG.isLoggable(Level.CONFIG)) {
+                        LOG.log(Level.CONFIG, "Adding {0} provider {1}", new Object[] {
                                 (componentClass.isAnnotationPresent(Provider.class) ? "JAX-RS provider" : "component"),
                                 component
                         });
@@ -69,13 +69,13 @@ public class HttpService extends AbstractIdleService {
                 }
             }
 
-            if (LOG.isLoggable(Level.INFO) && !resourceMappings.isEmpty()) {
+            if (LOG.isLoggable(Level.CONFIG) && !resourceMappings.isEmpty()) {
                 int maxPathLength = 0;
                 for (String path : resourceMappings.keySet()) {
                     maxPathLength = Math.max(maxPathLength, path.length());
                 }
                 for (Map.Entry<String, Object> mapping : resourceMappings.entrySet()) {
-                    LOG.log(Level.INFO, "JAX-RS Resource Mapping: " + Joiner.on(" => ").join(
+                    LOG.log(Level.CONFIG, "JAX-RS Resource Mapping: " + Joiner.on(" => ").join(
                             Strings.padEnd(mapping.getKey(), maxPathLength, ' '),
                             mapping.getValue())
                     );
