@@ -50,7 +50,7 @@ public class Templates extends freemarker.template.Configuration {
             setSharedVariable("cp", configuration.property("faust.context_path"));
             setSharedVariable("yp", configuration.property("faust.yui_path"));
             setSharedVariable("facsimileIIPUrl", InternetImageServer.BASE_URI.toString());
-            setSharedVariable("debug", Boolean.parseBoolean(configuration.property("faust.development_mode")));
+            setSharedVariable("debug", Boolean.parseBoolean(configuration.property("faust.debug")));
 
             setAutoIncludes(Collections.singletonList("/header.ftl"));
             setDefaultEncoding("UTF-8");

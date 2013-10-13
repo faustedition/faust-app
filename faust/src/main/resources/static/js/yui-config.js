@@ -1,13 +1,7 @@
 YUI.GlobalConfig = {
-    debug: false,
-    combine: false,
-    comboBase: cp + '/resources?',
-    root: 'yui3/build/',
     groups: {
         faust: {
             base: cp + '/static/js/',
-            combine: false,
-            comboBase: cp + '/resources?',
             filter: "raw",
             root: 'js/',
             modules: {

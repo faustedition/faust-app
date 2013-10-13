@@ -23,7 +23,8 @@ import java.util.logging.Logger;
 public class Configuration extends Properties {
 
     private static final Logger LOG = Logger.getLogger(Configuration.class.getName());
-    private static final String FAUST_PROPERTIES = "faust.properties";
+
+    private static final String CONFIG_FILE_NAME = "config.properties";
 
     public String property(String key, String defaultValue) {
         final String value = getProperty(key, defaultValue);
@@ -40,9 +41,9 @@ public class Configuration extends Properties {
 
         final Closer closer = Closer.create();
         try {
-            configuration.load(closer.register(Configuration.class.getResourceAsStream("/" + FAUST_PROPERTIES)));
+            configuration.load(closer.register(Configuration.class.getResourceAsStream("/" + CONFIG_FILE_NAME)));
 
-            final File configFile = new File(dataDirectory, FAUST_PROPERTIES);
+            final File configFile = new File(dataDirectory, CONFIG_FILE_NAME);
             if (configFile.isFile()) {
                 configuration.load(closer.register(Files.newReader(configFile, Charsets.UTF_8)));
             } else {

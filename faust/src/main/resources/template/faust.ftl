@@ -15,8 +15,13 @@
         var cp = '${cp?js_string}';
         var Faust = { contextPath: cp, FacsimileServer: "${facsimileIIPUrl}" };
     </script>
-    <script type="text/javascript" src="${yp}/yui/yui-debug.js"></script>
+    <script type="text/javascript" src="${yp}/yui/yui.js"></script>
     <script type="text/javascript" src="${cp}/static/js/yui-config.js"></script>
+    <#if debug>
+    <script type="text/javascript">
+        YUI.GlobalConfig.debug = true;
+    </script>
+    </#if>
     <script type="text/javascript" src="${cp}/static/js/svg<#if !debug>.min</#if>.js"></script>
     <script type="text/javascript" src="${cp}/static/js/svg.draggable<#if !debug>.min</#if>.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
