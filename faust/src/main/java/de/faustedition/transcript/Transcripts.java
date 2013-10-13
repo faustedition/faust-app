@@ -77,7 +77,7 @@ public class Transcripts {
                 try {
                     Iterator<Token> tokens = Iterators.transform(
                             XML.stream(reader = xif.createXMLEventReader(new SAXSource(xml.getInputSource(source)))),
-                            new XMLStreamToTokenFunction(objectMapper, namespaceMapping)
+                            new XMLStreamToTokenFunction(objectMapper, namespaceMapping, true)
                     );
 
                     tokens = new TranscriptMarkupHandler(tokens, objectMapper, namespaceMapping);

@@ -40,6 +40,10 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
         this(objectMapper, namespaceMapping, false, DEFAULT_ID_PREFIX);
     }
 
+    public XMLStreamToTokenFunction(ObjectMapper objectMapper, NamespaceMapping namespaceMapping, boolean withNodePath) {
+        this(objectMapper, namespaceMapping, withNodePath, DEFAULT_ID_PREFIX);
+    }
+
     public XMLStreamToTokenFunction(ObjectMapper objectMapper, NamespaceMapping namespaceMapping, boolean withNodePath, String idPrefix) {
         this.objectMapper = objectMapper;
         this.namespaceMapping = namespaceMapping;
