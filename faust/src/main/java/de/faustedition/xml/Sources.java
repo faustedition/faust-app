@@ -1,40 +1,49 @@
 package de.faustedition.xml;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-
-import javax.annotation.Nullable;
-import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Sources implements Iterable<FaustURI> {
+import javax.xml.transform.TransformerException;
+
+import org.neo4j.helpers.collection.IterableWrapper;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import com.google.common.base.Preconditions;
+
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+
+@Component
+public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 	private final Pattern xmlFilenamePattern = Pattern.compile("[^\\.]+\\.[xX][mM][lL]$");
 
+	@Autowired
+	private Environment environment;
 
-	private final File baseDirectory;
-	private final String storagePath;
+	private File storageDirectory;
+	private String storagePath;
 
-    public Sources(File baseDirectory) {
-        this.baseDirectory = baseDirectory;
-        this.storagePath = baseDirectory.getAbsolutePath();
-    }
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.storageDirectory = environment.getRequiredProperty("xml.home", File.class);
+		Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getCanonicalPath() + " is a directory");
+		this.storagePath = storageDirectory.getCanonicalPath();
+	}
 
 	@Override
 	public Iterator<FaustURI> iterator() {
-		return iterate(baseDirectory).iterator();
+		return iterate(storageDirectory).iterator();
 	}
 
 	public Iterable<FaustURI> iterate(FaustURI base) {
@@ -44,16 +53,11 @@ public class Sources implements Iterable<FaustURI> {
 	}
 
 	protected Iterable<FaustURI> iterate(File base) {
+		Preconditions.checkArgument(isInStore(base), base.getAbsolutePath() + " is not in XML storage");
 		final List<File> files = new LinkedList<File>();
 		listRecursively(files, base);
-        return Iterables.transform(files, new Function<File, FaustURI>() {
-            @Nullable
-            @Override
-            public FaustURI apply(@Nullable File input) {
-                return toUri(input);
-            }
-        });
-    }
+		return new FileToUriWrapper(files);
+	}
 
 	private void listRecursively(List<File> contents, File base) {
 		for (File contained : base.listFiles()) {
@@ -75,7 +79,7 @@ public class Sources implements Iterable<FaustURI> {
 		XMLUtil.serialize(xml, toFile(uri));
 	}
 
-	public FaustURI walk(Deque<String> path) {
+	public FaustURI walk (Deque<String> path) {
 		return walk(path, null);
 	}
 	
@@ -91,7 +95,7 @@ public class Sources implements Iterable<FaustURI> {
 			if (walked != null)
 				walked.add(next);
 			if (isDirectory(nextURI)) {
-				uri = new FaustURI(URI.create(nextURI.toString() + "/"));
+				uri = FaustURI.parse(nextURI.toString() + "/");
 				continue;
 			} else if (isResource(nextURI)) {
 				uri = nextURI;
@@ -115,20 +119,42 @@ public class Sources implements Iterable<FaustURI> {
 
 	protected File toFile(FaustURI uri) {
 		Preconditions.checkArgument(FaustAuthority.XML == uri.getAuthority(), uri + " not valid");
-		final File file = new File(baseDirectory, uri.getPath());
-		final String filePath = file.getAbsolutePath();
-		Preconditions.checkArgument(filePath.startsWith(storagePath), filePath + " is not in XML storage");
+		final File file = new File(storageDirectory, uri.getPath());
+		try {
+			Preconditions.checkArgument(isInStore(file), file.getCanonicalPath() + " is not in XML storage");
+		} catch (IOException e) {
+			throw new IllegalArgumentException(file.getAbsolutePath() + " is not in XML storage", e);
+		}
 		return file;
 	}
 
 	protected FaustURI toUri(File file) {
-		final String filePath = file.getAbsolutePath();
-		Preconditions.checkArgument(isInStore(file), filePath + " not in XML store");
-		return new FaustURI(FaustAuthority.XML, filePath.substring(storagePath.length()));
+		try {
+			final String filePath = file.getCanonicalPath();
+			Preconditions.checkArgument(isInStore(file), filePath + " not in XML store");
+			return new FaustURI(FaustAuthority.XML, filePath.substring(storagePath.length()));
+		} catch (IOException e) {
+			throw new IllegalArgumentException(file.getAbsolutePath() + " is not in XML storage", e);
+		}
 	}
 
 	protected boolean isInStore(File file) {
-		return file.getAbsolutePath().startsWith(storagePath);
+		try {
+			return file.getCanonicalPath().startsWith(storagePath);
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
+	private class FileToUriWrapper extends IterableWrapper<FaustURI, File> {
+
+		private FileToUriWrapper(Iterable<File> iterableToWrap) {
+			super(iterableToWrap);
+		}
+
+		@Override
+		protected FaustURI underlyingObjectToObject(File file) {
+			return toUri(file);
+		}
+	}
 }

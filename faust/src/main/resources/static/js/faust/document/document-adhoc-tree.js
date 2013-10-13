@@ -1,168 +1,72 @@
 YUI.add('document-adhoc-tree', function (Y) {
+
+	var DocumentLayout = {
+		// Text factory; the current model only delivers text nodes, some additional elements (gaps, insertion marks) need 
+		// to be delivered to know their tree context (hands...) for visualisation
+		createText : function(content, start, end, text){
+			if (content.length < 1) throw "Cannot create empty text!";
+			var textAttrs = {};
+			var annotations = text.find(start, end)
+			//ignore empty annotations at the borders
+				.filter(function(x){var r = x.target().range; return r.start !== r.end});
+
+			Y.each(annotations, function(a) {
+				if (a.name.localName == "hand") {
+					textAttrs.hand = a.data["value"].substring(1);
+				} else if (a.name.localName == "rewrite" && a.data["hand"]) {
+					textAttrs.rewrite = a.data["hand"].substring(1);
+				} else if (a.name.localName == "under") {
+					textAttrs.under = true;
+				} else if (a.name.localName == "over") {
+					textAttrs.over = true;
+				} else if (a.name.localName == "st") {
+					textAttrs.strikethrough = true;
+				} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].indexOf("underline") >= 0) {
+					textAttrs.underline = true;
+				} else if (a.name.localName == "line") {
+					textAttrs.fontsize = ((a.data["type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
+				}
+
+			});				
+			return new Faust.Text(content, textAttrs);				
+		},
+		
+	};
+
+	Y.mix(Y.namespace("Faust"), {
+        DocumentLayout: DocumentLayout,
+    });
 	
-	DocumentAdhocTree = function() {
+
+	var DocumentAdhocTree = function() {
 		this.mainZone = null;
 		this.idMap = {};
 		this.postBuildDeferred = [];
 	}
 	
 	Y.extend(DocumentAdhocTree, Object, {
-	
-		buildVC: function(parent, tree) {
+
+		buildVC: function(parent, node, text) {
 			
-			if (tree == null) return null;
+			if (node == null) return null;
 			var vc = null;
-			var node = tree;
-			var nodeIsInvisible = false;
 
-			// Text factory; the current model only delivers text nodes, some additional elements (gaps, insertion marks) need 
-			// to be delivered to know their tree context (hands...) for visualisation
-			var createText = function(content, node){
-				if (content.length < 1) throw "Cannot create empty text!";
-				var textAttrs = {};
-				var annotations = transcript.find(node.range.start, node.range.end);
-				Y.each(annotations, function(a) {
-					if (a.name.localName == "hand") {
-						textAttrs.hand = a.data["value"];
-					} else if (a.name.localName == "rewrite") {
-						textAttrs.rewrite = a.data["hand"];
-					} else if (a.name.localName == "under") {
-						textAttrs.under = true;
-					} else if (a.name.localName == "over") {
-						textAttrs.over = true;
-					} else if (a.name.localName == "st") {
-						textAttrs.strikethrough = true;
-					} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].indexOf("underline") >= 0) {
-						textAttrs.underline = true;
-					} else if (a.name.localName == "line") {
-						textAttrs.fontsize = ((a.data["type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
-					}
-
-				});				
-				return new Faust.Text(content, textAttrs);				
-			};
 
 			if ((node instanceof Y.Faust.TextNode) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
-				vc = createText(node.content(), node);
+				vc = Y.Faust.DocumentLayout.createText(node.content(), node.range.start, node.range.end, text);
 			} else if (node instanceof Y.Faust.AnnotationNode) {
-				if (node.name().localName in {"document":1, "treeRoot":1} ) {
-					vc = new Faust.Surface();
-				} else if (node.name().localName === "surface") {
-					vc = new Faust.Surface();
-				} else if (node.name().localName === "zone")	{
-					vc = new Faust.Zone();
-					if ("rotate" in node.data()) 
-						vc.rotation = parseInt(node.data()["rotate"]);
-					if ("type" in node.data() && node.data()["type"] == "main") {
-						if (this.mainZone != null)
-							throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
-						else
-							this.mainZone = vc;
-					} 
-					
 
-				} else if (node.name().localName === "line") {
-					var lineAttrs = {};
-					var rendition = node.data()["ge:rend"] || "";
-					if (rendition.indexOf("center") >= 0) {
-						lineAttrs.center = true;
-					} else if (rendition.indexOf("indent") >= 0) {
-						var start = rendition.indexOf("indent-");
-						lineAttrs.indent = parseInt(rendition.substring(start + 7, rendition.length)) / 100.0;
+				var annotationStart = node.annotation.target().range.start;
+				var annotationEnd = node.annotation.target().range.end;
+
+				//ioc: configurable modules handle the construction of the view
+				if (node.name().localName in Y.Faust.DocumentConfiguration.names) {
+					var nameHandler = Y.Faust.DocumentConfiguration.names[node.name().localName];
+					if (nameHandler.vc) {
+						vc = nameHandler.vc(node, text, this);
 					}
-
-					var  position = node.data()["f:pos"] || "";
-
-					if (position.indexOf("over") >= 0)
-						lineAttrs.over = true;
-
-					if (position.indexOf("between") >= 0)
-						lineAttrs.between = true;
-
-					vc = new Faust.Line(lineAttrs);
-
-				} else if (node.name().localName == "vspace") {
-					//TODO real implementation, non-integer values
-
-					switch (node.data()["unit"]) {
-					case "lines":
-						if (node.data()['quantity']) {
-							vc = new Faust.VSpace(node.data()['quantity']);
-						} else throw (Faust.ENC_EXC_PREF + "f:vspace: Please specify @qunatity");
-						break;
-					default: 
-						throw (Faust.ENC_EXC_PREF + "Invalid unit for vspace element! Use 'lines'!");
-					}
-					
-				} else if (node.name().localName === "gap") {
-					var gapChar = '\u00d7';
-					var gapUncertainChar = '\u00d7'; //'.';
-					switch (node.data()["unit"]) {
-					case "chars":
-						if (node.data()['quantity'] && node.data()['precision'] && 
-							node.data()['precision'] === 'medium') {
-							var representation = gapChar;
-							for (var nrChars=2; nrChars < node.data()["quantity"]; nrChars++) {
-								representation += gapUncertainChar;  
-							}
-							vc = createText (representation + gapChar, node);															
-						} else if (node.data()['quantity']) {
-							var representation = '';
-							for (var nrChars=0; nrChars < node.data()["quantity"]; nrChars++) {
-								//representation += '\u2715'; //capital X
-								representation += gapChar; // small X
-							}
-							vc = createText (representation, node);							
-						} else if(node.data()['atLeast']) {
-							var representation = gapChar;
-							for (var nrChars=2; nrChars < node.data()["atLeast"]; nrChars++) {
-								representation += gapUncertainChar;  
-							}
-							vc = createText (representation + gapChar, node);							
-
-						} else {
-							throw (Faust.ENC_EXC_PREF + "Please specify either @qunatity or @atLeast");
-						}
-						break;
-					default: 
-						throw (Faust.ENC_EXC_PREF + "Invalid unit for gap element! Use 'chars'!");
-					}
-				} else if (node.name().localName == "f:hspace") {
-					switch (node.data()["unit"]) {
-					case "chars":
-						if (node.data()['quantity']) {
-							var width = String(node.data()['quantity']);
-							vc = new Faust.HSpace(width);
-						} else throw (Faust.ENC_EXC_PREF + "f:hspace: Please specify @qunatity");
-						break;
-					default: 
-						throw (Faust.ENC_EXC_PREF + "Invalid unit for hspace element! Use 'chars'!");
-					}
-				}  else if (node.name().localName == "f:grLine") {
-					if (node.data()['f:style'] == 'curly')
-						vc = new Faust.GrLine();
-				} else if (node.name().localName == "f:grBrace") {
-					//vc = new Faust.GBrace();
-				} else if (node.name().localName == "anchor") {
-					//use empty text element as an anchor
-					// FIXME make proper phrase/block context differentiation
-					if (parent.elementName === "zone")
-						vc = new Faust.Line([]);
-					else
-						vc = new Faust.Text("", {});
-					
-					
-				} else if (node.name().localName == "f:ins" && node.data()["f:orient"] == "right") {
-					vc = new Faust.DefaultVC();
-					//Einweisungszeichen
-					vc.add (createText("\u2308", node));
-					// Default Elements
-				} else if (node.name().localName in {'treeRoot':1, 'anchor':1}) {
-					vc = new Faust.DefaultVC();
-					//Invisible elements				
-				} else if (node.name().localName in {"rdg":1}){
-					nodeIsInvisible = true;
 				}
+
 				aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left", "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
 				
 				var that = this;
@@ -193,14 +97,13 @@ YUI.add('document-adhoc-tree', function (Y) {
 					}						
 				});
 				
-				// TODO redundant with line properties
 				// TODO special treatment of zones
-				if ("ge:rend" in node.data()) {
-					if (node.data()["ge:rend"] == "right") {
+				if ("rend" in node.data()) {
+					if (node.data()["rend"] == "right") {
 				 		vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 1, 1, Faust.Align.REND_ATTR));
-					} else if (node.data()["ge:rend"] == "left") {
+					} else if (node.data()["rend"] == "left") {
 				 		vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0, 0, Faust.Align.REND_ATTR));
-					} else if (node.data()["ge:rend"] == "center") {
+					} else if (node.data()["rend"] == "centered") {
 				 		vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0.5, 0.5, Faust.Align.REND_ATTR));
 					}
 
@@ -211,7 +114,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 			if (vc != null) {
 
 				// annotate the vc with the original element name
-		 		// vc.elementName = node.name().localName;
+		 		vc.elementName = node.name ? node.name().localName : "";
 				
 				if (parent != null ) { // && parent !== this) {
 					parent.add(vc);
@@ -229,27 +132,31 @@ YUI.add('document-adhoc-tree', function (Y) {
 			}
 
 			var that = this;
-			if (!nodeIsInvisible)
-				Y.each(tree.children(), function(c) { that.buildVC(parent, c); });
-			
-			// After all children, TODO move this into appropriate classes
-			if (node.name && node.name().localName == "ins" && node.data()["f:orient"] == "left") {
-				// Einweisungszeichen
-				vc.add (createText("\u2309", node));
-			}
 
+			Y.each(node.children(), function(c) { that.buildVC(parent, c, text); });
+			
+			if (node instanceof Y.Faust.AnnotationNode) {
+
+				// space at the beginning of each line, to give empty lines height
+				if (node.name().localName == "line") {
+					vc.add (Y.Faust.DocumentLayout.createText("\u00a0", annotationStart, annotationEnd, text));
+				}
+
+				// 'end' callback after all children are constructed
+				// with the vc for 'this'
+				
+				if (node.name().localName in Y.Faust.DocumentConfiguration.names) {
+					var nameHandler = Y.Faust.DocumentConfiguration.names[node.name().localName];
+					if (nameHandler.end) {
+						nameHandler.end.call(vc, node, text, this);
+					}
+				}
+			}
 			return vc;
 		},
 		
 		transcriptVC: function(jsonRepresentation) {
 			
-			// var structuralHierarchy = [{name:'zone', builder: null},
-			// 						   {name:'line', builder: null},
-			// 						   {name:'anchor', builder: null},
-			// 						  ];
-
-			// var structuralNames = structuralHierarchy.map(function(x) {return x.name});
-
 			var structuralNames = ['surface',
 								   'vspace', 
 								   'div',
@@ -265,16 +172,27 @@ YUI.add('document-adhoc-tree', function (Y) {
 								   'rdg',
 								   'lem',
 								   'anchor',
-								   'note']
+								   'note',
+								   'ins',
+								   'grBrace',
+								   'gap'
+								  ]
 
+			var text = Y.Faust.Text.create(jsonRepresentation);
 
-			transcript = Y.Faust.Text.create(jsonRepresentation);
-
-			var tree = new Y.Faust.AdhocTree(transcript, structuralNames);
-			//console.log("tree: " + tree);
+			var tree = new Y.Faust.AdhocTree(text, structuralNames,
+											 Y.Faust.XMLNodeUtils.documentOrderSort,
+											 Y.Faust.XMLNodeUtils.isDescendant
+											);
 
 			var surfaceVC = new Faust.Surface();
-			this.buildVC(surfaceVC, tree);
+			this.buildVC(surfaceVC, tree, text);
+
+			//global for debugging
+			debugText = text;
+
+			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
+
 			return surfaceVC;
 		}
 	});

@@ -1,5 +1,16 @@
+Faust.LayoutPreferences = {
+	
+	overlay : "overlay",
+	
+};
+
+
 YUI.add('document-yui-view', function (Y) {
+
+
 	var DiplomaticTranscriptView = Y.Base.create("diplomatic-transcript-view", Y.View, [], {
+
+
 		
 		destructor: function() {
 			
@@ -53,9 +64,15 @@ YUI.add('document-yui-view', function (Y) {
 
 			that = this;
 			aq = new Y.AsyncQueue();
+			var layoutAndCenter = function() {
+				that.intoView(innerContainer, svgRoot);
+				that.center(svgRoot, container);
+				visComponent.layout();
+			};
+
 			aq.add(
 				{
-					fn : visComponent.layout,
+					fn : layoutAndCenter, //visComponent.layout,
 					timeout: 10,
 					iterations: 5,
 					context: visComponent
@@ -65,9 +82,16 @@ YUI.add('document-yui-view', function (Y) {
 						that.intoView(innerContainer, svgRoot);
 						that.center(svgRoot, container);
 					},
-					timeout: 0,
+					timeout: 10,
 					iterations: 1,
 					context: visComponent
+				},
+				{
+					fn: function() {
+						Y.fire('faust:transcript-layout-done', {});						
+					},
+					timeout: 10,
+					iterations: 1
 				}
 			);
 			aq.run();
@@ -76,9 +100,8 @@ YUI.add('document-yui-view', function (Y) {
 
 		render: function() {
 			var container = this.get('container');
-			
-			
-			var transcriptSource = '/' + cp + this.get('source').components[1] + '/' + this.get('source').components[2];
+						
+			var transcriptSource = cp + '/' + this.get('source').components[1] + '/' + this.get('source').components[2];
 			this.editortoolbar = Y.Node.create('<div id="editor-toolbar"><a href="' + transcriptSource  + '">(XML source)</a></div>');
 			container.appendChild(this.editortoolbar);
 
@@ -86,7 +109,7 @@ YUI.add('document-yui-view', function (Y) {
 			container.appendChild(this.errorDisplay);
 			var svgRoot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 			//faust_svg_root = this.svgRoot;
-			svgRoot.setAttribute("xmlns:drag", DRAG_NS);
+			//svgRoot.setAttribute("xmlns:drag", DRAG_NS);
 			var that = this;
 			//addDragEventListener(DRAGMOVE, function(){
 			//	var innerContainer = document.getElementById("transcript_container");
@@ -99,10 +122,6 @@ YUI.add('document-yui-view', function (Y) {
 
 			//var visComponent = this.get('visComponent');
 
-			idMap = {};
-			postBuildDeferred = [];
-			mainZone = null;
-
 			try {
 				//var visComponent = Faust.DocumentRanges.transcriptVC(this.get('transcript'));
 				var documentBuilder = new Y.Faust.DocumentAdhocTree();
@@ -111,7 +130,7 @@ YUI.add('document-yui-view', function (Y) {
 				innerContainer.setAttribute("id", "transcript_container");
 				visComponent.svgCont = innerContainer;
 				svgRoot.appendChild(innerContainer);
-				Y.each(documentBuilder.postBuildDeferred, function(f) {f.apply(this)});
+
 				//this.alignMainZone();
 				while (innerContainer.hasChildNodes()) 
 					this.innerContainer.removeChild(innerContainer.firstChild);
@@ -120,7 +139,6 @@ YUI.add('document-yui-view', function (Y) {
 				visComponent.render();
 				this.relayout(visComponent, svgRoot, innerContainer, container);
 				
-				//console.log('bp');
 				//this.center(svgRoot, container);
 				
 				// }
@@ -166,7 +184,8 @@ YUI.add('document-yui-view', function (Y) {
 	});
 	
 }, '0.0', {
-	requires: ['view', 'node', 'document-adhoc-tree']
+	requires: ['view', 'node', 'document-model', 'document-adhoc-tree', 'document-configuration-faust',
+			   'document-view-svg', 'async-queue']
 });
 
 /*

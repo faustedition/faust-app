@@ -36,9 +36,7 @@ YUI.add('document-text', function (Y) {
 				}
 				else {
 					stageColors.uniqueStageCount++;
-					console.log("Number of stages:" + stageColors.uniqueStageCount);
 					var index = stageColors.uniqueStageCount % stageColors.colors.length;
-					console.log('index: ' + index);
 					stageColors.map[stageName] = stageColors.colors[index];
 					return stageColors.map[stageName];
 				}
@@ -84,8 +82,6 @@ YUI.add('document-text', function (Y) {
 
 					forAnnotationDo('stage', p, function(a) {
 						var stageName = a.data['value'];
-						// partitionNode.insert('<', 'before');
-						// partitionNode.insert('>', 'after');
 						partitionNode.setStyle('color', stageColor(stageName));
 						partitionNode.setAttribute('title', stageName);
 					});

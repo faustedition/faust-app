@@ -23,9 +23,6 @@ YUI.add('document-view-svg', function (Y) {
 	};
 	
 	Faust.ViewComponent.prototype.setCoord = function(coord, coordRotation) {
-		//var ctm = this.view.getCTM();
-		//var ctmTransform = this.view.viewportElement.createSVGTransformFromMatrix(ctm);
-		//var ctmTransformInv = this.view.viewportElement.createSVGTransformFromMatrix(ctm.inverse());
 		
 		var myRot = this.globalRotation();
 		var myRotMx = this.view.viewportElement.createSVGMatrix().rotate(myRot);
@@ -138,14 +135,7 @@ YUI.add('document-view-svg', function (Y) {
 		view.setAttribute('class', 'DefaultVC');
 		return view;
 	};
-	
-	
-	
-	//Faust.DefaultVC.prototype.render = function() {
-		//this.view = createView();
-		//Y.each(this.children, function(c) { c.render(); });
-	//};
-	
+		
 	Y.augment(Faust.Line, Faust.ViewComponent);
 
 
@@ -171,8 +161,21 @@ YUI.add('document-view-svg', function (Y) {
 		result.appendChild(box0);
 		result.setAttribute('class', 'Zone');
 		result.setAttributeNS(DRAG_NS, 'drag:enable', 'true');
+
+		var sheet = Y.StyleSheet('#style-document-transcript-highlight-hands');
 		
-			return result;
+		Y.one(result).on("mouseenter", function () {
+			//Y.all('.bgBox').transition('fadeIn');
+			sheet.enable();
+		});
+
+		Y.one(result).on("mouseleave", function () {
+			//Y.all('.bgBox').transition('fadeOut');
+			sheet.disable();
+		});
+
+		return result;
+		
 	};
 	Y.augment(Faust.Zone, Faust.ViewComponent);
 
@@ -186,7 +189,7 @@ YUI.add('document-view-svg', function (Y) {
 
 	Faust.Text.prototype.createView = function() {
 		var text = this.svgDocument().createElementNS(SVG_NS, "text");
-		this.setStyles(text);
+		text.setAttribute("class", "text " + this.computeClasses());
 		text.appendChild(this.svgDocument().createTextNode(this.text));
 		return text;
 	};
@@ -208,29 +211,52 @@ YUI.add('document-view-svg', function (Y) {
 			//this.strikethrough.transform.baseVal = this.view.transform.baseVal;
 			this.strikethrough.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
+
+		var bbox = this.view.getBBox();
+		this.bgBox.setAttribute("x", bbox.x);
+		this.bgBox.setAttribute("y", bbox.y);
+		this.bgBox.setAttribute("height", bbox.height);
+		this.bgBox.setAttribute("width", bbox.width);
+		this.bgBox.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		
 		if (this.underline) {
 			this.underline.setAttribute("x1", this.x);
 			this.underline.setAttribute("x2", this.x + this.width);
 			this.underline.setAttribute("y1", this.y);
 			this.underline.setAttribute("y2", this.y);
-			this.underline.setAttribute("stroke", this.handColor());
+			//this.underline.setAttribute("stroke", this.handColor());
+			this.underline.setAttribute("class", this.computeClasses());
+
 			this.underline.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
 	};
 
 
 	Faust.Text.prototype.render = function() {
+
+		this.bgBox = this.svgDocument().createElementNS(SVG_NS, "rect");
+		this.svgContainer().appendChild(this.bgBox);
+		this.bgBox.setAttribute("class", "bgBox " + this.computeClasses());
+							   
+
+
 		this.view = this.createView();
 		this.svgContainer().appendChild(this.view);
 		var textBox = this.view.getBBox();
+		
+
+
+
 		if ("strikethrough" in this.textAttrs) {
 			this.strikethrough = this.svgDocument().createElementNS(SVG_NS, "line");
 			this.svgContainer().appendChild(this.strikethrough);
 		}
 		if ("underline" in this.textAttrs) {
 			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
+			this.view.setAttribute("class", 
+								   this.view.getAttribute("class") + " underline");
 			this.svgContainer().appendChild(this.underline);
+
 		}
 		this.rotate(this.rotation);	
 		Y.each(this.children, function(c) { c.render(); });		
@@ -239,7 +265,7 @@ YUI.add('document-view-svg', function (Y) {
 
 	Faust.GrLine.prototype.createView = function() {
 		this.zoneSpanning = this.svgDocument().createElementNS(SVG_NS, 'rect');
-		this.zoneSpanning.setAttribute('fill', 'url(#curlyLinePattern)');
+		this.zoneSpanning.setAttribute('fill', 'url(#curlyLinePattern');
 		this.zoneSpanning.setAttribute('width', '100');
 		this.svgContainer().appendChild(this.zoneSpanning);
 		
@@ -367,5 +393,5 @@ YUI.add('document-view-svg', function (Y) {
 	};
 	
 }, '0.0', {
-	requires: ["node", "dom", "event", "document-model"]
+	requires: ["node", "dom", "event", "document-model", "event-mouseenter", "stylesheet", "transition"]
 });

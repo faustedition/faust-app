@@ -1,6 +1,4 @@
-YUI.add('document-model', function (Y) {		
-
-	console.log('document-model');
+YUI.add('document-model', function (Y) {
 
 	Faust.ENC_EXC_PREF = "ENCODING ERROR: ";
 	
@@ -95,18 +93,8 @@ YUI.add('document-model', function (Y) {
 			this.hAlign.align();
 			this.vAlign.align();
 		},
-		computeStyles: function() { 
-			return {}; 
-		},
-		setStyles: function(view) {
-			var styles = this.computeStyles();
-			if (styles) {
-				var stylesStr = "";
-				for (style in styles) {
-					stylesStr += (stylesStr.length == 0 ? "" : "; ") + (style + ": " + styles[style]);
-				}
-				view.setAttribute("style", stylesStr);
-			}			
+		computeClasses: function() { 
+			return []; 
 		},
 		rotX: function() {return 0 + this.globalRotation()},
 		rotY: function() {return 90 + this.globalRotation()},
@@ -147,12 +135,7 @@ YUI.add('document-model', function (Y) {
 	Faust.BreakingVC = function() {
 		this.initViewComponent();		
 	};
-	
-//	Faust.BreakingVC.prototype.render = function() {
-//
-//		Y.each(this.children, function(c) { c.render(); });
-//	};
- 	
+	 	
 	Faust.BreakingVC.prototype.defaultAligns = function () {
 		
 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
@@ -200,16 +183,14 @@ YUI.add('document-model', function (Y) {
 		this.lineAttrs = lineAttrs;
 	};
 	Faust.Line.prototype.dimension = function() {
-		//this.height = 20;
-		//this.width = 0;
-		//Y.each(this.children, function(c) { this.width += c.width; }, this);
 	};
+
  	Faust.Line.prototype.defaultAligns = function () {
 			
- 		if ("center" in this.lineAttrs) 
- 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0.5, 0.5, Faust.Align.REND_ATTR));
- 		else if ("indent" in this.lineAttrs) 
+		if ("indent" in this.lineAttrs) 
  			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, this.lineAttrs["indent"], Faust.Align.INDENT_ATTR));
+		else if ("indentCenter" in this.lineAttrs)
+			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0.5, this.lineAttrs["indentCenter"], Faust.Align.INDENT_CENTER_ATTR));
 		else
  			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 
@@ -248,47 +229,44 @@ YUI.add('document-model', function (Y) {
 		else
 			return this.textAttrs["hand"];
 	};
-	Faust.Text.prototype.handColor = function() {
-		var hand = this.getHand();
-		if (hand.indexOf("_bl") >= 0) {
-			return "darkgrey";
-		} else if (hand.indexOf("_t") >= 0) {
-			return "black";
-		} else {
-			return "black";
-		}
+
+	Faust.Text.prototype.getWriter = function() {
+		return this.getHand().split('_')[0];
 	};
-	Faust.Text.prototype.computeStyles = function() {
-		var styles = { "font-size": "11pt" };
+
+	Faust.Text.prototype.getMaterial = function() {
+		return this.getHand().split('_')[1];
+	};
+
+	Faust.Text.prototype.getScript = function() {
+		return this.getHand().split('_')[2];
+	}
+
+
+ 		Faust.Text.prototype.computeClasses = function() {
+		var classes = [""];
 		for (attr in this.textAttrs) {
 			if (attr == "hand") {
-				styles["fill"] = this.handColor();
-				var hand = this.getHand();
-				if (hand.indexOf("g_") >= 0) {
-					// TODO temp solution, Firefox can only display italics,
-					// Webkit only small-caps
-					//styles["font-variant"] = "small-caps";
-					//styles["font-style"] = "italic";
-					styles["font-family"] = "faust-serif";
-				} else if (hand.indexOf("xx_") >= 0) {
-					styles["font-family"] = "faust-monospace";
-				} else {
-					styles["font-family"] = "faust-sans-serif";
-				}
+				if (this.getWriter())
+					classes.push("hand-" + this.getWriter());
+				if (this.getMaterial())
+					classes.push("material-" + this.getMaterial());
+				if (this.getScript())
+					classes.push("script-" + this.getScript());
 			} else if (attr == "rewrite") {
-				styles["font-weight"] = "bold";
+				classes.push("rewrite");
 			} else if (attr == "under") {
-				styles["opacity"] = "0.5";
+				classes.push("under");
 			} else if (attr == "over") {
-				styles["font-weight"] = "bold";
+				classes.push("over");
 			} else if (attr == "fontsize") {
 				var size = this.textAttrs["fontsize"];
 				if (size == "small") {
-					styles["font-size"] = "9pt";
+					classes.push("small");
 				}
 			}
 		}
-		return styles;
+		return classes.reduce(function (x,y) {return x + " " + y});
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 	
@@ -305,21 +283,6 @@ YUI.add('document-model', function (Y) {
 		this.width = 40;
 		this.height = 20;
 	};
-//	Faust.GLine.prototype.position = function() {
-//		var prev = this.previous();
-//		if (prev) {
-//			if (prev instanceof Faust.Text) {
-//				this.x = prev.x + prev.width;
-//				this.y = prev.y;				
-//			} else {
-//				this.x = prev.x;
-//				this.y = prev.y + prev.height;
-//			}
-//		} else {
-//			this.x = this.parent.x;
-//			this.y = this.parent.y;			
-//		}
-//	};
 	Y.augment(Faust.GLine, Faust.ViewComponent);
 
 	Faust.GBrace = function() {
@@ -329,21 +292,6 @@ YUI.add('document-model', function (Y) {
 		this.width = 40;
 		this.height = 20;
 	};
-//	Faust.GBrace.prototype.position = function() {
-//		var prev = this.previous();
-//		if (prev) {
-//			if (prev instanceof Faust.Text) {
-//				this.x = prev.x + prev.width;
-//				this.y = prev.y;				
-//			} else {
-//				this.x = prev.x;
-//				this.y = prev.y + prev.height;
-//			}
-//		} else {
-//			this.x = this.parent.x;
-//			this.y = this.parent.y;			
-//		}
-//	};
 	Y.augment(Faust.GBrace, Faust.ViewComponent);
 
 	Faust.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
@@ -361,8 +309,12 @@ YUI.add('document-model', function (Y) {
 	Faust.Align['5'] = 'REND_ATTR';
 	Faust.Align.INDENT_ATTR = 7;
 	Faust.Align['7'] = 'INDENT_ATTR';
+	Faust.Align.INDENT_ATTR = 7;
+	Faust.Align['8'] = 'INDENT_CENTER_ATTR';
 	Faust.Align.EXPLICIT = 10;	
 	Faust.Align['10'] = 'EXPLICIT';
+	Faust.Align.MAIN_ZONE = 15;	
+	Faust.Align['15'] = 'MAIN_ZONE';
 
 	
 	Faust.Align.prototype.align = function() {
@@ -381,9 +333,7 @@ YUI.add('document-model', function (Y) {
 	
 	Faust.AbsoluteAlign.prototype.align = function() {
 		this.me.setCoord(this.coordinate, this.coordRotation);
-	}
-	
-	
+	}	
 	
 	Faust.Dimensions = function() {};
 

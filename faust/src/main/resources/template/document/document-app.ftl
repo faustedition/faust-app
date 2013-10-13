@@ -5,6 +5,9 @@
 <#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
 <#assign header>
 	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
+	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-text.css"/>
+    <link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript.css"/>
+    <link rel="stylesheet" type="text/css" id="style-document-transcript-highlight-hands" href="${cp}/static/css/document-transcript-highlight-hands.css"/>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
     <script type="text/javascript">
@@ -18,9 +21,12 @@
 
 YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 		  "document-structure-view", "button","panel", "dd-plugin", "resize-plugin", "util",
-		  "document-text",
+		 // "document-text",
+		 "text-display", "stylesheet",
 		  function(Y) {
-			  
+		  
+		  	  Y.StyleSheet('#style-document-transcript-highlight-hands').disable();
+
 			  Y.NavigationModel = Y.Base.create('navigationModel', Y.Model, [], {
 				  
 			  }, {
@@ -259,10 +265,37 @@ YUI().use("app", "node", "event", "slider", "document", "document-yui-view",
 					  var that = this;
 
 
+					  function stageNum(name){
+						  stageNum.stages = stageNum.stages || {};
+						  stageNum.stagecount = stageNum.stagecount || 0;
+						  if(stageNum.stages[name] === undefined)
+							  stageNum.stages[name] = stageNum.stagecount++;
+						  return stageNum.stages[name];
+					  };
+
+					  var handleSpecialAnnotations = function(annotation, prefix, partitionNode, lineNode, isFirst, isLast)
+					  {
+						  
+						  if(annotation.name.localName == 'stage')
+							  return [prefix + 'stage-' + stageNum(annotation.data['value'])];
+						  
+						  if(annotation.name.localName == 'l' && isFirst)
+							  partitionNode.insert('<span class="linenum">'+parseInt(annotation.data['n'])+'</span>', lineNode);
+						  
+						  return [];
+					  };
+		
 					  this.get('fd').transcriptionFromRanges(function(t) {
 						  window.setTimeout(function(){
 							  that.removeAjaxLoader(textContent);
-							  textContent.append(DocumentText.renderText(t));
+							  //textContent.append(DocumentText.renderText(t));
+							  var text = Y.Faust.Text.create(t);
+							  var textDisplay = new Y.Faust.TextDisplayView({
+							  	  container: textContent,
+								  text: text,
+								  cssPrefix: 'ann-',
+								  renderCallback: handleSpecialAnnotations});
+							  textDisplay.render();
 						  }, 2000);	  							  
 					  });
 
