@@ -9,11 +9,14 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
+@Singleton
 public class Graph {
     private static final Logger LOG = Logger.getLogger(Graph.class.getName());
 
@@ -28,7 +31,12 @@ public class Graph {
 
 	private final GraphDatabaseService db;
 
-    public static <T> T execute(GraphDatabaseService db, final Transaction<T> tx) throws Exception {
+    @Inject
+    public Graph(GraphDatabaseService db) {
+        this.db = db;
+    }
+
+    public <T> T execute(final Transaction<T> tx) throws Exception {
         Stopwatch sw = null;
         org.neo4j.graphdb.Transaction transaction = null;
         try {
@@ -76,10 +84,6 @@ public class Graph {
         public boolean rollsBackOn(Exception e) {
             return true;
         }
-    }
-
-    public Graph(GraphDatabaseService db) {
-        this.db = db;
     }
 
     public GraphDatabaseService db() {

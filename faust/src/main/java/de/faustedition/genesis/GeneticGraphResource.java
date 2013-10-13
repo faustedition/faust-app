@@ -24,17 +24,17 @@ import java.util.TreeSet;
 public class GeneticGraphResource {
 
     private final Templates templates;
-    private final GraphDatabaseService graphDatabaseService;
+    private final Graph graph;
 
     @Inject
-    public GeneticGraphResource(Templates templates, GraphDatabaseService graphDatabaseService) {
+    public GeneticGraphResource(Templates templates, Graph graph) {
         this.templates = templates;
-        this.graphDatabaseService = graphDatabaseService;
+        this.graph = graph;
     }
 
     @GET
     public Response index(@Context final Request request) throws Exception {
-        return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
+        return graph.execute(new Graph.Transaction<Response>() {
             @Override
             public Response execute(Graph graph) throws Exception {
                 final SortedSet<Document> archivalUnits = new TreeSet<Document>(new Comparator<Document>() {

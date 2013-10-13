@@ -39,14 +39,14 @@ public class DocumentImageLinkResource {
 
     private static final Logger LOG = Logger.getLogger(DocumentImageLinkResource.class.getName());
 
-    private final GraphDatabaseService graphDatabaseService;
+    private final Graph graph;
     private final XMLStorage xml;
 	private final Templates templates;
 	private final InternetImageServer imageServer;
 
     @Inject
-    public DocumentImageLinkResource(GraphDatabaseService graphDatabaseService, XMLStorage xml, Templates templates, InternetImageServer imageServer) {
-        this.graphDatabaseService = graphDatabaseService;
+    public DocumentImageLinkResource(Graph graph, XMLStorage xml, Templates templates, InternetImageServer imageServer) {
+        this.graph = graph;
         this.xml = xml;
         this.templates = templates;
         this.imageServer = imageServer;
@@ -55,7 +55,7 @@ public class DocumentImageLinkResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response page(@PathParam("path") final String path, @Context final Request request) throws Exception {
-        return Graph.execute(graphDatabaseService, new Graph.Transaction<Response>() {
+        return graph.execute(new Graph.Transaction<Response>() {
             @Override
             public Response execute(Graph graph) throws Exception {
                 final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
@@ -78,7 +78,7 @@ public class DocumentImageLinkResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> readLinkData(@PathParam("path") final String path) throws Exception {
-        return Graph.execute(graphDatabaseService, new Graph.Transaction<Map<String, Object>>() {
+        return graph.execute(new Graph.Transaction<Map<String, Object>>() {
             @Override
             public Map<String, Object> execute(Graph graph) throws Exception {
                 final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
@@ -92,7 +92,7 @@ public class DocumentImageLinkResource {
     @GET
     @Produces(DocumentImageLinks.IMAGE_SVG_TYPE)
     public Source readLinkMap(@PathParam("path") final String path) throws Exception {
-        return Graph.execute(graphDatabaseService, new Graph.Transaction<Source>() {
+        return graph.execute(new Graph.Transaction<Source>() {
             @Override
             public Source execute(Graph graph) throws Exception {
                 final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
@@ -134,7 +134,7 @@ public class DocumentImageLinkResource {
     @PUT
     @Consumes(DocumentImageLinks.IMAGE_SVG_TYPE)
 	public String write(@PathParam("path") final String path, final InputStream svgStream) throws Exception {
-        return Graph.execute(graphDatabaseService, new Graph.Transaction<String>() {
+        return graph.execute(new Graph.Transaction<String>() {
             @Override
             public String execute(Graph graph) throws Exception {
                 final FaustURI transcriptURI = DocumentPage.fromPath(path, graph).materialUnit().getTranscriptSource();

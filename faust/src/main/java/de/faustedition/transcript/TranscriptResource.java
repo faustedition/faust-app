@@ -29,16 +29,15 @@ import java.util.Map;
 @Path("/transcript")
 public class TranscriptResource {
 
-
-    private final GraphDatabaseService db;
+    private final Graph graph;
     private final Transcripts transcripts;
     private final Templates templates;
 
     @Inject
-    public TranscriptResource(GraphDatabaseService db,
+    public TranscriptResource(Graph graph,
                               Transcripts transcripts,
                               Templates templates) {
-        this.db = db;
+        this.graph = graph;
         this.transcripts = transcripts;
         this.templates = templates;
     }
@@ -46,7 +45,7 @@ public class TranscriptResource {
     @GET
     @Path("/{id}")
     public Response page(@PathParam("id") final long id, @Context final Request request) throws Exception {
-        return Graph.execute(db, new Graph.Transaction<Response>() {
+        return graph.execute(new Graph.Transaction<Response>() {
             @Override
             public Response execute(Graph graph) throws Exception {
                 final MaterialUnit materialUnit = materialUnit(graph, id);

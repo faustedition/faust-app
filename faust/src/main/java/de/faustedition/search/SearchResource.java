@@ -28,18 +28,18 @@ import java.util.SortedSet;
 @Singleton
 public class SearchResource {
 
-	private final GraphDatabaseService graphDatabaseService;
+    private final Graph graph;
 
     @Inject
-    public SearchResource(GraphDatabaseService graphDatabaseService) {
-        this.graphDatabaseService = graphDatabaseService;
+    public SearchResource(Graph graph) {
+        this.graph = graph;
     }
 
     @Path("/{query}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
 	public Map<String,Object> searchResults(@PathParam("query") final String query) throws Exception {
-        return Graph.execute(graphDatabaseService, new Graph.Transaction<Map<String, Object>>() {
+        return graph.execute(new Graph.Transaction<Map<String, Object>>() {
             @Override
             public Map<String, Object> execute(Graph graph) throws Exception {
                 final List<Map<String, Object>> documentDescs = Lists.newArrayList();
