@@ -11,18 +11,15 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Collections;
-import java.util.Queue;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class DefaultFacsimileStore implements FacsimileStore {
+public class DefaultFacsimiles implements Facsimiles {
 
     private final File facsimileDirectory;
 
-    public DefaultFacsimileStore(File facsimileDirectory) {
+    public DefaultFacsimiles(File facsimileDirectory) {
         this.facsimileDirectory = facsimileDirectory;
     }
 
@@ -41,12 +38,12 @@ public class DefaultFacsimileStore implements FacsimileStore {
     public BufferedImage tile(final String path, int zoom, int x, int y) throws IOException, IllegalArgumentException {
         ImageReader reader = null;
         try {
-            x = (Math.max(0, x) * FacsimileStore.TILE_SIZE);
-            y = (Math.max(0, y) * FacsimileStore.TILE_SIZE);
+            x = (Math.max(0, x) * Facsimiles.TILE_SIZE);
+            y = (Math.max(0, y) * Facsimiles.TILE_SIZE);
             reader = reader(path);
             final int index = Math.max(0, Math.min(zoom, reader.getNumImages(true) - 1));
             final ImageReadParam parameters = reader.getDefaultReadParam();
-            parameters.setSourceRegion(clip(x, y, FacsimileStore.TILE_SIZE, FacsimileStore.TILE_SIZE, reader.getWidth(index), reader.getHeight(index)));
+            parameters.setSourceRegion(clip(x, y, Facsimiles.TILE_SIZE, Facsimiles.TILE_SIZE, reader.getWidth(index), reader.getHeight(index)));
             return reader.read(index, parameters);
         } finally {
             if (reader != null) {

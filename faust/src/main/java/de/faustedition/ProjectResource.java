@@ -26,6 +26,6 @@ public class ProjectResource {
     @GET
     @Path("/{page}")
     public Response page(@PathParam("page") String page, @Context Request request) {
-        return templates.render(new Templates.ViewAndModel("project/" + page), request);
+        return templates.render(request, new Templates.ViewAndModel("project/" + page));
     }
 }

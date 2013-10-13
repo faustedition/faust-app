@@ -1,47 +1,40 @@
-package de.faustedition.document;
+package de.faustedition;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.Database;
 import de.faustedition.db.Tables;
-import de.faustedition.genesis.MacrogeneticRelationManager;
-import de.faustedition.xml.XMLStorage;
+import de.faustedition.document.ArchiveDescriptorParser;
+import de.faustedition.document.DocumentDescriptorParser;
+import de.faustedition.xml.Sources;
 import de.faustedition.xml.XMLUtil;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 import org.xml.sax.SAXException;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-public class MetadataInitializationService extends AbstractIdleService {
+@Singleton
+public class ScaffoldingService extends AbstractIdleService {
     public static final FaustURI DOCUMENT_BASE_URI = new FaustURI(FaustAuthority.XML, "/document");
 
-    private final XMLStorage xml;
+    private static final Logger LOG = Logger.getLogger(ScaffoldingService.class.getName());
+
+    private final Sources sources;
     private final Database database;
-    private final Logger logger;
     private final ObjectMapper objectMapper;
-    private final MacrogeneticRelationManager macrogeneticRelationManager;
 
     @Inject
-    public MetadataInitializationService(XMLStorage xml,
-                                         Database database,
-                                         ObjectMapper objectMapper,
-                                         MacrogeneticRelationManager macrogeneticRelationManager,
-                                         Logger logger) {
-        this.xml = xml;
+    public ScaffoldingService(Sources sources, Database database, ObjectMapper objectMapper) {
+        this.sources = sources;
         this.database = database;
         this.objectMapper = objectMapper;
-        this.macrogeneticRelationManager = macrogeneticRelationManager;
-        this.logger = logger;
     }
 
     @Override
@@ -52,10 +45,7 @@ public class MetadataInitializationService extends AbstractIdleService {
                 final Stopwatch sw = Stopwatch.createStarted();
 
                 if (sql.selectCount().from(Tables.ARCHIVE).fetchOne().value1() == 0) {
-                    XMLUtil.saxParser().parse(
-                            xml.getInputSource(ArchiveResource.ARCHIVE_DESCRIPTOR_URI),
-                            new ArchiveDescriptorParser(sql)
-                    );
+                    new ArchiveDescriptorParser(sources, sql).run();
                 }
 
                 if (sql.selectCount().from(Tables.MATERIAL_UNIT).fetchOne().value1() == 0) {
@@ -63,24 +53,22 @@ public class MetadataInitializationService extends AbstractIdleService {
                     for (Record2<Long, String> archive : sql.select(Tables.ARCHIVE.ID, Tables.ARCHIVE.LABEL).from(Tables.ARCHIVE).fetch()) {
                         archiveIds.put(archive.getValue(Tables.ARCHIVE.LABEL), archive.getValue(Tables.ARCHIVE.ID));
                     }
-                    for (FaustURI documentDescriptor : xml.iterate(DOCUMENT_BASE_URI)) {
+                    for (FaustURI documentDescriptor : sources.iterate(DOCUMENT_BASE_URI)) {
                         try {
-                            logger.fine("Importing document " + documentDescriptor);
+                            LOG.fine("<< " + documentDescriptor);
                             XMLUtil.saxParser().parse(
-                                    xml.getInputSource(documentDescriptor),
-                                    new DocumentDescriptorParser(sql, xml, objectMapper, archiveIds, documentDescriptor)
+                                    sources.getInputSource(documentDescriptor),
+                                    new DocumentDescriptorParser(sql, sources, objectMapper, archiveIds, documentDescriptor)
                             );
                         } catch (SAXException e) {
-                            logger.log(Level.SEVERE, "XML error while adding document " + documentDescriptor, e);
+                            LOG.log(Level.SEVERE, "XML error while adding document " + documentDescriptor, e);
                         } catch (IOException e) {
-                            logger.log(Level.SEVERE, "I/O error while adding document " + documentDescriptor, e);
+                            LOG.log(Level.SEVERE, "I/O error while adding document " + documentDescriptor, e);
                         }
                     }
                 }
 
-                //macrogeneticRelationManager.feedGraph(graph);
-
-                logger.log(Level.INFO, "Initialized graph in {0}", sw.stop());
+                LOG.log(Level.INFO, "Built scaffolding in {0}", sw.stop());
 
                 return null;
             }

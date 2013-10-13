@@ -50,18 +50,20 @@ public class GeneticGraphResource {
                     }
                     //Iterables.addAll(archivalUnits, Iterables.filter(archive, Document.class));
                 }
-                return templates.render(new Templates.ViewAndModel("genesis/graph").add("archivalUnits", archivalUnits), request);
+                return templates.render(request, new Templates.ViewAndModel("genesis/graph")
+                        .add("archivalUnits", archivalUnits)
+                );
             }
         });
     }
 
     @Path("/work/")
     public Response work(@Context final Request request) {
-        return templates.render(new Templates.ViewAndModel("genesis/work"), request);
+        return templates.render(request, new Templates.ViewAndModel("genesis/work"));
     }
 
     @Path("/app/")
     public Response app(@Context final Request request) {
-        return templates.render(new Templates.ViewAndModel("genesis/app"), request);
+        return templates.render(request, new Templates.ViewAndModel("genesis/app"));
     }
 }

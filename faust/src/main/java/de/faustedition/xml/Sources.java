@@ -20,22 +20,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class XMLStorage implements Iterable<FaustURI> {
+public class Sources implements Iterable<FaustURI> {
 	private final Pattern xmlFilenamePattern = Pattern.compile("[^\\.]+\\.[xX][mM][lL]$");
 
 
-	private final File storageDirectory;
+	private final File baseDirectory;
 	private final String storagePath;
 
-
-    public XMLStorage(File storageDirectory) {
-        this.storageDirectory = storageDirectory;
-        this.storagePath = storageDirectory.getAbsolutePath();
+    public Sources(File baseDirectory) {
+        this.baseDirectory = baseDirectory;
+        this.storagePath = baseDirectory.getAbsolutePath();
     }
 
 	@Override
 	public Iterator<FaustURI> iterator() {
-		return iterate(storageDirectory).iterator();
+		return iterate(baseDirectory).iterator();
 	}
 
 	public Iterable<FaustURI> iterate(FaustURI base) {
@@ -76,7 +75,7 @@ public class XMLStorage implements Iterable<FaustURI> {
 		XMLUtil.serialize(xml, toFile(uri));
 	}
 
-	public FaustURI walk (Deque<String> path) {
+	public FaustURI walk(Deque<String> path) {
 		return walk(path, null);
 	}
 	
@@ -116,7 +115,7 @@ public class XMLStorage implements Iterable<FaustURI> {
 
 	protected File toFile(FaustURI uri) {
 		Preconditions.checkArgument(FaustAuthority.XML == uri.getAuthority(), uri + " not valid");
-		final File file = new File(storageDirectory, uri.getPath());
+		final File file = new File(baseDirectory, uri.getPath());
 		final String filePath = file.getAbsolutePath();
 		Preconditions.checkArgument(filePath.startsWith(storagePath), filePath + " is not in XML storage");
 		return file;

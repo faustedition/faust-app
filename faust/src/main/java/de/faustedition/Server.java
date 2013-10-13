@@ -1,7 +1,5 @@
 package de.faustedition;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import dagger.Module;
@@ -14,7 +12,6 @@ import de.faustedition.facsimile.FacsimileResource;
 import de.faustedition.genesis.GeneticGraphResource;
 import de.faustedition.http.HttpService;
 import de.faustedition.http.JsonMessageBodyReaderWriter;
-import de.faustedition.http.StaticResourceHandler;
 import de.faustedition.search.SearchResource;
 import de.faustedition.transcript.SceneStatisticsResource;
 import de.faustedition.transcript.TranscriptResource;
@@ -22,7 +19,6 @@ import de.faustedition.transcript.VerseStatisticsResource;
 import de.faustedition.xml.XMLResource;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -43,7 +39,8 @@ import java.util.logging.Logger;
         SceneStatisticsResource.class,
         TranscriptResource.class,
         VerseStatisticsResource.class,
-        XMLResource.class
+        XMLResource.class,
+        ScaffoldingService.class
 })
 public class Server {
 
@@ -55,23 +52,26 @@ public class Server {
             final Configuration configuration = serverModule.getConfiguration();
             final ObjectGraph objectGraph = ObjectGraph.create(new Server(), serverModule);
 
-            final ServiceManager serviceManager = new ServiceManager(Arrays.asList(new HttpService(configuration,
-                    objectGraph.get(JsonMessageBodyReaderWriter.class),
-                    objectGraph.get(DemoResource.class),
-                    objectGraph.get(HomeResource.class),
-                    objectGraph.get(ProjectResource.class),
-                    objectGraph.get(ArchiveResource.class),
-                    objectGraph.get(DocumentResource.class),
-                    objectGraph.get(DocumentImageLinkResource.class),
-                    objectGraph.get(StructureResource.class),
-                    objectGraph.get(FacsimileResource.class),
-                    objectGraph.get(GeneticGraphResource.class),
-                    objectGraph.get(SearchResource.class),
-                    objectGraph.get(SceneStatisticsResource.class),
-                    objectGraph.get(TranscriptResource.class),
-                    objectGraph.get(VerseStatisticsResource.class),
-                    objectGraph.get(XMLResource.class)
-            )));
+            final ServiceManager serviceManager = new ServiceManager(Arrays.asList(
+                    new HttpService(configuration,
+                            objectGraph.get(JsonMessageBodyReaderWriter.class),
+                            objectGraph.get(DemoResource.class),
+                            objectGraph.get(HomeResource.class),
+                            objectGraph.get(ProjectResource.class),
+                            objectGraph.get(ArchiveResource.class),
+                            objectGraph.get(DocumentResource.class),
+                            objectGraph.get(DocumentImageLinkResource.class),
+                            objectGraph.get(StructureResource.class),
+                            objectGraph.get(FacsimileResource.class),
+                            objectGraph.get(GeneticGraphResource.class),
+                            objectGraph.get(SearchResource.class),
+                            objectGraph.get(SceneStatisticsResource.class),
+                            objectGraph.get(TranscriptResource.class),
+                            objectGraph.get(VerseStatisticsResource.class),
+                            objectGraph.get(XMLResource.class)
+                    ),
+                    objectGraph.get(ScaffoldingService.class)
+            ));
             serviceManager.addListener(START_FAILURE_LISTENER, Executors.newSingleThreadExecutor());
 
             Runtime.getRuntime().addShutdownHook(new Thread() {

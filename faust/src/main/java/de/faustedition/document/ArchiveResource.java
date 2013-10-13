@@ -1,9 +1,7 @@
 package de.faustedition.document;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.Templates;
 import de.faustedition.Database;
+import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
 import org.jooq.DSLContext;
@@ -21,8 +19,6 @@ import javax.ws.rs.core.Response;
 @Singleton
 public class ArchiveResource {
 
-    public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
-
     private final Database database;
     private final Templates templates;
 
@@ -37,8 +33,9 @@ public class ArchiveResource {
         return database.transaction(new Database.TransactionCallback<Response>() {
             @Override
             public Response doInTransaction(DSLContext sql) throws Exception {
-                return templates.render(new Templates.ViewAndModel("document/archives")
-                        .add("archives", sql.selectFrom(Tables.ARCHIVE).orderBy(Tables.ARCHIVE.NAME.asc()).fetchMaps()), request);
+                return templates.render(request, new Templates.ViewAndModel("document/archives")
+                        .add("archives", sql.selectFrom(Tables.ARCHIVE).orderBy(Tables.ARCHIVE.NAME.asc()).fetchMaps())
+                );
             }
         });
     }
@@ -54,7 +51,7 @@ public class ArchiveResource {
                     return Response.status(Response.Status.NOT_FOUND).entity(id).build();
                 }
 
-                return templates.render(new Templates.ViewAndModel("document/archive")
+                return templates.render(request, new Templates.ViewAndModel("document/archive")
                         .add("archive", archive.intoMap())
                         .add("documents", sql
                                 .select(Tables.DOCUMENT.ID, Tables.DOCUMENT.CALLNUMBER, Tables.DOCUMENT.WA_ID)
@@ -62,7 +59,8 @@ public class ArchiveResource {
                                 .where(Tables.DOCUMENT.ARCHIVE_ID.eq(archive.getId()))
                                 .orderBy(Tables.DOCUMENT.CALLNUMBER.asc())
                                 .fetchMaps()
-                        ), request);
+                        )
+                );
             }
         });
     }

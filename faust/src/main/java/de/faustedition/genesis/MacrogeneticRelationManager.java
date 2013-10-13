@@ -6,7 +6,7 @@ import de.faustedition.document.Document;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.Graph;
 import de.faustedition.xml.Namespaces;
-import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.Sources;
 import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
@@ -34,12 +34,12 @@ public class MacrogeneticRelationManager {
 	
 	public static final String SOURCE_PROPERTY = "source";
 
-	private final XMLStorage xml;
+	private final Sources xml;
 	private final GraphDatabaseService db;
 	private final Logger logger;
 
     @Inject
-    public MacrogeneticRelationManager(XMLStorage xml, GraphDatabaseService db, Logger logger) {
+    public MacrogeneticRelationManager(Sources xml, GraphDatabaseService db, Logger logger) {
         this.xml = xml;
         this.db = db;
         this.logger = logger;

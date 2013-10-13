@@ -54,12 +54,13 @@ public class TranscriptResource {
                 }
 
                 final Archive archive = materialUnit.getArchive();
-                return templates.render(new Templates.ViewAndModel("transcript")
+                return templates.render(request, new Templates.ViewAndModel("transcript")
                         .add("id", materialUnit.node.getId())
                         .add("archiveName", (archive == null ? null : archive.getName()))
                         .add("archiveId", (archive == null ? null : archive.getId()))
                         .add("waId", materialUnit.getMetadataValue("wa-id"))
-                        .add("callnumber", materialUnit.getMetadataValue("callnumber")), request);
+                        .add("callnumber", materialUnit.getMetadataValue("callnumber"))
+                );
             }
         });
     }

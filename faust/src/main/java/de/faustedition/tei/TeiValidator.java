@@ -14,7 +14,7 @@ import dagger.ObjectGraph;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.ServerModule;
-import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.Sources;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -45,14 +45,14 @@ public class TeiValidator {
             final ServerModule serverModule = ServerModule.fromCommandLineArgs(args);
             validate(
                     URI.create(serverModule.getConfiguration().property("faust.schema_uri")),
-                    ObjectGraph.create(serverModule).get(XMLStorage.class)
+                    ObjectGraph.create(serverModule).get(Sources.class)
             );
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void validate(URI schemaSource, XMLStorage xmlStorage) throws SAXException, IOException, IncorrectSchemaException {
+    public static void validate(URI schemaSource, Sources sources) throws SAXException, IOException, IncorrectSchemaException {
         final CustomErrorHandler errorHandler = new CustomErrorHandler();
 
         final PropertyMapBuilder builder = errorHandler.configurationWithErrorHandler();
@@ -65,12 +65,12 @@ public class TeiValidator {
 
         final SortedSet<FaustURI> xmlErrors = new TreeSet<FaustURI>();
         final SortedMap<FaustURI, String> teiErrors = new TreeMap<FaustURI, String>();
-        for (FaustURI source : xmlStorage.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
+        for (FaustURI source : sources.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
             try {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Validating via RelaxNG: " + source);
                 }
-                final List<String> errors = validate(schema, xmlStorage.getInputSource(source));
+                final List<String> errors = validate(schema, sources.getInputSource(source));
                 if (!errors.isEmpty()) {
                     teiErrors.put(source, Joiner.on("\n").join(errors));
                 }

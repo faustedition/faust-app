@@ -6,7 +6,7 @@ import java.io.IOException;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public interface FacsimileStore {
+public interface Facsimiles {
 
     int TILE_SIZE = 256;
     String IMAGE_FILE_EXTENSION = ".tif";

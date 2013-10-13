@@ -19,10 +19,10 @@ import java.io.IOException;
 @Singleton
 public class XMLResource {
 
-	private final XMLStorage xml;
+	private final Sources xml;
 
     @Inject
-    public XMLResource(XMLStorage xml) {
+    public XMLResource(Sources xml) {
         this.xml = xml;
     }
 

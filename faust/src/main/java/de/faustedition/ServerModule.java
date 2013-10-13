@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import dagger.Module;
 import dagger.Provides;
-import de.faustedition.facsimile.DefaultFacsimileStore;
-import de.faustedition.facsimile.FacsimileStore;
-import de.faustedition.facsimile.MockFacsimileStore;
+import de.faustedition.facsimile.DefaultFacsimiles;
+import de.faustedition.facsimile.Facsimiles;
+import de.faustedition.facsimile.MockFacsimiles;
 import de.faustedition.graph.Graph;
 import de.faustedition.text.NamespaceMapping;
-import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.Sources;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import javax.inject.Singleton;
@@ -68,8 +68,8 @@ public class ServerModule {
 
     @Provides
     @Singleton
-    public FacsimileStore provideFacsimileStore() {
-        return (facsimilesAvailable() ? new DefaultFacsimileStore(dataSubDirectory("facsimile")) : new MockFacsimileStore());
+    public Facsimiles provideFacsimiles() {
+        return (facsimilesAvailable() ? new DefaultFacsimiles(dataSubDirectory("facsimile")) : new MockFacsimiles());
     }
 
     @Provides
@@ -90,8 +90,8 @@ public class ServerModule {
 
     @Provides
     @Singleton
-    public XMLStorage provideXmlStorage() {
-        return new XMLStorage(dataSubDirectory("xml"));
+    public Sources provideXmlStorage() {
+        return new Sources(dataSubDirectory("xml"));
     }
 
     @Provides
@@ -118,7 +118,7 @@ public class ServerModule {
             for (File file : directories.remove().listFiles()) {
                 if (file.isDirectory()) {
                     directories.add(file);
-                } else if (file.isFile() && file.getName().endsWith(FacsimileStore.IMAGE_FILE_EXTENSION)) {
+                } else if (file.isFile() && file.getName().endsWith(Facsimiles.IMAGE_FILE_EXTENSION)) {
                     return true;
                 }
             }

@@ -1,7 +1,7 @@
 package de.faustedition.document;
 
-import de.faustedition.Templates;
 import de.faustedition.Database;
+import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.DocumentRecord;
 import org.jooq.DSLContext;
@@ -17,7 +17,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 
 @Path("/document/{id}")
 @Singleton
@@ -34,7 +33,7 @@ public class DocumentResource {
 
 	@GET
     @Produces(MediaType.TEXT_HTML)
-	public Response overview(@PathParam("id") final long id, @Context final Request request, @Context final SecurityContext sc) {
+	public Response overview(@PathParam("id") final long id, @Context final Request request) {
         return database.transaction(new Database.TransactionCallback<Response>() {
             @Override
             public Response doInTransaction(DSLContext sql) throws Exception {
@@ -42,7 +41,9 @@ public class DocumentResource {
                 if (document == null) {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(Long.toString(id)).build());
                 }
-                return templates.render(new Templates.ViewAndModel("document/document").add("document", document.intoMap()), request);
+                return templates.render(request, new Templates.ViewAndModel("document/document")
+                        .add("document", document.intoMap())
+                );
             }
         });
     }

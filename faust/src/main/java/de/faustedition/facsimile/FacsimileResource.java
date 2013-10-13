@@ -25,12 +25,12 @@ import java.io.OutputStream;
 @Path("/facsimile")
 public class FacsimileResource {
 
-    private final FacsimileStore facsimileStore;
+    private final Facsimiles facsimiles;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public FacsimileResource(FacsimileStore facsimileStore, ObjectMapper objectMapper) {
-        this.facsimileStore = facsimileStore;
+    public FacsimileResource(Facsimiles facsimiles, ObjectMapper objectMapper) {
+        this.facsimiles = facsimiles;
         this.objectMapper = objectMapper;
     }
 
@@ -38,7 +38,7 @@ public class FacsimileResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public JsonNode metadata(@PathParam("path") final String path) throws IOException {
-        final FacsimileMetadata metadata = facsimileStore.metadata(HTTP.normalizePath(path));
+        final FacsimileMetadata metadata = facsimiles.metadata(HTTP.normalizePath(path));
         return  objectMapper.createObjectNode()
                 .put("width", metadata.getWidth())
                 .put("height", metadata.getHeight())
@@ -56,7 +56,7 @@ public class FacsimileResource {
         return new StreamingOutput() {
             @Override
             public void write(OutputStream output) throws IOException, WebApplicationException {
-                ImageIO.write(facsimileStore.tile(HTTP.normalizePath(path), zoom, x, y), "JPEG", output);
+                ImageIO.write(facsimiles.tile(HTTP.normalizePath(path), zoom, x, y), "JPEG", output);
             }
         };
     }

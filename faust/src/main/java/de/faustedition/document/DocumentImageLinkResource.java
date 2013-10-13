@@ -6,7 +6,7 @@ import de.faustedition.Templates;
 import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.Graph;
 import de.faustedition.xml.Namespaces;
-import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.Sources;
 import de.faustedition.xml.XMLUtil;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -39,12 +39,12 @@ public class DocumentImageLinkResource {
     private static final Logger LOG = Logger.getLogger(DocumentImageLinkResource.class.getName());
 
     private final Graph graph;
-    private final XMLStorage xml;
+    private final Sources xml;
 	private final Templates templates;
 	private final InternetImageServer imageServer;
 
     @Inject
-    public DocumentImageLinkResource(Graph graph, XMLStorage xml, Templates templates, InternetImageServer imageServer) {
+    public DocumentImageLinkResource(Graph graph, Sources xml, Templates templates, InternetImageServer imageServer) {
         this.graph = graph;
         this.xml = xml;
         this.templates = templates;
@@ -58,7 +58,7 @@ public class DocumentImageLinkResource {
             @Override
             public Response doInTransaction(Graph graph) throws Exception {
                 final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
-                return templates.render(new Templates.ViewAndModel("document/imagelink")
+                return templates.render(request, new Templates.ViewAndModel("document/imagelink")
                         .add("pageNum", documentPage.getPage())
                         .add("document", documentPage.getDocument())
                         .add("facsimileUrl", imageServer.uriFor(documentPage.materialUnit().getFacsimile())
@@ -67,8 +67,9 @@ public class DocumentImageLinkResource {
                                 .queryParam("WID", "800")
                                 .queryParam("QLT", "90")
                                 .queryParam("CVT", "jpeg")
-                                .build().toString()),
-                        request);
+                                .build().toString()
+                        )
+                );
             }
         });
     }

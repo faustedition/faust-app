@@ -3,7 +3,6 @@ package de.faustedition.facsimile;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -13,7 +12,7 @@ import java.io.IOException;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class MockFacsimileStore implements FacsimileStore {
+public class MockFacsimiles implements Facsimiles {
 
     @Override
     public FacsimileMetadata metadata(String path) throws IOException, IllegalArgumentException {

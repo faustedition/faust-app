@@ -17,7 +17,7 @@ import de.faustedition.text.Token;
 import de.faustedition.text.WhitespaceCompressor;
 import de.faustedition.text.XML;
 import de.faustedition.text.XMLStreamToTokenFunction;
-import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 
 import javax.inject.Inject;
@@ -35,12 +35,12 @@ import static de.faustedition.text.TokenPredicates.name;
 public class Transcripts {
 
     private final Database database;
-	private final XMLStorage xml;
+	private final Sources xml;
 	private final ObjectMapper objectMapper;
     private final NamespaceMapping namespaceMapping;
 
     @Inject
-    public Transcripts(Database database, XMLStorage xml, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
+    public Transcripts(Database database, Sources xml, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
         this.database = database;
         this.xml = xml;
         this.objectMapper = objectMapper;

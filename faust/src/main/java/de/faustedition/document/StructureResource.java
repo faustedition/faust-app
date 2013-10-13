@@ -4,7 +4,7 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Templates;
 import de.faustedition.http.HTTP;
-import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.Sources;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -24,11 +24,11 @@ import java.util.Deque;
 @Singleton
 public class StructureResource {
 
-	private final XMLStorage xml;
+	private final Sources xml;
     private final Templates templates;
 
     @Inject
-    public StructureResource(XMLStorage xml, Templates templates) {
+    public StructureResource(Sources xml, Templates templates) {
         this.xml = xml;
         this.templates = templates;
     }
@@ -46,6 +46,6 @@ public class StructureResource {
             throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(uri.toString()).build());
         }
 
-        return templates.render(new Templates.ViewAndModel("structure/structure").add("uri", uri), request);
+        return templates.render(request, new Templates.ViewAndModel("structure/structure").add("uri", uri));
     }
 }

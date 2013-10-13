@@ -66,7 +66,7 @@ public class Templates extends freemarker.template.Configuration {
         }
     }
 
-    public Response render(ViewAndModel viewAndModel, Request request) {
+    public Response render(Request request, ViewAndModel viewAndModel) {
         try {
             final Variant variant = Objects.firstNonNull(request.selectVariant(VARIANTS), VARIANTS.get(0));
 

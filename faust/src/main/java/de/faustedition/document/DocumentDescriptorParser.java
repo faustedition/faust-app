@@ -16,8 +16,8 @@ import de.faustedition.db.tables.records.DocumentRecord;
 import de.faustedition.db.tables.records.MaterialUnitRecord;
 import de.faustedition.db.tables.records.TranscriptRecord;
 import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.Sources;
 import de.faustedition.xml.XMLBaseTracker;
-import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -54,7 +54,7 @@ public class DocumentDescriptorParser extends DefaultHandler {
     );
 
     private final DSLContext sql;
-    private final XMLStorage xml;
+    private final Sources xml;
     private final ObjectMapper objectMapper;
     private final Map<String, Long> archiveIds;
     private final FaustURI source;
@@ -69,7 +69,7 @@ public class DocumentDescriptorParser extends DefaultHandler {
     private int materialUnitCounter;
     private boolean inMetadataSection;
 
-    public DocumentDescriptorParser(DSLContext sql, XMLStorage xml, ObjectMapper objectMapper, Map<String, Long> archiveIds, FaustURI source) {
+    public DocumentDescriptorParser(DSLContext sql, Sources xml, ObjectMapper objectMapper, Map<String, Long> archiveIds, FaustURI source) {
         this.sql = sql;
         this.xml = xml;
         this.objectMapper = objectMapper;
