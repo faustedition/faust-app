@@ -3,12 +3,15 @@ package de.faustedition.transcript;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterators;
-import de.faustedition.FaustURI;
+import com.google.common.collect.Range;
 import de.faustedition.Database;
+import de.faustedition.FaustURI;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.TranscriptRecord;
 import de.faustedition.document.MaterialUnit;
+import de.faustedition.text.Annotation;
 import de.faustedition.text.AnnotationProcessor;
+import de.faustedition.text.Characters;
 import de.faustedition.text.ElementContextFilter;
 import de.faustedition.text.LineBreaker;
 import de.faustedition.text.MilestoneMarkupProcessor;
@@ -27,6 +30,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.sax.SAXSource;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Iterator;
 
 import static de.faustedition.text.TokenPredicates.name;
@@ -58,15 +62,16 @@ public class Transcripts {
             @Override
             public TranscriptRecord doInTransaction(DSLContext sql) throws Exception {
                 TranscriptRecord transcriptRecord = sql.selectFrom(Tables.TRANSCRIPT).fetchOne();
-                if (transcriptRecord != null) {
-                    return transcriptRecord;
+                if (transcriptRecord == null) {
+                    transcriptRecord = sql.newRecord(Tables.TRANSCRIPT);
+                    transcriptRecord.setSourceUri(source.toString());
+                    transcriptRecord.store();
                 }
 
-                transcriptRecord = sql.newRecord(Tables.TRANSCRIPT);
-                transcriptRecord.setSourceUri(source.toString());
-                transcriptRecord.store();
-
                 final long transcriptId = transcriptRecord.getId();
+
+                sql.delete(Tables.TRANSCRIPT_ANNOTATION).where(Tables.TRANSCRIPT_ANNOTATION.TRANSCRIPT_ID.eq(transcriptRecord.getId()));
+
                 final XMLInputFactory xif = XML.inputFactory();
                 XMLEventReader reader = null;
                 try {
@@ -117,8 +122,34 @@ public class Transcripts {
 
                     tokens = new TranscribedVerseIntervalCollector(tokens, namespaceMapping, database, transcriptId);
 
-                    // FIXME: read text and annotations and batch store
                     tokens = new AnnotationProcessor(tokens);
+
+                    final StringBuilder text = new StringBuilder();
+
+                    while (tokens.hasNext()) {
+                        final Token token = tokens.next();
+                        if (token instanceof Characters) {
+                            text.append(((Characters) token).getContent());
+                        } else if  (token instanceof Annotation) {
+                            final Annotation annotation = (Annotation) token;
+                            final Range<Integer> segment = annotation.getSegment();
+                            sql.insertInto(
+                                    Tables.TRANSCRIPT_ANNOTATION,
+                                    Tables.TRANSCRIPT_ANNOTATION.TRANSCRIPT_ID,
+                                    Tables.TRANSCRIPT_ANNOTATION.RANGE_START,
+                                    Tables.TRANSCRIPT_ANNOTATION.RANGE_END,
+                                    Tables.TRANSCRIPT_ANNOTATION.ANNOTATION_DATA
+                            ).values(
+                                    transcriptId,
+                                    segment.lowerEndpoint().longValue(),
+                                    segment.upperEndpoint().longValue(),
+                                    objectMapper.writer().writeValueAsBytes(annotation.getData())
+                            ).execute();
+                        }
+                    }
+                    transcriptRecord.setLastRead(new Timestamp(System.currentTimeMillis()));
+                    transcriptRecord.setTextContent(text.toString());
+                    transcriptRecord.store();
                 } finally {
                     XML.closeQuietly(reader);
                 }
