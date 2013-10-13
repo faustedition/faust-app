@@ -36,7 +36,7 @@ public class Graph {
         this.db = db;
     }
 
-    public <T> T execute(final Transaction<T> tx) throws Exception {
+    public <T> T transaction(final TransactionCallback<T> tx) throws Exception {
         Stopwatch sw = null;
         org.neo4j.graphdb.Transaction transaction = null;
         try {
@@ -49,7 +49,7 @@ public class Graph {
                 LOG.log(Level.FINE, "Started transaction for {0}", tx);
             }
 
-            final T result = tx.execute(new Graph(db));
+            final T result = tx.doInTransaction(new Graph(db));
 
             transaction.success();
             if (LOG.isLoggable(Level.FINE)) {
@@ -77,11 +77,11 @@ public class Graph {
     }
 
 
-    public static abstract class Transaction<T> {
+    public static abstract class TransactionCallback<T> {
 
-        public abstract T execute(Graph graph) throws Exception;
+        public abstract T doInTransaction(Graph graph) throws Exception;
 
-        public boolean rollsBackOn(Exception e) {
+        protected boolean rollsBackOn(Exception e) {
             return true;
         }
     }

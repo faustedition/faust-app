@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterators;
 import de.faustedition.FaustURI;
-import de.faustedition.db.Relations;
+import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.TranscriptRecord;
 import de.faustedition.document.MaterialUnit;
@@ -22,7 +22,6 @@ import org.jooq.DSLContext;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -35,14 +34,14 @@ import static de.faustedition.text.TokenPredicates.name;
 @Singleton
 public class Transcripts {
 
-    private final DataSource dataSource;
+    private final Database database;
 	private final XMLStorage xml;
 	private final ObjectMapper objectMapper;
     private final NamespaceMapping namespaceMapping;
 
     @Inject
-    public Transcripts(DataSource dataSource, XMLStorage xml, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
-        this.dataSource = dataSource;
+    public Transcripts(Database database, XMLStorage xml, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
+        this.database = database;
         this.xml = xml;
         this.objectMapper = objectMapper;
         this.namespaceMapping = namespaceMapping;
@@ -55,9 +54,9 @@ public class Transcripts {
             return null;
         }
 
-        return Relations.execute(dataSource, new Relations.Transaction<TranscriptRecord>() {
+        return database.transaction(new Database.TransactionCallback<TranscriptRecord>() {
             @Override
-            public TranscriptRecord execute(DSLContext sql) throws Exception {
+            public TranscriptRecord doInTransaction(DSLContext sql) throws Exception {
                 TranscriptRecord transcriptRecord = sql.selectFrom(Tables.TRANSCRIPT).fetchOne();
                 if (transcriptRecord != null) {
                     return transcriptRecord;
@@ -117,7 +116,7 @@ public class Transcripts {
 
                     tokens = new MilestoneMarkupProcessor(tokens, objectMapper, namespaceMapping);
 
-                    tokens = new TranscribedVerseIntervalCollector(tokens, namespaceMapping, dataSource, transcriptId);
+                    tokens = new TranscribedVerseIntervalCollector(tokens, namespaceMapping, database, transcriptId);
 
                     // FIXME: read text and annotations and batch store
                     tokens = new AnnotationProcessor(tokens);

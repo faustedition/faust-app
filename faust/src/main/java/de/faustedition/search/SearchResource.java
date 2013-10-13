@@ -39,9 +39,9 @@ public class SearchResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
 	public Map<String,Object> searchResults(@PathParam("query") final String query) throws Exception {
-        return graph.execute(new Graph.Transaction<Map<String, Object>>() {
+        return graph.transaction(new Graph.TransactionCallback<Map<String, Object>>() {
             @Override
-            public Map<String, Object> execute(Graph graph) throws Exception {
+            public Map<String, Object> doInTransaction(Graph graph) throws Exception {
                 final List<Map<String, Object>> documentDescs = Lists.newArrayList();
 
                 final List<Document> documents = query(graph.db(), query);
@@ -63,7 +63,7 @@ public class SearchResource {
                     documentDescs.add(documentDesc);
                 }
 
-                final Map<String,Object> results = Maps.newHashMap();
+                final Map<String, Object> results = Maps.newHashMap();
                 results.put("documents", documentDescs);
                 return results;
             }

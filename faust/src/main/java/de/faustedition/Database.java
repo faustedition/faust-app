@@ -1,5 +1,6 @@
-package de.faustedition.db;
+package de.faustedition;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
@@ -7,18 +8,20 @@ import com.google.common.io.Closeables;
 import com.google.common.io.Closer;
 import com.jolbox.bonecp.BoneCPDataSource;
 import org.h2.Driver;
-import org.h2.engine.Database;
 import org.h2.tools.Console;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -26,6 +29,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,9 +37,10 @@ import java.util.logging.Logger;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Relations {
+@Singleton
+public class Database implements DataSource {
 
-    private static final Logger LOG = Logger.getLogger(Relations.class.getName());
+    private static final Logger LOG = Logger.getLogger(Database.class.getName());
 
     private static final String DRIVER_CLASS_NAME =  Driver.class.getName();
 
@@ -43,25 +48,77 @@ public class Relations {
 
     private static final String DB_PASSWORD = "";
 
+    private final DataSource ds;
 
-    public static abstract class Transaction<T> {
+    @Inject
+    public Database(File dataDirectory) {
+        this.ds = init(createDataSource(dataDirectory, true));
+    }
 
-        public abstract T execute(DSLContext sql) throws Exception;
+    @Override
+    public Connection getConnection() throws SQLException {
+        return ds.getConnection();
+    }
 
-        public boolean rollsBackOn(Exception e) {
+    @Override
+    public Connection getConnection(String username, String password) throws SQLException {
+        return ds.getConnection(username, password);
+    }
+
+    @Override
+    public PrintWriter getLogWriter() throws SQLException {
+        return ds.getLogWriter();
+    }
+
+    @Override
+    public void setLogWriter(PrintWriter out) throws SQLException {
+        ds.setLogWriter(out);
+    }
+
+    @Override
+    public void setLoginTimeout(int seconds) throws SQLException {
+        ds.setLoginTimeout(seconds);
+    }
+
+    @Override
+    public int getLoginTimeout() throws SQLException {
+        return ds.getLoginTimeout();
+    }
+
+    @Override
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        return ds.getParentLogger();
+    }
+
+    @Override
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return ds.unwrap(iface);
+    }
+
+    @Override
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return ds.isWrapperFor(iface);
+    }
+
+
+    public static abstract class TransactionCallback<T> {
+
+        public abstract T doInTransaction(DSLContext sql) throws Exception;
+
+        protected boolean rollsBackOn(Exception e) {
             return true;
         }
 
-        public boolean isReadOnly() {
+        protected  boolean isReadOnly() {
             return false;
         }
 
-        public int getTransactionIsolation() {
+        protected  int getTransactionIsolation() {
             return Connection.TRANSACTION_READ_COMMITTED;
         }
     }
 
-    public static <T> T execute(DataSource ds, final Transaction<T> tx) {
+    public <T> T transaction(final TransactionCallback<T> tx) {
         Stopwatch sw = null;
         Connection connection = null;
         try {
@@ -78,7 +135,7 @@ public class Relations {
                     LOG.log(Level.FINE, "Opened connection for {0}", tx);
                 }
 
-                final T result = tx.execute(DSL.using(connection, SQLDialect.H2));
+                final T result = tx.doInTransaction(DSL.using(connection, SQLDialect.H2));
 
                 connection.commit();
                 if (LOG.isLoggable(Level.FINE)) {
@@ -132,16 +189,22 @@ public class Relations {
         return dataSource;
     }
 
-    public static DataSource init(DataSource dataSource) throws IOException, SQLException {
-        final Closer closer = Closer.create();
+    public static DataSource init(DataSource dataSource) {
         try {
-            restore(dataSource, closer.register(new InputStreamReader(
-                    Relations.class.getResourceAsStream("/db-schema.sql"),
-                    Charset.forName("UTF-8")
-            )));
-            return dataSource;
-        } finally {
-            closer.close();
+            final Closer closer = Closer.create();
+            try {
+                restore(dataSource, closer.register(new InputStreamReader(
+                        Database.class.getResourceAsStream("/db-schema.sql"),
+                        Charset.forName("UTF-8")
+                )));
+                return dataSource;
+            } finally {
+                closer.close();
+            }
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        } catch (SQLException e) {
+            throw Throwables.propagate(e);
         }
     }
 
@@ -197,7 +260,7 @@ public class Relations {
     }
 
     public static void restore(DataSource dataSource, Reader from) throws IOException, SQLException {
-        final File restoreSql = File.createTempFile(Relations.class.getName() + ".restore", ".sql");
+        final File restoreSql = File.createTempFile(Database.class.getName() + ".restore", ".sql");
         restoreSql.deleteOnExit();
 
         try {
@@ -227,4 +290,12 @@ public class Relations {
         return new File(path, "relations").toURI().toString().replaceAll("^file:", "jdbc:h2://");
     }
 
+    public static void main(String... args) {
+        try {
+            Preconditions.checkArgument(args.length > 0, "Data directory path missing");
+            console(new File(args[0]));
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
 }

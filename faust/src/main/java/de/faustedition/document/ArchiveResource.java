@@ -3,14 +3,13 @@ package de.faustedition.document;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Templates;
-import de.faustedition.db.Relations;
+import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
 import org.jooq.DSLContext;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -24,20 +23,20 @@ public class ArchiveResource {
 
     public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
 
-    private final DataSource dataSource;
+    private final Database database;
     private final Templates templates;
 
     @Inject
-    public ArchiveResource(DataSource dataSource, Templates templates) {
-        this.dataSource = dataSource;
+    public ArchiveResource(Database database, Templates templates) {
+        this.database = database;
         this.templates = templates;
     }
 
     @GET
     public Response index(@Context final Request request) {
-        return Relations.execute(dataSource, new Relations.Transaction<Response>() {
+        return database.transaction(new Database.TransactionCallback<Response>() {
             @Override
-            public Response execute(DSLContext sql) throws Exception {
+            public Response doInTransaction(DSLContext sql) throws Exception {
                 return templates.render(new Templates.ViewAndModel("document/archives")
                         .add("archives", sql.selectFrom(Tables.ARCHIVE).orderBy(Tables.ARCHIVE.NAME.asc()).fetchMaps()), request);
             }
@@ -47,9 +46,9 @@ public class ArchiveResource {
     @Path("/{id}")
     @GET
     public Response archive(@PathParam("id") final String id, @Context final Request request) {
-        return Relations.execute(dataSource, new Relations.Transaction<Response>() {
+        return database.transaction(new Database.TransactionCallback<Response>() {
             @Override
-            public Response execute(DSLContext sql) throws Exception {
+            public Response doInTransaction(DSLContext sql) throws Exception {
                 final ArchiveRecord archive = sql.selectFrom(Tables.ARCHIVE).where(Tables.ARCHIVE.LABEL.eq(id)).fetchOne();
                 if (archive == null) {
                     return Response.status(Response.Status.NOT_FOUND).entity(id).build();

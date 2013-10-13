@@ -5,7 +5,6 @@ import de.faustedition.db.tables.records.TranscriptRecord;
 import de.faustedition.document.Archive;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.Graph;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
 
 import javax.inject.Inject;
@@ -45,9 +44,9 @@ public class TranscriptResource {
     @GET
     @Path("/{id}")
     public Response page(@PathParam("id") final long id, @Context final Request request) throws Exception {
-        return graph.execute(new Graph.Transaction<Response>() {
+        return graph.transaction(new Graph.TransactionCallback<Response>() {
             @Override
-            public Response execute(Graph graph) throws Exception {
+            public Response doInTransaction(Graph graph) throws Exception {
                 final MaterialUnit materialUnit = materialUnit(graph, id);
                 if (materialUnit.getType() != MaterialUnit.Type.ARCHIVALDOCUMENT) {
                     // FIXME when requesting a transcript of a non-document, we loop endlessly in the graph in getArchive()!

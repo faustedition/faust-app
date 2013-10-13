@@ -3,7 +3,7 @@ package de.faustedition.transcript;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ForwardingIterator;
 import com.google.common.collect.Sets;
-import de.faustedition.db.Relations;
+import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.TranscribedVerseIntervalRecord;
 import de.faustedition.text.AnnotationStart;
@@ -13,7 +13,6 @@ import de.faustedition.text.XML;
 import org.jooq.DSLContext;
 import org.jooq.InsertValuesStep3;
 
-import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -32,7 +31,7 @@ public class TranscribedVerseIntervalCollector extends ForwardingIterator<Token>
 	private static final Pattern VERSE_NUMBER_PATTERN = Pattern.compile("[0-9]+");
 
     private final Iterator<Token> delegate;
-    private final DataSource dataSource;
+    private final Database database;
     private final long transcriptId;
 
     private final String xmlNameKey;
@@ -41,9 +40,9 @@ public class TranscribedVerseIntervalCollector extends ForwardingIterator<Token>
 
     private final SortedSet<Integer> verses = Sets.newTreeSet();
 
-    public TranscribedVerseIntervalCollector(Iterator<Token> delegate, NamespaceMapping namespaceMapping, DataSource dataSource, long transcriptId) {
+    public TranscribedVerseIntervalCollector(Iterator<Token> delegate, NamespaceMapping namespaceMapping, Database database, long transcriptId) {
         this.delegate = delegate;
-        this.dataSource = dataSource;
+        this.database = database;
         this.transcriptId = transcriptId;
 
         this.xmlNameKey = map(namespaceMapping, XML.XML_ELEMENT_NAME);
@@ -79,10 +78,10 @@ public class TranscribedVerseIntervalCollector extends ForwardingIterator<Token>
     public boolean hasNext() {
         final boolean hasNext = super.hasNext();
         if (!hasNext && !verses.isEmpty()) {
-            Relations.execute(dataSource, new Relations.Transaction<Object>() {
+            database.transaction(new Database.TransactionCallback<Object>() {
                 @Override
-                public Object execute(DSLContext sql) throws Exception {
-                    InsertValuesStep3<TranscribedVerseIntervalRecord,Long,Integer,Integer> insertBatch = sql.insertInto(
+                public Object doInTransaction(DSLContext sql) throws Exception {
+                    InsertValuesStep3<TranscribedVerseIntervalRecord, Long, Integer, Integer> insertBatch = sql.insertInto(
                             Tables.TRANSCRIBED_VERSE_INTERVAL,
                             Tables.TRANSCRIBED_VERSE_INTERVAL.TRANSCRIPT_ID,
                             Tables.TRANSCRIBED_VERSE_INTERVAL.VERSE_START,

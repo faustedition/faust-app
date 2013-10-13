@@ -5,8 +5,6 @@ import de.faustedition.Templates;
 import de.faustedition.document.Archive;
 import de.faustedition.document.Document;
 import de.faustedition.graph.Graph;
-import de.faustedition.http.HTTP;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,9 +32,9 @@ public class GeneticGraphResource {
 
     @GET
     public Response index(@Context final Request request) throws Exception {
-        return graph.execute(new Graph.Transaction<Response>() {
+        return graph.transaction(new Graph.TransactionCallback<Response>() {
             @Override
-            public Response execute(Graph graph) throws Exception {
+            public Response doInTransaction(Graph graph) throws Exception {
                 final SortedSet<Document> archivalUnits = new TreeSet<Document>(new Comparator<Document>() {
                     @Override
                     public int compare(Document o1, Document o2) {

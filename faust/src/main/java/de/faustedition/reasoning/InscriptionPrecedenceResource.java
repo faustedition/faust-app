@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
+import de.faustedition.Database;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
@@ -56,7 +57,7 @@ import java.util.logging.Logger;
 public class InscriptionPrecedenceResource {
 
     private final GraphDatabaseService graphDb;
-    private final DataSource dataSource;
+    private final Database database;
     private final Logger logger;
     private final String tredPath;
     private final String dotPath;
@@ -69,9 +70,9 @@ public class InscriptionPrecedenceResource {
 
 
     @Inject
-    public InscriptionPrecedenceResource(GraphDatabaseService graphDb, DataSource dataSource, Logger logger) {
+    public InscriptionPrecedenceResource(GraphDatabaseService graphDb, Database database, Logger logger) {
         this.graphDb = graphDb;
-        this.dataSource = dataSource;
+        this.database = database;
         this.logger = logger;
         this.tredPath = System.getProperty("faust.tred", "/usr/bin/tred");
         this.dotPath = System.getProperty("faust.dot", "/usr/bin/dot");

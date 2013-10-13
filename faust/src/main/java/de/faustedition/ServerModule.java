@@ -2,23 +2,18 @@ package de.faustedition;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import dagger.Module;
 import dagger.Provides;
-import de.faustedition.db.Relations;
 import de.faustedition.facsimile.DefaultFacsimileStore;
 import de.faustedition.facsimile.FacsimileStore;
 import de.faustedition.facsimile.MockFacsimileStore;
+import de.faustedition.graph.Graph;
 import de.faustedition.text.NamespaceMapping;
 import de.faustedition.xml.XMLStorage;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Queue;
@@ -67,14 +62,8 @@ public class ServerModule {
 
     @Provides
     @Singleton
-    public DataSource provideRelationalDataSource() {
-        try {
-            return Relations.init(Relations.createDataSource(dataDirectory, true));
-        } catch (IOException e) {
-            throw Throwables.propagate(e);
-        } catch (SQLException e) {
-            throw Throwables.propagate(e);
-        }
+    public Database provideDatabase() {
+        return new Database(dataDirectory);
     }
 
     @Provides
@@ -85,7 +74,7 @@ public class ServerModule {
 
     @Provides
     @Singleton
-    public GraphDatabaseService provideGraphDataSource() {
+    public Graph provideGraph() {
         final EmbeddedGraphDatabase graphDatabase = new EmbeddedGraphDatabase(new File(dataDirectory, "graph").getPath());
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -96,7 +85,7 @@ public class ServerModule {
                 graphDatabase.shutdown();
             }
         }));
-        return graphDatabase;
+        return new Graph(graphDatabase);
     }
 
     @Provides

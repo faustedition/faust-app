@@ -2,7 +2,9 @@ package de.faustedition.transcript;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import de.faustedition.Database;
 import de.faustedition.document.MaterialUnit;
+import de.faustedition.graph.Graph;
 import de.faustedition.text.VerseInterval;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -25,13 +27,14 @@ import java.util.SortedMap;
 @Path("/transcript/by-scene/{part}")
 public class SceneStatisticsResource {
 
-	private final DataSource dataSource;
-	private final GraphDatabaseService graphDatabaseService;
+	private final Database database;
+    private final Graph graph;
+
 
     @Inject
-    public SceneStatisticsResource(DataSource dataSource, GraphDatabaseService graphDatabaseService) {
-        this.dataSource = dataSource;
-        this.graphDatabaseService = graphDatabaseService;
+    public SceneStatisticsResource(Database database, Graph graph) {
+        this.database = database;
+        this.graph = graph;
     }
 
     @GET

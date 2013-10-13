@@ -8,7 +8,6 @@ import de.faustedition.graph.Graph;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -55,9 +54,9 @@ public class DocumentImageLinkResource {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response page(@PathParam("path") final String path, @Context final Request request) throws Exception {
-        return graph.execute(new Graph.Transaction<Response>() {
+        return graph.transaction(new Graph.TransactionCallback<Response>() {
             @Override
-            public Response execute(Graph graph) throws Exception {
+            public Response doInTransaction(Graph graph) throws Exception {
                 final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
                 return templates.render(new Templates.ViewAndModel("document/imagelink")
                         .add("pageNum", documentPage.getPage())
@@ -78,9 +77,9 @@ public class DocumentImageLinkResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> readLinkData(@PathParam("path") final String path) throws Exception {
-        return graph.execute(new Graph.Transaction<Map<String, Object>>() {
+        return graph.transaction(new Graph.TransactionCallback<Map<String, Object>>() {
             @Override
-            public Map<String, Object> execute(Graph graph) throws Exception {
+            public Map<String, Object> doInTransaction(Graph graph) throws Exception {
                 final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
                 final FaustURI transcriptURI = documentPage.materialUnit().getTranscriptSource();
                 final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
@@ -92,9 +91,9 @@ public class DocumentImageLinkResource {
     @GET
     @Produces(DocumentImageLinks.IMAGE_SVG_TYPE)
     public Source readLinkMap(@PathParam("path") final String path) throws Exception {
-        return graph.execute(new Graph.Transaction<Source>() {
+        return graph.transaction(new Graph.TransactionCallback<Source>() {
             @Override
-            public Source execute(Graph graph) throws Exception {
+            public Source doInTransaction(Graph graph) throws Exception {
                 final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
                 final MaterialUnit page = documentPage.materialUnit();
                 final FaustURI transcriptURI = page.getTranscriptSource();
@@ -134,9 +133,9 @@ public class DocumentImageLinkResource {
     @PUT
     @Consumes(DocumentImageLinks.IMAGE_SVG_TYPE)
 	public String write(@PathParam("path") final String path, final InputStream svgStream) throws Exception {
-        return graph.execute(new Graph.Transaction<String>() {
+        return graph.transaction(new Graph.TransactionCallback<String>() {
             @Override
-            public String execute(Graph graph) throws Exception {
+            public String doInTransaction(Graph graph) throws Exception {
                 final FaustURI transcriptURI = DocumentPage.fromPath(path, graph).materialUnit().getTranscriptSource();
 
                 final org.w3c.dom.Document svg = XMLUtil.parse(svgStream);

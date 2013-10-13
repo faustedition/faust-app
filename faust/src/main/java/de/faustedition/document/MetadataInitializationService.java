@@ -6,8 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.Server;
-import de.faustedition.db.Relations;
+import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.genesis.MacrogeneticRelationManager;
 import de.faustedition.xml.XMLStorage;
@@ -17,7 +16,6 @@ import org.jooq.Record2;
 import org.xml.sax.SAXException;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
@@ -28,19 +26,19 @@ public class MetadataInitializationService extends AbstractIdleService {
     public static final FaustURI DOCUMENT_BASE_URI = new FaustURI(FaustAuthority.XML, "/document");
 
     private final XMLStorage xml;
-    private final DataSource dataSource;
+    private final Database database;
     private final Logger logger;
     private final ObjectMapper objectMapper;
     private final MacrogeneticRelationManager macrogeneticRelationManager;
 
     @Inject
     public MetadataInitializationService(XMLStorage xml,
-                                         DataSource dataSource,
+                                         Database database,
                                          ObjectMapper objectMapper,
                                          MacrogeneticRelationManager macrogeneticRelationManager,
                                          Logger logger) {
         this.xml = xml;
-        this.dataSource = dataSource;
+        this.database = database;
         this.objectMapper = objectMapper;
         this.macrogeneticRelationManager = macrogeneticRelationManager;
         this.logger = logger;
@@ -48,9 +46,9 @@ public class MetadataInitializationService extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
-        Relations.execute(dataSource, new Relations.Transaction<Object>() {
+        database.transaction(new Database.TransactionCallback<Object>() {
             @Override
-            public Object execute(final DSLContext sql) throws Exception {
+            public Object doInTransaction(final DSLContext sql) throws Exception {
                 final Stopwatch sw = Stopwatch.createStarted();
 
                 if (sql.selectCount().from(Tables.ARCHIVE).fetchOne().value1() == 0) {
