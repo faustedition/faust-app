@@ -73,7 +73,7 @@ public class Templates extends freemarker.template.Configuration {
             viewAndModel.put("message", ResourceBundle.getBundle("messages", variant.getLanguage()));
 
             final StringWriter entity = new StringWriter();
-            getTemplate(viewAndModel.getViewName() + ".ftl").process(viewAndModel, entity);
+            getTemplate(viewAndModel.viewName() + ".ftl").process(viewAndModel, entity);
 
             return Response.ok().variant(variant).entity(entity.toString()).build();
         } catch (TemplateException e) {
@@ -96,7 +96,7 @@ public class Templates extends freemarker.template.Configuration {
             return this;
         }
 
-        public String getViewName() {
+        public String viewName() {
             return viewName;
         }
     }

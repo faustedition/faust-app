@@ -1,48 +1,33 @@
 package de.faustedition.document;
 
+import de.faustedition.Templates;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
 
-import org.restlet.data.CharacterSet;
-import org.restlet.data.Form;
-import org.restlet.data.Language;
-import org.restlet.data.MediaType;
-import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-import de.faustedition.FaustURI;
-import de.faustedition.JsonRespresentation;
-import de.faustedition.template.TemplateRepresentationFactory;
+@Path("/document")
+@Singleton
+public class DocumentResource {
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public class DocumentResource extends ServerResource {
+    private final Templates templates;
 
-	@Autowired
-	private TemplateRepresentationFactory viewFactory;
+    @Inject
+    public DocumentResource(Templates templates) {
+        this.templates = templates;
+    }
 
-	private Document document;
-	
-	private FaustURI path;
 
-	public void setDocument(Document document) {
-		this.document = document;
-	}
-
-	public void setPath(FaustURI path) {
-		this.path = path;
-	}
-	
-	@Get("html")
-	public Representation overview() throws IOException {
+	@GET
+    @Produces(MediaType.TEXT_HTML)
+	public Response overview() throws IOException {
+        /*
 		Map<String, Object> viewModel = new HashMap<String, Object>();
 		viewModel.put("document", document);
 		viewModel.put("contents", document.getSortedContents());
@@ -54,21 +39,28 @@ public class DocumentResource extends ServerResource {
 		} else {				
 			return viewFactory.create("document/document-app", getRequest().getClientInfo(), viewModel);
 		}
+		*/
+        return null;
 	}
-	
-	@Get("svg")
-	public Representation graphic() {
+
+    @GET
+    @Produces(DocumentImageLinks.IMAGE_SVG_TYPE)
+	public Response graphic() {
 		String result = "<xml version=\"1open.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">"
 			+ "<script type=\"text/javascript\" ></script>"
 			+ "</svg>";
 		
-		
+		/*
 		return new StringRepresentation(result, MediaType.IMAGE_SVG,
 				Language.DEFAULT, CharacterSet.UTF_8);
+        */
+        return Response.ok(result).build();
 	}
-	
-	@Get("json")
-	public Representation documentStructure() {
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response documentStructure() {
+        /*
 		return new JsonRespresentation() {
 
 			@Override
@@ -116,6 +108,8 @@ public class DocumentResource extends ServerResource {
 				generator.writeEndObject();
 			}
 		};
+		*/
+        return null;
 	}
 
 	

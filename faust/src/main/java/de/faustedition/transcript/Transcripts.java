@@ -81,8 +81,7 @@ public class Transcripts {
                             Predicates.or(
                                     name(namespaceMapping, "tei:teiHeader"),
                                     name(namespaceMapping, "tei:front"),
-                                    name(namespaceMapping, "tei:app"),
-                                    name(namespaceMapping, "tei:fw")
+                                    name(namespaceMapping, "tei:app")
                             ),
                             Predicates.or(
                                     name(namespaceMapping, "tei:lem")

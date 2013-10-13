@@ -3,6 +3,7 @@ package de.faustedition.xml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,10 +13,6 @@ import java.util.regex.Pattern;
 import javax.xml.transform.TransformerException;
 
 import org.neo4j.helpers.collection.IterableWrapper;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -24,22 +21,16 @@ import com.google.common.base.Preconditions;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 
-@Component
-public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
+public class Sources implements Iterable<FaustURI> {
 	private final Pattern xmlFilenamePattern = Pattern.compile("[^\\.]+\\.[xX][mM][lL]$");
-
-	@Autowired
-	private Environment environment;
 
 	private File storageDirectory;
 	private String storagePath;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.storageDirectory = environment.getRequiredProperty("xml.home", File.class);
-		Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getCanonicalPath() + " is a directory");
-		this.storagePath = storageDirectory.getCanonicalPath();
-	}
+    public Sources(File storageDirectory) {
+        this.storageDirectory = storageDirectory;
+        this.storagePath = storageDirectory.getAbsolutePath();
+    }
 
 	@Override
 	public Iterator<FaustURI> iterator() {
@@ -79,7 +70,7 @@ public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 		XMLUtil.serialize(xml, toFile(uri));
 	}
 
-	public FaustURI walk (Deque<String> path) {
+	public FaustURI walk(Deque<String> path) {
 		return walk(path, null);
 	}
 	
@@ -95,7 +86,7 @@ public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 			if (walked != null)
 				walked.add(next);
 			if (isDirectory(nextURI)) {
-				uri = FaustURI.parse(nextURI.toString() + "/");
+				uri = new FaustURI(URI.create(nextURI.toString() + "/"));
 				continue;
 			} else if (isResource(nextURI)) {
 				uri = nextURI;

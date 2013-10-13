@@ -97,20 +97,7 @@
 				</div>
 				</div>
 			</li>
-			<!-- <li>
-				<a href="#texts" class="yui3-menu-label"><em>${message("menu.text")}</em></a>
-				<div id="texts" class="yui3-menu">
-				<div class="yui3-menu-content">
-				<ul>
-					<@textMenu "Faust – In ursprünglicher Gestalt." "0-"/>
-					<@textMenu "Faust – Eine Tragödie. [Erster Theil.]" "1-"/>
-					<@textMenu "Faust – Eine Tragödie. [Zweiter Theil.]" "2-"/>
-				</ul>
-				</div>
-				</div>
-			</li> -->			
 			<li class="yui3-menuitem"><a href="${cp}/genesis/work" class="yui3-menuitem-content">${message("menu.genesis")}</a></li>
-			</#if>
 			<li><a class="yui3-menu-label" href="${cp}/project/about"><em>${message("menu.project")}</em></a>
 				<div id="project" class="yui3-menu">
 				<div class="yui3-menu-content">
@@ -135,7 +122,6 @@
 			<li class="yui3-menuitem"><a href="${cp}/project/imprint" class="yui3-menuitem-content">${message("menu.imprint")}</a></li>
 			<li class="yui3-menuitem"><a href="/intern/" class="yui3-menuitem-content">${message("menu.restricted")}</a></li>
 			
-			<@restricted>
 			<li><a class="yui3-menu-label" href="#restricted"><em>${message("menu.restricted")}</em></a>
 				<div id="restricted" class="yui3-menu">
 				<div class="yui3-menu-content">
@@ -145,47 +131,11 @@
 				</div>
 				</div>
 			</li>
-			</@restricted>
-
-			<#if !roles?seq_contains("editor") && !roles?seq_contains("external")>
-			<li class="yui3-menuitem"><a href="${cp}/login" class="yui3-menuitem-content">Login</a></li>
-			</#if>
 		</ul>
 	</div>
 </div>	
 </#macro>
 
-<#macro textMenu title prefix>
-<li>
-	<#local firstEntry=true />
-	<#list textToc?keys as text>
-	<#if text?starts_with(prefix)>
-		<#if firstEntry>
-			<a href="${cp}/text/${text}.xml" class="yui3-menu-label">${title}</a>
-			<div id="#texts-faust-0" class="yui3-menu">
-			<div class="yui3-menu-content">
-			<ul>
-			<#local firstEntry=false />
-		</#if>
-		<li class="yui3-menuitem">
-			<a href="${cp}/text/${text}.xml" class="yui3-menuitem-content">${textToc[text]?html}</a>
-		</li>
-	</#if>
-	<#if !text_has_next>
-		</ul>
-		</div>
-		</div>
-	</#if>
-	</#list>
-</li>
-</#macro>
-
-<#macro restricted>
-	<#if roles?seq_contains("editor") || roles?seq_contains("admin")>
-		<#nested>
-	</#if>
-</#macro>
-
 <#function resolveUri uri>
 	<#return cp + uri?replace("faust://", "/")>
-</#function></#macro>
+</#function>

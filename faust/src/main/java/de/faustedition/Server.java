@@ -16,6 +16,7 @@ import de.faustedition.search.SearchResource;
 import de.faustedition.transcript.SceneStatisticsResource;
 import de.faustedition.transcript.TranscriptResource;
 import de.faustedition.transcript.VerseStatisticsResource;
+import de.faustedition.xml.XMLQueryResource;
 import de.faustedition.xml.XMLResource;
 
 import java.util.Arrays;
@@ -40,6 +41,7 @@ import java.util.logging.Logger;
         TranscriptResource.class,
         VerseStatisticsResource.class,
         XMLResource.class,
+        XMLQueryResource.class,
         ScaffoldingService.class
 })
 public class Server {
@@ -68,6 +70,7 @@ public class Server {
                             objectGraph.get(SceneStatisticsResource.class),
                             objectGraph.get(TranscriptResource.class),
                             objectGraph.get(VerseStatisticsResource.class),
+                            objectGraph.get(XMLQueryResource.class),
                             objectGraph.get(XMLResource.class)
                     ),
                     objectGraph.get(ScaffoldingService.class)
