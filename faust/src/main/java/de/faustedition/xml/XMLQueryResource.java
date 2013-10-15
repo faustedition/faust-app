@@ -35,14 +35,14 @@ import java.util.Set;
 @Singleton
 public class XMLQueryResource {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
     private enum Mode {
         XML, VALUES, FILES
     }
 
     private final Sources xmlStorage;
-	private final Templates templates;
+    private final Templates templates;
 
     @Inject
     public XMLQueryResource(Sources xmlStorage, Templates templates) {
@@ -52,25 +52,25 @@ public class XMLQueryResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-	public Response queryForm(@Context Request request,
+    public Response queryForm(@Context Request request,
                               @QueryParam("xpath") @DefaultValue("") String xpath,
                               @QueryParam("folder") @DefaultValue("transcript") String folder,
                               @QueryParam("mode") @DefaultValue("xml") String queryMode) throws IOException {
 
         return templates.render(request, query(xpath, folder, queryMode));
-	}
+    }
 
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-	public Templates.ViewAndModel queryResults(@QueryParam("xpath") @DefaultValue("") String xpath,
+    public Templates.ViewAndModel queryResults(@QueryParam("xpath") @DefaultValue("") String xpath,
                                                @QueryParam("folder") @DefaultValue("transcript") String folder,
                                                @QueryParam("mode") @DefaultValue("xml") String queryMode) {
         return query(xpath, folder, queryMode);
-	}
+    }
 
 
-	private Templates.ViewAndModel query(String xpath, String folder, String queryMode)  {
+    private Templates.ViewAndModel query(String xpath, String folder, String queryMode) {
         final List<Map<String, Object>> files = Lists.newLinkedList();
         if (!xpath.isEmpty()) {
             if (LOG.isInfoEnabled()) {
@@ -87,7 +87,7 @@ public class XMLQueryResource {
                     document = XMLUtil.parse(xmlStorage.getInputSource(uri));
                     NodeList xpathResultNodes = (NodeList) xpathExpr.evaluate(document, XPathConstants.NODESET);
                     List<String> xpathResults = new ArrayList<String>(xpathResultNodes.getLength());
-                    for (int i=0; i < xpathResultNodes.getLength(); i++) {
+                    for (int i = 0; i < xpathResultNodes.getLength(); i++) {
                         Node node = xpathResultNodes.item(i);
                         xpathResults.add(XMLUtil.toString(node));
 
@@ -114,14 +114,14 @@ public class XMLQueryResource {
             viewModel.add("files", files);
         } else if (mode == Mode.VALUES) {
             final Set<String> uniqueValues = Sets.newTreeSet();
-            for (Map<String,Object> file : files) {
+            for (Map<String, Object> file : files) {
                 if (file.containsKey("results")) {
-                    uniqueValues.addAll((List<String>)file.get("results"));
+                    uniqueValues.addAll((List<String>) file.get("results"));
                 }
             }
             viewModel.add("values", uniqueValues.toArray());
         }
 
-		return viewModel;
-	}
+        return viewModel;
+    }
 }

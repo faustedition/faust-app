@@ -4,11 +4,12 @@ import com.google.common.collect.ForwardingObject;
 
 /**
  * A transitive relation which forwards all its method calls to another transitive relation.
- * 
+ *
  * @author Andreou Dimitris, email: jim.andreou (at) gmail.com
  */
 public abstract class ForwardingTransitiveRelation<E> extends ForwardingObject implements TransitiveRelation<E> {
-    @Override protected abstract TransitiveRelation<E> delegate();
+    @Override
+    protected abstract TransitiveRelation<E> delegate();
 
     public Navigator<E> direct() {
         return delegate().direct();

@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 public class XPath {
 
-	public static XPathExpression compile(String xpath) {
+    public static XPathExpression compile(String xpath) {
         try {
             javax.xml.xpath.XPath xp = XPathFactory.newInstance().newXPath();
             xp.setNamespaceContext(Namespaces.INSTANCE);
@@ -21,7 +21,7 @@ public class XPath {
         } catch (XPathExpressionException e) {
             throw Throwables.propagate(e);
         }
-	}
+    }
 
     public static String toString(final String expr, final Object item) {
         try {

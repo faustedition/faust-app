@@ -156,7 +156,7 @@ public class XML {
 
     public static XMLInputFactory inputFactory() {
         if (xmlInputFactory == null) {
-            final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+            xmlInputFactory = XMLInputFactory.newInstance();
             xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.TRUE);
             xmlInputFactory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.FALSE);
             xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
@@ -208,6 +208,7 @@ public class XML {
             }
         };
     }
+
     public static XMLStreamReader filter(XMLInputFactory xif, XMLStreamReader reader, Iterable<StreamFilter> filters) throws XMLStreamException {
         for (StreamFilter filter : filters) {
             reader = xif.createFilteredReader(reader, filter);
@@ -276,7 +277,7 @@ public class XML {
 
     private static final Splitter VALUE_LIST_SPLITTER = Splitter.on(CharMatcher.WHITESPACE).omitEmptyStrings().trimResults();
 
-    public static final Function<String,String> ANCHOR_TO_ID = new Function<String, String>() {
+    public static final Function<String, String> ANCHOR_TO_ID = new Function<String, String>() {
 
         @Override
         public String apply(String input) {

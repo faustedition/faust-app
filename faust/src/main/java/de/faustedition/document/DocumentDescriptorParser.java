@@ -37,11 +37,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
-* @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
-*/
+ * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+ */
 public class DocumentDescriptorParser extends DefaultHandler {
 
-	private static final Logger LOG = Logger.getLogger(DocumentDescriptorParser.class.getName());
+    private static final Logger LOG = Logger.getLogger(DocumentDescriptorParser.class.getName());
 
     private static final Set<String> MATERIAL_UNIT_NAMES = ImmutableSet.of(
             "archivalDocument",
@@ -58,12 +58,12 @@ public class DocumentDescriptorParser extends DefaultHandler {
     private final ObjectMapper objectMapper;
     private final Map<String, Long> archiveIds;
     private final FaustURI source;
-	private final XMLBaseTracker baseTracker;
+    private final XMLBaseTracker baseTracker;
 
     private Deque<ObjectNode> unitStack = new ArrayDeque<ObjectNode>();
 
-	private String currentKey;
-	private StringBuilder currentValue;
+    private String currentKey;
+    private StringBuilder currentValue;
 
     private DocumentRecord document;
     private int materialUnitCounter;
@@ -78,23 +78,23 @@ public class DocumentDescriptorParser extends DefaultHandler {
         this.baseTracker = new XMLBaseTracker(source.toString());
     }
 
-	@Override
-	public void startDocument() throws SAXException {
-		materialUnitCounter = 0;
-		inMetadataSection = false;
+    @Override
+    public void startDocument() throws SAXException {
+        materialUnitCounter = 0;
+        inMetadataSection = false;
         document = null;
-		currentKey = null;
-		currentValue = null;
-	}
+        currentKey = null;
+        currentValue = null;
+    }
 
-	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		baseTracker.startElement(uri, localName, qName, attributes);
-		if (!Namespaces.FAUST_NS_URI.equals(uri)) {
-			return;
-		}
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        baseTracker.startElement(uri, localName, qName, attributes);
+        if (!Namespaces.FAUST_NS_URI.equals(uri)) {
+            return;
+        }
 
-		if (MATERIAL_UNIT_NAMES.contains(localName)) {
+        if (MATERIAL_UNIT_NAMES.contains(localName)) {
             final ObjectNode unitData = objectMapper.createObjectNode();
             unitData.put("type", localName);
             unitData.put("order", materialUnitCounter++);
@@ -111,9 +111,9 @@ public class DocumentDescriptorParser extends DefaultHandler {
                 contents.add(unitData);
             }
             unitStack.push(unitData);
-		} else if ("metadata".equals(localName) && !unitStack.isEmpty()) {
-			inMetadataSection = true;
-		} else if (inMetadataSection && currentKey == null) {
+        } else if ("metadata".equals(localName) && !unitStack.isEmpty()) {
+            inMetadataSection = true;
+        } else if (inMetadataSection && currentKey == null) {
             if (localName.equals("textTranscript") || localName.equals("docTranscript")) {
                 final String transcript = Strings.nullToEmpty(attributes.getValue("uri")).trim();
                 if (!transcript.isEmpty()) {
@@ -123,17 +123,17 @@ public class DocumentDescriptorParser extends DefaultHandler {
                 currentKey = toKey(localName, attributes);
                 currentValue = new StringBuilder();
             }
-		}
-	}
+        }
+    }
 
-	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
-		baseTracker.endElement(uri, localName, qName);
-		if (!Namespaces.FAUST_NS_URI.equals(uri)) {
-			return;
-		}
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        baseTracker.endElement(uri, localName, qName);
+        if (!Namespaces.FAUST_NS_URI.equals(uri)) {
+            return;
+        }
 
-		if (MATERIAL_UNIT_NAMES.contains(localName)) {
+        if (MATERIAL_UNIT_NAMES.contains(localName)) {
             final ObjectNode unitData = unitStack.pop();
             if (unitStack.isEmpty()) {
                 final String archiveId = unitData.path("archive").asText();
@@ -145,7 +145,7 @@ public class DocumentDescriptorParser extends DefaultHandler {
 
                 String callnumber = null;
                 String waId = null;
-                for (Iterator<Map.Entry<String,JsonNode>> it = unitData.fields(); it.hasNext(); ) {
+                for (Iterator<Map.Entry<String, JsonNode>> it = unitData.fields(); it.hasNext(); ) {
                     final Map.Entry<String, JsonNode> metadata = it.next();
                     final String metadataKey = metadata.getKey();
                     if (metadataKey.startsWith(callNumberPrefix)) {
@@ -214,8 +214,8 @@ public class DocumentDescriptorParser extends DefaultHandler {
                 ).execute();
             }
         } else if (inMetadataSection && "metadata".equals(localName)) {
-			inMetadataSection = false;
-		} else if (inMetadataSection && currentKey != null) {
+            inMetadataSection = false;
+        } else if (inMetadataSection && currentKey != null) {
             final String value = currentValue.toString().trim().replaceAll("\\s+", " ");
             if (!value.isEmpty()) {
                 final ObjectNode unitData = unitStack.peek();
@@ -233,18 +233,18 @@ public class DocumentDescriptorParser extends DefaultHandler {
                     }
                 }
             }
-			currentKey = null;
-			currentValue = null;
-		}
-	}
+            currentKey = null;
+            currentValue = null;
+        }
+    }
 
 
-	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
-		if (inMetadataSection && currentKey != null) {
-			currentValue.append(ch, start, length);
-		}
-	}
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+        if (inMetadataSection && currentKey != null) {
+            currentValue.append(ch, start, length);
+        }
+    }
 
     protected String toKey(String localName, Attributes attributes) {
         String key = localName;

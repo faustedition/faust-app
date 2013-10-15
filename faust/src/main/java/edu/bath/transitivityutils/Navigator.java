@@ -9,8 +9,8 @@ import java.util.Set;
  * with a directed edge.
  *
  * @param <E> the type of this navigator's objects
- * @see Navigators
  * @author Andreou Dimitris, email: jim.andreou (at) gmail.com
+ * @see Navigators
  */
 public interface Navigator<E> {
     /**

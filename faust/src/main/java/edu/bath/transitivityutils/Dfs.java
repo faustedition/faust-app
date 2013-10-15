@@ -1,14 +1,14 @@
 package edu.bath.transitivityutils;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 
 /**
  * An ad-hoc implementation of depth-first search.
@@ -48,7 +48,8 @@ class Dfs<E> {
                                     throw new IllegalArgumentException("Cycle detected in navigator: " + Joiner.on(" -> ").join(stack));
                                 }
                                 break in;
-                            case BLACK: continue;
+                            case BLACK:
+                                continue;
                         }
                     } else {
                         visited.put(next, Color.GRAY);
@@ -65,8 +66,11 @@ class Dfs<E> {
         }
     }
 
-    protected void treeEdge(E subject, E object) { }
-    protected void postVisit(E value) { }
+    protected void treeEdge(E subject, E object) {
+    }
+
+    protected void postVisit(E value) {
+    }
 
     private enum Color {
         BLACK, GRAY;
@@ -89,7 +93,8 @@ class Dfs<E> {
             return new NodeCursor<E>(value, Iterators.<E>emptyIterator());
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return String.valueOf(value);
         }
     }

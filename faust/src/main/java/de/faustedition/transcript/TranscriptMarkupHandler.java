@@ -122,10 +122,9 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
             handEnd();
             stageEnd();
             facsimileEnd();
-            return false;
         }
 
-        return true;
+        return !buf.isEmpty();
     }
 
     private void facsimileEnd() {
@@ -134,6 +133,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
             facsimileAnnotationId = null;
         }
     }
+
     private void stageEnd() {
         if (currentStageAnnotationId != null) {
             buf.add(new AnnotationEnd(currentStageAnnotationId));

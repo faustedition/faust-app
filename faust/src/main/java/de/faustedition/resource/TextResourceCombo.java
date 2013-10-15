@@ -37,61 +37,61 @@ import java.util.ArrayList;
  */
 public class TextResourceCombo extends ArrayList<TextResource> implements InputSupplier<Reader> {
 
-	/**
-	 * Constructor.
-	 *
-	 * @param resources the resources to be contained in this combo. The iteration order of the parameter is
-	 *                  supposed to be significant.
-	 */
-	public TextResourceCombo(Iterable<TextResource> resources) {
-		super(Iterables.size(resources));
-		Iterables.addAll(this, resources);
-	}
+    /**
+     * Constructor.
+     *
+     * @param resources the resources to be contained in this combo. The iteration order of the parameter is
+     *                  supposed to be significant.
+     */
+    public TextResourceCombo(Iterable<TextResource> resources) {
+        super(Iterables.size(resources));
+        Iterables.addAll(this, resources);
+    }
 
-	/**
-	 * Determines the media type of this combo by retrieving it from the first member.
-	 *
-	 * @return the media type or <code>text/plain</code> in the case of an empty combo
-	 */
-	public String getMediaType() {
-		return (isEmpty() ? TextResource.TEXT_PLAIN : get(0).getMediaType());
-	}
+    /**
+     * Determines the media type of this combo by retrieving it from the first member.
+     *
+     * @return the media type or <code>text/plain</code> in the case of an empty combo
+     */
+    public String getMediaType() {
+        return (isEmpty() ? TextResource.TEXT_PLAIN : get(0).getMediaType());
+    }
 
-	/**
-	 * Determines the latest modification time of all contained resources.
-	 *
-	 * @return the latest modification time
-	 * @see java.io.File#lastModified()
-	 */
-	public long lastModified() {
-		long lastModified = 0;
-		for (TextResource rd : this) {
-			lastModified = Math.max(lastModified, rd.lastModified);
-		}
-		return (lastModified > 0 ? lastModified : System.currentTimeMillis());
-	}
+    /**
+     * Determines the latest modification time of all contained resources.
+     *
+     * @return the latest modification time
+     * @see java.io.File#lastModified()
+     */
+    public long lastModified() {
+        long lastModified = 0;
+        for (TextResource rd : this) {
+            lastModified = Math.max(lastModified, rd.lastModified);
+        }
+        return (lastModified > 0 ? lastModified : System.currentTimeMillis());
+    }
 
-	/**
-	 * Determines the smallest maximum cache age of all contained resources.
-	 *
-	 * @return the maximum cache age of this combo (in seconds)
-	 */
-	public long maxAge() {
-		long maxAge = Long.MAX_VALUE;
-		for (TextResource rd : this) {
-			maxAge = Math.min(maxAge, rd.maxAge);
-		}
-		return (maxAge < Long.MAX_VALUE ? maxAge : 0);
-	}
+    /**
+     * Determines the smallest maximum cache age of all contained resources.
+     *
+     * @return the maximum cache age of this combo (in seconds)
+     */
+    public long maxAge() {
+        long maxAge = Long.MAX_VALUE;
+        for (TextResource rd : this) {
+            maxAge = Math.min(maxAge, rd.maxAge);
+        }
+        return (maxAge < Long.MAX_VALUE ? maxAge : 0);
+    }
 
-	/**
-	 * Provides a joint reader of all contained resources in their given order.
-	 *
-	 * @return a reader concatenating the contents of all resources in the combo
-	 * @throws IOException
-	 */
-	@Override
-	public Reader getInput() throws IOException {
-		return CharStreams.join(this).getInput();
-	}
+    /**
+     * Provides a joint reader of all contained resources in their given order.
+     *
+     * @return a reader concatenating the contents of all resources in the combo
+     * @throws IOException
+     */
+    @Override
+    public Reader getInput() throws IOException {
+        return CharStreams.join(this).getInput();
+    }
 }

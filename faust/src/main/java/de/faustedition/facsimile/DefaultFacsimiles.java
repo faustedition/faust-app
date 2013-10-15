@@ -51,6 +51,7 @@ public class DefaultFacsimiles implements Facsimiles {
             }
         }
     }
+
     public ImageReader reader(String path) throws IOException, IllegalArgumentException {
         final File facsimile = new File(facsimileDirectory, path + IMAGE_FILE_EXTENSION);
         Preconditions.checkArgument(facsimile.isFile() && isInHome(facsimile), path);

@@ -4,8 +4,8 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.http.HTTP;
 import de.faustedition.graph.Graph;
+import de.faustedition.http.HTTP;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

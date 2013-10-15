@@ -4,7 +4,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ForwardingIterator;
 
-
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import java.util.ArrayDeque;

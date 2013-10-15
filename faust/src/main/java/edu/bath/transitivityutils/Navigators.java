@@ -1,11 +1,5 @@
 package edu.bath.transitivityutils;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
@@ -13,21 +7,28 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Provides static utility methods for creating and working with {@link
  * Navigator} instances.
- * 
+ *
  * @author Andreou Dimitris, email: jim.andreou (at) gmail.com
  */
 public final class Navigators {
-    private Navigators() { }
+    private Navigators() {
+    }
 
     /**
      * Creates a {@code Navigator} <em>view</em> of the supplied {@link SetMultimap} instance.
      * The {@code domain()} of the created navigator will be the {@code keySet()} of the multimap,
      * whereas the navigator's {@code related(element)} invocations will be translated
      * to {@code multimap.get(element)} invocations.
-     *
+     * <p/>
      * <p>The returned navigator will be serializable if the specified multimap is serializable.
      *
      * @param multimap the backing multimap of the returned navigator view
@@ -38,19 +39,20 @@ public final class Navigators {
 
     //view
     //serializable if domain and navigationFunction is
+
     /**
      * Creates a {@code Navigator} <em>view</em> of the supplied domain and function.
      * The specified function is used to implement the returned navigator's {@code related(element)}
      * invocations. It must return an empty set if applied to an element not in the supplied domain.
-     *
+     * <p/>
      * <p>The returned navigator will be serializable if the specified set and function are serializable.
      *
-     * @param domain the domain of the returned navigator
+     * @param domain             the domain of the returned navigator
      * @param navigationFunction the function that will provide the implementation
-     * of navigator's {@linkplain Navigator#related(Object) related(Object)} method
+     *                           of navigator's {@linkplain Navigator#related(Object) related(Object)} method
      */
     public static <E> Navigator<E> forFunction(Set<E> domain,
-            Function<? super E, ? extends Set<E>> navigationFunction) {
+                                               Function<? super E, ? extends Set<E>> navigationFunction) {
         return new FunctionNavigator<E>(Preconditions.checkNotNull(domain),
                 Preconditions.checkNotNull(navigationFunction));
     }
@@ -62,7 +64,7 @@ public final class Navigators {
         private static final long serialVersionUID = 6024090827962229701L;
 
         FunctionNavigator(Set<E> domain,
-                Function<? super E, ? extends Set<E>> navigationFunction) {
+                          Function<? super E, ? extends Set<E>> navigationFunction) {
             this.domain = domain;
             this.navigationFunction = navigationFunction;
         }
@@ -75,7 +77,7 @@ public final class Navigators {
             return domain;
         }
     }
-    
+
     private static class MultimapNavigator<E> implements Navigator<E>, Serializable {
         private final SetMultimap<E, E> multimap;
 
@@ -105,7 +107,7 @@ public final class Navigators {
      * the specified object, using the supplied navigator.
      *
      * @param navigator the navigator to be used to compute the transitive closure of an element
-     * @param object an object (defined in the {@linkplain Navigator#domain() domain} of the navigator)
+     * @param object    an object (defined in the {@linkplain Navigator#domain() domain} of the navigator)
      * @return the transitive closure of the element (which includes the element itself)
      */
     public static <E> Set<E> closure(Navigator<E> navigator, E object) {
@@ -116,13 +118,13 @@ public final class Navigators {
      * Returns the unon of the transitive closures of some objects (which always includes the objects themselves),
      * which is the set of objects that are (by any number of steps) reachable from
      * any of the specified objects, using the supplied navigator.
-     *
+     * <p/>
      * <p>When the transitive
      * closures of the objects are expected to overlap, this method is likely to be more efficient than
      * computing separately the transitive closure of each object and then computing the union of them.
      *
      * @param navigator the navigator to be used to compute the transitive closure of an element
-     * @param objects some objects (defined in the {@linkplain Navigator#domain() domain} of the navigator)
+     * @param objects   some objects (defined in the {@linkplain Navigator#domain() domain} of the navigator)
      * @return the transitive closure of the element (which includes the element itself)
      */
     public static <E> Set<E> closureOfMany(Navigator<E> navigator, Iterable<? extends E> objects) {
@@ -148,7 +150,7 @@ public final class Navigators {
                 topologicalOrder.add(value);
             }
         }.execute(false); //false: not allowing cycles
-        
+
         return topologicalOrder;
     }
 }

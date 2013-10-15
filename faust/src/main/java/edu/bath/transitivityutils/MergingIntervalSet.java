@@ -1,29 +1,29 @@
 package edu.bath.transitivityutils;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-
 import edu.bath.transitivityutils.OrderList.Node;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * An interval set that supports adding intervals and testing whether a node belongs in any of them.
- * 
+ *
  * @author Andreou Dimitris, email: jim.andreou (at) gmail.com
  */
 final class MergingIntervalSet {
     private Node<?>[] array = new Node<?>[2];
     private int size = 0;
 
-    MergingIntervalSet() { }
+    MergingIntervalSet() {
+    }
 
     int size() {
         return size;
     }
-    
+
     void addIntervals(MergingIntervalSet other) {
         for (int i = 0; i < other.size; i += 2) {
             addInterval(other.array[i], other.array[i + 1]);
@@ -155,7 +155,7 @@ final class MergingIntervalSet {
             Node<?> otherRight = other.array[thatIndex + 1];
             while (true) {
                 if ((thisLeft.precedes(otherLeft) || thisLeft == otherLeft) &&
-                    (otherRight.precedes(thisRight) || otherRight == thisRight)) {
+                        (otherRight.precedes(thisRight) || otherRight == thisRight)) {
                     break;
                 }
                 thisIndex += 2;
@@ -171,10 +171,11 @@ final class MergingIntervalSet {
 
     private static class NodeComparator implements Comparator<OrderList.Node<?>> {
         static final NodeComparator INSTANCE = new NodeComparator();
+
         public int compare(Node<?> o1, Node<?> o2) {
-            if (o1 == o2) 
-                return 0; 
-            else 
+            if (o1 == o2)
+                return 0;
+            else
                 return o1.precedes(o2) ? -1 : 1;
         }
     }

@@ -96,7 +96,7 @@ public class MilestoneMarkupProcessor extends ForwardingIterator<Token> {
         this.milestoneKey = map(namespaceMapping, MILESTONE_NAME);
         this.milestoneUnitKey = map(namespaceMapping, MILESTONE_UNIT_ATTR_NAME);
 
-        this.milestoneElementKeys  = Maps.newHashMap();
+        this.milestoneElementKeys = Maps.newHashMap();
         for (Map.Entry<String, String> milestoneElementUnit : MILESTONE_ELEMENT_UNITS.entrySet()) {
             this.milestoneElementKeys.put(
                     map(namespaceMapping, new QName(TEI_NS_URI, milestoneElementUnit.getKey())),

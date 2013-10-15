@@ -1,11 +1,11 @@
 package de.faustedition.reasoning;
 
 
+import edu.bath.transitivityutils.ImmutableRelation;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
-import edu.bath.transitivityutils.ImmutableRelation;
 
 
 /**
@@ -13,43 +13,43 @@ import edu.bath.transitivityutils.ImmutableRelation;
  */
 public class PremiseBasedRelation<E> extends ArrayList<PremiseBasedRelation.Premise<E>> implements ImmutableRelation<E> {
 
-	public PremiseBasedRelation(Premise<E>... premises) {
-		this(Arrays.asList(premises));
-	}
-	public PremiseBasedRelation(Collection<? extends Premise<E>> c) {
-		super(c);
-	}
+    public PremiseBasedRelation(Premise<E>... premises) {
+        this(Arrays.asList(premises));
+    }
 
-	public boolean areRelated(E i, E j) {
-		for (Premise<E> premise : this) {
-			if (premise.applies(i, j)) {
-				return true;
-			} else if (premise.applies(j, i)) {
-				return false;
-			}
-		}
-		return false;
-	}
+    public PremiseBasedRelation(Collection<? extends Premise<E>> c) {
+        super(c);
+    }
 
-	public Premise findRelevantPremise(E i, E j) {
-		for (Premise<E> premise : this) {
-			if (premise.applies(i, j)) {
-				return premise;
-			} else if (premise.applies(j, i)) {
-				return null;
-			}
-		}
-		return null;
-	}
+    public boolean areRelated(E i, E j) {
+        for (Premise<E> premise : this) {
+            if (premise.applies(i, j)) {
+                return true;
+            } else if (premise.applies(j, i)) {
+                return false;
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * An implication of the form
-	 * premise(o,p) => related(o,p)
-	 *
-	 */
-	public static interface Premise<E> {
-		String getName();
+    public Premise findRelevantPremise(E i, E j) {
+        for (Premise<E> premise : this) {
+            if (premise.applies(i, j)) {
+                return premise;
+            } else if (premise.applies(j, i)) {
+                return null;
+            }
+        }
+        return null;
+    }
 
-		boolean applies(E o, E p);
-	}
+    /**
+     * An implication of the form
+     * premise(o,p) => related(o,p)
+     */
+    public static interface Premise<E> {
+        String getName();
+
+        boolean applies(E o, E p);
+    }
 }

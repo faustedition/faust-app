@@ -6,10 +6,8 @@ import de.faustedition.Database;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.Graph;
 import de.faustedition.text.VerseInterval;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -27,7 +25,7 @@ import java.util.SortedMap;
 @Path("/transcript/by-scene/{part}")
 public class SceneStatisticsResource {
 
-	private final Database database;
+    private final Database database;
     private final Graph graph;
 
 
@@ -39,24 +37,24 @@ public class SceneStatisticsResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-	public List<Map<String, Object>> sceneStatistics(@PathParam("part") int part) {
-        final SortedMap<VerseInterval,Integer> sceneStatistics = Maps.newTreeMap(VerseInterval.INTERVAL_COMPARATOR);
+    public List<Map<String, Object>> sceneStatistics(@PathParam("part") int part) {
+        final SortedMap<VerseInterval, Integer> sceneStatistics = Maps.newTreeMap(VerseInterval.INTERVAL_COMPARATOR);
         for (VerseInterval scene : VerseInterval.scenesOf(part)) {
             sceneStatistics.put(scene, 0);
         }
 
         // FIXME: query database
         for (Map.Entry<MaterialUnit, Collection<VerseInterval>> indexEntry : Collections.<MaterialUnit, Collection<VerseInterval>>emptyMap().entrySet()) {
-			for (VerseInterval sceneInterval : sceneStatistics.keySet()) {
-				for (VerseInterval documentInterval : indexEntry.getValue()) {
-					if (sceneInterval.overlapsWith(documentInterval)) {
-						sceneStatistics.put(sceneInterval, sceneStatistics.get(sceneInterval) + 1);
-						break;
-					}
-				}
-			}
+            for (VerseInterval sceneInterval : sceneStatistics.keySet()) {
+                for (VerseInterval documentInterval : indexEntry.getValue()) {
+                    if (sceneInterval.overlapsWith(documentInterval)) {
+                        sceneStatistics.put(sceneInterval, sceneStatistics.get(sceneInterval) + 1);
+                        break;
+                    }
+                }
+            }
 
-		}
+        }
         final List<Map<String, Object>> chartData = Lists.newArrayList();
         for (Map.Entry<VerseInterval, Integer> scene : sceneStatistics.entrySet()) {
             final Map<String, Object> sceneData = Maps.newLinkedHashMap();
@@ -65,5 +63,5 @@ public class SceneStatisticsResource {
             chartData.add(sceneData);
         }
         return chartData;
-	}
+    }
 }

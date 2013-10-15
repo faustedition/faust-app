@@ -25,7 +25,7 @@ import java.util.List;
 @Path("/resources")
 public class ComboResource {
 
-	private final TextResourceResolver resolver;
+    private final TextResourceResolver resolver;
 
     public ComboResource(String contextPath, File staticDirectory) {
         this.resolver = new TextResourceResolver();

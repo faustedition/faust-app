@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
@@ -94,7 +93,7 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
                 data.put(xmlNameKey, map(namespaceMapping, startElement.getName()));
 
                 final String elementNs = Strings.nullToEmpty(startElement.getName().getNamespaceURI());
-                for (Iterator<?> attrIt =  startElement.getAttributes(); attrIt.hasNext(); ) {
+                for (Iterator<?> attrIt = startElement.getAttributes(); attrIt.hasNext(); ) {
                     final Attribute attr = (Attribute) attrIt.next();
                     final String attrName = map(namespaceMapping, attr.getName(), elementNs);
                     final String attrValue = attr.getValue();

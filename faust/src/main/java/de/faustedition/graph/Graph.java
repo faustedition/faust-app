@@ -20,16 +20,16 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
 public class Graph {
     private static final Logger LOG = Logger.getLogger(Graph.class.getName());
 
-	public static final String PREFIX = "faust";
+    public static final String PREFIX = "faust";
 
-	private static final RelationshipType ROOT_RT = new FaustRelationshipType("root");
+    private static final RelationshipType ROOT_RT = new FaustRelationshipType("root");
 
-	private static final String ROOT_NAME_PROPERTY = ROOT_RT.name() + ".name";
-	private static final String ARCHIVES_ROOT_NAME = PREFIX + ".archives";
-	private static final String MATERIAL_UNITS_ROOT_NAME = PREFIX + ".material-units";
-	private static final String GENETIC_SOURCES_ROOT_NAME = PREFIX + ".genetic-sources";
+    private static final String ROOT_NAME_PROPERTY = ROOT_RT.name() + ".name";
+    private static final String ARCHIVES_ROOT_NAME = PREFIX + ".archives";
+    private static final String MATERIAL_UNITS_ROOT_NAME = PREFIX + ".material-units";
+    private static final String GENETIC_SOURCES_ROOT_NAME = PREFIX + ".genetic-sources";
 
-	private final GraphDatabaseService db;
+    private final GraphDatabaseService db;
 
     @Inject
     public Graph(GraphDatabaseService db) {
@@ -54,7 +54,7 @@ public class Graph {
             transaction.success();
             if (LOG.isLoggable(Level.FINE)) {
                 sw.stop();
-                LOG.log(Level.FINE, "Committed transaction for {0} after {1}", new Object[] { tx, sw });
+                LOG.log(Level.FINE, "Committed transaction for {0} after {1}", new Object[]{tx, sw});
             }
 
             return result;
@@ -103,15 +103,15 @@ public class Graph {
     }
 
     protected Node root(String rootName) {
-		final Node referenceNode = db.getReferenceNode();
-		for (Relationship r : referenceNode.getRelationships(ROOT_RT, OUTGOING)) {
-			if (rootName.equals(r.getProperty(ROOT_NAME_PROPERTY))) {
-				return r.getEndNode();
-			}
-		}
+        final Node referenceNode = db.getReferenceNode();
+        for (Relationship r : referenceNode.getRelationships(ROOT_RT, OUTGOING)) {
+            if (rootName.equals(r.getProperty(ROOT_NAME_PROPERTY))) {
+                return r.getEndNode();
+            }
+        }
 
-		Relationship r = referenceNode.createRelationshipTo(referenceNode.getGraphDatabase().createNode(), ROOT_RT);
-		r.setProperty(ROOT_NAME_PROPERTY, rootName);
-		return r.getEndNode();
-	}
+        Relationship r = referenceNode.createRelationshipTo(referenceNode.getGraphDatabase().createNode(), ROOT_RT);
+        r.setProperty(ROOT_NAME_PROPERTY, rootName);
+        return r.getEndNode();
+    }
 }

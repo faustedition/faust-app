@@ -28,7 +28,7 @@ import static de.faustedition.text.NamespaceMapping.map;
  */
 public class TranscribedVerseIntervalCollector extends ForwardingIterator<Token> {
 
-	private static final Pattern VERSE_NUMBER_PATTERN = Pattern.compile("[0-9]+");
+    private static final Pattern VERSE_NUMBER_PATTERN = Pattern.compile("[0-9]+");
 
     private final Iterator<Token> delegate;
     private final Database database;

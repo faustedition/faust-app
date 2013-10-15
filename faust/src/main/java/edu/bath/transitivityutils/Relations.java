@@ -1,11 +1,11 @@
 package edu.bath.transitivityutils;
 
+import com.google.common.base.Preconditions;
+
 import java.io.Serializable;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Provides static utility methods for creating and working with {@link
@@ -14,11 +14,12 @@ import com.google.common.base.Preconditions;
  * @author Andreou Dimitris, email: jim.andreou (at) gmail.com
  */
 public final class Relations {
-    private Relations() { }
+    private Relations() {
+    }
 
     /**
      * Creates a new, empty, transitive relation.
-     *
+     * <p/>
      * <p>The created {@code TransitiveRelation} is serializable, as long as the objects in the relation
      * are themselves serializable.
      */
@@ -28,7 +29,7 @@ public final class Relations {
 
     /**
      * Creates a new, empty, bidirectional transitive relation.
-     *
+     * <p/>
      * <p>The created {@code TransitiveBiRelation} is serializable, as long as the objects in the relation
      * are themselves serializable.
      */
@@ -56,7 +57,8 @@ public final class Relations {
             this.delegate = delegate;
         }
 
-        @Override protected TransitiveRelation<E> delegate() {
+        @Override
+        protected TransitiveRelation<E> delegate() {
             return delegate;
         }
 
@@ -81,12 +83,13 @@ public final class Relations {
         private final TransitiveBiRelation<E> delegate;
 
         private static final long serialVersionUID = -2563205678446433458L;
-        
+
         public UnmodifiableTransitiveBiRelation(TransitiveBiRelation<E> delegate) {
             this.delegate = delegate;
         }
 
-        @Override protected TransitiveBiRelation<E> delegate() {
+        @Override
+        protected TransitiveBiRelation<E> delegate() {
             return delegate;
         }
 
@@ -105,23 +108,23 @@ public final class Relations {
      * Merges into a {@link TransitiveRelation} all particular relationships found in the specified
      * navigator. The relationships of the navigator are allowed to form a cycle (if it is known that
      * the navigator is acyclic, then {@linkplain #mergeAcyclic(TransitiveRelation, Navigator)} is preferable).
-     *
+     * <p/>
      * <p>The effects of this method are equivalent to invoking the code:
-     *<pre>{@code
-        for (E subject : navigator.domain()) {
-            for (E object : navigator.related(subject)) {
-                relation.relate(subject, object);
-            }
-        }
-     *}</pre>
-     *
+     * <pre>{@code
+     * for (E subject : navigator.domain()) {
+     * for (E object : navigator.related(subject)) {
+     * relation.relate(subject, object);
+     * }
+     * }
+     * }</pre>
+     * <p/>
      * <p>There is an important difference though: doing this work via this method typically results in much
      * more memory-efficient representation of the relationships.
-     *
+     * <p/>
      * <p>The relationships of a navigator are found by iterating its {@link Navigator#domain() domain},
      * and for each object in that, finding all objects {@link Navigator#related(Object) related} to it.
      *
-     * @param relation the transitive relation into which to merge the relationships of the navigator
+     * @param relation  the transitive relation into which to merge the relationships of the navigator
      * @param navigator a navigator
      */
     public static <E> void merge(final TransitiveRelation<? super E> relation, Navigator<E> navigator) {
@@ -147,23 +150,23 @@ public final class Relations {
      * <em>acyclic</em> navigator. If the relationships of the navigator are found to form a cycle, an
      * {@code IllegalArgumentException} is thrown. Navigators with cycles can be accommodated by
      * the more general {@linkplain #merge(TransitiveRelation, Navigator)} method.
-     *
+     * <p/>
      * <p>The effects of this method are equivalent to invoking the code:
-     *<pre>{@code
-        for (E subject : navigator.domain()) {
-            for (E object : navigator.related(subject)) {
-                relation.relate(subject, object);
-            }
-        }
-     *}</pre>
-     *
+     * <pre>{@code
+     * for (E subject : navigator.domain()) {
+     * for (E object : navigator.related(subject)) {
+     * relation.relate(subject, object);
+     * }
+     * }
+     * }</pre>
+     * <p/>
      * <p>There is an important difference though: doing this work via this method typically results in much
      * more memory-efficient representation of the relationships.
-     *
+     * <p/>
      * <p>The relationships of a navigator are found by iterating its {@link Navigator#domain() domain},
      * and for each object in that, finding all objects {@link Navigator#related(Object) related} to it.
      *
-     * @param relation the transitive relation into which to merge the relationships of the navigator
+     * @param relation         the transitive relation into which to merge the relationships of the navigator
      * @param acyclicNavigator a navigator
      */
     public static <E> void mergeAcyclic(TransitiveRelation<? super E> relation, Navigator<E> acyclicNavigator) {

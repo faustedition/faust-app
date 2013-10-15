@@ -38,7 +38,7 @@ public class SearchResource {
     @Path("/{query}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-	public Map<String,Object> searchResults(@PathParam("query") final String query) throws Exception {
+    public Map<String, Object> searchResults(@PathParam("query") final String query) throws Exception {
         return graph.transaction(new Graph.TransactionCallback<Map<String, Object>>() {
             @Override
             public Map<String, Object> doInTransaction(Graph graph) throws Exception {
@@ -76,7 +76,7 @@ public class SearchResource {
                 return Sets.newTreeSet(Arrays.asList(Objects.firstNonNull(metadata, new String[0])));
             }
         });
-	}
+    }
 
 
 }

@@ -39,7 +39,7 @@ public class FacsimileResource {
     @Produces(MediaType.APPLICATION_JSON)
     public JsonNode metadata(@PathParam("path") final String path) throws IOException {
         final FacsimileMetadata metadata = facsimiles.metadata(HTTP.normalizePath(path));
-        return  objectMapper.createObjectNode()
+        return objectMapper.createObjectNode()
                 .put("width", metadata.getWidth())
                 .put("height", metadata.getHeight())
                 .put("maxZoom", metadata.getMaxZoom())

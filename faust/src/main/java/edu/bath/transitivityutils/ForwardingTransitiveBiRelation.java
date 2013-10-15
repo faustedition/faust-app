@@ -8,7 +8,8 @@ import com.google.common.collect.ForwardingObject;
  * @author Andreou Dimitris, email: jim.andreou (at) gmail.com
  */
 public abstract class ForwardingTransitiveBiRelation<E> extends ForwardingObject implements TransitiveBiRelation<E> {
-    @Override protected abstract TransitiveBiRelation<E> delegate();
+    @Override
+    protected abstract TransitiveBiRelation<E> delegate();
 
     public TransitiveBiRelation<E> inverse() {
         return delegate().inverse();

@@ -60,7 +60,7 @@ public class HttpService extends AbstractIdleService {
                     Preconditions.checkState(resourceMappings.put(path, component) == null, path);
                 } else {
                     if (LOG.isLoggable(Level.CONFIG)) {
-                        LOG.log(Level.CONFIG, "Adding {0} provider {1}", new Object[] {
+                        LOG.log(Level.CONFIG, "Adding {0} provider {1}", new Object[]{
                                 (componentClass.isAnnotationPresent(Provider.class) ? "JAX-RS provider" : "component"),
                                 component
                         });

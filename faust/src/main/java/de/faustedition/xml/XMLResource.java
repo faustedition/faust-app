@@ -19,7 +19,7 @@ import java.io.IOException;
 @Singleton
 public class XMLResource {
 
-	private final Sources xml;
+    private final Sources xml;
 
     @Inject
     public XMLResource(Sources xml) {

@@ -5,8 +5,8 @@ package edu.bath.transitivityutils;
  * directly implements the direct relation, while the inverse
  * relation can be accessed through the {@link #inverse()} method.
  *
- * @see Relations
  * @author Andreou Dimitris, email: jim.andreou (at) gmail.com
+ * @see Relations
  */
 public interface TransitiveBiRelation<E> extends TransitiveRelation<E> {
     /**

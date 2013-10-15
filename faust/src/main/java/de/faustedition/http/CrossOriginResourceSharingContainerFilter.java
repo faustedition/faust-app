@@ -23,7 +23,7 @@ public class CrossOriginResourceSharingContainerFilter implements ContainerRespo
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         final MultivaluedMap<String, String> requestHeaders = requestContext.getHeaders();
-        final MultivaluedMap<String,Object> responseHeaders = responseContext.getHeaders();
+        final MultivaluedMap<String, Object> responseHeaders = responseContext.getHeaders();
 
         responseHeaders.add("Access-Control-Allow-Origin", Objects.firstNonNull(requestHeaders.getFirst("Origin"), "*"));
         responseHeaders.add("Access-Control-Allow-Methods", Objects.firstNonNull(requestHeaders.getFirst("Access-Control-Request-Method"), "GET, POST, PUT, DELETE, HEAD, OPTIONS"));

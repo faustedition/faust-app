@@ -1,5 +1,13 @@
 package edu.bath.transitivityutils;
 
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.SetMultimap;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,14 +19,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.SetMultimap;
 
 /**
  * A (transitive, reflexive) binary relation.
@@ -33,7 +33,8 @@ class DefaultTransitiveRelation<E> implements TransitiveRelation<E>, Serializabl
 
     private static final long serialVersionUID = -4031451040065579682L;
 
-    DefaultTransitiveRelation() { }
+    DefaultTransitiveRelation() {
+    }
 
     public void relate(E subjectValue, E objectValue) {
         if (Objects.equal(subjectValue, objectValue)) {
@@ -93,7 +94,7 @@ class DefaultTransitiveRelation<E> implements TransitiveRelation<E>, Serializabl
 
         Node<E> object = nodeMap.get(objectValue);
         if (object == null) return false;
-        
+
         return areNodesRelated(subject, object);
     }
 
@@ -147,7 +148,7 @@ class DefaultTransitiveRelation<E> implements TransitiveRelation<E>, Serializabl
                 isEnclosable = intervalSet.size() == 2; //otherwise, this node has been tainted
                 //with foreign intervals, and it can never be enclosable (otherwise the enclosing interval
                 //would also subsume the gaps between the intervals, which could lead to errors)
-                if  (!isEnclosable) markNotEnclosable(); //also speeds up subsequent invocations
+                if (!isEnclosable) markNotEnclosable(); //also speeds up subsequent invocations
             }
             return isEnclosable;
         }
@@ -156,12 +157,13 @@ class DefaultTransitiveRelation<E> implements TransitiveRelation<E>, Serializabl
             post.setValue(null);
         }
 
-        @SuppressWarnings("unchecked") //ENCLOSABLE_MARKER is not an E,
-        //but we never get E from post.getValue(), rather we only use it to test
-        //whether it holds null or ENCLOSABLE_MARKER. Also, post is never exposed.
+        @SuppressWarnings("unchecked")
+            //ENCLOSABLE_MARKER is not an E,
+            //but we never get E from post.getValue(), rather we only use it to test
+            //whether it holds null or ENCLOSABLE_MARKER. Also, post is never exposed.
         Node<E> createEnclosing(DefaultTransitiveRelation<E> owner, E value) {
             OrderList.Node<E> newPre = owner.magicList.addAfter(pre.previous(), value);
-            OrderList.Node<E> newPost = owner.magicList.addAfter(post, (E)ENCLOSABLE_MARKER);
+            OrderList.Node<E> newPost = owner.magicList.addAfter(post, (E) ENCLOSABLE_MARKER);
             markNotEnclosable();
             return createAndRegister(owner, newPre, newPost, value);
         }
@@ -169,19 +171,19 @@ class DefaultTransitiveRelation<E> implements TransitiveRelation<E>, Serializabl
         //Note that in this case the created node cannot be enclosed; it is created already enclosed
         Node<E> createEnclosed(DefaultTransitiveRelation<E> owner, E value) {
             OrderList.Node<E> newPre = owner.magicList.addAfter(post.previous(), value);
-            OrderList.Node<E> newPost = owner.magicList.addAfter(newPre, null); 
+            OrderList.Node<E> newPost = owner.magicList.addAfter(newPre, null);
             return createAndRegister(owner, newPre, newPost, value);
         }
 
         @SuppressWarnings("unchecked") //Same as above
         static <E> Node<E> create(DefaultTransitiveRelation<E> owner, E value) {
             OrderList.Node<E> newPre = owner.magicList.addAfter(owner.magicList.base().previous(), value);
-            OrderList.Node<E> newPost = owner.magicList.addAfter(newPre, (E)ENCLOSABLE_MARKER);
+            OrderList.Node<E> newPost = owner.magicList.addAfter(newPre, (E) ENCLOSABLE_MARKER);
             return createAndRegister(owner, newPre, newPost, value);
         }
 
         static <E> Node<E> createAndRegister(DefaultTransitiveRelation<E> owner,
-                OrderList.Node<E> pre, OrderList.Node<E> post, E value) {
+                                             OrderList.Node<E> pre, OrderList.Node<E> post, E value) {
             Node<E> node = new Node<E>(pre, post);
             owner.nodeMap.put(value, node);
             return node;
@@ -194,7 +196,7 @@ class DefaultTransitiveRelation<E> implements TransitiveRelation<E>, Serializabl
                 return node.getValue();
             }
         };
-        
+
         public Set<E> related(E subjectValue) {
             Node<E> subject = nodeMap.get(subjectValue);
             if (subject == null) return Collections.emptySet();
@@ -207,17 +209,19 @@ class DefaultTransitiveRelation<E> implements TransitiveRelation<E>, Serializabl
             return transformSet(directRelationships.keySet(), nodeToValue);
         }
     }
-    
+
     private Object writeReplace() {
         return new SerializationProxy<E>(navigator);
     }
 
     private static class SerializationProxy<E> implements Serializable {
         transient Navigator<E> navigator;
-        
+
         private static final long serialVersionUID = 711361401943593391L;
 
-        SerializationProxy() { }
+        SerializationProxy() {
+        }
+
         SerializationProxy(Navigator<E> navigator) {
             this.navigator = navigator;
         }
@@ -253,7 +257,7 @@ class DefaultTransitiveRelation<E> implements TransitiveRelation<E>, Serializabl
                     objects.add(object);
                 }
             }
-            navigator = (Navigator)Navigators.forMultimap(mm);
+            navigator = (Navigator) Navigators.forMultimap(mm);
         }
 
         private Object readResolve() {
@@ -266,7 +270,7 @@ class DefaultTransitiveRelation<E> implements TransitiveRelation<E>, Serializabl
             return rel;
         }
     }
-    
+
     static <A, B> Set<B> transformSet(final Set<A> set, final Function<? super A, ? extends B> transformer) {
         return new AbstractSet<B>() {
             @Override

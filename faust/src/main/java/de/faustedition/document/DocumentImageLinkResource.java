@@ -40,8 +40,8 @@ public class DocumentImageLinkResource {
 
     private final Graph graph;
     private final Sources xml;
-	private final Templates templates;
-	private final InternetImageServer imageServer;
+    private final Templates templates;
+    private final InternetImageServer imageServer;
 
     @Inject
     public DocumentImageLinkResource(Graph graph, Sources xml, Templates templates, InternetImageServer imageServer) {
@@ -133,7 +133,7 @@ public class DocumentImageLinkResource {
 
     @PUT
     @Consumes(DocumentImageLinks.IMAGE_SVG_TYPE)
-	public String write(@PathParam("path") final String path, final InputStream svgStream) throws Exception {
+    public String write(@PathParam("path") final String path, final InputStream svgStream) throws Exception {
         return graph.transaction(new Graph.TransactionCallback<String>() {
             @Override
             public String doInTransaction(Graph graph) throws Exception {
@@ -173,5 +173,5 @@ public class DocumentImageLinkResource {
                 return "<svg></svg>";
             }
         });
-	}
+    }
 }

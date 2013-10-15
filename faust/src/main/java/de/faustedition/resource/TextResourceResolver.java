@@ -36,51 +36,51 @@ import java.util.Map;
  */
 public class TextResourceResolver implements Function<String, TextResource> {
 
-	/**
-	 * Maps an ordered sequence of paths to a combination of text-based resources.
-	 *
-	 * @param paths the list of paths to be mapped
-	 * @return a new resource combo containing the mapped resources
-	 * @throws IllegalArgumentException in case a path cannot be mapped, e.g. because a specified path cannot be
-	 *                                  dereferenced
-	 */
-	public TextResourceCombo resolve(Iterable<String> paths) throws IllegalArgumentException {
-		return new TextResourceCombo(Iterables.transform(paths, this));
-	}
+    /**
+     * Maps an ordered sequence of paths to a combination of text-based resources.
+     *
+     * @param paths the list of paths to be mapped
+     * @return a new resource combo containing the mapped resources
+     * @throws IllegalArgumentException in case a path cannot be mapped, e.g. because a specified path cannot be
+     *                                  dereferenced
+     */
+    public TextResourceCombo resolve(Iterable<String> paths) throws IllegalArgumentException {
+        return new TextResourceCombo(Iterables.transform(paths, this));
+    }
 
-	/**
-	 * Maps a path to a text-based resource.
-	 *
-	 * @param input the path to be mapped
-	 * @return the mapped resource
-	 * @throws IllegalArgumentException in case the path cannot be mapped, e.g. because the specified path cannot be
-	 *                                  dereferenced
-	 */
-	@Override
-	public TextResource apply(String input) throws IllegalArgumentException {
-		for (Map.Entry<String, TextResourceCollection> mountPoint : mountPoints.entrySet()) {
-			String rootPath = mountPoint.getKey();
-			if (input.startsWith(rootPath)) {
-				try {
-					return mountPoint.getValue().resolve(input.substring(rootPath.length()).replaceAll("^\\/+", ""));
-				} catch (IOException e) {
-				}
-			}
-		}
-		throw new IllegalArgumentException(input);
+    /**
+     * Maps a path to a text-based resource.
+     *
+     * @param input the path to be mapped
+     * @return the mapped resource
+     * @throws IllegalArgumentException in case the path cannot be mapped, e.g. because the specified path cannot be
+     *                                  dereferenced
+     */
+    @Override
+    public TextResource apply(String input) throws IllegalArgumentException {
+        for (Map.Entry<String, TextResourceCollection> mountPoint : mountPoints.entrySet()) {
+            String rootPath = mountPoint.getKey();
+            if (input.startsWith(rootPath)) {
+                try {
+                    return mountPoint.getValue().resolve(input.substring(rootPath.length()).replaceAll("^\\/+", ""));
+                } catch (IOException e) {
+                }
+            }
+        }
+        throw new IllegalArgumentException(input);
 
-	}
+    }
 
-	/**
-	 * Registers a collection with the resolver, whose contents it can subsequently resolve.
-	 *
-	 * @param root       the path prefix under which resources of this mount point will be made available
-	 * @param collection the collection to be registered
-	 */
-	public void mount(String root, TextResourceCollection collection) {
-		mountPoints.put(root, collection);
-	}
+    /**
+     * Registers a collection with the resolver, whose contents it can subsequently resolve.
+     *
+     * @param root       the path prefix under which resources of this mount point will be made available
+     * @param collection the collection to be registered
+     */
+    public void mount(String root, TextResourceCollection collection) {
+        mountPoints.put(root, collection);
+    }
 
-	private final Map<String, TextResourceCollection> mountPoints = Maps.newHashMap();
+    private final Map<String, TextResourceCollection> mountPoints = Maps.newHashMap();
 
 }

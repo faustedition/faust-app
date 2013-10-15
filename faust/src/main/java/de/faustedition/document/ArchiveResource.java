@@ -47,7 +47,7 @@ public class ArchiveResource {
     @Path("/data")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Map<String, Object>> index() {
-        return database.transaction(new Database.TransactionCallback<List<Map<String,Object>>>() {
+        return database.transaction(new Database.TransactionCallback<List<Map<String, Object>>>() {
             @Override
             public List<Map<String, Object>> doInTransaction(DSLContext sql) throws Exception {
                 return sql.selectFrom(Tables.ARCHIVE).orderBy(Tables.ARCHIVE.NAME.asc()).fetchMaps();
@@ -74,14 +74,14 @@ public class ArchiveResource {
                 }
 
                 return new Templates.ViewAndModel("document/archive")
-                    .add("archive", archive.intoMap())
-                    .add("documents", sql
-                            .select(Tables.DOCUMENT.ID, Tables.DOCUMENT.CALLNUMBER, Tables.DOCUMENT.WA_ID)
-                            .from(Tables.DOCUMENT)
-                            .where(Tables.DOCUMENT.ARCHIVE_ID.eq(archive.getId()))
-                            .orderBy(Tables.DOCUMENT.CALLNUMBER.asc())
-                            .fetchMaps()
-                );
+                        .add("archive", archive.intoMap())
+                        .add("documents", sql
+                                .select(Tables.DOCUMENT.ID, Tables.DOCUMENT.CALLNUMBER, Tables.DOCUMENT.WA_ID)
+                                .from(Tables.DOCUMENT)
+                                .where(Tables.DOCUMENT.ARCHIVE_ID.eq(archive.getId()))
+                                .orderBy(Tables.DOCUMENT.CALLNUMBER.asc())
+                                .fetchMaps()
+                        );
             }
 
             @Override

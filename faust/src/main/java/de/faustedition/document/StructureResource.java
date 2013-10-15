@@ -24,7 +24,7 @@ import java.util.Deque;
 @Singleton
 public class StructureResource {
 
-	private final Sources xml;
+    private final Sources xml;
     private final Templates templates;
 
     @Inject

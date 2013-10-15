@@ -27,7 +27,12 @@ import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -44,156 +49,156 @@ import java.util.regex.Pattern;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 public class TextResource implements InputSupplier<Reader> {
-	/**
-	 * CSS media type.
-	 */
-	public static final String TEXT_CSS = "text/css";
+    /**
+     * CSS media type.
+     */
+    public static final String TEXT_CSS = "text/css";
 
-	/**
-	 * JavaScript source media type.
-	 */
-	public static final String APPLICATION_JAVASCRIPT = "application/javascript";
+    /**
+     * JavaScript source media type.
+     */
+    public static final String APPLICATION_JAVASCRIPT = "application/javascript";
 
-	/**
-	 * JSON media type.
-	 */
-	public static final String APPLICATION_JSON = "application/json";
+    /**
+     * JSON media type.
+     */
+    public static final String APPLICATION_JSON = "application/json";
 
-	/**
-	 * Plaintext media type.
-	 */
-	public static final String TEXT_PLAIN = "text/plain";
+    /**
+     * Plaintext media type.
+     */
+    public static final String TEXT_PLAIN = "text/plain";
 
-	/**
-	 * XML media type.
-	 */
-	public static final String APPLICATION_XML = "application/xml";
+    /**
+     * XML media type.
+     */
+    public static final String APPLICATION_XML = "application/xml";
 
-	/**
-	 * Supplier of the resource's content.
-	 */
-	public final InputSupplier<? extends InputStream> content;
+    /**
+     * Supplier of the resource's content.
+     */
+    public final InputSupplier<? extends InputStream> content;
 
-	/**
-	 * URI of the resource, used e.g. for link rewriting.
-	 */
-	public final URI source;
+    /**
+     * URI of the resource, used e.g. for link rewriting.
+     */
+    public final URI source;
 
-	/**
-	 * The character set with which the resource's content is encoded.
-	 */
-	public final Charset charset;
+    /**
+     * The character set with which the resource's content is encoded.
+     */
+    public final Charset charset;
 
-	/**
-	 * When this resource was last modified (milliseconds since epoch).
-	 */
-	public final long lastModified;
+    /**
+     * When this resource was last modified (milliseconds since epoch).
+     */
+    public final long lastModified;
 
-	/**
-	 * Maximum age of this resource in a HTTP cache (specified in seconds).
-	 */
-	public final long maxAge;
+    /**
+     * Maximum age of this resource in a HTTP cache (specified in seconds).
+     */
+    public final long maxAge;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param content      assigned to {@link #content}
-	 * @param source       assigned to {@link #source}
-	 * @param charset      assigned to {@link #charset}
-	 * @param lastModified assigned to {@link #lastModified}
-	 * @param maxAge       assigned to {@link #maxAge}
-	 */
-	public TextResource(InputSupplier<? extends InputStream> content, URI source, Charset charset, long lastModified, long maxAge) {
-		this.content = content;
-		this.source = source;
-		this.charset = charset;
-		this.lastModified = lastModified;
-		this.maxAge = maxAge;
-	}
+    /**
+     * Constructor.
+     *
+     * @param content      assigned to {@link #content}
+     * @param source       assigned to {@link #source}
+     * @param charset      assigned to {@link #charset}
+     * @param lastModified assigned to {@link #lastModified}
+     * @param maxAge       assigned to {@link #maxAge}
+     */
+    public TextResource(InputSupplier<? extends InputStream> content, URI source, Charset charset, long lastModified, long maxAge) {
+        this.content = content;
+        this.source = source;
+        this.charset = charset;
+        this.lastModified = lastModified;
+        this.maxAge = maxAge;
+    }
 
-	/**
-	 * Determines the media type of the resource by mapping its filename extension in the {@link #source source URI} path.
-	 * <p/>
-	 * For unknown filename extensions, it returns <code>text/plain</code> as a default.
-	 *
-	 * @return the media/MIME type
-	 */
-	public String getMediaType() {
-		return Objects.firstNonNull(MIME_TYPES.get(TO_FILENAME_EXTENSION.apply(source.getPath())), TEXT_PLAIN);
-	}
+    /**
+     * Determines the media type of the resource by mapping its filename extension in the {@link #source source URI} path.
+     * <p/>
+     * For unknown filename extensions, it returns <code>text/plain</code> as a default.
+     *
+     * @return the media/MIME type
+     */
+    public String getMediaType() {
+        return Objects.firstNonNull(MIME_TYPES.get(TO_FILENAME_EXTENSION.apply(source.getPath())), TEXT_PLAIN);
+    }
 
-	/**
-	 * Creates a reader for this resource's content.
-	 * <p/>
-	 * If the resource is of media type <code>text/css</code>, the reader is wrapped by a {@link CSSURLRewriteFilterReader filter}
-	 * which rewrites <code>url()</code> references to external resources on the fly.
-	 *
-	 * @return a reader for this resource's content
-	 * @throws IOException
-	 */
-	@Override
-	public Reader getInput() throws IOException {
-		final BufferedReader reader = new BufferedReader(new InputStreamReader(content.getInput(), charset));
-		return (TEXT_CSS.equals(getMediaType()) ? new CSSURLRewriteFilterReader(reader) : reader);
-	}
+    /**
+     * Creates a reader for this resource's content.
+     * <p/>
+     * If the resource is of media type <code>text/css</code>, the reader is wrapped by a {@link CSSURLRewriteFilterReader filter}
+     * which rewrites <code>url()</code> references to external resources on the fly.
+     *
+     * @return a reader for this resource's content
+     * @throws IOException
+     */
+    @Override
+    public Reader getInput() throws IOException {
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(content.getInput(), charset));
+        return (TEXT_CSS.equals(getMediaType()) ? new CSSURLRewriteFilterReader(reader) : reader);
+    }
 
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this).addValue(source).toString();
-	}
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).addValue(source).toString();
+    }
 
-	/**
-	 * Filters CSS input from a reader in order to rewrite references to external resources.
-	 * <p/>
-	 * References to external resources in CSS via <code>url()</code> are relative to the location of the CSS stylesheet,
-	 * which often results in them becoming invalid upon {@link TextResourceCombo resource combination}. This filter
-	 * uses the CSS stylesheet's {@link TextResource#source source URI} to resolve external references against it on the fly.
-	 */
-	protected class CSSURLRewriteFilterReader extends Reader {
-		private final Reader in;
-		private StringReader buf;
+    /**
+     * Filters CSS input from a reader in order to rewrite references to external resources.
+     * <p/>
+     * References to external resources in CSS via <code>url()</code> are relative to the location of the CSS stylesheet,
+     * which often results in them becoming invalid upon {@link TextResourceCombo resource combination}. This filter
+     * uses the CSS stylesheet's {@link TextResource#source source URI} to resolve external references against it on the fly.
+     */
+    protected class CSSURLRewriteFilterReader extends Reader {
+        private final Reader in;
+        private StringReader buf;
 
-		private CSSURLRewriteFilterReader(Reader in) {
-			this.in = in;
-		}
+        private CSSURLRewriteFilterReader(Reader in) {
+            this.in = in;
+        }
 
-		@Override
-		public int read(char[] cbuf, int off, int len) throws IOException {
-			if (buf == null) {
-				final String css = CharStreams.toString(in);
-				final Matcher urlRefMatcher = URL_REF_PATTERN.matcher(css);
-				final StringBuffer rewritten = new StringBuffer(css.length());
-				while (urlRefMatcher.find()) {
-					urlRefMatcher.appendReplacement(rewritten, "url(" + source.resolve(urlRefMatcher.group(1)) + ")");
-				}
-				urlRefMatcher.appendTail(rewritten);
-				buf = new StringReader(rewritten.toString());
-			}
-			return buf.read(cbuf, off, len);
-		}
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            if (buf == null) {
+                final String css = CharStreams.toString(in);
+                final Matcher urlRefMatcher = URL_REF_PATTERN.matcher(css);
+                final StringBuffer rewritten = new StringBuffer(css.length());
+                while (urlRefMatcher.find()) {
+                    urlRefMatcher.appendReplacement(rewritten, "url(" + source.resolve(urlRefMatcher.group(1)) + ")");
+                }
+                urlRefMatcher.appendTail(rewritten);
+                buf = new StringReader(rewritten.toString());
+            }
+            return buf.read(cbuf, off, len);
+        }
 
-		@Override
-		public void close() throws IOException {
-			Closeables.close(buf, false);
-		}
-	}
+        @Override
+        public void close() throws IOException {
+            Closeables.close(buf, false);
+        }
+    }
 
-	private static final Pattern URL_REF_PATTERN = Pattern.compile("url\\(([^\\)]+)\\)");
+    private static final Pattern URL_REF_PATTERN = Pattern.compile("url\\(([^\\)]+)\\)");
 
-	private static Map<String, String> MIME_TYPES = Maps.newHashMap();
+    private static Map<String, String> MIME_TYPES = Maps.newHashMap();
 
-	static {
-		MIME_TYPES.put("css", TEXT_CSS);
-		MIME_TYPES.put("js", APPLICATION_JAVASCRIPT);
-		MIME_TYPES.put("json", APPLICATION_JSON);
-		MIME_TYPES.put("txt", TEXT_PLAIN);
-		MIME_TYPES.put("xml", APPLICATION_XML);
-	}
+    static {
+        MIME_TYPES.put("css", TEXT_CSS);
+        MIME_TYPES.put("js", APPLICATION_JAVASCRIPT);
+        MIME_TYPES.put("json", APPLICATION_JSON);
+        MIME_TYPES.put("txt", TEXT_PLAIN);
+        MIME_TYPES.put("xml", APPLICATION_XML);
+    }
 
-	private static final Function<String, String> TO_FILENAME_EXTENSION = new Function<String, String>() {
-		@Override
-		public String apply(String input) {
-			return Objects.firstNonNull(Files.getFileExtension(input), "").toLowerCase();
-		}
-	};
+    private static final Function<String, String> TO_FILENAME_EXTENSION = new Function<String, String>() {
+        @Override
+        public String apply(String input) {
+            return Objects.firstNonNull(Files.getFileExtension(input), "").toLowerCase();
+        }
+    };
 }

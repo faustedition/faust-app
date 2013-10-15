@@ -14,7 +14,6 @@ import de.faustedition.genesis.GeneticSource;
 import de.faustedition.graph.Graph;
 import de.faustedition.reasoning.PremiseBasedRelation.Premise;
 import de.faustedition.text.VerseInterval;
-import de.faustedition.transcript.TranscribedVerseIntervalCollector;
 import edu.bath.transitivityutils.ImmutableRelation;
 import edu.bath.transitivityutils.Relation;
 import edu.bath.transitivityutils.Relations;
@@ -23,7 +22,6 @@ import org.neo4j.graphdb.Node;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -136,12 +134,12 @@ public class InscriptionPrecedenceResource {
 
         Relation<Inscription> test = Util.wrapTransitive(
                 new PremiseBasedRelation<Inscription>(premisesFromInference()
-        ), inscriptions);
+                ), inscriptions);
 
 
         Relation<Inscription> check = Util.wrapTransitive(
                 new PremiseBasedRelation<Inscription>(premisesFromGeneticSources()
-        ), inscriptions);
+                ), inscriptions);
 
         logger.info("Genetic graph statistics: ");
         logger.info(

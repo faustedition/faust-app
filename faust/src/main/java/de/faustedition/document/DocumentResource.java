@@ -45,10 +45,10 @@ public class DocumentResource {
         return templates.render(request, document(id));
     }
 
-	@GET
+    @GET
     @Path("/{id}/data")
     @Produces(MediaType.APPLICATION_JSON)
-	public Templates.ViewAndModel document(@PathParam("id") final long id) {
+    public Templates.ViewAndModel document(@PathParam("id") final long id) {
         return database.transaction(new Database.TransactionCallback<Templates.ViewAndModel>() {
             @Override
             public Templates.ViewAndModel doInTransaction(DSLContext sql) throws Exception {
@@ -61,7 +61,7 @@ public class DocumentResource {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
                 }
 
-                final Result<Record3<Long,Long,String>> materialUnits = sql
+                final Result<Record3<Long, Long, String>> materialUnits = sql
                         .select(Tables.MATERIAL_UNIT.ID, Tables.MATERIAL_UNIT.TRANSCRIPT_ID, Tables.FACSIMILE.PATH)
                         .from(Tables.MATERIAL_UNIT)
                         .leftOuterJoin(Tables.FACSIMILE)
@@ -70,18 +70,15 @@ public class DocumentResource {
                         .orderBy(Tables.MATERIAL_UNIT.DOCUMENT_ORDER.asc(), Tables.FACSIMILE.FACSIMILE_ORDER.asc())
                         .fetch();
 
-                final ArrayNode pages = objectMapper.createArrayNode();
-                ObjectNode materialUnit;
+                final ArrayNode references = objectMapper.createArrayNode();
                 ArrayNode facsimiles = null;
                 long currentUnit = 0;
-                for (Record3<Long,Long,String> materialUnitData : materialUnits) {
+                for (Record3<Long, Long, String> materialUnitData : materialUnits) {
                     if (materialUnitData.value1() != currentUnit) {
                         currentUnit = materialUnitData.value1();
-                        materialUnit = pages.addObject();
-                        facsimiles = materialUnit.putArray("facsimiles");
-                        if (materialUnitData.value2() != null) {
-                            materialUnit.put("transcript", materialUnitData.value2());
-                        }
+                        facsimiles = references.addObject()
+                                .put("transcript", materialUnitData.value2())
+                                .putArray("facsimiles");
                     }
                     if (materialUnitData.value3() != null) {
                         facsimiles.add(materialUnitData.value3());
@@ -90,7 +87,7 @@ public class DocumentResource {
 
                 return new Templates.ViewAndModel("document/document-app")
                         .add("document", objectMapper.reader().readTree(document.value1()))
-                        .add("pages", pages);
+                        .add("references", references);
             }
 
             @Override
@@ -98,5 +95,5 @@ public class DocumentResource {
                 return !(e instanceof WebApplicationException);
             }
         });
-	}
+    }
 }

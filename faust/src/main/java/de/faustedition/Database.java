@@ -42,7 +42,7 @@ public class Database implements DataSource {
 
     private static final Logger LOG = Logger.getLogger(Database.class.getName());
 
-    private static final String DRIVER_CLASS_NAME =  Driver.class.getName();
+    private static final String DRIVER_CLASS_NAME = Driver.class.getName();
 
     private static final String DB_USER = "sa";
 
@@ -109,11 +109,11 @@ public class Database implements DataSource {
             return true;
         }
 
-        protected  boolean isReadOnly() {
+        protected boolean isReadOnly() {
             return false;
         }
 
-        protected  int getTransactionIsolation() {
+        protected int getTransactionIsolation() {
             return Connection.TRANSACTION_READ_COMMITTED;
         }
     }
@@ -140,7 +140,7 @@ public class Database implements DataSource {
                 connection.commit();
                 if (LOG.isLoggable(Level.FINE)) {
                     sw.stop();
-                    LOG.log(Level.FINE, "Committed transaction for {0} after {1}", new Object[] { tx, sw });
+                    LOG.log(Level.FINE, "Committed transaction for {0} after {1}", new Object[]{tx, sw});
                 }
 
                 return result;

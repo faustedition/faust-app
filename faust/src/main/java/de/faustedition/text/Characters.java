@@ -15,7 +15,7 @@ public class Characters implements Token {
     public static final Predicate<Token> EMPTY_CONTENT = Predicates.and(IS_INSTANCE, new Predicate<Token>() {
         @Override
         public boolean apply(@Nullable Token input) {
-            return (((Characters)input).getContent().length() == 0);
+            return (((Characters) input).getContent().length() == 0);
         }
     });
 

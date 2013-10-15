@@ -30,8 +30,8 @@ import java.util.Map;
 @Path("/transcript/by-verse/{from}/{to}")
 public class VerseStatisticsResource {
 
-	private final Database database;
-	private final Graph graph;
+    private final Database database;
+    private final Graph graph;
 
     @Inject
     public VerseStatisticsResource(Database database, Graph graph) {
@@ -42,7 +42,7 @@ public class VerseStatisticsResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-	public List<Map<String, Object>> verseStatistics(@PathParam("from") int from, @PathParam("to") int to) {
+    public List<Map<String, Object>> verseStatistics(@PathParam("from") int from, @PathParam("to") int to) {
         Preconditions.checkArgument(from >= to, "Invalid interval");
         //final Map<MaterialUnit, Collection<VerseInterval>> verseStatistics = TranscribedVerseIntervalCollector.byMaterialUnit(dataSource, graphDb, from, to);
         // FIXME: query!
@@ -64,9 +64,9 @@ public class VerseStatisticsResource {
             }
 
             final Map<String, Object> documentMap = Maps.newHashMap();
-            documentMap.put("sigil", documentDesc.substring(0,documentDesc.indexOf('[') ));
+            documentMap.put("sigil", documentDesc.substring(0, documentDesc.indexOf('[')));
             /*documentMap.put("transcript", documentIndex.get(documentDesc).node.getId());*/
-            documentMap.put("source", ((Document)documentIndex.get(documentDesc)).getSource().toString());
+            documentMap.put("source", ((Document) documentIndex.get(documentDesc)).getSource().toString());
             documentMap.put("intervals", intervals);
             chartData.add(documentMap);
         }

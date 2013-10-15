@@ -4,13 +4,9 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Request;
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 
