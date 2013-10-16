@@ -88,7 +88,7 @@ public class TranscriptManager implements InitializingBean {
 		return (rel == null ? read(materialUnit) : new LayerNode<JsonNode>(textRepository, rel.getStartNode()));
 	}
 
-	LayerNode<JsonNode> read(MaterialUnit materialUnit) throws IOException, XMLStreamException {
+	private LayerNode<JsonNode> read(MaterialUnit materialUnit) throws IOException, XMLStreamException {
 		final FaustURI source = materialUnit.getTranscriptSource();
 		if (source == null) {
 			return null;
