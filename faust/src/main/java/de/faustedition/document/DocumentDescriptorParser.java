@@ -250,8 +250,10 @@ public class DocumentDescriptorParser extends DefaultHandler {
         String key = localName;
         if ("idno".equals(key)) {
             final String type = Strings.nullToEmpty(attributes.getValue("", "type")).trim();
-            key = ("callnumber" + (type.isEmpty() ? "" : "." + type));
-        } else if ("repository".equals(key)) {
+            return ("callnumber" + (type.isEmpty() ? "" : "." + type));
+        }
+
+        if ("repository".equals(key)) {
             key = "archive";
         }
 

@@ -17,7 +17,7 @@
 			<#if (a_index % 3) == 0><div class="yui3-g archive-row"></#if>
 			<div class="yui3-u-1-3">
 			<div class="archive-container">
-				<p>${a_index + 1}.<br><a href="${cp}/archive/${(a.LABEL)?url}">${a.NAME?html}</a></p>
+				<p>${a_index + 1}.<br><a href="${cp}/document/archive/${(a.LABEL)?url}/">${a.NAME?html}</a></p>
 				<@snippets.archiveData a false />
 			</div>
 			</div>

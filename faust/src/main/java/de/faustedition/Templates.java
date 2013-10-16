@@ -1,13 +1,27 @@
 package de.faustedition;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
+import freemarker.ext.beans.BooleanModel;
+import freemarker.ext.beans.CollectionModel;
+import freemarker.ext.beans.NumberModel;
+import freemarker.ext.beans.StringModel;
 import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.SimpleHash;
+import freemarker.template.SimpleNumber;
+import freemarker.template.SimpleScalar;
+import freemarker.template.SimpleSequence;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -23,8 +37,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -105,6 +121,29 @@ public class Templates extends freemarker.template.Configuration {
 
         @Override
         public TemplateModel wrap(Object obj) throws TemplateModelException {
+            if (obj instanceof JsonNode) {
+                final JsonNode node = (JsonNode) obj;
+                if (node.isObject()) {
+                    final Map<String, JsonNode> hash = Maps.newHashMapWithExpectedSize(node.size());
+                    for (Iterator<Map.Entry<String,JsonNode>> it = node.fields(); it.hasNext(); ) {
+                        Map.Entry<String, JsonNode> field = it.next();
+                        hash.put(field.getKey(), field.getValue());
+                    }
+                    return new SimpleHash(hash, this);
+                } else if (node.isArray()) {
+                    return new SimpleSequence(Lists.newArrayList(node), this);
+                } else if (node.isBoolean()) {
+                    return new BooleanModel(node.asBoolean(), this);
+                } else if (node.isNumber()) {
+                    return new NumberModel(node.numberValue(), this);
+                } else if (node.isTextual()) {
+                    return new StringModel(node.asText(), this);
+                } else if (node.isNull()) {
+                    return null;
+                } else {
+                    throw new TemplateModelException(node.toString());
+                }
+            }
             if (obj instanceof NodeWrapperCollection) {
                 return new NodeWrapperCollectionTemplateModel((NodeWrapperCollection<?>) obj);
             }

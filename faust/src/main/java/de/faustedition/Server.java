@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import dagger.Module;
 import dagger.ObjectGraph;
-import de.faustedition.document.ArchiveResource;
 import de.faustedition.document.DocumentImageLinkResource;
 import de.faustedition.document.DocumentResource;
 import de.faustedition.document.StructureResource;
@@ -30,7 +29,6 @@ import java.util.logging.Logger;
         DemoResource.class,
         HomeResource.class,
         ProjectResource.class,
-        ArchiveResource.class,
         DocumentResource.class,
         DocumentImageLinkResource.class,
         StructureResource.class,
@@ -60,7 +58,6 @@ public class Server {
                             objectGraph.get(DemoResource.class),
                             objectGraph.get(HomeResource.class),
                             objectGraph.get(ProjectResource.class),
-                            objectGraph.get(ArchiveResource.class),
                             objectGraph.get(DocumentResource.class),
                             objectGraph.get(DocumentImageLinkResource.class),
                             objectGraph.get(StructureResource.class),

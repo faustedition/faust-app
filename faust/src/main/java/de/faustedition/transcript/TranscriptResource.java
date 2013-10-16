@@ -1,10 +1,8 @@
 package de.faustedition.transcript;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 import de.faustedition.Database;
 import de.faustedition.FaustURI;
 import de.faustedition.Templates;
@@ -22,13 +20,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import java.net.URI;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -56,12 +55,18 @@ public class TranscriptResource {
     }
 
     @GET
+    @Path("/{id}")
+    public Response transcript(@Context Request request, @PathParam("id") final long id) throws Exception {
+        return templates.render(request, transcriptData(id));
+    }
+
+    @GET
     @Path("/{id}/data")
     @Produces(MediaType.APPLICATION_JSON)
     public Templates.ViewAndModel transcriptData(@PathParam("id") final long id) throws Exception {
         checkTranscriptExists(id);
 
-        return transcripts.read(id, new Transcripts.TokenCallback<Templates.ViewAndModel>() {
+        return transcripts.tokens(id, new Transcripts.TokenCallback<Templates.ViewAndModel>() {
             @Override
             public Templates.ViewAndModel withTokens(Iterator<Token> tokens) throws Exception {
                 final StringBuilder text = new StringBuilder();
@@ -81,7 +86,10 @@ public class TranscriptResource {
                         text.append(((Characters) token).getContent());
                     }
                 }
-                return new Templates.ViewAndModel("transcript").add("text", text.toString()).add("annotations", annotations);
+                return new Templates.ViewAndModel("transcript")
+                        .add("id", id)
+                        .add("text", text.toString())
+                        .add("annotations", annotations);
             }
         });
     }

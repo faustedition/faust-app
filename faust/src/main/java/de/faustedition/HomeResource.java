@@ -22,13 +22,13 @@ public class HomeResource {
 
     @GET
     public Response start(@Context UriInfo uriInfo) {
-        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path("archive").build()).build();
+        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path("document/").build()).build();
     }
 
     @Path("/login")
     @GET
     public Response login(@Context UriInfo uriInfo) {
-        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path("archive").build()).build();
+        return Response.temporaryRedirect(uriInfo.getBaseUriBuilder().path("document/").build()).build();
     }
 
 }

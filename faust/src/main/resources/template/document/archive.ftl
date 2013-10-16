@@ -40,8 +40,8 @@
 			<#list documents as d>
 				<#if (d_index % 2) == 0><tr></#if>
 				<td>${d_index + 1}.</td>
-				<td><a href="${cp}/document/${d.ID?url}" title="${message('archive.goto_document')}">${d.CALLNUMBER!'-'?html}</a></td>
-				<td><a href="${cp}/document/${d.ID?url}" title="${message('archive.goto_document')}">${d.WA_ID!'-'?html}</a></td>
+				<td><a href="${cp}/document/${d.ID?url}/" title="${message('archive.goto_document')}">${d.CALLNUMBER!'-'?html}</a></td>
+				<td><a href="${cp}/document/${d.ID?url}/" title="${message('archive.goto_document')}">${d.WA_ID!'-'?html}</a></td>
 				<#if (d_index % 2) == 1></tr></#if>
 				<#if !d_has_next && ((d_index % 2) == 0)>
 				<td>&nbsp;</td>

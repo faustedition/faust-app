@@ -55,7 +55,7 @@ public class Transcripts {
         this.namespaceMapping = namespaceMapping;
     }
 
-    public <R> R read(final long id, final TokenCallback<R> callback) {
+    public <R> R tokens(final long id, final TokenCallback<R> callback) {
         return database.transaction(new Database.TransactionCallback<R>() {
             @Override
             public R doInTransaction(DSLContext sql) throws Exception {

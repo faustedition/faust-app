@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.faustedition.Database;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
+import de.faustedition.db.tables.records.ArchiveRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
+import org.jooq.Record2;
 import org.jooq.Record3;
 import org.jooq.Result;
 
@@ -22,6 +24,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Map;
 
 
 @Path("/document")
@@ -40,19 +44,79 @@ public class DocumentResource {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/")
+    public Response indexView(@Context final Request request) {
+        return database.transaction(new Database.TransactionCallback<Response>() {
+            @Override
+            public Response doInTransaction(DSLContext sql) throws Exception {
+                return templates.render(request, new Templates.ViewAndModel("document/archives").add("archives", index()));
+            }
+        });
+    }
+
+    @GET
+    @Path("/data/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Map<String, Object>> index() {
+        return database.transaction(new Database.TransactionCallback<List<Map<String, Object>>>() {
+            @Override
+            public List<Map<String, Object>> doInTransaction(DSLContext sql) throws Exception {
+                return sql.selectFrom(Tables.ARCHIVE).orderBy(Tables.ARCHIVE.NAME.asc()).fetchMaps();
+            }
+        });
+    }
+
+    @Path("/archive/{id}/")
+    @GET
+    public Response archiveView(@PathParam("id") final String id, @Context final Request request) {
+        return templates.render(request, archive(id));
+    }
+
+    @GET
+    @Path("/archive/{id}/data/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Templates.ViewAndModel archive(@PathParam("id") final String id) {
+        return database.transaction(new Database.TransactionCallback<Templates.ViewAndModel>() {
+            @Override
+            public Templates.ViewAndModel doInTransaction(DSLContext sql) throws Exception {
+                final ArchiveRecord archive = sql.selectFrom(Tables.ARCHIVE).where(Tables.ARCHIVE.LABEL.eq(id)).fetchOne();
+                if (archive == null) {
+                    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
+                }
+
+                return new Templates.ViewAndModel("document/archive")
+                        .add("archive", archive.intoMap())
+                        .add("documents", sql
+                                .select(Tables.DOCUMENT.ID, Tables.DOCUMENT.CALLNUMBER, Tables.DOCUMENT.WA_ID)
+                                .from(Tables.DOCUMENT)
+                                .where(Tables.DOCUMENT.ARCHIVE_ID.eq(archive.getId()))
+                                .orderBy(Tables.DOCUMENT.CALLNUMBER.asc())
+                                .fetchMaps()
+                        );
+            }
+
+            @Override
+            protected boolean rollsBackOn(Exception e) {
+                return !(e instanceof WebApplicationException);
+            }
+        });
+    }
+
+    @GET
+    @Path("/{id}/")
     public Response documentView(@Context Request request, @PathParam("id") final long id) {
         return templates.render(request, document(id));
     }
 
     @GET
-    @Path("/{id}/data")
+    @Path("/{id}/data/")
     @Produces(MediaType.APPLICATION_JSON)
     public Templates.ViewAndModel document(@PathParam("id") final long id) {
         return database.transaction(new Database.TransactionCallback<Templates.ViewAndModel>() {
             @Override
             public Templates.ViewAndModel doInTransaction(DSLContext sql) throws Exception {
-                final Record1<String> document = sql.select(Tables.DOCUMENT.METADATA)
+                final Record2<String, String> document = sql
+                        .select(Tables.DOCUMENT.CALLNUMBER, Tables.DOCUMENT.METADATA)
                         .from(Tables.DOCUMENT)
                         .where(Tables.DOCUMENT.ID.eq(id))
                         .fetchOne();
@@ -85,8 +149,9 @@ public class DocumentResource {
                     }
                 }
 
-                return new Templates.ViewAndModel("document/document-app")
-                        .add("document", objectMapper.reader().readTree(document.value1()))
+                return new Templates.ViewAndModel("document")
+                        .add("callnumber", document.value1())
+                        .add("metadata", objectMapper.reader().readTree(document.value2()))
                         .add("references", references);
             }
 

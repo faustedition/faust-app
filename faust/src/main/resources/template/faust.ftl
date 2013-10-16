@@ -6,16 +6,15 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>Digitale Faust-Edition: ${title}</title>
-    <link rel="stylesheet" type="text/css" href="${yp}/cssreset/reset-min.css">
-    <link rel="stylesheet" type="text/css" href="${yp}/cssgrids/grids-min.css">
-    <link rel="stylesheet" type="text/css" href="${yp}/cssfonts/fonts-min.css">
-    <link rel="stylesheet" type="text/css" href="${yp}/cssbase/base-min.css">
+    <link rel="stylesheet" type="text/css" href="${cp}/static/css/bootstrap<#if !debug>.min</#if>.css">
     <link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css">
     <script type="text/javascript">
         var cp = '${cp?js_string}';
         var Faust = { contextPath: cp, FacsimileServer: "${facsimileIIPUrl}" };
     </script>
-    <script type="text/javascript" src="${yp}/yui/yui.js"></script>
+    <script type="text/javascript" src="${cp}/static/js/jquery-1.10.2<#if !debug>.min</#if>.js"></script>
+    <script type="text/javascript" src="${cp}/static/js/bootstrap<#if !debug>.min</#if>.js"></script>
+    <script type="text/javascript" src="${yp}/yui/yui<#if !debug>-min</#if>.js"></script>
     <script type="text/javascript" src="${cp}/static/js/yui-config.js"></script>
     <#if debug>
     <script type="text/javascript">
@@ -40,28 +39,37 @@
 	 <#if css?has_content><style type="text/css">${css}</style></#if>
 	 <#if header?has_content>${header}</#if>
 </head>
-<body class="yui3-skin-sam<#if layout?has_content> layout-${layout}</#if>">
-<div id="header">
-	<div style="float: right"><input title="${message('menu.search')}" id="quick-search" type="text" value=""/></div>
-	<h1><a href="${cp}/genesis/work" class="color-1">Digitale Faustedition</a>:&#160;${title}</h1>
-	<@topNavigation />
-</div>
-<div id="main" class="<#if layout?has_content>layout-${layout}</#if>">
+<body class="yui3-skin-sam">
+<nav class="navbar navbar-default" role="navigation">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="${cp}/">Faust</a>
+    </div>
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav">
+            <li><a href="${cp}/text/">${message("menu.text")}</a></li>
+            <li><a href="${cp}/document/">${message("menu.document")}</a></li>
+            <li><a href="${cp}/genesis/">${message("menu.genesis")}</a></li>
+        </ul>
+        <form class="navbar-form navbar-right" role="search">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="${message("menu.search")}">
+            </div>
+            <button type="submit" class="btn btn-default">${message("menu.search")}</button>
+        </form>
+    </div>
+</nav>
+<section id="main">
 	<#nested />
-</div>
-<div id="footer">
-	<p>Digitale Faust-Edition. Copyright (c) 2009, 2010 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
-</div>
-<script type="text/javascript">
-	YUI().use("node", "dom", "node-menunav", "search", function(Y) {
-		Y.one("#top-navigation").plug(Y.Plugin.NodeMenuNav);
-		Y.one("html").removeClass("yui3-loading");
-
-		var quickSearch = Y.one("#quick-search");
-		new Y.Faust.QuickSearch({ srcNode: quickSearch }).render();
-		quickSearch.focus();
-	});
-</script>
+</section>
+<footer>
+    <p>Digitale Faust-Edition. Copyright (c) 2009-2013 Freies Deutsches Hochstift Frankfurt, Klassik Stiftung Weimar, Universität Würzburg.</p>
+</footer>
 </body>
 </html>
 </#macro>
