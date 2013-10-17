@@ -205,20 +205,25 @@ YUI.add('document-app', function (Y) {
 
 			var that = this;
 			var page = this.get('pages')[pagenum - 1];
-			var source = page.transcript.source;
-			page.transcriptionFromRanges(function (t) {
 
-				that.removeAjaxLoader(diplomaticContent);
-				var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
-					container: diplomaticContainer.one('.diplomaticContent'),
-					visComponent: null,
-					transcript: t,
-					source: source
-				});
+			var initTranscriptView = function(transcript) {
+					that.removeAjaxLoader(diplomaticContent);
+					var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
+						container: diplomaticContainer.one('.diplomaticContent'),
+						visComponent: null,
+						transcript: transcript,
+						source: source
+					});
+					diplomaticTranscriptView.render();
+			}
 
-				diplomaticTranscriptView.render();
+			if (page.transcript && page.transcript.source) {
+				var source = page.transcript.source;
+				page.transcriptionFromRanges(initTranscriptView);
+			} else {
+				initTranscriptView(null);
+			}
 
-			});
 		},
 
 		updateStructureView: function () {
@@ -449,7 +454,7 @@ YUI.add('document-app', function (Y) {
 					  var pages = [];
 					  var descendants = fd.descendants();
 					  for (i=0; i < descendants.length; i++)
-						  if (descendants[i].type === 'page' && descendants[i].transcript)
+						  if (descendants[i].type === 'page' /* && descendants[i].transcript */)
 							  pages.push(descendants[i]);
 
 					  Y.fire('faust:document-data-arrives', {
