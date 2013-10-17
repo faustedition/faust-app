@@ -181,6 +181,15 @@
 	</#if>
 </#macro>
 
+<#macro passMessages messages>
+<script type="text/javascript">
+	Faust.messages = {};
+	<#list messages as msg>
+		Faust.messages["${msg}"] = "${message(msg)}";
+	</#list>
+</script>
+</#macro>
+
 <#function resolveUri uri>
 	<#return cp + uri?replace("faust://", "/")>
 </#function>
