@@ -5,6 +5,7 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Throwables;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import de.faustedition.Database;
 import de.faustedition.FaustAuthority;
@@ -20,6 +21,7 @@ import de.faustedition.text.XML;
 import de.faustedition.text.XMLStreamToTokenFunction;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Result;
 
@@ -28,8 +30,11 @@ import javax.inject.Singleton;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.stream.StreamSource;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,6 +59,45 @@ public class Transcripts {
         this.namespaceMapping = namespaceMapping;
     }
 
+    public <R> R textual(final long documentId, TokenCallback<R> callback) {
+        final List<Long> textualTranscript = database.transaction(new Database.TransactionCallback<List<Long>>() {
+            @Override
+            public List<Long> doInTransaction(DSLContext sql) throws Exception {
+                Record1<Long> transcriptRecord = sql.select(Tables.TRANSCRIPT.ID).from(Tables.TRANSCRIPT)
+                        .join(Tables.MATERIAL_UNIT).on(Tables.TRANSCRIPT.MATERIAL_UNIT_ID.eq(Tables.MATERIAL_UNIT.ID))
+                        .join(Tables.DOCUMENT).on(Tables.DOCUMENT.ID.eq(Tables.MATERIAL_UNIT.DOCUMENT_ID))
+                        .where(Tables.DOCUMENT.ID.eq(documentId))
+                        .and(Tables.MATERIAL_UNIT.DOCUMENT_ORDER.eq(0))
+                        .fetchOne();
+                return (transcriptRecord == null ? Collections.<Long>emptyList() : Arrays.asList(transcriptRecord.value1()));
+            }
+        });
+
+        return tokens(textualTranscript, callback);
+    }
+
+    public <R> R documentary(final long documentId, TokenCallback<R> callback) {
+        final List<Long> documentaryTranscripts = database.transaction(new Database.TransactionCallback<List<Long>>() {
+            @Override
+            public List<Long> doInTransaction(DSLContext sql) throws Exception {
+                final Result<Record1<Long>> idResult = sql.select(Tables.TRANSCRIPT.ID).from(Tables.TRANSCRIPT)
+                        .join(Tables.MATERIAL_UNIT).on(Tables.MATERIAL_UNIT.ID.eq(Tables.TRANSCRIPT.MATERIAL_UNIT_ID))
+                        .join(Tables.DOCUMENT).on(Tables.DOCUMENT.ID.eq(Tables.MATERIAL_UNIT.DOCUMENT_ID))
+                        .where(Tables.DOCUMENT.ID.eq(documentId))
+                        .and(Tables.MATERIAL_UNIT.DOCUMENT_ORDER.gt(0))
+                        .orderBy(Tables.MATERIAL_UNIT.DOCUMENT_ORDER)
+                        .fetch();
+
+                final List<Long> ids = Lists.newLinkedList();
+                for (Record1<Long> id : idResult) {
+                    ids.add(id.value1());
+                }
+                return ids;
+            }
+        });
+
+        return tokens(documentaryTranscripts, callback);
+    }
 
     public <R> R tokens(final Collection<Long> ids, final TokenCallback<R> callback) {
         final Map<Long, FaustURI> uris = database.transaction(new Database.TransactionCallback<Map<Long, FaustURI>>() {
