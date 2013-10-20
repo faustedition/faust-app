@@ -2,45 +2,44 @@ package de.faustedition.transcript;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Predicates;
+import com.google.common.base.Throwables;
+import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Range;
+import com.google.common.collect.Maps;
 import de.faustedition.Database;
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.db.Tables;
-import de.faustedition.db.tables.records.TranscriptRecord;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.text.Annotation;
-import de.faustedition.text.AnnotationProcessor;
-import de.faustedition.text.Characters;
 import de.faustedition.text.ElementContextFilter;
 import de.faustedition.text.LineBreaker;
-import de.faustedition.text.MilestoneMarkupProcessor;
 import de.faustedition.text.NamespaceMapping;
+import de.faustedition.text.TEIMilestoneMarkupProcessor;
 import de.faustedition.text.Token;
 import de.faustedition.text.WhitespaceCompressor;
 import de.faustedition.text.XML;
 import de.faustedition.text.XMLStreamToTokenFunction;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.Result;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
-import java.net.URI;
-import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static de.faustedition.text.TokenPredicates.name;
 
 @Singleton
 public class Transcripts {
+
+    private static final Logger LOG = Logger.getLogger(Transcripts.class.getName());
 
     private final Database database;
     private final Sources xml;
@@ -55,39 +54,78 @@ public class Transcripts {
         this.namespaceMapping = namespaceMapping;
     }
 
-    public <R> R tokens(final long id, final TokenCallback<R> callback) {
-        return database.transaction(new Database.TransactionCallback<R>() {
+
+    public <R> R tokens(final Collection<Long> ids, final TokenCallback<R> callback) {
+        final Map<Long, FaustURI> uris = database.transaction(new Database.TransactionCallback<Map<Long, FaustURI>>() {
             @Override
-            public R doInTransaction(DSLContext sql) throws Exception {
-                final Record1<String> transcriptSource = sql
-                        .select(Tables.TRANSCRIPT.SOURCE_URI)
+            public Map<Long, FaustURI> doInTransaction(DSLContext sql) throws Exception {
+                final Result<Record2<Long, String>> uriMappings = sql
+                        .select(Tables.TRANSCRIPT.ID, Tables.TRANSCRIPT.SOURCE_URI)
                         .from(Tables.TRANSCRIPT)
-                        .where(Tables.TRANSCRIPT.ID.eq(id))
-                        .fetchOne();
-
-                if (transcriptSource == null) {
-                    return callback.withTokens(Iterators.<Token>emptyIterator());
+                        .where(Tables.TRANSCRIPT.ID.in(ids))
+                        .fetch();
+                final Map<Long, FaustURI> uris = Maps.newHashMap();
+                for (Record2<Long, String> uriMapping : uriMappings) {
+                    uris.put(uriMapping.value1(), new FaustURI(FaustAuthority.XML, "/" + uriMapping.value2()));
                 }
-
-                final FaustURI uri = new FaustURI(URI.create(transcriptSource.value1()));
-                if (!xml.isResource(uri)) {
-                    return callback.withTokens(Iterators.<Token>emptyIterator());
-                }
-
-                final XMLInputFactory xif = XML.inputFactory();
-                XMLEventReader reader = null;
-                try {
-                    return callback.withTokens(tokens(XML.stream(reader = xif.createXMLEventReader(new StreamSource(xml.file(uri))))));
-                } finally {
-                    XML.closeQuietly(reader);
-                }
+                return uris;
             }
         });
+
+        try {
+            return callback.withTokens(transcriptTokens(new AbstractIterator<Token>() {
+
+                Iterator<Long> idIt = ids.iterator();
+                Iterator<Token> tokenIt = Iterators.emptyIterator();
+                XMLEventReader xmlEvents = null;
+
+                @Override
+                protected Token computeNext() {
+                    while (!tokenIt.hasNext() && idIt.hasNext()) {
+                        final Long id = idIt.next();
+                        final FaustURI uri = uris.get(id);
+                        if (uri == null || !xml.isResource(uri)) {
+                            if (LOG.isLoggable(Level.WARNING)) {
+                                LOG.warning("Cannot find source for transcript #" + id);
+                            }
+                            continue;
+                        }
+                        if (!xml.isResource(uri)) {
+                            if (LOG.isLoggable(Level.WARNING)) {
+                                LOG.warning("Source " + uri + " for transcript #" + id + " does not exist");
+                            }
+                            continue;
+                        }
+                        try {
+                            XML.closeQuietly(xmlEvents);
+                            xmlEvents = XML.inputFactory().createXMLEventReader(new StreamSource(xml.file(uri)));
+                            tokenIt = Iterators.transform(
+                                    XML.stream(xmlEvents),
+                                    new XMLStreamToTokenFunction(objectMapper, namespaceMapping).withNodePath()
+                            );
+                        } catch (XMLStreamException e) {
+                            XML.closeQuietly(xmlEvents);
+                            throw Throwables.propagate(e);
+                        }
+                    }
+                    if (!tokenIt.hasNext()) {
+                        XML.closeQuietly(xmlEvents);
+                        return endOfData();
+                    }
+                    return tokenIt.next();
+                }
+
+                @Override
+                protected void finalize() throws Throwable {
+                    XML.closeQuietly(xmlEvents);
+                }
+            }));
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
     }
 
-    public Iterator<Token> tokens(Iterator<XMLEvent> xml) {
-        Iterator<Token> tokens = Iterators.transform(xml, new XMLStreamToTokenFunction(objectMapper, namespaceMapping, true));
-
+    public Iterator<Token> transcriptTokens(Iterator<Token> tokens) {
         tokens = Iterators.filter(tokens, new ElementContextFilter(
                 Predicates.or(
                         name(namespaceMapping, "tei:teiHeader"),
@@ -130,11 +168,9 @@ public class Transcripts {
                 name(namespaceMapping, "ge:line")
         ));
 
-        tokens = new MilestoneMarkupProcessor(tokens, objectMapper, namespaceMapping);
+        tokens = new TEIMilestoneMarkupProcessor(tokens, objectMapper, namespaceMapping);
 
         tokens = new TranscriptMarkupHandler(tokens, objectMapper, namespaceMapping);
-
-        tokens = new AnnotationProcessor(tokens);
 
         return tokens;
     }
@@ -143,68 +179,5 @@ public class Transcripts {
 
         R withTokens(Iterator<Token> tokens) throws Exception;
 
-    }
-
-    public TranscriptRecord transcriptOf(final MaterialUnit materialUnit) throws IOException, XMLStreamException {
-        final FaustURI source = materialUnit.getTranscriptSource();
-        if (source == null) {
-            return null;
-        }
-
-        return database.transaction(new Database.TransactionCallback<TranscriptRecord>() {
-            @Override
-            public TranscriptRecord doInTransaction(DSLContext sql) throws Exception {
-                TranscriptRecord transcriptRecord = sql.selectFrom(Tables.TRANSCRIPT).fetchOne();
-                if (transcriptRecord == null) {
-                    transcriptRecord = sql.newRecord(Tables.TRANSCRIPT);
-                    transcriptRecord.setSourceUri(source.toString());
-                    transcriptRecord.store();
-                }
-
-                final long transcriptId = transcriptRecord.getId();
-
-                sql.delete(Tables.TRANSCRIPT_ANNOTATION).where(Tables.TRANSCRIPT_ANNOTATION.TRANSCRIPT_ID.eq(transcriptRecord.getId()));
-
-                final XMLInputFactory xif = XML.inputFactory();
-                XMLEventReader reader = null;
-                try {
-
-                    Iterator<Token> tokens = tokens(XML.stream(reader = xif.createXMLEventReader(new SAXSource(xml.getInputSource(source)))));
-
-                    tokens = new TranscribedVerseIntervalCollector(tokens, namespaceMapping, database, transcriptId);
-
-                    final StringBuilder text = new StringBuilder();
-
-                    while (tokens.hasNext()) {
-                        final Token token = tokens.next();
-                        if (token instanceof Characters) {
-                            text.append(((Characters) token).getContent());
-                        } else if (token instanceof Annotation) {
-                            final Annotation annotation = (Annotation) token;
-                            final Range<Integer> segment = annotation.getSegment();
-                            sql.insertInto(
-                                    Tables.TRANSCRIPT_ANNOTATION,
-                                    Tables.TRANSCRIPT_ANNOTATION.TRANSCRIPT_ID,
-                                    Tables.TRANSCRIPT_ANNOTATION.RANGE_START,
-                                    Tables.TRANSCRIPT_ANNOTATION.RANGE_END,
-                                    Tables.TRANSCRIPT_ANNOTATION.ANNOTATION_DATA
-                            ).values(
-                                    transcriptId,
-                                    segment.lowerEndpoint().longValue(),
-                                    segment.upperEndpoint().longValue(),
-                                    objectMapper.writer().writeValueAsBytes(annotation.getData())
-                            ).execute();
-                        }
-                    }
-                    transcriptRecord.setLastRead(new Timestamp(System.currentTimeMillis()));
-                    transcriptRecord.setTextContent(text.toString());
-                    transcriptRecord.store();
-                } finally {
-                    XML.closeQuietly(reader);
-                }
-
-                return transcriptRecord;
-            }
-        });
     }
 }

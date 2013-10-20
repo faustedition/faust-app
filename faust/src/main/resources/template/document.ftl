@@ -8,6 +8,8 @@
 </#assign>
 <@faust.page title=(callnumber!"n/a") header=header>
 
+<p><a href="${cp}/document/${id?c}/source" title="XML Source">XML</a></p>
+
 <h2>Metadata</h2>
 
 <table>

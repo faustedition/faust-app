@@ -6,6 +6,7 @@ import dagger.Module;
 import dagger.ObjectGraph;
 import de.faustedition.document.DocumentImageLinkResource;
 import de.faustedition.document.DocumentResource;
+import de.faustedition.document.Documents;
 import de.faustedition.document.StructureResource;
 import de.faustedition.facsimile.FacsimileResource;
 import de.faustedition.genesis.GeneticGraphResource;
@@ -24,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Module(includes = ServerModule.class, injects = {
+@Module(includes = Infrastructure.class, injects = {
         JsonMessageBodyReaderWriter.class,
         DemoResource.class,
         HomeResource.class,
@@ -39,8 +40,7 @@ import java.util.logging.Logger;
         TranscriptResource.class,
         VerseStatisticsResource.class,
         XMLResource.class,
-        XMLQueryResource.class,
-        ScaffoldingService.class
+        XMLQueryResource.class
 })
 public class Server {
 
@@ -48,11 +48,12 @@ public class Server {
 
     public static void main(String... args) {
         try {
-            final ServerModule serverModule = ServerModule.fromCommandLineArgs(args);
-            final Configuration configuration = serverModule.getConfiguration();
-            final ObjectGraph objectGraph = ObjectGraph.create(new Server(), serverModule);
+            final Infrastructure infrastructure = Infrastructure.create(args);
+            final Configuration configuration = infrastructure.getConfiguration();
+            final ObjectGraph objectGraph = ObjectGraph.create(new Server(), infrastructure);
 
             final ServiceManager serviceManager = new ServiceManager(Arrays.asList(
+                    objectGraph.get(Documents.class),
                     new HttpService(configuration,
                             objectGraph.get(JsonMessageBodyReaderWriter.class),
                             objectGraph.get(DemoResource.class),
@@ -69,8 +70,7 @@ public class Server {
                             objectGraph.get(VerseStatisticsResource.class),
                             objectGraph.get(XMLQueryResource.class),
                             objectGraph.get(XMLResource.class)
-                    ),
-                    objectGraph.get(ScaffoldingService.class)
+                    )
             ));
             serviceManager.addListener(START_FAILURE_LISTENER, Executors.newSingleThreadExecutor());
 

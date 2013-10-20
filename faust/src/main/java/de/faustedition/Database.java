@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Singleton
 public class Database implements DataSource {
 
     private static final Logger LOG = Logger.getLogger(Database.class.getName());
@@ -50,7 +49,6 @@ public class Database implements DataSource {
 
     private final DataSource ds;
 
-    @Inject
     public Database(File dataDirectory) {
         this.ds = init(createDataSource(dataDirectory, true));
     }

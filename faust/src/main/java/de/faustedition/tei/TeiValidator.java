@@ -13,7 +13,7 @@ import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
 import dagger.ObjectGraph;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
-import de.faustedition.ServerModule;
+import de.faustedition.Infrastructure;
 import de.faustedition.xml.Sources;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -42,10 +42,10 @@ public class TeiValidator {
 
     public static void main(String[] args) {
         try {
-            final ServerModule serverModule = ServerModule.fromCommandLineArgs(args);
+            final Infrastructure infrastructure = Infrastructure.create(args);
             validate(
-                    URI.create(serverModule.getConfiguration().property("faust.schema_uri")),
-                    ObjectGraph.create(serverModule).get(Sources.class)
+                    URI.create(infrastructure.getConfiguration().property("faust.schema_uri")),
+                    ObjectGraph.create(infrastructure).get(Sources.class)
             );
         } catch (Exception e) {
             e.printStackTrace();

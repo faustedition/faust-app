@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import dagger.Module;
 import dagger.Provides;
+import de.faustedition.document.Documents;
 import de.faustedition.facsimile.DefaultFacsimiles;
 import de.faustedition.facsimile.Facsimiles;
 import de.faustedition.facsimile.MockFacsimiles;
 import de.faustedition.graph.Graph;
 import de.faustedition.text.NamespaceMapping;
+import de.faustedition.transcript.Transcripts;
 import de.faustedition.xml.Sources;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
@@ -23,20 +25,30 @@ import java.util.logging.Logger;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Module(library = true)
-public class ServerModule {
+@Module(injects = {
+        Configuration.class,
+        NamespaceMapping.class,
+        ObjectMapper.class,
+        Database.class,
+        Graph.class,
+        Sources.class,
+        Facsimiles.class,
+        Documents.class,
+        Transcripts.class
+}, library = true)
+public class Infrastructure {
 
-    private static final Logger LOG = Logger.getLogger(ServerModule.class.getName());
+    private static final Logger LOG = Logger.getLogger(Infrastructure.class.getName());
 
     private final File dataDirectory;
     private final Configuration configuration;
 
-    public ServerModule(File dataDirectory) {
+    public Infrastructure(File dataDirectory) {
         this.dataDirectory = dataDirectory;
         this.configuration = Configuration.read(dataDirectory);
     }
 
-    public static ServerModule fromCommandLineArgs(String... args) {
+    public static Infrastructure create(String... args) {
         if (args.length < 1) {
             System.err.println("Usage: java -jar <faust-jar-path> <data-directory-path>");
             System.exit(1);
@@ -48,7 +60,7 @@ public class ServerModule {
             System.exit(2);
         }
 
-        return new ServerModule(dataDirectory);
+        return new Infrastructure(dataDirectory);
     }
 
     public File getDataDirectory() {

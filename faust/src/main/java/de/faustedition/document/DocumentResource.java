@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.faustedition.Database;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
+import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Record2;
@@ -24,6 +27,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -33,18 +39,19 @@ import java.util.Map;
 public class DocumentResource {
 
     private final Database database;
+    private final Sources sources;
     private final Templates templates;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public DocumentResource(Database database, Templates templates, ObjectMapper objectMapper) {
+    public DocumentResource(Database database, Sources sources, Templates templates, ObjectMapper objectMapper) {
         this.database = database;
+        this.sources = sources;
         this.templates = templates;
         this.objectMapper = objectMapper;
     }
 
     @GET
-    @Path("/")
     public Response indexView(@Context final Request request) {
         return database.transaction(new Database.TransactionCallback<Response>() {
             @Override
@@ -126,10 +133,10 @@ public class DocumentResource {
                 }
 
                 final Result<Record3<Long, Long, String>> materialUnits = sql
-                        .select(Tables.MATERIAL_UNIT.ID, Tables.MATERIAL_UNIT.TRANSCRIPT_ID, Tables.FACSIMILE.PATH)
+                        .select(Tables.MATERIAL_UNIT.ID, Tables.TRANSCRIPT.ID, Tables.FACSIMILE.PATH)
                         .from(Tables.MATERIAL_UNIT)
-                        .leftOuterJoin(Tables.FACSIMILE)
-                        .on(Tables.FACSIMILE.MATERIAL_UNIT_ID.eq(Tables.MATERIAL_UNIT.ID))
+                        .leftOuterJoin(Tables.TRANSCRIPT).on(Tables.TRANSCRIPT.MATERIAL_UNIT_ID.eq(Tables.MATERIAL_UNIT.ID))
+                        .leftOuterJoin(Tables.FACSIMILE).on(Tables.FACSIMILE.TRANSCRIPT_ID.eq(Tables.TRANSCRIPT.ID))
                         .where(Tables.MATERIAL_UNIT.DOCUMENT_ID.eq(id))
                         .orderBy(Tables.MATERIAL_UNIT.DOCUMENT_ORDER.asc(), Tables.FACSIMILE.FACSIMILE_ORDER.asc())
                         .fetch();
@@ -140,9 +147,7 @@ public class DocumentResource {
                 for (Record3<Long, Long, String> materialUnitData : materialUnits) {
                     if (materialUnitData.value1() != currentUnit) {
                         currentUnit = materialUnitData.value1();
-                        facsimiles = references.addObject()
-                                .put("transcript", materialUnitData.value2())
-                                .putArray("facsimiles");
+                        facsimiles = references.addObject().put("transcript", materialUnitData.value2()).putArray("facsimiles");
                     }
                     if (materialUnitData.value3() != null) {
                         facsimiles.add(materialUnitData.value3());
@@ -150,6 +155,7 @@ public class DocumentResource {
                 }
 
                 return new Templates.ViewAndModel("document")
+                        .add("id", id)
                         .add("callnumber", document.value1())
                         .add("metadata", objectMapper.reader().readTree(document.value2()))
                         .add("references", references);
@@ -161,4 +167,37 @@ public class DocumentResource {
             }
         });
     }
+
+    @GET
+    @Path("/{id}/source/")
+    @Produces(MediaType.APPLICATION_XML)
+    public File documentDescriptor(@PathParam("id") final long id) {
+        return database.transaction(new Database.TransactionCallback<File>() {
+            @Override
+            public File doInTransaction(DSLContext sql) throws Exception {
+                final Record1<String> descriptor = sql
+                        .select(Tables.DOCUMENT.DESCRIPTOR_URI)
+                        .from(Tables.DOCUMENT)
+                        .where(Tables.DOCUMENT.ID.eq(id))
+                        .fetchOne();
+
+                if (descriptor == null) {
+                    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
+                }
+
+                final FaustURI descriptorUri = new FaustURI(FaustAuthority.XML, "/" + descriptor.value1());
+                if (!sources.isResource(descriptorUri)) {
+                    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(descriptorUri.toString()).build());
+                }
+
+                return sources.file(descriptorUri);
+            }
+
+            @Override
+            protected boolean rollsBackOn(Exception e) {
+                return !(e instanceof WebApplicationException);
+            }
+        });
+    }
+
 }

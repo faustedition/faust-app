@@ -42,10 +42,11 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
     private final String handKey;
     private final String newAttributeName;
     private final String xmlNameKey;
+    private final String documentKey;
 
     private String facsimileAnnotationId = null;
-    private String currentStageAnnotationId = null;
-    private String currentHandAnnotationId = null;
+    private String stageAnnotationId = null;
+    private String handAnnotationId = null;
 
     public TranscriptMarkupHandler(Iterator<Token> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
         this.delegate = delegate;
@@ -60,6 +61,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
         this.handShiftName = map(namespaceMapping, new QName(TEI_NS_URI, "handShift"));
         this.newAttributeName = map(namespaceMapping, new QName(TEI_NS_URI, "new"));
 
+        this.documentKey = map(namespaceMapping, new QName(TEI_SIG_GE_URI, "document"));
         this.facsimileKey = map(namespaceMapping, new QName(FAUST_NS_URI, "facsimile"));
         this.graphicName = map(namespaceMapping, new QName(TEI_NS_URI, "graphic"));
         this.mimeTypeAttributeName = map(namespaceMapping, new QName(TEI_NS_URI, "mimeType"));
@@ -81,11 +83,18 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
         if (buf.isEmpty() && super.hasNext()) {
             final Token next = super.next();
             if (next instanceof AnnotationStart) {
-                final ObjectNode data = ((AnnotationStart) next).getData();
+                final AnnotationStart annotationStart = (AnnotationStart) next;
+                final ObjectNode data = annotationStart.getData();
                 final String xmlName = data.path(xmlNameKey).asText();
 
+                if (xmlName.equals(documentKey)) {
+                    handEnd();
+                    stageEnd();
+                    facsimileEnd();
+                }
+
                 // generate facsimile annotation only once per transcript and filter text-image-link elements (@mimeType)
-                if (facsimileAnnotationId == null && xmlName.equals(graphicName) && !data.has(mimeTypeAttributeName)) {
+                if (xmlName.equals(graphicName) && facsimileAnnotationId == null && !data.has(mimeTypeAttributeName)) {
                     final String url = data.path(urlAttributeName).asText();
                     if (!url.isEmpty()) {
                         buf.add(new AnnotationStart(
@@ -99,7 +108,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
                 if (!stage.isEmpty()) {
                     stageEnd();
                     buf.add(new AnnotationStart(
-                            currentStageAnnotationId = ids.next(),
+                            stageAnnotationId = ids.next(),
                             objectMapper.createObjectNode().put(stageKey, stage)
                     ));
                 }
@@ -109,7 +118,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
                     if (!hand.isEmpty()) {
                         handEnd();
                         buf.add(new AnnotationStart(
-                                currentHandAnnotationId = ids.next(),
+                                handAnnotationId = ids.next(),
                                 objectMapper.createObjectNode().put(handKey, hand)
                         ));
                     }
@@ -135,16 +144,16 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
     }
 
     private void stageEnd() {
-        if (currentStageAnnotationId != null) {
-            buf.add(new AnnotationEnd(currentStageAnnotationId));
-            currentStageAnnotationId = null;
+        if (stageAnnotationId != null) {
+            buf.add(new AnnotationEnd(stageAnnotationId));
+            stageAnnotationId = null;
         }
     }
 
     private void handEnd() {
-        if (currentHandAnnotationId != null) {
-            buf.add(new AnnotationEnd(currentHandAnnotationId));
-            currentHandAnnotationId = null;
+        if (handAnnotationId != null) {
+            buf.add(new AnnotationEnd(handAnnotationId));
+            handAnnotationId = null;
         }
     }
 }

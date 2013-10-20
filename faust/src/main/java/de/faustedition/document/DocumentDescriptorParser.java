@@ -27,6 +27,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
 import java.net.URI;
+import java.sql.Timestamp;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
@@ -37,9 +38,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
- */
-public class DocumentDescriptorParser extends DefaultHandler {
+* @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+*/
+class DocumentDescriptorParser extends DefaultHandler {
 
     private static final Logger LOG = Logger.getLogger(DocumentDescriptorParser.class.getName());
 
@@ -54,13 +55,13 @@ public class DocumentDescriptorParser extends DefaultHandler {
     );
 
     private final DSLContext sql;
-    private final Sources xml;
-    private final ObjectMapper objectMapper;
-    private final Map<String, Long> archiveIds;
     private final FaustURI source;
-    private final XMLBaseTracker baseTracker;
+    private final ObjectMapper objectMapper;
+    private final Sources xml;
+    private final Map<String, Long> archives;
 
-    private Deque<ObjectNode> unitStack = new ArrayDeque<ObjectNode>();
+    private final XMLBaseTracker baseTracker;
+    private final Deque<ObjectNode> unitStack = new ArrayDeque<ObjectNode>();
 
     private String currentKey;
     private StringBuilder currentValue;
@@ -69,12 +70,12 @@ public class DocumentDescriptorParser extends DefaultHandler {
     private int materialUnitCounter;
     private boolean inMetadataSection;
 
-    public DocumentDescriptorParser(DSLContext sql, Sources xml, ObjectMapper objectMapper, Map<String, Long> archiveIds, FaustURI source) {
+    DocumentDescriptorParser(DSLContext sql, FaustURI source, ObjectMapper objectMapper, Sources xml, Map<String, Long> archives) {
         this.sql = sql;
-        this.xml = xml;
-        this.objectMapper = objectMapper;
-        this.archiveIds = archiveIds;
         this.source = source;
+        this.objectMapper = objectMapper;
+        this.xml = xml;
+        this.archives = archives;
         this.baseTracker = new XMLBaseTracker(source.toString());
     }
 
@@ -101,7 +102,8 @@ public class DocumentDescriptorParser extends DefaultHandler {
 
             if (unitStack.isEmpty()) {
                 document = sql.newRecord(Tables.DOCUMENT);
-                document.setDescriptorUri(source.toString());
+                document.setLastRead(new Timestamp(System.currentTimeMillis()));
+                document.setDescriptorUri(Documents.uri2Path(source));
                 document.store();
             } else {
                 final ObjectNode parent = unitStack.peek();
@@ -138,7 +140,7 @@ public class DocumentDescriptorParser extends DefaultHandler {
             if (unitStack.isEmpty()) {
                 final String archiveId = unitData.path("archive").asText();
                 if (!archiveId.isEmpty()) {
-                    document.setArchiveId(Preconditions.checkNotNull(archiveIds.get(archiveId), archiveId));
+                    document.setArchiveId(Preconditions.checkNotNull(archives.get(archiveId), archiveId));
                 }
                 final String callNumberPrefix = "callnumber" + (archiveId.isEmpty() ? "" : "." + archiveId);
                 final String waIdPrefix = "callnumber.wa-";
@@ -166,52 +168,52 @@ public class DocumentDescriptorParser extends DefaultHandler {
                 document.store();
             }
 
-            final List<String> facsimiles = Lists.newLinkedList();
-            Long transcriptId = null;
-            if (unitData.has("transcriptSource")) {
-                final String transcriptSource = unitData.remove("transcriptSource").asText();
-                final Record1<Long> transcript = sql.select(Tables.TRANSCRIPT.ID).from(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.SOURCE_URI.eq(transcriptSource)).fetchOne();
-                if (transcript == null) {
-                    final TranscriptRecord transcriptRecord = sql.newRecord(Tables.TRANSCRIPT);
-                    transcriptRecord.setSourceUri(transcriptSource);
-                    transcriptRecord.store();
-                    transcriptId = transcriptRecord.getId();
-                } else {
-                    transcriptId = transcript.getValue(Tables.TRANSCRIPT.ID);
-                }
-
-                try {
-                    final FacsimileReferenceCollector facsimileReferenceCollector = new FacsimileReferenceCollector();
-                    XMLUtil.saxParser().parse(
-                            xml.getInputSource(new FaustURI(URI.create(transcriptSource))),
-                            facsimileReferenceCollector
-                    );
-                    facsimiles.addAll(facsimileReferenceCollector.facsimileReferences);
-                } catch (IOException e) {
-                    LOG.log(Level.WARNING, "I/O error while extracting facsimile references from " + transcriptSource, e);
-                } catch (SAXException e) {
-                    LOG.log(Level.WARNING, "XML error while extracting facsimile references from " + transcriptSource, e);
-                }
-            }
-
             final MaterialUnitRecord unit = sql.newRecord(Tables.MATERIAL_UNIT);
             unit.setDocumentId(document.getId());
             unit.setDocumentOrder(unitData.path("order").asInt());
-            unit.setTranscriptId(transcriptId);
             unit.store();
 
-            int facsimileOrder = 0;
-            for (String facsimile : facsimiles) {
-                sql.insertInto(
-                        Tables.FACSIMILE,
-                        Tables.FACSIMILE.MATERIAL_UNIT_ID,
-                        Tables.FACSIMILE.FACSIMILE_ORDER,
-                        Tables.FACSIMILE.PATH
-                ).values(
-                        unit.getId(),
-                        facsimileOrder++,
-                        facsimile
-                ).execute();
+            final List<String> facsimiles = Lists.newLinkedList();
+            String textImageLinkUri = null;
+            if (unitData.has("transcriptSource")) {
+                final String transcriptSource = Documents.uri2Path(new FaustURI(URI.create(unitData.remove("transcriptSource").asText())));
+                final Record1<Long> transcript = sql.select(Tables.TRANSCRIPT.ID).from(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.SOURCE_URI.eq(transcriptSource)).fetchOne();
+                if (transcript == null) {
+                    try {
+                        final FacsimileReferenceParser facsimileReferenceParser = new FacsimileReferenceParser(source);
+                        XMLUtil.saxParser().parse(
+                                xml.getInputSource(new FaustURI(FaustAuthority.XML, "/" + transcriptSource)),
+                                facsimileReferenceParser
+                        );
+                        facsimiles.addAll(facsimileReferenceParser.getFacsimileReferences());
+                        textImageLinkUri = facsimileReferenceParser.getTextImageLinkReference();
+                    } catch (IOException e) {
+                        LOG.log(Level.WARNING, "I/O error while extracting facsimile references from " + transcriptSource, e);
+                    } catch (SAXException e) {
+                        LOG.log(Level.WARNING, "XML error while extracting facsimile references from " + transcriptSource, e);
+                    }
+
+                    final TranscriptRecord transcriptRecord = sql.newRecord(Tables.TRANSCRIPT);
+                    transcriptRecord.setSourceUri(transcriptSource);
+                    transcriptRecord.setMaterialUnitId(unit.getId());
+                    transcriptRecord.setTextImageLinkUri(textImageLinkUri);
+                    transcriptRecord.store();
+
+                    final long transcriptId = transcriptRecord.getId();
+                    int facsimileOrder = 0;
+                    for (String facsimile : facsimiles) {
+                        sql.insertInto(
+                                Tables.FACSIMILE,
+                                Tables.FACSIMILE.TRANSCRIPT_ID,
+                                Tables.FACSIMILE.FACSIMILE_ORDER,
+                                Tables.FACSIMILE.PATH
+                        ).values(
+                                transcriptId,
+                                facsimileOrder++,
+                                facsimile
+                        ).execute();
+                    }
+                }
             }
         } else if (inMetadataSection && "metadata".equals(localName)) {
             inMetadataSection = false;
@@ -270,28 +272,5 @@ public class DocumentDescriptorParser extends DefaultHandler {
             converted.append(current);
         }
         return converted.toString();
-    }
-
-    private class FacsimileReferenceCollector extends DefaultHandler {
-
-        private List<String> facsimileReferences = Lists.newLinkedList();
-
-        @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-            if (!localName.equals("graphic") || !Strings.nullToEmpty(attributes.getValue("mimeType")).trim().isEmpty()) {
-                return;
-            }
-            final String url = Strings.nullToEmpty(attributes.getValue("url")).trim();
-            if (url.isEmpty()) {
-                return;
-            }
-            try {
-                final FaustURI facsimileReference = new FaustURI(URI.create(url));
-                Preconditions.checkArgument(facsimileReference.getAuthority() == FaustAuthority.FACSIMILE);
-                facsimileReferences.add(facsimileReference.getPath().replaceAll("^/++", ""));
-            } catch (IllegalArgumentException e) {
-                LOG.warning("Invalid facsimile reference '" + url + "' in " + source);
-            }
-        }
     }
 }

@@ -11,6 +11,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,8 +27,6 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
 
     private final ObjectMapper objectMapper;
     private final NamespaceMapping namespaceMapping;
-    private final Iterator<String> ids;
-    private final LinkedList<Integer> nodePath;
 
     private final String xmlIdKey;
     private final String xmlNameKey;
@@ -35,23 +34,26 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
 
     private final Deque<String> annotationIds = Lists.newLinkedList();
 
+    private Iterator<String> ids = Annotation.ids(DEFAULT_ID_PREFIX);
+    private LinkedList<Integer> nodePath;
+
     public XMLStreamToTokenFunction(ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
-        this(objectMapper, namespaceMapping, false, DEFAULT_ID_PREFIX);
-    }
-
-    public XMLStreamToTokenFunction(ObjectMapper objectMapper, NamespaceMapping namespaceMapping, boolean withNodePath) {
-        this(objectMapper, namespaceMapping, withNodePath, DEFAULT_ID_PREFIX);
-    }
-
-    public XMLStreamToTokenFunction(ObjectMapper objectMapper, NamespaceMapping namespaceMapping, boolean withNodePath, String idPrefix) {
         this.objectMapper = objectMapper;
         this.namespaceMapping = namespaceMapping;
-        this.ids = Annotation.ids(idPrefix);
-        this.nodePath = (withNodePath ? Lists.<Integer>newLinkedList() : null);
 
         this.xmlIdKey = map(namespaceMapping, XML.XML_ID_NAME);
         this.xmlNameKey = map(namespaceMapping, XML.XML_ELEMENT_NAME);
         this.xmlNodePathKey = map(namespaceMapping, XML.XML_NODE_PATH);
+    }
+
+    public XMLStreamToTokenFunction withIdPrefix(String prefix) {
+        this.ids = Annotation.ids(prefix);
+        return this;
+    }
+
+    public XMLStreamToTokenFunction withNodePath() {
+        this.nodePath = Lists.newLinkedList();
+        return this;
     }
 
     @Nullable

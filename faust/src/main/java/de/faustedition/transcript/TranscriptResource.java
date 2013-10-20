@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.faustedition.Database;
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.text.Annotation;
+import de.faustedition.text.AnnotationProcessor;
 import de.faustedition.text.Characters;
 import de.faustedition.text.Token;
 import de.faustedition.xml.Sources;
@@ -27,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -66,9 +69,12 @@ public class TranscriptResource {
     public Templates.ViewAndModel transcriptData(@PathParam("id") final long id) throws Exception {
         checkTranscriptExists(id);
 
-        return transcripts.tokens(id, new Transcripts.TokenCallback<Templates.ViewAndModel>() {
+        return transcripts.tokens(Arrays.asList(id), new Transcripts.TokenCallback<Templates.ViewAndModel>() {
             @Override
             public Templates.ViewAndModel withTokens(Iterator<Token> tokens) throws Exception {
+
+                tokens = new AnnotationProcessor(tokens);
+
                 final StringBuilder text = new StringBuilder();
                 final ArrayNode annotations = objectMapper.createArrayNode();
 
@@ -106,7 +112,7 @@ public class TranscriptResource {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
                 }
 
-                final FaustURI uri = new FaustURI(URI.create(transcriptText.value1()));
+                final FaustURI uri = new FaustURI(FaustAuthority.XML, "/" + transcriptText.value1());
                 if (!sources.isResource(uri)) {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(uri.toString()).build());
                 }
