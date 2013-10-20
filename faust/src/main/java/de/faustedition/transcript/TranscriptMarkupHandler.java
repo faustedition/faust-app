@@ -30,11 +30,6 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
     private final Queue<Token> buf = Lists.newLinkedList();
     private final Iterator<String> ids = Annotation.ids("transcript_annotation_");
 
-    private final String facsimileKey;
-    private final String graphicName;
-    private final String mimeTypeAttributeName;
-    private final String urlAttributeName;
-
     private final String stageAttributeName;
     private final String stageKey;
 
@@ -44,7 +39,6 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
     private final String xmlNameKey;
     private final String documentKey;
 
-    private String facsimileAnnotationId = null;
     private String stageAnnotationId = null;
     private String handAnnotationId = null;
 
@@ -62,10 +56,6 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
         this.newAttributeName = map(namespaceMapping, new QName(TEI_NS_URI, "new"));
 
         this.documentKey = map(namespaceMapping, new QName(TEI_SIG_GE_URI, "document"));
-        this.facsimileKey = map(namespaceMapping, new QName(FAUST_NS_URI, "facsimile"));
-        this.graphicName = map(namespaceMapping, new QName(TEI_NS_URI, "graphic"));
-        this.mimeTypeAttributeName = map(namespaceMapping, new QName(TEI_NS_URI, "mimeType"));
-        this.urlAttributeName = map(namespaceMapping, new QName(TEI_NS_URI, "url"));
     }
 
     @Override
@@ -85,21 +75,18 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
             if (next instanceof AnnotationStart) {
                 final AnnotationStart annotationStart = (AnnotationStart) next;
                 final ObjectNode data = annotationStart.getData();
-                final String xmlName = data.path(xmlNameKey).asText();
 
+                final String xmlName = data.path(xmlNameKey).asText();
                 if (xmlName.equals(documentKey)) {
                     handEnd();
                     stageEnd();
-                    facsimileEnd();
-                }
-
-                // generate facsimile annotation only once per transcript and filter text-image-link elements (@mimeType)
-                if (xmlName.equals(graphicName) && facsimileAnnotationId == null && !data.has(mimeTypeAttributeName)) {
-                    final String url = data.path(urlAttributeName).asText();
-                    if (!url.isEmpty()) {
+                } else if (xmlName.equals(handShiftName)) {
+                    final String hand = data.path(newAttributeName).asText();
+                    if (!hand.isEmpty()) {
+                        handEnd();
                         buf.add(new AnnotationStart(
-                                facsimileAnnotationId = ids.next(),
-                                objectMapper.createObjectNode().put(facsimileKey, url)
+                                handAnnotationId = ids.next(),
+                                objectMapper.createObjectNode().put(handKey, hand)
                         ));
                     }
                 }
@@ -113,16 +100,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
                     ));
                 }
 
-                if (xmlName.equals(handShiftName)) {
-                    final String hand = data.path(newAttributeName).asText();
-                    if (!hand.isEmpty()) {
-                        handEnd();
-                        buf.add(new AnnotationStart(
-                                handAnnotationId = ids.next(),
-                                objectMapper.createObjectNode().put(handKey, hand)
-                        ));
-                    }
-                }
+
             }
             buf.add(next);
         }
@@ -130,17 +108,9 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
         if (buf.isEmpty()) {
             handEnd();
             stageEnd();
-            facsimileEnd();
         }
 
         return !buf.isEmpty();
-    }
-
-    private void facsimileEnd() {
-        if (facsimileAnnotationId != null) {
-            buf.add(new AnnotationEnd(facsimileAnnotationId));
-            facsimileAnnotationId = null;
-        }
     }
 
     private void stageEnd() {
