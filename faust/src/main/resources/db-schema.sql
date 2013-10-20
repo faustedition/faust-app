@@ -51,6 +51,19 @@ create table if not exists facsimile (
   unique (transcript_id, facsimile_order)
 );
 
+create table if not exists document_segment (
+  document_id bigint not null,
+  transcript_type tinyint not null,
+  segment_unit tinyint not null,
+  segment_order int not null,
+  segment_start int not null,
+  segment_end int not null,
+  foreign key (document_id) references document (id) on delete cascade,
+  unique (document_id, transcript_type, segment_unit, segment_order)
+);
+
+create index if not exists document_segment_range on document_segment (document_id, transcript_type, segment_unit, segment_start, segment_end);
+
 create table if not exists transcribed_verse_interval (
   transcript_id bigint not null,
   verse_start int not null,

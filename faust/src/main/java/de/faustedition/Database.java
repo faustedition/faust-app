@@ -101,6 +101,16 @@ public class Database implements DataSource {
 
     public static abstract class TransactionCallback<T> {
 
+        private final boolean readOnly;
+
+        protected TransactionCallback() {
+            this(false);
+        }
+
+        protected TransactionCallback(boolean readOnly) {
+            this.readOnly = readOnly;
+        }
+
         public abstract T doInTransaction(DSLContext sql) throws Exception;
 
         protected boolean rollsBackOn(Exception e) {
@@ -108,7 +118,7 @@ public class Database implements DataSource {
         }
 
         protected boolean isReadOnly() {
-            return false;
+            return readOnly;
         }
 
         protected int getTransactionIsolation() {

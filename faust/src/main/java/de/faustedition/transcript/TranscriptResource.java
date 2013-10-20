@@ -66,7 +66,6 @@ public class TranscriptResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Templates.ViewAndModel transcriptData(@PathParam("id") final long id) throws Exception {
         checkTranscriptExists(id);
-
         return transcripts.tokens(Arrays.asList(id), new Transcripts.TokenCallback<Templates.ViewAndModel>() {
             @Override
             public Templates.ViewAndModel withTokens(Iterator<Token> tokens) throws Exception {

@@ -14,6 +14,7 @@ import de.faustedition.http.JsonMessageBodyReaderWriter;
 import de.faustedition.search.SearchResource;
 import de.faustedition.transcript.SceneStatisticsResource;
 import de.faustedition.transcript.TranscriptResource;
+import de.faustedition.transcript.TranscriptSegments;
 import de.faustedition.transcript.VerseStatisticsResource;
 import de.faustedition.xml.XMLQueryResource;
 import de.faustedition.xml.XMLResource;
@@ -52,6 +53,7 @@ public class Server {
 
             final ServiceManager serviceManager = new ServiceManager(Arrays.asList(
                     objectGraph.get(Documents.class),
+                    objectGraph.get(TranscriptSegments.class),
                     new HttpService(configuration,
                             objectGraph.get(JsonMessageBodyReaderWriter.class),
                             objectGraph.get(DemoResource.class),

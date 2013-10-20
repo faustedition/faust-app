@@ -2,6 +2,9 @@ package de.faustedition;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.MoreExecutors;
 import dagger.Module;
 import dagger.Provides;
 import de.faustedition.document.Documents;
@@ -10,6 +13,7 @@ import de.faustedition.facsimile.Facsimiles;
 import de.faustedition.facsimile.MockFacsimiles;
 import de.faustedition.graph.Graph;
 import de.faustedition.text.NamespaceMapping;
+import de.faustedition.transcript.TranscriptSegments;
 import de.faustedition.transcript.Transcripts;
 import de.faustedition.xml.Sources;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -19,6 +23,8 @@ import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Queue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +33,7 @@ import java.util.logging.Logger;
  */
 @Module(injects = {
         Configuration.class,
+        EventBus.class,
         NamespaceMapping.class,
         ObjectMapper.class,
         Database.class,
@@ -34,7 +41,8 @@ import java.util.logging.Logger;
         Sources.class,
         Facsimiles.class,
         Documents.class,
-        Transcripts.class
+        Transcripts.class,
+        TranscriptSegments.class
 }, library = true)
 public class Infrastructure {
 
@@ -82,6 +90,12 @@ public class Infrastructure {
     @Singleton
     public Facsimiles provideFacsimiles() {
         return (facsimilesAvailable() ? new DefaultFacsimiles(dataSubDirectory("facsimile")) : new MockFacsimiles());
+    }
+
+    @Provides
+    @Singleton
+    public EventBus provideEventBus() {
+        return new AsyncEventBus(Executors.newCachedThreadPool());
     }
 
     @Provides

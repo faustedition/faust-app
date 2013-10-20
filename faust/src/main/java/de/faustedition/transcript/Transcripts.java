@@ -44,6 +44,10 @@ import static de.faustedition.text.TokenPredicates.name;
 @Singleton
 public class Transcripts {
 
+    public static enum Type {
+        TEXTUAL, DOCUMENTARY
+    };
+
     private static final Logger LOG = Logger.getLogger(Transcripts.class.getName());
 
     private final Database database;

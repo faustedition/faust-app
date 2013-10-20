@@ -2,13 +2,14 @@ package de.faustedition.document;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.eventbus.EventBus;
 import de.faustedition.Database;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
+import de.faustedition.transcript.TranscriptSegments;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -27,8 +28,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +38,15 @@ import java.util.Map;
 public class DocumentResource {
 
     private final Database database;
+    private final EventBus eventBus;
     private final Sources sources;
     private final Templates templates;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public DocumentResource(Database database, Sources sources, Templates templates, ObjectMapper objectMapper) {
+    public DocumentResource(Database database, EventBus eventBus, Sources sources, Templates templates, ObjectMapper objectMapper) {
         this.database = database;
+        this.eventBus = eventBus;
         this.sources = sources;
         this.templates = templates;
         this.objectMapper = objectMapper;
@@ -131,6 +132,8 @@ public class DocumentResource {
                 if (document == null) {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
                 }
+
+                eventBus.post(new DocumentRequested(id));
 
                 final Result<Record3<Long, Long, String>> materialUnits = sql
                         .select(Tables.MATERIAL_UNIT.ID, Tables.TRANSCRIPT.ID, Tables.FACSIMILE.PATH)

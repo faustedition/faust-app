@@ -24,4 +24,16 @@ public class TokenPredicates {
             }
         });
     }
+
+    public static Predicate<Token> hasKey(NamespaceMapping namespaceMapping, QName keyName) {
+        final String key = NamespaceMapping.map(namespaceMapping, keyName);
+        return Predicates.and(AnnotationStart.IS_INSTANCE, new Predicate<Token>() {
+            @Override
+            public boolean apply(@Nullable Token input) {
+                return ((AnnotationStart) input).getData().has(key);
+            }
+        });
+    }
+
+
 }
