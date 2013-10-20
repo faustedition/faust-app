@@ -26,9 +26,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.xml.transform.Source;
-import javax.xml.transform.sax.SAXSource;
-import java.net.URI;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -103,10 +101,10 @@ public class TranscriptResource {
     @GET
     @Path("/{id}/source")
     @Produces(MediaType.APPLICATION_XML)
-    public Source transcriptSource(@PathParam("id") final long id) {
-        return database.transaction(new Database.TransactionCallback<Source>() {
+    public File transcriptSource(@PathParam("id") final long id) {
+        return database.transaction(new Database.TransactionCallback<File>() {
             @Override
-            public Source doInTransaction(DSLContext sql) throws Exception {
+            public File doInTransaction(DSLContext sql) throws Exception {
                 final Record1<String> transcriptText = sql.select(Tables.TRANSCRIPT.SOURCE_URI).from(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.ID.eq(id)).fetchOne();
                 if (transcriptText == null) {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
@@ -117,7 +115,7 @@ public class TranscriptResource {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(uri.toString()).build());
                 }
 
-                return new SAXSource(sources.getInputSource(uri));
+                return sources.file(uri);
             }
 
             @Override
