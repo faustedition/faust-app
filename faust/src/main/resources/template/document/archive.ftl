@@ -16,27 +16,30 @@
 	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 </#assign>
 <@faust.page title=(archive.NAME?html) header=header css=css>
-	<div class="yui3-g">
-		<div class="yui3-u-1-2">
+	<div class="pure-g">
+		<div class="pure-u-1-2">
 			<@snippets.archiveData archive />
 		</div>
-		<div class="yui3-u-1-2" id="archive_map_slot"></div>
+		<div class="pure-u-1-2" id="archive_map_slot"></div>
 	</div>
 	
 	<#if documents?has_content>
 	<div id="archival-units">
 		<h2>${message("archive.archival_units")}</h2>
 		
-		<table>
-			<tr>
-				<th>#</th>
-				<th>${message("archive.callnumber")}</th>
-				<th>${message("archive.wa_id")}</th>
+		<table class="pure-table pure-table-horizontal">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>${message("archive.callnumber")}</th>
+                    <th>${message("archive.wa_id")}</th>
 
-				<th>#</th>
-				<th>${message("archive.callnumber")}</th>
-				<th>${message("archive.wa_id")}</th>
-			</tr>
+                    <th>#</th>
+                    <th>${message("archive.callnumber")}</th>
+                    <th>${message("archive.wa_id")}</th>
+                </tr>
+            </thead>
+            <tbody>
 			<#list documents as d>
 				<#if (d_index % 2) == 0><tr></#if>
 				<td>${d_index + 1}.</td>
@@ -50,6 +53,7 @@
 				</tr>
 				</#if>
 			</#list>
+            </tbody>
 		</table>
 	</div>
 	</#if>	

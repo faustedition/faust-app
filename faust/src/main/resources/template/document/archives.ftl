@@ -14,8 +14,8 @@
 <@faust.page title=title css=css header=header>
 	<div id="archives">
 		<#list archives as a>
-			<#if (a_index % 3) == 0><div class="yui3-g archive-row"></#if>
-			<div class="yui3-u-1-3">
+			<#if (a_index % 3) == 0><div class="pure-g archive-row"></#if>
+			<div class="pure-u-1-3">
 			<div class="archive-container">
 				<p>${a_index + 1}.<br><a href="${cp}/document/archive/${(a.LABEL)?url}/">${a.NAME?html}</a></p>
 				<@snippets.archiveData a false />

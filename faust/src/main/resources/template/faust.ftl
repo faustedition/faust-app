@@ -6,14 +6,15 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>Digitale Faust-Edition: ${title}</title>
-    <link rel="stylesheet" type="text/css" href="${cp}/static/css/bootstrap<#if !debug>.min</#if>.css">
+    <link rel="stylesheet" type="text/css" href="${cp}/static/css/pure-0.3.0<#if !debug>-min</#if>.css"><#--
+    <link rel="stylesheet" type="text/css" href="${cp}/static/css/bootstrap<#if !debug>.min</#if>.css">-->
     <link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css">
     <script type="text/javascript">
         var cp = '${cp?js_string}';
         var Faust = { contextPath: cp, FacsimileServer: "${facsimileIIPUrl}" };
-    </script>
+    </script><#--
     <script type="text/javascript" src="${cp}/static/js/jquery-1.10.2<#if !debug>.min</#if>.js"></script>
-    <script type="text/javascript" src="${cp}/static/js/bootstrap<#if !debug>.min</#if>.js"></script>
+    <script type="text/javascript" src="${cp}/static/js/bootstrap<#if !debug>.min</#if>.js"></script>-->
     <script type="text/javascript" src="${yp}/yui/yui<#if !debug>-min</#if>.js"></script>
     <script type="text/javascript" src="${cp}/static/js/yui-config.js"></script>
     <#if debug>
@@ -40,30 +41,25 @@
 	 <#if header?has_content>${header}</#if>
 </head>
 <body class="yui3-skin-sam">
-<nav class="navbar navbar-default" role="navigation">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="${cp}/">Faust</a>
+<div class="pure-g">
+    <div class="pure-u-2-3">
+        <div class="pure-menu pure-menu-open pure-menu-horizontal">
+            <a href="${cp}/" class="pure-menu-heading">Goethe: Faust</a>
+
+            <ul>
+                <li><a href="${cp}/text/">${message("menu.text")}</a></li>
+                <li><a href="${cp}/document/">${message("menu.document")}</a></li>
+                <li><a href="${cp}/genesis/">${message("menu.genesis")}</a></li>
+            </ul>
+        </div>
     </div>
-    <div class="collapse navbar-collapse navbar-ex1-collapse">
-        <ul class="nav navbar-nav">
-            <li><a href="${cp}/text/">${message("menu.text")}</a></li>
-            <li><a href="${cp}/document/">${message("menu.document")}</a></li>
-            <li><a href="${cp}/genesis/">${message("menu.genesis")}</a></li>
-        </ul>
-        <form class="navbar-form navbar-right" role="search">
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="${message("menu.search")}">
-            </div>
-            <button type="submit" class="btn btn-default">${message("menu.search")}</button>
+    <div class="pure-u-1-3">
+        <form class="pure-form" id="search">
+            <input type="text" class="pure-input-rounded">
+            <button type="submit" class="pure-button">Search</button>
         </form>
     </div>
-</nav>
+</div>
 <section id="main">
 	<#nested />
 </section>
