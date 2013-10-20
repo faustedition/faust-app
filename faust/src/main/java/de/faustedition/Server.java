@@ -7,7 +7,6 @@ import dagger.ObjectGraph;
 import de.faustedition.document.DocumentImageLinkResource;
 import de.faustedition.document.DocumentResource;
 import de.faustedition.document.Documents;
-import de.faustedition.document.StructureResource;
 import de.faustedition.facsimile.FacsimileResource;
 import de.faustedition.genesis.GeneticGraphResource;
 import de.faustedition.http.HttpService;
@@ -32,7 +31,6 @@ import java.util.logging.Logger;
         ProjectResource.class,
         DocumentResource.class,
         DocumentImageLinkResource.class,
-        StructureResource.class,
         FacsimileResource.class,
         GeneticGraphResource.class,
         SearchResource.class,
@@ -61,7 +59,6 @@ public class Server {
                             objectGraph.get(ProjectResource.class),
                             objectGraph.get(DocumentResource.class),
                             objectGraph.get(DocumentImageLinkResource.class),
-                            objectGraph.get(StructureResource.class),
                             objectGraph.get(FacsimileResource.class),
                             objectGraph.get(GeneticGraphResource.class),
                             objectGraph.get(SearchResource.class),

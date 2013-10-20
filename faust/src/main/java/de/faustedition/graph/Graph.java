@@ -1,8 +1,6 @@
 package de.faustedition.graph;
 
 import com.google.common.base.Stopwatch;
-import de.faustedition.document.ArchiveCollection;
-import de.faustedition.document.MaterialUnitCollection;
 import de.faustedition.genesis.GeneticSourceCollection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -84,14 +82,6 @@ public class Graph {
 
     public GraphDatabaseService db() {
         return db;
-    }
-
-    public ArchiveCollection getArchives() {
-        return new ArchiveCollection(root(ARCHIVES_ROOT_NAME));
-    }
-
-    public MaterialUnitCollection getMaterialUnits() {
-        return new MaterialUnitCollection(root(MATERIAL_UNITS_ROOT_NAME));
     }
 
     public GeneticSourceCollection getGeneticSources() {
