@@ -103,7 +103,13 @@ YUI.add('document-yui-view', function (Y) {
 
 			if (this.get('source')) {
 				var transcriptSource = cp + '/' + this.get('source').components[1] + '/' + this.get('source').components[2];
-				this.editortoolbar = Y.Node.create('<div id="editor-toolbar"><a href="' + transcriptSource + '">(XML source)</a></div>');
+				var imageLinkPath = Faust.imageLinkBase + '/' + this.get('pagenum');
+
+				this.editortoolbar = Y.Node.create('<div id="editor-toolbar" >' +
+					'<a href="' + transcriptSource + '">XML source </a>' +
+					'<a href="' + imageLinkPath + '"> Text-Image-Links</a>' +
+					'</div>');
+
 				container.appendChild(this.editortoolbar);
 
 				this.errorDisplay = Y.Node.create('<div id="error-display"></div>');
@@ -181,7 +187,8 @@ YUI.add('document-yui-view', function (Y) {
 		
 	} , {
 		ATTRS: {
-			rootVC: { validator: function(v) { return true; } }
+			rootVC: { validator: function(v) { return true; } },
+			pagenum: {}
 		}
 	});
 

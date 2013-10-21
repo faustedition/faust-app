@@ -10,6 +10,8 @@
     <link rel="stylesheet" type="text/css" id="style-document-transcript-highlight-hands" href="${cp}/static/css/document-transcript-highlight-hands.css"/>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
+	<script type="text/javascript"> Faust.imageLinkBase = "${imageLinkBase}" </script>
+
 	<@faust.passMessages ["page_abbrev", "document.old_version", "document.facsimile",
 	"document.diplomatic_transcript", "document.document_structure", "document.document_text"] />
 
@@ -25,6 +27,7 @@
 
 </div>
 	<div id="document-app" class="yui-u-1" style="min-height: 600px;"></div>
+
 	<script type="text/javascript">
 
 YUI().use("stylesheet", "document-app", function(Y) {

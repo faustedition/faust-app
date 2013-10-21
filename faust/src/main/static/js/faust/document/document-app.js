@@ -212,7 +212,8 @@ YUI.add('document-app', function (Y) {
 						container: diplomaticContainer.one('.diplomaticContent'),
 						visComponent: null,
 						transcript: transcript,
-						source: source
+						source: source,
+						pagenum: pagenum
 					});
 					diplomaticTranscriptView.render();
 			}
