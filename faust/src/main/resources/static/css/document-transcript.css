@@ -24,6 +24,18 @@ svg.diplomatic {
   font-family: faust-serif, serif; 
 }
 
+#editor-toolbar {
+    margin-bottom: 3em;
+    margin-top: 0px;
+    text-align: center;
+}
+
+#editor-toolbar a {
+  color: #90ee90;
+  margin-right: 3em;
+}
+
+
 #error-display {
   background-color: red;
   color: white; 
