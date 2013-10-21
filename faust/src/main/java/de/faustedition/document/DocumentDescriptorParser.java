@@ -119,7 +119,11 @@ class DocumentDescriptorParser extends DefaultHandler {
             if (localName.equals("textTranscript") || localName.equals("docTranscript")) {
                 final String transcript = Strings.nullToEmpty(attributes.getValue("uri")).trim();
                 if (!transcript.isEmpty()) {
-                    unitStack.peek().put("transcriptSource", new FaustURI(baseTracker.getBaseURI().resolve(transcript)).toString());
+                    try {
+                        unitStack.peek().put("transcriptSource", new FaustURI(baseTracker.getBaseURI().resolve(transcript)).toString());
+                    } catch (IllegalArgumentException e) {
+                        throw new SAXException(transcript, e);
+                    }
                 }
             } else {
                 currentKey = toKey(localName, attributes);
