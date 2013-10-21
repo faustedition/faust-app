@@ -147,7 +147,7 @@ class DocumentDescriptorParser extends DefaultHandler {
                     document.setArchiveId(Preconditions.checkNotNull(archives.get(archiveId), archiveId));
                 }
                 final String callNumberPrefix = "callnumber" + (archiveId.isEmpty() ? "" : "." + archiveId);
-                final String waIdPrefix = "callnumber.wa-";
+                final String waIdPrefix = "callnumber.wa_";
 
                 String callnumber = null;
                 String waId = null;

@@ -64,7 +64,9 @@ public class TranscriptSegments extends AbstractScheduledService {
         this.textualLine = Predicates.or(
                 name(namespaceMapping, new QName(TEI_NS_URI, "l")),
                 name(namespaceMapping, new QName(TEI_NS_URI, "stage")),
-                name(namespaceMapping, new QName(TEI_NS_URI, "head"))
+                name(namespaceMapping, new QName(TEI_NS_URI, "speaker")),
+                name(namespaceMapping, new QName(TEI_NS_URI, "head")),
+                name(namespaceMapping, new QName(TEI_NS_URI, "p"))
         );
 
         eventBus.register(this);

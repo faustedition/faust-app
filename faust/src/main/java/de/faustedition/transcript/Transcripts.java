@@ -132,7 +132,7 @@ public class Transcripts {
                     while (!tokenIt.hasNext() && idIt.hasNext()) {
                         final Long id = idIt.next();
                         final FaustURI uri = uris.get(id);
-                        if (uri == null || !xml.isResource(uri)) {
+                        if (uri == null) {
                             if (LOG.isLoggable(Level.WARNING)) {
                                 LOG.warning("Cannot find source for transcript #" + id);
                             }
