@@ -177,9 +177,9 @@ public class TranscriptSegments extends AbstractScheduledService {
                 } else if (token instanceof AnnotationEnd) {
                     final String annotationId = ((AnnotationEnd) token).getId();
                     if (pageStartId.equals(annotationId)) {
-                        pages.add(Range.closedOpen(pageStartOffset, offset + 1));
+                        pages.add(Range.closedOpen(pageStartOffset, offset));
                     } else if (lineStartId.equals(annotationId)) {
-                        lines.add(Range.closedOpen(lineStartOffset, offset + 1));
+                        lines.add(Range.closedOpen(lineStartOffset, offset));
                     }
                 } else if (token instanceof Characters) {
                     offset += ((Characters) token).getContent().length();
