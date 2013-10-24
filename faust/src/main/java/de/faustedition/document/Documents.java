@@ -94,11 +94,7 @@ public class Documents extends AbstractIdleService {
                     archives.put(archiveRecord.getLabel(), archiveRecord.getId());
                 }
 
-                if (sql.selectCount().from(Tables.MATERIAL_UNIT).fetchOne().value1() == 0) {
-                    final Map<String, Long> archiveIds = Maps.newHashMap();
-                    for (Record2<Long, String> archive : sql.select(Tables.ARCHIVE.ID, Tables.ARCHIVE.LABEL).from(Tables.ARCHIVE).fetch()) {
-                        archiveIds.put(archive.getValue(Tables.ARCHIVE.LABEL), archive.getValue(Tables.ARCHIVE.ID));
-                    }
+                if (sql.selectCount().from(Tables.DOCUMENT).fetchOne().value1() == 0) {
                     for (FaustURI documentDescriptor : xml.iterate(DOCUMENT_BASE_URI)) {
                         LOG.fine("<< " + documentDescriptor);
                         update(documentDescriptor, sql);
