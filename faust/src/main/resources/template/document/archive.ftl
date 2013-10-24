@@ -7,14 +7,6 @@
 	#archival-units tr { border-bottom: 1px solid #ccc }
 	#archival-units th { text-align: left }
 </#assign>
-<#assign header>
-	<script type="text/javascript">
-		var archiveLat = parseFloat('${archive.LOCATION_LAT?js_string}');
-		var archiveLng = parseFloat('${archive.LOCATION_LNG?js_string}');
-	</script>
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
-</#assign>
 <@faust.page title=(archive.NAME?html) header=header css=css>
 	<div class="pure-g">
 		<div class="pure-u-1-2">
@@ -56,5 +48,11 @@
             </tbody>
 		</table>
 	</div>
-	</#if>	
+	</#if>
+    <script type="text/javascript">
+        var archiveLat = parseFloat('${archive.LOCATION_LAT?js_string}');
+        var archiveLng = parseFloat('${archive.LOCATION_LNG?js_string}');
+    </script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 </@faust.page>

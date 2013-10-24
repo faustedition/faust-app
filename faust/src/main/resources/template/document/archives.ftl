@@ -7,10 +7,6 @@
 	.archive-row {border-bottom: 1px solid #ccc }
 	.archive-container { padding: 1em }
 </#assign>
-<#assign header>
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
-</#assign>
 <@faust.page title=title css=css header=header>
 	<div id="archives">
 		<#list archives as a>
@@ -24,4 +20,6 @@
 			<#if ((a_index % 3) == 2) || !a_has_next></div></#if>
 		</#list>		
 	</div>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 </@faust.page>
