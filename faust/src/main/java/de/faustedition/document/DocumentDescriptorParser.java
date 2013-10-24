@@ -28,9 +28,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,14 +60,13 @@ class DocumentDescriptorParser extends DefaultHandler {
     private final Map<String, Long> archives;
 
     private final XMLBaseTracker baseTracker;
-    private final Deque<ObjectNode> unitStack = new ArrayDeque<ObjectNode>();
-
-    private String currentKey;
-    private StringBuilder currentValue;
+    private final LinkedList<ObjectNode> unitStack = Lists.newLinkedList();
+    private final LinkedList<String> metadataKeyStack = Lists.newLinkedList();
+    private final LinkedList<StringBuilder> metadataValueStack = Lists.newLinkedList();
 
     private DocumentRecord document;
-    private int materialUnitCounter;
-    private boolean inMetadataSection;
+    private int materialUnitCounter = 0;
+    private boolean inMetadataSection = false;
 
     DocumentDescriptorParser(DSLContext sql, FaustURI source, ObjectMapper objectMapper, Sources xml, Map<String, Long> archives) {
         this.sql = sql;
@@ -77,15 +75,6 @@ class DocumentDescriptorParser extends DefaultHandler {
         this.xml = xml;
         this.archives = archives;
         this.baseTracker = new XMLBaseTracker(source.toString());
-    }
-
-    @Override
-    public void startDocument() throws SAXException {
-        materialUnitCounter = 0;
-        inMetadataSection = false;
-        document = null;
-        currentKey = null;
-        currentValue = null;
     }
 
     @Override
@@ -115,7 +104,7 @@ class DocumentDescriptorParser extends DefaultHandler {
             unitStack.push(unitData);
         } else if ("metadata".equals(localName) && !unitStack.isEmpty()) {
             inMetadataSection = true;
-        } else if (inMetadataSection && currentKey == null) {
+        } else if (inMetadataSection) {
             if (localName.equals("textTranscript") || localName.equals("docTranscript")) {
                 final String transcript = Strings.nullToEmpty(attributes.getValue("uri")).trim();
                 if (!transcript.isEmpty()) {
@@ -126,8 +115,8 @@ class DocumentDescriptorParser extends DefaultHandler {
                     }
                 }
             } else {
-                currentKey = toKey(localName, attributes);
-                currentValue = new StringBuilder();
+                metadataKeyStack.push(toKey(localName, attributes));
+                metadataValueStack.push(new StringBuilder());
             }
         }
     }
@@ -221,34 +210,33 @@ class DocumentDescriptorParser extends DefaultHandler {
             }
         } else if (inMetadataSection && "metadata".equals(localName)) {
             inMetadataSection = false;
-        } else if (inMetadataSection && currentKey != null) {
-            final String value = currentValue.toString().trim().replaceAll("\\s+", " ");
+        } else if (inMetadataSection && !metadataKeyStack.isEmpty()) {
+            final String key = metadataKeyStack.pop();
+            final String value = metadataValueStack.pop().toString().replaceAll("\\s+", " ").trim();
             if (!value.isEmpty()) {
                 final ObjectNode unitData = unitStack.peek();
-                if (!unitData.has(currentKey)) {
-                    unitData.put(currentKey, value);
+                if (!unitData.has(key)) {
+                    unitData.put(key, value);
                 } else {
-                    final JsonNode currentValue = unitData.get(currentKey);
+                    final JsonNode currentValue = unitData.get(key);
                     if (currentValue.isArray()) {
                         ((ArrayNode) currentValue).add(value);
                     } else {
                         final ArrayNode metadataValues = objectMapper.createArrayNode();
-                        metadataValues.add(unitData.get(currentKey));
+                        metadataValues.add(unitData.get(key));
                         metadataValues.add(value);
-                        unitData.put(currentKey, metadataValues);
+                        unitData.put(key, metadataValues);
                     }
                 }
             }
-            currentKey = null;
-            currentValue = null;
         }
     }
 
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if (inMetadataSection && currentKey != null) {
-            currentValue.append(ch, start, length);
+        if (inMetadataSection && !metadataValueStack.isEmpty()) {
+            metadataValueStack.peek().append(ch, start, length);
         }
     }
 
