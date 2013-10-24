@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
-import com.google.common.util.concurrent.MoreExecutors;
 import dagger.Module;
 import dagger.Provides;
 import de.faustedition.document.Documents;
@@ -24,7 +23,6 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Queue;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -123,7 +121,7 @@ public class Infrastructure {
     @Provides
     @Singleton
     public ObjectMapper provideObjectMapper() {
-        return new ObjectMapper();
+        return new ObjectMapper().registerModule(new Templates.TemplateModule());
     }
 
     @Provides

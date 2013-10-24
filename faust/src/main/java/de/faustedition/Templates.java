@@ -1,11 +1,18 @@
 package de.faustedition;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import de.faustedition.facsimile.InternetImageServer;
@@ -13,19 +20,24 @@ import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
+import freemarker.core.Environment;
+import freemarker.ext.beans.ArrayModel;
 import freemarker.ext.beans.BooleanModel;
 import freemarker.ext.beans.CollectionModel;
+import freemarker.ext.beans.MapModel;
 import freemarker.ext.beans.NumberModel;
 import freemarker.ext.beans.StringModel;
+import freemarker.template.AdapterTemplateModel;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.SimpleHash;
-import freemarker.template.SimpleNumber;
-import freemarker.template.SimpleScalar;
 import freemarker.template.SimpleSequence;
+import freemarker.template.TemplateDirectiveBody;
+import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -42,6 +54,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -55,7 +69,7 @@ public class Templates extends freemarker.template.Configuration {
             .build();
 
     @Inject
-    public Templates(Configuration configuration) {
+    public Templates(Configuration configuration, ObjectMapper objectMapper) {
         super();
         try {
             final String templateRootPath = configuration.property("faust.template_root");
@@ -67,6 +81,7 @@ public class Templates extends freemarker.template.Configuration {
             setSharedVariable("yp", configuration.property("faust.yui_path"));
             setSharedVariable("facsimileIIPUrl", InternetImageServer.BASE_URI.toString());
             setSharedVariable("debug", Boolean.parseBoolean(configuration.property("faust.debug")));
+            setSharedVariable("json", new ObjectMapperDirective(objectMapper));
 
             setAutoIncludes(Collections.singletonList("/header.ftl"));
             setDefaultEncoding("UTF-8");
@@ -124,14 +139,14 @@ public class Templates extends freemarker.template.Configuration {
             if (obj instanceof JsonNode) {
                 final JsonNode node = (JsonNode) obj;
                 if (node.isObject()) {
-                    final Map<String, JsonNode> hash = Maps.newHashMapWithExpectedSize(node.size());
+                    final Map<String, JsonNode> map = Maps.newHashMapWithExpectedSize(node.size());
                     for (Iterator<Map.Entry<String,JsonNode>> it = node.fields(); it.hasNext(); ) {
                         Map.Entry<String, JsonNode> field = it.next();
-                        hash.put(field.getKey(), field.getValue());
+                        map.put(field.getKey(), field.getValue());
                     }
-                    return new SimpleHash(hash, this);
+                    return new MapModel(map, this);
                 } else if (node.isArray()) {
-                    return new SimpleSequence(Lists.newArrayList(node), this);
+                    return new CollectionModel(Lists.newArrayList(node), this);
                 } else if (node.isBoolean()) {
                     return new BooleanModel(node.asBoolean(), this);
                 } else if (node.isNumber()) {
@@ -160,5 +175,42 @@ public class Templates extends freemarker.template.Configuration {
         }
     }
 
+    public static class ObjectMapperDirective implements TemplateDirectiveModel {
 
+        private final ObjectWriter objectWriter;
+
+        public ObjectMapperDirective(ObjectMapper objectMapper) {
+            this.objectWriter = objectMapper.writer();
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
+            objectWriter.writeValue(
+                    env.getOut(),
+                    (params.size() == 1 ? Iterables.getOnlyElement(params.values()) : params)
+            );
+        }
+    }
+
+    /**
+     * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
+     */
+    public static class TemplateModule extends SimpleModule {
+
+        public TemplateModule() {
+            super(Version.unknownVersion());
+            addSerializer(AdapterTemplateModel.class, TEMPLATE_MODEL_SERIALIZER);
+        }
+
+        private static final JsonSerializer<AdapterTemplateModel> TEMPLATE_MODEL_SERIALIZER = new StdSerializer<AdapterTemplateModel>(AdapterTemplateModel.class) {
+
+            @Override
+            public void serialize(AdapterTemplateModel value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+                final Object adaptedObject = value.getAdaptedObject(Object.class);
+                provider.findValueSerializer(adaptedObject.getClass(), null).serialize(adaptedObject, jgen, provider);
+            }
+
+        };
+    }
 }
