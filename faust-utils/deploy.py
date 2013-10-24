@@ -15,41 +15,25 @@ NAME = 'faust-1.3-SNAPSHOT'
 KILL_TIMEOUT = 20.0
 
 def is_alive (name):
-	contains = lambda x: x.find(name) >= 0
-	logical_or = lambda x, y: x or y
-	psout = os.popen('ps xaww')
-	return reduce(logical_or, map(contains, psout))
+        contains = lambda x: x.find(name) >= 0
+        logical_or = lambda x, y: x or y
+        psout = os.popen('ps xaww')
+        return reduce(logical_or, map(contains, psout))
 
 def pids (name):
-	return [l.split()[0] for l in os.popen('ps xaww') if name in l]
+        return [l.split()[0] for l in os.popen('ps xaww') if name in l]
 
-def main():
+def pull():
     print 'Pulling source...'
     os.chdir(SRC_DIR)
     check_call(['git', 'pull'])
 
+def build():
     print 'Building application...'
     os.chdir('faust')
     check_call(['mvn','-DskipTests','clean','package'])
 
-    print 'Copying new application...'
-    os.chdir('target')
-    check_call(['cp', NAME + '-app' + '.zip', APP_DIR])
-
-    print 'Stopping running application...'
-    app_pids = pids(NAME)
-    if len(app_pids) > 0:
-	    check_call(['kill', app_pids[0]])
-
-    for i in range(20):
-	    sleep(KILL_TIMEOUT / 20.0)
-	    if not is_alive(NAME):
-		    break
-
-    if is_alive(NAME):
-	    print 'Process not dead, giving up!'
-	    sys.exit(1)
-
+def backup():
     print 'Making a backup...'
     os.chdir('/mnt/data')
     call(['rm', '-rf', 'app.bak3'])
@@ -58,13 +42,72 @@ def main():
     call(['mv', 'app.bak', 'app.bak1'])
     check_call(['mv', 'app', 'app.bak'])
 
+def copy():
+    print 'Copying new application...'
+    os.chdir('target')
+    check_call(['cp', NAME + '-app' + '.zip', APP_DIR])
+
+def unzip():
     print 'Unzipping...'
     os.chdir(APP_DIR)
     check_call(['unzip', NAME + '-app' + '.zip'])
 
+def start():
     print 'Restarting app...'
     check_call(['nohup java -Xmx1024m -server -jar app/lib/' + NAME +'.jar /mnt/data/config.properties &'], shell=True)
+
+def stop():
+    print 'Stopping running application...'
+    app_pids = pids(NAME)
+    if len(app_pids) > 0:
+            check_call(['kill', app_pids[0]])
+
+    for i in range(30):
+            sleep(KILL_TIMEOUT / 30.0)
+            if not is_alive(NAME):
+                    break
+
+    if is_alive(NAME):
+            print 'Process not dead, giving up!'
+            sys.exit(1)
+
+def read():
+    print 'Deleting old database...'
+    call(['rm', '-rf', 'db/*'])
+    print 'Reading database...'
+    check_call(['java -Xmx1024m -server -cp app/lib/' + NAME +'.jar de.faustedition.transcript.TranscriptBatchReader /mnt/data/config.properties'], shell=True)
+    
+def update():
+
+    pull()
+    build()
+    copy()
+    stop()
+    backup()
+    unzip()
+    read()
+    start()
+
     print 'All done!'
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 2:
+        if sys.argv[1] == 'stop':
+            stop()
+            exit(0)
+        elif sys.argv[1] == 'start':
+            start()
+            exit(0)
+        elif sys.argv[1] == 'read':
+            stop()
+            read()
+            start()
+            exit(0)
+        elif sys.argv[1] == 'update':
+            update()
+            exit(0)
+
+    print 'usage: deploy.py command'
+    print '   commands: stop start read update'
+    exit(-1)
+
