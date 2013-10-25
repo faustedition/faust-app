@@ -196,14 +196,14 @@ YUI.add('document-structure-view', function (Y) {
 					if (transcriptPath) {
 						pageDisplay.attr({
 							cursor:"pointer",
-							href: Faust.contextPath + transcriptPath,
+							href: Faust.contextPath + transcriptPath
 						});
 
 					}
 					else {
 						pageDisplay.attr({
 							cursor: "not-allowed",
-							href: null,
+							href: null
 						});
 
 
@@ -345,7 +345,7 @@ YUI.add('document-structure-view', function (Y) {
 										"x": x,
 										"y": y,
 										"width": width,
-										"height": height,
+										"height": height
 									   }, 0, ">");
 					lockButton.toFront();
 					lockButton.topblatt = this.topblatt;
@@ -913,21 +913,21 @@ YUI.add('document-structure-view', function (Y) {
 				"gsa/390883/390883_0038":"/document/faust/2.5/gsa_390883.xml#26",
 				"gsa/390883/390883_0039":"/document/faust/2.5/gsa_390883.xml#26",
 				"gsa/390883/390883_0040":"/document/faust/2.5/gsa_390883.xml#26",
-				"gsa/390883/390883_0041":"/document/faust/2.5/gsa_390883.xml#27",
+				"gsa/390883/390883_0041":"/document/faust/2.5/gsa_390883.xml#27"
 
 			}
 			
 			FaustStructure.render(this.get('document'), this.get('container'));
-		},
+		}
 		
 	} , {
 		ATTRS: {
-			rootVC: { validator: function(v) { return true; } }
+			rootVC: { validator: function() { return true; } }
 		}
 	});
 
 	Y.mix(Y.namespace("Faust"), {
-        DocumentStructureView: DocumentStructureView,
+        DocumentStructureView: DocumentStructureView
 	});
 	
 }, '0.0', {
