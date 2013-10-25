@@ -19,7 +19,7 @@
     <script type="text/javascript" src="${cp}/static/js/yui-config.js"></script>
     <#if debug>
     <script type="text/javascript">
-        YUI.GlobalConfig.debug = true;
+        YUI.applyConfig({ debug: true, filter: "debug" });
     </script>
     </#if>
     <script type="text/javascript" src="${cp}/static/js/svg<#if !debug>.min</#if>.js"></script>
@@ -40,7 +40,7 @@
 	 <#if css?has_content><style type="text/css">${css}</style></#if>
 	 <#if header?has_content>${header}</#if>
 </head>
-<body class="yui3-skin-sam">
+<body>
 <div class="pure-g">
     <div class="pure-u-2-3">
         <div class="pure-menu pure-menu-open pure-menu-horizontal">

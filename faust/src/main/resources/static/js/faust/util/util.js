@@ -14,8 +14,44 @@ YUI.add('util', function (Y) {
         return encodePath(this.components[2]);
     };
 
+    var IOStatus = Y.Base.create('io-status', Y.Widget, [], {
+        initializer: function() {
+            this._transactions = {};
+
+            this._ioStartHandle = Y.on("io:start", this._ioStart, this);
+            this._ioEndHandle = Y.on("io:end", this._ioEnd, this);
+        },
+        destructor: function() {
+            this._ioStartHandle && this._ioStartHandle.detach();
+            this._ioEndHandle && this._ioEndHandle.detach();
+        },
+        renderUI: function() {
+            this._status = this.get("contentBox").appendChild("<div class='io-status'/>");
+            this._status.appendChild("<img/>").setAttrs({
+                src: cp + "/static/img/spinner.gif",
+                alt: "Loading"
+            });
+        },
+        syncUI: function() {
+            if ((Y.Object.size(this._transactions) > 0)) {
+                this._status.show(true);
+            } else {
+                this._status.hide(true);
+            }
+        },
+        _ioStart: function(tid) {
+            this._transactions[tid] = Date.now();
+            this.syncUI();
+        },
+        _ioEnd: function(tid) {
+            delete this._transactions[tid];
+            this.syncUI();
+        }
+    });
+
     Y.mix(Y.namespace("Faust"), {
         encodePath:encodePath,
+        IOStatus: IOStatus,
         URI:URI,
         io:function (uri, callback, reviver) {
             Faust.YUI().use("io", "json", function (Y) {
@@ -49,5 +85,5 @@ YUI.add('util', function (Y) {
         }
     });
 }, '0.0', {
-    requires:["io"]
+    requires:["io", "widget"]
 });

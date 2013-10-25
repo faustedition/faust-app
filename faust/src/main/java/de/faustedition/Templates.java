@@ -1,5 +1,6 @@
 package de.faustedition;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
@@ -21,7 +21,6 @@ import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.core.Environment;
-import freemarker.ext.beans.ArrayModel;
 import freemarker.ext.beans.BooleanModel;
 import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.beans.MapModel;
@@ -29,15 +28,14 @@ import freemarker.ext.beans.NumberModel;
 import freemarker.ext.beans.StringModel;
 import freemarker.template.AdapterTemplateModel;
 import freemarker.template.DefaultObjectWrapper;
-import freemarker.template.SimpleHash;
-import freemarker.template.SimpleSequence;
+import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import sun.org.mozilla.javascript.internal.ast.StringLiteral;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -108,8 +106,10 @@ public class Templates extends freemarker.template.Configuration {
 
             return Response.ok().variant(variant).entity(entity.toString()).build();
         } catch (TemplateException e) {
+            Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
             throw new WebApplicationException(e);
         } catch (IOException e) {
+            Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
             throw new WebApplicationException(e);
         }
     }
@@ -149,8 +149,10 @@ public class Templates extends freemarker.template.Configuration {
                     return new CollectionModel(Lists.newArrayList(node), this);
                 } else if (node.isBoolean()) {
                     return new BooleanModel(node.asBoolean(), this);
-                } else if (node.isNumber()) {
-                    return new NumberModel(node.numberValue(), this);
+                } else if (node.isFloatingPointNumber()) {
+                    return new SimpleNumber(node.asDouble());
+                } else if (node.isIntegralNumber()) {
+                    return new SimpleNumber(node.asLong());
                 } else if (node.isTextual()) {
                     return new StringModel(node.asText(), this);
                 } else if (node.isNull()) {
@@ -200,17 +202,31 @@ public class Templates extends freemarker.template.Configuration {
 
         public TemplateModule() {
             super(Version.unknownVersion());
-            addSerializer(AdapterTemplateModel.class, TEMPLATE_MODEL_SERIALIZER);
+            addSerializer(SimpleNumber.class, NUMBER_TEMPLATE_MODEL_SERIALIZER);
+            addSerializer(AdapterTemplateModel.class, ADAPTER_TEMPLATE_MODEL_SERIALIZER);
         }
 
-        private static final JsonSerializer<AdapterTemplateModel> TEMPLATE_MODEL_SERIALIZER = new StdSerializer<AdapterTemplateModel>(AdapterTemplateModel.class) {
+        private static final JsonSerializer<SimpleNumber> NUMBER_TEMPLATE_MODEL_SERIALIZER = new StdSerializer<SimpleNumber>(SimpleNumber.class) {
+            @Override
+            public void serialize(SimpleNumber value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+                final Number number = value.getAsNumber();
+                if (number instanceof Double) {
+                    jgen.writeNumber((Double) number);
+                } else if (number instanceof Long) {
+                    jgen.writeNumber((Long) number);
+                } else {
+                    throw new IllegalArgumentException(number.toString());
+                }
+            }
+        };
+
+        private static final JsonSerializer<AdapterTemplateModel> ADAPTER_TEMPLATE_MODEL_SERIALIZER = new StdSerializer<AdapterTemplateModel>(AdapterTemplateModel.class) {
 
             @Override
             public void serialize(AdapterTemplateModel value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 final Object adaptedObject = value.getAdaptedObject(Object.class);
                 provider.findValueSerializer(adaptedObject.getClass(), null).serialize(adaptedObject, jgen, provider);
             }
-
         };
     }
 }

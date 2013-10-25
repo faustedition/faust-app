@@ -1,5 +1,178 @@
 YUI.add('document-structure-view', function (Y) {
-	var DocumentStructureView = Y.Base.create("document-structure-view", Y.View, [], {
+
+    var DocumentPaginator = Y.Base.create("document-paginator-view", Y.View, [], {
+        events: {
+            "a": { "click": "pageClicked"}
+        },
+        destructor: function() {
+            this.navigateHandle && this.navigateHandle.detach();
+        },
+        render: function() {
+            this.get("container").addClass("pure-paginator");
+            this.pages = [];
+            for (var unit = this.get("document").metadata, unitQueue = []; unit; unit = unitQueue.shift()) {
+                if (unit.type == "page") this.pages.push(Y.merge(unit, { pageNum: this.pages.length }));
+                if (unit.contents) unitQueue = unit.contents.concat(unitQueue);
+            }
+
+            this.page(0);
+            this.navigateHandle = Y.on("faust:navigate", this.navigate, this);
+
+            return this;
+        },
+        page: function(page) {
+            if (this.currentPage == page) return;
+
+            var container = this.get("container").empty(),
+                totalPages = this.pages.length,
+                maxAdjacentPages = this.get("maxAdjacentPages"),
+                maxAdjacentLeft = Math.floor(maxAdjacentPages / 2),
+                maxAdjacentRight = Math.ceil(maxAdjacentPages / 2),
+                firstPage = Math.max(0, Math.min(totalPages - maxAdjacentPages, page - maxAdjacentLeft)),
+                lastPage = Math.min(totalPages, Math.max(page + maxAdjacentRight, maxAdjacentPages));
+
+            if (firstPage != 0) {
+                container
+                    .appendChild(Y.Node.create("<li/>"))
+                    .appendChild(Y.Node.create("<a/>"))
+                    .addClass("pure-button")
+                    .addClass("prev")
+                    .setAttrs({
+                        "href": "#1",
+                        "title": "Page 1",
+                        "text": "«"
+                    });
+            }
+            for (var p = firstPage + 1; p<= lastPage; p++) {
+                var item = container
+                    .appendChild(Y.Node.create("<li/>"))
+                    .appendChild(Y.Node.create("<a/>"))
+                    .addClass("pure-button")
+                    .setAttrs({
+                        "href": "#" + p,
+                        "title": "Page " + p,
+                        "text": "" + p
+                    });
+                if ((p - 1) == page) {
+                    item.addClass("pure-button-active");
+                }
+            }
+            if (lastPage != totalPages) {
+                container
+                    .appendChild(Y.Node.create("<li/>"))
+                    .appendChild(Y.Node.create("<a/>"))
+                    .addClass("pure-button")
+                    .addClass("next")
+                    .setAttrs({
+                        "href": "#" + totalPages,
+                        "title": "Page " + totalPages,
+                        "text": "»"
+                    });
+            }
+
+            this.currentPage = page;
+
+            Y.fire("faust:navigate", {
+                document: this.get("document").id,
+                unit: this.pages[this.currentPage].order || 0,
+                unitType: this.pages[this.currentPage].type,
+                source: this
+            });
+        },
+        navigate: function(e) {
+            if (this == e.source || this.get("document").id != e.document || "page" != e.unitType) return;
+            var page = Y.Array.find(this.pages, function(page) { return (e.unit == page.order); });
+            if (page) this.page(page.pageNum);
+        },
+        pageClicked: function (e) {
+            e.preventDefault();
+            var href = e.currentTarget.get("href");
+            this.page(parseInt(href.substring(href.lastIndexOf("#") + 1)) - 1);
+        }
+    }, {
+        ATTRS: {
+            document: {},
+            maxAdjacentPages: { value: 7 }
+        }
+    });
+
+    var DocumentTree = Y.Base.create("document-tree-view", Y.View, [], {
+        events: {
+            ".label": { "click": "toggle"}
+        },
+        initializer: function() {
+            Y.on("faust:navigate", this.navigate, this);
+        },
+        render: function() {
+            var container = this.get("container");
+
+            this.document = parseInt(container.getData("document-id"));
+
+            container.all("li").each(function(node) {
+                if (node.one("> ol")) {
+                    node.addClass("branch-node").one(".label").prepend(Y.Node.create("<i></i>").addClass("collapse-handle").set("text", "-"))
+                } else {
+                    node.addClass("leaf-node")
+                }
+            });
+
+            if (!this.get("expandAll")) {
+                container.all("li.branch-node").each(this.collapse, this);
+            }
+            return this;
+        },
+        expand: function(node) {
+            node.ancestors("li.collapsed", true).each(function(node) {
+                node.removeClass("collapsed");
+                node.one(".collapse-handle").set("text", "-")
+            });
+            return node;
+        },
+        collapse: function(node) {
+            node.ancestor().all("li.branch-node").each(function(node) {
+                node.addClass("collapsed");
+                node.one(".collapse-handle").set("text", "+");
+            });
+            return node;
+        },
+        activate: function(node) {
+            this.active && this.active.removeClass("active");
+            this.active = this.expand(node).addClass("active");
+
+            if (!this.active.inRegion(this.get("container"))) this.active.scrollIntoView(true);
+
+            Y.fire("faust:navigate", {
+                document: this.document,
+                unit: parseInt(this.active.getData("order")),
+                unitType: this.active.getData("type"),
+                source: this
+            });
+
+            return this.active;
+        },
+        toggle: function (e) {
+            e.preventDefault();
+            var node = e.currentTarget.ancestor("li");
+            if (this.active && this.active.compareTo(node)) {
+                node.hasClass("collapsed") ? this.expand(node) : this.collapse(node);
+            } else {
+                this.activate(node);
+            }
+        },
+        navigate: function(e) {
+            if (this == e.source) return;
+            if (this.document == e.document) {
+                var materialUnit = this.get("container").one("li[data-order='" + (e.unit || "0") + "']");
+                if (materialUnit) this.activate(materialUnit);
+            }
+        }
+    }, {
+        ATTRS: {
+            "expandAll": { value: true, validator: Y.Lang.isBoolean }
+        }
+    });
+
+    var DocumentStructureView = Y.Base.create("document-structure-view", Y.View, [], {
 		
 		destructor: function() {
 			
@@ -927,10 +1100,12 @@ YUI.add('document-structure-view', function (Y) {
 	});
 
 	Y.mix(Y.namespace("Faust"), {
-        DocumentStructureView: DocumentStructureView
+        DocumentStructureView: DocumentStructureView,
+        DocumentTree: DocumentTree,
+        DocumentPaginator: DocumentPaginator
 	});
 	
-}, '0.0', {
-	requires: ['view', 'node']
+}, "0.0", {
+	requires: ["view", "array-extras" ]
 });
 
