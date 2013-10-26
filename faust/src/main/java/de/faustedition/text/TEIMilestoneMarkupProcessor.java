@@ -21,6 +21,8 @@ package de.faustedition.text;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ForwardingIterator;
@@ -29,6 +31,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
+import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.Map;
@@ -43,7 +46,7 @@ import static de.faustedition.text.NamespaceMapping.map;
  */
 public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
 
-    public static final String DEFAULT_ID_PREFIX = "tei_milestone_";
+    public static final String DEFAULT_ID_PREFIX = "tei_";
 
     private static final Map<String, String> MILESTONE_ELEMENT_UNITS = Maps.newHashMap();
 
@@ -61,7 +64,6 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
 
     private final Iterator<Token> delegate;
     private final ObjectMapper objectMapper;
-    private final NamespaceMapping namespaceMapping;
     private final String idPrefix;
 
     private final Set<String> handledElements = Sets.newHashSet();
@@ -87,7 +89,6 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
     public TEIMilestoneMarkupProcessor(Iterator<Token> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping, String idPrefix) {
         this.delegate = delegate;
         this.objectMapper = objectMapper;
-        this.namespaceMapping = namespaceMapping;
         this.idPrefix = idPrefix;
 
         this.xmlIdKey = map(namespaceMapping, XML.XML_ID_NAME);
@@ -102,7 +103,7 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
         for (Map.Entry<String, String> milestoneElementUnit : MILESTONE_ELEMENT_UNITS.entrySet()) {
             this.milestoneElementKeys.put(
                     map(namespaceMapping, new QName(TEI_NS_URI, milestoneElementUnit.getKey())),
-                    map(namespaceMapping, new QName(TEI_NS_URI, milestoneElementUnit.getValue()))
+                    milestoneElementUnit.getValue()
             );
         }
 
@@ -153,6 +154,16 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
         return buffer.remove();
     }
 
+    public static Predicate<Token> teiMilestone(NamespaceMapping namespaceMapping, final String unit) {
+        final String key = NamespaceMapping.map(namespaceMapping, MILESTONE_NAME);
+        return Predicates.and(AnnotationStart.IS_INSTANCE, new Predicate<Token>() {
+            @Override
+            public boolean apply(@Nullable Token input) {
+                return unit.equals(((AnnotationStart) input).getData().path(key).asText());
+            }
+        });
+    }
+
     boolean handleMilestoneElements(AnnotationStart annotationStart) {
         String milestoneUnit = null;
         final String xmlName = annotationStart.getData().path(xmlNameKey).asText();
@@ -168,8 +179,9 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
 
         final ObjectNode data = objectMapper.createObjectNode();
         data.putAll(annotationStart.getData());
+        data.put(milestoneKey, milestoneUnit);
         data.remove(milestoneUnitKey);
-        data.put(xmlNameKey, milestoneUnit);
+        data.remove(xmlNameKey);
 
         final String last = milestones.remove(milestoneUnit);
         if (last != null) {
@@ -195,7 +207,7 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
             final ObjectNode data = objectMapper.createObjectNode();
             data.putAll(annotationStart.getData());
             data.remove(spanToKey);
-            data.put(xmlNameKey, data.remove(xmlNameKey).asText().replaceAll("Span$", ""));
+            data.put(milestoneKey, data.remove(xmlNameKey).asText().replaceAll("Span$", ""));
 
             final String id = (idPrefix + ++annotationId);
             buffer.add(new AnnotationStart(id, data));

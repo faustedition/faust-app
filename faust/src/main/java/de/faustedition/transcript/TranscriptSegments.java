@@ -29,7 +29,8 @@ import java.util.concurrent.TimeUnit;
 
 import static de.faustedition.text.NamespaceMapping.TEI_NS_URI;
 import static de.faustedition.text.NamespaceMapping.TEI_SIG_GE_URI;
-import static de.faustedition.text.TokenPredicates.name;
+import static de.faustedition.text.TEIMilestoneMarkupProcessor.teiMilestone;
+import static de.faustedition.text.TokenPredicates.xmlName;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -57,16 +58,16 @@ public class TranscriptSegments extends AbstractScheduledService {
         this.database = database;
         this.transcripts = transcripts;
 
-        this.documentaryPage = name(namespaceMapping, new QName(TEI_SIG_GE_URI, "document"));
-        this.documentaryLine = name(namespaceMapping, new QName(TEI_SIG_GE_URI, "line"));
+        this.documentaryPage = xmlName(namespaceMapping, new QName(TEI_SIG_GE_URI, "document"));
+        this.documentaryLine = xmlName(namespaceMapping, new QName(TEI_SIG_GE_URI, "line"));
 
-        this.textualPage = name(namespaceMapping, new QName(TEI_NS_URI, "page"));
+        this.textualPage = teiMilestone(namespaceMapping, "page");
         this.textualLine = Predicates.or(
-                name(namespaceMapping, new QName(TEI_NS_URI, "l")),
-                name(namespaceMapping, new QName(TEI_NS_URI, "stage")),
-                name(namespaceMapping, new QName(TEI_NS_URI, "speaker")),
-                name(namespaceMapping, new QName(TEI_NS_URI, "head")),
-                name(namespaceMapping, new QName(TEI_NS_URI, "p"))
+                xmlName(namespaceMapping, new QName(TEI_NS_URI, "l")),
+                xmlName(namespaceMapping, new QName(TEI_NS_URI, "stage")),
+                xmlName(namespaceMapping, new QName(TEI_NS_URI, "speaker")),
+                xmlName(namespaceMapping, new QName(TEI_NS_URI, "head")),
+                xmlName(namespaceMapping, new QName(TEI_NS_URI, "p"))
         );
 
         eventBus.register(this);

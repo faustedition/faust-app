@@ -1,5 +1,6 @@
 package de.faustedition.transcript;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,7 +10,9 @@ import de.faustedition.FaustURI;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.text.Annotation;
+import de.faustedition.text.AnnotationEnd;
 import de.faustedition.text.AnnotationProcessor;
+import de.faustedition.text.AnnotationStart;
 import de.faustedition.text.Characters;
 import de.faustedition.text.Token;
 import de.faustedition.xml.Sources;
@@ -26,7 +29,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -93,6 +99,44 @@ public class TranscriptResource {
                         .add("id", id)
                         .add("text", text.toString())
                         .add("annotations", annotations);
+            }
+        });
+    }
+
+    @GET
+    @Path("/{id}/stream")
+    @Produces(MediaType.APPLICATION_JSON)
+    public StreamingOutput transcriptStream(@PathParam("id") final long id) {
+        checkTranscriptExists(id);
+        return transcripts.tokens(Arrays.asList(id), new Transcripts.TokenCallback<StreamingOutput>() {
+            @Override
+            public StreamingOutput withTokens(final Iterator<Token> tokens) throws Exception {
+                return new StreamingOutput() {
+                    @Override
+                    public void write(OutputStream output) throws IOException, WebApplicationException {
+                        final JsonGenerator jgen = objectMapper.getJsonFactory().createJsonGenerator(output);
+                        jgen.writeStartArray();
+                        while (tokens.hasNext()) {
+                            final Token token = tokens.next();
+                            if (token instanceof Characters) {
+                                jgen.writeString(((Characters) token).getContent());
+                            } else if (token instanceof AnnotationStart) {
+                                final AnnotationStart annotationStart = (AnnotationStart) token;
+                                jgen.writeStartObject();
+                                jgen.writeStringField("s", annotationStart.getId());
+                                jgen.writeFieldName("d");
+                                jgen.writeTree(annotationStart.getData());
+                                jgen.writeEndObject();
+                            } else if (token instanceof AnnotationEnd) {
+                                jgen.writeStartObject();
+                                jgen.writeStringField("e", ((AnnotationEnd) token).getId());
+                                jgen.writeEndObject();
+                            }
+                        }
+                        jgen.writeEndArray();
+                        jgen.flush();
+                    }
+                };
             }
         });
     }

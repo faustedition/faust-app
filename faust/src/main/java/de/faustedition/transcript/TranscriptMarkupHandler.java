@@ -28,7 +28,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
     private final Iterator<Token> delegate;
     private final ObjectMapper objectMapper;
     private final Queue<Token> buf = Lists.newLinkedList();
-    private final Iterator<String> ids = Annotation.ids("transcript_annotation_");
+    private final Iterator<String> ids = Annotation.ids("transcript_");
 
     private final String stageAttributeName;
     private final String stageKey;

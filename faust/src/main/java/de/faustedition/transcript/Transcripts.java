@@ -16,6 +16,7 @@ import de.faustedition.text.LineBreaker;
 import de.faustedition.text.NamespaceMapping;
 import de.faustedition.text.TEIMilestoneMarkupProcessor;
 import de.faustedition.text.Token;
+import de.faustedition.text.TokenPredicates;
 import de.faustedition.text.WhitespaceCompressor;
 import de.faustedition.text.XML;
 import de.faustedition.text.XMLStreamToTokenFunction;
@@ -38,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static de.faustedition.text.TokenPredicates.name;
 
 @Singleton
 public class Transcripts {
@@ -149,7 +148,7 @@ public class Transcripts {
                             xmlEvents = XML.inputFactory().createXMLEventReader(new StreamSource(xml.file(uri)));
                             tokenIt = Iterators.transform(
                                     XML.stream(xmlEvents),
-                                    new XMLStreamToTokenFunction(objectMapper, namespaceMapping).withNodePath()
+                                    new XMLStreamToTokenFunction(objectMapper, namespaceMapping)
                             );
                         } catch (XMLStreamException e) {
                             XML.closeQuietly(xmlEvents);
@@ -176,44 +175,44 @@ public class Transcripts {
     public Iterator<Token> transcriptTokens(Iterator<Token> tokens) {
         tokens = Iterators.filter(tokens, new ElementContextFilter(
                 Predicates.or(
-                        name(namespaceMapping, "tei:teiHeader"),
-                        name(namespaceMapping, "tei:front"),
-                        name(namespaceMapping, "tei:app")
+                        TokenPredicates.xmlName(namespaceMapping, "tei:teiHeader"),
+                        TokenPredicates.xmlName(namespaceMapping, "tei:front"),
+                        TokenPredicates.xmlName(namespaceMapping, "tei:app")
                 ),
                 Predicates.or(
-                        name(namespaceMapping, "tei:lem")
+                        TokenPredicates.xmlName(namespaceMapping, "tei:lem")
                 )
 
         ));
 
         tokens = new WhitespaceCompressor(tokens, namespaceMapping, Predicates.or(
-                name(namespaceMapping, "tei:body"),
-                name(namespaceMapping, "tei:group"),
-                name(namespaceMapping, "tei:text"),
-                name(namespaceMapping, "tei:div"),
-                name(namespaceMapping, "tei:lg"),
-                name(namespaceMapping, "tei:sp"),
-                name(namespaceMapping, "tei:subst"),
-                name(namespaceMapping, "tei:choice"),
-                name(namespaceMapping, "tei:surface"),
-                name(namespaceMapping, "tei:zone"),
-                name(namespaceMapping, "ge:document"),
-                name(namespaceMapping, "f:overw")
+                TokenPredicates.xmlName(namespaceMapping, "tei:body"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:group"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:text"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:div"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:lg"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:sp"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:subst"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:choice"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:surface"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:zone"),
+                TokenPredicates.xmlName(namespaceMapping, "ge:document"),
+                TokenPredicates.xmlName(namespaceMapping, "f:overw")
         ));
 
         tokens = new LineBreaker(tokens, Predicates.or(
-                name(namespaceMapping, "tei:text"),
-                name(namespaceMapping, "tei:div"),
-                name(namespaceMapping, "tei:head"),
-                name(namespaceMapping, "tei:sp"),
-                name(namespaceMapping, "tei:stage"),
-                name(namespaceMapping, "tei:speaker"),
-                name(namespaceMapping, "tei:lg"),
-                name(namespaceMapping, "tei:l"),
-                name(namespaceMapping, "tei:p"),
-                name(namespaceMapping, "tei:ab"),
-                name(namespaceMapping, "tei:line"),
-                name(namespaceMapping, "ge:line")
+                TokenPredicates.xmlName(namespaceMapping, "tei:text"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:div"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:head"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:sp"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:stage"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:speaker"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:lg"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:l"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:p"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:ab"),
+                TokenPredicates.xmlName(namespaceMapping, "tei:line"),
+                TokenPredicates.xmlName(namespaceMapping, "ge:line")
         ));
 
         tokens = new TEIMilestoneMarkupProcessor(tokens, objectMapper, namespaceMapping);

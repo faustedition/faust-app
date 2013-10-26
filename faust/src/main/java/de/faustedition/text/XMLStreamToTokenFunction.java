@@ -11,7 +11,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -23,7 +22,7 @@ import static de.faustedition.text.NamespaceMapping.map;
  */
 public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
 
-    public static final String DEFAULT_ID_PREFIX = "xml-";
+    public static final String DEFAULT_ID_PREFIX = "";
 
     private final ObjectMapper objectMapper;
     private final NamespaceMapping namespaceMapping;
@@ -35,6 +34,7 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
     private final Deque<String> annotationIds = Lists.newLinkedList();
 
     private Iterator<String> ids = Annotation.ids(DEFAULT_ID_PREFIX);
+    private boolean xmlIdReuse = false;
     private LinkedList<Integer> nodePath;
 
     public XMLStreamToTokenFunction(ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
@@ -53,6 +53,11 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
 
     public XMLStreamToTokenFunction withNodePath() {
         this.nodePath = Lists.newLinkedList();
+        return this;
+    }
+
+    public XMLStreamToTokenFunction withXmlIdReuse() {
+        this.xmlIdReuse = true;
         return this;
     }
 
@@ -101,7 +106,7 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
                     final String attrValue = attr.getValue();
 
                     data.put(attrName, attrValue);
-                    if (xmlIdKey.equals(attrName)) {
+                    if (xmlIdReuse && xmlIdKey.equals(attrName)) {
                         xmlId = attrValue;
                     }
                 }

@@ -11,11 +11,11 @@ import javax.xml.namespace.QName;
  */
 public class TokenPredicates {
 
-    public static Predicate<Token> name(final NamespaceMapping namespaceMapping, final QName name) {
-        return name(namespaceMapping, NamespaceMapping.map(namespaceMapping, name));
+    public static Predicate<Token> xmlName(final NamespaceMapping namespaceMapping, final QName name) {
+        return xmlName(namespaceMapping, NamespaceMapping.map(namespaceMapping, name));
     }
 
-    public static Predicate<Token> name(final NamespaceMapping namespaceMapping, final String name) {
+    public static Predicate<Token> xmlName(final NamespaceMapping namespaceMapping, final String name) {
         final String xmlElementNameKey = NamespaceMapping.map(namespaceMapping, XML.XML_ELEMENT_NAME);
         return Predicates.and(AnnotationStart.IS_INSTANCE, new Predicate<Token>() {
             @Override
