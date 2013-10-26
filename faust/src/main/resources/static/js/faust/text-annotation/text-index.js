@@ -19,8 +19,8 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
-
 YUI.add('text-index', function (Y) {
+
     var Iterator = function (tree) {
         this._tree = tree;
         this._cursor = null;
@@ -209,13 +209,14 @@ YUI.add('text-index', function (Y) {
         return single_rotate(root, dir);
     }
 
-    var RBTree = function (comparator, keyFunction) {
+    var RedBlackTree = function (comparator, keyFunction) {
         this._root = null;
         this._comparator = comparator;
         this._keyFunction = keyFunction || function(d) { return d; };
         this.size = 0;
     };
-    Y.extend(RBTree, TreeBase, {
+
+    Y.extend(RedBlackTree, TreeBase, {
         // returns true if inserted, false if duplicate
         insert: function (data) {
             var key = this._keyFunction(data);
@@ -385,9 +386,62 @@ YUI.add('text-index', function (Y) {
             return found !== null;
         }
     });
-    Y.mix(Y.namespace("Faust"), {
-        RBTree: RBTree
+
+    var NS = Y.namespace("Faust");
+
+    var segmentComparator = function(a, b) {
+        return ((a[0] == b[0]) ? (b[1] - a[1]) : (a[0] - b[0]));
+    };
+
+    var segmentKeyFunction = function(d) {
+        return d[0];
+    }
+
+    NS.SegmentIndex = function(contents) {
+        NS.SegmentIndex.superclass.constructor.call(this, segmentComparator, segmentKeyFunction);
+        Y.Array.each(contents, this.insert, this);
+        this._index(this._root);
+    };
+
+    Y.extend(NS.SegmentIndex, RedBlackTree, {
+        find: function (segment) {
+            var result = [];
+            this._find(this._root, segment, result);
+            return result;
+        },
+        _find: function (node, segment, result) {
+            // Don't search nodes that don't exist
+            if (node === null) return;
+
+            // If range is to the right of the rightmost point of any interval
+            // in this node and all children, there won't be any matches.
+            if (segment[0] > node.maxEnd) return;
+
+            // Search left children
+            if (node.left !== null) this._find(node.left, segment, result);
+
+            // Check this node
+            if (node.key[0] < segment[1] && node.key[1] > segment[0]) {
+                for (var v = 0, vc = node.values.length; v < vc; v++) {
+                    result.push(node.values[v][1]);
+                }
+            }
+
+            // If range is to the left of the start of this interval,
+            // then it can't be in any child to the right.
+            if (segment[1] < node.key[0]) return;
+
+            // Otherwise, search right children
+            if (node.right !== null) this._find(node.right, segment, result);
+        },
+        _index: function (node) {
+            if (node === null) return 0;
+            node.maxEnd = Math.max(node.key.end, this._index(node.left), this._index(node.right));
+            return node.maxEnd;
+        }
     });
+
+
 }, '0.0', {
-    requires: ["base", "substitute", "array-extras", "io", "json"]
+    requires: ["oop", "array-extras"]
 });
