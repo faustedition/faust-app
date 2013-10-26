@@ -10,7 +10,10 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import de.faustedition.Configuration;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.message.DeflateEncoder;
+import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.EncodingFilter;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
@@ -42,7 +45,11 @@ public class HttpService extends AbstractIdleService {
 
     public HttpService(Configuration configuration, Iterable<Object> components) {
         try {
-            final ResourceConfig resourceConfig = new ResourceConfig();
+            final ResourceConfig resourceConfig = new ResourceConfig(
+                    EncodingFilter.class,
+                    DeflateEncoder.class,
+                    GZipEncoder.class
+            );
 
             resourceConfig.registerResources(StaticResourceHandler.create("/static", Strings.emptyToNull(configuration.property("faust.static_root")), "/static"));
 
