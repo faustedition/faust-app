@@ -7,18 +7,18 @@ import javax.annotation.Nullable;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class AnnotationEnd implements Token {
+public class TextAnnotationEnd implements TextToken {
 
-    public static final Predicate<Token> IS_INSTANCE = new Predicate<Token>() {
+    public static final Predicate<TextToken> IS_INSTANCE = new Predicate<TextToken>() {
         @Override
-        public boolean apply(@Nullable Token input) {
-            return (input instanceof AnnotationEnd);
+        public boolean apply(@Nullable TextToken input) {
+            return (input instanceof TextAnnotationEnd);
         }
     };
 
     private final String id;
 
-    public AnnotationEnd(String id) {
+    public TextAnnotationEnd(String id) {
         this.id = id;
     }
 

@@ -6,9 +6,9 @@ import com.google.common.collect.Sets;
 import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.TranscribedVerseIntervalRecord;
-import de.faustedition.text.AnnotationStart;
+import de.faustedition.text.TextAnnotationStart;
 import de.faustedition.text.NamespaceMapping;
-import de.faustedition.text.Token;
+import de.faustedition.text.TextToken;
 import de.faustedition.text.XML;
 import org.jooq.DSLContext;
 import org.jooq.InsertValuesStep3;
@@ -26,11 +26,11 @@ import static de.faustedition.text.NamespaceMapping.map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TranscribedVerseIntervalCollector extends ForwardingIterator<Token> {
+public class TranscribedVerseIntervalCollector extends ForwardingIterator<TextToken> {
 
     private static final Pattern VERSE_NUMBER_PATTERN = Pattern.compile("[0-9]+");
 
-    private final Iterator<Token> delegate;
+    private final Iterator<TextToken> delegate;
     private final Database database;
     private final long transcriptId;
 
@@ -40,7 +40,7 @@ public class TranscribedVerseIntervalCollector extends ForwardingIterator<Token>
 
     private final SortedSet<Integer> verses = Sets.newTreeSet();
 
-    public TranscribedVerseIntervalCollector(Iterator<Token> delegate, NamespaceMapping namespaceMapping, Database database, long transcriptId) {
+    public TranscribedVerseIntervalCollector(Iterator<TextToken> delegate, NamespaceMapping namespaceMapping, Database database, long transcriptId) {
         this.delegate = delegate;
         this.database = database;
         this.transcriptId = transcriptId;
@@ -51,16 +51,16 @@ public class TranscribedVerseIntervalCollector extends ForwardingIterator<Token>
     }
 
     @Override
-    protected Iterator<Token> delegate() {
+    protected Iterator<TextToken> delegate() {
         return delegate;
     }
 
 
     @Override
-    public Token next() {
-        final Token token = super.next();
-        if (token instanceof AnnotationStart) {
-            final ObjectNode data = ((AnnotationStart) token).getData();
+    public TextToken next() {
+        final TextToken token = super.next();
+        if (token instanceof TextAnnotationStart) {
+            final ObjectNode data = ((TextAnnotationStart) token).getData();
             if (data.path(xmlNameKey).asText().equals(verseXmlName)) {
                 final Matcher verseNumberMatcher = VERSE_NUMBER_PATTERN.matcher(data.path(verseNumberAttribute).asText());
                 while (verseNumberMatcher.find()) {

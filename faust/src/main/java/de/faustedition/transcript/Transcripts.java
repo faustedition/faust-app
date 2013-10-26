@@ -11,15 +11,13 @@ import de.faustedition.Database;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.db.Tables;
-import de.faustedition.text.ElementContextFilter;
+import de.faustedition.text.XMLElementContextFilter;
 import de.faustedition.text.LineBreaker;
 import de.faustedition.text.NamespaceMapping;
-import de.faustedition.text.TEIMilestoneMarkupProcessor;
-import de.faustedition.text.Token;
-import de.faustedition.text.TokenPredicates;
+import de.faustedition.text.TextToken;
 import de.faustedition.text.WhitespaceCompressor;
 import de.faustedition.text.XML;
-import de.faustedition.text.XMLStreamToTokenFunction;
+import de.faustedition.text.XMLEvent2TextToken;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -39,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static de.faustedition.text.TextTokenPredicates.xmlName;
 
 @Singleton
 public class Transcripts {
@@ -120,14 +120,14 @@ public class Transcripts {
         });
 
         try {
-            return callback.withTokens(transcriptTokens(new AbstractIterator<Token>() {
+            return callback.withTokens(transcriptTokens(new AbstractIterator<TextToken>() {
 
                 Iterator<Long> idIt = ids.iterator();
-                Iterator<Token> tokenIt = Iterators.emptyIterator();
+                Iterator<TextToken> tokenIt = Iterators.emptyIterator();
                 XMLEventReader xmlEvents = null;
 
                 @Override
-                protected Token computeNext() {
+                protected TextToken computeNext() {
                     while (!tokenIt.hasNext() && idIt.hasNext()) {
                         final Long id = idIt.next();
                         final FaustURI uri = uris.get(id);
@@ -146,10 +146,7 @@ public class Transcripts {
                         try {
                             XML.closeQuietly(xmlEvents);
                             xmlEvents = XML.inputFactory().createXMLEventReader(new StreamSource(xml.file(uri)));
-                            tokenIt = Iterators.transform(
-                                    XML.stream(xmlEvents),
-                                    new XMLStreamToTokenFunction(objectMapper, namespaceMapping)
-                            );
+                            tokenIt = Iterators.transform(XML.stream(xmlEvents), new XMLEvent2TextToken(objectMapper, namespaceMapping));
                         } catch (XMLStreamException e) {
                             XML.closeQuietly(xmlEvents);
                             throw Throwables.propagate(e);
@@ -172,47 +169,47 @@ public class Transcripts {
         }
     }
 
-    public Iterator<Token> transcriptTokens(Iterator<Token> tokens) {
-        tokens = Iterators.filter(tokens, new ElementContextFilter(
+    public Iterator<TextToken> transcriptTokens(Iterator<TextToken> tokens) {
+        tokens = Iterators.filter(tokens, new XMLElementContextFilter(
                 Predicates.or(
-                        TokenPredicates.xmlName(namespaceMapping, "tei:teiHeader"),
-                        TokenPredicates.xmlName(namespaceMapping, "tei:front"),
-                        TokenPredicates.xmlName(namespaceMapping, "tei:app")
+                        xmlName(namespaceMapping, "tei:teiHeader"),
+                        xmlName(namespaceMapping, "tei:front"),
+                        xmlName(namespaceMapping, "tei:app")
                 ),
                 Predicates.or(
-                        TokenPredicates.xmlName(namespaceMapping, "tei:lem")
+                        xmlName(namespaceMapping, "tei:lem")
                 )
 
         ));
 
         tokens = new WhitespaceCompressor(tokens, namespaceMapping, Predicates.or(
-                TokenPredicates.xmlName(namespaceMapping, "tei:body"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:group"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:text"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:div"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:lg"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:sp"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:subst"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:choice"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:surface"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:zone"),
-                TokenPredicates.xmlName(namespaceMapping, "ge:document"),
-                TokenPredicates.xmlName(namespaceMapping, "f:overw")
+                xmlName(namespaceMapping, "tei:body"),
+                xmlName(namespaceMapping, "tei:group"),
+                xmlName(namespaceMapping, "tei:text"),
+                xmlName(namespaceMapping, "tei:div"),
+                xmlName(namespaceMapping, "tei:lg"),
+                xmlName(namespaceMapping, "tei:sp"),
+                xmlName(namespaceMapping, "tei:subst"),
+                xmlName(namespaceMapping, "tei:choice"),
+                xmlName(namespaceMapping, "tei:surface"),
+                xmlName(namespaceMapping, "tei:zone"),
+                xmlName(namespaceMapping, "ge:document"),
+                xmlName(namespaceMapping, "f:overw")
         ));
 
         tokens = new LineBreaker(tokens, Predicates.or(
-                TokenPredicates.xmlName(namespaceMapping, "tei:text"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:div"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:head"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:sp"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:stage"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:speaker"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:lg"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:l"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:p"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:ab"),
-                TokenPredicates.xmlName(namespaceMapping, "tei:line"),
-                TokenPredicates.xmlName(namespaceMapping, "ge:line")
+                xmlName(namespaceMapping, "tei:text"),
+                xmlName(namespaceMapping, "tei:div"),
+                xmlName(namespaceMapping, "tei:head"),
+                xmlName(namespaceMapping, "tei:sp"),
+                xmlName(namespaceMapping, "tei:stage"),
+                xmlName(namespaceMapping, "tei:speaker"),
+                xmlName(namespaceMapping, "tei:lg"),
+                xmlName(namespaceMapping, "tei:l"),
+                xmlName(namespaceMapping, "tei:p"),
+                xmlName(namespaceMapping, "tei:ab"),
+                xmlName(namespaceMapping, "tei:line"),
+                xmlName(namespaceMapping, "ge:line")
         ));
 
         tokens = new TEIMilestoneMarkupProcessor(tokens, objectMapper, namespaceMapping);
@@ -224,7 +221,7 @@ public class Transcripts {
 
     public static interface TokenCallback<R> {
 
-        R withTokens(Iterator<Token> tokens) throws Exception;
+        R withTokens(Iterator<TextToken> tokens) throws Exception;
 
     }
 }

@@ -5,10 +5,10 @@ import com.google.common.base.Function;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import de.faustedition.text.AnnotationEnd;
-import de.faustedition.text.AnnotationStart;
-import de.faustedition.text.Characters;
-import de.faustedition.text.Token;
+import de.faustedition.text.TextAnnotationEnd;
+import de.faustedition.text.TextAnnotationStart;
+import de.faustedition.text.TextContent;
+import de.faustedition.text.TextToken;
 
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Queue;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TranscriptTokenizer implements Function<Iterator<Token>, Iterator<TranscriptToken>> {
+public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterator<TranscriptToken>> {
 
     private Queue<TranscriptToken> buf;
     private Map<String, ObjectNode> annotations;
@@ -29,7 +29,7 @@ public class TranscriptTokenizer implements Function<Iterator<Token>, Iterator<T
     private StringBuilder tokenContent;
 
     @Override
-    public Iterator<TranscriptToken> apply(final Iterator<Token> input) {
+    public Iterator<TranscriptToken> apply(final Iterator<TextToken> input) {
         buf = Lists.newLinkedList();
         annotations = Maps.newLinkedHashMap();
         lastChar = ' ';
@@ -42,22 +42,22 @@ public class TranscriptTokenizer implements Function<Iterator<Token>, Iterator<T
             @Override
             protected TranscriptToken computeNext() {
                 while (buf.isEmpty() && input.hasNext()) {
-                    final Token token = input.next();
-                    if (token instanceof Characters) {
-                        for (char currentChar : ((Characters) token).getContent().toCharArray()) {
+                    final TextToken token = input.next();
+                    if (token instanceof TextContent) {
+                        for (char currentChar : ((TextContent) token).getContent().toCharArray()) {
                             if (Character.isWhitespace(lastChar) && !Character.isWhitespace(currentChar)) {
                                 emitToken();
                             }
                             tokenContent.append(lastChar = currentChar);
                             offset++;
                         }
-                    } else if (token instanceof AnnotationStart) {
-                        final AnnotationStart annotationStart = (AnnotationStart) token;
+                    } else if (token instanceof TextAnnotationStart) {
+                        final TextAnnotationStart annotationStart = (TextAnnotationStart) token;
                         final ObjectNode annotationData = annotationStart.getData();
                         annotations.put(annotationStart.getId(), annotationData);
                         tokenAnnotations.add(annotationData);
-                    } else if (token instanceof AnnotationEnd) {
-                        annotations.remove(((AnnotationEnd) token).getId());
+                    } else if (token instanceof TextAnnotationEnd) {
+                        annotations.remove(((TextAnnotationEnd) token).getId());
                     }
                 }
                 if (buf.isEmpty()) {

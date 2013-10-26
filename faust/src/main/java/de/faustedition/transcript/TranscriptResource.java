@@ -9,12 +9,12 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
-import de.faustedition.text.Annotation;
-import de.faustedition.text.AnnotationEnd;
-import de.faustedition.text.AnnotationProcessor;
-import de.faustedition.text.AnnotationStart;
-import de.faustedition.text.Characters;
-import de.faustedition.text.Token;
+import de.faustedition.text.TextSegmentAnnotation;
+import de.faustedition.text.TextAnnotationEnd;
+import de.faustedition.text.TextSegmentAnnotationProcessor;
+import de.faustedition.text.TextAnnotationStart;
+import de.faustedition.text.TextContent;
+import de.faustedition.text.TextToken;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -74,25 +74,25 @@ public class TranscriptResource {
         checkTranscriptExists(id);
         return transcripts.tokens(Arrays.asList(id), new Transcripts.TokenCallback<Templates.ViewAndModel>() {
             @Override
-            public Templates.ViewAndModel withTokens(Iterator<Token> tokens) throws Exception {
+            public Templates.ViewAndModel withTokens(Iterator<TextToken> tokens) throws Exception {
 
-                tokens = new AnnotationProcessor(tokens);
+                tokens = new TextSegmentAnnotationProcessor(tokens);
 
                 final StringBuilder text = new StringBuilder();
                 final ArrayNode annotations = objectMapper.createArrayNode();
 
                 while (tokens.hasNext()) {
-                    final Token token = tokens.next();
-                    if (token instanceof Annotation) {
-                        final Annotation annotation = (Annotation) token;
+                    final TextToken token = tokens.next();
+                    if (token instanceof TextSegmentAnnotation) {
+                        final TextSegmentAnnotation annotation = (TextSegmentAnnotation) token;
 
                         final ObjectNode annotationDesc = objectMapper.createObjectNode()
                                 .put("s", annotation.getSegment().lowerEndpoint())
                                 .put("e", annotation.getSegment().upperEndpoint());
                         annotationDesc.put("d", annotation.getData());
                         annotations.add(annotationDesc);
-                    } else if (token instanceof Characters) {
-                        text.append(((Characters) token).getContent());
+                    } else if (token instanceof TextContent) {
+                        text.append(((TextContent) token).getContent());
                     }
                 }
                 return new Templates.ViewAndModel("transcript")
@@ -110,26 +110,26 @@ public class TranscriptResource {
         checkTranscriptExists(id);
         return transcripts.tokens(Arrays.asList(id), new Transcripts.TokenCallback<StreamingOutput>() {
             @Override
-            public StreamingOutput withTokens(final Iterator<Token> tokens) throws Exception {
+            public StreamingOutput withTokens(final Iterator<TextToken> tokens) throws Exception {
                 return new StreamingOutput() {
                     @Override
                     public void write(OutputStream output) throws IOException, WebApplicationException {
                         final JsonGenerator jgen = objectMapper.getJsonFactory().createJsonGenerator(output);
                         jgen.writeStartArray();
                         while (tokens.hasNext()) {
-                            final Token token = tokens.next();
-                            if (token instanceof Characters) {
-                                jgen.writeString(((Characters) token).getContent());
-                            } else if (token instanceof AnnotationStart) {
-                                final AnnotationStart annotationStart = (AnnotationStart) token;
+                            final TextToken token = tokens.next();
+                            if (token instanceof TextContent) {
+                                jgen.writeString(((TextContent) token).getContent());
+                            } else if (token instanceof TextAnnotationStart) {
+                                final TextAnnotationStart annotationStart = (TextAnnotationStart) token;
                                 jgen.writeStartObject();
                                 jgen.writeStringField("s", annotationStart.getId());
                                 jgen.writeFieldName("d");
                                 jgen.writeTree(annotationStart.getData());
                                 jgen.writeEndObject();
-                            } else if (token instanceof AnnotationEnd) {
+                            } else if (token instanceof TextAnnotationEnd) {
                                 jgen.writeStartObject();
-                                jgen.writeStringField("e", ((AnnotationEnd) token).getId());
+                                jgen.writeStringField("e", ((TextAnnotationEnd) token).getId());
                                 jgen.writeEndObject();
                             }
                         }

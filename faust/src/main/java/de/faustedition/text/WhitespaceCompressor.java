@@ -15,10 +15,10 @@ import static de.faustedition.text.NamespaceMapping.map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class WhitespaceCompressor extends ForwardingIterator<Token> {
+public class WhitespaceCompressor extends ForwardingIterator<TextToken> {
 
-    private final Iterator<Token> delegate;
-    private final Predicate<Token> container;
+    private final Iterator<TextToken> delegate;
+    private final Predicate<TextToken> container;
     private final String xmlSpaceKey;
 
     private final Deque<Boolean> containerContext = new ArrayDeque<Boolean>();
@@ -26,22 +26,22 @@ public class WhitespaceCompressor extends ForwardingIterator<Token> {
 
     private char lastChar = ' ';
 
-    public WhitespaceCompressor(Iterator<Token> delegate, NamespaceMapping namespaceMapping, Predicate<Token> container) {
+    public WhitespaceCompressor(Iterator<TextToken> delegate, NamespaceMapping namespaceMapping, Predicate<TextToken> container) {
         this.delegate = delegate;
         this.container = container;
         this.xmlSpaceKey = map(namespaceMapping, new QName(XMLConstants.XML_NS_URI, "space"));
     }
 
     @Override
-    protected Iterator<Token> delegate() {
+    protected Iterator<TextToken> delegate() {
         return delegate;
     }
 
     @Override
-    public Token next() {
-        final Token next = super.next();
-        if (next instanceof AnnotationStart) {
-            final AnnotationStart startEvent = (AnnotationStart) next;
+    public TextToken next() {
+        final TextToken next = super.next();
+        if (next instanceof TextAnnotationStart) {
+            final TextAnnotationStart startEvent = (TextAnnotationStart) next;
 
             containerContext.push(container.apply(startEvent));
 
@@ -51,11 +51,11 @@ public class WhitespaceCompressor extends ForwardingIterator<Token> {
                 spacePreservationContext.pop();
                 spacePreservationContext.push("preserve".equalsIgnoreCase(xmlSpace));
             }
-        } else if (next instanceof AnnotationEnd) {
+        } else if (next instanceof TextAnnotationEnd) {
             containerContext.pop();
             spacePreservationContext.pop();
-        } else if (next instanceof Characters) {
-            final String text = ((Characters) next).getContent();
+        } else if (next instanceof TextContent) {
+            final String text = ((TextContent) next).getContent();
             final StringBuilder compressed = new StringBuilder();
             final boolean preserveSpace = Objects.firstNonNull(spacePreservationContext.peek(), false);
             for (int cc = 0, length = text.length(); cc < length; cc++) {
@@ -68,7 +68,7 @@ public class WhitespaceCompressor extends ForwardingIterator<Token> {
                 }
                 compressed.append(lastChar = currentChar);
             }
-            return new Characters(compressed.toString());
+            return new TextContent(compressed.toString());
         }
 
         return next;

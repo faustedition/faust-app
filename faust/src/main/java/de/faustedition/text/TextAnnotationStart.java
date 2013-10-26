@@ -8,19 +8,19 @@ import javax.annotation.Nullable;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class AnnotationStart implements Token {
+public class TextAnnotationStart implements TextToken {
 
-    public static final Predicate<Token> IS_INSTANCE = new Predicate<Token>() {
+    public static final Predicate<TextToken> IS_INSTANCE = new Predicate<TextToken>() {
         @Override
-        public boolean apply(@Nullable Token input) {
-            return (input instanceof AnnotationStart);
+        public boolean apply(@Nullable TextToken input) {
+            return (input instanceof TextAnnotationStart);
         }
     };
 
     private final String id;
     private final ObjectNode data;
 
-    public AnnotationStart(String id, ObjectNode data) {
+    public TextAnnotationStart(String id, ObjectNode data) {
         this.id = id;
         this.data = data;
     }

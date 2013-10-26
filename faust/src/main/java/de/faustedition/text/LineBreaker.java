@@ -9,45 +9,45 @@ import java.util.Iterator;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class LineBreaker extends ForwardingIterator<Token> {
+public class LineBreaker extends ForwardingIterator<TextToken> {
 
-    private final Iterator<Token> delegate;
-    private final Predicate<Token> lineBreak;
+    private final Iterator<TextToken> delegate;
+    private final Predicate<TextToken> lineBreak;
 
     private boolean atStartOfText = true;
     private int introduceBreaks = 0;
 
-    public LineBreaker(Iterator<Token> delegate, Predicate<Token> lineBreak) {
+    public LineBreaker(Iterator<TextToken> delegate, Predicate<TextToken> lineBreak) {
         this.delegate = delegate;
         this.lineBreak = lineBreak;
     }
 
     @Override
-    protected Iterator<Token> delegate() {
+    protected Iterator<TextToken> delegate() {
         return delegate;
     }
 
     @Override
-    public Token next() {
-        final Token next = super.next();
+    public TextToken next() {
+        final TextToken next = super.next();
 
         if (!atStartOfText && this.lineBreak.apply(next)) {
             introduceBreaks++;
         }
 
-        if (!(next instanceof Characters)) {
+        if (!(next instanceof TextContent)) {
             return next;
         }
 
-        final String text = ((Characters) next).getContent();
+        final String text = ((TextContent) next).getContent();
         if (text.trim().length() == 0) {
             return next;
         }
 
         if (!atStartOfText && introduceBreaks > 0) {
-            final Characters characters = new Characters(Strings.repeat("\n", introduceBreaks) + text);
+            final TextContent textContent = new TextContent(Strings.repeat("\n", introduceBreaks) + text);
             introduceBreaks = 0;
-            return characters;
+            return textContent;
         }
 
         atStartOfText = false;

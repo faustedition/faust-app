@@ -17,7 +17,7 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.text;
+package de.faustedition.transcript;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -30,6 +30,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import de.faustedition.text.NamespaceMapping;
+import de.faustedition.text.TextAnnotationEnd;
+import de.faustedition.text.TextAnnotationStart;
+import de.faustedition.text.TextToken;
+import de.faustedition.text.XML;
 
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
@@ -44,7 +49,7 @@ import static de.faustedition.text.NamespaceMapping.map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
+public class TEIMilestoneMarkupProcessor extends ForwardingIterator<TextToken> {
 
     public static final String DEFAULT_ID_PREFIX = "tei_";
 
@@ -62,7 +67,7 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
     private static final QName MILESTONE_UNIT_ATTR_NAME = new QName(TEI_NS_URI, "unit");
     private static final QName SPAN_TO_ATTR_NAME = new QName(TEI_NS_URI, "spanTo");
 
-    private final Iterator<Token> delegate;
+    private final Iterator<TextToken> delegate;
     private final ObjectMapper objectMapper;
     private final String idPrefix;
 
@@ -70,7 +75,7 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
     private final Multimap<String, String> spanning = ArrayListMultimap.create();
     private final Map<String, String> milestones = Maps.newHashMap();
 
-    private final Queue<Token> buffer = Lists.newLinkedList();
+    private final Queue<TextToken> buffer = Lists.newLinkedList();
 
     private final String xmlIdKey;
     private final String xmlNameKey;
@@ -82,11 +87,11 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
 
     private int annotationId = 0;
 
-    public TEIMilestoneMarkupProcessor(Iterator<Token> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
+    public TEIMilestoneMarkupProcessor(Iterator<TextToken> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
         this(delegate, objectMapper, namespaceMapping, DEFAULT_ID_PREFIX);
     }
 
-    public TEIMilestoneMarkupProcessor(Iterator<Token> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping, String idPrefix) {
+    public TEIMilestoneMarkupProcessor(Iterator<TextToken> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping, String idPrefix) {
         this.delegate = delegate;
         this.objectMapper = objectMapper;
         this.idPrefix = idPrefix;
@@ -110,7 +115,7 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
     }
 
     @Override
-    protected Iterator<Token> delegate() {
+    protected Iterator<TextToken> delegate() {
         return delegate;
     }
 
@@ -118,17 +123,17 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
     public boolean hasNext() {
         if (buffer.isEmpty()) {
             while (super.hasNext()) {
-                final Token next = super.next();
-                if (next instanceof AnnotationStart) {
-                    final AnnotationStart annotationStart = (AnnotationStart) next;
+                final TextToken next = super.next();
+                if (next instanceof TextAnnotationStart) {
+                    final TextAnnotationStart annotationStart = (TextAnnotationStart) next;
                     final boolean handledSpanningElement = handleSpanningElements(annotationStart);
                     final boolean handledMilestoneElement = handleMilestoneElements(annotationStart);
                     if (handledSpanningElement || handledMilestoneElement) {
                         handledElements.add(annotationStart.getId());
                         break;
                     }
-                } else if (next instanceof AnnotationEnd) {
-                    if (handledElements.remove(((AnnotationEnd) next).getId())) {
+                } else if (next instanceof TextAnnotationEnd) {
+                    if (handledElements.remove(((TextAnnotationEnd) next).getId())) {
                         continue;
                     }
                 }
@@ -137,11 +142,11 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
             }
             if (buffer.isEmpty()) {
                 for (final Iterator<String> milestoneIdIt = milestones.values().iterator(); milestoneIdIt.hasNext(); ) {
-                    buffer.add(new AnnotationEnd(milestoneIdIt.next()));
+                    buffer.add(new TextAnnotationEnd(milestoneIdIt.next()));
                     milestoneIdIt.remove();
                 }
                 for (final Iterator<String> spanningIdIt = spanning.values().iterator(); spanningIdIt.hasNext(); ) {
-                    buffer.add(new AnnotationEnd(spanningIdIt.next()));
+                    buffer.add(new TextAnnotationEnd(spanningIdIt.next()));
                     spanningIdIt.remove();
                 }
             }
@@ -150,21 +155,21 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
     }
 
     @Override
-    public Token next() {
+    public TextToken next() {
         return buffer.remove();
     }
 
-    public static Predicate<Token> teiMilestone(NamespaceMapping namespaceMapping, final String unit) {
+    public static Predicate<TextToken> teiMilestone(NamespaceMapping namespaceMapping, final String unit) {
         final String key = NamespaceMapping.map(namespaceMapping, MILESTONE_NAME);
-        return Predicates.and(AnnotationStart.IS_INSTANCE, new Predicate<Token>() {
+        return Predicates.and(TextAnnotationStart.IS_INSTANCE, new Predicate<TextToken>() {
             @Override
-            public boolean apply(@Nullable Token input) {
-                return unit.equals(((AnnotationStart) input).getData().path(key).asText());
+            public boolean apply(@Nullable TextToken input) {
+                return unit.equals(((TextAnnotationStart) input).getData().path(key).asText());
             }
         });
     }
 
-    boolean handleMilestoneElements(AnnotationStart annotationStart) {
+    boolean handleMilestoneElements(TextAnnotationStart annotationStart) {
         String milestoneUnit = null;
         final String xmlName = annotationStart.getData().path(xmlNameKey).asText();
         if (milestoneKey.equals(xmlName)) {
@@ -185,20 +190,20 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
 
         final String last = milestones.remove(milestoneUnit);
         if (last != null) {
-            buffer.add(new AnnotationEnd(last));
+            buffer.add(new TextAnnotationEnd(last));
         }
 
         final String id = (idPrefix + ++annotationId);
-        buffer.add(new AnnotationStart(id, data));
+        buffer.add(new TextAnnotationStart(id, data));
         milestones.put(milestoneUnit, id);
         return true;
     }
 
-    boolean handleSpanningElements(AnnotationStart annotationStart) {
+    boolean handleSpanningElements(TextAnnotationStart annotationStart) {
         final String refId = annotationStart.getData().path(xmlIdKey).asText();
         if (refId.length() > 0) {
             for (String id : spanning.removeAll(refId)) {
-                buffer.add(new AnnotationEnd(id));
+                buffer.add(new TextAnnotationEnd(id));
             }
         }
 
@@ -210,7 +215,7 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<Token> {
             data.put(milestoneKey, data.remove(xmlNameKey).asText().replaceAll("Span$", ""));
 
             final String id = (idPrefix + ++annotationId);
-            buffer.add(new AnnotationStart(id, data));
+            buffer.add(new TextAnnotationStart(id, data));
             spanning.put(spanTo, id);
             return true;
         }

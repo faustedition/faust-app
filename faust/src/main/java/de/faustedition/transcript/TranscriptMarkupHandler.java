@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ForwardingIterator;
 import com.google.common.collect.Lists;
-import de.faustedition.text.Annotation;
-import de.faustedition.text.AnnotationEnd;
-import de.faustedition.text.AnnotationStart;
+import de.faustedition.text.TextAnnotationEnd;
+import de.faustedition.text.TextAnnotationStart;
 import de.faustedition.text.NamespaceMapping;
-import de.faustedition.text.Token;
+import de.faustedition.text.TextToken;
 import de.faustedition.text.XML;
+import de.faustedition.text.XMLEvent2TextToken;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -23,12 +23,12 @@ import static de.faustedition.text.NamespaceMapping.map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
+public class TranscriptMarkupHandler extends ForwardingIterator<TextToken> {
 
-    private final Iterator<Token> delegate;
+    private final Iterator<TextToken> delegate;
     private final ObjectMapper objectMapper;
-    private final Queue<Token> buf = Lists.newLinkedList();
-    private final Iterator<String> ids = Annotation.ids("transcript_");
+    private final Queue<TextToken> buf = Lists.newLinkedList();
+    private final Iterator<String> ids = XMLEvent2TextToken.ids("transcript_");
 
     private final String stageAttributeName;
     private final String stageKey;
@@ -42,7 +42,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
     private String stageAnnotationId = null;
     private String handAnnotationId = null;
 
-    public TranscriptMarkupHandler(Iterator<Token> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
+    public TranscriptMarkupHandler(Iterator<TextToken> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
         this.delegate = delegate;
         this.objectMapper = objectMapper;
 
@@ -59,21 +59,21 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
     }
 
     @Override
-    protected Iterator<Token> delegate() {
+    protected Iterator<TextToken> delegate() {
         return delegate;
     }
 
     @Override
-    public Token next() {
+    public TextToken next() {
         return buf.remove();
     }
 
     @Override
     public boolean hasNext() {
         if (buf.isEmpty() && super.hasNext()) {
-            final Token next = super.next();
-            if (next instanceof AnnotationStart) {
-                final AnnotationStart annotationStart = (AnnotationStart) next;
+            final TextToken next = super.next();
+            if (next instanceof TextAnnotationStart) {
+                final TextAnnotationStart annotationStart = (TextAnnotationStart) next;
                 final ObjectNode data = annotationStart.getData();
 
                 final String xmlName = data.path(xmlNameKey).asText();
@@ -84,7 +84,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
                     final String hand = data.path(newAttributeName).asText();
                     if (!hand.isEmpty()) {
                         handEnd();
-                        buf.add(new AnnotationStart(
+                        buf.add(new TextAnnotationStart(
                                 handAnnotationId = ids.next(),
                                 objectMapper.createObjectNode().put(handKey, hand)
                         ));
@@ -94,7 +94,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
                 final String stage = data.path(stageAttributeName).asText();
                 if (!stage.isEmpty()) {
                     stageEnd();
-                    buf.add(new AnnotationStart(
+                    buf.add(new TextAnnotationStart(
                             stageAnnotationId = ids.next(),
                             objectMapper.createObjectNode().put(stageKey, stage)
                     ));
@@ -115,14 +115,14 @@ public class TranscriptMarkupHandler extends ForwardingIterator<Token> {
 
     private void stageEnd() {
         if (stageAnnotationId != null) {
-            buf.add(new AnnotationEnd(stageAnnotationId));
+            buf.add(new TextAnnotationEnd(stageAnnotationId));
             stageAnnotationId = null;
         }
     }
 
     private void handEnd() {
         if (handAnnotationId != null) {
-            buf.add(new AnnotationEnd(handAnnotationId));
+            buf.add(new TextAnnotationEnd(handAnnotationId));
             handAnnotationId = null;
         }
     }

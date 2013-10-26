@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
+import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
@@ -20,7 +21,7 @@ import static de.faustedition.text.NamespaceMapping.map;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
+public class XMLEvent2TextToken implements Function<XMLEvent, TextToken> {
 
     public static final String DEFAULT_ID_PREFIX = "";
 
@@ -33,11 +34,11 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
 
     private final Deque<String> annotationIds = Lists.newLinkedList();
 
-    private Iterator<String> ids = Annotation.ids(DEFAULT_ID_PREFIX);
+    private Iterator<String> ids = ids(DEFAULT_ID_PREFIX);
     private boolean xmlIdReuse = false;
     private LinkedList<Integer> nodePath;
 
-    public XMLStreamToTokenFunction(ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
+    public XMLEvent2TextToken(ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
         this.objectMapper = objectMapper;
         this.namespaceMapping = namespaceMapping;
 
@@ -46,24 +47,24 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
         this.xmlNodePathKey = map(namespaceMapping, XML.XML_NODE_PATH);
     }
 
-    public XMLStreamToTokenFunction withIdPrefix(String prefix) {
-        this.ids = Annotation.ids(prefix);
+    public XMLEvent2TextToken withIdPrefix(String prefix) {
+        this.ids = ids(prefix);
         return this;
     }
 
-    public XMLStreamToTokenFunction withNodePath() {
+    public XMLEvent2TextToken withNodePath() {
         this.nodePath = Lists.newLinkedList();
         return this;
     }
 
-    public XMLStreamToTokenFunction withXmlIdReuse() {
+    public XMLEvent2TextToken withXmlIdReuse() {
         this.xmlIdReuse = true;
         return this;
     }
 
     @Nullable
     @Override
-    public Token apply(@Nullable XMLEvent input) {
+    public TextToken apply(@Nullable XMLEvent input) {
         if (nodePath != null) {
             switch (input.getEventType()) {
                 case XMLStreamConstants.START_DOCUMENT:
@@ -90,7 +91,7 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
         switch (input.getEventType()) {
             case XMLStreamConstants.CHARACTERS:
             case XMLStreamConstants.CDATA:
-                return new Characters(input.asCharacters().getData());
+                return new TextContent(input.asCharacters().getData());
             case XMLStreamConstants.START_ELEMENT:
                 final StartElement startElement = input.asStartElement();
 
@@ -116,9 +117,9 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
 
                 final String id = (xmlId == null ? ids.next() : xmlId);
                 annotationIds.push(id);
-                return new AnnotationStart(id, data);
+                return new TextAnnotationStart(id, data);
             case XMLStreamConstants.END_ELEMENT:
-                return new AnnotationEnd(annotationIds.pop());
+                return new TextAnnotationEnd(annotationIds.pop());
         }
 
         return new XMLToken(input);
@@ -127,7 +128,7 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
     /**
      * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
      */
-    public static class XMLToken implements Token {
+    public static class XMLToken implements TextToken {
 
         private final XMLEvent event;
 
@@ -143,5 +144,17 @@ public class XMLStreamToTokenFunction implements Function<XMLEvent, Token> {
         public String toString() {
             return getEvent().toString();
         }
+    }
+
+    public static Iterator<String> ids(final String prefix) {
+        return new AbstractIterator<String>() {
+
+            private int id = 0;
+
+            @Override
+            protected String computeNext() {
+                return prefix + id++;
+            }
+        };
     }
 }

@@ -11,11 +11,11 @@ import com.google.common.util.concurrent.AbstractScheduledService;
 import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.document.DocumentRequested;
-import de.faustedition.text.AnnotationEnd;
-import de.faustedition.text.AnnotationStart;
-import de.faustedition.text.Characters;
+import de.faustedition.text.TextAnnotationEnd;
+import de.faustedition.text.TextAnnotationStart;
+import de.faustedition.text.TextContent;
 import de.faustedition.text.NamespaceMapping;
-import de.faustedition.text.Token;
+import de.faustedition.text.TextToken;
 import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
 
@@ -29,8 +29,8 @@ import java.util.concurrent.TimeUnit;
 
 import static de.faustedition.text.NamespaceMapping.TEI_NS_URI;
 import static de.faustedition.text.NamespaceMapping.TEI_SIG_GE_URI;
-import static de.faustedition.text.TEIMilestoneMarkupProcessor.teiMilestone;
-import static de.faustedition.text.TokenPredicates.xmlName;
+import static de.faustedition.transcript.TEIMilestoneMarkupProcessor.teiMilestone;
+import static de.faustedition.text.TextTokenPredicates.xmlName;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -46,11 +46,11 @@ public class TranscriptSegments extends AbstractScheduledService {
     private final Database database;
     private final Transcripts transcripts;
 
-    private final Predicate<Token> documentaryPage;
-    private final Predicate<Token> documentaryLine;
+    private final Predicate<TextToken> documentaryPage;
+    private final Predicate<TextToken> documentaryLine;
 
-    private final Predicate<Token> textualPage;
-    private final Predicate<Token> textualLine;
+    private final Predicate<TextToken> textualPage;
+    private final Predicate<TextToken> textualLine;
 
 
     @Inject
@@ -146,28 +146,28 @@ public class TranscriptSegments extends AbstractScheduledService {
 
     private static class SegmentCollector implements Transcripts.TokenCallback<SegmentCollector> {
 
-        private final Predicate<Token> pagePredicate;
-        private final Predicate<Token> linePredicate;
+        private final Predicate<TextToken> pagePredicate;
+        private final Predicate<TextToken> linePredicate;
 
         private final List<Range<Long>> pages = Lists.newLinkedList();
         private final List<Range<Long>> lines = Lists.newLinkedList();
 
-        private SegmentCollector(Predicate<Token> pagePredicate, Predicate<Token> linePredicate) {
+        private SegmentCollector(Predicate<TextToken> pagePredicate, Predicate<TextToken> linePredicate) {
             this.pagePredicate = pagePredicate;
             this.linePredicate = linePredicate;
         }
 
         @Override
-        public SegmentCollector withTokens(Iterator<Token> tokens) throws Exception {
+        public SegmentCollector withTokens(Iterator<TextToken> tokens) throws Exception {
             long offset = 0;
             String pageStartId = "";
             String lineStartId = "";
             long pageStartOffset = 0;
             long lineStartOffset = 0;
             while (tokens.hasNext()) {
-                final Token token = tokens.next();
-                if (token instanceof AnnotationStart) {
-                    final AnnotationStart annotationStart = (AnnotationStart) token;
+                final TextToken token = tokens.next();
+                if (token instanceof TextAnnotationStart) {
+                    final TextAnnotationStart annotationStart = (TextAnnotationStart) token;
                     if (pagePredicate.apply(annotationStart)) {
                         pageStartId = annotationStart.getId();
                         pageStartOffset = offset;
@@ -175,15 +175,15 @@ public class TranscriptSegments extends AbstractScheduledService {
                         lineStartId = annotationStart.getId();
                         lineStartOffset = offset;
                     }
-                } else if (token instanceof AnnotationEnd) {
-                    final String annotationId = ((AnnotationEnd) token).getId();
+                } else if (token instanceof TextAnnotationEnd) {
+                    final String annotationId = ((TextAnnotationEnd) token).getId();
                     if (pageStartId.equals(annotationId)) {
                         pages.add(Range.closedOpen(pageStartOffset, offset));
                     } else if (lineStartId.equals(annotationId)) {
                         lines.add(Range.closedOpen(lineStartOffset, offset));
                     }
-                } else if (token instanceof Characters) {
-                    offset += ((Characters) token).getContent().length();
+                } else if (token instanceof TextContent) {
+                    offset += ((TextContent) token).getContent().length();
                 }
             }
             return this;

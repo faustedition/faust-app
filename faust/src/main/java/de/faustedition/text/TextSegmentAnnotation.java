@@ -28,20 +28,14 @@ import java.util.Iterator;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Annotation implements Token {
+public class TextSegmentAnnotation implements TextToken {
 
-    private final String id;
-    private final ObjectNode data;
     private final Range<Integer> segment;
+    private final ObjectNode data;
 
-    public Annotation(String id, ObjectNode data, Range<Integer> segment) {
-        this.id = id;
-        this.data = data;
+    public TextSegmentAnnotation(Range<Integer> segment, ObjectNode data) {
         this.segment = segment;
-    }
-
-    public String getId() {
-        return id;
+        this.data = data;
     }
 
     public ObjectNode getData() {
@@ -54,18 +48,7 @@ public class Annotation implements Token {
 
     @Override
     public String toString() {
-        return String.format("<%s/> - %s - %s", id, segment, data);
+        return String.format("%s: %s", segment, data);
     }
 
-    public static Iterator<String> ids(final String prefix) {
-        return new AbstractIterator<String>() {
-
-            private int id = 0;
-
-            @Override
-            protected String computeNext() {
-                return prefix + id++;
-            }
-        };
-    }
 }

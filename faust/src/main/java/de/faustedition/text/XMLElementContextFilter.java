@@ -28,28 +28,28 @@ import java.util.Deque;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class ElementContextFilter implements Predicate<Token> {
+public class XMLElementContextFilter implements Predicate<TextToken> {
 
-    private final Predicate<? super Token> contextStart;
-    private final Predicate<? super Token> contextEnd;
-    private final Predicate<? super Token> exclude;
-    private final Predicate<? super Token> include;
+    private final Predicate<? super TextToken> contextStart;
+    private final Predicate<? super TextToken> contextEnd;
+    private final Predicate<? super TextToken> exclude;
+    private final Predicate<? super TextToken> include;
 
     private final Deque<Boolean> filterContext = Lists.newLinkedList();
 
-    public ElementContextFilter(Predicate<Token> exclude, Predicate<Token> include, Predicate<Token> contextStart, Predicate<Token> contextEnd) {
+    public XMLElementContextFilter(Predicate<TextToken> exclude, Predicate<TextToken> include, Predicate<TextToken> contextStart, Predicate<TextToken> contextEnd) {
         this.exclude = exclude;
         this.include = include;
         this.contextStart = contextStart;
         this.contextEnd = contextEnd;
     }
 
-    public ElementContextFilter(Predicate<Token> exclude, Predicate<Token> include) {
-        this(exclude, include, AnnotationStart.IS_INSTANCE, AnnotationEnd.IS_INSTANCE);
+    public XMLElementContextFilter(Predicate<TextToken> exclude, Predicate<TextToken> include) {
+        this(exclude, include, TextAnnotationStart.IS_INSTANCE, TextAnnotationEnd.IS_INSTANCE);
     }
 
     @Override
-    public boolean apply(@Nullable Token input) {
+    public boolean apply(@Nullable TextToken input) {
         if (contextStart.apply(input)) {
             final boolean parentIncluded = (filterContext.isEmpty() ? true : filterContext.peek());
             filterContext.push(parentIncluded ? !exclude.apply(input) : include.apply(input));

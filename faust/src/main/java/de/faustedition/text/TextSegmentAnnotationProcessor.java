@@ -32,21 +32,21 @@ import java.util.Queue;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class AnnotationProcessor extends ForwardingIterator<Token> {
+public class TextSegmentAnnotationProcessor extends ForwardingIterator<TextToken> {
 
-    private final Iterator<Token> delegate;
-    private final Queue<Token> buf = Lists.newLinkedList();
-    private final Map<String, AnnotationStart> annotationStarts = Maps.newHashMap();
+    private final Iterator<TextToken> delegate;
+    private final Queue<TextToken> buf = Lists.newLinkedList();
+    private final Map<String, TextAnnotationStart> annotationStarts = Maps.newHashMap();
     private final Map<String, Integer> annotationOffsets = Maps.newHashMap();
 
     private int offset = 0;
 
-    public AnnotationProcessor(Iterator<Token> delegate) {
+    public TextSegmentAnnotationProcessor(Iterator<TextToken> delegate) {
         this.delegate = delegate;
     }
 
     @Override
-    protected Iterator<Token> delegate() {
+    protected Iterator<TextToken> delegate() {
         return delegate;
     }
 
@@ -54,36 +54,34 @@ public class AnnotationProcessor extends ForwardingIterator<Token> {
     public boolean hasNext() {
         if (buf.isEmpty()) {
             while (super.hasNext()) {
-                final Token next = super.next();
-                if (next instanceof AnnotationStart) {
-                    final AnnotationStart start = (AnnotationStart) next;
+                final TextToken next = super.next();
+                if (next instanceof TextAnnotationStart) {
+                    final TextAnnotationStart start = (TextAnnotationStart) next;
                     final String id = start.getId();
                     annotationStarts.put(id, start);
                     annotationOffsets.put(id, offset);
                     continue;
-                } else if (next instanceof AnnotationEnd) {
-                    final AnnotationEnd end = (AnnotationEnd) next;
+                } else if (next instanceof TextAnnotationEnd) {
+                    final TextAnnotationEnd end = (TextAnnotationEnd) next;
                     final String id = end.getId();
-                    buf.add(new Annotation(
-                            id,
-                            Preconditions.checkNotNull(annotationStarts.remove(id)).getData(),
-                            Range.closedOpen(Preconditions.checkNotNull(annotationOffsets.remove(id)), offset)
+                    buf.add(new TextSegmentAnnotation(
+                            Range.closedOpen(Preconditions.checkNotNull(annotationOffsets.remove(id)), offset),
+                            Preconditions.checkNotNull(annotationStarts.remove(id)).getData()
                     ));
                     continue;
-                } else if (next instanceof Characters) {
-                    offset += ((Characters) next).getContent().length();
+                } else if (next instanceof TextContent) {
+                    offset += ((TextContent) next).getContent().length();
                 }
                 buf.add(next);
                 break;
             }
             if (buf.isEmpty() && !annotationStarts.isEmpty()) {
-                for (Iterator<Map.Entry<String, AnnotationStart>> startIt = annotationStarts.entrySet().iterator(); startIt.hasNext(); ) {
-                    final Map.Entry<String, AnnotationStart> startEntry = startIt.next();
+                for (Iterator<Map.Entry<String, TextAnnotationStart>> startIt = annotationStarts.entrySet().iterator(); startIt.hasNext(); ) {
+                    final Map.Entry<String, TextAnnotationStart> startEntry = startIt.next();
                     final String id = startEntry.getKey();
-                    buf.add(new Annotation(
-                            id,
-                            startEntry.getValue().getData(),
-                            Range.closedOpen(Preconditions.checkNotNull(annotationOffsets.remove(id)), offset)
+                    buf.add(new TextSegmentAnnotation(
+                            Range.closedOpen(Preconditions.checkNotNull(annotationOffsets.remove(id)), offset),
+                            startEntry.getValue().getData()
                     ));
                     startIt.remove();
                 }
@@ -93,7 +91,7 @@ public class AnnotationProcessor extends ForwardingIterator<Token> {
     }
 
     @Override
-    public Token next() {
+    public TextToken next() {
         return buf.remove();
     }
 }
