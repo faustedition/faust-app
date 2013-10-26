@@ -11,10 +11,10 @@ import com.google.common.util.concurrent.AbstractScheduledService;
 import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.document.DocumentRequested;
+import de.faustedition.text.NamespaceMapping;
 import de.faustedition.text.TextAnnotationEnd;
 import de.faustedition.text.TextAnnotationStart;
 import de.faustedition.text.TextContent;
-import de.faustedition.text.NamespaceMapping;
 import de.faustedition.text.TextToken;
 import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
@@ -22,15 +22,14 @@ import org.jooq.DSLContext;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.namespace.QName;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static de.faustedition.text.NamespaceMapping.TEI_NS_URI;
 import static de.faustedition.text.NamespaceMapping.TEI_SIG_GE_URI;
-import static de.faustedition.transcript.TEIMilestoneMarkupProcessor.teiMilestone;
 import static de.faustedition.text.TextTokenPredicates.xmlName;
+import static de.faustedition.transcript.TEIMilestoneMarkupProcessor.teiMilestone;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -96,11 +95,11 @@ public class TranscriptSegments extends AbstractScheduledService {
         final Map<Transcripts.Type, SegmentCollector> segments = Maps.newHashMap();
         segments.put(
                 Transcripts.Type.DOCUMENTARY,
-                transcripts.documentary(documentId, new SegmentCollector(documentaryPage, documentaryLine))
+                new SegmentCollector(documentaryPage, documentaryLine).collect(transcripts.documentary(documentId))
         );
         segments.put(
                 Transcripts.Type.TEXTUAL,
-                transcripts.textual(documentId, new SegmentCollector(textualPage, textualLine))
+                new SegmentCollector(textualPage, textualLine).collect(transcripts.textual(documentId))
         );
 
         final BatchBindStep batch = sql.batch(sql.insertInto(
@@ -144,7 +143,7 @@ public class TranscriptSegments extends AbstractScheduledService {
         batch.execute();
     }
 
-    private static class SegmentCollector implements Transcripts.TokenCallback<SegmentCollector> {
+    private static class SegmentCollector {
 
         private final Predicate<TextToken> pagePredicate;
         private final Predicate<TextToken> linePredicate;
@@ -157,15 +156,13 @@ public class TranscriptSegments extends AbstractScheduledService {
             this.linePredicate = linePredicate;
         }
 
-        @Override
-        public SegmentCollector withTokens(Iterator<TextToken> tokens) throws Exception {
+        private SegmentCollector collect(Transcript transcript) {
             long offset = 0;
             String pageStartId = "";
             String lineStartId = "";
             long pageStartOffset = 0;
             long lineStartOffset = 0;
-            while (tokens.hasNext()) {
-                final TextToken token = tokens.next();
+            for (TextToken token : transcript) {
                 if (token instanceof TextAnnotationStart) {
                     final TextAnnotationStart annotationStart = (TextAnnotationStart) token;
                     if (pagePredicate.apply(annotationStart)) {

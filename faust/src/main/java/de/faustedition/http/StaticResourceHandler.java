@@ -109,9 +109,7 @@ public class StaticResourceHandler implements Inflector<ContainerRequestContext,
         return null;
     }
 
-    private static interface TimestampedByteSource {
-        Date lastModified();
-
+    private static interface TimestampedByteSource extends LastModified {
         ByteSource byteSource();
     }
 

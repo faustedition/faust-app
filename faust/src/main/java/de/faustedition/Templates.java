@@ -1,6 +1,5 @@
 package de.faustedition;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,13 +17,13 @@ import com.google.common.collect.Maps;
 import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
+import de.faustedition.http.LastModified;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.core.Environment;
 import freemarker.ext.beans.BooleanModel;
 import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.beans.MapModel;
-import freemarker.ext.beans.NumberModel;
 import freemarker.ext.beans.StringModel;
 import freemarker.template.AdapterTemplateModel;
 import freemarker.template.DefaultObjectWrapper;
@@ -34,7 +33,6 @@ import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import sun.org.mozilla.javascript.internal.ast.StringLiteral;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
@@ -46,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -66,10 +65,14 @@ public class Templates extends freemarker.template.Configuration {
             .add()
             .build();
 
+    private final boolean debug;
+
     @Inject
     public Templates(Configuration configuration, ObjectMapper objectMapper) {
         super();
         try {
+            this.debug = Boolean.parseBoolean(configuration.property("faust.debug"));
+
             final String templateRootPath = configuration.property("faust.template_root");
             setTemplateLoader(templateRootPath.isEmpty()
                     ? new ClassTemplateLoader(getClass(), "/template")
@@ -78,7 +81,7 @@ public class Templates extends freemarker.template.Configuration {
             setSharedVariable("cp", configuration.property("faust.context_path"));
             setSharedVariable("yp", configuration.property("faust.yui_path"));
             setSharedVariable("facsimileIIPUrl", InternetImageServer.BASE_URI.toString());
-            setSharedVariable("debug", Boolean.parseBoolean(configuration.property("faust.debug")));
+            setSharedVariable("debug", debug);
             setSharedVariable("json", new ObjectMapperDirective(objectMapper));
 
             setAutoIncludes(Collections.singletonList("/header.ftl"));
@@ -96,15 +99,30 @@ public class Templates extends freemarker.template.Configuration {
     }
 
     public Response render(Request request, ViewAndModel viewAndModel) {
+        return render(request, Response.ok(viewAndModel).build());
+    }
+
+    public Response render(Request request, Response response) {
         try {
             final Variant variant = Objects.firstNonNull(request.selectVariant(VARIANTS), VARIANTS.get(0));
+            final ViewAndModel viewAndModel = (ViewAndModel) response.getEntity();
 
-            viewAndModel.put("message", ResourceBundle.getBundle("messages", variant.getLanguage()));
+            Date lastModified = response.getLastModified();
+            if (debug && lastModified == null) {
+                lastModified = new Date(System.currentTimeMillis());
+            }
 
-            final StringWriter entity = new StringWriter();
-            getTemplate(viewAndModel.viewName() + ".ftl", variant.getLanguage()).process(viewAndModel, entity);
-
-            return Response.ok().variant(variant).entity(entity.toString()).build();
+            Response.ResponseBuilder renderedResponse = null;
+            if (lastModified != null) {
+                renderedResponse = request.evaluatePreconditions(lastModified);
+            }
+            if (renderedResponse == null) {
+                renderedResponse = Response.ok(render(viewAndModel, variant));
+            }
+            if (lastModified != null) {
+                renderedResponse.lastModified(lastModified);
+            }
+            return renderedResponse.variant(variant).build();
         } catch (TemplateException e) {
             Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
             throw new WebApplicationException(e);
@@ -114,12 +132,28 @@ public class Templates extends freemarker.template.Configuration {
         }
     }
 
-    public static class ViewAndModel extends HashMap<String, Object> {
+    public String render(ViewAndModel viewAndModel, Variant variant) throws IOException, TemplateException {
+        variant = Objects.firstNonNull(variant, VARIANTS.get(0));
+
+        viewAndModel.put("message", ResourceBundle.getBundle("messages", variant.getLanguage()));
+
+        final StringWriter entity = new StringWriter();
+        getTemplate(viewAndModel.viewName() + ".ftl", variant.getLanguage()).process(viewAndModel, entity);
+        return entity.toString();
+    }
+
+    public static class ViewAndModel extends HashMap<String, Object> implements LastModified {
 
         private final String viewName;
+        private Date lastModified;
 
         public ViewAndModel(String viewName) {
             this.viewName = viewName;
+        }
+
+        public ViewAndModel(String viewName, Date lastModified) {
+            this.viewName = viewName;
+            this.lastModified = lastModified;
         }
 
         public ViewAndModel add(String key, Object value) {
@@ -129,6 +163,11 @@ public class Templates extends freemarker.template.Configuration {
 
         public String viewName() {
             return viewName;
+        }
+
+        @Override
+        public Date lastModified() {
+            return lastModified;
         }
     }
 
