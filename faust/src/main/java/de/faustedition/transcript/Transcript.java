@@ -106,6 +106,7 @@ public class Transcript implements Iterable<TextToken>, LastModified {
         ));
 
         tokens = new WhitespaceCompressor(tokens, namespaceMapping, Predicates.or(
+                xmlName(namespaceMapping, "tei:TEI"),
                 xmlName(namespaceMapping, "tei:body"),
                 xmlName(namespaceMapping, "tei:group"),
                 xmlName(namespaceMapping, "tei:text"),

@@ -279,13 +279,79 @@ YUI.add('text-annotation', function (Y) {
 		}
 	});
 
+    var TextSchema = Y.Base.create("text-schema", Y.Plugin.Base, [], {
+        initializer: function() {
+            this.doBefore("_defDataFn", this._beforeDefDataFn);
+        },
+        _beforeDefDataFn: function(e) {
+            var data = e.data && (e.data.responseText || e.data),
+                text = (Y.Lang.isString(data) ? Y.JSON.parse(data) : data),
+                payload = e.details[0];
+
+            if (Y.Lang.isObject(text) && text.text) text = text.text;
+
+            var jitt = new Y.Tree(),
+                offset = 0,
+                content = "",
+                annotations = {},
+                treeAnnotations = {},
+                treeStack = [],
+                treeFilter = this.get("treeFilter");
+
+            for (var tc = 0, tl = text.length; tc < tl; tc++) {
+                var t = text[tc],
+                    parentId = (treeStack.length == 0 ?  null : treeStack[treeStack.length - 1]),
+                    parent = (parentId == null ? null : treeAnnotations[parentId]);
+
+                if (Y.Lang.isString(t)) {
+                    var end = offset + t.length;
+                    parent && parent.append({ "txt:content": [ offset, end ] });
+                    content += t;
+                    offset = end;
+                } else if (t.s && t.d) {
+                    var data = annotations[t.s] = Y.merge(t.d, { "txt:id": t.s, "txt:range" : [offset] });
+
+                    if (treeFilter(t.d)) {
+                        var node = (parent ? parent.append(jitt.createNode()) : jitt.rootNode);
+                        node.data = data;
+                        treeAnnotations[t.s] = node;
+                        treeStack.push(t.s);
+                    }
+                } else if (t.e) {
+                    annotations[t.e]["txt:range"].push(offset);
+
+                    if (parentId && (t.e == parentId)) {
+                        treeStack.pop();
+                        delete treeAnnotations[t.e];
+                    }
+                }
+            }
+
+            payload.response = { jitt: jitt, annotations: annotations, content: content  };
+
+            this.get("host").fire("response", payload);
+
+            return new Y.Do.Halt("TextSchema plugin halted _defDataFn");
+        }
+    }, {
+        NS: "schema",
+
+        ATTRS: {
+            treeFilter: {
+                value: function(t) { return t["xml:name"]; },
+                validator: Y.Lang.isFunction
+            }
+        }
+    });
+
 	Y.mix(Y.namespace("Faust"), {
 		Text: Text,
 		Name: Name,
 		Range: Range,
 		TextTarget: TextTarget,
-		Annotation: Annotation
+		Annotation: Annotation,
+        TextSchema: TextSchema
 	});
 }, '0.0', {
-	requires: ["text-index", "base", "substitute", "array-extras", "io", "json"]
+	requires: ["text-index", "base", "substitute", "array-extras", "io", "json", "plugin", "tree"]
 });

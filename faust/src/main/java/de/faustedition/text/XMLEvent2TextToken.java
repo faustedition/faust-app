@@ -153,7 +153,7 @@ public class XMLEvent2TextToken implements Function<XMLEvent, TextToken> {
 
             @Override
             protected String computeNext() {
-                return prefix + id++;
+                return prefix + ++id;
             }
         };
     }

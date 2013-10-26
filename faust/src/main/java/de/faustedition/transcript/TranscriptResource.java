@@ -1,9 +1,7 @@
 package de.faustedition.transcript;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Iterables;
 import de.faustedition.Database;
 import de.faustedition.Templates;
@@ -11,8 +9,6 @@ import de.faustedition.db.Tables;
 import de.faustedition.text.TextAnnotationEnd;
 import de.faustedition.text.TextAnnotationStart;
 import de.faustedition.text.TextContent;
-import de.faustedition.text.TextSegmentAnnotation;
-import de.faustedition.text.TextSegmentAnnotationProcessor;
 import de.faustedition.text.TextToken;
 import org.jooq.DSLContext;
 
@@ -26,11 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Date;
-import java.util.Iterator;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -63,75 +55,35 @@ public class TranscriptResource {
     @GET
     @Path("/{id}/data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response transcriptData(@Context Request request, @PathParam("id") final long id) throws Exception {
+    public Response transcriptData(@Context Request request, @PathParam("id") final long id) {
         final Transcript transcript = transcript(id);
         final Date lastModified = transcript.lastModified();
 
         Response.ResponseBuilder response = request.evaluatePreconditions(lastModified);
         if (response == null) {
-            final StringBuilder text = new StringBuilder();
-            final ArrayNode annotations = objectMapper.createArrayNode();
-            final Iterator<TextToken> tokens = new TextSegmentAnnotationProcessor(transcript.iterator());
-
-            while (tokens.hasNext()) {
-                final TextToken token = tokens.next();
-                if (token instanceof TextSegmentAnnotation) {
-                    final TextSegmentAnnotation annotation = (TextSegmentAnnotation) token;
-
-                    final ObjectNode annotationDesc = objectMapper.createObjectNode()
-                            .put("s", annotation.getSegment().lowerEndpoint())
-                            .put("e", annotation.getSegment().upperEndpoint());
-                    annotationDesc.put("d", annotation.getData());
-                    annotations.add(annotationDesc);
-                } else if (token instanceof TextContent) {
-                    text.append(((TextContent) token).getContent());
-                }
-            }
             response = Response.ok(new Templates.ViewAndModel("transcript", lastModified)
                     .add("id", id)
-                    .add("text", text.toString())
-                    .add("annotations", annotations));
+                    .add("text", json(transcript)));
         }
         return response.lastModified(lastModified).build();
     }
 
-    @GET
-    @Path("/{id}/stream")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response transcriptStream(@Context Request request, @PathParam("id") final long id) {
-        final Transcript transcript = transcript(id);
-        final Date lastModified = transcript.lastModified();
-
-        Response.ResponseBuilder response = request.evaluatePreconditions(lastModified);
-        if (response == null) {
-            response = Response.ok(new StreamingOutput() {
-                @Override
-                public void write(OutputStream output) throws IOException, WebApplicationException {
-                    final JsonGenerator jgen = objectMapper.getJsonFactory().createJsonGenerator(output);
-                    jgen.writeStartArray();
-                    for (TextToken token : transcript) {
-                        if (token instanceof TextContent) {
-                            jgen.writeString(((TextContent) token).getContent());
-                        } else if (token instanceof TextAnnotationStart) {
-                            final TextAnnotationStart annotationStart = (TextAnnotationStart) token;
-                            jgen.writeStartObject();
-                            jgen.writeStringField("s", annotationStart.getId());
-                            jgen.writeFieldName("d");
-                            jgen.writeTree(annotationStart.getData());
-                            jgen.writeEndObject();
-                        } else if (token instanceof TextAnnotationEnd) {
-                            jgen.writeStartObject();
-                            jgen.writeStringField("e", ((TextAnnotationEnd) token).getId());
-                            jgen.writeEndObject();
-                        }
-                    }
-                    jgen.writeEndArray();
-                    jgen.flush();
+    protected ArrayNode json(Transcript transcript) {
+        final ArrayNode text = objectMapper.createArrayNode();
+        for (TextToken token : transcript) {
+            if (token instanceof TextContent) {
+                final String content = ((TextContent) token).getContent();
+                if (content.length() > 0) {
+                    text.add(content);
                 }
-            });
+            } else if (token instanceof TextAnnotationStart) {
+                final TextAnnotationStart annotationStart = (TextAnnotationStart) token;
+                text.addObject().put("s", annotationStart.getId()).put("d", annotationStart.getData());
+            } else if (token instanceof TextAnnotationEnd) {
+                text.addObject().put("e", ((TextAnnotationEnd) token).getId());
+            }
         }
-
-        return response.lastModified(lastModified).build();
+        return text;
     }
 
     @GET

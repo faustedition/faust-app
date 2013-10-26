@@ -1,5 +1,6 @@
 package de.faustedition;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,13 +22,13 @@ import de.faustedition.http.LastModified;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.core.Environment;
-import freemarker.ext.beans.BooleanModel;
 import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.beans.MapModel;
-import freemarker.ext.beans.StringModel;
 import freemarker.template.AdapterTemplateModel;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.SimpleNumber;
+import freemarker.template.SimpleScalar;
+import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
@@ -187,13 +188,13 @@ public class Templates extends freemarker.template.Configuration {
                 } else if (node.isArray()) {
                     return new CollectionModel(Lists.newArrayList(node), this);
                 } else if (node.isBoolean()) {
-                    return new BooleanModel(node.asBoolean(), this);
+                    return (node.asBoolean() ? TemplateBooleanModel.TRUE : TemplateBooleanModel.FALSE);
                 } else if (node.isFloatingPointNumber()) {
                     return new SimpleNumber(node.asDouble());
                 } else if (node.isIntegralNumber()) {
                     return new SimpleNumber(node.asLong());
                 } else if (node.isTextual()) {
-                    return new StringModel(node.asText(), this);
+                    return new SimpleScalar(node.asText());
                 } else if (node.isNull()) {
                     return null;
                 } else {
@@ -242,6 +243,8 @@ public class Templates extends freemarker.template.Configuration {
         public TemplateModule() {
             super(Version.unknownVersion());
             addSerializer(SimpleNumber.class, NUMBER_TEMPLATE_MODEL_SERIALIZER);
+            addSerializer(SimpleScalar.class, STRING_TEMPLATE_MODEL_SERIALIZER);
+            addSerializer(TemplateBooleanModel.class, BOOLEAN_TEMPLATE_MODEL_SERIALIZER);
             addSerializer(AdapterTemplateModel.class, ADAPTER_TEMPLATE_MODEL_SERIALIZER);
         }
 
@@ -265,6 +268,24 @@ public class Templates extends freemarker.template.Configuration {
             public void serialize(AdapterTemplateModel value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 final Object adaptedObject = value.getAdaptedObject(Object.class);
                 provider.findValueSerializer(adaptedObject.getClass(), null).serialize(adaptedObject, jgen, provider);
+            }
+        };
+
+        private static final JsonSerializer<SimpleScalar> STRING_TEMPLATE_MODEL_SERIALIZER = new StdSerializer<SimpleScalar>(SimpleScalar.class) {
+            @Override
+            public void serialize(SimpleScalar value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
+                jgen.writeString(value.getAsString());
+            }
+        };
+
+        private static final JsonSerializer<TemplateBooleanModel> BOOLEAN_TEMPLATE_MODEL_SERIALIZER = new StdSerializer<TemplateBooleanModel>(TemplateBooleanModel.class) {
+            @Override
+            public void serialize(TemplateBooleanModel value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
+                try {
+                    jgen.writeBoolean(value.getAsBoolean());
+                } catch (TemplateModelException e) {
+                    throw Throwables.propagate(e);
+                }
             }
         };
     }
