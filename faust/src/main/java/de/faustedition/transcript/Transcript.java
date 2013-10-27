@@ -121,6 +121,10 @@ public class Transcript implements Iterable<TextToken>, LastModified {
                 xmlName(namespaceMapping, "f:overw")
         ));
 
+        tokens = new TEIMilestoneMarkupProcessor(tokens, objectMapper, namespaceMapping);
+
+        tokens = new TranscriptMarkupHandler(tokens, objectMapper, namespaceMapping);
+
         tokens = new LineBreaker(tokens, Predicates.or(
                 xmlName(namespaceMapping, "tei:text"),
                 xmlName(namespaceMapping, "tei:div"),
@@ -135,10 +139,6 @@ public class Transcript implements Iterable<TextToken>, LastModified {
                 xmlName(namespaceMapping, "tei:line"),
                 xmlName(namespaceMapping, "ge:line")
         ));
-
-        tokens = new TEIMilestoneMarkupProcessor(tokens, objectMapper, namespaceMapping);
-
-        tokens = new TranscriptMarkupHandler(tokens, objectMapper, namespaceMapping);
 
         return tokens;
     }
