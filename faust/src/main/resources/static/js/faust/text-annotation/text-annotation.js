@@ -1,13 +1,13 @@
 YUI.add('text-annotation', function (Y) {
 
-    var SEGMENT_KEY = "txt:segment", ID_KEY = "txt:id";
-
     var Text = function(content, annotations, tree, segment, length) {
         this._content = (content || "");
         this.annotations = (annotations || []);
-        this.tree = tree;
         this.length = (length || this._content.length);
         this.segment = (segment || [0, this.length]);
+
+        this.tree = tree;
+        if (this.tree) this.tree.text = this;
     };
 
     Y.extend(Text, Object, {
@@ -24,7 +24,7 @@ YUI.add('text-annotation', function (Y) {
 
             var milestones = [];
             Y.Object.each(this.annotations, function (a) {
-                var ms = 0, me = milestones.length, segment = a[SEGMENT_KEY], start = segment[0], end = segment[1];
+                var ms = 0, me = milestones.length, segment = a["txt:segment"], start = segment[0], end = segment[1];
                 while (ms < me && milestones[ms] < start) ms++;
                 if (ms == me || milestones[ms] != start) {
                     milestones.splice(ms, 0, start);
@@ -52,7 +52,7 @@ YUI.add('text-annotation', function (Y) {
             if (this._index) return this._index;
 
             var annotations = [];
-            Y.Object.each(this.annotations, function(a) { this.push([a[SEGMENT_KEY], a]); }, annotations);
+            Y.Object.each(this.annotations, function(a) { this.push([a["txt:segment"], a]); }, annotations);
             return (this._index = new Y.Faust.SegmentIndex(annotations));
         }
     });
@@ -83,17 +83,11 @@ YUI.add('text-annotation', function (Y) {
 
                 if (Y.Lang.isString(t)) {
                     var end = offset + t.length;
-                    if (parent) {
-                        var data = [];
-                        data[SEGMENT_KEY] = [ offset, end ];
-                        parent.append(data);
-                    }
+                    if (parent) parent.append({ "id": ("t" + offset), "txt:content": [ offset, end ] });
                     content += t;
                     offset = end;
                 } else if (t.s && t.d) {
-                    var data = annotations[t.s] = t.d;
-                    data[ID_KEY] = t.s;
-                    data[SEGMENT_KEY] = [ offset ];
+                    var data = annotations[t.s] = Y.merge(t.d, { "id": t.s, "txt:segment": [ offset ] });
 
                     if (treeFilter(t.d)) {
                         var node = (parent ? parent.append(tree.createNode()) : (tree = new Y.Tree()).rootNode);
@@ -102,7 +96,7 @@ YUI.add('text-annotation', function (Y) {
                         treeStack.push(t.s);
                     }
                 } else if (t.e) {
-                    annotations[t.e][SEGMENT_KEY].push(offset);
+                    annotations[t.e]["txt:segment"].push(offset);
 
                     if (parentId && (t.e == parentId)) {
                         treeStack.pop();
