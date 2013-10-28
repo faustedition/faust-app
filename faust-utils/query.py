@@ -230,106 +230,110 @@ if __name__ == "__main__":
 # === find the subset of  manuscripts that doesn't contain certain markup
 
 	bad_markup = [
-		"//*[@rend='font-big']",
-		"//*[@rend='font-small']",
-		"//@f:pos",
-		"//ge:patch",
-		"//tei:reg",
-		"//tei:sic",
-		"//tei:corr",
-		"//tei:g[@ref='#parenthesis_left']",
-		"//tei:g[@ref='#parenthesis_right']",
-		"//tei:g[@ref='#truncation']",
-		"//tei:g[@ref='#ditto-quote']",
-		"//tei:g[@ref='#ditto-line']",
-		"//tei:g[@ref='#g_break']",
-		"//tei:g[@ref='#g_transp_1']",
-		"//tei:g[@ref='#g_transp_2']",
-		"//tei:g[@ref='#g_transp_3']",
-		"//tei:g[@ref='#g_transp_4']",
-		"//tei:g[@ref='#g_transp_5']",
-		"//tei:g[@ref='#g_transp_6']",
-		"//tei:g[@ref='#g_transp_7']",
-		"//tei:expan",
-		"//tei:ex",
-		"//*[@rend='underline_double']",
-		"//*[@rend='underline_triple']",
-		"//*[@rend='underline_quadruple']",
-		"//*[@rend='']",
-		"//*[@rend='frame']",
-		"//*[@rend='overline']",
-		"//*[@rend='vertical']",
-		"//tei:g[@ref='']",
-		"//f:st//f:st",
-		"//f:st[@rend='erase']",
-		"//tei:hi[@rend='underdots']",
-		"//f:overw",
-		"//ge:rewrite",
-		#fixierung mit aenderung redundant
-		# "//tei:seg[@type='between']", funktioniert schon
-		"//tei:seg[@rend='inbetween']",
-		"//f:grLine",
-		"//f:grBrace",
-		"//f:ins//f:ins",
-		"//comment()[contains(.,'S-Linie')]",
-		"//tei:gap[@atLeast or @atMost]",
-		"//tei:gap[not(@unit='chars')]",
-		"//tei:damage",
-		"//*[@cert='low']",
-		"//tei:certainty",
-		"//tei:supplied",
-		# u"//text()[contains(.,'\u0029')]",
-		# u"//text()[contains(.,'\u0026')]",
-		u"//text()[contains(.,'\u23BC')]",
-		u"//text()[contains(.,'\u23D1')]",
-		u"//text()[contains(.,'\u0301')]",
-		u"//text()[contains(.,'\u2114')]",
-		u"//text()[contains(.,'\u0370')]",
-		u"//text()[contains(.,'\u0371')]",
-		u"//text()[contains(.,'\u0372')]",
-		u"//text()[contains(.,'\u0373')]",
-		u"//text()[contains(.,'\u0374')]",
-		u"//text()[contains(.,'\u0375')]",
-		u"//text()[contains(.,'\u0376')]",
-		u"//text()[contains(.,'\u0377')]",
-		u"//text()[contains(.,'\u037A')]",
-		u"//text()[contains(.,'\u037B')]",
-		u"//text()[contains(.,'\u037C')]",
-		u"//text()[contains(.,'\u037D')]",
-		u"//text()[contains(.,'\u037E')]",
-		u"//text()[contains(.,'\u037F')]",
-		# ... TODO griechische Zeichen ausgelassen
-		u"//text()[contains(.,'\u203f')]", #8255
-		u"//text()[contains(.,'\u2044')]", #8260
-		u"//text()[contains(.,'\u204c')]", #8268
-		u"//text()[contains(.,'\u00b7')]", #183
-		u"//text()[contains(.,'\u231c')]", #8988
-		u"//text()[contains(.,'\u231d')]", #8989
-		u"//text()[contains(.,'\u231e')]", #8990
-		u"//text()[contains(.,'\u231f')]", #8991
-		u"//text()[contains(.,'\u2609')]", #9737
-		u"//text()[contains(.,'\u263d')]", #9789
-		u"//text()[contains(.,'\u0a50')]", #2640
-		u"//text()[contains(.,'\u2e13')]", #11795
-		u"//text()[contains(.,'\u2713')]", #10003
-		u"//text()[contains(.,'\u002B')]",
-		u"//text()[contains(.,'\u274C')]",
-		# u"//text()[contains(.,'\u00bc')]", # 188
-		# u"//text()[contains(.,'\u00bd')]", # 189
-		# u"//text()[contains(.,'\u00be')]", # 190
-		u"//text()[contains(.,'\u0391')]", # 913
-		u"//text()[contains(.,'\u0392')]", # 914
-		u"//text()[contains(.,'\u0393')]", # 915
-		u"//text()[contains(.,'\u0394')]", # 916
-		u"//text()[contains(.,'\u03b1')]", # 945
-		u"//text()[contains(.,'\u03b2')]", # 946
-		u"//text()[contains(.,'\u02e0')]", # 736
-		u"//text()[contains(.,'\u03b4')]", # 948
+                #X "//*[@rend='font-big']",
+                #X "//*[@rend='font-small']",
+                "//@f:pos",
+                "//ge:patch",
+                "//tei:reg",
+                #X "//tei:sic",
+                "//tei:corr",
+                "//tei:g[@ref='#parenthesis_left']",
+                "//tei:g[@ref='#parenthesis_right']",
+                "//tei:g[@ref='#truncation']",
+                "//tei:g[@ref='#ditto-quote']",
+                "//tei:g[@ref='#ditto-line']",
+                "//tei:g[@ref='#g_break']",
+                #X "//tei:g[@ref='#g_transp_1']",
+                #X "//tei:g[@ref='#g_transp_2']",
+                #X "//tei:g[@ref='#g_transp_3']",
+                #X "//tei:g[@ref='#g_transp_4']",
+                #X "//tei:g[@ref='#g_transp_5']",
+                #X "//tei:g[@ref='#g_transp_6']",
+                #X "//tei:g[@ref='#g_transp_7']",
+                "//tei:expan",
+                "//tei:ex",
+                #X "//*[@rend='underline']",
+                #X "//*[@rend='underline_double']",
+                #X "//*[@rend='underline_triple']",
+                #X "//*[@rend='underline_quadruple']",
+                "//*[@rend='']",
+                "//*[@rend='frame']",
+                "//*[@rend='overline']",
+                #X "//*[@rend='vertical']",
+                #X "//tei:g[@ref='']",
+                #X "//f:st//f:st",
+                #X "//f:st[@rend='erase']",
+                "//tei:hi[@rend='underdots']",
+                "//f:overw",
+                #X "//ge:rewrite",
+                #fixierung mit aenderung redundant
+                # "//tei:seg[@type='between']",
+                "//tei:seg[@rend='inbetween']",
+                #X "//f:grLine",
+                #X "//f:grBrace",
+                #X "//f:ins//f:ins",
+                #X "//comment()[contains(.,'S-Linie')]",
+                "//tei:gap[@atLeast or @atMost]",
+                "//tei:gap[not(@unit='chars')]",
+                #X "//tei:damage",
+                "//*[@cert='low']",
+                #X "//tei:certainty",
+                "//tei:supplied",
+                # u"//text()[contains(.,'\u0029')]",
+                # u"//text()[contains(.,'\u0026')]",
+                #X u"//text()[contains(.,'\u23BC')]",
+                #X u"//text()[contains(.,'\u23D1')]",
+                #X u"//text()[contains(.,'\u0301')]",
+                #X u"//text()[contains(.,'\u2114')]",
+                u"//text()[contains(.,'\u0370')]",
+                u"//text()[contains(.,'\u0371')]",
+                u"//text()[contains(.,'\u0372')]",
+                u"//text()[contains(.,'\u0373')]",
+                u"//text()[contains(.,'\u0374')]",
+                u"//text()[contains(.,'\u0375')]",
+                u"//text()[contains(.,'\u0376')]",
+                u"//text()[contains(.,'\u0377')]",
+                u"//text()[contains(.,'\u037A')]",
+                u"//text()[contains(.,'\u037B')]",
+                u"//text()[contains(.,'\u037C')]",
+                u"//text()[contains(.,'\u037D')]",
+                u"//text()[contains(.,'\u037E')]",
+                u"//text()[contains(.,'\u037F')]",
+                # ... TODO griechische Zeichen ausgelassen
+                #X u"//text()[contains(.,'\u203f')]", #8255
+                u"//text()[contains(.,'\u2044')]", #8260
+                u"//text()[contains(.,'\u204c')]", #8268
+                #X u"//text()[contains(.,'\u00b7')]", #183
+                #X u"//text()[contains(.,'\u231c')]", #8988
+                #X u"//text()[contains(.,'\u231d')]", #8989
+                #X u"//text()[contains(.,'\u231e')]", #8990
+                #X u"//text()[contains(.,'\u231f')]", #8991
+                #X u"//text()[contains(.,'\u2609')]", #9737
+                #X u"//text()[contains(.,'\u263d')]", #9789
+                u"//text()[contains(.,'\u0a50')]", #2640
+                #X u"//text()[contains(.,'\u2e13')]", #11795
+                #X u"//text()[contains(.,'\u2713')]", #10003
+                #X u"//text()[contains(.,'\u002B')]",
+                #X u"//text()[contains(.,'\u274C')]",
+                # u"//text()[contains(.,'\u00bc')]", # 188
+                # u"//text()[contains(.,'\u00bd')]", # 189
+                # u"//text()[contains(.,'\u00be')]", # 190
+                u"//text()[contains(.,'\u0391')]", # 913
+                u"//text()[contains(.,'\u0392')]", # 914
+                u"//text()[contains(.,'\u0393')]", # 915
+                u"//text()[contains(.,'\u0394')]", # 916
+                u"//text()[contains(.,'\u03b1')]", # 945
+                u"//text()[contains(.,'\u03b2')]", # 946
+                u"//text()[contains(.,'\u02e0')]", # 736
+                u"//text()[contains(.,'\u03b4')]", # 948
+            # Don't include files that have been proofread already
+                u"//tei:change//comment()[contains(.,'Ritschel')]",
+                u"//tei:change[@who='ritschel']"
 		]
 	bad_markup_disjunction = ' | '.join(bad_markup)
 	all_documents = set(map (os.path.dirname, faust.transcript_files()))
-	print bad_markup_disjunction
+	# print bad_markup_disjunction.encode('utf-8')
 	bad_documents = set(map (os.path.dirname, matches(faust.transcript_files(), bad_markup_disjunction)))
-	
+
 	for d in all_documents.difference(bad_documents):
 	 	print '/'.join(d.split('/')[-2:])
