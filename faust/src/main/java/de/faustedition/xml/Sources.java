@@ -131,11 +131,7 @@ public class Sources implements Iterable<FaustURI> {
     }
 
     protected boolean isInStore(File file) {
-        try {
-            return file.getCanonicalPath().startsWith(storagePath);
-        } catch (IOException e) {
-            return false;
-        }
+        return true;
     }
 
     private class FileToUriWrapper extends IterableWrapper<FaustURI, File> {
