@@ -4,10 +4,10 @@ YUI.add('documentary-transcript', function (Y) {
         EPSILON = 0.01,
         LINE_OVERLAY_MODE = false;
 
-    var Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
+    var Align = function(me, you, xy, myJoint, yourJoint, priority) {
         this.me = me;
         this.you = you;
-        this.coordRotation = coordRotation;
+        this.xy = xy;
         this.myJoint = myJoint;
         this.yourJoint = yourJoint;
         this.priority = priority;
@@ -15,10 +15,10 @@ YUI.add('documentary-transcript', function (Y) {
 
     Y.extend(Align, Object, {
         align: function() {
-            var value = this.you.getCoord(this.coordRotation);
-            value -= this.myJoint * this.me.getExt(this.coordRotation);
-            value += this.yourJoint * this.you.getExt(this.coordRotation);
-            this.me.setCoord(value, this.coordRotation);
+            var value = this.you.getCoord(this.xy);
+            value -= this.myJoint * this.me.getExt(this.xy);
+            value += this.yourJoint * this.you.getExt(this.xy);
+            this.me.setCoord(value, this.xy);
         }
     }, {
         "IMPLICIT_BY_DOC_ORDER": "0",
@@ -37,16 +37,16 @@ YUI.add('documentary-transcript', function (Y) {
     });
 
 
-    var AbsoluteAlign = function (me, coordRotation, coordinate, priority) {
+    var AbsoluteAlign = function (me, xy, coordinate, priority) {
         this.me = me;
-        this.coordRotation = coordRotation;
+        this.xy = xy;
         this.coordinate = coordinate;
         this.priority = priority;
     };
 
     Y.extend(AbsoluteAlign, Object, {
         align: function() {
-            this.me.setCoord(this.coordinate, this.coordRotation);
+            this.me.setCoord(this.coordinate, this.xy);
         }
     });
 
@@ -54,28 +54,16 @@ YUI.add('documentary-transcript', function (Y) {
         this.xmlName = (config["xml:name"] || "");
         this.nodeType = DocumentaryTranscriptNode.NODE_TYPES[this.xmlName] || (config["txt:content"] ? "text" : "");
 
+        // FIXME make proper phrase/block context differentiation
+        this.nodeType = ("anchor" == this.nodeType ? ("zone" == this.parent.nodeType ? "line" : "text") : this.nodeType);
+
         this.mainZone = ("zone" == this.nodeType) && (config["tei:type"] || config["ge:type"]);
         this.rotation = parseInt(config["tei:rotate"] || config["ge:rotate"] || "0") || 0;
-
-        this.x = 0;
-        this.y = 0;
-        this.width = 0;
-        this.height = 0;
 
         // default alignment
         var prev = this.previous();
         this.hAlign = new Align(this, (prev || this.parent), this.rotX(), 0, (prev ? 1 : 0), Align.IMPLICIT_BY_DOC_ORDER);
         this.vAlign = new Align(this, this.parent, this.rotY(), 0, 0, Align.IMPLICIT_BY_DOC_ORDER);
-
-        if ("anchor" == this.nodeType) {
-            // FIXME make proper phrase/block context differentiation
-            this.nodeType = ("zone" == this.parent.nodeType ? "line" : "text");
-        }
-
-        // Text
-        if ("text" == this.nodeType) {
-            this.textAttrs = textAttrs;
-        }
     };
 
     Y.extend(DocumentaryTranscriptNode, Object, {
@@ -162,13 +150,13 @@ YUI.add('documentary-transcript', function (Y) {
                 this.setAlign("hAlign", new Align(this, this.parent, this.parent.globalRotation(), 0.5, 0.5, Align.REND_ATTR));
             }
         },
-        getCoord: function(coordRotation) {
-            return Y.SvgUtils.getBoundingBox(this.view, this.view.viewportElement.createSVGMatrix().rotate(coordRotation)).x;
+        getCoord: function(xy) {
+            return Y.SvgUtils.getBoundingBox(this.view, this.view.viewportElement.createSVGMatrix().rotate(xy)).x;
         },
-        getExt: function(coordRotation) {
-            return Y.SvgUtils.getBoundingBox(this.view, this.view.viewportElement.createSVGMatrix().rotate(coordRotation)).width;
+        getExt: function(xy) {
+            return Y.SvgUtils.getBoundingBox(this.view, this.view.viewportElement.createSVGMatrix().rotate(xy)).width;
         },
-        setCoord: function(coord, coordRotation) {
+        setCoord: function(coord, xy) {
 
             var myRot = this.globalRotation();
             var myRotMx = this.view.viewportElement.createSVGMatrix().rotate(myRot);
@@ -176,12 +164,12 @@ YUI.add('documentary-transcript', function (Y) {
             var myRotTfInv = this.view.viewportElement.createSVGTransformFromMatrix(myRotMx.inverse());
 
             var matrix = this.view.viewportElement.createSVGMatrix();
-            var currentCoord = this.getCoord(coordRotation);
+            var currentCoord = this.getCoord(xy);
             var deltaCoord = coord - currentCoord;
 
-            matrix = matrix.rotate(coordRotation);
+            matrix = matrix.rotate(xy);
             matrix = matrix.translate(deltaCoord, 0);
-            matrix = matrix.rotate(-coordRotation);
+            matrix = matrix.rotate(-xy);
             var transform = this.view.viewportElement.createSVGTransformFromMatrix(matrix);
             this.view.transform.baseVal.consolidate();
             this.view.transform.baseVal.appendItem(myRotTfInv);
@@ -261,7 +249,7 @@ YUI.add('documentary-transcript', function (Y) {
 
                     container = container.appendChild(Y.SvgUtils.svg("text", { "class": classes.concat("text").join(" ") }));
                     container.appendChild(Y.config.doc.createTextNode(
-                        this.tree.text.content(this.data["txt:content"]).replace(/\s+/g, "\u00a0")
+                        this.tree.text.content(this.data["txt:content"] || [0, 0]).replace(/\s+/g, "\u00a0")
                     ));
 
                 case "line":
@@ -376,6 +364,8 @@ YUI.add('documentary-transcript', function (Y) {
 
             // recurse
             for (var cc = 0, cl = this.children.length; cc < cl; cc++) this.children[cc].render(container);
+
+            return (this.container = container);
         },
         globalRotation: function () {
             var rotation = 0;
@@ -458,19 +448,10 @@ YUI.add('documentary-transcript', function (Y) {
             return 90 + this.globalRotation()
         },
         setAlign: function (name, align) {
-            if (this[name]) {
+            if (this[name] && align.priority === this[name].priority)  throw("ENCODING ERROR: Conflicting alignment instructions for element " +
+                this.xmlName + " #" + (this.data["xml:id"] || "") + " (" + name + ", " + Align[align.priority] + " )");
 
-                if (align.priority === this[name].priority){
-                    var xmlId = this.xmlId ? this.xmlId : '';
-                    throw("ENCODING ERROR: Conflicting alignment instructions for element "
-                        + this.elementName + " #" + xmlId + " (" + name + ", "
-                        + Align[align.priority] + " )");
-                }
-                else if (align.priority > this[name].priority)
-                    this[name] = align;
-            }
-            else
-                this[name] = align;
+            if (!this[name] || (align.priority > this[name].priority)) this[name] = align;
         },
         getHand: function() {
             // Text
