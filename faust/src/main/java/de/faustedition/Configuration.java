@@ -47,7 +47,7 @@ public class Configuration extends Properties {
             if (configFile.isFile()) {
                 configuration.load(closer.register(Files.newReader(configFile, Charsets.UTF_8)));
             } else {
-                configuration.store(Files.newWriter(configFile, Charsets.UTF_8), "Faust configuration");
+                configuration.store(closer.register(Files.newWriter(configFile, Charsets.UTF_8)), "Faust configuration");
             }
 
             configuration.putAll(System.getProperties());
