@@ -191,7 +191,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 	@Override
 	public String toString() {
 
-		final String waFaust = getMetadataValue("callnumber.wa-faust");
+        final String waFaust = getMetadataValue("callnumber.wa-faust");
 		if (!Strings.isNullOrEmpty(waFaust) && !"none".equals(waFaust)) {
 			return waFaust;
 		}

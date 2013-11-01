@@ -1,16 +1,18 @@
 package de.faustedition.document;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.document.MaterialUnit.Type;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.transcript.GoddagTranscriptManager;
+import de.faustedition.transcript.TranscriptType;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLBaseTracker;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,20 +25,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.document.MaterialUnit.Type;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.transcript.GoddagTranscriptManager;
-import de.faustedition.transcript.TranscriptType;
-import de.faustedition.xml.Namespaces;
-import de.faustedition.xml.XMLBaseTracker;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
-import sun.util.LocaleServiceProviderPool;
+import java.io.IOException;
+import java.util.*;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -168,6 +158,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		} else if ("metadata".equals(localName) && !materialUnitStack.isEmpty()) {
 			inMetadataSection = true;
 			metadata = new HashMap<String, List<String>>();
+            metadata.put("source", ImmutableList.<String>of(this.source.toString()));
 		} else if (inMetadataSection && metadataKey == null) {
 			// String type = attributes.getValue("type");
 			// metadataKey = type == null ? localName : localName + "_" + type;
@@ -182,7 +173,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			
 			// TODO: transcript uris as regular metadata
 			
-			if (localName == "textTranscript" || localName == "docTranscript") {
+			if ("textTranscript".equals(localName) || "docTranscript".equals(localName)) {
 				TranscriptType type = localName == "textTranscript" ? TranscriptType.TEXTUAL : 
 					TranscriptType.DOCUMENTARY;
 				final String transcript = metadataValue.toString();

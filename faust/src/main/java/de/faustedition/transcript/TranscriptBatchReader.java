@@ -46,11 +46,11 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 
-    final Deque<MaterialUnit> queue = new ArrayDeque<MaterialUnit>(graph.getMaterialUnits());
+		final Deque<MaterialUnit> queue = new ArrayDeque<MaterialUnit>(graph.getMaterialUnits());
 		while (!queue.isEmpty()) {
-      final MaterialUnit mu = queue.pop();
+			final MaterialUnit mu = queue.pop();
 
-      queue.addAll(mu);
+			queue.addAll(mu);
 
 			if (mu.getTranscriptSource() == null) {
 				continue;
@@ -59,20 +59,23 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					try {
-						logger.debug("Reading transcript of {}", mu);
+						logger.debug("Reading transcript of {}: {}", mu, mu.getMetadataValue("source"));
             			transcriptManager.find(mu);
 					} catch (IOException e) {
 						if (logger.isWarnEnabled()) {
-							logger.warn("I/O error while reading transcript from " + mu, e);
+							logger.warn("I/O error while reading transcript from " + mu + ": "
+                                    + mu.getMetadataValue("source"), e);
 						}
 					} catch (XMLStreamException e) {
 						if (logger.isWarnEnabled()) {
-							logger.warn("XML error while reading transcript from " + mu, e);
+							logger.warn("XML error while reading transcript from " + mu + ": "
+                                    + mu.getMetadataValue("source"), e);
 						}
 					} catch (TranscriptInvalidException e) {
 						if (logger.isWarnEnabled()) {
-							logger.warn("Validation error while reading transcript from " + mu, e);
-						}						
+							logger.warn("Validation error while reading transcript from " + mu + ": "
+                                    + mu.getMetadataValue("source"), e);
+						}
 					}
 				}
 			});

@@ -55,6 +55,11 @@ public class MaterialUnitInitializer implements InitializingBean {
 		logger.info("Initializing material unit graph");
 		StopWatch sw = new StopWatch();
 		sw.start();
+        int documentCount = 0;
+        for (final FaustURI documentDescriptor : xml.iterate(DOCUMENT_BASE_URI)) {
+            documentCount++;
+        }
+		logger.debug("Importing " + documentCount + " document descriptors.");
 		for (final FaustURI documentDescriptor : xml.iterate(DOCUMENT_BASE_URI)) {
 			try {
 				logger.debug("Importing document " + documentDescriptor);

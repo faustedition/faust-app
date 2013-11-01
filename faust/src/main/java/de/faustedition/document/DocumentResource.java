@@ -1,12 +1,9 @@
 package de.faustedition.document;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
-
+import de.faustedition.FaustURI;
+import de.faustedition.JsonRespresentation;
+import de.faustedition.template.TemplateRepresentationFactory;
 import org.restlet.data.CharacterSet;
-import org.restlet.data.Form;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
@@ -18,9 +15,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import de.faustedition.FaustURI;
-import de.faustedition.JsonRespresentation;
-import de.faustedition.template.TemplateRepresentationFactory;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
@@ -85,6 +83,8 @@ public class DocumentResource extends ServerResource {
 				}
 				generator.writeNumberField("order", unit.getOrder());
 				generator.writeNumberField("id", unit.node.getId());
+                generator.writeStringField("source", unit.getMetadataValue("source"));
+
 //				final GoddagTranscript transcript = unit.getTranscript();
 				if (unit.getTranscriptSource() != null) {
 					generator.writeObjectFieldStart("transcript");
