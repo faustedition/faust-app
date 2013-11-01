@@ -3,6 +3,7 @@ package de.faustedition.transcript;
 import com.google.common.collect.Sets;
 import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
+import de.faustedition.document.DocumentDescriptorHandler;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.input.TranscriptInvalidException;
@@ -54,7 +55,7 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 		final Deque<MaterialUnit> queue = new ArrayDeque<MaterialUnit>(graph.getMaterialUnits());
 		while (!queue.isEmpty()) {
 			final MaterialUnit mu = queue.pop();
-			final String source = mu.getMetadataValue("documentSource");
+			final String source = mu.getMetadataValue(DocumentDescriptorHandler.internalKeyDocumentSource);
 			final FaustURI transcriptSource = mu.getTranscriptSource();
 			for (MaterialUnit child: mu) {
 				if (!imported.contains(transcriptSource)) {
@@ -63,7 +64,7 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 				}
 			//queue.addAll(mu);
 			}
-			if (mu.getTranscriptSource() == null) {
+			if (mu.getTranscriptSource() == null || DocumentDescriptorHandler.noneURI.equals(transcriptSource)) {
 				continue;
 			}
 			transactionTemplate.execute(new TransactionCallbackWithoutResult() {

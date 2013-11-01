@@ -36,6 +36,8 @@ import java.util.*;
 public class DocumentDescriptorHandler extends DefaultHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DocumentDescriptorHandler.class);
+	public static final FaustURI noneURI = new FaustURI(FaustAuthority.SELF, "/none/");
+	public static final String internalKeyDocumentSource = "document-source";
 
 	@Autowired
 	private FaustGraph graph;
@@ -77,8 +79,8 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		valueAttribute.put("textTranscript", "uri");
 		valueAttribute.put("docTranscript", "uri");
 	}
-	
-	
+
+
 	public Document handle(FaustURI source) throws IOException, SAXException {
 		this.source = source;
 		this.baseTracker = new XMLBaseTracker(source.toString());
@@ -158,7 +160,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		} else if ("metadata".equals(localName) && !materialUnitStack.isEmpty()) {
 			inMetadataSection = true;
 			metadata = new HashMap<String, List<String>>();
-            metadata.put("documentSource", ImmutableList.<String>of(this.source.toString()));
+            metadata.put(internalKeyDocumentSource, ImmutableList.<String>of(this.source.toString()));
 		} else if (inMetadataSection && metadataKey == null) {
 			// String type = attributes.getValue("type");
 			// metadataKey = type == null ? localName : localName + "_" + type;
@@ -183,7 +185,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 					if (!transcript.equals("none")) {
 						transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
 					} else {
-						transcriptSource = new FaustURI(FaustAuthority.SELF, "/none/");
+						transcriptSource = noneURI;
 					}
 					unit.setTranscriptSource(transcriptSource);
 					unit.setTranscript(transcriptManager.find(transcriptSource, type));
