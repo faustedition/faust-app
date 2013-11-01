@@ -1,5 +1,7 @@
 package de.faustedition.transcript;
 
+import com.google.common.collect.Sets;
+import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
@@ -17,6 +19,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -46,12 +49,20 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 
+		final Set<FaustURI> imported = Sets.<FaustURI>newHashSet();
+
 		final Deque<MaterialUnit> queue = new ArrayDeque<MaterialUnit>(graph.getMaterialUnits());
 		while (!queue.isEmpty()) {
 			final MaterialUnit mu = queue.pop();
-
-			queue.addAll(mu);
-
+			final String source = mu.getMetadataValue("documentSource");
+			final FaustURI transcriptSource = mu.getTranscriptSource();
+			for (MaterialUnit child: mu) {
+				if (!imported.contains(transcriptSource)) {
+					imported.add(transcriptSource);
+					queue.add(child);
+				}
+			//queue.addAll(mu);
+			}
 			if (mu.getTranscriptSource() == null) {
 				continue;
 			}
@@ -59,22 +70,22 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					try {
-						logger.debug("Reading transcript of {}: {}", mu, mu.getMetadataValue("source"));
-            			transcriptManager.find(mu);
+						logger.debug("Reading transcript {} referenced in {}", transcriptSource, source);
+						transcriptManager.find(mu);
 					} catch (IOException e) {
 						if (logger.isWarnEnabled()) {
 							logger.warn("I/O error while reading transcript from " + mu + ": "
-                                    + mu.getMetadataValue("source"), e);
+                                    + source, e);
 						}
 					} catch (XMLStreamException e) {
 						if (logger.isWarnEnabled()) {
 							logger.warn("XML error while reading transcript from " + mu + ": "
-                                    + mu.getMetadataValue("source"), e);
+                                    + source, e);
 						}
 					} catch (TranscriptInvalidException e) {
 						if (logger.isWarnEnabled()) {
 							logger.warn("Validation error while reading transcript from " + mu + ": "
-                                    + mu.getMetadataValue("source"), e);
+                                    + source, e);
 						}
 					}
 				}

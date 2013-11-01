@@ -63,7 +63,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 
 	private static final Set<String> materialUnitNames = ImmutableSet.of("archivalDocument",
 			"sheet", "leaf", "disjunctLeaf", "page", "patch", "patchSurface");
-	
+
 	private static final Map<String, String> legacyNames;
 	static {
 		legacyNames = new HashMap<String, String>();
@@ -158,7 +158,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		} else if ("metadata".equals(localName) && !materialUnitStack.isEmpty()) {
 			inMetadataSection = true;
 			metadata = new HashMap<String, List<String>>();
-            metadata.put("source", ImmutableList.<String>of(this.source.toString()));
+            metadata.put("documentSource", ImmutableList.<String>of(this.source.toString()));
 		} else if (inMetadataSection && metadataKey == null) {
 			// String type = attributes.getValue("type");
 			// metadataKey = type == null ? localName : localName + "_" + type;

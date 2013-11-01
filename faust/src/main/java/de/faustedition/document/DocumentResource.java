@@ -83,7 +83,7 @@ public class DocumentResource extends ServerResource {
 				}
 				generator.writeNumberField("order", unit.getOrder());
 				generator.writeNumberField("id", unit.node.getId());
-                generator.writeStringField("source", unit.getMetadataValue("source"));
+                generator.writeStringField("documentSource", unit.getMetadataValue("documentSource"));
 
 //				final GoddagTranscript transcript = unit.getTranscript();
 				if (unit.getTranscriptSource() != null) {
@@ -102,17 +102,12 @@ public class DocumentResource extends ServerResource {
 					final FaustURI facsimile = unit.getFacsimile();
 					if (facsimile != null) 
 							generator.writeStringField("facsimile", facsimile.toString());
-					
-
-
 				}
-
 				generator.writeArrayFieldStart("contents");
 				for (MaterialUnit content : new TreeSet<MaterialUnit>(unit)) {
 					generate(content);
 				}
 				generator.writeEndArray();
-
 				generator.writeEndObject();
 			}
 		};
