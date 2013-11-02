@@ -2,7 +2,8 @@ YUI.add('documentary-transcript', function (Y) {
     var DRAG_NS = "http://www.codedread.com/dragsvg",
         NS = Y.namespace("Faust"),
         EPSILON = 0.01,
-        LINE_OVERLAY_MODE = false;
+        LINE_OVERLAY_MODE = false,
+        svg = Y.SvgUtils.svg;
 
     var Align = function(me, you, xy, myJoint, yourJoint, priority) {
         this.me = me;
@@ -100,9 +101,9 @@ YUI.add('documentary-transcript', function (Y) {
                     if (prev) {
                         var position = (this.data["f:pos"] || ""),
                             positionOver = (position.indexOf("over") >= 0),
-                            positionBetween = (position.indexOf("between") >= 0);
+                            positionBetween = (position.indexOf("between") >= 0),
+                            yourJoint = 1.5;
 
-                        var yourJoint = 1.5;
                         if (LINE_OVERLAY_MODE) {
                             //yourJoint = (positionBetween ? 1 : 1);
                             yourJoint = (positionOver ? 0.1 : yourJoint);
@@ -211,13 +212,14 @@ YUI.add('documentary-transcript', function (Y) {
                                 break;
                             case "fontsize":
                                 if ("small" == v) classes.push(v);
+                                break;
                         }
                     });
 
                     var bbox = container.getBBox(),
-                        bgBox = container.appendChild(Y.SvgUtils.svg("rect", { "class": classes.concat("bgBox").join(" ") })),
-                        strikethrough = ("strikethrough" in textAttrs) && container.appendChild(Y.SvgUtils.svg("line")),
-                        underline = ("underline" in textAttrs) && container.appendChild(Y.SvgUtils.svg("line"));
+                        bgBox = container.appendChild(svg("rect", { "class": classes.concat("bgBox").join(" ") })),
+                        strikethrough = ("strikethrough" in textAttrs) && container.appendChild(svg("line")),
+                        underline = ("underline" in textAttrs) && container.appendChild(svg("line"));
 
                     bgBox.setAttribute("x", bbox.x);
                     bgBox.setAttribute("y", bbox.y);
@@ -239,25 +241,26 @@ YUI.add('documentary-transcript', function (Y) {
 
                     if (strikethrough) {
                         var height = Math.round(this.view.getBBox().height / 6);
-                        strikethrough.setAttribute("x1", this.x);
-                        strikethrough.setAttribute("x2", this.x + this.width);
-                        strikethrough.setAttribute("y1", this.y - height);
-                        strikethrough.setAttribute("y2", this.y - height);
+                        strikethrough.setAttribute("x1", this.x.toString());
+                        strikethrough.setAttribute("x2", this.x + this.width.toString());
+                        strikethrough.setAttribute("y1", (this.y - height).toString());
+                        strikethrough.setAttribute("y2", (this.y - height).toString());
                         strikethrough.setAttribute("stroke", "#333");
                         strikethrough.transform.baseVal.initialize(container.transform.baseVal.consolidate());
                     }
 
-                    container = container.appendChild(Y.SvgUtils.svg("text", { "class": classes.concat("text").join(" ") }));
+                    container = container.appendChild(svg("text", { "class": classes.concat("text").join(" ") }));
                     container.appendChild(Y.config.doc.createTextNode(
                         this.tree.text.content(this.data["txt:content"] || [0, 0]).replace(/\s+/g, "\u00a0")
                     ));
-
+                    break;
                 case "line":
                     // FIXME: space at the beginning of each line, to give empty lines height
                     // vc.add (Y.Faust.DocumentLayout.createText("\u00a0", annotationStart, annotationEnd, text));
-                    container = container.appendChild(Y.SvgUtils.svg("g", { "class": "Line" }));
+                    container = container.appendChild(svg("g", { "class": "Line" }));
+                    break;
                 case "zone":
-                    var zone = Y.SvgUtils.svg("rect", {
+                    var zone = svg("rect", {
                         "x": "0",
                         "y": "0",
                         "width": "0.1em",
@@ -268,7 +271,7 @@ YUI.add('documentary-transcript', function (Y) {
                         "visibility": "hidden"
                     });
 
-                    container = container.appendChild(Y.SvgUtils.svg("g", { "class": "Zone" }));
+                    container = container.appendChild(svg("g", { "class": "Zone" }));
                     container.setAttributeNS(DRAG_NS, 'drag:enable', 'true');
                     container.appendChild(zone);
 
@@ -285,21 +288,23 @@ YUI.add('documentary-transcript', function (Y) {
                      sheet.disable();
                      });
                      */
+                    break;
                 case "surface":
-                    container = container.appendChild(Y.SvgUtils.svg("g", { "class": "Surface" }));
-
+                    container = container.appendChild(svg("g", { "class": "Surface" }));
+                    break;
                 case "vspace":
                     if (this.data["f:unit"] != "lines") throw ("Invalid unit for vspace element! Use 'lines'!");
                     if (!this.data["f:quantity"]) throw ("f:vspace: Please specify @quantity");
 
                     //TODO real implementation, non-integer values
-                    container = container.appendChild(Y.SvgUtils.svg("rect", {
+                    container = container.appendChild(svg("rect", {
                         "class": "VSpace",
                         "width": "0.1em",
                         "height": ((parseInt(this.data["f:quantity"]) || 0) * 2) + 'em'
                     }, {
                         "visibility": "hidden"
                     }));
+                    break;
                 case "hspace":
                     if (this.data["f:unit"] != "chars") throw "Invalid unit for hspace element! Use 'chars'!";
                     if (!this.data["f:quantity"]) throw "f:hspace: Please specify @quantity";
@@ -312,12 +317,13 @@ YUI.add('documentary-transcript', function (Y) {
                     }, {
                         "visibility": "hidden"
                     }));
+                    break;
                 case "grLine":
                     var lineStyle = this.data["f:style"];
                     if (lineStyle && lineStyle != "curly") Y.log("Unsupported style for grLine: " + lineStyle);
 
                     // FIXME: zoneSpanning added to the container, but another dummy rect returned
-                    container.appendChild(Y.SvgUtils.svg("rect", {
+                    container.appendChild(svg("rect", {
                         "width": "100",
                         "height": this.parent.getExt(this.parent.rotY()),
                         "fill": 'url(#curlyLinePattern)',
@@ -325,7 +331,7 @@ YUI.add('documentary-transcript', function (Y) {
                         "y": "0"
                     }));
 
-                    container = container.appendChild(Y.SvgUtils.svg("rect", {
+                    container = container.appendChild(svg("rect", {
                         "width": "0.1em",
                         "height": "0.1em"
                     }, {
@@ -333,10 +339,10 @@ YUI.add('documentary-transcript', function (Y) {
                         "stroke": "black",
                         "visibility": "hidden"
                     }));
-
+                    break;
                 case "gLine":
                     // FIXME: still used?
-                    container = container.appendChild(Y.SvgUtils.svg("line", {
+                    container = container.appendChild(svg("line", {
                         "x1": this.x,
                         "y1": (this.y - 10),
                         "x2": (this.x + 40),
@@ -344,14 +350,16 @@ YUI.add('documentary-transcript', function (Y) {
                         "stroke-width": "1",
                         "stroke": "black"
                     }));
+                    break;
                 case "grBrace":
-                    container = container.appendChild(Y.SvgUtils.svg("path", {
+                    container = container.appendChild(svg("path", {
                         "d": "M " + ((this.x) + " " + (this.y) + " q 5,-10 20,-5 q 5,0 10,-10 q -5,0 10,10 q 10,-5 20,5"),
                         "stroke-width": "1",
                         "stroke": "black",
                         "fill": "transparent"
 
                     }));
+                    break;
             }
 
             if (this.rotation) {
