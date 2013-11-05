@@ -80,10 +80,18 @@ public class DocumentResource extends ServerResource {
 				generator.writeStringField("type", unit.getType().name().toLowerCase());
 				if (unit instanceof Document) {
 					generator.writeStringField("name", unit.toString());
+
+					generator.writeStringField("document-source", unit.getMetadataValue("document-source"));
+					generator.writeStringField("note", unit.getMetadataValue("note"));
+
+					generator.writeStringField("callnumber.gsa-1", unit.getMetadataValue("callnumber.gsa-1"));
+					generator.writeStringField("callnumber.gsa-2", unit.getMetadataValue("callnumber.gsa-2"));
+					generator.writeStringField("callnumber.wa-faust", unit.getMetadataValue("callnumber.wa-faust"));
+
 				}
 				generator.writeNumberField("order", unit.getOrder());
 				generator.writeNumberField("id", unit.node.getId());
-                generator.writeStringField("documentSource", unit.getMetadataValue("documentSource"));
+
 
 //				final GoddagTranscript transcript = unit.getTranscript();
 				if (unit.getTranscriptSource() != null) {
