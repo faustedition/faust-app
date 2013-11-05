@@ -89,11 +89,18 @@ public class ArchiveRouter extends Router implements InitializingBean {
 			final SortedSet<Document> archivalUnits = new TreeSet<Document>(new Comparator<Document>() {
 				@Override
 				public int compare(Document o1, Document o2) {
-					final String o1cn = o1.toString();
-					final String o2cn = o2.toString();
-					return (o1cn == null || o2cn == null) ? 0 : o1cn.compareTo(o2cn);
+					final String o1cn = o1.getMetadataValue("callnumber");
+					final String o2cn = o2.getMetadataValue("callnumber");
+					if (o1cn != null && o2cn != null) {
+						int order = o1cn.compareTo(o2cn);
+						if (order != 0) return order;
+					}
+					return o1.getSource().compareTo(o2.getSource());
+
+					//return (o1cn == null || o2cn == null) ? 0 : o1cn.compareTo(o2cn);
 				}
 			});
+
 			Iterables.addAll(archivalUnits, Iterables.filter(archive, Document.class));
 			model.put("archivalUnits", archivalUnits);
 
