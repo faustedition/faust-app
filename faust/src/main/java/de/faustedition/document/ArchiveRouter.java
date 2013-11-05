@@ -1,16 +1,13 @@
 package de.faustedition.document;
 
-import static de.faustedition.xml.XPathUtil.xpath;
-
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.xml.xpath.XPathExpression;
-
+import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
+import de.faustedition.ApplicationContextFinder;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.template.TemplateRepresentationFactory;
+import de.faustedition.xml.NodeListWrapper;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -25,15 +22,11 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Iterables;
+import javax.xml.xpath.XPathExpression;
+import java.io.IOException;
+import java.util.*;
 
-import de.faustedition.ApplicationContextFinder;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.xml.NodeListWrapper;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import static de.faustedition.xml.XPathUtil.xpath;
 
 @Component
 public class ArchiveRouter extends Router implements InitializingBean {
@@ -96,8 +89,6 @@ public class ArchiveRouter extends Router implements InitializingBean {
 						if (order != 0) return order;
 					}
 					return o1.getSource().compareTo(o2.getSource());
-
-					//return (o1cn == null || o2cn == null) ? 0 : o1cn.compareTo(o2cn);
 				}
 			});
 
