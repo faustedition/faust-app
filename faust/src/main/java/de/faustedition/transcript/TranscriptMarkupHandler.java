@@ -2,9 +2,11 @@ package de.faustedition.transcript;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ForwardingIterator;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import de.faustedition.text.TextAnnotationEnd;
 import de.faustedition.text.TextAnnotationStart;
 import de.faustedition.text.NamespaceMapping;
@@ -16,6 +18,7 @@ import de.faustedition.text.XMLEvent2TextToken;
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,8 +33,18 @@ import static de.faustedition.text.NamespaceMapping.map;
  */
 public class TranscriptMarkupHandler extends ForwardingIterator<TextToken> {
 
-    public static final String GAP_CHAR = "_"; //"\u00d7";
-    public static final String IMPRECISE_GAP_CHAR = "_"; //"\u00d7";
+    public static final Map<String, String> GLYPH_MAPPING = Maps.newHashMap();
+
+    static {
+        GLYPH_MAPPING.put("g_break", "[");
+        GLYPH_MAPPING.put("parenthesis_left", "(");
+        GLYPH_MAPPING.put("parenthesis_right", ")");
+        GLYPH_MAPPING.put("truncation", ".");
+        GLYPH_MAPPING.put("g_transp_4", "\u271a");
+    }
+
+    public static final String GAP_CHAR = "\u00d7"; // "_";
+    public static final String IMPRECISE_GAP_CHAR = "\u00d7"; // "_";
 
     public static final String INSERT_RIGHT_CHAR = "\u2308";
     public static final String INSERT_LEFT_CHAR = "\u2309";
@@ -40,11 +53,15 @@ public class TranscriptMarkupHandler extends ForwardingIterator<TextToken> {
 
     private final Iterator<TextToken> delegate;
     private final ObjectMapper objectMapper;
+
     private final Queue<TextToken> buf = Lists.newLinkedList();
     private final Iterator<String> ids = XMLEvent2TextToken.ids("transcript_");
 
     private final String insertKey;
     private final String insertOrientationKey;
+
+    private final String glyphKey;
+    private final String glyphRefKey;
 
     private final String gapKey;
     private final String gapQuantityKey;
@@ -72,6 +89,9 @@ public class TranscriptMarkupHandler extends ForwardingIterator<TextToken> {
 
         this.insertKey = map(namespaceMapping, new QName(FAUST_NS_URI, "ins"));
         this.insertOrientationKey = map(namespaceMapping, new QName(FAUST_NS_URI, "orient"));
+
+        this.glyphKey = map(namespaceMapping, new QName(TEI_NS_URI, "g"));
+        this.glyphRefKey = map(namespaceMapping, new QName(TEI_NS_URI, "ref"));
 
         this.gapKey = map(namespaceMapping, new QName(TEI_NS_URI, "gap"));
         this.gapQuantityKey = map(namespaceMapping, new QName(TEI_NS_URI, "quantity"));
@@ -111,6 +131,10 @@ public class TranscriptMarkupHandler extends ForwardingIterator<TextToken> {
                 if (xmlName.equals(documentKey)) {
                     handEnd();
                     stageEnd();
+                } else if (xmlName.equals(glyphKey)) {
+                    buf.add(next);
+                    tokenPending = false;
+                    buf.add(new TextContent(Objects.firstNonNull(GLYPH_MAPPING.get(data.path(glyphRefKey).asText().replaceAll("^#", "")), "")));
                 } else if (xmlName.equals(gapKey)) {
                     buf.add(next);
                     tokenPending = false;
