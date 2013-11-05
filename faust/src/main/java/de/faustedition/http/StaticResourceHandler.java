@@ -1,8 +1,5 @@
 package de.faustedition.http;
 
-import com.github.sommeri.less4j.Less4jException;
-import com.github.sommeri.less4j.LessCompiler;
-import com.github.sommeri.less4j.core.DefaultLessCompiler;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
@@ -12,6 +9,8 @@ import com.google.common.io.Resources;
 import org.glassfish.grizzly.http.util.MimeType;
 import org.glassfish.jersey.process.Inflector;
 import org.glassfish.jersey.server.model.Resource;
+import org.lesscss.LessCompiler;
+import org.lesscss.LessException;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Deque;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -153,6 +151,8 @@ public class StaticResourceHandler implements Inflector<ContainerRequestContext,
 
     private static class LessSource implements TimestampedByteSource {
 
+        private static final LessCompiler LESS_COMPILER = new LessCompiler();
+
         private final TimestampedByteSource source;
 
         private LessSource(TimestampedByteSource source) {
@@ -167,18 +167,12 @@ public class StaticResourceHandler implements Inflector<ContainerRequestContext,
         @Override
         public ByteSource byteSource() {
             try {
-                final LessCompiler.CompilationResult compiledLess = new DefaultLessCompiler().compile(
+                return ByteSource.wrap(LESS_COMPILER.compile(
                         source.byteSource().asCharSource(Charsets.UTF_8).read()
-                );
-                if (LOG.isLoggable(Level.WARNING)) {
-                    for (LessCompiler.Problem lessProblem : compiledLess.getWarnings()) {
-                        LOG.log(Level.WARNING, lessProblem.getMessage());
-                    }
-                }
-                return ByteSource.wrap(compiledLess.getCss().getBytes(Charsets.UTF_8));
-            } catch (Less4jException e) {
-                throw Throwables.propagate(e);
+                ).getBytes(Charsets.UTF_8));
             } catch (IOException e) {
+                throw Throwables.propagate(e);
+            } catch (LessException e) {
                 throw Throwables.propagate(e);
             }
         }
