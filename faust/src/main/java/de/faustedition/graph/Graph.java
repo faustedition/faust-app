@@ -89,7 +89,7 @@ public class Graph {
     }
 
     protected Node root(String rootName) {
-        final Node referenceNode = db.getReferenceNode();
+        @SuppressWarnings("deprecation") final Node referenceNode = db.getReferenceNode();
         for (Relationship r : referenceNode.getRelationships(ROOT_RT, OUTGOING)) {
             if (rootName.equals(r.getProperty(ROOT_NAME_PROPERTY))) {
                 return r.getEndNode();
