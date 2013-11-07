@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Predicates;
 import com.google.common.base.Throwables;
 import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Range;
 import de.faustedition.http.LastModified;
 import de.faustedition.text.LineBreaker;
 import de.faustedition.text.NamespaceMapping;
+import de.faustedition.text.TextContent;
 import de.faustedition.text.TextToken;
 import de.faustedition.text.WhitespaceCompressor;
 import de.faustedition.text.XML;
@@ -141,5 +144,13 @@ public class Transcript implements Iterable<TextToken>, LastModified {
         ));
 
         return tokens;
+    }
+
+    public String text(int start, int end) {
+        final StringBuilder text = new StringBuilder();
+        for (TextContent textContent : Iterables.filter(this, TextContent.class)) {
+            text.append(textContent.getContent());
+        }
+        return text.substring(Math.max(0, start), Math.min(end, text.length()));
     }
 }

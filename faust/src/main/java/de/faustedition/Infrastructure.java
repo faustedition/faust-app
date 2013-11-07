@@ -11,6 +11,8 @@ import de.faustedition.facsimile.DefaultFacsimiles;
 import de.faustedition.facsimile.Facsimiles;
 import de.faustedition.facsimile.MockFacsimiles;
 import de.faustedition.graph.Graph;
+import de.faustedition.index.DocumentIndexer;
+import de.faustedition.index.Index;
 import de.faustedition.text.NamespaceMapping;
 import de.faustedition.transcript.TranscriptSegments;
 import de.faustedition.transcript.Transcripts;
@@ -37,6 +39,8 @@ import java.util.logging.Logger;
         ObjectMapper.class,
         Database.class,
         Graph.class,
+        Index.class,
+        DocumentIndexer.class,
         Sources.class,
         Facsimiles.class,
         Documents.class,
@@ -83,6 +87,12 @@ public class Infrastructure {
     @Singleton
     public Database provideDatabase() {
         return new Database(dataDirectory);
+    }
+
+    @Provides
+    @Singleton
+    public Index provideIndex() {
+        return new Index(dataSubDirectory("index"));
     }
 
     @Provides

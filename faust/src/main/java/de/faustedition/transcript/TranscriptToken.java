@@ -1,11 +1,9 @@
 package de.faustedition.transcript;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import de.faustedition.text.TextSegmentAnnotation;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,13 +21,25 @@ public class TranscriptToken {
         this.annotations = annotations;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public List<TextSegmentAnnotation> getAnnotations() {
+        return annotations;
+    }
+
     @Override
     public String toString() {
-        return Joiner.on("\n").join(Arrays.asList(
+        return Joiner.on("\n").join(
                 "'" + content.replaceAll("[\r\n]+", "\u00b6") + "' [" + offset + "]" ,
                 Strings.repeat("-", 80),
                 Joiner.on("\n").join(annotations),
                 Strings.repeat("=", 80)
-        ));
+        );
     }
 }

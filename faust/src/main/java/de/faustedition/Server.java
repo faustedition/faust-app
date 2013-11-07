@@ -11,7 +11,8 @@ import de.faustedition.facsimile.FacsimileResource;
 import de.faustedition.genesis.GeneticGraphResource;
 import de.faustedition.http.HttpService;
 import de.faustedition.http.JsonMessageBodyReaderWriter;
-import de.faustedition.search.SearchResource;
+import de.faustedition.index.Index;
+import de.faustedition.index.SearchResource;
 import de.faustedition.transcript.SceneStatisticsResource;
 import de.faustedition.transcript.TranscriptResource;
 import de.faustedition.transcript.TranscriptSegments;
@@ -52,6 +53,7 @@ public class Server {
             final ObjectGraph objectGraph = ObjectGraph.create(new Server(), infrastructure);
 
             final ServiceManager serviceManager = new ServiceManager(Arrays.asList(
+                    objectGraph.get(Index.class),
                     objectGraph.get(Documents.class),
                     objectGraph.get(TranscriptSegments.class),
                     new HttpService(configuration,

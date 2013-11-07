@@ -1,4 +1,4 @@
-package de.faustedition.search;
+package de.faustedition.index;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;

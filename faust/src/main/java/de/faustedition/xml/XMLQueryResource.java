@@ -6,7 +6,7 @@ import com.google.common.collect.Sets;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Templates;
-import de.faustedition.search.SearchResource;
+import de.faustedition.index.SearchResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
