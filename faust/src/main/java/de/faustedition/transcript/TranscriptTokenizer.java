@@ -2,9 +2,7 @@ package de.faustedition.transcript;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -27,13 +25,12 @@ public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterat
 
     private Queue<TranscriptToken> buf;
     private Map<String, ObjectNode> annotations;
-    private Map<String,  Integer> annotationStarts;
+    private Map<String, Integer> annotationStarts;
     private Map<String, Integer> annotationEnds;
 
     private char lastChar;
     private int offset;
 
-    private Map<String, ObjectNode> tokenAnnotations;
     private StringBuilder tokenContent;
 
     @Override
@@ -45,7 +42,6 @@ public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterat
         lastChar = ' ';
         offset = 0;
 
-        tokenAnnotations = Maps.newLinkedHashMap();
         tokenContent = new StringBuilder();
 
         return new AbstractIterator<TranscriptToken>() {
@@ -68,15 +64,10 @@ public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterat
                     } else if (token instanceof TextAnnotationStart) {
                         final TextAnnotationStart annotationStart = (TextAnnotationStart) token;
                         final String id = annotationStart.getId();
-                        final ObjectNode data = annotationStart.getData();
-
-                        annotations.put(id, data);
+                        annotations.put(id, annotationStart.getData());
                         annotationStarts.put(id, offset);
-                        tokenAnnotations.put(id, data);
                     } else if (token instanceof TextAnnotationEnd) {
-                        final String id = ((TextAnnotationEnd) token).getId();
-                        annotations.remove(id);
-                        annotationEnds.put(id, offset);
+                        annotationEnds.put(((TextAnnotationEnd) token).getId(), offset);
                     }
                 }
                 if (buf.isEmpty()) {
@@ -93,30 +84,31 @@ public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterat
             final int tokenStart = offset - length;
             final int tokenEnd = offset;
 
-            final List<TextSegmentAnnotation> annotations = Lists.newArrayListWithExpectedSize(tokenAnnotations.size());
-            for (Map.Entry<String, ObjectNode> annotation : tokenAnnotations.entrySet()) {
+            final List<TextSegmentAnnotation> tokenAnnotations = Lists.newLinkedList();
+
+            for (final Iterator<Map.Entry<String, ObjectNode>> it = annotations.entrySet().iterator(); it.hasNext(); ) {
+                final Map.Entry<String, ObjectNode> annotation = it.next();
                 final String annotationId = annotation.getKey();
-                final int annotationStart = Math.max(annotationStarts.get(annotationId), tokenStart);
-                final int annotationEnd = Objects.firstNonNull(annotationEnds.get(annotationId), tokenEnd);
+
+                final int annotationStart = annotationStarts.get(annotationId);
+                final int annotationEnd = Objects.firstNonNull(annotationEnds.get(annotationId), Integer.MAX_VALUE);
                 if (annotationEnd > tokenStart && annotationStart < tokenEnd) {
-                    annotations.add(new TextSegmentAnnotation(
-                            Range.closedOpen(annotationStart, annotationEnd),
+                    tokenAnnotations.add(new TextSegmentAnnotation(
+                            Range.closedOpen(Math.max(annotationStart, tokenStart), Math.min(annotationEnd, tokenEnd)),
                             annotation.getValue()
                     ));
                 }
-            }
-            buf.add(new TranscriptToken(tokenContent.toString(), tokenStart, annotations));
 
-            tokenAnnotations = Maps.newLinkedHashMap(this.annotations);
-            tokenContent = new StringBuilder();
-
-            for (Iterator<Map.Entry<String, Integer>> it = annotationEnds.entrySet().iterator(); it.hasNext() ; ) {
-                final Map.Entry<String, Integer> annotationEnd = it.next();
-                if (annotationEnd.getValue() <= offset) {
-                    annotationStarts.remove(annotationEnd.getKey());
+                if (annotationEnd <= tokenEnd) {
                     it.remove();
+                    annotationStarts.remove(annotationId);
+                    annotationEnds.remove(annotationId);
                 }
             }
+
+            buf.add(new TranscriptToken(tokenContent.toString(), tokenStart, tokenAnnotations));
+
+            tokenContent = new StringBuilder();
         }
     }
 }
