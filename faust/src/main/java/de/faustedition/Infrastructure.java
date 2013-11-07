@@ -15,7 +15,8 @@ import de.faustedition.text.NamespaceMapping;
 import de.faustedition.transcript.TranscriptSegments;
 import de.faustedition.transcript.Transcripts;
 import de.faustedition.xml.Sources;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 import javax.inject.Singleton;
 import java.io.File;
@@ -99,7 +100,7 @@ public class Infrastructure {
     @Provides
     @Singleton
     public Graph provideGraph() {
-        final EmbeddedGraphDatabase graphDatabase = new EmbeddedGraphDatabase(new File(dataDirectory, "graph").getPath());
+        final GraphDatabaseService graphDatabase = new GraphDatabaseFactory().newEmbeddedDatabase(new File(dataDirectory, "graph").getPath());
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
