@@ -109,7 +109,7 @@ YUI.add('document-view-svg', function (Y) {
 		result.setAttribute('width', '0.1em');
 		result.setAttribute('style', 'visibility: hidden;');
 		//TODO dynamically calculate from context line height
-		var height = String(this.vSpaceHeight * 2) + 'em';
+		var height = String(this.vSpaceHeight * 1.5) + 'em';
 		result.setAttribute('height', height);
 		return result;
 	};
