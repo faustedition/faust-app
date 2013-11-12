@@ -57,14 +57,16 @@ def start():
     check_call(['nohup java -Xmx1024m -server -jar app/lib/' + NAME +'.jar /mnt/data/config.properties &'], shell=True)
 
 def stop():
-    print 'Stopping running application...'
+    sys.stdout.write('Stopping running application...')
     app_pids = pids(NAME)
     if len(app_pids) > 0:
             check_call(['kill', app_pids[0]])
 
     for i in range(30):
             sleep(KILL_TIMEOUT / 30.0)
+	    sys.stdout.write('.')
             if not is_alive(NAME):
+		    print 'Stopped.'
                     break
 
     if is_alive(NAME):
@@ -73,7 +75,7 @@ def stop():
 
 def read():
     print 'Deleting old database...'
-    call(['rm', '-rf', 'db/*'])
+    check_call(['rm -rf db/*'], shell=True)
     print 'Reading database...'
     check_call(['java -Xmx1024m -server -cp app/lib/' + NAME +'.jar de.faustedition.transcript.TranscriptBatchReader /mnt/data/config.properties'], shell=True)
     
