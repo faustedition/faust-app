@@ -263,30 +263,33 @@ YUI.add('document-view-svg', function (Y) {
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 
-	Faust.GrLine.prototype.createView = function() {
-		this.zoneSpanning = this.svgDocument().createElementNS(SVG_NS, 'rect');
-		this.zoneSpanning.setAttribute('fill', 'url(#curlyLinePattern');
-		this.zoneSpanning.setAttribute('width', '100');
-		this.svgContainer().appendChild(this.zoneSpanning);
-		
+	Faust.SpanningVC.prototype.createView = function() {
+		this.spanningRect = this.svgDocument().createElementNS(SVG_NS, 'use');
+		//this.spanningRect.setAttribute('fill', 'url(#curlyLinePattern');
+		this.spanningRect.setAttribute('class', this.type);
+		this.spanningRect.setAttribute('width', this.imageWidth);
+		this.spanningRect.setAttribute('height', this.imageHeight);
+		this.spanningRect.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
+		this.svgContainer().appendChild(this.spanningRect);
 		var block = this.svgDocument().createElementNS(SVG_NS, 'rect');
-		block.setAttribute('width', '0.1em');
+		block.setAttribute('width', '20em');
 		block.setAttribute('height', '0.1em');
 		block.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden')
 		return block;
-		
-		
 	};
 	
-	Faust.GrLine.prototype.onRelayout = function() {
-		this.zoneSpanning.setAttribute('x', 0);
-		this.zoneSpanning.setAttribute('y', 0);
-		
-		
-		this.zoneSpanning.setAttribute('height', this.parent.getExt(this.parent.rotY()));
+	Faust.SpanningVC.prototype.onRelayout = function() {
+		this.spanningRect.setAttribute('x', 0);
+		this.spanningRect.setAttribute('y', 0);
+		var width = this.parent.getExt(this.rotX());
+		var height = this.parent.getExt(this.rotY());
+		var transform = "scale(" + width / this.imageWidth + "," + height / this.imageHeight + ")";
+		this.spanningRect.setAttribute('width', width);
+		this.spanningRect.setAttribute('height', height);
+		this.spanningRect.setAttribute('transform', transform);
 	};
-	
-	Y.augment(Faust.GrLine, Faust.ViewComponent);
+
+	Y.augment(Faust.SpanningVC, Faust.ViewComponent);
 	
 
 	

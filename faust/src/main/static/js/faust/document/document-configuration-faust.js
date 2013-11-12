@@ -152,7 +152,9 @@ YUI.add('document-configuration-faust', function (Y) {
 				'grLine':  { 
 					vc: function(node, text, layoutState) {
 						if (node.data()['f:style'] == 'curly')
-							return new Faust.GrLine();
+							return new Faust.SpanningVC('grLine',
+								'/faustedition/static/img/transcript/grLineCurly.svg#img',
+								100, 100);
 					}
 				},
 				'grBrace':  { 

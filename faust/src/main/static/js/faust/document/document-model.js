@@ -218,10 +218,10 @@ YUI.add('document-model', function (Y) {
 		this.text = text.replace(/\s+/g, "\u00a0");
 		this.textAttrs = textAttrs;
 	};
-	Faust.Text.prototype.dimension = function() {		
+	Faust.Text.prototype.dimension = function() {
 		var measured = this.measure();
 		this.width = measured.width;
-		this.height = measured.height;		
+		this.height = measured.height;
 	};
 	Faust.Text.prototype.getHand = function() {
 		if (this.textAttrs.rewrite)
@@ -270,11 +270,15 @@ YUI.add('document-model', function (Y) {
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 	
-	Faust.GrLine = function() {
+	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight) {
+		this.type =  type;
+		this.imageUrl = imageUrl;
+		this.imageWidth = imageWidth;
+		this.imageHeight = imageHeight;
 		this.initViewComponent();
 	};
-	
-	Y.augment (Faust.GrLine, Faust.ViewComponent);
+
+	Y.augment (Faust.SpanningVC, Faust.ViewComponent);
 	
 	Faust.GLine = function() {
 		this.initViewComponent();
