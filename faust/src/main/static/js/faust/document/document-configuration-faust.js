@@ -154,7 +154,7 @@ YUI.add('document-configuration-faust', function (Y) {
 						if (node.data()['f:style'] == 'curly') {
 							if (node.data()['f:orient'] == 'horiz') {
 								return new Faust.SpanningVC('grLine',
-									'/faustedition/static/img/transcript/grLineCurly.svg#img',
+									cp + '/static/img/transcript/grLineCurly.svg#img',
 									100, 100, 100, null);
 							} else if (node.data()['f:orient' == 'vert']) {
 
