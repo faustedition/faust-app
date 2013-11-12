@@ -162,7 +162,7 @@ YUI.add('document-configuration-faust', function (Y) {
 						} else if (node.data()['f:style'] == 'linear') {
 							if (node.data()['f:orient'] == 'horiz') {
 								return new Faust.SpanningVC('grLine',
-									'/faustedition/static/img/transcript/grLineStraightHorizontal.svg#img',
+									cp + '/static/img/transcript/grLineStraightHorizontal.svg#img',
 									100, 20, null, 20);
 							}
 						}
