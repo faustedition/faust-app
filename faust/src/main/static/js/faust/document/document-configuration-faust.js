@@ -151,10 +151,21 @@ YUI.add('document-configuration-faust', function (Y) {
 
 				'grLine':  { 
 					vc: function(node, text, layoutState) {
-						if (node.data()['f:style'] == 'curly')
-							return new Faust.SpanningVC('grLine',
-								'/faustedition/static/img/transcript/grLineCurly.svg#img',
-								100, 100);
+						if (node.data()['f:style'] == 'curly') {
+							if (node.data()['f:orient'] == 'horiz') {
+								return new Faust.SpanningVC('grLine',
+									'/faustedition/static/img/transcript/grLineCurly.svg#img',
+									100, 100, 100, null);
+							} else if (node.data()['f:orient' == 'vert']) {
+
+							}
+						} else if (node.data()['f:style'] == 'linear') {
+							if (node.data()['f:orient'] == 'horiz') {
+								return new Faust.SpanningVC('grLine',
+									'/faustedition/static/img/transcript/grLineStraightHorizontal.svg#img',
+									100, 20, null, 20);
+							}
+						}
 					}
 				},
 				'grBrace':  { 

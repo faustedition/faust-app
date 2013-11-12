@@ -279,11 +279,15 @@ YUI.add('document-view-svg', function (Y) {
 	};
 	
 	Faust.SpanningVC.prototype.onRelayout = function() {
-		this.spanningRect.setAttribute('x', 0);
-		this.spanningRect.setAttribute('y', 0);
-		var width = this.parent.getExt(this.rotX());
-		var height = this.parent.getExt(this.rotY());
+		var parentWidth = this.parent.getExt(this.rotX());
+		var parentHeight = this.parent.getExt(this.rotY());
+		var width = this.defaultWidth ? this.defaultWidth : parentWidth;
+		var height = this.defaultHeight ? this.defaultHeight : parentHeight;
+		this.spanningRect.setAttribute('x', (parentWidth - width) / 2);
+		this.spanningRect.setAttribute('y', (parentHeight - height) / 2);
+
 		var transform = "scale(" + width / this.imageWidth + "," + height / this.imageHeight + ")";
+
 		this.spanningRect.setAttribute('width', width);
 		this.spanningRect.setAttribute('height', height);
 		this.spanningRect.setAttribute('transform', transform);
