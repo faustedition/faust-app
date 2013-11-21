@@ -281,7 +281,19 @@ YUI.add('document-model', function (Y) {
 	};
 
 	Y.augment (Faust.SpanningVC, Faust.ViewComponent);
-	
+
+	Faust.InlineGraphic = function(type, imageUrl, imageWidth, imageHeight, displayWidth, displayHeight) {
+		this.type =  type;
+		this.imageUrl = imageUrl;
+		this.imageWidth = imageWidth;
+		this.imageHeight = imageHeight;
+		this.displayWidth = displayWidth;
+		this.displayHeight = displayHeight;
+		this.initViewComponent();
+	};
+
+	Y.augment (Faust.InlineGraphic, Faust.ViewComponent);
+
 	Faust.GLine = function() {
 		this.initViewComponent();
 	};

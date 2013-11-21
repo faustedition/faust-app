@@ -151,19 +151,51 @@ YUI.add('document-configuration-faust', function (Y) {
 
 				'grLine':  { 
 					vc: function(node, text, layoutState) {
+						var ancestorNames = node.ancestors().map(function(node){return node.annotation.name.localName});
+						var inline = ancestorNames.indexOf('line') >= 0;
 						if (node.data()['f:style'] == 'curly') {
 							if (node.data()['f:orient'] == 'horiz') {
-								return new Faust.SpanningVC('grLine',
-									cp + '/static/img/transcript/grLineCurly.svg#img',
-									100, 100, 100, null);
-							} else if (node.data()['f:orient' == 'vert']) {
-
+								if (inline) {
+									return new Faust.InlineGraphic('grLine',
+										cp + '/static/img/transcript/grLineCurlyHorizontal.svg#img',
+										100, 100, 100, 20);
+								} else {
+									return new Faust.SpanningVC('grLine',
+										cp + '/static/img/transcript/grLineCurlyHorizontal.svg#img',
+										100, 100, 100, null);
+								}
+							} else if (node.data()['f:orient'] == 'vert') {
+								if (inline) {
+									return new Faust.InlineGraphic('grLine',
+										cp + '/static/img/transcript/grLineCurlyVertical.svg#img',
+										100, 100, 100, 100);
+								} else {
+									return new Faust.SpanningVC('grLine',
+										cp + '/static/img/transcript/grLineCurlyVertical.svg#img',
+										100, 100, 100, null);
+								}
 							}
 						} else if (node.data()['f:style'] == 'linear') {
 							if (node.data()['f:orient'] == 'horiz') {
-								return new Faust.SpanningVC('grLine',
-									cp + '/static/img/transcript/grLineStraightHorizontal.svg#img',
-									100, 20, null, 20);
+								if (inline) {
+									return new Faust.InlineGraphic('grLine',
+										cp + '/static/img/transcript/grLineStraightHorizontal.svg#img',
+										100, 20, 100, 20);
+								} else {
+									return new Faust.SpanningVC('grLine',
+										cp + '/static/img/transcript/grLineStraightHorizontal.svg#img',
+										100, 20, null, 20);
+								}
+							} else if (node.data()['f:orient'] == 'vert') {
+								if (inline) {
+									return new Faust.InlineGraphic('grLine',
+										cp + '/static/img/transcript/grLineStraightVertical.svg#img',
+										20, 100, 20, 20);
+								} else {
+									return new Faust.SpanningVC('grLine',
+										cp + '/static/img/transcript/grLineStraightVertical.svg#img',
+										20, 100, null, 20);
+								}
 							}
 						}
 					}

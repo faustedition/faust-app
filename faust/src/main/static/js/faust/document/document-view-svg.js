@@ -294,8 +294,22 @@ YUI.add('document-view-svg', function (Y) {
 	};
 
 	Y.augment(Faust.SpanningVC, Faust.ViewComponent);
-	
 
+	Faust.InlineGraphic.prototype.createView = function() {
+		var graphic = this.svgDocument().createElementNS(SVG_NS, 'use');
+		graphic.setAttribute('class', this.type);
+		graphic.setAttribute('width', this.imageWidth);
+		graphic.setAttribute('height', this.imageHeight);
+		graphic.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
+		var transform = "scale(" + this.displayWidth / this.imageWidth + "," + this.displayHeight / this.imageHeight + ")";
+		graphic.setAttribute('width', this.displayWidth);
+		graphic.setAttribute('height', this.displayHeight);
+		graphic.setAttribute('transform', transform);
+
+		return graphic;
+	};
+
+	Y.augment(Faust.InlineGraphic, Faust.ViewComponent);
 	
 	Faust.GLine.prototype.createView = function() {
 		var line = this.svgDocument().createElementNS(SVG_NS, "line");
