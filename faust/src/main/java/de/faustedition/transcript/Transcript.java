@@ -1,22 +1,26 @@
 package de.faustedition.transcript;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Throwables;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Range;
 import de.faustedition.http.LastModified;
+import de.faustedition.text.SegmentRangeFilter;
 import de.faustedition.text.LineBreaker;
 import de.faustedition.text.NamespaceMapping;
+import de.faustedition.text.TextAnnotationStart;
 import de.faustedition.text.TextContent;
+import de.faustedition.text.TextRangeFilter;
 import de.faustedition.text.TextToken;
 import de.faustedition.text.WhitespaceCompressor;
 import de.faustedition.text.XML;
 import de.faustedition.text.XMLElementContextFilter;
 import de.faustedition.text.XMLEvent2TextToken;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.stream.StreamSource;
@@ -25,6 +29,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import static de.faustedition.text.NamespaceMapping.TEI_NS_URI;
+import static de.faustedition.text.NamespaceMapping.TEI_SIG_GE_URI;
 import static de.faustedition.text.TextTokenPredicates.xmlName;
 
 /**
@@ -36,12 +42,21 @@ public class Transcript implements Iterable<TextToken>, LastModified {
     private final NamespaceMapping namespaceMapping;
     private final ObjectMapper objectMapper;
     private long lastModified;
+    private Predicate<TextAnnotationStart> segmentStart;
 
     public Transcript(List<File> sources, NamespaceMapping namespaceMapping, ObjectMapper objectMapper, long lastModified) {
         this.sources = sources;
         this.namespaceMapping = namespaceMapping;
         this.objectMapper = objectMapper;
         this.lastModified = lastModified;
+
+        this.segmentStart = Predicates.or(
+                xmlName(namespaceMapping, new QName(TEI_NS_URI, "l")),
+                xmlName(namespaceMapping, new QName(TEI_NS_URI, "line")),
+                xmlName(namespaceMapping, new QName(TEI_NS_URI, "p")),
+                xmlName(namespaceMapping, new QName(TEI_NS_URI, "ab")),
+                xmlName(namespaceMapping, new QName(TEI_SIG_GE_URI, "line"))
+        );
     }
 
     public List<File> getSources() {
@@ -146,11 +161,37 @@ public class Transcript implements Iterable<TextToken>, LastModified {
         return tokens;
     }
 
-    public String text(int start, int end) {
+    public Iterable<TextToken> range(final int start, final int end) {
+        return new Iterable<TextToken>() {
+            @Override
+            public Iterator<TextToken> iterator() {
+                return new TextRangeFilter(Transcript.this.iterator(), start, end);
+            }
+        };
+    }
+
+    public Iterable<TextToken> segment(final int start, final int end) {
+        return new Iterable<TextToken>() {
+            @Override
+            public Iterator<TextToken> iterator() {
+                return new SegmentRangeFilter(Transcript.this.iterator(), segmentStart, start, end);
+            }
+        };
+    }
+
+    public String rangeText(int start, int end) {
         final StringBuilder text = new StringBuilder();
-        for (TextContent textContent : Iterables.filter(this, TextContent.class)) {
+        for (TextContent textContent : Iterables.filter(range(start, end), TextContent.class)) {
             text.append(textContent.getContent());
         }
-        return text.substring(Math.max(0, start), Math.min(end, text.length()));
+        return text.toString();
+    }
+
+    public String segmentText(int start, int end) {
+        final StringBuilder text = new StringBuilder();
+        for (TextContent textContent : Iterables.filter(segment(start, end), TextContent.class)) {
+            text.append(textContent.getContent());
+        }
+        return text.toString();
     }
 }
