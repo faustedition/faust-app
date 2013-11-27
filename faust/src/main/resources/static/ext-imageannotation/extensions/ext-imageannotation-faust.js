@@ -1,3 +1,13 @@
+/*
+ * ext-imageannotation-faust.js
+ *
+ * Licensed under the Apache License, Version 2
+ *
+ * Copyright(c) 2010 Moritz Wissenbach
+ *
+ */
+
+
 YUI().use('node', 'event', 'io', 'json', function(Y) {
 
 	// first request the text content/lines
@@ -6,7 +16,20 @@ YUI().use('node', 'event', 'io', 'json', function(Y) {
 
 	var svgURL = window.parent.location.href.split('?')[0];
 
-	var textContentURL = top.path;
+	var textContentURL;
+
+	// parse url parameters for location of lines
+	var urldata = $.deparam.querystring(true);
+	if(!$.isEmptyObject(urldata)) {
+		if(urldata.imageannotation_text) {
+			textContentURL = urldata.imageannotation_text;
+		} else {
+			textContentURL = top.path;
+		}
+		if(urldata.url) {
+			svgURL = urldata.url;
+		}
+	}
 
 	function textSuccess(transactionid, response) {
 		$.unblockUI();
@@ -27,9 +50,7 @@ YUI().use('node', 'event', 'io', 'json', function(Y) {
 		}
 
 		$.blockUI({ message: '<h1>Loading SVG data...</h1>' });
-		svgEditor.loadFromURL(svgURL, svgOpts);
-
-		
+		svgEditor.loadFromURL(svgURL, svgOpts);	
 	}
 
 	var textCfg = {
@@ -44,6 +65,4 @@ YUI().use('node', 'event', 'io', 'json', function(Y) {
 
 	$.blockUI({ message: '<h1>Loading text data...</h1>' });
 	Y.io (textContentURL, textCfg);
-
-
 });

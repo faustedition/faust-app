@@ -333,6 +333,13 @@
 
 								</valList>
 							</attDef>
+							
+							<attDef ident="nx" ns="http://www.faustedition.net/ns" mode="change">
+								<desc>Alternative Zählungen</desc>
+								<datatype>									
+									<rng:ref name="data.token" minOccurs="1" maxOccurs="unbounded"/>
+								</datatype>
+							</attDef>
 						</attList>
 					</classSpec>
 
@@ -1030,12 +1037,6 @@
 						</attList>
 					</elementSpec>
 
-					<elementSpec ident="line" ns="http://www.tei-c.org/ns/geneticEditions" mode="change">
-						<attList>
-						</attList>				
-					</elementSpec>
-
-
 					<elementSpec ident="add" mode="change">
 						<classes mode="change">
 							<memberOf key="att.changeRelated"/>
@@ -1080,7 +1081,7 @@
 							<memberOf key="att.transcriptional"/>
 						</classes>
 					</elementSpec>
-					
+
 					<!-- modified for faust; temporary solution -->
 					<classSpec ident="att.segLike" type="atts"  mode="change">
 						<attList>
@@ -1094,7 +1095,27 @@
 							</attDef>
 						</attList>
 					</classSpec>
-					
+
+					<!-- modified for faust; milestones for paralipomena -->
+
+					<elementSpec ident="milestone" module="core" mode="change">
+						<classes mode="change">
+							<memberOf key="att.global.linking" mode="add"/>							
+						</classes>
+					</elementSpec>
+
+					<classSpec ident="att.milestoneUnit" type="atts" mode="change">
+						<attList>
+							<attDef ident="unit" mode="change">
+								<valList mode="change">
+									<valItem ident="paralipomenon" mode="add">
+										<gloss>A paralipomenon.</gloss>
+									</valItem>
+								</valList>
+							</attDef>
+						</attList>
+					</classSpec>
+										
 				</schemaSpec>
 			</div>
 		</body>

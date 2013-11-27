@@ -29,12 +29,12 @@ YUI.add('document-adhoc-tree', function (Y) {
 
 			});				
 			return new Faust.Text(content, textAttrs);				
-		},
+		}
 		
 	};
 
 	Y.mix(Y.namespace("Faust"), {
-        DocumentLayout: DocumentLayout,
+        DocumentLayout: DocumentLayout
     });
 	
 
@@ -157,26 +157,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 		
 		transcriptVC: function(jsonRepresentation) {
 			
-			var structuralNames = ['surface',
-								   'vspace', 
-								   'div',
-								   'seg',
-								   'hspace',
-								   'patch',
-								   'figure',
-								   'figDesc',
-								   'zone',
-								   'space',
-								   'line',
-								   'app',
-								   'rdg',
-								   'lem',
-								   'anchor',
-								   'note',
-								   'ins',
-								   'grBrace',
-								   'gap'
-								  ]
+			var structuralNames = Object.keys(Y.Faust.DocumentConfiguration.names);
 
 			var text = Y.Faust.Text.create(jsonRepresentation);
 
@@ -198,7 +179,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 	});
 	
 	Y.mix(Y.namespace("Faust"), {
-        DocumentAdhocTree: DocumentAdhocTree,
+        DocumentAdhocTree: DocumentAdhocTree
     });
 	
 }, '0.0', {

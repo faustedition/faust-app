@@ -71,11 +71,11 @@ svg.diplomatic .text.hand-xx {
 }
 
 svg.diplomatic .text.material-bl {
-	fill: darkgrey;
+	fill: #808080;
 }
 
 svg.diplomatic Line.material-bl {
-	stroke: darkgrey;
+	stroke: #808080;
 }
 
 svg.diplomatic .text.material-t {
@@ -95,7 +95,7 @@ svg.diplomatic .text.under {
 }
 
 svg.diplomatic .text.over {
-	font-weight: "bold";
+	font-weight: bold;
 }
 
 svg.diplomatic .text.small {

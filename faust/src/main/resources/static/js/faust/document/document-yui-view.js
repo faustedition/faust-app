@@ -65,8 +65,9 @@ YUI.add('document-yui-view', function (Y) {
 			that = this;
 			aq = new Y.AsyncQueue();
 			var layoutAndCenter = function() {
-				that.intoView(innerContainer, svgRoot);
-				that.center(svgRoot, container);
+				// TODO: maybe fix and re-enable. it's not very importatnt and interferes with absolute alignment
+				//that.intoView(innerContainer, svgRoot);
+				//that.center(svgRoot, container);
 				visComponent.layout();
 			};
 

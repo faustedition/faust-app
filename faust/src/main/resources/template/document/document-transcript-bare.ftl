@@ -11,6 +11,7 @@
 ] />" />
     <link rel="stylesheet" type="text/css" href="${cp}/static/css/faust.css"/>
     <link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript.css"/>
+    <link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript-highlight-hands.css"/>
 
     <script type="text/javascript">
     var cp = '${cp?js_string}';

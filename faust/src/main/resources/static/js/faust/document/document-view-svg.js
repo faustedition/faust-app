@@ -109,7 +109,7 @@ YUI.add('document-view-svg', function (Y) {
 		result.setAttribute('width', '0.1em');
 		result.setAttribute('style', 'visibility: hidden;');
 		//TODO dynamically calculate from context line height
-		var height = String(this.vSpaceHeight * 2) + 'em';
+		var height = String(this.vSpaceHeight * 1.5) + 'em';
 		result.setAttribute('height', height);
 		return result;
 	};
@@ -263,32 +263,53 @@ YUI.add('document-view-svg', function (Y) {
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 
-	Faust.GrLine.prototype.createView = function() {
-		this.zoneSpanning = this.svgDocument().createElementNS(SVG_NS, 'rect');
-		this.zoneSpanning.setAttribute('fill', 'url(#curlyLinePattern');
-		this.zoneSpanning.setAttribute('width', '100');
-		this.svgContainer().appendChild(this.zoneSpanning);
-		
+	Faust.SpanningVC.prototype.createView = function() {
+		this.spanningRect = this.svgDocument().createElementNS(SVG_NS, 'use');
+		//this.spanningRect.setAttribute('fill', 'url(#curlyLinePattern');
+		this.spanningRect.setAttribute('class', this.type);
+		this.spanningRect.setAttribute('width', this.imageWidth);
+		this.spanningRect.setAttribute('height', this.imageHeight);
+		this.spanningRect.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
+		this.svgContainer().appendChild(this.spanningRect);
 		var block = this.svgDocument().createElementNS(SVG_NS, 'rect');
-		block.setAttribute('width', '0.1em');
+		block.setAttribute('width', '20em');
 		block.setAttribute('height', '0.1em');
 		block.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden')
 		return block;
-		
-		
 	};
 	
-	Faust.GrLine.prototype.onRelayout = function() {
-		this.zoneSpanning.setAttribute('x', 0);
-		this.zoneSpanning.setAttribute('y', 0);
-		
-		
-		this.zoneSpanning.setAttribute('height', this.parent.getExt(this.parent.rotY()));
-	};
-	
-	Y.augment(Faust.GrLine, Faust.ViewComponent);
-	
+	Faust.SpanningVC.prototype.onRelayout = function() {
+		var parentWidth = this.parent.getExt(this.rotX());
+		var parentHeight = this.parent.getExt(this.rotY());
+		var width = this.defaultWidth ? this.defaultWidth : parentWidth;
+		var height = this.defaultHeight ? this.defaultHeight : parentHeight;
+		this.spanningRect.setAttribute('x', (parentWidth - width) / 2);
+		this.spanningRect.setAttribute('y', (parentHeight - height) / 2);
 
+		var transform = "scale(" + width / this.imageWidth + "," + height / this.imageHeight + ")";
+
+		this.spanningRect.setAttribute('width', width);
+		this.spanningRect.setAttribute('height', height);
+		this.spanningRect.setAttribute('transform', transform);
+	};
+
+	Y.augment(Faust.SpanningVC, Faust.ViewComponent);
+
+	Faust.InlineGraphic.prototype.createView = function() {
+		var graphic = this.svgDocument().createElementNS(SVG_NS, 'use');
+		graphic.setAttribute('class', this.type);
+		graphic.setAttribute('width', this.imageWidth);
+		graphic.setAttribute('height', this.imageHeight);
+		graphic.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
+		var transform = "scale(" + this.displayWidth / this.imageWidth + "," + this.displayHeight / this.imageHeight + ")";
+		graphic.setAttribute('width', this.displayWidth);
+		graphic.setAttribute('height', this.displayHeight);
+		graphic.setAttribute('transform', transform);
+
+		return graphic;
+	};
+
+	Y.augment(Faust.InlineGraphic, Faust.ViewComponent);
 	
 	Faust.GLine.prototype.createView = function() {
 		var line = this.svgDocument().createElementNS(SVG_NS, "line");
