@@ -2,6 +2,7 @@ package de.faustedition.index;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import dagger.ObjectGraph;
 import de.faustedition.Database;
@@ -9,14 +10,8 @@ import de.faustedition.Infrastructure;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.DocumentRecord;
 import de.faustedition.transcript.Transcript;
-import de.faustedition.transcript.TranscriptToken;
-import de.faustedition.transcript.TranscriptTokenizer;
 import de.faustedition.transcript.Transcripts;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
-import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
@@ -25,15 +20,16 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.vectorhighlight.FastVectorHighlighter;
-import org.apache.lucene.search.vectorhighlight.FieldQuery;
-import org.apache.lucene.search.vectorhighlight.SimpleFragListBuilder;
+import org.apache.lucene.search.payloads.MinPayloadFunction;
+import org.apache.lucene.search.payloads.PayloadTermQuery;
 import org.jooq.DSLContext;
+import org.jooq.Record2;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.Iterator;
+import java.util.Arrays;
+
+import static de.faustedition.index.TranscriptTokenAnnotation.STAGE;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -44,19 +40,20 @@ public class DocumentIndexer {
     private final Index index;
     private final Database database;
     private final Transcripts transcripts;
+    private final TranscriptTokenAnnotationCodec annotationCodec;
 
     @Inject
-    public DocumentIndexer(Index index, Database database, Transcripts transcripts) {
+    public DocumentIndexer(Index index, Database database, Transcripts transcripts, TranscriptTokenAnnotationCodec annotationCodec) {
         this.index = index;
         this.database = database;
         this.transcripts = transcripts;
+        this.annotationCodec = annotationCodec;
     }
 
     public static void main(String... args) throws Exception {
         final Infrastructure infrastructure = Infrastructure.create(args);
         final ObjectGraph objectGraph = ObjectGraph.create(infrastructure);
 
-        /*
         final DocumentIndexer documentIndexer = objectGraph.get(DocumentIndexer.class);
         final Stopwatch stopwatch = Stopwatch.createStarted();
         final Database database = objectGraph.get(Database.class);
@@ -71,29 +68,41 @@ public class DocumentIndexer {
             }
         });
         System.out.println(stopwatch.stop());
-        */
 
         final TranscriptExcerpts excerpts = new TranscriptExcerpts(objectGraph.get(Transcripts.class));
+        final TranscriptTokenAnnotationCodec annotationCodec = objectGraph.get(TranscriptTokenAnnotationCodec.class);
         objectGraph.get(Index.class).transaction(new Index.TransactionCallback<Object>() {
             @Override
             public Object doInTransaction() throws Exception {
 
 
                 final IndexSearcher searcher = searcher();
+                searcher.setSimilarity(annotationCodec.score(Arrays.asList(STAGE)));
                 final IndexReader indexReader = searcher.getIndexReader();
 
-                final Query query = Index.queryParser("textual").parse("haus*");
+                //final Query query = Index.queryParser("documentary").parse("komm*");
+                //final Query query = new TermQuery(new Term("documentary", "kommen"));
+                final Query query = new PayloadTermQuery(new Term("textual", "kommen"), new MinPayloadFunction() {
+                    @Override
+                    public float docScore(int docId, String field, int numPayloadsSeen, float payloadScore) {
+                        return payloadScore;
+                    }
+                }, true);
+
 
                 final TopDocs topDocs = searcher.search(query, 10);
                 System.out.println(topDocs.totalHits);
 
                 for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+                    final Stopwatch stopwatch = Stopwatch.createStarted();
                     System.out.println(scoreDoc.score);
+                    System.out.println(searcher.explain(query, scoreDoc.doc));
                     final Document document = searcher.doc(scoreDoc.doc);
                     System.out.printf("%s: %s\n", document.get("id"), document.get("callnumber"));
-                    for (TranscriptExcerpts.TranscriptExcerpt excerpt : excerpts.get(query, indexReader, scoreDoc.doc, "textual", 80, 3)) {
-                        System.out.println(excerpt.getExcerpt().replaceAll("\n", "//"));
+                    for (TranscriptExcerpts.TranscriptExcerpt excerpt : excerpts.get(query, indexReader, scoreDoc.doc, "documentary", 20, 3)) {
+                        System.out.println(excerpt.getExcerpt().replaceAll("\n", "\u00b6"));
                     }
+                    System.out.println(stopwatch.stop());
                     System.out.println(Strings.repeat("=", 80));
                 }
                 return null;
@@ -130,51 +139,8 @@ public class DocumentIndexer {
         });
     }
 
-    private static TokenStream transcriptTokens(Transcript transcript) {
-        return CustomAnalyzer.wrap(new TranscriptTokenStream(transcript));
+    private TokenStream transcriptTokens(Transcript transcript) {
+        return CustomAnalyzer.wrap(new TranscriptTokenStream(transcript, annotationCodec));
     }
 
-    private static class TranscriptTokenStream extends TokenStream {
-
-        private final Transcript transcript;
-        private final TypeAttribute typeAttribute;
-        private Iterator<TranscriptToken> tokens;
-
-        private final CharTermAttribute charTermAttribute;
-        private final OffsetAttribute offsetAttribute;
-        private final PositionIncrementAttribute positionIncrementAttribute;
-
-        private TranscriptTokenStream(Transcript transcript) {
-            this.transcript = transcript;
-
-            this.charTermAttribute = addAttribute(CharTermAttribute.class);
-            this.offsetAttribute = addAttribute(OffsetAttribute.class);
-            this.positionIncrementAttribute = addAttribute(PositionIncrementAttribute.class);
-            this.typeAttribute = addAttribute(TypeAttribute.class);
-        }
-
-        @Override
-        public void reset() throws IOException {
-            tokens = new TranscriptTokenizer().apply(transcript.iterator());
-        }
-
-        @Override
-        public boolean incrementToken() throws IOException {
-            if (!tokens.hasNext()) {
-                return false;
-            }
-            final TranscriptToken token = tokens.next();
-
-            this.positionIncrementAttribute.setPositionIncrement(1);
-            this.typeAttribute.setType(TypeAttribute.DEFAULT_TYPE);
-
-            final String content = token.getContent();
-            charTermAttribute.setEmpty().append(content);
-
-            final int offset = token.getOffset();
-            offsetAttribute.setOffset(offset, offset + content.length());
-
-            return true;
-        }
-    }
 }
