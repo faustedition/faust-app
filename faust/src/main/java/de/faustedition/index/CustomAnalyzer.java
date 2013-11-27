@@ -59,9 +59,9 @@ public class CustomAnalyzer extends StopwordAnalyzerBase {
                     case '\u0304':
                     case '\u0305':
                         // resolve "Geminationsstriche"
-                        int next = cc + 1;
-                        if (next < cl) {
-                            buf.append(charTermAttribute.charAt(next));
+                        int prev = cc - 1;
+                        if (prev >= 0) {
+                            buf.append(charTermAttribute.charAt(prev));
                         }
                         break;
                     default:
