@@ -56,7 +56,7 @@ public class TranscriptExcerpts {
             final int offset = fragment.getStartOffset();
             final List<Range> matches = Lists.newLinkedList();
 
-            excerpts.add(new TranscriptExcerpt(transcript.text(offset, fragment.getEndOffset()), offset, matches));
+            excerpts.add(new TranscriptExcerpt(transcript.segmentText(offset, fragment.getEndOffset()), offset, matches));
 
             for (FieldFragList.WeightedFragInfo.SubInfo info : fragment.getSubInfos()) {
                 for (FieldPhraseList.WeightedPhraseInfo.Toffs termOffset : info.getTermsOffsets()) {
