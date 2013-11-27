@@ -153,7 +153,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<TextToken> {
                         }
                     }
                 } else if (xmlName.equals(handShiftName)) {
-                    final String hand = data.path(newAttributeName).asText();
+                    final String hand = data.path(newAttributeName).asText().replaceAll("^#", "");
                     if (!hand.isEmpty()) {
                         handEnd();
                         buf.add(new TextAnnotationStart(
