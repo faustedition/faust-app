@@ -153,49 +153,44 @@ YUI.add('document-configuration-faust', function (Y) {
 					vc: function(node, text, layoutState) {
 						var ancestorNames = node.ancestors().map(function(node){return node.annotation.name.localName});
 						var inline = ancestorNames.indexOf('line') >= 0;
+						// TODO figure outh the number of pixels per em dynamically
+						var EM = 10;
+						var width = node.data()['width'] ? Number(node.data()['width']) * EM: null;
+						var height = node.data()['height'] ? Number(node.data()['height']) * EM : null;
+						var imgPath = cp + '/static/img/transcript/';
 						if (node.data()['f:style'] == 'curly') {
 							if (node.data()['f:orient'] == 'horiz') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine',
-										cp + '/static/img/transcript/grLineCurlyHorizontal.svg#img',
-										100, 100, 100, 20);
+									return new Faust.InlineGraphic('grLine', imgPath + 'grLineCurlyHorizontal.svg#img', 100, 100, 20 * EM, 2 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine',
-										cp + '/static/img/transcript/grLineCurlyHorizontal.svg#img',
-										100, 100, 100, null);
+									return new Faust.SpanningVC('grLine',imgPath + 'grLineCurlyHorizontal.svg#img',	100, 100, width, height);
 								}
 							} else if (node.data()['f:orient'] == 'vert') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine',
-										cp + '/static/img/transcript/grLineCurlyVertical.svg#img',
-										100, 100, 100, 100);
+									return new Faust.InlineGraphic('grLine', imgPath + 'img/transcript/grLineCurlyVertical.svg#img', 100, 100, 10 * EM, 10 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine',
-										cp + '/static/img/transcript/grLineCurlyVertical.svg#img',
-										100, 100, 100, null);
+									return new Faust.SpanningVC('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
 								}
 							}
 						} else if (node.data()['f:style'] == 'linear') {
 							if (node.data()['f:orient'] == 'horiz') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine',
-										cp + '/static/img/transcript/grLineStraightHorizontal.svg#img',
-										100, 20, 100, 20);
+									return new Faust.InlineGraphic('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, 10 * EM, 2 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine',
-										cp + '/static/img/transcript/grLineStraightHorizontal.svg#img',
-										100, 20, null, 20);
+									return new Faust.SpanningVC('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, null, 2 * EM);
 								}
 							} else if (node.data()['f:orient'] == 'vert') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine',
-										cp + '/static/img/transcript/grLineStraightVertical.svg#img',
-										20, 100, 20, 20);
+									return new Faust.InlineGraphic('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, 1 * EM, 2 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine',
-										cp + '/static/img/transcript/grLineStraightVertical.svg#img',
-										20, 100, null, 20);
+									return new Faust.SpanningVC('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, null, 2 * EM);
 								}
+							}
+						} else if (node.data()['f:style'] == 's-left-right') {
+							if (inline) {
+								throw (Faust.ENC_EXC_PREF + "S-curve can't be inline!");
+							} else {
+								return new Faust.SpanningVC('grLine', imgPath + 'grLineSLeftRight.svg#img', 100, 100, null, null);
 							}
 						}
 					}

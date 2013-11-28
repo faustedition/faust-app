@@ -10,28 +10,8 @@ YUI.add('document-yui-view', function (Y) {
 
 	var DiplomaticTranscriptView = Y.Base.create("diplomatic-transcript-view", Y.View, [], {
 
-
-		
 		destructor: function() {
 			
-		},
-		
-		_appendPatternDefs: function(svgRoot) {
-			var defs = document.createElementNS(SVG_NS, 'defs');
-			svgRoot.appendChild(defs);
-			var grLinePattern = document.createElementNS(SVG_NS, 'pattern');
-			grLinePattern.setAttribute('id', 'curlyLinePattern');
-			grLinePattern.setAttribute('x', '0');
-			grLinePattern.setAttribute('y', '0');
-			grLinePattern.setAttribute('width', '100');
-			grLinePattern.setAttribute('height', '80');
-			grLinePattern.setAttribute('patternUnits', 'userSpaceOnUse');
-			defs.appendChild(grLinePattern);
-			var grLinePath = document.createElementNS(SVG_NS, 'path');
-			grLinePath.setAttribute('d', 'M50,0 a40,20 0 0,1 0,40 a40,20, 0 0,0 0,40');
-			grLinePath.setAttribute('fill', 'none');
-			grLinePath.setAttribute('stroke', 'black');
-			grLinePattern.appendChild(grLinePath);
 		},
 
 		displayError: function(error) {
@@ -75,7 +55,7 @@ YUI.add('document-yui-view', function (Y) {
 				{
 					fn : layoutAndCenter, //visComponent.layout,
 					timeout: 10,
-					iterations: 5,
+					iterations: 15,
 					context: visComponent
 				},
 				{
@@ -124,7 +104,6 @@ YUI.add('document-yui-view', function (Y) {
 				//	that.intoView(innerContainer, that.svgRoot);
 				//});
 				svgRoot.setAttribute("class", "diplomatic");
-				this._appendPatternDefs(svgRoot);
 				container.getDOMNode().appendChild(svgRoot);
 
 
@@ -180,12 +159,7 @@ YUI.add('document-yui-view', function (Y) {
 				var noTranscriptDisplay = Y.Node.create('<div style="text-align: center; font-size: 400%">&#8709;</div>');
 				container.appendChild(noTranscriptDisplay);
 			}
-			
-			
-			
-
 		}
-		
 	} , {
 		ATTRS: {
 			rootVC: { validator: function(v) { return true; } },

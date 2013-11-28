@@ -115,7 +115,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 
 				// annotate the vc with the original element name
 		 		vc.elementName = node.name ? node.name().localName : "";
-				
+
 				if (parent != null ) { // && parent !== this) {
 					parent.add(vc);
 					vc.parent = parent;
