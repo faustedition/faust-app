@@ -270,13 +270,13 @@ YUI.add('document-model', function (Y) {
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 	
-	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, defaultWidth, defaultHeight) {
+	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
 		this.type =  type;
 		this.imageUrl = imageUrl;
 		this.imageWidth = imageWidth;
 		this.imageHeight = imageHeight;
-		this.defaultWidth = defaultWidth;
-		this.defaultHeight = defaultHeight;
+		this.fixedWidth = fixedWidth;
+		this.fixedHeight = fixedHeight;
 		this.initViewComponent();
 	};
 

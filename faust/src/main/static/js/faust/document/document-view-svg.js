@@ -289,15 +289,15 @@ YUI.add('document-view-svg', function (Y) {
 	Faust.SpanningVC.prototype.onRelayout = function() {
 		var parentWidth = this.parent.getExt(this.rotX());
 		var parentHeight = this.parent.getExt(this.rotY());
-		var width = this.defaultWidth ? this.defaultWidth : parentWidth;
-		var height = this.defaultHeight ? this.defaultHeight : parentHeight;
+		var width = this.fixedWidth ? this.fixedWidth : parentWidth;
+		var height = this.fixedHeight ? this.fixedHeight : parentHeight;
 		this.spanningRect.setAttribute('x', (parentWidth - width) / 2);
 		this.spanningRect.setAttribute('y', (parentHeight - height) / 2);
 
 		var transform = "scale(" + width / this.imageWidth + "," + height / this.imageHeight + ")";
 
-		this.spanningRect.setAttribute('width', width);
-		this.spanningRect.setAttribute('height', height);
+		//this.spanningRect.setAttribute('width', width);
+		//this.spanningRect.setAttribute('height', height);
 		this.spanningRect.setAttribute('transform', transform);
 	};
 
@@ -311,8 +311,8 @@ YUI.add('document-view-svg', function (Y) {
 
 		this.graphic = this.svgDocument().createElementNS(SVG_NS, 'use');
 		g.setAttribute('class', this.type);
-		//this.graphic.setAttribute('width', this.imageWidth);
-		//this.graphic.setAttribute('height', this.imageHeight);
+		this.graphic.setAttribute('width', this.imageWidth);
+		this.graphic.setAttribute('height', this.imageHeight);
 		this.graphic.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
 		g.setAttribute('vector-effect', 'non-scaling-stroke');
 		var transform = "scale(" + this.displayWidth / this.imageWidth + "," + this.displayHeight / this.imageHeight + ")";

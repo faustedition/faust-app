@@ -167,7 +167,7 @@ YUI.add('document-configuration-faust', function (Y) {
 								}
 							} else if (node.data()['f:orient'] == 'vert') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine', imgPath + 'img/transcript/grLineCurlyVertical.svg#img', 100, 100, 10 * EM, 10 * EM);
+									return new Faust.InlineGraphic('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
 								} else {
 									return new Faust.SpanningVC('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
 								}
