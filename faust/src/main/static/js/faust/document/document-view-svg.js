@@ -99,6 +99,10 @@ YUI.add('document-view-svg', function (Y) {
 		var bbox = this.view.getBBox();
 		return { width: Math.round(bbox.width), height: Math.round(bbox.height)};		
 	};
+
+	Faust.ViewComponent.prototype.getClassesString = function() {
+		return this.computeClasses().join(' ');
+	}
 	
 	Y.augment (Faust.DefaultVC, Faust.ViewComponent);
 	
@@ -139,7 +143,7 @@ YUI.add('document-view-svg', function (Y) {
 	
 	Faust.DefaultVC.prototype.createView = function() {
 		var view = this.svgDocument().createElementNS(SVG_NS, "g");
-		view.setAttribute('class', 'DefaultVC');
+		view.setAttribute('class', this.getClassesString() + ' DefaultVC');
 		return view;
 	};
 		

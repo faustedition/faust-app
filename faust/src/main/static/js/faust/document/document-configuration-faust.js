@@ -5,7 +5,36 @@ YUI.add('document-configuration-faust', function (Y) {
 
 	Y.mix(Y.namespace("Faust"), {
         DocumentConfiguration: 	 {
-			names: {
+	        names: {
+		        'choice' : { vc: function(){return new Faust.DefaultVC();}},
+		        'unclear' : {
+					vc : function (node, text, layoutState) {
+
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						var vc = new Faust.DefaultVC();
+						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
+						vc.add (Y.Faust.DocumentLayout.createText(startMarker, annotationStart, annotationEnd, text));
+						return vc;
+					},
+					end: function(node, text, layoutState) {
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						var endMarker = node.data()['cert'] == 'low' ? '}}' : '}';
+						this.add (Y.Faust.DocumentLayout.createText(endMarker, annotationStart, annotationEnd, text));
+
+						// hide the component if it is a less probable alternative of a choice
+						if (node.parent.name().localName == 'choice') {
+							var sibling_cert_values = node.parent.children().map(
+								function(annotation){return annotation.data()['cert']});
+							if (node.data()['cert'] == 'low' && sibling_cert_values.indexOf('high') >= 0) {
+								this.computeClasses = function(){
+									return ['invisible'];
+								};
+							}
+						}
+					}
+				},
 				
 				'document': { 
 					vc: function(node, text, layoutState) {
@@ -235,7 +264,8 @@ YUI.add('document-configuration-faust', function (Y) {
 							this.add (Y.Faust.DocumentLayout.createText("\u2309", annotationStart, annotationEnd, text));
 						}
 					}
-				}
+				},
+
 			}
 		}
 	});

@@ -106,4 +106,7 @@ svg.diplomatic .bgBox {
 	fill: none;
 }
 
+svg.diplomatic .invisible {
+    display: none;
+}
 

@@ -64,6 +64,8 @@ YUI.add('document-adhoc-tree', function (Y) {
 					var nameHandler = Y.Faust.DocumentConfiguration.names[node.name().localName];
 					if (nameHandler.vc) {
 						vc = nameHandler.vc(node, text, this);
+					} else {
+						vc = new Faust.DefaultVC();
 					}
 				}
 
