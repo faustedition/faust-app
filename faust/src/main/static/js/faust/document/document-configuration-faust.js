@@ -5,6 +5,7 @@ YUI.add('document-configuration-faust', function (Y) {
 
 	Y.mix(Y.namespace("Faust"), {
         DocumentConfiguration: 	 {
+			stripWhitespace : ['overw'],
 	        names: {
 		        'choice' : { vc: function(){return new Faust.DefaultVC();}},
 		        'unclear' : {

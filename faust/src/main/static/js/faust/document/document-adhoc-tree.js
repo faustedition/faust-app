@@ -52,8 +52,13 @@ YUI.add('document-adhoc-tree', function (Y) {
 			var vc = null;
 
 
+
 			if ((node instanceof Y.Faust.TextNode) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
-				vc = Y.Faust.DocumentLayout.createText(node.content(), node.range.start, node.range.end, text);
+				if (Y.Faust.DocumentConfiguration.stripWhitespace.indexOf(node.parent.name().localName) >= 0 && node.content().trimRight() == "") {
+					//only whitespace to be stripped, do not return a text representation
+				} else {
+					vc = Y.Faust.DocumentLayout.createText(node.content(), node.range.start, node.range.end, text);
+				}
 			} else if (node instanceof Y.Faust.AnnotationNode) {
 
 				var annotationStart = node.annotation.target().range.start;
