@@ -42,7 +42,27 @@ YUI.add('document-configuration-faust', function (Y) {
 					}
 				},
 
-				'treeRoot': { 
+				overw : {
+					vc: function() {return new Faust.DefaultVC();}
+				},
+
+				under : {
+					vc: function() {
+						var vc =  new Faust.DefaultVC();
+						vc.defaultAligns = function () {
+
+							this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+
+							if (this.previous())
+								this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+							else
+								this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+						};
+						return vc;
+					}
+				},
+
+				'treeRoot': {
 					vc: function(node, text, layoutState) {
 						return new Faust.Surface();
 					}

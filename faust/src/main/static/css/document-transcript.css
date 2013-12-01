@@ -91,11 +91,13 @@ svg.diplomatic .text.rewrite {
 }
 
 svg.diplomatic .text.under {
-	opacity: 0.5;
+	/* opacity: 0.5; */
+    font-size: 75%;
 }
 
 svg.diplomatic .text.over {
-	font-weight: bold;
+	/* font-weight: bold; */
+    font-size: 125%;
 }
 
 svg.diplomatic .text.small {
