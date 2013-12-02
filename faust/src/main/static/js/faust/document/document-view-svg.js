@@ -219,7 +219,6 @@ YUI.add('document-view-svg', function (Y) {
 			this.strikethrough.setAttribute("x2", this.x + this.width);
 			this.strikethrough.setAttribute("y1", this.y - this.measure().height / 6);
 			this.strikethrough.setAttribute("y2", this.y - this.measure().height / 6);
-			this.strikethrough.setAttribute("stroke", "#333");
 			//this.strikethrough.transform.baseVal = this.view.transform.baseVal;
 			this.strikethrough.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
@@ -256,8 +255,11 @@ YUI.add('document-view-svg', function (Y) {
 
 		if ("strikethrough" in this.textAttrs) {
 			this.strikethrough = this.svgDocument().createElementNS(SVG_NS, "line");
-			this.svgContainer().appendChild(this.strikethrough);
-		}
+			if ("strikethroughHand" in this.textAttrs) {
+				var strikethroughHandClasses = this.computeHandClasses(this.textAttrs['strikethroughHand']);
+				this.strikethrough.setAttribute('class', strikethroughHandClasses.join(' '));
+			}
+			this.svgContainer().appendChild(this.strikethrough);		}
 		if ("underline" in this.textAttrs) {
 			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
 			this.view.setAttribute("class", 

@@ -74,6 +74,10 @@ svg.diplomatic .text.material-bl {
 	fill: #808080;
 }
 
+svg.diplomatic Line {
+    stroke: black;
+}
+
 svg.diplomatic Line.material-bl {
 	stroke: #808080;
 }

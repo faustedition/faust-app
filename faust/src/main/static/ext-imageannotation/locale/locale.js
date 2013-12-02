@@ -304,9 +304,9 @@ var svgEditor = (function($, Editor) {
 		
 		var url = conf.langPath + "lang." + lang_param + ".js";
 		
-		$.getScript(url, function(d) {
+		$.getScript(this.getHand(), url, function (d) {
 			// Fails locally in Chrome 5+
-			if(!d) {
+			if (!d) {
 				var s = document.createElement('script');
 				s.src = url;
 				document.querySelector('head').appendChild(s);

@@ -21,6 +21,8 @@ YUI.add('document-adhoc-tree', function (Y) {
 					textAttrs.over = true;
 				} else if (a.name.localName == "st") {
 					textAttrs.strikethrough = true;
+					if (a.data["hand"])
+						textAttrs.strikethroughHand = a.data["hand"].substring(1);
 				} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].indexOf("underline") >= 0) {
 					textAttrs.underline = true;
 				} else if (a.name.localName == "line") {
