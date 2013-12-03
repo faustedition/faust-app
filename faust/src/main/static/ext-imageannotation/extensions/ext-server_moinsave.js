@@ -30,23 +30,22 @@ svgEditor.addExtension("server_opensave", {
 				var c = $('#export_canvas')[0];
 				c.width = svgCanvas.contentW;
 				c.height = svgCanvas.contentH;
-				$.getScript(this.getHand(), 'canvg/canvg.js', function () {
-					canvg(c, svg, {renderCallback: function () {
-						var datauri = c.toDataURL('image/png');
-						var uiStrings = svgEditor.uiStrings;
-						var png_data = svgedit.utilities.encode64(datauri);
-						var form = $('<form>').attr({
-							method: 'post',
-							action: save_svg_action + '/' + name,
-							target: 'output_frame'
-						}).append('<input type="hidden" name="png_data" value="' + png_data + '">')
-							.append('<input type="hidden" name="filepath" value="' + svg_data + '">')
-							.append('<input type="hidden" name="filename" value="' + 'drawing.svg">')
-							.append('<input type="hidden" name="contenttype" value="application/x-svgdraw">')
-							.appendTo('body')
-							.submit().remove();
-					}})
-				});
+				$.getScript('canvg/canvg.js', function() {
+				canvg(c, svg, {renderCallback: function() {
+					var datauri = c.toDataURL('image/png');
+					var uiStrings = svgEditor.uiStrings;
+					var png_data = svgedit.utilities.encode64(datauri);
+					var form = $('<form>').attr({
+					method: 'post',
+					action: save_svg_action + '/' + name,
+					target: 'output_frame'
+				})	.append('<input type="hidden" name="png_data" value="' + png_data + '">')
+					.append('<input type="hidden" name="filepath" value="' + svg_data + '">')
+					.append('<input type="hidden" name="filename" value="' + 'drawing.svg">')
+					.append('<input type="hidden" name="contenttype" value="application/x-svgdraw">')
+					.appendTo('body')
+					.submit().remove();
+					}})});
 				alert("Saved! Return to Item View!");
 				top.window.location = '/'+name;
 			},

@@ -259,9 +259,9 @@
 			var extFunc = function() {
 				$.each(curConfig.extensions, function() {
 					var extname = this;
-					$.getScript(this.getHand(), curConfig.extPath + extname, function (d) {
+					$.getScript(curConfig.extPath + extname, function(d) {
 						// Fails locally in Chrome 5
-						if (!d) {
+						if(!d) {
 							var s = document.createElement('script');
 							s.src = curConfig.extPath + extname;
 							document.querySelector('head').appendChild(s);
@@ -2645,8 +2645,8 @@
 				if(window.canvg) {
 					svgCanvas.rasterExport();
 				} else {
-					$.getScript(this.getHand(), 'canvg/rgbcolor.js', function () {
-						$.getScript(this.getHand(), 'canvg/canvg.js', function () {
+					$.getScript('canvg/rgbcolor.js', function() {
+						$.getScript('canvg/canvg.js', function() {
 							svgCanvas.rasterExport();
 						});
 					});
