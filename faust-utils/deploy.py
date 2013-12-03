@@ -54,7 +54,7 @@ def unzip():
 
 def start():
     print 'Restarting app...'
-    check_call(['nohup java -Xmx1024m -server -jar app/lib/' + NAME +'.jar /mnt/data/config.properties &'], shell=True)
+    check_call(['nohup java -Xmx1024m -server -Dfile.encoding=UTF-8 -jar app/lib/' + NAME +'.jar /mnt/data/config.properties &'], shell=True)
 
 def stop():
     sys.stdout.write('Stopping running application...')
@@ -77,7 +77,7 @@ def read():
     print 'Deleting old database...'
     check_call(['rm -rf db/*'], shell=True)
     print 'Reading database...'
-    check_call(['java -Xmx1024m -server -cp app/lib/' + NAME +'.jar de.faustedition.transcript.TranscriptBatchReader /mnt/data/config.properties'], shell=True)
+    check_call(['java -Xmx1024m -server -Dfile.encoding=UTF-8 -cp app/lib/' + NAME +'.jar de.faustedition.transcript.TranscriptBatchReader /mnt/data/config.properties'], shell=True)
     
 def update():
 
