@@ -223,6 +223,14 @@ YUI.add('document-view-svg', function (Y) {
 			this.strikethrough.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
 
+		if (this.rewrite) {
+			var offset = this.measure().height / 20.0;
+			this.rewrite.setAttribute("x", this.x + offset);
+			this.rewrite.setAttribute("y", this.y - offset);
+			this.rewrite.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
+
+		}
+
 		var bbox = this.view.getBBox();
 		this.bgBox.setAttribute("x", bbox.x);
 		this.bgBox.setAttribute("y", bbox.y);
@@ -263,12 +271,16 @@ YUI.add('document-view-svg', function (Y) {
 		if ("underline" in this.textAttrs) {
 			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
 			this.view.setAttribute("class", 
-								   this.view.getAttribute("class") + " underline");
+				this.view.getAttribute("class") + " underline");
 			this.svgContainer().appendChild(this.underline);
 
 		}
+		if ("rewrite" in this.textAttrs) {
+			this.rewrite = this.createView();
+			this.svgContainer().appendChild(this.rewrite);
+		}
 		this.rotate(this.rotation);	
-		Y.each(this.children, function(c) { c.render(); });		
+		Y.each(this.children, function(c) { c.render(); });
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 
