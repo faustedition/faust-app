@@ -146,7 +146,7 @@ YUI.add('document-configuration-faust', function (Y) {
 						var annotationEnd = node.annotation.target().range.end;
 
 						var gapChar = '\u00d7';
-						var gapUncertainChar = '\u00d7';
+						var gapUncertainChar = '.';
 						switch (node.data()["unit"]) {
 						case "chars":
 							if (node.data()['quantity'] && node.data()['precision'] && 
