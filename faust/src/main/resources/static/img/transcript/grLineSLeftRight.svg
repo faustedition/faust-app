@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<g id="img">
+	<!--		<path vector-effect="non-scaling-stroke" stroke-width="0.1em" fill="none" stroke="#000000" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" d="m3,58.625c-0.375,-8.125 7.625,-8.5 7.625,-8.5c0,0 79.75,0.25 79.75,0.25c0,0 6,-0.125 6.375,-8" id="svg_2"/> -->
+		  <path vector-effect="non-scaling-stroke" stroke-width="0.1em" fill="none" stroke="#000000" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" d="m2.75,66.5c0.25,-12.125 5,-16.375 16.625,-16.5c11.625,-0.125 54.5,-0.125 63.875,0.125c9.375,0.25 12.375,-5.75 12.5,-14.875" id="svg_2"/>
+
+		</g>
+	</defs>
+</svg>

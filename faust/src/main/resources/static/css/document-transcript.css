@@ -74,6 +74,10 @@ svg.diplomatic .text.material-bl {
 	fill: #808080;
 }
 
+svg.diplomatic Line {
+    stroke: black;
+}
+
 svg.diplomatic Line.material-bl {
 	stroke: #808080;
 }
@@ -91,11 +95,13 @@ svg.diplomatic .text.rewrite {
 }
 
 svg.diplomatic .text.under {
-	opacity: 0.5;
+	/* opacity: 0.5; */
+    font-size: 75%;
 }
 
 svg.diplomatic .text.over {
-	font-weight: bold;
+	/* font-weight: bold; */
+    font-size: 135%;
 }
 
 svg.diplomatic .text.small {
@@ -106,4 +112,7 @@ svg.diplomatic .bgBox {
 	fill: none;
 }
 
+svg.diplomatic .invisible {
+    display: none;
+}
 

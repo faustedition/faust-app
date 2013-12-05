@@ -230,29 +230,35 @@ YUI.add('document-model', function (Y) {
 			return this.textAttrs["hand"];
 	};
 
-	Faust.Text.prototype.getWriter = function() {
-		return this.getHand().split('_')[0];
+	Faust.Text.prototype.writer = function (hand) {
+		return hand.split('_')[0];
 	};
 
-	Faust.Text.prototype.getMaterial = function() {
-		return this.getHand().split('_')[1];
+	Faust.Text.prototype.material = function (hand) {
+		return hand.split('_')[1];
 	};
 
-	Faust.Text.prototype.getScript = function() {
-		return this.getHand().split('_')[2];
+	Faust.Text.prototype.script = function (hand) {
+		return hand.split('_')[2];
 	}
 
+	Faust.Text.prototype.computeHandClasses = function(hand) {
+		var classes = [""];
+		if (this.writer(hand))
+			classes.push("hand-" + this.writer(hand));
+		if (this.material(this.getHand()))
+			classes.push("material-" + this.material(hand));
+		if (this.script(this.getHand()))
+			classes.push("script-" + this.script(hand));
+		return classes;
+	}
 
- 		Faust.Text.prototype.computeClasses = function() {
+	Faust.Text.prototype.computeClasses = function() {
 		var classes = [""];
 		for (attr in this.textAttrs) {
 			if (attr == "hand") {
-				if (this.getWriter())
-					classes.push("hand-" + this.getWriter());
-				if (this.getMaterial())
-					classes.push("material-" + this.getMaterial());
-				if (this.getScript())
-					classes.push("script-" + this.getScript());
+				var handClasses = this.computeHandClasses(this.getHand());
+				classes = classes.concat(handClasses);
 			} else if (attr == "rewrite") {
 				classes.push("rewrite");
 			} else if (attr == "under") {
@@ -270,13 +276,13 @@ YUI.add('document-model', function (Y) {
 	};
 	Y.augment(Faust.Text, Faust.ViewComponent);
 	
-	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, defaultWidth, defaultHeight) {
+	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
 		this.type =  type;
 		this.imageUrl = imageUrl;
 		this.imageWidth = imageWidth;
 		this.imageHeight = imageHeight;
-		this.defaultWidth = defaultWidth;
-		this.defaultHeight = defaultHeight;
+		this.fixedWidth = fixedWidth;
+		this.fixedHeight = fixedHeight;
 		this.initViewComponent();
 	};
 

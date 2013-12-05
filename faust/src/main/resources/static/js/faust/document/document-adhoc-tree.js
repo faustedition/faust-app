@@ -21,6 +21,8 @@ YUI.add('document-adhoc-tree', function (Y) {
 					textAttrs.over = true;
 				} else if (a.name.localName == "st") {
 					textAttrs.strikethrough = true;
+					if (a.data["hand"])
+						textAttrs.strikethroughHand = a.data["hand"].substring(1);
 				} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].indexOf("underline") >= 0) {
 					textAttrs.underline = true;
 				} else if (a.name.localName == "line") {
@@ -52,8 +54,13 @@ YUI.add('document-adhoc-tree', function (Y) {
 			var vc = null;
 
 
+
 			if ((node instanceof Y.Faust.TextNode) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
-				vc = Y.Faust.DocumentLayout.createText(node.content(), node.range.start, node.range.end, text);
+				if (Y.Faust.DocumentConfiguration.stripWhitespace.indexOf(node.parent.name().localName) >= 0 && node.content().trimRight() == "") {
+					//only whitespace to be stripped, do not return a text representation
+				} else {
+					vc = Y.Faust.DocumentLayout.createText(node.content(), node.range.start, node.range.end, text);
+				}
 			} else if (node instanceof Y.Faust.AnnotationNode) {
 
 				var annotationStart = node.annotation.target().range.start;
@@ -64,6 +71,8 @@ YUI.add('document-adhoc-tree', function (Y) {
 					var nameHandler = Y.Faust.DocumentConfiguration.names[node.name().localName];
 					if (nameHandler.vc) {
 						vc = nameHandler.vc(node, text, this);
+					} else {
+						vc = new Faust.DefaultVC();
 					}
 				}
 
@@ -115,7 +124,7 @@ YUI.add('document-adhoc-tree', function (Y) {
 
 				// annotate the vc with the original element name
 		 		vc.elementName = node.name ? node.name().localName : "";
-				
+
 				if (parent != null ) { // && parent !== this) {
 					parent.add(vc);
 					vc.parent = parent;

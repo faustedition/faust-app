@@ -21,7 +21,14 @@ YUI.add('document-view-svg', function (Y) {
 		var result = Faust.SVG.boundingBox(this.view, matrix).width;
 		return result;
 	};
-	
+
+	Faust.ViewComponent.prototype.wrap = function(view) {
+		var wrapper = this.svgDocument().createElementNS(SVG_NS, "g");
+		wrapper.appendChild(view);
+		return wrapper;
+	};
+
+
 	Faust.ViewComponent.prototype.setCoord = function(coord, coordRotation) {
 		
 		var myRot = this.globalRotation();
@@ -92,6 +99,10 @@ YUI.add('document-view-svg', function (Y) {
 		var bbox = this.view.getBBox();
 		return { width: Math.round(bbox.width), height: Math.round(bbox.height)};		
 	};
+
+	Faust.ViewComponent.prototype.getClassesString = function() {
+		return this.computeClasses().join(' ');
+	}
 	
 	Y.augment (Faust.DefaultVC, Faust.ViewComponent);
 	
@@ -132,7 +143,7 @@ YUI.add('document-view-svg', function (Y) {
 	
 	Faust.DefaultVC.prototype.createView = function() {
 		var view = this.svgDocument().createElementNS(SVG_NS, "g");
-		view.setAttribute('class', 'DefaultVC');
+		view.setAttribute('class', this.getClassesString() + ' DefaultVC');
 		return view;
 	};
 		
@@ -153,6 +164,7 @@ YUI.add('document-view-svg', function (Y) {
 		var svgContainer = this.svgContainer();
 		var result = this.svgDocument().createElementNS(SVG_NS, "g");
 		var box0 = this.svgDocument().createElementNS(SVG_NS, 'rect');
+		box0.setAttribute('class', 'ZoneDot');
 		box0.setAttribute('width', '0.1em');
 		box0.setAttribute('height', '0.1em');
 		box0.setAttribute('x', '0');
@@ -207,7 +219,6 @@ YUI.add('document-view-svg', function (Y) {
 			this.strikethrough.setAttribute("x2", this.x + this.width);
 			this.strikethrough.setAttribute("y1", this.y - this.measure().height / 6);
 			this.strikethrough.setAttribute("y2", this.y - this.measure().height / 6);
-			this.strikethrough.setAttribute("stroke", "#333");
 			//this.strikethrough.transform.baseVal = this.view.transform.baseVal;
 			this.strikethrough.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
@@ -237,20 +248,18 @@ YUI.add('document-view-svg', function (Y) {
 		this.bgBox = this.svgDocument().createElementNS(SVG_NS, "rect");
 		this.svgContainer().appendChild(this.bgBox);
 		this.bgBox.setAttribute("class", "bgBox " + this.computeClasses());
-							   
-
 
 		this.view = this.createView();
 		this.svgContainer().appendChild(this.view);
 		var textBox = this.view.getBBox();
-		
-
-
 
 		if ("strikethrough" in this.textAttrs) {
 			this.strikethrough = this.svgDocument().createElementNS(SVG_NS, "line");
-			this.svgContainer().appendChild(this.strikethrough);
-		}
+			if ("strikethroughHand" in this.textAttrs) {
+				var strikethroughHandClasses = this.computeHandClasses(this.textAttrs['strikethroughHand']);
+				this.strikethrough.setAttribute('class', strikethroughHandClasses.join(' '));
+			}
+			this.svgContainer().appendChild(this.strikethrough);		}
 		if ("underline" in this.textAttrs) {
 			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
 			this.view.setAttribute("class", 
@@ -265,48 +274,57 @@ YUI.add('document-view-svg', function (Y) {
 
 	Faust.SpanningVC.prototype.createView = function() {
 		this.spanningRect = this.svgDocument().createElementNS(SVG_NS, 'use');
-		//this.spanningRect.setAttribute('fill', 'url(#curlyLinePattern');
+		this.spanningRect.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
 		this.spanningRect.setAttribute('class', this.type);
+		this.spanningRect.setAttribute('x', 0);
+		this.spanningRect.setAttribute('y', 0);
 		this.spanningRect.setAttribute('width', this.imageWidth);
 		this.spanningRect.setAttribute('height', this.imageHeight);
-		this.spanningRect.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
+		this.spanningRect.setAttribute('transform', 'scale(0.000001)');
+
+
 		this.svgContainer().appendChild(this.spanningRect);
 		var block = this.svgDocument().createElementNS(SVG_NS, 'rect');
-		block.setAttribute('width', '20em');
+		block.setAttribute('width', '0.1em');
 		block.setAttribute('height', '0.1em');
-		block.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden')
+		block.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden');
+		block.setAttribute('class', 'SpanningDot');
 		return block;
 	};
 	
 	Faust.SpanningVC.prototype.onRelayout = function() {
 		var parentWidth = this.parent.getExt(this.rotX());
 		var parentHeight = this.parent.getExt(this.rotY());
-		var width = this.defaultWidth ? this.defaultWidth : parentWidth;
-		var height = this.defaultHeight ? this.defaultHeight : parentHeight;
+		var width = this.fixedWidth ? this.fixedWidth : parentWidth;
+		var height = this.fixedHeight ? this.fixedHeight : parentHeight;
 		this.spanningRect.setAttribute('x', (parentWidth - width) / 2);
 		this.spanningRect.setAttribute('y', (parentHeight - height) / 2);
 
 		var transform = "scale(" + width / this.imageWidth + "," + height / this.imageHeight + ")";
 
-		this.spanningRect.setAttribute('width', width);
-		this.spanningRect.setAttribute('height', height);
+		//this.spanningRect.setAttribute('width', width);
+		//this.spanningRect.setAttribute('height', height);
 		this.spanningRect.setAttribute('transform', transform);
 	};
 
 	Y.augment(Faust.SpanningVC, Faust.ViewComponent);
 
 	Faust.InlineGraphic.prototype.createView = function() {
-		var graphic = this.svgDocument().createElementNS(SVG_NS, 'use');
-		graphic.setAttribute('class', this.type);
-		graphic.setAttribute('width', this.imageWidth);
-		graphic.setAttribute('height', this.imageHeight);
-		graphic.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
-		var transform = "scale(" + this.displayWidth / this.imageWidth + "," + this.displayHeight / this.imageHeight + ")";
-		graphic.setAttribute('width', this.displayWidth);
-		graphic.setAttribute('height', this.displayHeight);
-		graphic.setAttribute('transform', transform);
+		// FIXME: a g element must be used as a wrapper, because we cannot set the transform attribute on the element
+		// returned by createView() directly (as that is overwritten by layout). TODO: wrap the output of createView
+		// in a central place.
+		var g = this.svgDocument().createElementNS(SVG_NS, 'g');
 
-		return graphic;
+		this.graphic = this.svgDocument().createElementNS(SVG_NS, 'use');
+		g.setAttribute('class', this.type);
+		this.graphic.setAttribute('width', this.imageWidth);
+		this.graphic.setAttribute('height', this.imageHeight);
+		this.graphic.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
+		g.setAttribute('vector-effect', 'non-scaling-stroke');
+		var transform = "scale(" + this.displayWidth / this.imageWidth + "," + this.displayHeight / this.imageHeight + ")";
+		this.graphic.setAttribute('transform', transform);
+		g.appendChild(this.graphic);
+		return g;
 	};
 
 	Y.augment(Faust.InlineGraphic, Faust.ViewComponent);

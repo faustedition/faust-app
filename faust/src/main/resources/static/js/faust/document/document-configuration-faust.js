@@ -5,7 +5,37 @@ YUI.add('document-configuration-faust', function (Y) {
 
 	Y.mix(Y.namespace("Faust"), {
         DocumentConfiguration: 	 {
-			names: {
+			stripWhitespace : ['overw'],
+	        names: {
+		        'choice' : { vc: function(){return new Faust.DefaultVC();}},
+		        'unclear' : {
+					vc : function (node, text, layoutState) {
+
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						var vc = new Faust.DefaultVC();
+						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
+						vc.add (Y.Faust.DocumentLayout.createText(startMarker, annotationStart, annotationEnd, text));
+						return vc;
+					},
+					end: function(node, text, layoutState) {
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						var endMarker = node.data()['cert'] == 'low' ? '}}' : '}';
+						this.add (Y.Faust.DocumentLayout.createText(endMarker, annotationStart, annotationEnd, text));
+
+						// hide the component if it is a less probable alternative of a choice
+						if (node.parent.name().localName == 'choice') {
+							var sibling_cert_values = node.parent.children().map(
+								function(annotation){return annotation.data()['cert']});
+							if (node.data()['cert'] == 'low' && sibling_cert_values.indexOf('high') >= 0) {
+								this.computeClasses = function(){
+									return ['invisible'];
+								};
+							}
+						}
+					}
+				},
 				
 				'document': { 
 					vc: function(node, text, layoutState) {
@@ -13,7 +43,27 @@ YUI.add('document-configuration-faust', function (Y) {
 					}
 				},
 
-				'treeRoot': { 
+				overw : {
+					vc: function() {return new Faust.DefaultVC();}
+				},
+
+				under : {
+					vc: function() {
+						var vc =  new Faust.DefaultVC();
+						vc.defaultAligns = function () {
+
+							this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+
+							if (this.previous())
+								this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+							else
+								this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+						};
+						return vc;
+					}
+				},
+
+				'treeRoot': {
 					vc: function(node, text, layoutState) {
 						return new Faust.Surface();
 					}
@@ -153,49 +203,44 @@ YUI.add('document-configuration-faust', function (Y) {
 					vc: function(node, text, layoutState) {
 						var ancestorNames = node.ancestors().map(function(node){return node.annotation.name.localName});
 						var inline = ancestorNames.indexOf('line') >= 0;
+						// TODO figure outh the number of pixels per em dynamically
+						var EM = 10;
+						var width = node.data()['width'] ? Number(node.data()['width']) * EM: null;
+						var height = node.data()['height'] ? Number(node.data()['height']) * EM : null;
+						var imgPath = cp + '/static/img/transcript/';
 						if (node.data()['f:style'] == 'curly') {
 							if (node.data()['f:orient'] == 'horiz') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine',
-										cp + '/static/img/transcript/grLineCurlyHorizontal.svg#img',
-										100, 100, 100, 20);
+									return new Faust.InlineGraphic('grLine', imgPath + 'grLineCurlyHorizontal.svg#img', 100, 100, 20 * EM, 2 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine',
-										cp + '/static/img/transcript/grLineCurlyHorizontal.svg#img',
-										100, 100, 100, null);
+									return new Faust.SpanningVC('grLine',imgPath + 'grLineCurlyHorizontal.svg#img',	100, 100, width, height);
 								}
 							} else if (node.data()['f:orient'] == 'vert') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine',
-										cp + '/static/img/transcript/grLineCurlyVertical.svg#img',
-										100, 100, 100, 100);
+									return new Faust.InlineGraphic('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
 								} else {
-									return new Faust.SpanningVC('grLine',
-										cp + '/static/img/transcript/grLineCurlyVertical.svg#img',
-										100, 100, 100, null);
+									return new Faust.SpanningVC('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
 								}
 							}
 						} else if (node.data()['f:style'] == 'linear') {
 							if (node.data()['f:orient'] == 'horiz') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine',
-										cp + '/static/img/transcript/grLineStraightHorizontal.svg#img',
-										100, 20, 100, 20);
+									return new Faust.InlineGraphic('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, 10 * EM, 2 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine',
-										cp + '/static/img/transcript/grLineStraightHorizontal.svg#img',
-										100, 20, null, 20);
+									return new Faust.SpanningVC('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, null, 2 * EM);
 								}
 							} else if (node.data()['f:orient'] == 'vert') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine',
-										cp + '/static/img/transcript/grLineStraightVertical.svg#img',
-										20, 100, 20, 20);
+									return new Faust.InlineGraphic('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, 1 * EM, 2 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine',
-										cp + '/static/img/transcript/grLineStraightVertical.svg#img',
-										20, 100, null, 20);
+									return new Faust.SpanningVC('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, null, 2 * EM);
 								}
+							}
+						} else if (node.data()['f:style'] == 's-left-right') {
+							if (inline) {
+								throw (Faust.ENC_EXC_PREF + "S-curve can't be inline!");
+							} else {
+								return new Faust.SpanningVC('grLine', imgPath + 'grLineSLeftRight.svg#img', 100, 100, null, null);
 							}
 						}
 					}
@@ -240,7 +285,8 @@ YUI.add('document-configuration-faust', function (Y) {
 							this.add (Y.Faust.DocumentLayout.createText("\u2309", annotationStart, annotationEnd, text));
 						}
 					}
-				}
+				},
+
 			}
 		}
 	});
