@@ -106,7 +106,7 @@ public class Infrastructure {
     @Provides
     @Singleton
     public EventBus provideEventBus() {
-        return new AsyncEventBus(Executors.newCachedThreadPool());
+        return new AsyncEventBus(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
     }
 
     @Provides

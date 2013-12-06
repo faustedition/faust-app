@@ -3,8 +3,10 @@ package de.faustedition.document;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import de.faustedition.Database;
 import de.faustedition.db.Tables;
@@ -21,8 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -35,17 +39,20 @@ import java.util.logging.Logger;
 @Singleton
 public class Documents extends AbstractScheduledService {
     private static final Logger LOG = Logger.getLogger(Documents.class.getName());
+    public static final int MAX_DOCUMENTS_PER_EVENT = 25;
 
     private final Database database;
     private final Sources sources;
+    private final EventBus eventBus;
     private final ObjectMapper objectMapper;
 
     private Map<String, ArchiveRecord> archives;
 
     @Inject
-    public Documents(Database database, Sources sources, ObjectMapper objectMapper) {
+    public Documents(Database database, Sources sources, EventBus eventBus, ObjectMapper objectMapper) {
         this.database = database;
         this.sources = sources;
+        this.eventBus = eventBus;
         this.objectMapper = objectMapper;
     }
 
@@ -55,6 +62,8 @@ public class Documents extends AbstractScheduledService {
 
     public void synchronize(final Collection<Long> documentIds) {
         final boolean synchronizeAll = documentIds.isEmpty();
+        final Set<Long> updated = Sets.newHashSet();
+        final Set<Long> removed = Sets.newHashSet();
         database.transaction(new Database.TransactionCallback<Object>() {
             @Override
             public Object doInTransaction(DSLContext sql) throws Exception {
@@ -69,11 +78,26 @@ public class Documents extends AbstractScheduledService {
 
                 for (File documentDescriptor : sources.directory("document")) {
                     final String descriptorPath = sources.path(documentDescriptor);
-                    final DocumentRecord record = documents.remove(descriptorPath);
-                    if (synchronizeAll || (record != null && record.getLastRead().getTime() < documentDescriptor.lastModified())) {
+                    DocumentRecord record = documents.remove(descriptorPath);
+                    if (synchronizeAll && record == null) {
+                        record = sql.newRecord(Tables.DOCUMENT);
+                        record.setDescriptorPath(descriptorPath);
+                        record.setLastRead(new Timestamp(0));
+                        record.store();
+                    }
+                    if ((record != null && record.getLastRead().getTime() < documentDescriptor.lastModified())) {
                         try {
                             LOG.fine("<< " + documentDescriptor);
-                            XML.saxParser().parse(documentDescriptor, new DocumentDescriptorParser(sql, descriptorPath, objectMapper, sources, archives));
+
+                            // FIXME: do we need the document structure in the relational database?
+                            sql.delete(Tables.MATERIAL_UNIT).where(Tables.MATERIAL_UNIT.DOCUMENT_ID.eq(record.getId()));
+
+                            XML.saxParser().parse(documentDescriptor, new DocumentDescriptorParser(sql, record, objectMapper, sources, archives));
+
+                            record.setLastRead(new Timestamp(System.currentTimeMillis()));
+                            record.update();
+
+                            updated.add(record.getId());
                         } catch (SAXException e) {
                             LOG.log(Level.SEVERE, "XML error while adding document " + documentDescriptor, e);
                         } catch (IOException e) {
@@ -83,11 +107,10 @@ public class Documents extends AbstractScheduledService {
                 }
 
                 if (!documents.isEmpty()) {
-                    final Set<Long> ids = Sets.newHashSet();
                     for (DocumentRecord record : documents.values()) {
-                        ids.add(record.getId());
+                        removed.add(record.getId());
                     }
-                    sql.delete(Tables.DOCUMENT).where(Tables.DOCUMENT.ID.in(ids));
+                    sql.delete(Tables.DOCUMENT).where(Tables.DOCUMENT.ID.in(removed));
                 }
 
                 LOG.log(Level.INFO, "Synchronized documents in {0}", sw.stop());
@@ -95,6 +118,12 @@ public class Documents extends AbstractScheduledService {
                 return null;
             }
         });
+        for (List<Long> ids : Iterables.partition(removed, MAX_DOCUMENTS_PER_EVENT)) {
+            eventBus.post(new Removed(ids));
+        }
+        for (List<Long> ids : Iterables.partition(updated, MAX_DOCUMENTS_PER_EVENT)) {
+            eventBus.post(new Updated(ids));
+        }
     }
 
     @Override
@@ -130,5 +159,29 @@ public class Documents extends AbstractScheduledService {
     @Override
     protected Scheduler scheduler() {
         return Scheduler.newFixedDelaySchedule(1, 1, TimeUnit.HOURS);
+    }
+
+    public static class Updated {
+        private final Collection<Long> ids;
+
+        public Updated(Collection<Long> ids) {
+            this.ids = ids;
+        }
+
+        public Collection<Long> getIds() {
+            return ids;
+        }
+    }
+
+    public static class Removed {
+        private final Collection<Long> ids;
+
+        public Removed(Collection<Long> ids) {
+            this.ids = ids;
+        }
+
+        public Collection<Long> getIds() {
+            return ids;
+        }
     }
 }

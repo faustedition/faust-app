@@ -11,6 +11,7 @@ import de.faustedition.facsimile.FacsimileResource;
 import de.faustedition.genesis.GeneticGraphResource;
 import de.faustedition.http.HttpService;
 import de.faustedition.http.JsonMessageBodyReaderWriter;
+import de.faustedition.index.DocumentIndexer;
 import de.faustedition.index.Index;
 import de.faustedition.index.SearchResource;
 import de.faustedition.transcript.SceneStatisticsResource;
@@ -33,6 +34,7 @@ import java.util.logging.Logger;
         ProjectResource.class,
         DocumentResource.class,
         DocumentImageLinkResource.class,
+        DocumentIndexer.class,
         FacsimileResource.class,
         GeneticGraphResource.class,
         SearchResource.class,
@@ -55,6 +57,7 @@ public class Server {
             final ServiceManager serviceManager = new ServiceManager(Arrays.asList(
                     objectGraph.get(Index.class),
                     objectGraph.get(Documents.class),
+                    objectGraph.get(DocumentIndexer.class),
                     objectGraph.get(TranscriptSegments.class),
                     new HttpService(configuration,
                             objectGraph.get(JsonMessageBodyReaderWriter.class),

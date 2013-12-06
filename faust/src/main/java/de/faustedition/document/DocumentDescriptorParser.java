@@ -27,7 +27,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +53,6 @@ class DocumentDescriptorParser extends DefaultHandler {
     );
 
     private final DSLContext sql;
-    private final String source;
     private final ObjectMapper objectMapper;
     private final Sources sources;
     private final Map<String, ArchiveRecord> archives;
@@ -64,21 +62,25 @@ class DocumentDescriptorParser extends DefaultHandler {
     private final LinkedList<String> metadataKeyStack = Lists.newLinkedList();
     private final LinkedList<StringBuilder> metadataValueStack = Lists.newLinkedList();
 
-    private DocumentRecord document;
+    private final DocumentRecord document;
     private int materialUnitCounter = 0;
     private boolean inMetadataSection = false;
 
-    DocumentDescriptorParser(DSLContext sql, String source, ObjectMapper objectMapper, Sources sources, Map<String, ArchiveRecord> archives) {
+    DocumentDescriptorParser(DSLContext sql, DocumentRecord document, ObjectMapper objectMapper, Sources sources, Map<String, ArchiveRecord> archives) {
         try {
             this.sql = sql;
-            this.source = source;
+            this.document = document;
             this.objectMapper = objectMapper;
             this.sources = sources;
             this.archives = archives;
-            this.baseTracker = new XMLBaseTracker(new URI("faust", "xml", "/" + source, null, null).toString());
+            this.baseTracker = new XMLBaseTracker(new URI("faust", "xml", "/" + document.getDescriptorPath(), null, null).toString());
         } catch (URISyntaxException e) {
             throw Throwables.propagate(e);
         }
+    }
+
+    public DocumentRecord getDocument() {
+        return document;
     }
 
     @Override
@@ -93,12 +95,7 @@ class DocumentDescriptorParser extends DefaultHandler {
             unitData.put("type", localName);
             unitData.put("order", materialUnitCounter++);
 
-            if (unitStack.isEmpty()) {
-                document = sql.newRecord(Tables.DOCUMENT);
-                document.setLastRead(new Timestamp(System.currentTimeMillis()));
-                document.setDescriptorPath(source);
-                document.store();
-            } else {
+            if (!unitStack.isEmpty()) {
                 final ObjectNode parent = unitStack.peek();
                 final ArrayNode contents = parent.has("contents")
                         ? (ArrayNode) parent.get("contents")
@@ -177,7 +174,7 @@ class DocumentDescriptorParser extends DefaultHandler {
                 final Record1<Long> transcript = sql.select(Tables.TRANSCRIPT.ID).from(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.SOURCE_URI.eq(transcriptSource)).fetchOne();
                 if (transcript == null) {
                     try {
-                        final FacsimileReferenceParser facsimileReferenceParser = new FacsimileReferenceParser(source);
+                        final FacsimileReferenceParser facsimileReferenceParser = new FacsimileReferenceParser(document.getDescriptorPath());
                         XMLUtil.saxParser().parse(sources.apply(transcriptSource), facsimileReferenceParser);
                         facsimiles.addAll(facsimileReferenceParser.getFacsimileReferences());
                         textImageLinkUri = facsimileReferenceParser.getTextImageLinkReference();
