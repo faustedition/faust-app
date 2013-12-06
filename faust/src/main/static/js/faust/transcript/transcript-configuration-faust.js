@@ -1,4 +1,4 @@
-YUI.add('document-configuration-faust', function (Y) {
+YUI.add('transcript-configuration-faust', function (Y) {
 
 	// A configuration defines how markup is rendered by providing handler
 	// functions in Y.Faust.DocumentConfiguration.

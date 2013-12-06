@@ -1,4 +1,4 @@
-YUI.add('document-adhoc-tree', function (Y) {
+YUI.add('transcript-adhoc-tree', function (Y) {
 
 	var DocumentLayout = {
 		// Text factory; the current model only delivers text nodes, some additional elements (gaps, insertion marks) need 
