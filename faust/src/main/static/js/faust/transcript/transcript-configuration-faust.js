@@ -292,7 +292,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 	});
 
 }, '0.0', {
-	requires: ['transcript-model', 'transcript-svg']
+	requires: ['transcript', 'transcript-svg']
 });
 
 

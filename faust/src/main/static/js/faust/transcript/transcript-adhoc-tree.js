@@ -196,7 +196,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
     });
 	
 }, '0.0', {
-	requires: ["adhoc-tree", "transcript-model", "text-annotation"]
+	requires: ["adhoc-tree", "transcript", "text-annotation"]
 });
 
 

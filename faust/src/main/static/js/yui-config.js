@@ -22,7 +22,7 @@ YUI.GlobalConfig = {
 				'document-yui-view' : { path: 'faust/document/document-yui-view.js' },
 				'document-structure-view' : { path: 'faust/document/document-structure-view.js' },
 				"transcript-svg" : { path: 'faust/transcript/transcript-svg.js' },
-				"transcript-model" : { path: 'faust/transcript/transcript-model.js' },
+				"transcript" : { path: 'faust/transcript/transcript.js' },
 				'document-text' : { path: 'faust/document/document-text.js' },
 				'materialunit' : { path: 'faust/document/materialunit.js' },
                 'protovis': { path: "protovis-r3.2.js"},

@@ -1,4 +1,4 @@
-YUI.add('transcript-model', function (Y) {
+YUI.add('transcript', function (Y) {
 
 	Faust.ENC_EXC_PREF = "ENCODING ERROR: ";
 	
