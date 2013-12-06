@@ -210,7 +210,6 @@ YUI.add('document-app', function (Y) {
 					that.removeAjaxLoader(diplomaticContent);
 					var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
 						container: diplomaticContainer.one('.diplomaticContent'),
-						visComponent: null,
 						transcript: transcript,
 						source: source,
 						pagenum: pagenum
