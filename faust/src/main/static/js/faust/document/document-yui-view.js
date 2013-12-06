@@ -173,7 +173,7 @@ YUI.add('document-yui-view', function (Y) {
 	
 }, '0.0', {
 	requires: ['view', 'node', 'transcript-model', 'document-adhoc-tree', 'document-configuration-faust',
-			   'document-view-svg', 'async-queue']
+			   'transcript-view-svg', 'async-queue']
 });
 
 /*
