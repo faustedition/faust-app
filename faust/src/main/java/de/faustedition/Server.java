@@ -13,7 +13,7 @@ import de.faustedition.http.HttpService;
 import de.faustedition.http.JsonMessageBodyReaderWriter;
 import de.faustedition.index.DocumentIndexer;
 import de.faustedition.index.Index;
-import de.faustedition.index.SearchResource;
+import de.faustedition.index.IndexResource;
 import de.faustedition.transcript.SceneStatisticsResource;
 import de.faustedition.transcript.TranscriptResource;
 import de.faustedition.transcript.TranscriptSegments;
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
         DocumentIndexer.class,
         FacsimileResource.class,
         GeneticGraphResource.class,
-        SearchResource.class,
+        IndexResource.class,
         SceneStatisticsResource.class,
         TranscriptResource.class,
         VerseStatisticsResource.class,
@@ -68,7 +68,7 @@ public class Server {
                             objectGraph.get(DocumentImageLinkResource.class),
                             objectGraph.get(FacsimileResource.class),
                             objectGraph.get(GeneticGraphResource.class),
-                            objectGraph.get(SearchResource.class),
+                            objectGraph.get(IndexResource.class),
                             objectGraph.get(SceneStatisticsResource.class),
                             objectGraph.get(TranscriptResource.class),
                             objectGraph.get(VerseStatisticsResource.class),

@@ -15,6 +15,8 @@ import org.apache.lucene.search.vectorhighlight.FieldTermStack;
 import org.apache.lucene.search.vectorhighlight.ScoreOrderFragmentsBuilder;
 import org.apache.lucene.search.vectorhighlight.SimpleFragListBuilder;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.List;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
+@Singleton
 public class TranscriptExcerpts {
 
     private final FastVectorHighlighter highlighter = new FastVectorHighlighter(true, true);
@@ -29,6 +32,7 @@ public class TranscriptExcerpts {
 
     private final Transcripts transcripts;
 
+    @Inject
     public TranscriptExcerpts(Transcripts transcripts) {
         this.transcripts = transcripts;
     }

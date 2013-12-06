@@ -13,6 +13,7 @@ import de.faustedition.facsimile.MockFacsimiles;
 import de.faustedition.graph.Graph;
 import de.faustedition.index.DocumentIndexer;
 import de.faustedition.index.Index;
+import de.faustedition.index.TranscriptExcerpts;
 import de.faustedition.index.TranscriptTokenAnnotationCodec;
 import de.faustedition.text.NamespaceMapping;
 import de.faustedition.transcript.TranscriptSegments;
@@ -46,6 +47,7 @@ import java.util.logging.Logger;
         Facsimiles.class,
         Documents.class,
         Transcripts.class,
+        TranscriptExcerpts.class,
         TranscriptSegments.class,
         TranscriptTokenAnnotationCodec.class
 }, library = true)

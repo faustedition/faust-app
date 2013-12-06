@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import de.faustedition.Templates;
-import de.faustedition.index.SearchResource;
+import de.faustedition.index.IndexResource;
 import de.faustedition.text.XML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ import java.util.Set;
 @Singleton
 public class XMLQueryResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexResource.class);
 
     private enum Mode {
         XML, VALUES, FILES

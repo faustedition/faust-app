@@ -46,7 +46,8 @@ public class Documents extends AbstractScheduledService {
     private final EventBus eventBus;
     private final ObjectMapper objectMapper;
 
-    private Map<String, ArchiveRecord> archives;
+    private Map<String, ArchiveRecord> archivesByLabel;
+    private Map<Long, ArchiveRecord> archivesById;
 
     @Inject
     public Documents(Database database, Sources sources, EventBus eventBus, ObjectMapper objectMapper) {
@@ -56,8 +57,12 @@ public class Documents extends AbstractScheduledService {
         this.objectMapper = objectMapper;
     }
 
-    public Map<String, ArchiveRecord> getArchives() {
-        return archives;
+    public Map<String, ArchiveRecord> getArchivesByLabel() {
+        return archivesByLabel;
+    }
+
+    public Map<Long, ArchiveRecord> getArchivesById() {
+        return archivesById;
     }
 
     public void synchronize(final Collection<Long> documentIds) {
@@ -92,7 +97,7 @@ public class Documents extends AbstractScheduledService {
                             // FIXME: do we need the document structure in the relational database?
                             sql.delete(Tables.MATERIAL_UNIT).where(Tables.MATERIAL_UNIT.DOCUMENT_ID.eq(record.getId()));
 
-                            XML.saxParser().parse(documentDescriptor, new DocumentDescriptorParser(sql, record, objectMapper, sources, archives));
+                            XML.saxParser().parse(documentDescriptor, new DocumentDescriptorParser(sql, record, objectMapper, sources, archivesByLabel));
 
                             record.setLastRead(new Timestamp(System.currentTimeMillis()));
                             record.update();
@@ -136,11 +141,14 @@ public class Documents extends AbstractScheduledService {
                     XMLUtil.saxParser().parse(sources.apply("archives.xml"), new ArchiveDescriptorParser(sql));
                 }
 
-                final Map<String, ArchiveRecord> archives = Maps.newHashMap();
+                final Map<String, ArchiveRecord> archivesByLabel = Maps.newHashMap();
+                final Map<Long, ArchiveRecord> archivesById = Maps.newHashMap();
                 for (ArchiveRecord archiveRecord : sql.selectFrom(Tables.ARCHIVE).fetch()) {
-                    archives.put(archiveRecord.getLabel(), archiveRecord);
+                    archivesByLabel.put(archiveRecord.getLabel(), archiveRecord);
+                    archivesById.put(archiveRecord.getId(), archiveRecord);
                 }
-                Documents.this.archives = Collections.unmodifiableMap(archives);
+                Documents.this.archivesByLabel = Collections.unmodifiableMap(archivesByLabel);
+                Documents.this.archivesById = Collections.unmodifiableMap(archivesById);
 
                 return (sql.selectCount().from(Tables.DOCUMENT).fetchOne().value1() == 0);
             }

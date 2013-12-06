@@ -83,9 +83,6 @@ public class TranscriptTokenAnnotationCodec {
             public float scorePayload(int docId, String fieldName, int start, int end, byte[] payload, int offset, int length) {
                 final BitSet termAnnotationSet = BitSet.valueOf(ByteBuffer.wrap(payload, offset, length));
                 termAnnotationSet.and(annotationSet);
-                if (termAnnotationSet.equals(annotationSet)) {
-                    System.out.println(termAnnotationSet + " = " + annotationSet);
-                }
                 return (termAnnotationSet.equals(annotationSet) ? 1.0f : 0.0f);
             }
         };

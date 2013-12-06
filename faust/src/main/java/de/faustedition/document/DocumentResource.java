@@ -86,7 +86,7 @@ public class DocumentResource {
         return database.transaction(new Database.TransactionCallback<Templates.ViewAndModel>() {
             @Override
             public Templates.ViewAndModel doInTransaction(DSLContext sql) throws Exception {
-                final ArchiveRecord archive = documents.getArchives().get(id);
+                final ArchiveRecord archive = documents.getArchivesByLabel().get(id);
                 if (archive == null) {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
                 }
