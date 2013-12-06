@@ -1,10 +1,10 @@
 YUI.add('transcript-configuration-faust', function (Y) {
 
 	// A configuration defines how markup is rendered by providing handler
-	// functions in Y.Faust.DocumentConfiguration.
+	// functions in Y.Faust.TranscriptConfiguration.
 
 	Y.mix(Y.namespace("Faust"), {
-        DocumentConfiguration: 	 {
+        TranscriptConfiguration: 	 {
 			stripWhitespace : ['overw'],
 	        names: {
 		        'choice' : { vc: function(){return new Faust.DefaultVC();}},

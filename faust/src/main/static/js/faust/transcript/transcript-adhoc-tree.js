@@ -60,7 +60,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 
 
 			if ((node instanceof Y.Faust.TextNode) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
-				if (Y.Faust.DocumentConfiguration.stripWhitespace.indexOf(node.parent.name().localName) >= 0 && node.content().trimRight() == "") {
+				if (Y.Faust.TranscriptConfiguration.stripWhitespace.indexOf(node.parent.name().localName) >= 0 && node.content().trimRight() == "") {
 					//only whitespace to be stripped, do not return a text representation
 				} else {
 					vc = Y.Faust.TranscriptLayout.createText(node.content(), node.range.start, node.range.end, text);
@@ -71,8 +71,8 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				var annotationEnd = node.annotation.target().range.end;
 
 				//ioc: configurable modules handle the construction of the view
-				if (node.name().localName in Y.Faust.DocumentConfiguration.names) {
-					var nameHandler = Y.Faust.DocumentConfiguration.names[node.name().localName];
+				if (node.name().localName in Y.Faust.TranscriptConfiguration.names) {
+					var nameHandler = Y.Faust.TranscriptConfiguration.names[node.name().localName];
 					if (nameHandler.vc) {
 						vc = nameHandler.vc(node, text, this);
 					} else {
@@ -158,8 +158,8 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				// 'end' callback after all children are constructed
 				// with the vc for 'this'
 				
-				if (node.name().localName in Y.Faust.DocumentConfiguration.names) {
-					var nameHandler = Y.Faust.DocumentConfiguration.names[node.name().localName];
+				if (node.name().localName in Y.Faust.TranscriptConfiguration.names) {
+					var nameHandler = Y.Faust.TranscriptConfiguration.names[node.name().localName];
 					if (nameHandler.end) {
 						nameHandler.end.call(vc, node, text, this);
 					}
@@ -170,7 +170,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 		
 		transcriptVC: function(jsonRepresentation) {
 			
-			var structuralNames = Object.keys(Y.Faust.DocumentConfiguration.names);
+			var structuralNames = Object.keys(Y.Faust.TranscriptConfiguration.names);
 
 			var text = Y.Faust.Text.create(jsonRepresentation);
 
