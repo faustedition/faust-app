@@ -5,7 +5,7 @@ YUI({
 	   'test-adhoc-tree', 'test-transcript-view', 'transcript-view',
 	   function (Y) {
 
-		   //Y.Test.Runner.add(Y.FaustTest.adhocTreeTestSuite);
+		   Y.Test.Runner.add(Y.FaustTest.adhocTreeTestSuite);
 		   Y.Test.Runner.add(Y.FaustTest.transcriptViewTestSuite);
 
 		   new Y.Test.Console({
