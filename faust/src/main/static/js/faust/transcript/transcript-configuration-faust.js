@@ -15,14 +15,14 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						var annotationEnd = node.annotation.target().range.end;
 						var vc = new Faust.DefaultVC();
 						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
-						vc.add (Y.Faust.DocumentLayout.createText(startMarker, annotationStart, annotationEnd, text));
+						vc.add (Y.Faust.TranscriptLayout.createText(startMarker, annotationStart, annotationEnd, text));
 						return vc;
 					},
 					end: function(node, text, layoutState) {
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
 						var endMarker = node.data()['cert'] == 'low' ? '}}' : '}';
-						this.add (Y.Faust.DocumentLayout.createText(endMarker, annotationStart, annotationEnd, text));
+						this.add (Y.Faust.TranscriptLayout.createText(endMarker, annotationStart, annotationEnd, text));
 
 						// hide the component if it is a less probable alternative of a choice
 						if (node.parent.name().localName == 'choice') {
@@ -155,7 +155,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 								for (var nrChars=2; nrChars < node.data()["quantity"]; nrChars++) {
 									representation += gapUncertainChar;  
 								}
-								return Y.Faust.DocumentLayout.createText (representation + gapChar, 
+								return Y.Faust.TranscriptLayout.createText (representation + gapChar,
 																		  annotationStart,
 																		  annotationEnd, 
 																		  text);
@@ -165,13 +165,13 @@ YUI.add('transcript-configuration-faust', function (Y) {
 									//representation += '\u2715'; //capital X
 									representation += gapChar; // small X
 								}
-								return Y.Faust.DocumentLayout.createText (representation, annotationStart, annotationEnd, text);
+								return Y.Faust.TranscriptLayout.createText (representation, annotationStart, annotationEnd, text);
 							} else if(node.data()['atLeast']) {
 								var representation = gapChar;
 								for (var nrChars=2; nrChars < node.data()["atLeast"]; nrChars++) {
 									representation += gapUncertainChar;  
 								}
-								return Y.Faust.DocumentLayout.createText (representation + gapChar, annotationStart, 
+								return Y.Faust.TranscriptLayout.createText (representation + gapChar, annotationStart,
 																		  annotationEnd, text);
 
 							} else {
@@ -273,7 +273,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						var vc = new Faust.DefaultVC();						
 						//Einweisungszeichen
 						if (node.data()["f:orient"] === "right") {
-							vc.add (Y.Faust.DocumentLayout.createText("\u2308", annotationStart, annotationEnd, text));
+							vc.add (Y.Faust.TranscriptLayout.createText("\u2308", annotationStart, annotationEnd, text));
 						}
 						return vc;
 					},
@@ -282,7 +282,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							// Einweisungszeichen
 							var annotationStart = node.annotation.target().range.start;
 							var annotationEnd = node.annotation.target().range.end;
-							this.add (Y.Faust.DocumentLayout.createText("\u2309", annotationStart, annotationEnd, text));
+							this.add (Y.Faust.TranscriptLayout.createText("\u2309", annotationStart, annotationEnd, text));
 						}
 					}
 				},

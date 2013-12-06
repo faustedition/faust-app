@@ -111,7 +111,7 @@ YUI.add('document-yui-view', function (Y) {
 
 				try {
 					//var visComponent = Faust.DocumentRanges.transcriptVC(this.get('transcript'));
-					var documentBuilder = new Y.Faust.DocumentAdhocTree();
+					var documentBuilder = new Y.Faust.TranscriptAdhocTree();
 					var visComponent = documentBuilder.transcriptVC(this.get('transcript'));
 					var innerContainer = document.createElementNS(SVG_NS, "g");
 					innerContainer.setAttribute("id", "transcript_container");

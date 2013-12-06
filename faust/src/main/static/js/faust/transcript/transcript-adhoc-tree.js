@@ -1,6 +1,6 @@
 YUI.add('transcript-adhoc-tree', function (Y) {
 
-	var DocumentLayout = {
+	var TranscriptLayout = {
 		// Text factory; the current model only delivers text nodes, some additional elements (gaps, insertion marks) need 
 		// to be delivered to know their tree context (hands...) for visualisation
 		createText : function(content, start, end, text){
@@ -40,17 +40,17 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 	};
 
 	Y.mix(Y.namespace("Faust"), {
-        DocumentLayout: DocumentLayout
+        TranscriptLayout: TranscriptLayout
     });
 	
 
-	var DocumentAdhocTree = function() {
+	var TranscriptAdhocTree = function() {
 		this.mainZone = null;
 		this.idMap = {};
 		this.postBuildDeferred = [];
 	}
 	
-	Y.extend(DocumentAdhocTree, Object, {
+	Y.extend(TranscriptAdhocTree, Object, {
 
 		buildVC: function(parent, node, text) {
 			
@@ -63,7 +63,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				if (Y.Faust.DocumentConfiguration.stripWhitespace.indexOf(node.parent.name().localName) >= 0 && node.content().trimRight() == "") {
 					//only whitespace to be stripped, do not return a text representation
 				} else {
-					vc = Y.Faust.DocumentLayout.createText(node.content(), node.range.start, node.range.end, text);
+					vc = Y.Faust.TranscriptLayout.createText(node.content(), node.range.start, node.range.end, text);
 				}
 			} else if (node instanceof Y.Faust.AnnotationNode) {
 
@@ -152,7 +152,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 
 				// space at the beginning of each line, to give empty lines height
 				if (node.name().localName == "line") {
-					vc.add (Y.Faust.DocumentLayout.createText("\u00a0", annotationStart, annotationEnd, text));
+					vc.add (Y.Faust.TranscriptLayout.createText("\u00a0", annotationStart, annotationEnd, text));
 				}
 
 				// 'end' callback after all children are constructed
@@ -192,7 +192,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 	});
 	
 	Y.mix(Y.namespace("Faust"), {
-        DocumentAdhocTree: DocumentAdhocTree
+        TranscriptAdhocTree: TranscriptAdhocTree
     });
 	
 }, '0.0', {
