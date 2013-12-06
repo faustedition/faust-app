@@ -188,12 +188,11 @@ public class DocumentResource {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
                 }
 
-                final FaustURI descriptorUri = new FaustURI(FaustAuthority.XML, "/" + descriptor.value1());
-                if (!sources.isResource(descriptorUri)) {
-                    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(descriptorUri.toString()).build());
+                final File descriptorFile = sources.apply(descriptor.value1());
+                if (!descriptorFile.isFile()) {
+                    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(descriptor.value1()).build());
                 }
-
-                return sources.file(descriptorUri);
+                return descriptorFile;
             }
 
             @Override

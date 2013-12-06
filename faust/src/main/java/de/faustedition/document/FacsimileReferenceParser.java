@@ -9,6 +9,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Level;
@@ -21,12 +22,12 @@ class FacsimileReferenceParser extends DefaultHandler {
 
     private static final Logger LOG = Logger.getLogger(FacsimileReferenceParser.class.getName());
 
-    private final FaustURI source;
+    private final File source;
 
     private List<String> facsimileReferences = Lists.newLinkedList();
     private String textImageLinkReference = null;
 
-    FacsimileReferenceParser(FaustURI source) {
+    FacsimileReferenceParser(File source) {
         this.source = source;
     }
 
@@ -49,13 +50,14 @@ class FacsimileReferenceParser extends DefaultHandler {
             return;
         }
         try {
-            final FaustURI referenceUri = new FaustURI(URI.create(url));
-            final String path = Documents.uri2Path(referenceUri);
+            final URI referenceUri = URI.create(url);
+            final String path = referenceUri.getPath().replaceAll("^/+", "");
+            Preconditions.checkArgument(!path.isEmpty());
             if (isFacsimile) {
-                Preconditions.checkArgument(referenceUri.getAuthority() == FaustAuthority.FACSIMILE);
+                Preconditions.checkArgument(referenceUri.getAuthority().equals("facsimile"));
                 facsimileReferences.add(path);
             } else if (textImageLinkReference == null) {
-                Preconditions.checkArgument(referenceUri.getAuthority() == FaustAuthority.XML);
+                Preconditions.checkArgument(referenceUri.getAuthority().equals("xml"));
                 textImageLinkReference = path;
             }
         } catch (IllegalArgumentException e) {

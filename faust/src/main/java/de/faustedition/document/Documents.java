@@ -6,15 +6,13 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
 import de.faustedition.Database;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
+import de.faustedition.text.XML;
 import de.faustedition.xml.Sources;
 import de.faustedition.xml.XMLUtil;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
-import org.jooq.Record2;
 import org.xml.sax.SAXException;
 
 import javax.inject.Inject;
@@ -31,27 +29,23 @@ import java.util.logging.Logger;
  */
 @Singleton
 public class Documents extends AbstractIdleService {
-    public static final FaustURI DOCUMENT_BASE_URI = new FaustURI(FaustAuthority.XML, "/document");
-
-    public static final FaustURI ARCHIVE_DESCRIPTOR_URI = new FaustURI(FaustAuthority.XML, "/archives.xml");
-
     private static final Logger LOG = Logger.getLogger(Documents.class.getName());
 
     private final Database database;
-    private final Sources xml;
+    private final Sources sources;
     private final ObjectMapper objectMapper;
 
     private final Map<String, Long> archives = Maps.newHashMap();
 
     @Inject
-    public Documents(Database database, Sources xml, ObjectMapper objectMapper) {
+    public Documents(Database database, Sources sources, ObjectMapper objectMapper) {
         this.database = database;
-        this.xml = xml;
+        this.sources = sources;
         this.objectMapper = objectMapper;
     }
 
-    public void update(final FaustURI source) {
-        Preconditions.checkArgument(xml.isResource(source), source.toString());
+    public void update(final File source) {
+        Preconditions.checkArgument(source.isFile(), source.toString());
         database.transaction(new Database.TransactionCallback<Object>() {
             @Override
             public Object doInTransaction(DSLContext sql) throws Exception {
@@ -61,16 +55,15 @@ public class Documents extends AbstractIdleService {
         });
     }
 
-    public void update(final FaustURI source, DSLContext sql) {
-        Preconditions.checkArgument(xml.isResource(source), source.toString());
-        final File descriptor = xml.file(source);
+    public void update(final File source, DSLContext sql) {
+        Preconditions.checkArgument(source.isFile(), source.toString());
         final Record1<Timestamp> lastRead = sql.select(Tables.DOCUMENT.LAST_READ)
                 .from(Tables.DOCUMENT)
-                .where(Tables.DOCUMENT.DESCRIPTOR_URI.eq(uri2Path(source)))
+                .where(Tables.DOCUMENT.DESCRIPTOR_URI.eq(sources.path(source)))
                 .fetchOne();
-        if (lastRead == null || lastRead.value1().getTime() < descriptor.lastModified()) {
+        if (lastRead == null || lastRead.value1().getTime() < source.lastModified()) {
             try {
-                XMLUtil.saxParser().parse(descriptor, new DocumentDescriptorParser(sql, source, objectMapper, xml, archives));
+                XML.saxParser().parse(source, new DocumentDescriptorParser(sql, source, objectMapper, sources, archives));
             } catch (SAXException e) {
                 LOG.log(Level.SEVERE, "XML error while adding document " + source, e);
             } catch (IOException e) {
@@ -87,7 +80,7 @@ public class Documents extends AbstractIdleService {
                 final Stopwatch sw = Stopwatch.createStarted();
 
                 if (sql.selectCount().from(Tables.ARCHIVE).fetchOne().value1() == 0) {
-                    XMLUtil.saxParser().parse(xml.file(ARCHIVE_DESCRIPTOR_URI), new ArchiveDescriptorParser(sql));
+                    XMLUtil.saxParser().parse(sources.apply("archives.xml"), new ArchiveDescriptorParser(sql));
                 }
 
                 for (ArchiveRecord archiveRecord : sql.selectFrom(Tables.ARCHIVE).fetch()) {
@@ -95,7 +88,7 @@ public class Documents extends AbstractIdleService {
                 }
 
                 if (sql.selectCount().from(Tables.DOCUMENT).fetchOne().value1() == 0) {
-                    for (FaustURI documentDescriptor : xml.iterate(DOCUMENT_BASE_URI)) {
+                    for (File documentDescriptor : sources.directory("document")) {
                         LOG.fine("<< " + documentDescriptor);
                         update(documentDescriptor, sql);
                     }
@@ -112,9 +105,4 @@ public class Documents extends AbstractIdleService {
     @Override
     protected void shutDown() throws Exception {
     }
-
-    static String uri2Path(FaustURI uri) {
-        return uri.getPath().replaceAll("^/++", "");
-    }
-
 }

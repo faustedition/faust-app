@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import de.faustedition.Configuration;
 import de.faustedition.Database;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
 import de.faustedition.db.Tables;
 import de.faustedition.text.NamespaceMapping;
 import de.faustedition.xml.Sources;
@@ -25,21 +23,21 @@ public class Transcripts {
 
     public static enum Type {
         TEXTUAL, DOCUMENTARY
-    };
+    }
 
     private static final Logger LOG = Logger.getLogger(Transcripts.class.getName());
 
     private final boolean debug;
     private final Database database;
-    private final Sources xml;
+    private final Sources sources;
     private final ObjectMapper objectMapper;
     private final NamespaceMapping namespaceMapping;
 
     @Inject
-    public Transcripts(Configuration configuration, Database database, Sources xml, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
+    public Transcripts(Configuration configuration, Database database, Sources sources, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
         this.debug = Boolean.parseBoolean(configuration.property("faust.debug"));
         this.database = database;
-        this.xml = xml;
+        this.sources = sources;
         this.objectMapper = objectMapper;
         this.namespaceMapping = namespaceMapping;
     }
@@ -94,21 +92,21 @@ public class Transcripts {
         for (Record2<Long, String> source : sourceResult) {
             final Long id = source.value1();
             final String path = source.value2();
-            final FaustURI uri = (path == null ? null : new FaustURI(FaustAuthority.XML, "/" + path));
-            if (uri == null) {
+            if (path == null) {
                 if (LOG.isLoggable(Level.WARNING)) {
                     LOG.warning("Cannot find source for transcript #" + id);
                 }
                 continue;
             }
-            if (!xml.isResource(uri)) {
+            final File sourceFile = this.sources.apply(path);
+            if (!sourceFile.isFile()) {
                 if (LOG.isLoggable(Level.WARNING)) {
-                    LOG.warning("Source " + uri + " for transcript #" + id + " does not exist");
+                    LOG.warning("Source " + sourceFile + " for transcript #" + id + " does not exist");
                 }
                 continue;
             }
 
-            sources.add(xml.file(uri));
+            sources.add(sourceFile);
         }
         return new Transcript(sources, namespaceMapping, objectMapper, (debug ? System.currentTimeMillis() : 0));
     }

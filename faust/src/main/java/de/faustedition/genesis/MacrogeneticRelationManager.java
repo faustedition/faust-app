@@ -1,5 +1,6 @@
 package de.faustedition.genesis;
 
+import com.google.common.collect.Sets;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
@@ -15,11 +16,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,21 +35,21 @@ public class MacrogeneticRelationManager {
 
     public static final String SOURCE_PROPERTY = "source";
 
-    private final Sources xml;
+    private final Sources sources;
     private final GraphDatabaseService db;
     private final Logger logger;
 
     @Inject
-    public MacrogeneticRelationManager(Sources xml, GraphDatabaseService db, Logger logger) {
-        this.xml = xml;
+    public MacrogeneticRelationManager(Sources sources, GraphDatabaseService db, Logger logger) {
+        this.sources = sources;
         this.db = db;
         this.logger = logger;
     }
 
-    public Set<FaustURI> feedGraph(Graph graph) {
+    public Set<File> feedGraph(Graph graph) {
         logger.info("Feeding macrogenetic data into graph");
-        final Set<FaustURI> failed = new HashSet<FaustURI>();
-        for (final FaustURI macrogeneticFile : xml.iterate(new FaustURI(FaustAuthority.XML, "/macrogenesis"))) {
+        final Set<File> failed = Sets.newHashSet();
+        for (File macrogeneticFile : sources.directory("macrogenesis")) {
             try {
                 logger.fine("Parsing macrogenetic file " + macrogeneticFile);
                 logger.fine("Adding macrogenetic relations from " + macrogeneticFile);
@@ -67,9 +68,7 @@ public class MacrogeneticRelationManager {
         return failed;
     }
 
-    ;
-
-    private void setRelationship(MGRelationship r, FaustURI source, FaustURI geneticSource) {
+    private void setRelationship(MGRelationship r, File source, FaustURI geneticSource) {
         Document from = Document.findByUri(db, r.from);
         if (from == null) {
             logger.warning(r.from + " unknown, but referenced in " + source);
@@ -85,7 +84,7 @@ public class MacrogeneticRelationManager {
         logger.fine("Adding: " + r.from + " ---" + r.type.name() + "---> " + r.to);
         try {
             Relationship rel = from.node.createRelationshipTo(to.node, r.type);
-            rel.setProperty(SOURCE_PROPERTY, source.toString());
+            rel.setProperty(SOURCE_PROPERTY, sources.path(source));
             rel.setProperty(Document.GENETIC_SOURCE_PROPERTY, geneticSource.toString());
         } catch (Exception e) {
             logger.warning("Could not create relationship " + r.from + " ---" + r.type.name() + "---> " + r.to + ". Reason: " + e.getMessage());
@@ -103,11 +102,11 @@ public class MacrogeneticRelationManager {
         }
     }
 
-    public void parse(final FaustURI source, final Graph graph) throws SAXException, IOException {
+    public void parse(final File source, final Graph graph) throws SAXException, IOException {
 
 
         //final Set<MGRelationship> relationships = new HashSet<MGRelationship>();
-        XMLUtil.saxParser().parse(xml.getInputSource(source), new DefaultHandler() {
+        XMLUtil.saxParser().parse(source, new DefaultHandler() {
 
             private MGRelationship relationship = null;
             private GeneticSourceCollection geneticSources = graph.getGeneticSources();

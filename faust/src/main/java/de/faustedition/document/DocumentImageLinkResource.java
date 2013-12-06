@@ -1,10 +1,12 @@
 package de.faustedition.document;
 
+import com.google.common.base.Preconditions;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.Templates;
 import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.Graph;
+import de.faustedition.text.XML;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.Sources;
 import de.faustedition.xml.XMLUtil;
@@ -25,7 +27,9 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.awt.Dimension;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
@@ -39,14 +43,14 @@ public class DocumentImageLinkResource {
     private static final Logger LOG = Logger.getLogger(DocumentImageLinkResource.class.getName());
 
     private final Graph graph;
-    private final Sources xml;
+    private final Sources sources;
     private final Templates templates;
     private final InternetImageServer imageServer;
 
     @Inject
-    public DocumentImageLinkResource(Graph graph, Sources xml, Templates templates, InternetImageServer imageServer) {
+    public DocumentImageLinkResource(Graph graph, Sources sources, Templates templates, InternetImageServer imageServer) {
         this.graph = graph;
-        this.xml = xml;
+        this.sources = sources;
         this.templates = templates;
         this.imageServer = imageServer;
     }
@@ -83,8 +87,7 @@ public class DocumentImageLinkResource {
             public Map<String, Object> doInTransaction(Graph graph) throws Exception {
                 final DocumentPage documentPage = DocumentPage.fromPath(path, graph);
                 final FaustURI transcriptURI = documentPage.materialUnit().getTranscriptSource();
-                final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
-                return DocumentImageLinks.read(source, null);
+                return DocumentImageLinks.read(XML.newDocumentBuilder().parse(toFile(transcriptURI)), null);
             }
         });
     }
@@ -99,7 +102,7 @@ public class DocumentImageLinkResource {
                 final MaterialUnit page = documentPage.materialUnit();
                 final FaustURI transcriptURI = page.getTranscriptSource();
 
-                final org.w3c.dom.Document transcript = XMLUtil.parse(xml.getInputSource(transcriptURI));
+                final org.w3c.dom.Document transcript = XML.newDocumentBuilder().parse(toFile(transcriptURI));
 
                 final URI linkDataURI = DocumentImageLinks.readLinkDataURI(transcript);
                 org.w3c.dom.Document svg;
@@ -118,7 +121,7 @@ public class DocumentImageLinkResource {
                     g.appendChild(svg.createElementNS(Namespaces.SVG_NS_URI, "title")).setTextContent("Layer 1");
                 } else {
                     LOG.fine(transcriptURI + " has image-text links, loading");
-                    svg = XMLUtil.parse(xml.getInputSource(new FaustURI(linkDataURI)));
+                    svg = XML.newDocumentBuilder().parse(toFile(new FaustURI(linkDataURI)));
 
                     // adjust the links
                     DocumentImageLinks.read(transcript, svg);
@@ -140,7 +143,7 @@ public class DocumentImageLinkResource {
                 final FaustURI transcriptURI = DocumentPage.fromPath(path, graph).materialUnit().getTranscriptSource();
 
                 final org.w3c.dom.Document svg = XMLUtil.parse(svgStream);
-                final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
+                final org.w3c.dom.Document source = XML.newDocumentBuilder().parse(toFile(transcriptURI));
 
                 boolean hasSourceChanged = DocumentImageLinks.write(source, svg);
                 if (hasSourceChanged) {
@@ -161,17 +164,21 @@ public class DocumentImageLinkResource {
 
                 // write the image links file
                 LOG.fine("Writing image-text-link data to " + linkDataURI);
-                xml.put(new FaustURI(linkDataURI), svg);
-
+                XML.newTransformer().transform(new DOMSource(svg), new StreamResult(toFile(new FaustURI(linkDataURI))));
                 if (hasSourceChanged) {
                     // write the modified transcript
                     LOG.fine("Writing " + transcriptURI);
-                    xml.put(transcriptURI, source);
+                    XML.newTransformer().transform(new DOMSource(source), new StreamResult(toFile(transcriptURI)));
                 }
 
                 // FIXME
                 return "<svg></svg>";
             }
         });
+    }
+
+    protected File toFile(FaustURI uri) {
+        Preconditions.checkArgument(uri.getAuthority() == FaustAuthority.XML);
+        return sources.apply(uri.getPath().replaceAll("^/+", ""));
     }
 }

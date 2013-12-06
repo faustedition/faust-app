@@ -9,8 +9,6 @@ import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.DocumentRecord;
 import de.faustedition.db.tables.records.MaterialUnitRecord;
@@ -25,8 +23,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -54,9 +54,9 @@ class DocumentDescriptorParser extends DefaultHandler {
     );
 
     private final DSLContext sql;
-    private final FaustURI source;
+    private final File source;
     private final ObjectMapper objectMapper;
-    private final Sources xml;
+    private final Sources sources;
     private final Map<String, Long> archives;
 
     private final XMLBaseTracker baseTracker;
@@ -68,13 +68,17 @@ class DocumentDescriptorParser extends DefaultHandler {
     private int materialUnitCounter = 0;
     private boolean inMetadataSection = false;
 
-    DocumentDescriptorParser(DSLContext sql, FaustURI source, ObjectMapper objectMapper, Sources xml, Map<String, Long> archives) {
-        this.sql = sql;
-        this.source = source;
-        this.objectMapper = objectMapper;
-        this.xml = xml;
-        this.archives = archives;
-        this.baseTracker = new XMLBaseTracker(source.toString());
+    DocumentDescriptorParser(DSLContext sql, File source, ObjectMapper objectMapper, Sources sources, Map<String, Long> archives) {
+        try {
+            this.sql = sql;
+            this.source = source;
+            this.objectMapper = objectMapper;
+            this.sources = sources;
+            this.archives = archives;
+            this.baseTracker = new XMLBaseTracker(new URI("faust", "xml", "/" + sources.path(source), null, null).toString());
+        } catch (URISyntaxException e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     @Override
@@ -92,7 +96,7 @@ class DocumentDescriptorParser extends DefaultHandler {
             if (unitStack.isEmpty()) {
                 document = sql.newRecord(Tables.DOCUMENT);
                 document.setLastRead(new Timestamp(System.currentTimeMillis()));
-                document.setDescriptorUri(Documents.uri2Path(source));
+                document.setDescriptorUri(sources.path(source));
                 document.store();
             } else {
                 final ObjectNode parent = unitStack.peek();
@@ -109,7 +113,7 @@ class DocumentDescriptorParser extends DefaultHandler {
                 final String transcript = Strings.nullToEmpty(attributes.getValue("uri")).trim();
                 if (!transcript.isEmpty()) {
                     try {
-                        unitStack.peek().put("transcriptSource", new FaustURI(baseTracker.getBaseURI().resolve(transcript)).toString());
+                        unitStack.peek().put("transcriptSource", baseTracker.getBaseURI().resolve(transcript).getPath().replaceAll("^/+", ""));
                     } catch (IllegalArgumentException e) {
                         throw new SAXException(transcript, e);
                     }
@@ -169,15 +173,12 @@ class DocumentDescriptorParser extends DefaultHandler {
             final List<String> facsimiles = Lists.newLinkedList();
             String textImageLinkUri = null;
             if (unitData.has("transcriptSource")) {
-                final String transcriptSource = Documents.uri2Path(new FaustURI(URI.create(unitData.remove("transcriptSource").asText())));
+                final String transcriptSource = unitData.remove("transcriptSource").asText();
                 final Record1<Long> transcript = sql.select(Tables.TRANSCRIPT.ID).from(Tables.TRANSCRIPT).where(Tables.TRANSCRIPT.SOURCE_URI.eq(transcriptSource)).fetchOne();
                 if (transcript == null) {
                     try {
                         final FacsimileReferenceParser facsimileReferenceParser = new FacsimileReferenceParser(source);
-                        XMLUtil.saxParser().parse(
-                                xml.getInputSource(new FaustURI(FaustAuthority.XML, "/" + transcriptSource)),
-                                facsimileReferenceParser
-                        );
+                        XMLUtil.saxParser().parse(sources.apply(transcriptSource), facsimileReferenceParser);
                         facsimiles.addAll(facsimileReferenceParser.getFacsimileReferences());
                         textImageLinkUri = facsimileReferenceParser.getTextImageLinkReference();
                     } catch (IOException e) {

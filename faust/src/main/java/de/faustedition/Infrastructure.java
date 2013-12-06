@@ -127,7 +127,7 @@ public class Infrastructure {
 
     @Provides
     @Singleton
-    public Sources provideXmlStorage() {
+    public Sources provideSources() {
         return new Sources(dataSubDirectory("xml"));
     }
 

@@ -11,8 +11,6 @@ import com.thaiopensource.validate.Validator;
 import com.thaiopensource.validate.rng.SAXSchemaReader;
 import com.thaiopensource.xml.sax.Sax2XMLReaderCreator;
 import dagger.ObjectGraph;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
 import de.faustedition.Infrastructure;
 import de.faustedition.xml.Sources;
 import org.xml.sax.ErrorHandler;
@@ -23,6 +21,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.xml.XMLConstants;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -63,14 +62,14 @@ public class TeiValidator {
 
         LOG.info("Initialized RelaxNG-based TEI validator from " + schemaSource);
 
-        final SortedSet<FaustURI> xmlErrors = new TreeSet<FaustURI>();
-        final SortedMap<FaustURI, String> teiErrors = new TreeMap<FaustURI, String>();
-        for (FaustURI source : sources.iterate(new FaustURI(FaustAuthority.XML, "/transcript"))) {
+        final SortedSet<File> xmlErrors = new TreeSet<File>();
+        final SortedMap<File, String> teiErrors = new TreeMap<File, String>();
+        for (File source : sources.directory("transcript")) {
             try {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Validating via RelaxNG: " + source);
                 }
-                final List<String> errors = validate(schema, sources.getInputSource(source));
+                final List<String> errors = validate(schema, source);
                 if (!errors.isEmpty()) {
                     teiErrors.put(source, Joiner.on("\n").join(errors));
                 }
@@ -96,7 +95,7 @@ public class TeiValidator {
             System.out.println(Strings.padStart(" TEI errors", 79, '='));
             System.out.println();
 
-            for (Map.Entry<FaustURI, String> teiError : teiErrors.entrySet()) {
+            for (Map.Entry<File, String> teiError : teiErrors.entrySet()) {
                 System.out.println(Strings.padStart(" " + teiError.getKey(), 79, '-'));
                 System.out.println();
                 System.out.println(teiError.getValue());
@@ -106,18 +105,18 @@ public class TeiValidator {
         }
     }
 
-    public static List<String> validate(Schema schema, InputSource xml) throws SAXException, IOException {
+    public static List<String> validate(Schema schema, File xml) throws SAXException, IOException {
         final CustomErrorHandler errorHandler = new CustomErrorHandler();
         final Validator validator = schema.createValidator(errorHandler.configurationWithErrorHandler().toPropertyMap());
 
         final XMLReader xmlReader = XMLReaderFactory.createXMLReader();
         xmlReader.setContentHandler(validator.getContentHandler());
-        xmlReader.parse(xml);
+        xmlReader.parse(xml.toURI().toString());
 
         return errorHandler.getErrors();
     }
 
-    public boolean isValid(Schema schema, InputSource xml) throws SAXException, IOException {
+    public boolean isValid(Schema schema, File xml) throws SAXException, IOException {
         return validate(schema, xml).isEmpty();
     }
 
