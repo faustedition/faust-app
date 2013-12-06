@@ -197,7 +197,7 @@ YUI.add('transcript', function (Y) {
  		
 		if (this.previous()) {
 			var yourJoint = 1.5;
-			if (Faust.LayoutPreferences.overlay === "overlay") {
+			if (Y.Faust.TranscriptConfiguration.overlay === "overlay") {
 				//yourJoint = ("between" in this.lineAttrs)? 1 : 1;				
 				yourJoint = ("over" in this.lineAttrs)? 0.1 : yourJoint;
 			}

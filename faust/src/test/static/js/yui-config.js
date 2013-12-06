@@ -5,5 +5,6 @@ YUI.GlobalConfig.groups.faust_test = {
     root: 'js/',
     modules: {
         'test-adhoc-tree': { path: 'faust/text-annotation/adhoc-tree-test.js'},
+		'test-transcript-view' : { path: 'faust/transcript/test-transcript-view.js'}
     }
 };

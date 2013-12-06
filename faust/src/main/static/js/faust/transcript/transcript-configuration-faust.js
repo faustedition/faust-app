@@ -4,7 +4,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 	// functions in Y.Faust.TranscriptConfiguration.
 
 	Y.mix(Y.namespace("Faust"), {
-        TranscriptConfiguration: 	 {
+		TranscriptConfiguration: 	 {
+			overlay : "overlay",
 			stripWhitespace : ['overw'],
 	        names: {
 		        'choice' : { vc: function(){return new Faust.DefaultVC();}},

@@ -1,9 +1,3 @@
-Faust.LayoutPreferences = {
-	
-	overlay : "overlay"
-	
-};
-
 YUI.add('transcript-view', function (Y) {
 
 
