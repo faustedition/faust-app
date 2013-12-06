@@ -12,7 +12,6 @@ YUI.add('transcript-view', function (Y) {
 		displayError: function(error) {
 			var msg = Y.Node.create('<p/>');
 			msg.append(error.toString());
-			//var errorDisplay = Y.one('#error-display');
 			this.errorDisplay.append(msg);
 			this.errorDisplay.show();
 		},
@@ -36,8 +35,8 @@ YUI.add('transcript-view', function (Y) {
 
 		relayout: function(visComponent, svgRoot, innerContainer, container) {
 
-			that = this;
-			aq = new Y.AsyncQueue();
+			var that = this;
+			var aq = new Y.AsyncQueue();
 			var layoutAndCenter = function() {
 				// TODO: maybe fix and re-enable. it's not very importatnt and interferes with absolute alignment
 				//that.intoView(innerContainer, svgRoot);
@@ -113,7 +112,7 @@ YUI.add('transcript-view', function (Y) {
 					while (innerContainer.hasChildNodes())
 						this.innerContainer.removeChild(innerContainer.firstChild);
 
-					// 	//FIXME calculate the required number of iterations
+					//FIXME calculate the required number of iterations
 					visComponent.render();
 					this.relayout(visComponent, svgRoot, innerContainer, container);
 				} catch (error) {

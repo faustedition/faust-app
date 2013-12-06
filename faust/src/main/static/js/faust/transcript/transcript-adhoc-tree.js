@@ -48,7 +48,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 		this.mainZone = null;
 		this.idMap = {};
 		this.postBuildDeferred = [];
-	}
+	};
 	
 	Y.extend(TranscriptAdhocTree, Object, {
 
@@ -80,7 +80,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 					}
 				}
 
-				aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left", "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
+				var aligningAttributes = ["f:at", "f:left", "f:left-right", "f:right", "f:right-left", "f:top", "f:top-bottom", "f:bottom", "f:bottom-top"];
 				
 				var that = this;
 
@@ -137,7 +137,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 			}
 
 			if (node instanceof Y.Faust.AnnotationNode) {
-				xmlId = node.data()["xml:id"];
+				var xmlId = node.data()["xml:id"];
 				if (xmlId) {
 					this.idMap[xmlId] = vc;
 					vc.xmlId = xmlId;
@@ -181,9 +181,6 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 
 			var surfaceVC = new Faust.Surface();
 			this.buildVC(surfaceVC, tree, text);
-
-			//global for debugging
-			debugText = text;
 
 			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
 

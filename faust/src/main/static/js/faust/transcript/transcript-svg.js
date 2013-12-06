@@ -18,8 +18,7 @@ YUI.add('transcript-svg', function (Y) {
 	Faust.ViewComponent.prototype.getExt = function(coordRotation) {
 		var matrix = this.view.viewportElement.createSVGMatrix();
 		matrix = matrix.rotate(coordRotation);
-		var result = Faust.SVG.boundingBox(this.view, matrix).width;
-		return result;
+		return Faust.SVG.boundingBox(this.view, matrix).width;
 	};
 
 	Faust.ViewComponent.prototype.wrap = function(view) {
@@ -102,7 +101,7 @@ YUI.add('transcript-svg', function (Y) {
 
 	Faust.ViewComponent.prototype.getClassesString = function() {
 		return this.computeClasses().join(' ');
-	}
+	};
 	
 	Y.augment (Faust.DefaultVC, Faust.ViewComponent);
 	
@@ -161,7 +160,6 @@ YUI.add('transcript-svg', function (Y) {
 	Y.augment (Faust.Surface, Faust.ViewComponent);
 
 	Faust.Zone.prototype.createView = function() {
-		var svgContainer = this.svgContainer();
 		var result = this.svgDocument().createElementNS(SVG_NS, "g");
 		var box0 = this.svgDocument().createElementNS(SVG_NS, 'rect');
 		box0.setAttribute('class', 'ZoneDot');
@@ -169,7 +167,7 @@ YUI.add('transcript-svg', function (Y) {
 		box0.setAttribute('height', '0.1em');
 		box0.setAttribute('x', '0');
 		box0.setAttribute('y', '0');
-		box0.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden')
+		box0.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden');
 		result.appendChild(box0);
 		result.setAttribute('class', 'Zone');
 		result.setAttributeNS(DRAG_NS, 'drag:enable', 'true');
@@ -397,7 +395,7 @@ YUI.add('transcript-svg', function (Y) {
 
 		  
 		  
-		  var inv = matrix.inverse()
+		  var inv = matrix.inverse();
 		  
 		  inv = inv.multiply(element.getCTM());
 		  
@@ -439,8 +437,7 @@ YUI.add('transcript-svg', function (Y) {
 		  }
 		  
 		  // return the bounding box as an SVGRect object
-		  var result = createRect(min.x, min.y, max.x - min.x, max.y - min.y);
-		  return result;
+		  return createRect(min.x, min.y, max.x - min.x, max.y - min.y);
 	};
 	
 }, '0.0', {

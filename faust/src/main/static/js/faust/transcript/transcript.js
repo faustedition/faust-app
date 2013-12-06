@@ -50,8 +50,8 @@ YUI.add('transcript', function (Y) {
 				
 				Y.each(this.children, function(c) {
 					//if (!c.layoutSatisfied) {
-						c.layout();
-						dimensions.update (c.x, c.y, c.x + c.width, c.y + c.height);
+					c.layout();
+					dimensions.update (c.x, c.y, c.x + c.width, c.y + c.height);
 					//}
 				});	
 			}
@@ -240,7 +240,7 @@ YUI.add('transcript', function (Y) {
 
 	Faust.Text.prototype.script = function (hand) {
 		return hand.split('_')[2];
-	}
+	};
 
 	Faust.Text.prototype.computeHandClasses = function(hand) {
 		var classes = [""];
@@ -251,11 +251,11 @@ YUI.add('transcript', function (Y) {
 		if (this.script(this.getHand()))
 			classes.push("script-" + this.script(hand));
 		return classes;
-	}
+	};
 
 	Faust.Text.prototype.computeClasses = function() {
 		var classes = [""];
-		for (attr in this.textAttrs) {
+		for (var attr in this.textAttrs) {
 			if (attr == "hand") {
 				var handClasses = this.computeHandClasses(this.getHand());
 				classes = classes.concat(handClasses);
@@ -357,7 +357,7 @@ YUI.add('transcript', function (Y) {
 	
 	Faust.AbsoluteAlign.prototype.align = function() {
 		this.me.setCoord(this.coordinate, this.coordRotation);
-	}	
+	};
 	
 	Faust.Dimensions = function() {};
 

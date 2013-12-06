@@ -271,7 +271,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
 						var vc = new Faust.DefaultVC();						
-						//Einweisungszeichen
+						// insertion mark
 						if (node.data()["f:orient"] === "right") {
 							vc.add (Y.Faust.TranscriptLayout.createText("\u2308", annotationStart, annotationEnd, text));
 						}
@@ -279,13 +279,13 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					},
 					end: function(node, text, layoutState) {
 						if (node.data()["f:orient"] == "left") {
-							// Einweisungszeichen
+							// insertion mark
 							var annotationStart = node.annotation.target().range.start;
 							var annotationEnd = node.annotation.target().range.end;
 							this.add (Y.Faust.TranscriptLayout.createText("\u2309", annotationStart, annotationEnd, text));
 						}
 					}
-				},
+				}
 
 			}
 		}
