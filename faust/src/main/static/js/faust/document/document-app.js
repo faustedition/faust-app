@@ -449,7 +449,7 @@ YUI.add('document-app', function (Y) {
 
 
 
-				  Faust.Document.load(new Faust.URI(documentSource), function(fd) {
+			Y.Faust.Document.load(new Faust.URI(documentSource), function(fd) {
 
 					  var pages = [];
 					  var descendants = fd.descendants();
@@ -475,5 +475,5 @@ YUI.add('document-app', function (Y) {
 }, '0.0', {
 	requires: ["app", "node", "event", "slider", "document", "transcript-view",
 		"document-structure-view", "button", "panel", "dd-plugin", "resize-plugin", "util",
-		"text-display"]
+		"text-display", "materialunit"]
 });

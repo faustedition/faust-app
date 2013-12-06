@@ -1,6 +1,6 @@
 YUI.add('materialunit', function (Y) {		
-	Faust.MaterialUnit = function() {};
-	Faust.MaterialUnit.prototype = {
+	var MaterialUnit = function() {};
+	MaterialUnit.prototype = {
 		descendants: function() {
 			return (function(list, mu) {
 				for (var cc = 0; cc < mu.contents.length; cc++) {
@@ -29,11 +29,15 @@ YUI.add('materialunit', function (Y) {
 		
 	};
 
-	Faust.Document = function() {};
-	Faust.Document.load = function(uri, callback) {
+	Y.mix(Y.namespace("Faust"), {
+		MaterialUnit: MaterialUnit
+	});
+
+	var Document = function() {};
+	Document.load = function(uri, callback) {
 		Faust.io(uri.encodedPath() /* + "/descriptor.json" */, callback, function(key, value) {
 			if (key === "order") {
-				Y.augment(this, Faust.MaterialUnit);
+				Y.augment(this, MaterialUnit);
 			}
 			if (key === "source") {			
 				return new Faust.URI(value);				
@@ -46,7 +50,13 @@ YUI.add('materialunit', function (Y) {
 			}
 			return value;
 		});
-	};	
+	};
+
+	Y.mix(Y.namespace("Faust"), {
+		Document: Document
+	});
+
+
 }, '0.0', {
 	requires: ['oop']
 });
