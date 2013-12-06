@@ -106,8 +106,84 @@ YUI.add('svg-utils', function (Y) {
 		return createRect(min.x, min.y, max.x - min.x, max.y - min.y);
 	}
 
+	/**
+	 * Return the bounding box of element as seen from the coordinate system given by matrix.
+	 */
+
+	function boundingBox(element, matrix) {
+
+		// macro to create an SVGPoint object
+		function createPoint (x, y) {
+			var point = element.viewportElement.createSVGPoint();
+			point.x = x;
+			point.y = y;
+			return point;
+		}
+
+		// macro to create an SVGRect object
+		function createRect (x, y, width, height) {
+			var rect = element.viewportElement.createSVGRect();
+			rect.x = x;
+			rect.y = y;
+			rect.width = width;
+			rect.height = height;
+			return rect;
+		}
+
+		// local bounding box in local coordinates
+		var box = element.getBBox();
+
+
+
+		var inv = matrix.inverse();
+
+		inv = inv.multiply(element.getCTM());
+
+		// create an array of SVGPoints for each corner
+		// of the bounding box and update their location
+		// with the transform matrix
+		var corners = [];
+		var point = createPoint(box.x, box.y);
+		corners.push(point.matrixTransform(inv) );
+		point.x = box.x + box.width;
+		point.y = box.y;
+		corners.push( point.matrixTransform(inv) );
+		point.x = box.x + box.width;
+		point.y = box.y + box.height;
+		corners.push( point.matrixTransform(inv) );
+		point.x = box.x;
+		point.y = box.y + box.height;
+		corners.push( point.matrixTransform(inv) );
+		var max = createPoint(corners[0].x, corners[0].y);
+		var min = createPoint(corners[0].x, corners[0].y);
+
+		// identify the new corner coordinates of the
+		// fully transformed bounding box
+		for (var i = 1; i < corners.length; i++) {
+			var x = corners[i].x;
+			var y = corners[i].y;
+			if (x < min.x) {
+				min.x = x;
+			}
+			else if (x > max.x) {
+				max.x = x;
+			}
+			if (y < min.y) {
+				min.y = y;
+			}
+			else if (y > max.y) {
+				max.y = y;
+			}
+		}
+
+		// return the bounding box as an SVGRect object
+		return createRect(min.x, min.y, max.x - min.x, max.y - min.y);
+	};
+
+
 	Y.mix(Y.namespace("SvgUtils"), {
 		SVG_NS: SVG_NS,
+		boundingBox: boundingBox,
 		qscale: qscale,
 		svgElement: svgElement,
 		svgAttrs: svgAttrs,

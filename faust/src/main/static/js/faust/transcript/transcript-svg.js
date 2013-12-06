@@ -3,7 +3,7 @@ DRAG_NS = "http://www.codedread.com/dragsvg";
 
 YUI.add('transcript-svg', function (Y) {
 
-	// START of view components. Keep in sync with model.
+	// Implementation of View Components. Keep in sync with transcript.js.
 	// These components are based on SVG. The model is only
 	// accessing a narrow interface to learn about the actual
 	// size, so in theory this could be exchanged with say a 
@@ -12,13 +12,13 @@ YUI.add('transcript-svg', function (Y) {
 	Faust.ViewComponent.prototype.getCoord = function(coordRotation) {
 		var matrix = this.view.viewportElement.createSVGMatrix();
 		matrix = matrix.rotate(coordRotation);
-		return Faust.SVG.boundingBox(this.view, matrix).x;
+		return Y.SvgUtils.boundingBox(this.view, matrix).x;
 	};
 
 	Faust.ViewComponent.prototype.getExt = function(coordRotation) {
 		var matrix = this.view.viewportElement.createSVGMatrix();
 		matrix = matrix.rotate(coordRotation);
-		return Faust.SVG.boundingBox(this.view, matrix).width;
+		return Y.SvgUtils.boundingBox(this.view, matrix).width;
 	};
 
 	Faust.ViewComponent.prototype.wrap = function(view) {
@@ -361,85 +361,7 @@ YUI.add('transcript-svg', function (Y) {
 	};
 	Y.augment(Faust.GBrace, Faust.ViewComponent);
 	
-	// END of view components
-		
-	// SVG Helper Methods
-	
-	Faust.SVG = function(){};
-	
-	/** 
-	 * Return the bounding box of element as seen from the coordinate system given by matrix.
-	 */
-	Faust.SVG.boundingBox = function(element, matrix) {
-		  
-		// macro to create an SVGPoint object
-		  function createPoint (x, y) {
-		    var point = element.viewportElement.createSVGPoint();
-		    point.x = x;
-		    point.y = y;
-		    return point;
-		  }
-
-		  // macro to create an SVGRect object
-		  function createRect (x, y, width, height) {
-		    var rect = element.viewportElement.createSVGRect();
-		    rect.x = x;
-		    rect.y = y;
-		    rect.width = width;
-		    rect.height = height;
-		    return rect; 
-		  }
-
-		  // local bounding box in local coordinates
-		  var box = element.getBBox();
-
-		  
-		  
-		  var inv = matrix.inverse();
-		  
-		  inv = inv.multiply(element.getCTM());
-		  
-		  // create an array of SVGPoints for each corner
-		  // of the bounding box and update their location
-		  // with the transform matrix 
-		  var corners = [];
-		  var point = createPoint(box.x, box.y);
-		  corners.push(point.matrixTransform(inv) );
-		  point.x = box.x + box.width;
-		  point.y = box.y;
-		  corners.push( point.matrixTransform(inv) );
-		  point.x = box.x + box.width;
-		  point.y = box.y + box.height;
-		  corners.push( point.matrixTransform(inv) );
-		  point.x = box.x;
-		  point.y = box.y + box.height;
-		  corners.push( point.matrixTransform(inv) );
-		  var max = createPoint(corners[0].x, corners[0].y);
-		  var min = createPoint(corners[0].x, corners[0].y);
-
-		  // identify the new corner coordinates of the
-		  // fully transformed bounding box
-		  for (var i = 1; i < corners.length; i++) {
-		    var x = corners[i].x;
-		    var y = corners[i].y;
-		    if (x < min.x) {
-		      min.x = x;
-		    }
-		    else if (x > max.x) {
-		      max.x = x;
-		    }
-		    if (y < min.y) {
-		      min.y = y;
-		    }
-		    else if (y > max.y) {
-		      max.y = y;
-		    }
-		  }
-		  
-		  // return the bounding box as an SVGRect object
-		  return createRect(min.x, min.y, max.x - min.x, max.y - min.y);
-	};
-	
 }, '0.0', {
-	requires: ["node", "dom", "event", "transcript", "event-mouseenter", "stylesheet", "transition"]
+	requires: ["node", "dom", "event", "transcript", "event-mouseenter",
+		"stylesheet", "transition", "svg-utils"]
 });

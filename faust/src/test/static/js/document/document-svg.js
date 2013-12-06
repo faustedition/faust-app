@@ -76,7 +76,7 @@ YUI({gallery: 'gallery-2010.10.15-19-32'}).add ('document-test-svg', function (Y
 				});
 			}
 
-			var bbox = Faust.SVG.boundingBox (bboxMe, matrix);
+			var bbox = Y.SvgUtils.boundingBox (bboxMe, matrix);
 
 			drawBBox('bbox1');
 			
@@ -92,7 +92,7 @@ YUI({gallery: 'gallery-2010.10.15-19-32'}).add ('document-test-svg', function (Y
 
 			matrix = matrix.rotate(30);
 
-			bbox = Faust.SVG.boundingBox (bboxMe, matrix);
+			bbox = Y.SvgUtils.boundingBox (bboxMe, matrix);
 
 			drawBBox('bbox2');
 
@@ -153,7 +153,7 @@ YUI({gallery: 'gallery-2010.10.15-19-32'}).add ('document-test-svg', function (Y
 				});
 			}
 
-			var bbox = Faust.SVG.boundingBox (g, matrix);
+			var bbox = Y.SvgUtils.boundingBox (g, matrix);
 
 			drawBBox('bboxg1');
 			
@@ -169,7 +169,7 @@ YUI({gallery: 'gallery-2010.10.15-19-32'}).add ('document-test-svg', function (Y
 
 			matrix = matrix.rotate(30);
 
-			bbox = Faust.SVG.boundingBox (g, matrix);
+			bbox = Y.SvgUtils.boundingBox (g, matrix);
 
 			drawBBox('bboxg2');
 
