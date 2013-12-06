@@ -444,5 +444,5 @@ YUI.add('document-view-svg', function (Y) {
 	};
 	
 }, '0.0', {
-	requires: ["node", "dom", "event", "document-model", "event-mouseenter", "stylesheet", "transition"]
+	requires: ["node", "dom", "event", "transcript-model", "event-mouseenter", "stylesheet", "transition"]
 });
