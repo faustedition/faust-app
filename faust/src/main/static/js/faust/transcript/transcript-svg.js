@@ -1,7 +1,7 @@
 SVG_NS = "http://www.w3.org/2000/svg";
 DRAG_NS = "http://www.codedread.com/dragsvg";
 
-YUI.add('transcript-view-svg', function (Y) {
+YUI.add('transcript-svg', function (Y) {
 
 	// START of view components. Keep in sync with model.
 	// These components are based on SVG. The model is only

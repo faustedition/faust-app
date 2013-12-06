@@ -21,7 +21,7 @@ YUI.GlobalConfig = {
 				"transcript-configuration-faust" : { path: 'faust/transcript/transcript-configuration-faust.js' },
 				'document-yui-view' : { path: 'faust/document/document-yui-view.js' },
 				'document-structure-view' : { path: 'faust/document/document-structure-view.js' },
-				"transcript-view-svg" : { path: 'faust/transcript/transcript-view-svg.js' },
+				"transcript-svg" : { path: 'faust/transcript/transcript-svg.js' },
 				"transcript-model" : { path: 'faust/transcript/transcript-model.js' },
 				'document-text' : { path: 'faust/document/document-text.js' },
 				'materialunit' : { path: 'faust/document/materialunit.js' },
