@@ -4,8 +4,7 @@ Faust.LayoutPreferences = {
 	
 };
 
-
-YUI.add('document-yui-view', function (Y) {
+YUI.add('transcript-view', function (Y) {
 
 
 	var DiplomaticTranscriptView = Y.Base.create("diplomatic-transcript-view", Y.View, [], {

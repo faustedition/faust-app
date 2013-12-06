@@ -19,7 +19,7 @@ YUI.GlobalConfig = {
 				"transcript-adhoc-tree" : { path: 'faust/transcript/transcript-adhoc-tree.js' },
 	            'document-app' : { path: 'faust/document/document-app.js' },
 				"transcript-configuration-faust" : { path: 'faust/transcript/transcript-configuration-faust.js' },
-				'document-yui-view' : { path: 'faust/document/document-yui-view.js' },
+				"transcript-view" : { path: 'faust/transcript/transcript-view.js' },
 				'document-structure-view' : { path: 'faust/document/document-structure-view.js' },
 				"transcript-svg" : { path: 'faust/transcript/transcript-svg.js' },
 				"transcript" : { path: 'faust/transcript/transcript.js' },

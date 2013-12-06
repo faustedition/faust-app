@@ -38,7 +38,7 @@ var Faust = { contextPath: cp, FacsimileServer: "${facsimilieIIPUrl}" };
 
 	<script type="text/javascript">
 
-YUI().use("node", "event", "document-yui-view",	function(Y) {
+YUI().use("node", "event", "transcript-view",	function(Y) {
 	
 	Y.on('faust:transcript-layout-done', function(e) {
 		Y.one('.diplomatic').setStyle('left', '0px');

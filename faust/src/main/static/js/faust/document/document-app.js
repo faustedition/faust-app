@@ -474,7 +474,7 @@ YUI.add('document-app', function (Y) {
 
 
 }, '0.0', {
-	requires: ["app", "node", "event", "slider", "document", "document-yui-view",
+	requires: ["app", "node", "event", "slider", "document", "transcript-view",
 		"document-structure-view", "button", "panel", "dd-plugin", "resize-plugin", "util",
 		"text-display"]
 });
