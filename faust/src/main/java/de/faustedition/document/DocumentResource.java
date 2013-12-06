@@ -4,12 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.eventbus.EventBus;
 import de.faustedition.Database;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
-import de.faustedition.transcript.TranscriptSegments;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -39,14 +36,16 @@ public class DocumentResource {
 
     private final Database database;
     private final EventBus eventBus;
+    private final Documents documents;
     private final Sources sources;
     private final Templates templates;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public DocumentResource(Database database, EventBus eventBus, Sources sources, Templates templates, ObjectMapper objectMapper) {
+    public DocumentResource(Database database, EventBus eventBus, Documents documents, Sources sources, Templates templates, ObjectMapper objectMapper) {
         this.database = database;
         this.eventBus = eventBus;
+        this.documents = documents;
         this.sources = sources;
         this.templates = templates;
         this.objectMapper = objectMapper;
@@ -87,7 +86,7 @@ public class DocumentResource {
         return database.transaction(new Database.TransactionCallback<Templates.ViewAndModel>() {
             @Override
             public Templates.ViewAndModel doInTransaction(DSLContext sql) throws Exception {
-                final ArchiveRecord archive = sql.selectFrom(Tables.ARCHIVE).where(Tables.ARCHIVE.LABEL.eq(id)).fetchOne();
+                final ArchiveRecord archive = documents.getArchives().get(id);
                 if (archive == null) {
                     throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).entity(id).build());
                 }
@@ -179,7 +178,7 @@ public class DocumentResource {
             @Override
             public File doInTransaction(DSLContext sql) throws Exception {
                 final Record1<String> descriptor = sql
-                        .select(Tables.DOCUMENT.DESCRIPTOR_URI)
+                        .select(Tables.DOCUMENT.DESCRIPTOR_PATH)
                         .from(Tables.DOCUMENT)
                         .where(Tables.DOCUMENT.ID.eq(id))
                         .fetchOne();

@@ -3,13 +3,10 @@ package de.faustedition.document;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Level;
@@ -22,12 +19,12 @@ class FacsimileReferenceParser extends DefaultHandler {
 
     private static final Logger LOG = Logger.getLogger(FacsimileReferenceParser.class.getName());
 
-    private final File source;
+    private final String source;
 
     private List<String> facsimileReferences = Lists.newLinkedList();
     private String textImageLinkReference = null;
 
-    FacsimileReferenceParser(File source) {
+    FacsimileReferenceParser(String source) {
         this.source = source;
     }
 

@@ -15,7 +15,7 @@ create table if not exists archive (
 
 create table if not exists document (
   id bigint identity,
-  descriptor_uri varchar(100) not null,
+  descriptor_path varchar(100) not null,
   last_read timestamp not null,
   archive_id bigint,
   callnumber varchar(100),

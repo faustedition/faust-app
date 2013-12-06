@@ -60,7 +60,7 @@ public class DocumentIndexer {
         database.transaction(new Database.TransactionCallback<Object>(true) {
             @Override
             public Object doInTransaction(DSLContext sql) throws Exception {
-                for (Record2<Long, String> document : sql.select(Tables.DOCUMENT.ID, Tables.DOCUMENT.DESCRIPTOR_URI).from(Tables.DOCUMENT).fetch()) {
+                for (Record2<Long, String> document : sql.select(Tables.DOCUMENT.ID, Tables.DOCUMENT.DESCRIPTOR_PATH).from(Tables.DOCUMENT).fetch()) {
                     System.out.println(document.value2());
                     documentIndexer.index(document.value1());
                 }

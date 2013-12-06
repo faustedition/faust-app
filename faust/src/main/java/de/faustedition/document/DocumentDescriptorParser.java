@@ -10,6 +10,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import de.faustedition.db.Tables;
+import de.faustedition.db.tables.records.ArchiveRecord;
 import de.faustedition.db.tables.records.DocumentRecord;
 import de.faustedition.db.tables.records.MaterialUnitRecord;
 import de.faustedition.db.tables.records.TranscriptRecord;
@@ -23,7 +24,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -54,10 +54,10 @@ class DocumentDescriptorParser extends DefaultHandler {
     );
 
     private final DSLContext sql;
-    private final File source;
+    private final String source;
     private final ObjectMapper objectMapper;
     private final Sources sources;
-    private final Map<String, Long> archives;
+    private final Map<String, ArchiveRecord> archives;
 
     private final XMLBaseTracker baseTracker;
     private final LinkedList<ObjectNode> unitStack = Lists.newLinkedList();
@@ -68,14 +68,14 @@ class DocumentDescriptorParser extends DefaultHandler {
     private int materialUnitCounter = 0;
     private boolean inMetadataSection = false;
 
-    DocumentDescriptorParser(DSLContext sql, File source, ObjectMapper objectMapper, Sources sources, Map<String, Long> archives) {
+    DocumentDescriptorParser(DSLContext sql, String source, ObjectMapper objectMapper, Sources sources, Map<String, ArchiveRecord> archives) {
         try {
             this.sql = sql;
             this.source = source;
             this.objectMapper = objectMapper;
             this.sources = sources;
             this.archives = archives;
-            this.baseTracker = new XMLBaseTracker(new URI("faust", "xml", "/" + sources.path(source), null, null).toString());
+            this.baseTracker = new XMLBaseTracker(new URI("faust", "xml", "/" + source, null, null).toString());
         } catch (URISyntaxException e) {
             throw Throwables.propagate(e);
         }
@@ -96,7 +96,7 @@ class DocumentDescriptorParser extends DefaultHandler {
             if (unitStack.isEmpty()) {
                 document = sql.newRecord(Tables.DOCUMENT);
                 document.setLastRead(new Timestamp(System.currentTimeMillis()));
-                document.setDescriptorUri(sources.path(source));
+                document.setDescriptorPath(source);
                 document.store();
             } else {
                 final ObjectNode parent = unitStack.peek();
@@ -137,7 +137,7 @@ class DocumentDescriptorParser extends DefaultHandler {
             if (unitStack.isEmpty()) {
                 final String archiveId = unitData.path("archive").asText();
                 if (!archiveId.isEmpty()) {
-                    document.setArchiveId(Preconditions.checkNotNull(archives.get(archiveId), archiveId));
+                    document.setArchiveId(Preconditions.checkNotNull(archives.get(archiveId), archiveId).getId());
                 }
                 final String callNumberPrefix = "callnumber" + (archiveId.isEmpty() ? "" : "." + archiveId);
                 final String waIdPrefix = "callnumber.wa_";
