@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -53,9 +54,10 @@ public class IndexResource {
         this.objectMapper = objectMapper;
     }
 
+    @Path("/{query}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ArrayNode search(@QueryParam("q") final String queryStr,
+    public ArrayNode search(@PathParam("query") final String queryStr,
                             @QueryParam("limit") @DefaultValue("10") final int limit) throws Exception {
         return index.transaction(new Index.TransactionCallback<ArrayNode>() {
             @Override
@@ -81,6 +83,7 @@ public class IndexResource {
                 final List<String> explanations = Lists.newArrayListWithCapacity(limit);
                 for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
                     final org.apache.lucene.document.Document indexDocument = searcher.doc(scoreDoc.doc);
+
                     final String documentId = indexDocument.get("id");
                     final String archive = indexDocument.get("archive");
                     final String callnumber = indexDocument.get("callnumber");
@@ -88,6 +91,7 @@ public class IndexResource {
                     for (TranscriptExcerpts.TranscriptExcerpt excerpt : transcriptExcerpts.get(query, indexReader, scoreDoc.doc, "textual", 20, 3)) {
                         excerpts.add(excerpt.getExcerpt().replaceAll("\n", "\u00b6"));
                     }
+
                     results.addObject()
                             .put("id", documentId)
                             .put("archive", archive)
