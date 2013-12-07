@@ -19,7 +19,10 @@ import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
 import de.faustedition.http.LastModified;
 import de.faustedition.text.NamespaceMapping;
+import de.faustedition.text.TextTemplateAnnotationHandler;
 import de.faustedition.text.TextTemplateDirective;
+import de.faustedition.transcript.DramaAnnotationTemplateMarkupHandler;
+import de.faustedition.transcript.EditAnnotationTemplateMarkupHandler;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.core.Environment;
@@ -45,6 +48,7 @@ import javax.ws.rs.core.Variant;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -70,7 +74,7 @@ public class Templates extends freemarker.template.Configuration {
     private final boolean debug;
 
     @Inject
-    public Templates(Configuration configuration, NamespaceMapping namespaceMapping, ObjectMapper objectMapper) {
+    public Templates(Configuration configuration, final NamespaceMapping namespaceMapping, ObjectMapper objectMapper) {
         super();
         try {
             this.debug = Boolean.parseBoolean(configuration.property("faust.debug"));
@@ -85,7 +89,16 @@ public class Templates extends freemarker.template.Configuration {
             setSharedVariable("facsimileIIPUrl", InternetImageServer.BASE_URI.toString());
             setSharedVariable("debug", debug);
             setSharedVariable("json", new ObjectMapperDirective(objectMapper));
-            setSharedVariable("transcriptMarkup", new TextTemplateDirective(namespaceMapping));
+            setSharedVariable("transcriptMarkup", new TextTemplateDirective() {
+
+                @Override
+                protected Iterable<TextTemplateAnnotationHandler> createAnnotationHandlers() {
+                    return Arrays.asList(
+                            new DramaAnnotationTemplateMarkupHandler(namespaceMapping),
+                            new EditAnnotationTemplateMarkupHandler(namespaceMapping)
+                    );
+                }
+            });
 
             setAutoIncludes(Collections.singletonList("/header.ftl"));
             setDefaultEncoding("UTF-8");

@@ -7,8 +7,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.escape.Escaper;
 import com.google.common.html.HtmlEscapers;
-import de.faustedition.transcript.DramaAnnotationTemplateMarkupHandler;
-import de.faustedition.transcript.EditAnnotationTemplateMarkupHandler;
 import freemarker.core.Environment;
 import freemarker.ext.util.WrapperTemplateModel;
 import freemarker.template.TemplateDirectiveBody;
@@ -18,7 +16,6 @@ import freemarker.template.TemplateModel;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -26,18 +23,11 @@ import java.util.Set;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class TextTemplateDirective implements TemplateDirectiveModel {
+public abstract class TextTemplateDirective implements TemplateDirectiveModel {
 
     private static final Escaper HTML_ESCAPER = HtmlEscapers.htmlEscaper();
 
-    private final Iterable<TextTemplateAnnotationHandler> handlers;
-
-    public TextTemplateDirective(NamespaceMapping namespaceMapping) {
-        this.handlers = Arrays.asList(
-                new DramaAnnotationTemplateMarkupHandler(namespaceMapping),
-                new EditAnnotationTemplateMarkupHandler(namespaceMapping)
-        );
-    }
+    protected abstract Iterable<TextTemplateAnnotationHandler> createAnnotationHandlers();
 
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
@@ -50,6 +40,7 @@ public class TextTemplateDirective implements TemplateDirectiveModel {
             tokens = ((WrapperTemplateModel) tokens).getWrappedObject();
         }
         if (tokens instanceof Iterable) {
+            Iterable<TextTemplateAnnotationHandler> handlers = createAnnotationHandlers();
             final Writer out = env.getOut();
             final Map<String, TextAnnotationStart> annotationContext = Maps.newHashMap();
             final Set<String> classes = Sets.newTreeSet();
