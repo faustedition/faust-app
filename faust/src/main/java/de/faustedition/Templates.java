@@ -1,6 +1,5 @@
 package de.faustedition;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -273,14 +272,14 @@ public class Templates extends freemarker.template.Configuration {
 
         private static final JsonSerializer<SimpleScalar> STRING_TEMPLATE_MODEL_SERIALIZER = new StdSerializer<SimpleScalar>(SimpleScalar.class) {
             @Override
-            public void serialize(SimpleScalar value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
+            public void serialize(SimpleScalar value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 jgen.writeString(value.getAsString());
             }
         };
 
         private static final JsonSerializer<TemplateBooleanModel> BOOLEAN_TEMPLATE_MODEL_SERIALIZER = new StdSerializer<TemplateBooleanModel>(TemplateBooleanModel.class) {
             @Override
-            public void serialize(TemplateBooleanModel value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
+            public void serialize(TemplateBooleanModel value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 try {
                     jgen.writeBoolean(value.getAsBoolean());
                 } catch (TemplateModelException e) {
