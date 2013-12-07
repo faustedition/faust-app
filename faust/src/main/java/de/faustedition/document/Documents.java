@@ -95,7 +95,7 @@ public class Documents extends AbstractScheduledService {
                             LOG.fine("<< " + documentDescriptor);
 
                             // FIXME: do we need the document structure in the relational database?
-                            sql.delete(Tables.MATERIAL_UNIT).where(Tables.MATERIAL_UNIT.DOCUMENT_ID.eq(record.getId()));
+                            sql.delete(Tables.MATERIAL_UNIT).where(Tables.MATERIAL_UNIT.DOCUMENT_ID.eq(record.getId())).execute();
 
                             XML.saxParser().parse(documentDescriptor, new DocumentDescriptorParser(sql, record, objectMapper, sources, archivesByLabel));
 

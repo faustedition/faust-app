@@ -18,6 +18,8 @@ import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
 import de.faustedition.http.LastModified;
+import de.faustedition.text.NamespaceMapping;
+import de.faustedition.text.TextTemplateDirective;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.core.Environment;
@@ -68,7 +70,7 @@ public class Templates extends freemarker.template.Configuration {
     private final boolean debug;
 
     @Inject
-    public Templates(Configuration configuration, ObjectMapper objectMapper) {
+    public Templates(Configuration configuration, NamespaceMapping namespaceMapping, ObjectMapper objectMapper) {
         super();
         try {
             this.debug = Boolean.parseBoolean(configuration.property("faust.debug"));
@@ -83,6 +85,7 @@ public class Templates extends freemarker.template.Configuration {
             setSharedVariable("facsimileIIPUrl", InternetImageServer.BASE_URI.toString());
             setSharedVariable("debug", debug);
             setSharedVariable("json", new ObjectMapperDirective(objectMapper));
+            setSharedVariable("transcriptMarkup", new TextTemplateDirective(namespaceMapping));
 
             setAutoIncludes(Collections.singletonList("/header.ftl"));
             setDefaultEncoding("UTF-8");

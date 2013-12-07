@@ -7,9 +7,16 @@
 <script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 <script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
 [/#assign]
-[@faust.page title=(callnumber!"n/a") header=header]
+[#assign title][#if archive?has_content]${archive.name?html}: [/#if]${callnumber!"Document"?html}[/#assign]
+[@faust.page title=title header=header]
 
-<h2>${callnumber!"Document"?html} (<a href="${cp}/document/${id?c}/source" title="XML Source">XML</a>)</h2>
+<h2>[#if archive?has_content]<span class="archive">${archive.name?html}</span><br>[/#if]${callnumber!"Document"?html}</h2>
+
+<p><a href="${cp}/document/${id?c}/source" title="XML Source">Document Descriptor (XML)</a></p>
+
+<div class="document-textual">[@transcriptMarkup text=textualTranscript /]</div>
+
+<hr>
 
 <div class="pure-g">
     <div class="pure-u-1-4">
@@ -47,7 +54,6 @@
     <div class="pure-u-3-4">
         <div class="l-box">
             <ol class="document-paginator"></ol>
-            <p>Text</p>
         </div>
     </div>
 </div>

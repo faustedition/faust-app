@@ -2,11 +2,13 @@ package de.faustedition.document;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.base.Objects;
 import com.google.common.eventbus.EventBus;
 import de.faustedition.Database;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
+import de.faustedition.transcript.Transcripts;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -37,15 +39,17 @@ public class DocumentResource {
     private final Database database;
     private final EventBus eventBus;
     private final Documents documents;
+    private final Transcripts transcripts;
     private final Sources sources;
     private final Templates templates;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public DocumentResource(Database database, EventBus eventBus, Documents documents, Sources sources, Templates templates, ObjectMapper objectMapper) {
+    public DocumentResource(Database database, EventBus eventBus, Documents documents, Transcripts transcripts, Sources sources, Templates templates, ObjectMapper objectMapper) {
         this.database = database;
         this.eventBus = eventBus;
         this.documents = documents;
+        this.transcripts = transcripts;
         this.sources = sources;
         this.templates = templates;
         this.objectMapper = objectMapper;
@@ -122,8 +126,8 @@ public class DocumentResource {
         return database.transaction(new Database.TransactionCallback<Templates.ViewAndModel>() {
             @Override
             public Templates.ViewAndModel doInTransaction(DSLContext sql) throws Exception {
-                final Record2<String, String> document = sql
-                        .select(Tables.DOCUMENT.CALLNUMBER, Tables.DOCUMENT.METADATA)
+                final Record3<Long, String, String> document = sql
+                        .select(Tables.DOCUMENT.ARCHIVE_ID, Tables.DOCUMENT.CALLNUMBER, Tables.DOCUMENT.METADATA)
                         .from(Tables.DOCUMENT)
                         .where(Tables.DOCUMENT.ID.eq(id))
                         .fetchOne();
@@ -158,9 +162,11 @@ public class DocumentResource {
 
                 return new Templates.ViewAndModel("document")
                         .add("id", id)
-                        .add("callnumber", document.value1())
-                        .add("metadata", objectMapper.reader().readTree(document.value2()))
-                        .add("references", references);
+                        .add("archive", documents.getArchivesById().get(Objects.firstNonNull(document.value1(), 0L)))
+                        .add("callnumber", document.value2())
+                        .add("metadata", objectMapper.reader().readTree(document.value3()))
+                        .add("references", references)
+                        .add("textualTranscript", transcripts.textual(id));
             }
 
             @Override
