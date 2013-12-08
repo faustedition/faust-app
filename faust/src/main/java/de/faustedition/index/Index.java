@@ -39,7 +39,9 @@ public class Index extends AbstractScheduledService {
 
 
     public static QueryParser queryParser(String defaultField) {
-        return new QueryParser(LUCENE_VERSION, defaultField, analyzer());
+        final QueryParser queryParser = new QueryParser(LUCENE_VERSION, defaultField, analyzer());
+        queryParser.setAllowLeadingWildcard(true);
+        return queryParser;
     }
 
     public Index(File dataDirectory) {
