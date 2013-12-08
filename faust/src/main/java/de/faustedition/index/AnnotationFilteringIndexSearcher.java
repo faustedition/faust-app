@@ -1,11 +1,10 @@
 package de.faustedition.index;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Range;
 import com.google.common.io.Closeables;
 import org.apache.lucene.index.IndexReader;
@@ -53,6 +52,11 @@ public class AnnotationFilteringIndexSearcher extends Collector {
         public List<Range<Integer>> getMatches() {
             return matches;
         }
+
+        @Override
+        public String toString() {
+            return Objects.toStringHelper(this).addValue(segment).add("matches", Iterables.toString(matches)).toString();
+        }
     }
 
     public static class Result implements Comparable<Result> {
@@ -96,10 +100,11 @@ public class AnnotationFilteringIndexSearcher extends Collector {
     private String[] kwicFields;
     private boolean filterPayload;
     private FieldQuery fieldQuery;
+
+    private int totalHits;
     private PriorityQueue<Result> results;
 
     private IndexReader reader;
-    private TermPositions termPositions;
     private int docBase;
     private Scorer scorer;
 
@@ -109,11 +114,11 @@ public class AnnotationFilteringIndexSearcher extends Collector {
         this.maxKwicSegmentsPerField = maxKwicSegmentsPerField;
     }
 
-    public List<Result> search(Query query, int limit, String... kwicFields) throws IOException {
-        return search(query, limit, new BitSet(), kwicFields);
+    public int search(Query query, List<Result> results, int limit, String... kwicFields) throws IOException {
+        return search(query, results, limit, new BitSet(), kwicFields);
     }
 
-    public List<Result> search(Query query, int limit, BitSet annotations, String... kwicFields) throws IOException {
+    public int search(Query query, List<Result> results, int limit, BitSet annotations, String... kwicFields) throws IOException {
         try {
             this.limit = limit;
             this.annotations = annotations;
@@ -122,17 +127,20 @@ public class AnnotationFilteringIndexSearcher extends Collector {
             Preconditions.checkArgument(!this.filterPayload || this.kwicFields.length > 0, "Cannot filter on payload without KWIC fields");
             this.fieldQuery = highlighter.getFieldQuery(query, delegate.getIndexReader());
 
+            this.totalHits = 0;
             this.results = new PriorityQueue<Result>(limit);
             this.reader = null;
-            this.termPositions = null;
             this.docBase = 0;
             this.scorer = null;
 
             this.delegate.search(query, this);
 
-            return Ordering.natural().reverse().immutableSortedCopy(results);
+            results.clear();
+            for (Result result : this.results) {
+                results.add(0, result);
+            }
+            return totalHits;
         } finally {
-            Closeables.close(this.termPositions, false);
             this.reader = null;
             this.scorer = null;
         }
@@ -141,6 +149,8 @@ public class AnnotationFilteringIndexSearcher extends Collector {
     @Override
     public void collect(int doc) throws IOException {
         final Result result = new Result(doc + docBase, scorer.score());
+
+        totalHits++;
 
         if (results.size() == limit && results.poll().compareTo(result) > 0) {
             // not a top scorer
@@ -153,21 +163,27 @@ public class AnnotationFilteringIndexSearcher extends Collector {
             if (filterPayload) {
                 final LinkedList<FieldTermStack.TermInfo> termInfos = Lists.newLinkedList();
                 for (FieldTermStack.TermInfo termInfo = terms.pop(); termInfo != null; termInfo = terms.pop()) {
-                    termPositions.seek(new Term(termInfo.getText()));
-                    termPositions.skipTo(doc);
-                    int termPos = -1;
-                    for (int pc = 0, freq = termPositions.freq(); pc < freq; pc++) {
-                        if ((termPos = termPositions.nextPosition()) == termInfo.getPosition()) {
-                            break;
+                    final TermPositions termPositions = reader.termPositions(new Term(kwicField, termInfo.getText()));
+                    try {
+                        if (!termPositions.skipTo(doc) || termPositions.doc() != doc) {
+                            continue;
                         }
-                    }
-                    if ((termPos == termInfo.getPosition()) && termPositions.isPayloadAvailable()) {
-                        final byte[] payload = new byte[termPositions.getPayloadLength()];
-                        final BitSet tokenAnnotations = BitSet.valueOf(termPositions.getPayload(payload, 0));
-                        tokenAnnotations.and(annotations);
-                        if (tokenAnnotations.equals(annotations)) {
-                            termInfos.add(termInfo);
+                        int termPos = -1;
+                        for (int pc = 0, freq = termPositions.freq(); pc < freq; pc++) {
+                            if ((termPos = termPositions.nextPosition()) == termInfo.getPosition()) {
+                                break;
+                            }
                         }
+                        if ((termPos == termInfo.getPosition()) && termPositions.isPayloadAvailable()) {
+                            final byte[] payload = new byte[termPositions.getPayloadLength()];
+                            final BitSet tokenAnnotations = BitSet.valueOf(termPositions.getPayload(payload, 0));
+                            tokenAnnotations.and(annotations);
+                            if (tokenAnnotations.equals(annotations)) {
+                                termInfos.addFirst(termInfo);
+                            }
+                        }
+                    } finally {
+                        Closeables.close(termPositions, false);
                     }
                 }
                 for (FieldTermStack.TermInfo termInfo : termInfos) {
@@ -184,15 +200,20 @@ public class AnnotationFilteringIndexSearcher extends Collector {
 
             final List<KwicSegment> kwicSegments = Lists.newArrayListWithCapacity(maxKwicSegmentsPerField);
             for (FieldFragList.WeightedFragInfo fragment : Iterables.limit(fragments, maxKwicSegmentsPerField)) {
-                final int offset = fragment.getStartOffset();
+                final int fragmentStart = fragment.getStartOffset();
+                final int fragmentEnd = fragment.getEndOffset();
                 final List<Range<Integer>> matches = Lists.newLinkedList();
 
-                kwicSegments.add(new KwicSegment(Range.closedOpen(offset, fragment.getEndOffset()), matches));
                 for (FieldFragList.WeightedFragInfo.SubInfo info : fragment.getSubInfos()) {
                     for (FieldPhraseList.WeightedPhraseInfo.Toffs termOffset : info.getTermsOffsets()) {
-                        matches.add(Range.closedOpen(termOffset.getStartOffset(), termOffset.getEndOffset()));
+                        final int matchStart = termOffset.getStartOffset();
+                        final int matchEnd = termOffset.getEndOffset();
+                        if ((Math.min(fragmentEnd, matchEnd) - Math.max(fragmentStart, matchStart)) > 0) {
+                            matches.add(Range.closedOpen(matchStart, matchEnd));
+                        }
                     }
                 }
+                kwicSegments.add(new KwicSegment(Range.closedOpen(fragmentStart, fragmentEnd), matches));
             }
             if (!kwicSegments.isEmpty()) {
                 result.kwicSegments.put(kwicField, kwicSegments);
@@ -201,6 +222,7 @@ public class AnnotationFilteringIndexSearcher extends Collector {
 
         if (kwicFields.length > 0 && result.kwicSegments.isEmpty()) {
             // we did not find any KWIC segments (possibly due to payload filtering)
+            totalHits--;
             return;
         }
 
@@ -209,13 +231,6 @@ public class AnnotationFilteringIndexSearcher extends Collector {
 
     @Override
     public void setNextReader(IndexReader reader, int base) {
-        try {
-            Closeables.close(this.termPositions, false);
-            this.termPositions = reader.termPositions();
-        } catch (IOException e) {
-            throw Throwables.propagate(e);
-        }
-
         this.reader = reader;
         this.docBase = base;
     }
