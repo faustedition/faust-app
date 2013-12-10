@@ -122,7 +122,7 @@ public class DocumentResource {
     @Path("/verse/{num}/")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ObjectNode archiveView(@PathParam("num") final int verse) throws Exception {
+    public ObjectNode verseConcordance(@PathParam("num") final int verse) throws Exception {
         final ObjectNode result = objectMapper.createObjectNode();
         for (Map.Entry<Long, Range<Integer>> document : verseIndex.query(verse, 100).entrySet()) {
             final Range<Integer> verseSegment = document.getValue();

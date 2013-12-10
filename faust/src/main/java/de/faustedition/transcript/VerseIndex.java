@@ -70,6 +70,14 @@ public class VerseIndex extends AbstractIdleService {
         eventBus.register(this);
     }
 
+    /**
+     * FIXME: Should we support the case were a verse appears multiple times in one document?
+     *
+     * @param verse
+     * @param limit
+     * @return
+     * @throws Exception
+     */
     public Map<Long, Range<Integer>> query(final int verse, final int limit) throws Exception {
         return index.transaction(new Index.TransactionCallback<Map<Long, Range<Integer>>>() {
             @Override
