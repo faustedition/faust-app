@@ -395,7 +395,7 @@ YUI.add('text-index', function (Y) {
 
     var segmentKeyFunction = function(d) {
         return d[0];
-    }
+    };
 
     NS.SegmentIndex = function(contents) {
         NS.SegmentIndex.superclass.constructor.call(this, segmentComparator, segmentKeyFunction);
