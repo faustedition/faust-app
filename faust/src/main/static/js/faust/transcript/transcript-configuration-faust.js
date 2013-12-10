@@ -17,6 +17,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						var vc = new Faust.DefaultVC();
 						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
 						vc.add (Y.Faust.TranscriptLayout.createText(startMarker, annotationStart, annotationEnd, text));
+
 						return vc;
 					},
 					end: function(node, text, layoutState) {
@@ -68,8 +69,24 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					vc: function(node, text, layoutState) {
 						return new Faust.Surface();
 					}
-				},		
-				
+				},
+
+				'supplied' : {
+					vc : function (node, text, layoutState) {
+
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						var vc = new Faust.DefaultVC();
+						vc.add (Y.Faust.TranscriptLayout.createText('[', annotationStart, annotationEnd, text));
+						return vc;
+					},
+					end: function(node, text, layoutState) {
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						this.add (Y.Faust.TranscriptLayout.createText(']', annotationStart, annotationEnd, text));
+					}
+				},
+
 				'surface': { 
 					vc: function(node, text, layoutState) {
 						return new Faust.Surface();
