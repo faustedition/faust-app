@@ -15,6 +15,24 @@
     ${callnumber!"Document"?html}
 </h2>
 
+<p class="note"><strong>Tipp:</strong> Beim Markieren von Abschnitten in den folgenden Transkripten wird der jeweils gültige Annotationskontext angezeigt.</p>
+
+<h3>Dokumentarisches Transkript (Annotationen)</h3>
+
+<div class="document-documentary-dump"></div>
+
+<h3>Textuelles Transkript (Annotationen)</h3>
+
+<div class="document-textual-dump"></div>
+
+<h3>Dokument-Deskriptor</h3>
+
+<iframe src="${cp}/document/${id?c}/source" style="width: 100%; height: 400px; overflow: auto; border: 1px solid #ccc"></iframe>
+
+<h3>Textuelles Transkript (zur Fehlerbereinigung)</h3>
+
+<div class="document-textual">[@transcriptMarkup text=text /]</div>
+
 <h3>Prototyp: Konvolut-Navigation</h3>
 
 <div class="pure-g">
@@ -57,20 +75,17 @@
     </div>
 </div>
 
-<h3>Textuelles Transkript (zur Fehlerbereinigung)</h3>
-
-<div class="document-textual">[@transcriptMarkup text=textualTranscript /]</div>
-
-<h3>Dokument-Deskriptor</h3>
-
-<iframe src="${cp}/document/${id?c}/source" style="width: 100%; height: 400px; overflow: auto; border: 1px solid #ccc"></iframe>
-
 <script type="text/javascript">
-    var model = [@json id=id metadata=metadata references=references/];
-    YUI().use("node", "util", "document-structure-view", function(Y) {
+    var documentModel = [@json id=id metadata=metadata references=references /],
+        documentaryTranscript = [@json text=documentaryTranscript /],
+        textualTranscript = [@json text=textualTranscript /];
+
+    YUI().use("node", "util", "document-structure-view", "text-annotation-dump", function(Y) {
         new Y.Faust.IOStatus({ render: true });
         new Y.Faust.DocumentTree({ container: ".document-structure", collapseAll: true }).render();
-        new Y.Faust.DocumentPaginator({ container: ".document-paginator", document: model }).render();
+        new Y.Faust.DocumentPaginator({ container: ".document-paginator", document: documentModel }).render();
+        new Y.Faust.TextAnnotationDump({ datasource: new Y.DataSource.Local({ source: documentaryTranscript }) }).render(".document-documentary-dump");
+        new Y.Faust.TextAnnotationDump({ datasource: new Y.DataSource.Local({ source: textualTranscript }) }).render(".document-textual-dump");
     });
 </script>
 [/@faust.page]

@@ -4,6 +4,7 @@ YUI.GlobalConfig = {
             base: cp + '/static/js/',
             filter: "raw",
             root: 'js/',
+            async: false,
             modules: {
                 'adhoc-tree': { path: 'faust/text-annotation/adhoc-tree.js'},
                 'facsimile': { path: 'faust/facsimile/facsimile.js'},
@@ -19,10 +20,13 @@ YUI.GlobalConfig = {
 				'document-model' : { path: 'faust/document/document-model.js' },
 				'document-text' : { path: 'faust/document/document-text.js' },
 				'materialunit' : { path: 'faust/document/materialunit.js' },
-                'protovis': { path: "protovis-r3.2.js"},
+                'protovis': { path: "protovis-r3.2.js" },
+                'rangy-core': { path: "rangy-1.3alpha.772/rangy-core.js" },
+                'rangy-textrange': { path: "rangy-1.3alpha.772/rangy-textrange.js", requires: [ "rangy-core" ] },
                 'search': { path: "faust/search/search.js"},
 				'svg-utils' : { path: "faust/svg-utils/svg-utils.js"},
                 'text-annotation': { path: "faust/text-annotation/text-annotation.js"},
+                'text-annotation-dump': { path: "faust/text-annotation/text-annotation-dump.js" },
 				'text-display': { path: "faust/text-display/text-display.js"},
                 'text-index': { path: 'faust/text-annotation/text-index.js'}
             }

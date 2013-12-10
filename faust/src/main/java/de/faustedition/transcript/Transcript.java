@@ -1,6 +1,7 @@
 package de.faustedition.transcript;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Throwables;
@@ -11,6 +12,7 @@ import de.faustedition.http.LastModified;
 import de.faustedition.text.SegmentRangeFilter;
 import de.faustedition.text.LineBreaker;
 import de.faustedition.text.NamespaceMapping;
+import de.faustedition.text.TextAnnotationEnd;
 import de.faustedition.text.TextAnnotationStart;
 import de.faustedition.text.TextContent;
 import de.faustedition.text.TextRangeFilter;
@@ -193,5 +195,23 @@ public class Transcript implements Iterable<TextToken>, LastModified {
             text.append(textContent.getContent());
         }
         return text.toString();
+    }
+
+    public ArrayNode json() {
+        final ArrayNode text = objectMapper.createArrayNode();
+        for (TextToken token : this) {
+            if (token instanceof TextContent) {
+                final String content = ((TextContent) token).getContent();
+                if (content.length() > 0) {
+                    text.add(content);
+                }
+            } else if (token instanceof TextAnnotationStart) {
+                final TextAnnotationStart annotationStart = (TextAnnotationStart) token;
+                text.addObject().put("s", annotationStart.getId()).put("d", annotationStart.getData());
+            } else if (token instanceof TextAnnotationEnd) {
+                text.addObject().put("e", ((TextAnnotationEnd) token).getId());
+            }
+        }
+        return text;
     }
 }

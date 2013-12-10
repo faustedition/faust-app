@@ -8,6 +8,7 @@ import de.faustedition.Database;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
+import de.faustedition.transcript.Transcript;
 import de.faustedition.transcript.Transcripts;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
@@ -160,13 +161,16 @@ public class DocumentResource {
                     }
                 }
 
+                final Transcript textualTranscript = transcripts.textual(id);
                 return new Templates.ViewAndModel("document")
                         .add("id", id)
                         .add("archive", documents.getArchivesById().get(Objects.firstNonNull(document.value1(), 0L)))
                         .add("callnumber", document.value2())
                         .add("metadata", objectMapper.reader().readTree(document.value3()))
                         .add("references", references)
-                        .add("textualTranscript", transcripts.textual(id));
+                        .add("text", textualTranscript)
+                        .add("documentaryTranscript", transcripts.documentary(id).json())
+                        .add("textualTranscript", textualTranscript.json());
             }
 
             @Override

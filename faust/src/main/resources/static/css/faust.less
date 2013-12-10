@@ -139,6 +139,8 @@ a.edit-permissions {
 
 .l-box {  padding: 1em; }
 
+.note { padding: .5em 1em; background: #393; color: #fff; font-size: smaller }
+
 .yui3-js-enabled .document-structure {
   height: 400px;
   overflow: auto;
@@ -174,4 +176,31 @@ h2 .archive {
   .add {
     color: #408051 !important
   }
+}
+
+.yui3-text-annotation-dump-content {
+
+  border: 1px solid #000;
+  margin: .5em;
+
+  .annotations, .text {
+    height: 400px;
+    overflow-y: auto;
+  }
+
+  .annotations {
+    font-size: smaller;
+  }
+
+  .annotation {
+    list-style: none;
+    border: 1px solid #ccc;
+    padding: .5em;
+    background: lightgoldenrodyellow;
+
+    .attr-name {
+      font-weight: bold;
+    }
+  }
+
 }
