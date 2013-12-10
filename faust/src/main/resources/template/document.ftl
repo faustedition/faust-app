@@ -10,13 +10,12 @@
 [#assign title][#if archive?has_content]${archive.name?html}: [/#if]${callnumber!"Document"?html}[/#assign]
 [@faust.page title=title header=header]
 
-<h2>[#if archive?has_content]<span class="archive">${archive.name?html}</span><br>[/#if]${callnumber!"Document"?html}</h2>
+<h2>
+    [#if archive?has_content]<a href="${cp}/document/archive/${archive.label?html}/" title="Archive" class="archive">${archive.name?html}</a><br>[/#if]
+    ${callnumber!"Document"?html}
+</h2>
 
-<p><a href="${cp}/document/${id?c}/source" title="XML Source">Document Descriptor (XML)</a></p>
-
-<div class="document-textual">[@transcriptMarkup text=textualTranscript /]</div>
-
-<hr>
+<h3>Prototyp: Konvolut-Navigation</h3>
 
 <div class="pure-g">
     <div class="pure-u-1-4">
@@ -57,6 +56,14 @@
         </div>
     </div>
 </div>
+
+<h3>Textuelles Transkript (zur Fehlerbereinigung)</h3>
+
+<div class="document-textual">[@transcriptMarkup text=textualTranscript /]</div>
+
+<h3>Dokument-Deskriptor</h3>
+
+<iframe src="${cp}/document/${id?c}/source" style="width: 100%; height: 400px; overflow: auto; border: 1px solid #ccc"></iframe>
 
 <script type="text/javascript">
     var model = [@json id=id metadata=metadata references=references/];
