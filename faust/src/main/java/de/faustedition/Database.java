@@ -84,7 +84,7 @@ public class Database implements DataSource {
     }
 
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return ds.getParentLogger();
+        throw new SQLFeatureNotSupportedException();
     }
 
     @Override

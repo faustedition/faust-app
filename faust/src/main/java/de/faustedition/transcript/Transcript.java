@@ -117,18 +117,18 @@ public class Transcript implements Iterable<TextToken>, LastModified {
 
     protected Iterator<TextToken> transcriptTokens(Iterator<TextToken> tokens, Iterator<String> ids) {
         tokens = Iterators.filter(tokens, new XMLElementContextFilter(
-                Predicates.or(
+                Predicates.<TextToken>or(
                         xmlName(namespaceMapping, "tei:teiHeader"),
                         xmlName(namespaceMapping, "tei:front"),
                         xmlName(namespaceMapping, "tei:app")
                 ),
-                Predicates.or(
+                Predicates.<TextToken>or(
                         xmlName(namespaceMapping, "tei:lem")
                 )
 
         ));
 
-        tokens = new WhitespaceCompressor(tokens, namespaceMapping, Predicates.or(
+        tokens = new WhitespaceCompressor(tokens, namespaceMapping, Predicates.<TextToken>or(
                 xmlName(namespaceMapping, "tei:TEI"),
                 xmlName(namespaceMapping, "tei:body"),
                 xmlName(namespaceMapping, "tei:group"),
@@ -148,7 +148,7 @@ public class Transcript implements Iterable<TextToken>, LastModified {
 
         tokens = new TranscriptMarkupHandler(tokens, objectMapper, namespaceMapping).withIds(ids);
 
-        tokens = new LineBreaker(tokens, Predicates.or(
+        tokens = new LineBreaker(tokens, Predicates.<TextToken>or(
                 xmlName(namespaceMapping, "tei:text"),
                 xmlName(namespaceMapping, "tei:div"),
                 xmlName(namespaceMapping, "tei:head"),
