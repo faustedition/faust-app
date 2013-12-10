@@ -176,7 +176,7 @@ public class AnnotationFilteringIndexSearcher extends Collector {
                         }
                         if ((termPos == termInfo.getPosition()) && termPositions.isPayloadAvailable()) {
                             final byte[] payload = new byte[termPositions.getPayloadLength()];
-                            final BitSet tokenAnnotations = BitSet.valueOf(termPositions.getPayload(payload, 0));
+                            final BitSet tokenAnnotations = TranscriptTokenAnnotationCodec.fromByteArray(termPositions.getPayload(payload, 0));
                             tokenAnnotations.and(annotations);
                             if (tokenAnnotations.equals(annotations)) {
                                 termInfos.addFirst(termInfo);

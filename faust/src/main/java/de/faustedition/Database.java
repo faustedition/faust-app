@@ -83,7 +83,6 @@ public class Database implements DataSource {
         return ds.getLoginTimeout();
     }
 
-    @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return ds.getParentLogger();
     }

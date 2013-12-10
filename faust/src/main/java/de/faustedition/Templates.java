@@ -65,6 +65,8 @@ import java.util.logging.Logger;
  */
 public class Templates extends freemarker.template.Configuration {
 
+    private static final Logger LOG = Logger.getLogger(Templates.class.getName());
+
     private static final List<Variant> VARIANTS = Variant.VariantListBuilder.newInstance()
             .mediaTypes(MediaType.TEXT_HTML_TYPE)
             .languages(Locale.GERMAN, Locale.ENGLISH)
@@ -140,10 +142,10 @@ public class Templates extends freemarker.template.Configuration {
             }
             return renderedResponse.variant(variant).build();
         } catch (TemplateException e) {
-            Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
+            LOG.log(Level.SEVERE, e.getMessage(), e);
             throw new WebApplicationException(e);
         } catch (IOException e) {
-            Logger.getGlobal().log(Level.SEVERE, e.getMessage(), e);
+            LOG.log(Level.SEVERE, e.getMessage(), e);
             throw new WebApplicationException(e);
         }
     }

@@ -2,24 +2,17 @@ package de.faustedition.index;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Predicate;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableSet;
 import de.faustedition.text.NamespaceMapping;
 import de.faustedition.text.TextAnnotationStart;
 import de.faustedition.text.TextToken;
 import de.faustedition.text.TextTokenPredicates;
 import de.faustedition.transcript.Hand;
 import org.apache.lucene.index.Payload;
-import org.apache.lucene.search.DefaultSimilarity;
-import org.apache.lucene.search.Similarity;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.namespace.QName;
-import java.nio.ByteBuffer;
 import java.util.BitSet;
-import java.util.List;
-import java.util.Set;
 
 import static de.faustedition.index.TranscriptTokenAnnotation.HAND_GOETHE;
 import static de.faustedition.index.TranscriptTokenAnnotation.HAND_INK;
@@ -76,19 +69,27 @@ public class TranscriptTokenAnnotationCodec {
         return annotationSet;
     }
 
-    public Similarity score(Iterable<TranscriptTokenAnnotation> annotations) {
-        final BitSet annotationSet = encode(annotations);
-        return new DefaultSimilarity() {
-            @Override
-            public float scorePayload(int docId, String fieldName, int start, int end, byte[] payload, int offset, int length) {
-                final BitSet termAnnotationSet = BitSet.valueOf(ByteBuffer.wrap(payload, offset, length));
-                termAnnotationSet.and(annotationSet);
-                return (termAnnotationSet.equals(annotationSet) ? 1.0f : 0.0f);
-            }
-        };
+    public static Payload asPayload(BitSet annotations) {
+        return new Payload(toByteArray(annotations));
     }
 
-    public Payload asPayload(BitSet annotations) {
-        return new Payload(annotations.toByteArray());
+    public static BitSet fromByteArray(byte[] bytes) {
+        BitSet bits = new BitSet();
+        for (int i = 0; i < bytes.length * 8; i++) {
+            if ((bytes[bytes.length - i / 8 - 1] & (1 << (i % 8))) > 0) {
+                bits.set(i);
+            }
+        }
+        return bits;
+    }
+
+    public static byte[] toByteArray(BitSet bits) {
+        byte[] bytes = new byte[bits.length() / 8 + 1];
+        for (int i = 0; i < bits.length(); i++) {
+            if (bits.get(i)) {
+                bytes[bytes.length - i / 8 - 1] |= 1 << (i % 8);
+            }
+        }
+        return bytes;
     }
 }
