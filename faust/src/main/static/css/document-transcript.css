@@ -48,12 +48,14 @@ svg.diplomatic g.Zone {
   -moz-user-select: none;-webkit-user-select: none;
 }
 
+/*
 svg.diplomatic g.Zone:hover {
   stroke: black;
   stroke-opacity: 0.3;
   stroke-width: 1;
 }
- 
+*/
+
 /* Text */
 
 svg.diplomatic .text {

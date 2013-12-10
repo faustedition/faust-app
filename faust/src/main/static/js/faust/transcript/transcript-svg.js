@@ -175,13 +175,13 @@ YUI.add('transcript-svg', function (Y) {
 		var sheet = Y.StyleSheet('#style-document-transcript-highlight-hands');
 		
 		Y.one(result).on("mouseenter", function () {
-			//Y.all('.bgBox').transition('fadeIn');
+			Y.all('.bgBox').transition('fadeIn');
 			sheet.enable();
 		});
 
 		Y.one(result).on("mouseleave", function () {
-			//Y.all('.bgBox').transition('fadeOut');
-			sheet.disable();
+			Y.all('.bgBox').transition('fadeOut');
+			//sheet.disable();
 		});
 
 		return result;

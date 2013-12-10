@@ -32,7 +32,7 @@
 
 YUI().use("stylesheet", "document-app", function(Y) {
 		  
-    Y.StyleSheet('#style-document-transcript-highlight-hands').disable();
+    //Y.StyleSheet('#style-document-transcript-highlight-hands').disable();
     Y.on("contentready", Y.Faust.DocumentApp.initializeFn('${path}', '${document.source?js_string}'), '#document-app');
 });
 
