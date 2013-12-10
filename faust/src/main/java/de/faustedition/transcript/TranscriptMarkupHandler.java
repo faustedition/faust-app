@@ -55,7 +55,7 @@ public class TranscriptMarkupHandler extends ForwardingIterator<TextToken> {
     private final ObjectMapper objectMapper;
 
     private final Queue<TextToken> buf = Lists.newLinkedList();
-    private final Iterator<String> ids = XMLEvent2TextToken.ids("transcript_");
+    private Iterator<String> ids = XMLEvent2TextToken.ids("transcript_");
 
     private final String insertKey;
     private final String insertOrientationKey;
@@ -106,6 +106,11 @@ public class TranscriptMarkupHandler extends ForwardingIterator<TextToken> {
         this.newAttributeName = map(namespaceMapping, new QName(TEI_NS_URI, "new"));
 
         this.documentKey = map(namespaceMapping, new QName(TEI_SIG_GE_URI, "document"));
+    }
+
+    public TranscriptMarkupHandler withIds(Iterator<String> ids) {
+        this.ids = ids;
+        return this;
     }
 
     @Override

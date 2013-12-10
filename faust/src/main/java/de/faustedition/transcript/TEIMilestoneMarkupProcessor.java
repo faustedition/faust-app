@@ -35,6 +35,7 @@ import de.faustedition.text.TextAnnotationEnd;
 import de.faustedition.text.TextAnnotationStart;
 import de.faustedition.text.TextToken;
 import de.faustedition.text.XML;
+import de.faustedition.text.XMLEvent2TextToken;
 
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
@@ -69,7 +70,7 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<TextToken> {
 
     private final Iterator<TextToken> delegate;
     private final ObjectMapper objectMapper;
-    private final String idPrefix;
+    private Iterator<String> ids = XMLEvent2TextToken.ids(DEFAULT_ID_PREFIX);
 
     private final Set<String> handledElements = Sets.newHashSet();
     private final Multimap<String, String> spanning = ArrayListMultimap.create();
@@ -85,16 +86,9 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<TextToken> {
 
     private final Map<String, String> milestoneElementKeys;
 
-    private int annotationId = 0;
-
     public TEIMilestoneMarkupProcessor(Iterator<TextToken> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
-        this(delegate, objectMapper, namespaceMapping, DEFAULT_ID_PREFIX);
-    }
-
-    public TEIMilestoneMarkupProcessor(Iterator<TextToken> delegate, ObjectMapper objectMapper, NamespaceMapping namespaceMapping, String idPrefix) {
         this.delegate = delegate;
         this.objectMapper = objectMapper;
-        this.idPrefix = idPrefix;
 
         this.xmlIdKey = map(namespaceMapping, XML.XML_ID_NAME);
         this.xmlNameKey = map(namespaceMapping, XML.XML_ELEMENT_NAME);
@@ -112,6 +106,11 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<TextToken> {
             );
         }
 
+    }
+
+    public TEIMilestoneMarkupProcessor withIds(Iterator<String> ids) {
+        this.ids = ids;
+        return this;
     }
 
     @Override
@@ -193,7 +192,7 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<TextToken> {
             buffer.add(new TextAnnotationEnd(last));
         }
 
-        final String id = (idPrefix + ++annotationId);
+        final String id = ids.next();
         buffer.add(new TextAnnotationStart(id, data));
         milestones.put(milestoneUnit, id);
         return true;
@@ -214,7 +213,7 @@ public class TEIMilestoneMarkupProcessor extends ForwardingIterator<TextToken> {
             data.remove(spanToKey);
             data.put(milestoneKey, data.remove(xmlNameKey).asText().replaceAll("Span$", ""));
 
-            final String id = (idPrefix + ++annotationId);
+            final String id = ids.next();
             buffer.add(new TextAnnotationStart(id, data));
             spanning.put(spanTo, id);
             return true;

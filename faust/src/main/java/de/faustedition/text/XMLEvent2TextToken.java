@@ -47,8 +47,9 @@ public class XMLEvent2TextToken implements Function<XMLEvent, TextToken> {
         this.xmlNodePathKey = map(namespaceMapping, XML.XML_NODE_PATH);
     }
 
-    public XMLEvent2TextToken withIdPrefix(String prefix) {
-        this.ids = ids(prefix);
+
+    public XMLEvent2TextToken withIds(Iterator<String> ids) {
+        this.ids = ids;
         return this;
     }
 

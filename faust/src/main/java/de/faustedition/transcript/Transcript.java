@@ -21,6 +21,7 @@ import de.faustedition.text.WhitespaceCompressor;
 import de.faustedition.text.XML;
 import de.faustedition.text.XMLElementContextFilter;
 import de.faustedition.text.XMLEvent2TextToken;
+import org.apache.commons.lang3.ObjectUtils;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -77,11 +78,13 @@ public class Transcript implements Iterable<TextToken>, LastModified {
     @Override
     public Iterator<TextToken> iterator() {
         try {
+            final Iterator<String> ids = XMLEvent2TextToken.ids(XMLEvent2TextToken.DEFAULT_ID_PREFIX);
             return transcriptTokens(new AbstractIterator<TextToken>() {
 
                 Iterator<File> sourceIt = sources.iterator();
                 Iterator<TextToken> tokenIt = Iterators.emptyIterator();
                 XMLEventReader xmlEvents = null;
+
 
                 @Override
                 protected TextToken computeNext() {
@@ -89,7 +92,7 @@ public class Transcript implements Iterable<TextToken>, LastModified {
                         try {
                             XML.closeQuietly(xmlEvents);
                             xmlEvents = XML.inputFactory().createXMLEventReader(new StreamSource(sourceIt.next()));
-                            tokenIt = Iterators.transform(XML.stream(xmlEvents), new XMLEvent2TextToken(objectMapper, namespaceMapping));
+                            tokenIt = Iterators.transform(XML.stream(xmlEvents), new XMLEvent2TextToken(objectMapper, namespaceMapping).withIds(ids));
                         } catch (XMLStreamException e) {
                             XML.closeQuietly(xmlEvents);
                             throw Throwables.propagate(e);
@@ -106,13 +109,13 @@ public class Transcript implements Iterable<TextToken>, LastModified {
                 protected void finalize() throws Throwable {
                     XML.closeQuietly(xmlEvents);
                 }
-            });
+            }, ids);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
     }
 
-    protected Iterator<TextToken> transcriptTokens(Iterator<TextToken> tokens) {
+    protected Iterator<TextToken> transcriptTokens(Iterator<TextToken> tokens, Iterator<String> ids) {
         tokens = Iterators.filter(tokens, new XMLElementContextFilter(
                 Predicates.or(
                         xmlName(namespaceMapping, "tei:teiHeader"),
@@ -141,9 +144,9 @@ public class Transcript implements Iterable<TextToken>, LastModified {
                 xmlName(namespaceMapping, "f:overw")
         ));
 
-        tokens = new TEIMilestoneMarkupProcessor(tokens, objectMapper, namespaceMapping);
+        tokens = new TEIMilestoneMarkupProcessor(tokens, objectMapper, namespaceMapping).withIds(ids);
 
-        tokens = new TranscriptMarkupHandler(tokens, objectMapper, namespaceMapping);
+        tokens = new TranscriptMarkupHandler(tokens, objectMapper, namespaceMapping).withIds(ids);
 
         tokens = new LineBreaker(tokens, Predicates.or(
                 xmlName(namespaceMapping, "tei:text"),
