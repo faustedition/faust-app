@@ -1,6 +1,6 @@
-/* Diplomatic transcript */
+/* diplomatic transcript */
 
-/* Custom fonts */
+/* custom fonts */
 
 @font-face {
   font-family: faust-serif;
@@ -41,7 +41,7 @@ svg.diplomatic {
   color: white; 
 }
 
-/* Drag 'n drop of zones */
+/* drag 'n drop of zones */
 
 svg.diplomatic g.Zone {
   cursor: move;
@@ -56,13 +56,15 @@ svg.diplomatic g.Zone:hover {
 }
 */
 
-/* Text */
+/* text */
 
 svg.diplomatic .text {
   font-size: 11pt;
   font-family: faust-sans-serif, sans-serif;
   fill: black;
 }
+
+/* writing hand / scribes */
 
 svg.diplomatic .text.hand-g {
 	font-family: faust-serif, serif;
@@ -72,12 +74,10 @@ svg.diplomatic .text.hand-xx {
 	font-family: faust-monospace, monospace;
 }
 
+/* writing material  */
+
 svg.diplomatic .text.material-bl {
 	fill: #808080;
-}
-
-svg.diplomatic Line {
-    stroke: black;
 }
 
 svg.diplomatic Line.material-bl {
@@ -91,6 +91,14 @@ svg.diplomatic .text.material-t {
 svg.diplomatic Line.material-t {
 	stroke: black;
 }
+
+/* script */
+
+svg.diplomatic .text.script-lat {
+    font-style: italic;
+}
+
+/* various annotations */
 
 svg.diplomatic .text.rewrite {
 	font-weight: bold;
@@ -118,3 +126,8 @@ svg.diplomatic .invisible {
     display: none;
 }
 
+/* graphical elements */
+
+svg.diplomatic Line {
+    stroke: black;
+}
