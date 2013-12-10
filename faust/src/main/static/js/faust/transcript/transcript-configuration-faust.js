@@ -45,11 +45,11 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
-				overw : {
+				'overw' : {
 					vc: function() {return new Faust.DefaultVC();}
 				},
 
-				under : {
+				'under' : {
 					vc: function() {
 						var vc =  new Faust.DefaultVC();
 						vc.defaultAligns = function () {
