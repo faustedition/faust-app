@@ -186,7 +186,7 @@ public class Index extends AbstractScheduledService {
         return new IndexWriterConfig(
                 LUCENE_VERSION,
                 analyzer()
-        ).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND).setWriteLockTimeout(30000);
+        ).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND).setWriteLockTimeout(60000);
     }
 
     protected static Analyzer analyzer() {

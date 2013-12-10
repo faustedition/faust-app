@@ -17,6 +17,7 @@ import de.faustedition.index.IndexResource;
 import de.faustedition.transcript.SceneStatisticsResource;
 import de.faustedition.transcript.TranscriptResource;
 import de.faustedition.transcript.TranscriptSegments;
+import de.faustedition.transcript.VerseIndex;
 import de.faustedition.transcript.VerseStatisticsResource;
 import de.faustedition.xml.XMLQueryResource;
 import de.faustedition.xml.XMLResource;
@@ -59,6 +60,7 @@ public class Server {
                     objectGraph.get(Documents.class),
                     objectGraph.get(DocumentIndexer.class),
                     objectGraph.get(TranscriptSegments.class),
+                    objectGraph.get(VerseIndex.class),
                     new HttpService(configuration,
                             objectGraph.get(JsonMessageBodyReaderWriter.class),
                             objectGraph.get(DemoResource.class),

@@ -17,6 +17,9 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.TermQuery;
 import org.jooq.DSLContext;
 
 import javax.inject.Inject;
@@ -122,11 +125,14 @@ public class DocumentIndexer extends AbstractIdleService {
 
     protected void delete(IndexWriter writer, Collection<Long> ids) throws IOException {
         int ni = ids.size();
-        final Term[] terms = new Term[ni];
+        final BooleanQuery[] queries = new BooleanQuery[ni];
+        final BooleanClause typeClause = new BooleanClause(new TermQuery(new Term("type", "document")), BooleanClause.Occur.MUST);
         for (long id : ids) {
-            terms[--ni] = new Term("id", Long.toString(id));
+            queries[--ni] = new BooleanQuery();
+            queries[ni].add(new BooleanClause(new TermQuery(new Term("id", Long.toString(id))), BooleanClause.Occur.MUST));
+            queries[ni].add(typeClause);
         }
-        writer.deleteDocuments(terms);
+        writer.deleteDocuments(queries);
     }
 
     private TokenStream transcriptTokens(Transcript transcript) {

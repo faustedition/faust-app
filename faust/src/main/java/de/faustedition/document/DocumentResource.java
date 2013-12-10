@@ -2,7 +2,9 @@ package de.faustedition.document;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Objects;
+import com.google.common.collect.Range;
 import com.google.common.eventbus.EventBus;
 import de.faustedition.Database;
 import de.faustedition.Templates;
@@ -10,6 +12,7 @@ import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
 import de.faustedition.transcript.Transcript;
 import de.faustedition.transcript.Transcripts;
+import de.faustedition.transcript.VerseIndex;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -41,16 +44,18 @@ public class DocumentResource {
     private final EventBus eventBus;
     private final Documents documents;
     private final Transcripts transcripts;
+    private final VerseIndex verseIndex;
     private final Sources sources;
     private final Templates templates;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public DocumentResource(Database database, EventBus eventBus, Documents documents, Transcripts transcripts, Sources sources, Templates templates, ObjectMapper objectMapper) {
+    public DocumentResource(Database database, EventBus eventBus, Documents documents, Transcripts transcripts, VerseIndex verseIndex, Sources sources, Templates templates, ObjectMapper objectMapper) {
         this.database = database;
         this.eventBus = eventBus;
         this.documents = documents;
         this.transcripts = transcripts;
+        this.verseIndex = verseIndex;
         this.sources = sources;
         this.templates = templates;
         this.objectMapper = objectMapper;
@@ -112,6 +117,20 @@ public class DocumentResource {
                 return !(e instanceof WebApplicationException);
             }
         });
+    }
+
+    @Path("/verse/{num}/")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public ObjectNode archiveView(@PathParam("num") final int verse) throws Exception {
+        final ObjectNode result = objectMapper.createObjectNode();
+        for (Map.Entry<Long, Range<Integer>> document : verseIndex.query(verse, 100).entrySet()) {
+            final Range<Integer> verseSegment = document.getValue();
+            result.putArray(Long.toString(document.getKey()))
+                    .add(verseSegment.lowerEndpoint())
+                    .add(verseSegment.upperEndpoint());
+        }
+        return result;
     }
 
     @GET

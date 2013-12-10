@@ -18,6 +18,7 @@ import de.faustedition.index.TranscriptTokenAnnotationCodec;
 import de.faustedition.text.NamespaceMapping;
 import de.faustedition.transcript.TranscriptSegments;
 import de.faustedition.transcript.Transcripts;
+import de.faustedition.transcript.VerseIndex;
 import de.faustedition.xml.Sources;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
@@ -49,7 +50,8 @@ import java.util.logging.Logger;
         Transcripts.class,
         TranscriptExcerpts.class,
         TranscriptSegments.class,
-        TranscriptTokenAnnotationCodec.class
+        TranscriptTokenAnnotationCodec.class,
+        VerseIndex.class
 }, library = true)
 public class Infrastructure {
 
