@@ -53,9 +53,11 @@ public class HttpService extends AbstractIdleService {
 
             resourceConfig.registerResources(StaticResourceHandler.create("/static", Strings.emptyToNull(configuration.property("faust.static_root")), "/static"));
 
+            final String contextPath = configuration.property("faust.context_path");
+            final String yuiPath = configuration.property("faust.yui_path");
             final String yuiRoot = configuration.property("faust.yui_root");
             if (!yuiRoot.isEmpty()) {
-                resourceConfig.registerResources(StaticResourceHandler.create(configuration.property("faust.yui_path"), yuiRoot, null));
+                resourceConfig.registerResources(StaticResourceHandler.create(yuiPath.substring(Strings.commonPrefix(contextPath, yuiPath).length()), yuiRoot, null));
             }
 
             final Map<String, Object> resourceMappings = Maps.newTreeMap();
@@ -90,7 +92,6 @@ public class HttpService extends AbstractIdleService {
             }
 
             final int port = Integer.parseInt(configuration.property("faust.http_port"));
-            final String contextPath = configuration.property("faust.context_path");
 
             final URI uri = new URI("http", null, "localhost", port, contextPath, null, null);
             this.httpServer = GrizzlyHttpServerFactory.createHttpServer(uri, resourceConfig);

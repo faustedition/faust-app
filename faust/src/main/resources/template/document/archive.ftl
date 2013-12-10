@@ -53,6 +53,6 @@
         var archiveLat = parseFloat('${archive.LOCATION_LAT?js_string}');
         var archiveLng = parseFloat('${archive.LOCATION_LNG?js_string}');
     </script>
-    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script>
     <script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 </@faust.page>
