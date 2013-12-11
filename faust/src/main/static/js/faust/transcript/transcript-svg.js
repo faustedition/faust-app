@@ -239,8 +239,9 @@ YUI.add('transcript-svg', function (Y) {
 		if (this.underline) {
 			this.underline.setAttribute("x1", this.x);
 			this.underline.setAttribute("x2", this.x + this.width);
-			this.underline.setAttribute("y1", this.y);
-			this.underline.setAttribute("y2", this.y);
+			var yOffset = this.height / 10.0;
+			this.underline.setAttribute("y1", this.y + yOffset);
+			this.underline.setAttribute("y2", this.y + yOffset);
 			this.underline.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
 	};
