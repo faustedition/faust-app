@@ -291,7 +291,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						var vc = new Faust.DefaultVC();						
 						// insertion mark
 						if (node.data()["f:orient"] === "right") {
-							vc.add (Y.Faust.TranscriptLayout.createText("\u2308", annotationStart, annotationEnd, text));
+							var insertionSign = node.data()['f:at'].substring(1) in layoutState.idMap ? "\u230a" : "\u2308";
+							vc.add (Y.Faust.TranscriptLayout.createText(insertionSign, annotationStart, annotationEnd, text));
 						}
 						return vc;
 					},
@@ -300,7 +301,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							// insertion mark
 							var annotationStart = node.annotation.target().range.start;
 							var annotationEnd = node.annotation.target().range.end;
-							this.add (Y.Faust.TranscriptLayout.createText("\u2309", annotationStart, annotationEnd, text));
+							var insertionSign = node.data()['f:at'].substring(1) in layoutState.idMap ? "\u230b" : "\u2309";
+							this.add (Y.Faust.TranscriptLayout.createText(insertionSign, annotationStart, annotationEnd, text));
 						}
 					}
 				}
