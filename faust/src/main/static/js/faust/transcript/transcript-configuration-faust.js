@@ -8,8 +8,22 @@ YUI.add('transcript-configuration-faust', function (Y) {
 			overlay : "overlay",
 			stripWhitespace : ['overw'],
 	        names: {
-		        'choice' : { vc: function(){return new Faust.DefaultVC();}},
-		        'unclear' : {
+				'anchor': {
+					vc: function(node, text, layoutState) {
+						//use empty text element as an anchor
+						// FIXME make proper phrase/block context differentiation
+						if (node.parent.name().localName === "zone")
+							return new Faust.Line([]);
+						else
+							return new Faust.Text("", {});
+					}
+				},
+
+				'choice' : { vc: function(){return new Faust.DefaultVC();}},
+
+				'document': {
+
+					'unclear' : {
 					vc : function (node, text, layoutState) {
 
 						var annotationStart = node.annotation.target().range.start;
@@ -39,125 +53,13 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 				
-				'document': { 
+
 					vc: function(node, text, layoutState) {
 						return new Faust.Surface();
 					}
 				},
 
-				'overw' : {
-					vc: function() {return new Faust.DefaultVC();}
-				},
-
-				'under' : {
-					vc: function() {
-						var vc =  new Faust.DefaultVC();
-						vc.defaultAligns = function () {
-
-							this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-
-							if (this.previous())
-								this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-							else
-								this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-						};
-						return vc;
-					}
-				},
-
-				'treeRoot': {
-					vc: function(node, text, layoutState) {
-						return new Faust.Surface();
-					}
-				},
-
-				'supplied' : {
-					vc : function (node, text, layoutState) {
-
-						var annotationStart = node.annotation.target().range.start;
-						var annotationEnd = node.annotation.target().range.end;
-						var vc = new Faust.DefaultVC();
-						vc.add (Y.Faust.TranscriptLayout.createText('[', annotationStart, annotationEnd, text));
-						return vc;
-					},
-					end: function(node, text, layoutState) {
-						var annotationStart = node.annotation.target().range.start;
-						var annotationEnd = node.annotation.target().range.end;
-						this.add (Y.Faust.TranscriptLayout.createText(']', annotationStart, annotationEnd, text));
-					}
-				},
-
-				'surface': { 
-					vc: function(node, text, layoutState) {
-						return new Faust.Surface();
-					}
-				},
-				
-				'zone':  { 
-					vc: function(node, text, layoutState) {
-						var vc = new Faust.Zone();
-						if ("rotate" in node.data()) 
-							vc.rotation = parseInt(node.data()["rotate"]);
-						if ("type" in node.data() && node.data()["type"] == "main") {
-							if (layoutState.mainZone)
-								throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
-							else {
-								layoutState.mainZone = vc;
-								// main zone is absolutely anchored
-								vc.setAlign('hAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
-								vc.setAlign('vAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
-							}
-						} 
-						return vc;
-					}
-				},
-
-				'line': { 
-					vc: function(node, text, layoutState) {
-
-						var lineAttrs = {};
-						var rendition = node.data()["rend"] || "";
-						if (rendition.indexOf("centered") >= 0) {
-							lineAttrs.center = true;
-						} 
-						else if (rendition.indexOf("indent-center") >=0) {
-							var start = rendition.indexOf("indent-center-");
-							lineAttrs.indentCenter = parseInt(rendition.substring(start + 14, rendition.length)) / 100.0;
-						}
-						else if (rendition.indexOf("indent") >= 0) {
-							var start = rendition.indexOf("indent-");
-							lineAttrs.indent = parseInt(rendition.substring(start + 7, rendition.length)) / 100.0;
-						}
-
-						var  position = node.data()["f:pos"] || "";
-
-						if (position.indexOf("over") >= 0)
-							lineAttrs.over = true;
-
-						if (position.indexOf("between") >= 0)
-							lineAttrs.between = true;
-
-						return new Faust.Line(lineAttrs);
-					}
-				},
-
-				'vspace': { 
-					vc: function(node, text, layoutState) {
-
-						//TODO real implementation, non-integer values
-						switch (node.data()["unit"]) {
-						case "lines":
-							if (node.data()['quantity']) {
-								return new Faust.VSpace(node.data()['quantity']);
-							} else throw (Faust.ENC_EXC_PREF + "f:vspace: Please specify @qunatity");
-							break;
-						default: 
-							throw (Faust.ENC_EXC_PREF + "Invalid unit for vspace element! Use 'lines'!");
-						}
-					}
-				},
-				
-				'gap': { 
+				'gap': {
 					vc:  function(node, text, layoutState) {
 
 						var annotationStart = node.annotation.target().range.start;
@@ -166,58 +68,49 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						var gapChar = '\u00d7';
 						var gapUncertainChar = '.';
 						switch (node.data()["unit"]) {
-						case "chars":
-							if (node.data()['quantity'] && node.data()['precision'] && 
-								node.data()['precision'] === 'medium') {
-								var representation = gapChar;
-								for (var nrChars=2; nrChars < node.data()["quantity"]; nrChars++) {
-									representation += gapUncertainChar;  
-								}
-								return Y.Faust.TranscriptLayout.createText (representation + gapChar,
-																		  annotationStart,
-																		  annotationEnd, 
-																		  text);
-							} else if (node.data()['quantity']) {
-								var representation = '';
-								for (var nrChars=0; nrChars < node.data()["quantity"]; nrChars++) {
-									//representation += '\u2715'; //capital X
-									representation += gapChar; // small X
-								}
-								return Y.Faust.TranscriptLayout.createText (representation, annotationStart, annotationEnd, text);
-							} else if(node.data()['atLeast']) {
-								var representation = gapChar;
-								for (var nrChars=2; nrChars < node.data()["atLeast"]; nrChars++) {
-									representation += gapUncertainChar;  
-								}
-								return Y.Faust.TranscriptLayout.createText (representation + gapChar, annotationStart,
-																		  annotationEnd, text);
+							case "chars":
+								if (node.data()['quantity'] && node.data()['precision'] &&
+									node.data()['precision'] === 'medium') {
+									var representation = gapChar;
+									for (var nrChars=2; nrChars < node.data()["quantity"]; nrChars++) {
+										representation += gapUncertainChar;
+									}
+									return Y.Faust.TranscriptLayout.createText (representation + gapChar,
+										annotationStart,
+										annotationEnd,
+										text);
+								} else if (node.data()['quantity']) {
+									var representation = '';
+									for (var nrChars=0; nrChars < node.data()["quantity"]; nrChars++) {
+										//representation += '\u2715'; //capital X
+										representation += gapChar; // small X
+									}
+									return Y.Faust.TranscriptLayout.createText (representation, annotationStart, annotationEnd, text);
+								} else if(node.data()['atLeast']) {
+									var representation = gapChar;
+									for (var nrChars=2; nrChars < node.data()["atLeast"]; nrChars++) {
+										representation += gapUncertainChar;
+									}
+									return Y.Faust.TranscriptLayout.createText (representation + gapChar, annotationStart,
+										annotationEnd, text);
 
-							} else {
-								throw (Faust.ENC_EXC_PREF + "Please specify either @qunatity or @atLeast");
-							}
-							break;
-						default: 
-							throw (Faust.ENC_EXC_PREF + "Invalid unit for gap element! Use 'chars'!");
+								} else {
+									throw (Faust.ENC_EXC_PREF + "Please specify either @qunatity or @atLeast");
+								}
+								break;
+							default:
+								throw (Faust.ENC_EXC_PREF + "Invalid unit for gap element! Use 'chars'!");
 						}
 					}
 				},
 
-				'hspace':  { 
+				'grBrace':  {
 					vc: function(node, text, layoutState) {
-						switch (node.data()["unit"]) {
-						case "chars":
-							if (node.data()['quantity']) {
-								var width = String(node.data()['quantity']);
-								return new Faust.HSpace(width);
-							} else throw (Faust.ENC_EXC_PREF + "f:hspace: Please specify @qunatity");
-							break;
-						default: 
-							throw (Faust.ENC_EXC_PREF + "Invalid unit for hspace element! Use 'chars'!");
-						}
+						//return new Faust.GBrace();
 					}
 				},
 
-				'grLine':  { 
+				'grLine':  {
 					vc: function(node, text, layoutState) {
 						var ancestorNames = node.ancestors().map(function(node){return node.annotation.name.localName});
 						var inline = ancestorNames.indexOf('line') >= 0;
@@ -263,32 +156,27 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						}
 					}
 				},
-				'grBrace':  { 
+
+				'hspace':  {
 					vc: function(node, text, layoutState) {
-						//return new Faust.GBrace();
+						switch (node.data()["unit"]) {
+							case "chars":
+								if (node.data()['quantity']) {
+									var width = String(node.data()['quantity']);
+									return new Faust.HSpace(width);
+								} else throw (Faust.ENC_EXC_PREF + "f:hspace: Please specify @qunatity");
+								break;
+							default:
+								throw (Faust.ENC_EXC_PREF + "Invalid unit for hspace element! Use 'chars'!");
+						}
 					}
 				},
-				'anchor': { 
-					vc: function(node, text, layoutState) {
-						//use empty text element as an anchor
-						// FIXME make proper phrase/block context differentiation
-						if (node.parent.name().localName === "zone")
-							return new Faust.Line([]);
-						else
-							return new Faust.Text("", {});
-					}
-				},
-				'rdg':  { 
-					vc: function(node, text, layoutState) {
-						// TODO make invisible
-						return new Faust.Text("", {});					
-					}
-				},
+
 				'ins': {
 					vc: function(node, text, layoutState) {
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
-						var vc = new Faust.DefaultVC();						
+						var vc = new Faust.DefaultVC();
 						// insertion mark
 						if (node.data()["f:orient"] === "right") {
 							var insertionSign = node.data()['f:at'].substring(1) in layoutState.idMap ? "\u230a" : "\u2308";
@@ -305,8 +193,126 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							this.add (Y.Faust.TranscriptLayout.createText(insertionSign, annotationStart, annotationEnd, text));
 						}
 					}
-				}
+				},
 
+				'line': {
+					vc: function(node, text, layoutState) {
+
+						var lineAttrs = {};
+						var rendition = node.data()["rend"] || "";
+						if (rendition.indexOf("centered") >= 0) {
+							lineAttrs.center = true;
+						}
+						else if (rendition.indexOf("indent-center") >=0) {
+							var start = rendition.indexOf("indent-center-");
+							lineAttrs.indentCenter = parseInt(rendition.substring(start + 14, rendition.length)) / 100.0;
+						}
+						else if (rendition.indexOf("indent") >= 0) {
+							var start = rendition.indexOf("indent-");
+							lineAttrs.indent = parseInt(rendition.substring(start + 7, rendition.length)) / 100.0;
+						}
+
+						var  position = node.data()["f:pos"] || "";
+
+						if (position.indexOf("over") >= 0)
+							lineAttrs.over = true;
+
+						if (position.indexOf("between") >= 0)
+							lineAttrs.between = true;
+
+						return new Faust.Line(lineAttrs);
+					}
+				},
+
+				'overw' : {
+					vc: function() {return new Faust.DefaultVC();}
+				},
+
+				'rdg':  {
+					vc: function(node, text, layoutState) {
+						// TODO make invisible
+						return new Faust.Text("", {});
+					}
+				},
+
+				'supplied' : {
+					vc : function (node, text, layoutState) {
+
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						var vc = new Faust.DefaultVC();
+						vc.add (Y.Faust.TranscriptLayout.createText('[', annotationStart, annotationEnd, text));
+						return vc;
+					},
+					end: function(node, text, layoutState) {
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						this.add (Y.Faust.TranscriptLayout.createText(']', annotationStart, annotationEnd, text));
+					}
+				},
+
+				'surface': {
+					vc: function(node, text, layoutState) {
+						return new Faust.Surface();
+					}
+				},
+
+				'treeRoot': {
+					vc: function(node, text, layoutState) {
+						return new Faust.Surface();
+					}
+				},
+
+				'under' : {
+					vc: function() {
+						var vc =  new Faust.DefaultVC();
+						vc.defaultAligns = function () {
+
+							this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+
+							if (this.previous())
+								this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+							else
+								this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+						};
+						return vc;
+					}
+				},
+
+				'vspace': {
+					vc: function(node, text, layoutState) {
+
+						//TODO real implementation, non-integer values
+						switch (node.data()["unit"]) {
+							case "lines":
+								if (node.data()['quantity']) {
+									return new Faust.VSpace(node.data()['quantity']);
+								} else throw (Faust.ENC_EXC_PREF + "f:vspace: Please specify @qunatity");
+								break;
+							default:
+								throw (Faust.ENC_EXC_PREF + "Invalid unit for vspace element! Use 'lines'!");
+						}
+					}
+				},
+
+				'zone':  { 
+					vc: function(node, text, layoutState) {
+						var vc = new Faust.Zone();
+						if ("rotate" in node.data()) 
+							vc.rotation = parseInt(node.data()["rotate"]);
+						if ("type" in node.data() && node.data()["type"] == "main") {
+							if (layoutState.mainZone)
+								throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
+							else {
+								layoutState.mainZone = vc;
+								// main zone is absolutely anchored
+								vc.setAlign('hAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
+								vc.setAlign('vAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
+							}
+						} 
+						return vc;
+					}
+				}
 			}
 		}
 	});
