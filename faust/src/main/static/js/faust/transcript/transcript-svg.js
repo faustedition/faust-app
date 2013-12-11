@@ -241,9 +241,6 @@ YUI.add('transcript-svg', function (Y) {
 			this.underline.setAttribute("x2", this.x + this.width);
 			this.underline.setAttribute("y1", this.y);
 			this.underline.setAttribute("y2", this.y);
-			//this.underline.setAttribute("stroke", this.handColor());
-			this.underline.setAttribute("class", this.computeClasses());
-
 			this.underline.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		}
 	};
@@ -270,6 +267,10 @@ YUI.add('transcript-svg', function (Y) {
 			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
 			this.view.setAttribute("class", 
 				this.view.getAttribute("class") + " underline");
+			if ("underlineHand" in this.textAttrs) {
+				var underlineHandClasses = this.computeHandClasses(this.textAttrs['underlineHand']);
+				this.underline.setAttribute('class', underlineHandClasses.join(' '));
+			}
 			this.svgContainer().appendChild(this.underline);
 
 		}

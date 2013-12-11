@@ -29,6 +29,8 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 						textAttrs.strikethroughHand = a.data["hand"].substring(1);
 				} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].indexOf("underline") >= 0) {
 					textAttrs.underline = true;
+					if (a.data["hand"])
+						textAttrs.underlineHand = a.data["hand"].substring(1);
 				} else if (a.name.localName == "line") {
 					textAttrs.fontsize = ((a.data["type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
 				}
