@@ -1,7 +1,6 @@
 svg.diplomatic .bgBox {
 	fill-opacity: .40;
-	fill: #b45f06;
-
+    fill: #a64d79;
     /* initially hide text background */
     opacity: 0;
 }
@@ -38,10 +37,10 @@ svg.diplomatic .bgBox.hand-go {
     fill: #9900ff;
 }
 
-svg.diplomatic .bgBox.hand-sc,  svg.diplomatic .bgBox.hand-zs,{
+svg.diplomatic .bgBox.hand-sc, svg.diplomatic .bgBox.hand-zs {
     fill: #ea9999;
 }
 
 svg.diplomatic .bgBox.hand-xx, svg.diplomatic .bgBox.hand-xy, svg.diplomatic .bgBox.hand-xz  {
-    fill: #a64d79;
+    fill: #b45f06;
 }
