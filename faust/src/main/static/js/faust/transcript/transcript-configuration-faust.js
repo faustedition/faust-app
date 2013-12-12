@@ -59,6 +59,10 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
+				'ex' : { vc: function(){return new Faust.DefaultVC();}},
+
+				'expan' : { vc: function(){return new Faust.DefaultVC();}},
+
 				'gap': {
 					vc:  function(node, text, layoutState) {
 
@@ -224,16 +228,9 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
-				'overw' : {
-					vc: function() {return new Faust.DefaultVC();}
-				},
+				'overw' : {vc: function() {return new Faust.DefaultVC();}},
 
-				'rdg':  {
-					vc: function(node, text, layoutState) {
-						// TODO make invisible
-						return new Faust.Text("", {});
-					}
-				},
+				'rdg' : { vc: function(){return new Faust.DefaultVC();}},
 
 				'supplied' : {
 					vc : function (node, text, layoutState) {

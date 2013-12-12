@@ -5,6 +5,7 @@ YUI.add('transcript', function (Y) {
 	Faust.ViewComponent = function() {};
 	Faust.ViewComponent.prototype = {
 		rotation: 0,
+		elementName: '',
 		globalRotation: function () {
 			var e = this;
 			var result = 0;
@@ -94,7 +95,7 @@ YUI.add('transcript', function (Y) {
 			this.vAlign.align();
 		},
 		computeClasses: function() { 
-			return []; 
+			return ['element-' + this.elementName];
 		},
 		rotX: function() {return 0 + this.globalRotation()},
 		rotY: function() {return 90 + this.globalRotation()},

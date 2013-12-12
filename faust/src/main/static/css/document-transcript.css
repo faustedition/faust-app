@@ -64,6 +64,14 @@ svg.diplomatic .text {
   fill: black;
 }
 
+/* hidden elements */
+
+svg.diplomatic .element-corr, svg.diplomatic .element-ex, svg.diplomatic .element-expan, svg.diplomatic .element-reg,
+svg.diplomatic .element-rdg {
+    display: none;
+}
+
+
 /* writing hand / scribes */
 
 svg.diplomatic .text.hand-g {
