@@ -1,0 +1,64 @@
+.tooltip-hand {
+    font-style: normal;
+    font-weight: bold;
+}
+
+.tooltip-material {
+    font-style: italic;
+    font-weight: normal;
+}
+
+.tooltip-script {
+    font-style: normal;
+    font-weight: normal;
+}
+
+/* scribal hands */
+
+.tooltip-caption-hand-g:before {content: 'Goethe';}
+.tooltip-caption-hand-aj:before {content: 'Anna Jameson';}
+.tooltip-caption-hand-ec:before {content: 'Eckermann';}
+.tooltip-caption-hand-f:before {content: 'Färber';}
+.tooltip-caption-hand-gt:before {content: 'Geist';}
+.tooltip-caption-hand-gh:before {content: 'Goechhausen';}
+.tooltip-caption-hand-go:before {content: 'Goettling';}
+.tooltip-caption-hand-hd:before {content: 'Herder';}
+.tooltip-caption-hand-jo:before {content: 'John';}
+.tooltip-caption-hand-kr:before {content: 'Kräuter';}
+.tooltip-caption-hand-m:before {content: 'Müller';}
+.tooltip-caption-hand-ovg:before {content: 'Ottilie von Goethe';}
+.tooltip-caption-hand-re:before {content: 'Reichel';}
+.tooltip-caption-hand-ri:before {content: 'Riemer';}
+.tooltip-caption-hand-st:before {content: 'Schuchardt';}
+.tooltip-caption-hand-sd:before {content: 'Seidler';}
+.tooltip-caption-hand-so:before {content: 'Soret';}
+.tooltip-caption-hand-sp:before {content: 'Spiegel';}
+.tooltip-caption-hand-sta:before {content: 'Stadelmann';}
+.tooltip-caption-hand-sti:before {content: 'Stieler';}
+.tooltip-caption-hand-ve:before {content: 'Varnhagen von Ense';}
+.tooltip-caption-hand-v:before {content: 'Helene Vulpius';}
+.tooltip-caption-hand-we:before {content: 'Weller';}
+.tooltip-caption-hand-wi:before {content: 'Maria Anna Katharina Theresia Willemer, genannt Marianne';}
+.tooltip-caption-hand-wo:before {content: 'Pius Alexander Wolff';}
+.tooltip-caption-hand-avg:before {content: 'August von Goethe';}
+.tooltip-caption-hand-w-owvg:before {content: 'Walther oder Wolfgang von Goethe';}
+.tooltip-caption-hand-wvg:before {content: 'Wolfgang von Goethe';}
+.tooltip-caption-hand-sc:before {content: 'Schreiberhand';}
+.tooltip-caption-hand-zs:before {content: 'zeitgenössische Schrift';}
+.tooltip-caption-hand-xx:before {content: 'fremde Hand #1';}
+.tooltip-caption-hand-xy:before {content: 'fremde Hand #2';}
+.tooltip-caption-hand-xz:before {content: 'fremde Hand #3';}
+
+/* materials */
+
+.tooltip-caption-material-t:before {content: 'Tinte';}
+.tooltip-caption-material-tr:before {content: 'rote/braune Tinte';}
+.tooltip-caption-material-bl:before {content: 'Bleistift';}
+.tooltip-caption-material-ro:before {content: 'Rötel';}
+.tooltip-caption-material-ko:before {content: 'Kohlestift';}
+.tooltip-caption-material-blau:before {content: 'blauer Bleistift';}
+
+/* script */
+
+.tooltip-caption-script-lat:before {content: 'lateinische Schrift';}
+.tooltip-caption-script-gr:before {content: 'griechische Schrift';}

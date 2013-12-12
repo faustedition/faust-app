@@ -8,6 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-text.css"/>
     <link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript.css"/>
     <link rel="stylesheet" type="text/css" id="style-document-transcript-highlight-hands" href="${cp}/static/css/document-transcript-highlight-hands.css"/>
+	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript-interaction.css"/>
 	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
 	<script type="text/javascript"> Faust.imageLinkBase = "${imageLinkBase}" </script>

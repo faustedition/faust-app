@@ -136,5 +136,5 @@ YUI.add('transcript-view', function (Y) {
 	
 }, '0.0', {
 	requires: ['view', 'node', 'transcript', 'transcript-adhoc-tree', 'transcript-configuration-faust',
-			   'transcript-svg', 'async-queue']
+			   'transcript-svg', 'transcript-interaction', 'async-queue']
 });
