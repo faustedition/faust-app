@@ -1,5 +1,8 @@
 YUI.add('transcript-interaction', function (Y) {
 	Y.on('faust:transcript-layout-done', function() {
+
+		// TOOLTIP
+
 		var tooltip = new Y.Overlay({
 			visible: false,
 			zIndex: 1300
@@ -40,6 +43,24 @@ YUI.add('transcript-interaction', function (Y) {
 		//Y.one('svg.diplomatic').delegate('mouseenter', showTooltip, '.text, .bgBox');
 		Y.all('svg.diplomatic .text, svg.diplomatic .bgBox').on('mousemove', showTooltip);
 		Y.all('svg.diplomatic .text, svg.diplomatic .bgBox').on('mouseleave', hideTooltip);
+
+		// highlight hands
+
+		var sheet = Y.StyleSheet('#style-document-transcript-highlight-hands');
+		var zones = Y.all('svg.diplomatic .Zone');
+
+		zones.on("mouseenter", function () {
+			Y.all('.bgBox').transition('fadeIn');
+			if (sheet) sheet.enable();
+		});
+
+		zones.on("mouseleave", function () {
+			Y.all('.bgBox').transition('fadeOut');
+			//sheet.disable();
+		});
+
+
+
 	})
 }, '0.0', {
 	requires: ['event-custom', 'node', 'overlay', 'widget-anim']

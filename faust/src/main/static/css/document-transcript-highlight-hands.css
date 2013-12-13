@@ -1,8 +1,6 @@
 svg.diplomatic .bgBox {
 	fill-opacity: .40;
     fill: #a64d79;
-    /* initially hide text background */
-    opacity: 0;
 }
 
 svg.diplomatic .bgBox.hand-g {

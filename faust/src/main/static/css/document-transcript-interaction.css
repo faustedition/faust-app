@@ -1,3 +1,8 @@
+svg.diplomatic .bgBox {
+    /* initially hide text background */
+    opacity: 0;
+}
+
 .tooltip-hand {
     font-style: normal;
     font-weight: bold;

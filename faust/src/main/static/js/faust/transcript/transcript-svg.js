@@ -172,18 +172,6 @@ YUI.add('transcript-svg', function (Y) {
 		result.setAttribute('class', 'Zone');
 		result.setAttributeNS(DRAG_NS, 'drag:enable', 'true');
 
-		var sheet = Y.StyleSheet('#style-document-transcript-highlight-hands');
-		
-		Y.one(result).on("mouseenter", function () {
-			Y.all('.bgBox').transition('fadeIn');
-			sheet.enable();
-		});
-
-		Y.one(result).on("mouseleave", function () {
-			Y.all('.bgBox').transition('fadeOut');
-			//sheet.disable();
-		});
-
 		return result;
 		
 	};
