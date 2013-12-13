@@ -23,5 +23,5 @@ for line in open (sys.argv[1]):
         relpath = find_document_for_gsa_number(gsa_number)[len(xml_dir) + 1:]
         print "   '" + cp + relpath + "',"
     else:
-        print "   '" + cp + archival_document_path + line[:-1] + xml_suffix + "'"
+        print "   '" + cp + archival_document_path + line[:-1] + xml_suffix + "',"
     
