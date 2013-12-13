@@ -38,11 +38,10 @@ var Faust = { contextPath: cp, FacsimileServer: "${facsimilieIIPUrl}" };
 
 	<script type="text/javascript">
 
-YUI().use("node", "event", "transcript-view",	function(Y) {
+YUI().use("node", "event", "materialunit", "transcript-view",	function(Y) {
 	
 	Y.on('faust:transcript-layout-done', function(e) {
 		Y.one('.diplomatic').setStyle('left', '0px');
-		Y.one('#editor-toolbar').setStyle('display', 'none');
 		Y.one('body').setStyle('width', Y.one('.diplomatic').get('offsetWidth'));
 		Y.fire('faust:bare-transcript-rendered', {});
 
@@ -62,9 +61,7 @@ YUI().use("node", "event", "transcript-view",	function(Y) {
 
 			var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
 				container: diplomaticContent,
-				visComponent: null,
 				transcript: t,
-				source: source
 			});
 
 			diplomaticTranscriptView.render();
@@ -72,7 +69,7 @@ YUI().use("node", "event", "transcript-view",	function(Y) {
 		});
 	});				 				  
 	
-	Faust.Document.load(new Faust.URI("${document.source?js_string}"), function(fd) {
+	Y.Faust.Document.load(new Faust.URI("${document.source?js_string}"), function(fd) {
 
 		var pages = [];
 		var descendants = fd.descendants();
