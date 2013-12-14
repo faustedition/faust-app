@@ -15,6 +15,7 @@ import de.faustedition.index.DocumentIndexer;
 import de.faustedition.index.Index;
 import de.faustedition.index.IndexResource;
 import de.faustedition.transcript.SceneStatisticsResource;
+import de.faustedition.transcript.TranscriptCollator;
 import de.faustedition.transcript.TranscriptResource;
 import de.faustedition.transcript.TranscriptSegments;
 import de.faustedition.transcript.VerseIndex;
@@ -59,6 +60,7 @@ public class Server {
                     objectGraph.get(Index.class),
                     objectGraph.get(Documents.class),
                     objectGraph.get(DocumentIndexer.class),
+                    objectGraph.get(TranscriptCollator.class),
                     objectGraph.get(TranscriptSegments.class),
                     objectGraph.get(VerseIndex.class),
                     new HttpService(configuration,
