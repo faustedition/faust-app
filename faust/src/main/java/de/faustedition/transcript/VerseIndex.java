@@ -1,12 +1,17 @@
 package de.faustedition.transcript;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.common.util.concurrent.AbstractScheduledService;
+import de.faustedition.Database;
+import de.faustedition.db.Tables;
 import de.faustedition.document.Documents;
 import de.faustedition.index.Index;
 import de.faustedition.text.NamespaceMapping;
@@ -27,13 +32,18 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.NumericUtils;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -47,21 +57,23 @@ import static de.faustedition.text.NamespaceMapping.map;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @Singleton
-public class VerseIndex extends AbstractIdleService {
+public class VerseIndex extends AbstractScheduledService {
 
     private static final Logger LOG = Logger.getLogger(VerseIndex.class.getName());
 
     private static final Pattern VERSE_NUMBER_PATTERN = Pattern.compile("[0-9]+");
 
     private final Index index;
+    private final Database database;
     private final Transcripts transcripts;
 
     private final Predicate<TextToken> versePredicate;
     private final String verseNumberAttribute;
 
     @Inject
-    public VerseIndex(Index index, Transcripts transcripts, NamespaceMapping namespaceMapping, EventBus eventBus) {
+    public VerseIndex(Index index, Database database, Transcripts transcripts, NamespaceMapping namespaceMapping, EventBus eventBus) {
         this.index = index;
+        this.database = database;
         this.transcripts = transcripts;
 
         this.versePredicate = TextTokenPredicates.xmlName(namespaceMapping, new QName(TEI_NS_URI, "l"));
@@ -102,13 +114,35 @@ public class VerseIndex extends AbstractIdleService {
     @Subscribe
     @AllowConcurrentEvents
     public void documentsUpdated(final Documents.Updated updated) {
+        update(updated.getIds());
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void documentsRemoved(final Documents.Removed removed) {
         try {
             index.transaction(new Index.TransactionCallback<Object>() {
                 @Override
                 public Object doInTransaction() throws Exception {
-                    final Collection<Long> ids = updated.getIds();
+                    delete(writer(), removed.getIds());
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            if (LOG.isLoggable(Level.SEVERE)) {
+                LOG.log(Level.SEVERE, "Error while updating verse index", e);
+            }
+        }
+    }
 
-                    delete(writer(), ids);
+    protected void update(final Collection<Long> ids)  {
+        try {
+            index.transaction(new Index.TransactionCallback<Object>() {
+                @Override
+                public Object doInTransaction() throws Exception {
+                    final IndexWriter writer = writer();
+
+                    delete(writer, ids);
 
                     for (long documentId : ids) {
                         if (LOG.isLoggable(Level.FINE)) {
@@ -150,7 +184,7 @@ public class VerseIndex extends AbstractIdleService {
                                         indexDocument.add(new Field("end", end, Field.Store.YES, Field.Index.NO));
                                         indexDocument.add(new NumericField("n", Field.Store.YES, true).setIntValue(n));
 
-                                        writer().addDocument(indexDocument);
+                                        writer.addDocument(indexDocument);
                                     } catch (NumberFormatException e) {
                                     }
                                 }
@@ -162,25 +196,7 @@ public class VerseIndex extends AbstractIdleService {
             });
         } catch (Exception e) {
             if (LOG.isLoggable(Level.SEVERE)) {
-                LOG.log(Level.SEVERE, "Error while updating document index", e);
-            }
-        }
-    }
-
-    @Subscribe
-    @AllowConcurrentEvents
-    public void documentsRemoved(final Documents.Removed removed) {
-        try {
-            index.transaction(new Index.TransactionCallback<Object>() {
-                @Override
-                public Object doInTransaction() throws Exception {
-                    delete(writer(), removed.getIds());
-                    return null;
-                }
-            });
-        } catch (Exception e) {
-            if (LOG.isLoggable(Level.SEVERE)) {
-                LOG.log(Level.SEVERE, "Error while updating document index", e);
+                LOG.log(Level.SEVERE, "Error while updating verse index", e);
             }
         }
     }
@@ -198,10 +214,26 @@ public class VerseIndex extends AbstractIdleService {
     }
 
     @Override
-    protected void startUp() throws Exception {
+    protected void runOneIteration() throws Exception {
+        database.transaction(new Database.TransactionCallback<Object>(true) {
+            @Override
+            public Object doInTransaction(DSLContext sql) throws Exception {
+                for (List<Record1<Long>> documentBatch : Iterables.partition(sql.select(Tables.DOCUMENT.ID).from(Tables.DOCUMENT).fetch(), 25)) {
+                    update(Lists.transform(documentBatch, new Function<Record1<Long>, Long>() {
+                        @Nullable
+                        @Override
+                        public Long apply(@Nullable Record1<Long> input) {
+                            return input.value1();
+                        }
+                    }));
+                }
+                return null;
+            }
+        });
     }
 
     @Override
-    protected void shutDown() throws Exception {
+    protected Scheduler scheduler() {
+        return Scheduler.newFixedDelaySchedule(1, 1, TimeUnit.DAYS);
     }
 }
