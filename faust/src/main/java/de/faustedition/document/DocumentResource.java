@@ -10,22 +10,24 @@ import de.faustedition.Database;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
+import de.faustedition.db.tables.records.DocumentTranscriptAlignmentRecord;
 import de.faustedition.transcript.Transcript;
 import de.faustedition.transcript.Transcripts;
 import de.faustedition.transcript.VerseIndex;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
-import org.jooq.Record2;
 import org.jooq.Record3;
 import org.jooq.Result;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -137,6 +139,80 @@ public class DocumentResource {
     @Path("/{id}/")
     public Response documentView(@Context Request request, @PathParam("id") final long id) {
         return templates.render(request, document(id));
+    }
+
+    @GET
+    @Path("/{id}/collation/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ObjectNode collation(@PathParam("id") final long id, @QueryParam("compressed") @DefaultValue("false") final boolean compressed) {
+        return database.transaction(new Database.TransactionCallback<ObjectNode>() {
+            @Override
+            public ObjectNode doInTransaction(DSLContext sql) throws Exception {
+                final Result<DocumentTranscriptAlignmentRecord> aligmentRecords = sql.selectFrom(Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT)
+                        .where(Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT.DOCUMENT_ID.eq(id))
+                        .orderBy(Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_START.asc(), Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_END.desc())
+                        .fetch();
+                final ObjectNode collation = objectMapper.createObjectNode();
+                final ArrayNode alignments = collation.putArray("alignments");
+                final ArrayNode transpositions = collation.putArray("transpositions");
+
+                int docStart = -1;
+                int docEnd = -1;
+                int textStart = -1;
+                int textEnd = -1;
+                boolean changed = false;
+                for (DocumentTranscriptAlignmentRecord alignment : aligmentRecords) {
+                    if (alignment.getIsTransposition()) {
+                        // transpositions are never compressed
+                        transpositions.addArray()
+                                .add(alignment.getDocStart()).add(alignment.getDocEnd())
+                                .add(alignment.getTextStart()).add(alignment.getTextEnd());
+                        continue;
+                    } else if (!compressed) {
+                        // in uncompressed mode just emit each alignment
+                        final ArrayNode alignmentDesc = alignments.addArray()
+                                .add(alignment.getDocStart()).add(alignment.getDocEnd())
+                                .add(alignment.getTextStart()).add(alignment.getTextEnd());
+
+                        if (alignment.getIsChanged()) {
+                            alignmentDesc.add(false);
+                        }
+                        continue;
+                    }
+                    if (alignment.getDocStart() == docEnd && alignment.getTextStart() == textEnd && alignment.getIsChanged().equals(changed)) {
+                        // extend alignments in compressed mode
+                        docEnd = alignment.getDocEnd();
+                        textEnd = alignment.getTextEnd();
+                        continue;
+                    }
+                    if (docStart >= 0 && textStart >= 0) {
+                        final ArrayNode alignmentDesc = alignments.addArray()
+                                .add(docStart).add(docEnd)
+                                .add(textStart).add(textEnd);
+
+                        if (changed) {
+                            alignmentDesc.add(false);
+                        }
+                    }
+                    docStart = alignment.getDocStart();
+                    docEnd = alignment.getDocEnd();
+                    textStart = alignment.getTextStart();
+                    textEnd = alignment.getTextEnd();
+                    changed = alignment.getIsChanged();
+                }
+                if (docStart >= 0 && textStart >= 0) {
+                    final ArrayNode alignmentDesc = alignments.addArray()
+                            .add(docStart).add(docEnd)
+                            .add(textStart).add(textEnd);
+
+                    if (changed) {
+                        alignmentDesc.add(false);
+                    }
+                }
+
+                return collation;
+            }
+        });
     }
 
     @GET

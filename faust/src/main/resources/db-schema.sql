@@ -78,6 +78,7 @@ create table if not exists document_transcript_alignment (
   doc_end int not null,
   text_start int not null,
   text_end int not null,
+  is_changed bool not null default false,
   is_transposition bool not null default false,
   foreign key (document_id) references document (id) on delete cascade
 );

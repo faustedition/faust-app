@@ -61,7 +61,7 @@ public class TranscriptCollator extends AbstractScheduledService {
             @Override
             public List<Long> doInTransaction(DSLContext sql) throws Exception {
                 final List<Long> ids = Lists.newLinkedList();
-                for (Record1<Long> documentRecord : sql.select(Tables.DOCUMENT.ID).from(Tables.DOCUMENT).orderBy(Tables.DOCUMENT.ID).fetch()) {
+                for (Record1<Long> documentRecord : sql.select(Tables.DOCUMENT.ID).from(Tables.DOCUMENT).orderBy(Tables.DOCUMENT.ID).limit(100).fetch()) {
                     ids.add(documentRecord.value1());
                 }
                 return ids;
@@ -125,8 +125,9 @@ public class TranscriptCollator extends AbstractScheduledService {
                             DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_START,
                             DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_END,
                             DOCUMENT_TRANSCRIPT_ALIGNMENT.TEXT_START,
-                            DOCUMENT_TRANSCRIPT_ALIGNMENT.TEXT_END
-                    ).values((Long) null, null, null, null, null));
+                            DOCUMENT_TRANSCRIPT_ALIGNMENT.TEXT_END,
+                            DOCUMENT_TRANSCRIPT_ALIGNMENT.IS_CHANGED
+                    ).values((Long) null, null, null, null, null, null));
                     boolean hasAlignments = false;
                     for (Set<VariantGraph.Vertex> rank : VariantGraphRanking.of(variantGraph)) {
                         TranscriptToken documentary = null;
@@ -158,7 +159,8 @@ public class TranscriptCollator extends AbstractScheduledService {
                             alignmentInsert.bind(
                                     id,
                                     documentRange.lowerEndpoint(), documentRange.upperEndpoint(),
-                                    textRange.lowerEndpoint(), textRange.upperEndpoint()
+                                    textRange.lowerEndpoint(), textRange.upperEndpoint(),
+                                    changed
                             );
                             hasAlignments = true;
 
