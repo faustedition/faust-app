@@ -77,8 +77,9 @@
 
 <script type="text/javascript">
     var documentModel = [@json id=id metadata=metadata references=references /],
-        documentaryTranscript = [@json text=documentaryTranscript /],
-        textualTranscript = [@json text=textualTranscript /];
+        documentaryTranscript = [@json documentaryTranscript=documentaryTranscript /],
+        textualTranscript = [@json textualTranscript=textualTranscript /],
+        collation = [@json collation=collation /];
 
     YUI().use("node", "util", "document-structure-view", "text-annotation-dump", function(Y) {
         new Y.Faust.IOStatus({ render: true });
