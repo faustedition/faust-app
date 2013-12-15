@@ -17,13 +17,14 @@
 
 <p class="note"><strong>Tipp:</strong> Beim Markieren von Abschnitten in den folgenden Transkripten wird der jeweils gültige Annotationskontext angezeigt.</p>
 
-<h3>Dokumentarisches Transkript (Annotationen)</h3>
+<div class="pure-g">
+    <div class="pure-u-1-2"><h3>Textuelles Transkript</h3></div>
+    <div class="pure-u-1-2"><h3>Documentarisches Transkript</h3></div>
+    <div class="pure-u-1-2"><div class="l-box transcript-textual"></div></div>
+    <div class="pure-u-1-2"><div class="l-box transcript-documentary"></div></div>
+</div>
 
-<div class="document-documentary-dump"></div>
-
-<h3>Textuelles Transkript (Annotationen)</h3>
-
-<div class="document-textual-dump"></div>
+<div class="document-annotation-dump"></div>
 
 <h3>Dokument-Deskriptor</h3>
 
@@ -81,12 +82,36 @@
         textualTranscript = [@json textualTranscript=textualTranscript /],
         collation = [@json collation=collation /];
 
-    YUI().use("node", "util", "document-structure-view", "text-annotation-dump", function(Y) {
+    YUI().use("node", "datasource", "util", "document-structure-view", "text-annotation-view", function(Y) {
         new Y.Faust.IOStatus({ render: true });
         new Y.Faust.DocumentTree({ container: ".document-structure", collapseAll: true }).render();
         new Y.Faust.DocumentPaginator({ container: ".document-paginator", document: documentModel }).render();
-        new Y.Faust.TextAnnotationDump({ datasource: new Y.DataSource.Local({ source: documentaryTranscript }) }).render(".document-documentary-dump");
-        new Y.Faust.TextAnnotationDump({ datasource: new Y.DataSource.Local({ source: textualTranscript }) }).render(".document-textual-dump");
+
+        var documentaryView = new Y.Faust.TextView().render(".transcript-documentary"),
+            textualView = new Y.Faust.TextView().render(".transcript-textual"),
+            annotationDump = new Y.Faust.TextAnnotationDump().render(".document-annotation-dump");
+
+        var updateAnnotationDump = function(e) {
+            annotationDump.setAttrs({
+                segment: e.segment,
+                annotations: e.text.index().find(e.segment)
+            });
+        };
+        documentaryView.after("textSelected", updateAnnotationDump);
+        textualView.after("textSelected", updateAnnotationDump);
+
+        new Y.DataSource.Local({ source: documentaryTranscript }).plug({ fn: Y.Faust.TextSchema }).sendRequest({
+            on: {
+                success: function(e) { e.response && documentaryView.set("text", e.response); },
+                failure: function(e) { alert(e.error.message); }
+            }
+        });
+        new Y.DataSource.Local({ source: textualTranscript }).plug({ fn: Y.Faust.TextSchema }).sendRequest({
+            on: {
+                success: function(e) { e.response && textualView.set("text", e.response); },
+                failure: function(e) { alert(e.error.message); }
+            }
+        });
     });
 </script>
 [/@faust.page]
