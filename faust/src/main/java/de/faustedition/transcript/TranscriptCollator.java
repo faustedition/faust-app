@@ -7,17 +7,19 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import de.faustedition.Database;
 import de.faustedition.db.Tables;
-import eu.interedition.collatex.CollationAlgorithm;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
 import eu.interedition.collatex.Witness;
+import eu.interedition.collatex.dekker.DekkerAlgorithm;
 import eu.interedition.collatex.jung.JungVariantGraph;
 import eu.interedition.collatex.simple.SimpleTokenNormalizers;
 import eu.interedition.collatex.util.VariantGraphRanking;
+import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 
@@ -25,7 +27,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +35,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static de.faustedition.db.Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -54,15 +57,16 @@ public class TranscriptCollator extends AbstractScheduledService {
 
     @Override
     protected void runOneIteration() throws Exception {
-        database.transaction(new Database.TransactionCallback<Object>(true) {
+        collate(database.transaction(new Database.TransactionCallback<List<Long>>(true) {
             @Override
-            public Object doInTransaction(DSLContext sql) throws Exception {
+            public List<Long> doInTransaction(DSLContext sql) throws Exception {
+                final List<Long> ids = Lists.newLinkedList();
                 for (Record1<Long> documentRecord : sql.select(Tables.DOCUMENT.ID).from(Tables.DOCUMENT).orderBy(Tables.DOCUMENT.ID).fetch()) {
-                    collate(Collections.singleton(documentRecord.value1()));
+                    ids.add(documentRecord.value1());
                 }
-                return null;
+                return ids;
             }
-        });
+        }));
     }
 
     @Override
@@ -87,9 +91,8 @@ public class TranscriptCollator extends AbstractScheduledService {
             final JungVariantGraph variantGraph = new JungVariantGraph();
 
             try {
-                final CollationAlgorithm collationAlgorithm = (Math.max(documentaryWitness.size(), textualWitness.size()) > 5000)
-                        ? CollationAlgorithmFactory.needlemanWunsch(TRANSCRIPT_TOKEN_WRAPPER_COMPARATOR)
-                        : CollationAlgorithmFactory.dekker(TRANSCRIPT_TOKEN_WRAPPER_COMPARATOR);
+                DekkerAlgorithm collationAlgorithm = (DekkerAlgorithm) CollationAlgorithmFactory.dekker(TRANSCRIPT_TOKEN_WRAPPER_COMPARATOR);
+                collationAlgorithm.setMergeTranspositions(true);
 
                 collationAlgorithm.collate(
                         variantGraph,
@@ -108,58 +111,121 @@ public class TranscriptCollator extends AbstractScheduledService {
                 continue;
             }
 
-            for (Set<VariantGraph.Vertex> rank : VariantGraphRanking.of(variantGraph)) {
-                TranscriptToken documentary = null;
-                TranscriptToken textual = null;
-                boolean changed = false;
-                for (VariantGraph.Vertex vertex : rank) {
-                    if (Iterables.isEmpty(vertex.transpositions())) {
-                        for (Token token : vertex.tokens()) {
-                            final TranscriptTokenWrapper tokenWrapper = (TranscriptTokenWrapper) token;
-                            if (((TranscriptWitness) tokenWrapper.getWitness()).isDocumentary()) {
-                                documentary = tokenWrapper.getTranscriptToken();
-                            } else  {
-                                textual = tokenWrapper.getTranscriptToken();
+            database.transaction(new Database.TransactionCallback<Object>() {
+                @Override
+                public Object doInTransaction(DSLContext sql) throws Exception {
+
+                    sql.delete(DOCUMENT_TRANSCRIPT_ALIGNMENT).where(DOCUMENT_TRANSCRIPT_ALIGNMENT.DOCUMENT_ID.eq(id)).execute();
+
+                    Range<Integer> documentRange = Range.closedOpen(0, 0);
+                    Range<Integer> textRange = Range.closedOpen(0, 0);
+
+                    final BatchBindStep alignmentInsert = sql.batch(sql.insertInto(DOCUMENT_TRANSCRIPT_ALIGNMENT,
+                            DOCUMENT_TRANSCRIPT_ALIGNMENT.DOCUMENT_ID,
+                            DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_START,
+                            DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_END,
+                            DOCUMENT_TRANSCRIPT_ALIGNMENT.TEXT_START,
+                            DOCUMENT_TRANSCRIPT_ALIGNMENT.TEXT_END
+                    ).values((Long) null, null, null, null, null));
+                    boolean hasAlignments = false;
+                    for (Set<VariantGraph.Vertex> rank : VariantGraphRanking.of(variantGraph)) {
+                        TranscriptToken documentary = null;
+                        TranscriptToken textual = null;
+                        boolean changed = false;
+                        for (VariantGraph.Vertex vertex : rank) {
+                            if (Iterables.isEmpty(vertex.transpositions())) {
+                                for (Token token : vertex.tokens()) {
+                                    final TranscriptTokenWrapper tokenWrapper = (TranscriptTokenWrapper) token;
+                                    if (((TranscriptWitness) tokenWrapper.getWitness()).isDocumentary()) {
+                                        documentary = tokenWrapper.getTranscriptToken();
+                                    } else  {
+                                        textual = tokenWrapper.getTranscriptToken();
+                                    }
+                                }
+                            }
+                            // if we do not collect both tokens from the same vertex, we assume a change/edit
+                            changed = changed || (documentary == null || textual == null);
+                        }
+
+                        if (documentary != null || textual != null) {
+                            documentRange = (documentary == null
+                                    ? Range.closedOpen(documentRange.upperEndpoint(), documentRange.upperEndpoint())
+                                    : documentary.getSegment());
+                            textRange = (textual == null
+                                    ? Range.closedOpen(textRange.upperEndpoint(), textRange.upperEndpoint())
+                                    : textual.getSegment());
+
+                            alignmentInsert.bind(
+                                    id,
+                                    documentRange.lowerEndpoint(), documentRange.upperEndpoint(),
+                                    textRange.lowerEndpoint(), textRange.upperEndpoint()
+                            );
+                            hasAlignments = true;
+
+                            if (LOG.isLoggable(Level.FINER)) {
+                                LOG.finer(Joiner.on(" => ").join(
+                                        (documentary == null ? "-" : documentary.getContent().replaceAll("[\r\n]+", "\u00b6")),
+                                        (textual == null ? "-" : textual.getContent().replaceAll("[\r\n]+", "\u00b6"))
+                                ));
                             }
                         }
                     }
-                    // if we do not collect both tokens from the same vertex, we assume a change/edit
-                    changed = changed || (documentary == null || textual == null);
-                }
 
-                if (documentary != null || textual != null) {
-                    // FIXME: write alignment to database
-                    if (LOG.isLoggable(Level.FINER)) {
-                        LOG.finer(Joiner.on(" => ").join(
-                                (documentary == null ? "-" : documentary.getContent().replaceAll("[\r\n]+", "\u00b6")),
-                                (textual == null ? "-" : textual.getContent().replaceAll("[\r\n]+", "\u00b6"))
-                        ));
+                    if (hasAlignments) {
+                        alignmentInsert.execute();
                     }
-                }
-            }
-            for (VariantGraph.Transposition transposition : variantGraph.transpositions()) {
-                TranscriptToken documentary = null;
-                TranscriptToken textual = null;
-                for (VariantGraph.Vertex vertex : transposition) {
-                    for (Token token : vertex.tokens()) {
-                        final TranscriptTokenWrapper tokenWrapper = (TranscriptTokenWrapper) token;
-                        if (((TranscriptWitness) tokenWrapper.getWitness()).isDocumentary()) {
-                            documentary = tokenWrapper.getTranscriptToken();
-                        } else  {
-                            textual = tokenWrapper.getTranscriptToken();
+
+
+                    if (!variantGraph.transpositions().isEmpty()) {
+                        final BatchBindStep transpositionInsert = sql.batch(sql.insertInto(DOCUMENT_TRANSCRIPT_ALIGNMENT,
+                                DOCUMENT_TRANSCRIPT_ALIGNMENT.DOCUMENT_ID,
+                                DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_START,
+                                DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_END,
+                                DOCUMENT_TRANSCRIPT_ALIGNMENT.TEXT_START,
+                                DOCUMENT_TRANSCRIPT_ALIGNMENT.TEXT_END,
+                                DOCUMENT_TRANSCRIPT_ALIGNMENT.IS_TRANSPOSITION
+                        ).values((Long) null, null, null, null, null, null));
+
+                        for (VariantGraph.Transposition transposition : variantGraph.transpositions()) {
+                            TranscriptToken documentary = null;
+                            TranscriptToken textual = null;
+                            for (VariantGraph.Vertex vertex : transposition) {
+                                for (Token token : vertex.tokens()) {
+                                    final TranscriptTokenWrapper tokenWrapper = (TranscriptTokenWrapper) token;
+                                    if (((TranscriptWitness) tokenWrapper.getWitness()).isDocumentary()) {
+                                        documentary = tokenWrapper.getTranscriptToken();
+                                    } else  {
+                                        textual = tokenWrapper.getTranscriptToken();
+                                    }
+                                }
+                            }
+
+                            Preconditions.checkState(documentary != null && textual != null);
+
+                            final Range<Integer> documentarySegment = documentary.getSegment();
+                            final Range<Integer> textualSegment = textual.getSegment();
+
+                            transpositionInsert.bind(
+                                    id,
+                                    documentarySegment.lowerEndpoint(), documentarySegment.upperEndpoint(),
+                                    textualSegment.lowerEndpoint(), textualSegment.upperEndpoint(),
+                                    true
+                            );
+
+                            if (LOG.isLoggable(Level.FINER)) {
+                                LOG.finer(Joiner.on(" => ").join(
+                                        (documentary.getContent().replaceAll("[\r\n]+", "\u00b6")),
+                                        (textual.getContent().replaceAll("[\r\n]+", "\u00b6"))
+                                ));
+                            }
                         }
-                    }
-                }
 
-                Preconditions.checkState(documentary != null && textual != null);
-                // FIXME: write transposition to database
-                if (LOG.isLoggable(Level.FINER)) {
-                    LOG.finer(Joiner.on(" => ").join(
-                            (documentary == null ? "-" : documentary.getContent().replaceAll("[\r\n]+", "\u00b6")),
-                            (textual == null ? "-" : textual.getContent().replaceAll("[\r\n]+", "\u00b6"))
-                    ));
+                        transpositionInsert.execute();
+                    }
+
+                    return null;
                 }
-            }
+            });
 
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine(String.format("Collated document #%d [%s, %s] in %s", id, documentaryWitness, textualWitness, stopwatch.stop()));

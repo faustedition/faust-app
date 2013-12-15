@@ -71,3 +71,16 @@ create table if not exists transcribed_verse_interval (
   foreign key (transcript_id) references transcript (id) on delete cascade,
   unique (transcript_id, verse_start, verse_end)
 );
+
+create table if not exists document_transcript_alignment (
+  document_id bigint not null,
+  doc_start int not null,
+  doc_end int not null,
+  text_start int not null,
+  text_end int not null,
+  is_transposition bool not null default false,
+  foreign key (document_id) references document (id) on delete cascade
+);
+
+create index if not exists document_transcript_alignment_doc on document_transcript_alignment (document_id, doc_start, doc_end);
+create index if not exists document_transcript_alignment_text on document_transcript_alignment (document_id, text_start, text_end);

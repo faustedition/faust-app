@@ -2,6 +2,7 @@ package de.faustedition.transcript;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
+import com.google.common.collect.Range;
 import de.faustedition.text.TextSegmentAnnotation;
 
 import java.util.List;
@@ -27,6 +28,10 @@ public class TranscriptToken {
 
     public int getOffset() {
         return offset;
+    }
+
+    public Range<Integer> getSegment() {
+        return Range.closedOpen(offset, offset + content.length());
     }
 
     public List<TextSegmentAnnotation> getAnnotations() {

@@ -51,13 +51,10 @@ public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterat
                     final TextToken token = input.next();
                     if (token instanceof TextContent) {
                         for (char currentChar : ((TextContent) token).getContent().toCharArray()) {
-                            final boolean currentIsWhitespace = Character.isWhitespace(currentChar);
-                            if (!Character.isWhitespace(lastChar) && currentIsWhitespace) {
+                            if (Character.isWhitespace(lastChar) && !Character.isWhitespace(currentChar)) {
                                 emitToken();
                             }
-                            if (!currentIsWhitespace) {
-                                tokenContent.append(currentChar);
-                            }
+                            tokenContent.append(currentChar);
                             lastChar = currentChar;
                             offset++;
                         }
@@ -79,10 +76,11 @@ public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterat
     }
 
     protected void emitToken() {
-        final int length = tokenContent.length();
+        final String token = tokenContent.toString();
+        final int length = token.length();
         if (length > 0) {
             final int tokenStart = offset - length;
-            final int tokenEnd = offset;
+            final int tokenEnd = tokenStart + token.trim().length(); // omit trailing whitespace
 
             final List<TextSegmentAnnotation> tokenAnnotations = Lists.newLinkedList();
 
@@ -106,7 +104,7 @@ public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterat
                 }
             }
 
-            buf.add(new TranscriptToken(tokenContent.toString(), tokenStart, tokenAnnotations));
+            buf.add(new TranscriptToken(token, tokenStart, tokenAnnotations));
 
             tokenContent = new StringBuilder();
         }
