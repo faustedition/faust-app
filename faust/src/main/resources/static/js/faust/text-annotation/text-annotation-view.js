@@ -6,7 +6,7 @@ YUI.add("text-annotation-view", function(Y) {
     NS.TextView = Y.Base.create("text-view", Y.Widget, [], {
         initializer: function() {
             this.eventHandles = [];
-            this.eventHandles.push(this.after(["textChange", "highlightSpacesChange"], this.syncUI, this));
+            this.eventHandles.push(this.after(["textChange", "highlightSpacesChange", "milestonesChange"], this.syncUI, this));
         },
         destructor: function() {
             Y.Array.each(this.eventHandles, function(eh) { eh.detach(); });
@@ -16,8 +16,8 @@ YUI.add("text-annotation-view", function(Y) {
                 var selection = rangy.getSelection();
 
                 selection.refresh();
-                var a = Y.one(selection.anchorNode).ancestor("span", true),
-                    b = Y.one(selection.focusNode).ancestor("span", true);
+                var aNode = Y.one(selection.anchorNode), a = (aNode ? aNode.ancestor("span", true) : null),
+                    bNode = Y.one(selection.focusNode), b = (bNode ? bNode.ancestor("span", true) : null);
 
                 if (a == null || b == null) return;
 
@@ -39,20 +39,23 @@ YUI.add("text-annotation-view", function(Y) {
 
             var text = this.get("text"),
                 highlightSpaces = this.get("highlightSpaces"),
-                milestones = text.milestones(),
-                lineBreaks = text.lineBreaks();
+                lineBreaks = text.lineBreaks(),
+                milestones = Y.Faust.SortedArray.dedupe(
+                    Y.Faust.SortedArray.merge(text.milestones(), this.get("milestones"), Y.Faust.compareNumbers),
+                    Y.Faust.compareNumbers
+                );
 
             var line = null, newLine = function() {
                 line = cb.appendChild("<div></div>");
             };
 
-            var segments = [], segment = function(start, end) {
+            var segments = [], segmentNodes = [], segment = function(start, end) {
                 if (line == null) newLine();
 
                 var content = text.content([start, end]);
                 if (highlightSpaces) content = content.replace(/ /g, "\u2423");
 
-                line.appendChild("<span></span>").set("text", content).setData("n", segments.length);
+                segmentNodes.push(line.appendChild("<span></span>").set("text", content).setData("n", segments.length));
                 segments.push([start, end]);
             };
 
@@ -74,11 +77,13 @@ YUI.add("text-annotation-view", function(Y) {
             }
 
             this.set("segments", segments);
+            this.fire("segmentsRendered", { segments: segments, nodes: segmentNodes });
         }
     }, {
         ATTRS: {
             "text": { valueFn: function() { return new Y.Faust.Text(); } },
             "highlightSpaces": { value: false, validator: Y.Lang.isBoolean },
+            "milestones" : { valueFn: function() { return []; } },
             "segments": { valueFn: function() { return []; } }
         }
     });

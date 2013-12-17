@@ -66,15 +66,32 @@ YUI.add('text-annotation', function (Y) {
                 text = (Y.Lang.isString(data) ? Y.JSON.parse(data) : data),
                 payload = e.details[0];
 
-            if (Y.Lang.isObject(text) && text.text) text = text.text;
+            payload.response = arguments.callee.parse(
+                (Y.Lang.isObject(text) && text.text ? text.text : text),
+                this.get("treeFilter")
+            );
 
+            this.get("host").fire("response", payload);
+
+            return new Y.Do.Halt("TextSchema plugin halted _defDataFn");
+        }
+    }, {
+        NS: "schema",
+
+        ATTRS: {
+            treeFilter: {
+                value: function(t) { return t["xml:name"]; },
+                validator: Y.Lang.isFunction
+            }
+        },
+
+        parse: function(text, treeFilter) {
             var tree = null,
                 offset = 0,
                 content = "",
                 annotations = {},
                 treeNodes = {},
-                treeStack = [],
-                treeFilter = this.get("treeFilter");
+                treeStack = [];
 
             for (var tc = 0, tl = text.length; tc < tl; tc++) {
                 var t = text[tc],
@@ -89,7 +106,7 @@ YUI.add('text-annotation', function (Y) {
                 } else if (t.s && t.d) {
                     var data = annotations[t.s] = Y.merge(t.d, { "id": t.s, "txt:segment": [ offset ] });
 
-                    if (treeFilter(t.d)) {
+                    if (treeFilter && treeFilter(t.d)) {
                         var node = (parent ? parent.append(tree.createNode()) : (tree = new Y.Tree()).rootNode);
                         node.data = data;
                         treeNodes[t.s] = node;
@@ -105,28 +122,51 @@ YUI.add('text-annotation', function (Y) {
                 }
             }
 
-            payload.response = new Text(content, annotations, tree);
-
-            this.get("host").fire("response", payload);
-
-            return new Y.Do.Halt("TextSchema plugin halted _defDataFn");
-        }
-    }, {
-        NS: "schema",
-
-        ATTRS: {
-            treeFilter: {
-                value: function(t) { return t["xml:name"]; },
-                validator: Y.Lang.isFunction
-            }
+            return new Text(content, annotations, tree);
         }
     });
 
+    var Collation = function(data) {
+        this.data = data || {};
+    };
+
+    Y.extend(Collation, Object, {
+        alignments: function() {
+            return (this.data.alignments || []);
+        },
+        transpostions: function() {
+            return (this.data.transpositions || []);
+        },
+        milestones: function(witness) {
+            var witnessOffset = (witness * 2),
+                alignments = this.alignments(),
+                transpositions = this.transpostions(),
+                alignmentMilestones = [],
+                transpositionMilestones = [];
+
+            for (var oc = 0, last = -1; oc < alignments.length; oc++) {
+                var alignment = alignments[oc];
+                if (last != alignment[witnessOffset]) alignmentMilestones.push(last = alignment[witnessOffset]);
+                if (last != alignment[witnessOffset + 1]) alignmentMilestones.push(last = alignment[witnessOffset + 1]);
+            }
+            for (var tc = 0, last = -1; tc < transpositions.length; tc++) {
+                var transposition = transpositions[tc];
+                if (last != transposition[witnessOffset]) transpositionMilestones.push(last = transposition[witnessOffset]);
+                if (last != transposition[witnessOffset + 1]) transpositionMilestones.push(last = transposition[witnessOffset + 1]);
+            }
+
+            return Y.Faust.SortedArray.dedupe(
+                Y.Faust.SortedArray.merge(alignmentMilestones, transpositionMilestones, Y.Faust.compareNumbers),
+                Y.Faust.compareNumbers
+            );
+        }
+    });
 
 	Y.mix(Y.namespace("Faust"), {
 		Text: Text,
-        TextSchema: TextSchema
+        TextSchema: TextSchema,
+        Collation: Collation
 	});
 }, '0.0', {
-	requires: ["text-index", "base", "substitute", "array-extras", "io", "json", "plugin", "tree"]
+	requires: ["text-index", "util", "base", "substitute", "array-extras", "io", "json", "plugin", "tree"]
 });
