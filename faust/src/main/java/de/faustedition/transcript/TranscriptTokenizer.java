@@ -51,7 +51,7 @@ public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterat
                     final TextToken token = input.next();
                     if (token instanceof TextContent) {
                         for (char currentChar : ((TextContent) token).getContent().toCharArray()) {
-                            if (Character.isWhitespace(lastChar) && !Character.isWhitespace(currentChar)) {
+                            if (isTokenBoundary(lastChar) && !isTokenBoundary(currentChar)) {
                                 emitToken();
                             }
                             tokenContent.append(currentChar);
@@ -73,6 +73,14 @@ public class TranscriptTokenizer implements Function<Iterator<TextToken>, Iterat
                 return (buf.isEmpty() ? endOfData() : buf.remove());
             }
         };
+    }
+
+    protected boolean isTokenBoundary(char c) {
+        if (Character.isWhitespace(c)) {
+            return true;
+        }
+        final int type = Character.getType(c);
+        return (Character.START_PUNCTUATION == type || Character.END_PUNCTUATION == type || Character.OTHER_PUNCTUATION == type);
     }
 
     protected void emitToken() {
