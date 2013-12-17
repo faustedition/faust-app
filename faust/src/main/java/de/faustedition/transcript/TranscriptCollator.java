@@ -8,9 +8,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import de.faustedition.Database;
 import de.faustedition.db.Tables;
+import de.faustedition.document.Documents;
+import de.faustedition.index.Index;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -50,9 +55,29 @@ public class TranscriptCollator extends AbstractScheduledService {
     private final Transcripts transcripts;
 
     @Inject
-    public TranscriptCollator(Database database, Transcripts transcripts) {
+    public TranscriptCollator(Database database, Transcripts transcripts, EventBus eventBus) {
         this.database = database;
         this.transcripts = transcripts;
+
+        eventBus.register(this);
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void documentsUpdated(final Documents.Updated updated) {
+        collate(updated.getIds());
+    }
+
+    @Subscribe
+    @AllowConcurrentEvents
+    public void documentsRemoved(final Documents.Removed removed) {
+        database.transaction(new Database.TransactionCallback<Object>() {
+            @Override
+            public Object doInTransaction(DSLContext sql) throws Exception {
+                sql.delete(DOCUMENT_TRANSCRIPT_ALIGNMENT).where(DOCUMENT_TRANSCRIPT_ALIGNMENT.DOCUMENT_ID.in(removed.getIds())).execute();
+                return null;
+            }
+        });
     }
 
     @Override
@@ -71,7 +96,7 @@ public class TranscriptCollator extends AbstractScheduledService {
 
     @Override
     protected Scheduler scheduler() {
-        return Scheduler.newFixedDelaySchedule(1, 1, TimeUnit.DAYS);
+        return Scheduler.newFixedDelaySchedule(0, 1, TimeUnit.DAYS);
     }
 
     private void collate(Collection<Long> ids) {
@@ -88,6 +113,12 @@ public class TranscriptCollator extends AbstractScheduledService {
                 continue;
             }
 
+            if (Math.max(documentaryWitness.size(), textualWitness.size()) > 8000) {
+                if (LOG.isLoggable(Level.WARNING)) {
+                    LOG.warning(String.format("Skip collation of large document #%d (%s)", id, stopwatch.stop()));
+                }
+                continue;
+            }
             final JungVariantGraph variantGraph = new JungVariantGraph();
 
             try {
@@ -146,6 +177,10 @@ public class TranscriptCollator extends AbstractScheduledService {
                             }
                             // if we do not collect both tokens from the same vertex, we assume a change/edit
                             changed = changed || (documentary == null || textual == null);
+                        }
+                        if (documentary == null || textual == null) {
+                            // if we did not collect both tokens, it is an omission/addition, not a change
+                            changed = false;
                         }
 
                         if (documentary != null || textual != null) {
