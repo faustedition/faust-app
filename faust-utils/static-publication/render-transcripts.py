@@ -16,6 +16,7 @@ latex_header = """\\documentclass[11pt,oneside]{book}
     urlcolor=black
 }
 \DeclareUnicodeCharacter{00D7}{x}
+\DeclareUnicodeCharacter{00A0}{~}
 \\begin{document} 
 \\author{Johann Wolfgang Goethe} 
 \\title{Faust. Historisch-kritische Ausgabe} 
@@ -87,7 +88,13 @@ def latex_escape_text(text):
         .replace('{', '\\{')\
         .replace('}', '\\}')\
         .replace('~', '\\textasciitilde{}')\
-        .replace('-', '\\textendash{}')
+        .replace('-', '\\textendash{}')\
+        .replace(u'\u03B1', '\\ensuremath{\\alpha}')\
+        .replace(u'\u03B2', '\\ensuremath{\\beta}')\
+        .replace(u'\u03B3', '\\ensuremath{\\gamma}')\
+        .replace(u'\u03B4', '\\ensuremath{\\delta}')
+
+    
 
 def metadata_if_exists(value):
     return u'\\noindent{}' + latex_escape_text(value) + u'\n\n' if value and value != "none" else ""
