@@ -15,7 +15,6 @@ import com.google.common.util.concurrent.AbstractScheduledService;
 import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.document.Documents;
-import de.faustedition.index.Index;
 import eu.interedition.collatex.CollationAlgorithmFactory;
 import eu.interedition.collatex.Token;
 import eu.interedition.collatex.VariantGraph;
@@ -96,7 +95,7 @@ public class TranscriptCollator extends AbstractScheduledService {
 
     @Override
     protected Scheduler scheduler() {
-        return Scheduler.newFixedDelaySchedule(0, 1, TimeUnit.DAYS);
+        return Scheduler.newFixedDelaySchedule(1, 1, TimeUnit.DAYS);
     }
 
     private void collate(Collection<Long> ids) {
