@@ -1,56 +1,12 @@
 import requests, urllib, os, os.path, sys, tempfile, shutil
 from subprocess import call, check_call
 
-context_path = 'http://localhost:8080/faustedition/'
-
-manuscript_urls = [
-    # "artige Handschriften"
-
-    'http://localhost:8080/faustedition/document/gedichte/gsa_390162.xml',
-    #'http://localhost:8080/faustedition/document/gedichte/gsa_390603.xml',
-    #'http://localhost:8080/faustedition/document/verschiedenes/gsa_390376.xml',
-    'http://localhost:8080/faustedition/document/verschiedenes/gsa_390200.xml',
-    #'http://localhost:8080/faustedition/document/archival/gsa/GSA_35-N_44.xml',
-    'http://localhost:8080/faustedition/document/archival/gsa/GSA_68-878_Mit_drey_Blumen_Straeussen.xml',
-    'http://localhost:8080/faustedition/document/archival/gsa/GSA_25-W_1419a.xml',
-    #'http://localhost:8080/faustedition/document/archival/gsa/GSA_25-XIX-3_Filmnr_1427_360.xml',
-    'http://localhost:8080/faustedition/document/faust/1/gsa_390789.xml',
-    'http://localhost:8080/faustedition/document/faust/1/gsa_390753.xml',
-    'http://localhost:8080/faustedition/document/faust/1/gsa_390263.xml',
-    'http://localhost:8080/faustedition/document/faust/2.3/gsa_390838.xml',
-    # 'http://localhost:8080/faustedition/document/faust/2.3/gsa_391484.xml',
-    'http://localhost:8080/faustedition/document/faust/2.5/gsa_391525.xml',
-    'http://localhost:8080/faustedition/document/faust/2.5/gsa_391507.xml',
-    # 'http://localhost:8080/faustedition/document/faust/2.5/gsa_391508.xml',
-    'http://localhost:8080/faustedition/document/faust/2.5/gsa_389771.xml',
-    'http://localhost:8080/faustedition/document/faust/2.4/gsa_390704.xml',
-    # 'http://localhost:8080/faustedition/document/faust/2.4/gsa_390157.xml',
-    'http://localhost:8080/faustedition/document/faust/2/gsa_390777.xml',
-    'http://localhost:8080/faustedition/document/faust/2.2/gsa_391436.xml',
-    'http://localhost:8080/faustedition/document/faust/2.2/gsa_391492.xml',
-    'http://localhost:8080/faustedition/document/faust/2.2/gsa_390656.xml',
-    'http://localhost:8080/faustedition/document/faust/2.1/gsa_390871.xml',
-    'http://localhost:8080/faustedition/document/faust/2.1/gsa_390434.xml',
-    # 'http://localhost:8080/faustedition/document/faust/2.1/gsa_389892.xml',
-    'http://localhost:8080/faustedition/document/faust/2.1/gsa_390893.xml',
-    'http://localhost:8080/faustedition/document/faust/2.1/gsa_390188.xml',
-    'http://localhost:8080/faustedition/document/paralipomena/gsa_390887.xml',
-    'http://localhost:8080/faustedition/document/paralipomena/gsa_390778.xml',
-    'http://localhost:8080/faustedition/document/paralipomena/gsa_390259.xml',
-    'http://localhost:8080/faustedition/document/paralipomena/gsa_391360.xml',
-    'http://localhost:8080/faustedition/document/paralipomena/gsa_389847.xml',
-    'http://localhost:8080/faustedition/document/paralipomena/gsa_390093.xml',
-    'http://localhost:8080/faustedition/document/paralipomena/gsa_389879.xml',
-    'http://localhost:8080/faustedition/document/paralipomena/gsa_390405.xml',
-    # 'http://localhost:8080/faustedition/document/paralipomena/gsa_391368.xml',
-    'http://localhost:8080/faustedition/document/paralipomena/gsa_390387.xml'
-    ]
-
 latex_header = """\\documentclass[11pt,oneside]{book} 
 \\usepackage{makeidx}
 \\usepackage{graphicx}
 \\usepackage[german]{babel} 
 \\usepackage[utf8]{inputenc}
+
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
@@ -115,18 +71,33 @@ def render_document(url, tmp_dir):
         if not os.path.exists(out_filepath):
             print "   (rendering to      " + out_filepath  + ")"
             check_call(['phantomjs', 'render-transcript.js', url + '?view=transcript-bare#' + str(i+1), out_filepath]) 
+            check_call(['mogrify', '-resize', '6000x6000', out_filepath])
         else:
             print "   (already exists at " + out_filepath + ")"
 
+def latex_escape_text(text):
+    return text\
+        .replace('#', '\\#')\
+        .replace('$', '\\$')\
+        .replace('%', '\\%')\
+        .replace('&', '\\&')\
+        .replace('\\', '\\textbackslash{}')\
+        .replace('^', '\\textasciicircum{}')\
+        .replace('_', '\\_')\
+        .replace('{', '\\{')\
+        .replace('}', '\\}')\
+        .replace('~', '\\textasciitilde{}')\
+        .replace('-', '\\textendash{}')
+
 def metadata_if_exists(value):
-    return u'\\noindent{}' + value + u'\n\n' if value and value != "none" else ""
+    return u'\\noindent{}' + latex_escape_text(value) + u'\n\n' if value and value != "none" else ""
         
 def generate_document_overview(url, doc_data):
     result = u''
     doc_src = get_doc_src(doc_data)
     result = result +  u'\clearpage\n'
-    result = result + u'\\vfill\n{}'
-    result = result + u'\section{' + doc_data['name'] + u'}\n\n\n'
+    result = result + u'\\vfill{}\n'
+    result = result + u'\section{' + latex_escape_text(doc_data['name']) + u'}\n\n\n'
     result = result + metadata_if_exists(doc_data['callnumber.wa-faust'])
     result = result + metadata_if_exists(doc_data['callnumber.gsa-1'])
     result = result + metadata_if_exists(doc_data['callnumber.gsa-2'])
@@ -143,7 +114,7 @@ def generate_document_overview(url, doc_data):
 def generate_latex(manuscript_urls, tmp_dir):
     result = ''
     for url in manuscript_urls:
-        # try:
+        try:
             doc_data = requests.get(url).json()
             result = result + generate_document_overview(url, doc_data)
             for (i, page_url) in enumerate(get_pageurls(url)):
@@ -156,24 +127,33 @@ def generate_latex(manuscript_urls, tmp_dir):
                 if "self/none"  in page_url:
                     result = result + u"[Leere Seite]"
                 else: 
-                    result = result + u'\includegraphics[width=\\linewidth,height=0.9\\textheight,keepaspectratio]{' + generate_out_filepath(page_url, tmp_dir)  + u'}\n'
-        # except Exception as e:
-        #     result = result + 'Fehler beim Einlesen der Handschriftenbeschreibung \n\n'
-        #     print "Error: ", e
+                    transcript_graphic_path = generate_out_filepath(page_url, tmp_dir)
+                    if os.path.exists(transcript_graphic_path):
+                        result = result + u'\includegraphics[width=\\linewidth,height=0.9\\textheight,keepaspectratio]{' + transcript_graphic_path  + u'}\n'
+                    else:
+                        result = result + u'[Fehler beim generieren des Transkripts]'
+        except Exception as e:
+            #result = result + 'Fehler beim Einlesen der Handschriftenbeschreibung \n\n'
+            print "Error: ", e
     return result
 
 def main():
 
-    if len(sys.argv) < 2 or len(sys.argv) > 3:
-        print 'usage: render-transcripts.py pdf_result [tmp_dir]'
+    if len(sys.argv) < 3 or len(sys.argv) > 4:
+        print 'usage: render-transcripts.py manuscript_list pdf_result [tmp_dir]'
         print '   tmp_dir caches rendered graphics to be reused'
         exit(-1)
 
-    pdf_result = os.path.abspath(sys.argv[1])
-    tmp_dir = os.path.abspath(sys.argv[2]) if len(sys.argv) > 2 else tempfile.mkdtemp()
+    manuscript_list = os.path.abspath(sys.argv[1])
+    pdf_result = os.path.abspath(sys.argv[2])
+    tmp_dir = os.path.abspath(sys.argv[3]) if len(sys.argv) > 3 else tempfile.mkdtemp()
 
     if not os.path.isdir(tmp_dir):
         os.mkdir(tmp_dir)
+    
+    manuscript_urls = []
+    for line in open(manuscript_list).read().splitlines():
+        manuscript_urls.append(line)
 
     for url in manuscript_urls:
         try:
@@ -195,6 +175,7 @@ def main():
     # twice for toc indexing
     check_call(['pdflatex', '-output-directory ' + latex_tmp_dir, latex_filename])
     check_call(['pdflatex', '-output-directory ' + latex_tmp_dir, latex_filename])
+
     shutil.copyfile(os.path.join(latex_tmp_dir, "faust.pdf"), pdf_result)
 
 if __name__ == '__main__':
