@@ -13,7 +13,7 @@ import de.faustedition.document.MaterialUnit;
 import de.faustedition.genesis.GeneticSource;
 import de.faustedition.graph.Graph;
 import de.faustedition.reasoning.PremiseBasedRelation.Premise;
-import de.faustedition.text.VerseInterval;
+import de.faustedition.textstream.VerseInterval;
 import edu.bath.transitivityutils.ImmutableRelation;
 import edu.bath.transitivityutils.Relation;
 import edu.bath.transitivityutils.Relations;

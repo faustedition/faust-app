@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import de.faustedition.Database;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.Graph;
-import de.faustedition.text.VerseInterval;
+import de.faustedition.textstream.VerseInterval;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;

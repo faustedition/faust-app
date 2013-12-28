@@ -2,10 +2,10 @@ package de.faustedition.index;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import de.faustedition.text.TextAnnotationEnd;
-import de.faustedition.text.TextAnnotationStart;
-import de.faustedition.text.TextContent;
-import de.faustedition.text.TextToken;
+import de.faustedition.textstream.TextAnnotationEnd;
+import de.faustedition.textstream.TextAnnotationStart;
+import de.faustedition.textstream.TextContent;
+import de.faustedition.textstream.TextToken;
 import de.faustedition.transcript.Transcript;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -13,7 +13,6 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.PayloadAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
-import org.apache.lucene.index.Payload;
 
 import java.io.IOException;
 import java.util.BitSet;

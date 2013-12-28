@@ -3,7 +3,7 @@ package de.faustedition.transcript;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
-import de.faustedition.text.TextSegmentAnnotation;
+import de.faustedition.textstream.TextSegmentAnnotation;
 
 import java.util.List;
 

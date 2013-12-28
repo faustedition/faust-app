@@ -17,13 +17,10 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.text;
+package de.faustedition.textstream;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Range;
-
-import java.util.Iterator;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

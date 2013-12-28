@@ -10,7 +10,7 @@ import de.faustedition.Database;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.Graph;
-import de.faustedition.text.VerseInterval;
+import de.faustedition.textstream.VerseInterval;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;

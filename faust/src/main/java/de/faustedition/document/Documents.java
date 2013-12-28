@@ -12,7 +12,7 @@ import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.db.tables.records.ArchiveRecord;
 import de.faustedition.db.tables.records.DocumentRecord;
-import de.faustedition.text.XML;
+import de.faustedition.textstream.XML;
 import de.faustedition.xml.Sources;
 import de.faustedition.xml.XMLUtil;
 import org.jooq.Condition;

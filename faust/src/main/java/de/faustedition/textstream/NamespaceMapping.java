@@ -17,7 +17,7 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.text;
+package de.faustedition.textstream;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;

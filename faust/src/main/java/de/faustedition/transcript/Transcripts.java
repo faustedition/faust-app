@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import de.faustedition.Configuration;
 import de.faustedition.Database;
 import de.faustedition.db.Tables;
-import de.faustedition.text.NamespaceMapping;
+import de.faustedition.textstream.NamespaceMapping;
 import de.faustedition.xml.Sources;
 import org.jooq.DSLContext;
 import org.jooq.Record2;

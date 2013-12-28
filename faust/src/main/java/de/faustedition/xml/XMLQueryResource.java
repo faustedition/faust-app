@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import de.faustedition.Templates;
 import de.faustedition.index.IndexResource;
-import de.faustedition.text.XML;
+import de.faustedition.textstream.XML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

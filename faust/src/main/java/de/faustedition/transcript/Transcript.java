@@ -9,19 +9,18 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import de.faustedition.http.LastModified;
-import de.faustedition.text.SegmentRangeFilter;
-import de.faustedition.text.LineBreaker;
-import de.faustedition.text.NamespaceMapping;
-import de.faustedition.text.TextAnnotationEnd;
-import de.faustedition.text.TextAnnotationStart;
-import de.faustedition.text.TextContent;
-import de.faustedition.text.TextRangeFilter;
-import de.faustedition.text.TextToken;
-import de.faustedition.text.WhitespaceCompressor;
-import de.faustedition.text.XML;
-import de.faustedition.text.XMLElementContextFilter;
-import de.faustedition.text.XMLEvent2TextToken;
-import org.apache.commons.lang3.ObjectUtils;
+import de.faustedition.textstream.SegmentRangeFilter;
+import de.faustedition.textstream.LineBreaker;
+import de.faustedition.textstream.NamespaceMapping;
+import de.faustedition.textstream.TextAnnotationEnd;
+import de.faustedition.textstream.TextAnnotationStart;
+import de.faustedition.textstream.TextContent;
+import de.faustedition.textstream.TextRangeFilter;
+import de.faustedition.textstream.TextToken;
+import de.faustedition.textstream.WhitespaceCompressor;
+import de.faustedition.textstream.XML;
+import de.faustedition.textstream.XMLElementContextFilter;
+import de.faustedition.textstream.XMLEvent2TextToken;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -32,9 +31,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import static de.faustedition.text.NamespaceMapping.TEI_NS_URI;
-import static de.faustedition.text.NamespaceMapping.TEI_SIG_GE_URI;
-import static de.faustedition.text.TextTokenPredicates.xmlName;
+import static de.faustedition.textstream.NamespaceMapping.TEI_NS_URI;
+import static de.faustedition.textstream.NamespaceMapping.TEI_SIG_GE_URI;
+import static de.faustedition.textstream.TextTokenPredicates.xmlName;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

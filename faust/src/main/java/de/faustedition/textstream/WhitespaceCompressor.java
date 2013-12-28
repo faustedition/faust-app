@@ -1,4 +1,4 @@
-package de.faustedition.text;
+package de.faustedition.textstream;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
@@ -10,7 +10,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 
-import static de.faustedition.text.NamespaceMapping.map;
+import static de.faustedition.textstream.NamespaceMapping.map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

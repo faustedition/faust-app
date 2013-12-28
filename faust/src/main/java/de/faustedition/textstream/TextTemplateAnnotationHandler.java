@@ -1,4 +1,4 @@
-package de.faustedition.text;
+package de.faustedition.textstream;
 
 import java.util.Set;
 

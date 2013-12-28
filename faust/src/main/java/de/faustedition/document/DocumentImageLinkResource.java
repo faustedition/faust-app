@@ -6,7 +6,7 @@ import de.faustedition.FaustURI;
 import de.faustedition.Templates;
 import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.Graph;
-import de.faustedition.text.XML;
+import de.faustedition.textstream.XML;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.Sources;
 import de.faustedition.xml.XMLUtil;

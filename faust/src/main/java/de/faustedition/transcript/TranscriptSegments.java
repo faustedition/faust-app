@@ -11,11 +11,11 @@ import com.google.common.util.concurrent.AbstractScheduledService;
 import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.document.DocumentRequested;
-import de.faustedition.text.NamespaceMapping;
-import de.faustedition.text.TextAnnotationEnd;
-import de.faustedition.text.TextAnnotationStart;
-import de.faustedition.text.TextContent;
-import de.faustedition.text.TextToken;
+import de.faustedition.textstream.NamespaceMapping;
+import de.faustedition.textstream.TextAnnotationEnd;
+import de.faustedition.textstream.TextAnnotationStart;
+import de.faustedition.textstream.TextContent;
+import de.faustedition.textstream.TextToken;
 import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
 
@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static de.faustedition.text.NamespaceMapping.TEI_NS_URI;
-import static de.faustedition.text.NamespaceMapping.TEI_SIG_GE_URI;
-import static de.faustedition.text.TextTokenPredicates.xmlName;
+import static de.faustedition.textstream.NamespaceMapping.TEI_NS_URI;
+import static de.faustedition.textstream.NamespaceMapping.TEI_SIG_GE_URI;
+import static de.faustedition.textstream.TextTokenPredicates.xmlName;
 import static de.faustedition.transcript.TEIMilestoneMarkupProcessor.teiMilestone;
 
 /**

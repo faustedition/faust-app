@@ -1,4 +1,4 @@
-package de.faustedition.text;
+package de.faustedition.textstream;
 
 import com.google.common.collect.ForwardingIterator;
 import com.google.common.collect.Lists;
