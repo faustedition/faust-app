@@ -393,17 +393,11 @@ YUI.add('document-app', function (Y) {
 						  model: navigationModel
 					  });
 
-					  app.route("/", function() {
-						  this.navigate("/1");
-					  });
-
-					  app.route("/:page", function(req) {
+					  app.route("/:page", function(req, res, next) {
 						  var model = this.get('model');
-						  var requestPagenum =  parseInt(req.params.page);
+						  var parsedPagenum = parseInt(req.params.page);
+						  var requestPagenum =  typeof(parsedPagenum) === "number" ? parsedPagenum : 1;
 						  model.set('pagenumber', requestPagenum);
-						  if (model.get('pagenumber') !== requestPagenum)
-							  this.navigate("/" + model.get('pagenumber'));
-						  else {
 							  this.showView("document-view",
 											{ pagenum: model.get('pagenumber'),
 											  fd: e.fd,
@@ -416,8 +410,8 @@ YUI.add('document-app', function (Y) {
 												update: false
 											});
 							  this.fire('faust:navigation-done');
-						  }
 					  });
+
 
 					  app.set('fd', e.fd);
 

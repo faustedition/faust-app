@@ -72,9 +72,11 @@ YUI.add('transcript-view', function (Y) {
 			if (this.get('source')) {
 				var transcriptSource = cp + '/' + this.get('source').components[1] + '/' + this.get('source').components[2];
 				var imageLinkPath = Faust.imageLinkBase + '/' + this.get('pagenum');
+				var printPath = location.pathname + "?view=transcript-bare#" + this.get("pagenum");
 				this.editortoolbar = Y.Node.create('<div id="editor-toolbar" >' +
 					'<a href="' + transcriptSource + '">XML source </a>' +
 					'<a href="' + imageLinkPath + '"> Text-Image-Links</a>' +
+					'<a href="" onclick="window.open(\'' + printPath + '\')"> Print </a>' +
 					'</div>');
 				container.appendChild(this.editortoolbar);
 			}
