@@ -156,7 +156,7 @@ public class DocumentResource {
     protected ObjectNode collation(DSLContext sql, final long id, final boolean compressed) {
         final Result<DocumentTranscriptAlignmentRecord> aligmentRecords = sql.selectFrom(Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT)
                 .where(Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT.DOCUMENT_ID.eq(id))
-                .orderBy(Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_START.asc(), Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_END.desc())
+                .orderBy(Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_START.asc(), Tables.DOCUMENT_TRANSCRIPT_ALIGNMENT.DOC_END.asc())
                 .fetch();
         final ObjectNode collation = objectMapper.createObjectNode();
         final ArrayNode alignments = collation.putArray("alignments");
