@@ -4,30 +4,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.base.Throwables;
-import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import de.faustedition.http.LastModified;
-import de.faustedition.textstream.SegmentRangeFilter;
+import de.faustedition.textstream.FileBasedTextStream;
 import de.faustedition.textstream.LineBreaker;
 import de.faustedition.textstream.NamespaceMapping;
+import de.faustedition.textstream.SegmentRangeFilter;
 import de.faustedition.textstream.TextAnnotationEnd;
 import de.faustedition.textstream.TextAnnotationStart;
 import de.faustedition.textstream.TextContent;
 import de.faustedition.textstream.TextRangeFilter;
 import de.faustedition.textstream.TextToken;
 import de.faustedition.textstream.WhitespaceCompressor;
-import de.faustedition.textstream.XML;
 import de.faustedition.textstream.XMLElementContextFilter;
-import de.faustedition.textstream.XMLEvent2TextToken;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.stream.StreamSource;
 import java.io.File;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,19 +30,12 @@ import static de.faustedition.textstream.TextTokenPredicates.xmlName;
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-public class Transcript implements Iterable<TextToken>, LastModified {
+public class Transcript extends FileBasedTextStream {
 
-    private final List<File> sources;
-    private final NamespaceMapping namespaceMapping;
-    private final ObjectMapper objectMapper;
-    private long lastModified;
     private Predicate<TextAnnotationStart> segmentStart;
 
-    public Transcript(List<File> sources, NamespaceMapping namespaceMapping, ObjectMapper objectMapper, long lastModified) {
-        this.sources = sources;
-        this.namespaceMapping = namespaceMapping;
-        this.objectMapper = objectMapper;
-        this.lastModified = lastModified;
+    public Transcript(List<File> sources, long lastModified, ObjectMapper objectMapper, NamespaceMapping namespaceMapping) {
+        super(sources, lastModified, objectMapper, namespaceMapping);
 
         this.segmentStart = Predicates.or(
                 xmlName(namespaceMapping, new QName(TEI_NS_URI, "l")),
@@ -61,60 +46,7 @@ public class Transcript implements Iterable<TextToken>, LastModified {
         );
     }
 
-    public List<File> getSources() {
-        return sources;
-    }
-
-    @Override
-    public Date lastModified() {
-        long lastModified = this.lastModified;
-        for (File source : sources) {
-            lastModified = Math.max(lastModified, source.lastModified());
-        }
-        return new Date(lastModified);
-    }
-
-    @Override
-    public Iterator<TextToken> iterator() {
-        try {
-            final Iterator<String> ids = XMLEvent2TextToken.ids(XMLEvent2TextToken.DEFAULT_ID_PREFIX);
-            return transcriptTokens(new AbstractIterator<TextToken>() {
-
-                Iterator<File> sourceIt = sources.iterator();
-                Iterator<TextToken> tokenIt = Iterators.emptyIterator();
-                XMLEventReader xmlEvents = null;
-
-
-                @Override
-                protected TextToken computeNext() {
-                    while (!tokenIt.hasNext() && sourceIt.hasNext()) {
-                        try {
-                            XML.closeQuietly(xmlEvents);
-                            xmlEvents = XML.inputFactory().createXMLEventReader(new StreamSource(sourceIt.next()));
-                            tokenIt = Iterators.transform(XML.stream(xmlEvents), new XMLEvent2TextToken(objectMapper, namespaceMapping).withIds(ids));
-                        } catch (XMLStreamException e) {
-                            XML.closeQuietly(xmlEvents);
-                            throw Throwables.propagate(e);
-                        }
-                    }
-                    if (!tokenIt.hasNext()) {
-                        XML.closeQuietly(xmlEvents);
-                        return endOfData();
-                    }
-                    return tokenIt.next();
-                }
-
-                @Override
-                protected void finalize() throws Throwable {
-                    XML.closeQuietly(xmlEvents);
-                }
-            }, ids);
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
-    }
-
-    protected Iterator<TextToken> transcriptTokens(Iterator<TextToken> tokens, Iterator<String> ids) {
+    protected Iterator<TextToken> configure(Iterator<TextToken> tokens, Iterator<String> ids) {
         tokens = Iterators.filter(tokens, new XMLElementContextFilter(
                 Predicates.<TextToken>or(
                         xmlName(namespaceMapping, "tei:teiHeader"),
@@ -197,23 +129,5 @@ public class Transcript implements Iterable<TextToken>, LastModified {
             text.append(textContent.getContent());
         }
         return text.toString();
-    }
-
-    public ArrayNode json() {
-        final ArrayNode text = objectMapper.createArrayNode();
-        for (TextToken token : this) {
-            if (token instanceof TextContent) {
-                final String content = ((TextContent) token).getContent();
-                if (content.length() > 0) {
-                    text.add(content);
-                }
-            } else if (token instanceof TextAnnotationStart) {
-                final TextAnnotationStart annotationStart = (TextAnnotationStart) token;
-                text.addObject().put("s", annotationStart.getId()).put("d", annotationStart.getData());
-            } else if (token instanceof TextAnnotationEnd) {
-                text.addObject().put("e", ((TextAnnotationEnd) token).getId());
-            }
-        }
-        return text;
     }
 }

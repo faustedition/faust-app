@@ -15,6 +15,7 @@ import de.faustedition.index.DocumentIndexer;
 import de.faustedition.index.Index;
 import de.faustedition.index.TranscriptExcerpts;
 import de.faustedition.index.TranscriptTokenAnnotationCodec;
+import de.faustedition.text.Texts;
 import de.faustedition.textstream.NamespaceMapping;
 import de.faustedition.transcript.TranscriptCollator;
 import de.faustedition.transcript.TranscriptSegments;
@@ -48,6 +49,7 @@ import java.util.logging.Logger;
         Sources.class,
         Facsimiles.class,
         Documents.class,
+        Texts.class,
         Transcripts.class,
         TranscriptCollator.class,
         TranscriptExcerpts.class,

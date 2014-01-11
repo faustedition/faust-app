@@ -108,6 +108,6 @@ public class Transcripts {
 
             sources.add(sourceFile);
         }
-        return new Transcript(sources, namespaceMapping, objectMapper, (debug ? System.currentTimeMillis() : 0));
+        return new Transcript(sources, (debug ? System.currentTimeMillis() : 0), objectMapper, namespaceMapping);
     }
 }

@@ -14,6 +14,8 @@ import de.faustedition.http.JsonMessageBodyReaderWriter;
 import de.faustedition.index.DocumentIndexer;
 import de.faustedition.index.Index;
 import de.faustedition.index.IndexResource;
+import de.faustedition.text.TextResource;
+import de.faustedition.text.Texts;
 import de.faustedition.transcript.SceneStatisticsResource;
 import de.faustedition.transcript.TranscriptCollator;
 import de.faustedition.transcript.TranscriptResource;
@@ -41,6 +43,7 @@ import java.util.logging.Logger;
         GeneticGraphResource.class,
         IndexResource.class,
         SceneStatisticsResource.class,
+        TextResource.class,
         TranscriptResource.class,
         VerseStatisticsResource.class,
         XMLResource.class,
@@ -60,6 +63,7 @@ public class Server {
                     objectGraph.get(Index.class),
                     objectGraph.get(Documents.class),
                     objectGraph.get(DocumentIndexer.class),
+                    objectGraph.get(Texts.class),
                     objectGraph.get(TranscriptCollator.class),
                     objectGraph.get(TranscriptSegments.class),
                     objectGraph.get(VerseIndex.class),
@@ -74,6 +78,7 @@ public class Server {
                             objectGraph.get(GeneticGraphResource.class),
                             objectGraph.get(IndexResource.class),
                             objectGraph.get(SceneStatisticsResource.class),
+                            objectGraph.get(TextResource.class),
                             objectGraph.get(TranscriptResource.class),
                             objectGraph.get(VerseStatisticsResource.class),
                             objectGraph.get(XMLQueryResource.class),
