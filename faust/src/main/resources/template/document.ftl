@@ -101,7 +101,6 @@
         textualView.after("textSelected", updateAnnotationDump);
 
         var overlaps = function(a, b) {
-            0,2 - 0,3
             return (a[0] >= b[1]) ? 1 : ((b[0] >= a[1]) ? -1 : 0);
         };
 
