@@ -121,9 +121,11 @@ public class TranscriptCollator extends AbstractScheduledService {
             final JungVariantGraph variantGraph = new JungVariantGraph();
 
             try {
-                DekkerAlgorithm collationAlgorithm = (DekkerAlgorithm) CollationAlgorithmFactory.dekker(TRANSCRIPT_TOKEN_WRAPPER_COMPARATOR);
+                final DekkerAlgorithm collationAlgorithm = (DekkerAlgorithm) CollationAlgorithmFactory.dekkerMatchMatrix(
+                        TRANSCRIPT_TOKEN_WRAPPER_COMPARATOR,
+                        1
+                );
                 collationAlgorithm.setMergeTranspositions(true);
-
                 collationAlgorithm.collate(
                         variantGraph,
                         documentaryWitness,
