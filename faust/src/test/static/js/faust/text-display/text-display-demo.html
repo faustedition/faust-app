@@ -22,7 +22,7 @@
 <link rel="stylesheet" type="text/css" href="text-display-demo.css"></link>
 
 <script type="text/javascript">
- 	YUI().use("text-display", "text-annotation", "base", "io", "json", function (Y) {
+ 	YUI().use("paged-text-display", "text-annotation", "base", "io", "json", 'history-hash', function (Y) {
 
  	
 		function stageNum(name){
@@ -44,13 +44,20 @@
 			return [];
 		}
 		
+		var view = null;
+		
 		var createTextDisplay = function(id, o) {
 			var text = Y.Faust.Text.create(Y.JSON.parse(o.responseText));
-			var view = new Y.Faust.TextDisplayView({container: '#text-container', text: text, cssPrefix: 'ann-', renderCallback: handleSpecialAnnotations});
-			view.render();
+			view = new Y.Faust.PagedTextDisplayView({container: '#text-container', text: text, cssPrefix: 'ann-', renderCallback: handleSpecialAnnotations, linesPerPage: 40});
+			view.render(0);
 		};
+		
+		Y.after('hashchange', function(e){
+			Y.one('#text-container').empty();
+			view.render(parseInt(e.newHash));
+		});
 
-		Y.io("1280.json", {
+		Y.io("4109.json", {
             headers:{ "Accept":"application/json" },
             on:{
                 success: createTextDisplay
