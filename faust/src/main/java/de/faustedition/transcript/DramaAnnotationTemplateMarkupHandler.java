@@ -17,10 +17,12 @@ import static de.faustedition.textstream.TextTokenPredicates.xmlName;
 */
 public class DramaAnnotationTemplateMarkupHandler implements TextTemplateAnnotationHandler {
 
+    private final Predicate<TextToken> headPredicate;
     private final Predicate<TextToken> stagePredicate;
     private final Predicate<TextToken> speakerPredicate;
 
     public DramaAnnotationTemplateMarkupHandler(NamespaceMapping namespaceMapping) {
+        this.headPredicate = xmlName(namespaceMapping, new QName(TEI_NS_URI, "head"));
         this.stagePredicate = xmlName(namespaceMapping, new QName(TEI_NS_URI, "stage"));
         this.speakerPredicate = xmlName(namespaceMapping, new QName(TEI_NS_URI, "speaker"));
     }
@@ -33,6 +35,9 @@ public class DramaAnnotationTemplateMarkupHandler implements TextTemplateAnnotat
         } else if (speakerPredicate.apply(start)) {
             classes.add("speaker");
             return true;
+        } else if (headPredicate.apply(start)) {
+            classes.add("head");
+            return true;
         }
         return false;
     }
@@ -44,6 +49,9 @@ public class DramaAnnotationTemplateMarkupHandler implements TextTemplateAnnotat
             return true;
         } else if (speakerPredicate.apply(start)) {
             classes.remove("speaker");
+            return true;
+        }  else if (headPredicate.apply(start)) {
+            classes.remove("head");
             return true;
         }
         return false;
