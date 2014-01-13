@@ -232,6 +232,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'rdg' : { vc: function(){return new Faust.DefaultVC();}},
 
+				'seg' : {vc: function() {return new Faust.DefaultVC();}},
+
 				'supplied' : {
 					vc : function (node, text, layoutState) {
 
