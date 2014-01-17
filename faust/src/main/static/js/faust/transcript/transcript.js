@@ -173,13 +173,13 @@ YUI.add('transcript', function (Y) {
 		// TODO: surface-specific layout
 	};
 
-	Y.augment(Faust.Surface, Faust.ViewComponent);
+	Y.augment(Faust.Surface, Faust.BreakingVC);
 			
 	Faust.Zone = function() {
 		this.initViewComponent();
 	};
 	
-	Y.augment(Faust.Zone, Faust.ViewComponent);
+	Y.augment(Faust.Zone, Faust.BreakingVC);
 	
 	Faust.Line = function(lineAttrs) {
 		this.initViewComponent();
@@ -292,7 +292,7 @@ YUI.add('transcript', function (Y) {
 	};
 
 
-	Y.augment(Faust.Text, Faust.ViewComponent);
+	Y.augment(Faust.Text, Faust.BreakingVC);
 	
 	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
 		this.type =  type;
