@@ -145,8 +145,6 @@ YUI.add('transcript', function (Y) {
 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
  	};
 
-
-
 	Faust.InlineViewComponent = function() {
 		this.initViewComponent();
 	};

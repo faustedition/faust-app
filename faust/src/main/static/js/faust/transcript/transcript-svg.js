@@ -301,6 +301,7 @@ YUI.add('transcript-svg', function (Y) {
 		g.setAttribute('vector-effect', 'non-scaling-stroke');
 		var transform = "scale(" + this.displayWidth / this.imageWidth + "," + this.displayHeight / this.imageHeight + ")";
 		this.graphic.setAttribute('transform', transform);
+		g.setAttribute('transform', 'translate(0, -' + this.displayHeight + ')');
 		g.appendChild(this.graphic);
 		return g;
 	};
