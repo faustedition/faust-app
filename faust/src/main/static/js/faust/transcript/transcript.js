@@ -103,7 +103,9 @@ YUI.add('transcript', function (Y) {
  		defaultAligns: function () {
  		
  			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
- 			
+			//this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			//this.setAlign("vAlign", new Faust.NullAlign());
+
  			if (this.previous())
  				this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
  			else
@@ -139,7 +141,7 @@ YUI.add('transcript', function (Y) {
 	 	
 	Faust.BreakingVC.prototype.defaultAligns = function () {
 		
-			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 		
 		if (this.previous())
 			this.setAlign("vAlign", new Faust.Align(this, this.previous(), this.rotY(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
@@ -275,6 +277,21 @@ YUI.add('transcript', function (Y) {
 		}
 		return classes.reduce(function (x,y) {return x + " " + y});
 	};
+
+	Faust.Text.prototype.defaultAligns = function () {
+
+		//this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		//this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		this.setAlign("vAlign", new Faust.NullAlign());
+
+		if (this.previous())
+			this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		else
+			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+
+	};
+
+
 	Y.augment(Faust.Text, Faust.ViewComponent);
 	
 	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
@@ -359,7 +376,15 @@ YUI.add('transcript', function (Y) {
 	Faust.AbsoluteAlign.prototype.align = function() {
 		this.me.setCoord(this.coordinate, this.coordRotation);
 	};
-	
+
+	Faust.NullAlign = function (priority) {
+		this.priority = priority;
+	};
+
+	Faust.NullAlign.prototype.align = function() {
+	};
+
+
 	Faust.Dimensions = function() {};
 
 	Faust.Dimensions.prototype = function() {};
