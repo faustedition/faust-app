@@ -105,13 +105,13 @@ YUI.add('transcript-svg', function (Y) {
 	
 	Y.augment (Faust.DefaultVC, Faust.ViewComponent);
 	
-	Faust.BreakingVC.prototype.createView = function() {
+	Faust.BlockViewComponent.prototype.createView = function() {
 		var view = this.svgDocument().createElementNS(SVG_NS, "g");
-		view.setAttribute('class', 'BreakingVC');
+		view.setAttribute('class', 'BlockViewComponent');
 		return view;
 	};
 
-	Y.augment (Faust.BreakingVC, Faust.ViewComponent);
+	Y.augment (Faust.BlockViewComponent, Faust.ViewComponent);
 	
 	Faust.VSpace.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "rect");
@@ -124,7 +124,7 @@ YUI.add('transcript-svg', function (Y) {
 		return result;
 	};
 	
-	Y.augment(Faust.VSpace, Faust.BreakingVC);
+	Y.augment(Faust.VSpace, Faust.BlockViewComponent);
 
 	Faust.HSpace.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "rect");

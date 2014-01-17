@@ -135,11 +135,11 @@ YUI.add('transcript', function (Y) {
 
 	Y.augment (Faust.DefaultVC, Faust.ViewComponent);
 
-	Faust.BreakingVC = function() {
-		this.initViewComponent();		
+	Faust.BlockViewComponent = function() {
+		this.initViewComponent();
 	};
 	 	
-	Faust.BreakingVC.prototype.defaultAligns = function () {
+	Faust.BlockViewComponent.prototype.defaultAligns = function () {
 		
 		this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 		
@@ -148,14 +148,14 @@ YUI.add('transcript', function (Y) {
 		else
 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
  	};
-	Y.augment (Faust.BreakingVC, Faust.ViewComponent);
+	Y.augment (Faust.BlockViewComponent, Faust.ViewComponent);
 	
 	Faust.VSpace = function(height) {
 		this.initViewComponent();
 		this.vSpaceHeight = height;
 	};
 
-	Y.augment (Faust.VSpace, Faust.BreakingVC);
+	Y.augment (Faust.VSpace, Faust.BlockViewComponent);
 
 	Faust.HSpace = function(width) {
 		this.initViewComponent();
@@ -173,13 +173,13 @@ YUI.add('transcript', function (Y) {
 		// TODO: surface-specific layout
 	};
 
-	Y.augment(Faust.Surface, Faust.BreakingVC);
+	Y.augment(Faust.Surface, Faust.BlockViewComponent);
 			
 	Faust.Zone = function() {
 		this.initViewComponent();
 	};
 	
-	Y.augment(Faust.Zone, Faust.BreakingVC);
+	Y.augment(Faust.Zone, Faust.BlockViewComponent);
 	
 	Faust.Line = function(lineAttrs) {
 		this.initViewComponent();
@@ -292,7 +292,7 @@ YUI.add('transcript', function (Y) {
 	};
 
 
-	Y.augment(Faust.Text, Faust.BreakingVC);
+	Y.augment(Faust.Text, Faust.BlockViewComponent);
 	
 	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
 		this.type =  type;
