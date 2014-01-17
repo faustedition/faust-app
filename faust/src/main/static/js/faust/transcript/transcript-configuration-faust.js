@@ -19,7 +19,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
-				'choice' : { vc: function(){return new Faust.DefaultVC();}},
+				'choice' : { vc: function(){return new Faust.InlineViewComponent();}},
 
 				'document': {
 
@@ -28,7 +28,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
-						var vc = new Faust.DefaultVC();
+						var vc = new Faust.InlineViewComponent();
 						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
 						vc.add (Y.Faust.TranscriptLayout.createText(startMarker, annotationStart, annotationEnd, text));
 
@@ -59,9 +59,9 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
-				'ex' : { vc: function(){return new Faust.DefaultVC();}},
+				'ex' : { vc: function(){return new Faust.InlineViewComponent();}},
 
-				'expan' : { vc: function(){return new Faust.DefaultVC();}},
+				'expan' : { vc: function(){return new Faust.InlineViewComponent();}},
 
 				'gap': {
 					vc:  function(node, text, layoutState) {
@@ -180,7 +180,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					vc: function(node, text, layoutState) {
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
-						var vc = new Faust.DefaultVC();
+						var vc = new Faust.InlineViewComponent();
 						// insertion mark
 						if (node.data()["f:orient"] === "right") {
 							var insertionSign = node.data()['f:at'].substring(1) in layoutState.idMap ? "\u230a" : "\u2308";
@@ -228,18 +228,18 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
-				'overw' : {vc: function() {return new Faust.DefaultVC();}},
+				'overw' : {vc: function() {return new Faust.InlineViewComponent();}},
 
-				'rdg' : { vc: function(){return new Faust.DefaultVC();}},
+				'rdg' : { vc: function(){return new Faust.InlineViewComponent();}},
 
-				'seg' : {vc: function() {return new Faust.DefaultVC();}},
+				'seg' : {vc: function() {return new Faust.InlineViewComponent();}},
 
 				'supplied' : {
 					vc : function (node, text, layoutState) {
 
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
-						var vc = new Faust.DefaultVC();
+						var vc = new Faust.InlineViewComponent();
 						vc.add (Y.Faust.TranscriptLayout.createText('[', annotationStart, annotationEnd, text));
 						return vc;
 					},
@@ -264,7 +264,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'under' : {
 					vc: function() {
-						var vc =  new Faust.DefaultVC();
+						var vc =  new Faust.InlineViewComponent();
 						vc.defaultAligns = function () {
 
 							this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));

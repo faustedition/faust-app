@@ -103,8 +103,6 @@ YUI.add('transcript-svg', function (Y) {
 		return this.computeClasses().join(' ');
 	};
 	
-	Y.augment (Faust.DefaultVC, Faust.ViewComponent);
-	
 	Faust.BlockViewComponent.prototype.createView = function() {
 		var view = this.svgDocument().createElementNS(SVG_NS, "g");
 		view.setAttribute('class', 'BlockViewComponent');
@@ -112,7 +110,15 @@ YUI.add('transcript-svg', function (Y) {
 	};
 
 	Y.augment (Faust.BlockViewComponent, Faust.ViewComponent);
-	
+
+	Faust.InlineViewComponent.prototype.createView = function() {
+		var view = this.svgDocument().createElementNS(SVG_NS, "g");
+		view.setAttribute('class', 'InlineViewComponent');
+		return view;
+	};
+
+	Y.augment (Faust.InlineViewComponent, Faust.ViewComponent);
+
 	Faust.VSpace.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "rect");
 		result.setAttribute('class', 'VSpace');
@@ -138,17 +144,6 @@ YUI.add('transcript-svg', function (Y) {
 	};
 	
 	Y.augment(Faust.HSpace, Faust.ViewComponent);
-
-	
-	Faust.DefaultVC.prototype.createView = function() {
-		var view = this.svgDocument().createElementNS(SVG_NS, "g");
-		view.setAttribute('class', this.getClassesString() + ' DefaultVC');
-		return view;
-	};
-		
-	Y.augment(Faust.Line, Faust.ViewComponent);
-
-
 	
 	Faust.Surface.prototype.createView = function() {
 		var surface = this.svgDocument().createElementNS(SVG_NS, "g");

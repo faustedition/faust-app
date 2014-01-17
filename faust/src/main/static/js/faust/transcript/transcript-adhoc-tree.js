@@ -78,7 +78,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 					if (nameHandler.vc) {
 						vc = nameHandler.vc(node, text, this);
 					} else {
-						vc = new Faust.DefaultVC();
+						vc = new Faust.InlineViewComponent();
 					}
 				}
 
@@ -89,7 +89,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				Y.each(aligningAttributes, function(a){
 					if (a in node.data()) {
 						if (!vc) {
-							vc = new Faust.DefaultVC();
+							vc = new Faust.InlineViewComponent();
 						}
 						//FIXME id hash hack; do real resolution of references
 						var anchorId = node.data()[a].substring(1);

@@ -128,12 +128,6 @@ YUI.add('transcript', function (Y) {
 				this[name] = align;
 		}
 	};
-	
-	Faust.DefaultVC = function() {
-		this.initViewComponent();		
-	};
-
-	Y.augment (Faust.DefaultVC, Faust.ViewComponent);
 
 	Faust.BlockViewComponent = function() {
 		this.initViewComponent();
@@ -148,8 +142,15 @@ YUI.add('transcript', function (Y) {
 		else
 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
  	};
+
 	Y.augment (Faust.BlockViewComponent, Faust.ViewComponent);
-	
+
+	Faust.InlineViewComponent = function() {
+		this.initViewComponent();
+	};
+
+	Y.augment (Faust.InlineViewComponent, Faust.ViewComponent);
+
 	Faust.VSpace = function(height) {
 		this.initViewComponent();
 		this.vSpaceHeight = height;
@@ -162,7 +163,7 @@ YUI.add('transcript', function (Y) {
 		this.hSpaceWidth = width;
 	};
 	
-	Y.augment (Faust.HSpace, Faust.ViewComponent);
+	Y.augment (Faust.HSpace, Faust.InlineViewComponent);
 	
 	Faust.Surface = function() {
 		this.initViewComponent();
@@ -316,7 +317,7 @@ YUI.add('transcript', function (Y) {
 		this.initViewComponent();
 	};
 
-	Y.augment (Faust.InlineGraphic, Faust.ViewComponent);
+	Y.augment (Faust.InlineGraphic, Faust.InlineViewComponent);
 
 	Faust.GLine = function() {
 		this.initViewComponent();
