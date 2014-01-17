@@ -132,7 +132,9 @@ YUI.add('transcript', function (Y) {
 	Faust.BlockViewComponent = function() {
 		this.initViewComponent();
 	};
-	 	
+
+	Y.extend (Faust.BlockViewComponent, Faust.ViewComponent);
+
 	Faust.BlockViewComponent.prototype.defaultAligns = function () {
 		
 		this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
@@ -143,49 +145,55 @@ YUI.add('transcript', function (Y) {
 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
  	};
 
-	Y.augment (Faust.BlockViewComponent, Faust.ViewComponent);
+
 
 	Faust.InlineViewComponent = function() {
 		this.initViewComponent();
 	};
 
-	Y.augment (Faust.InlineViewComponent, Faust.ViewComponent);
+	Y.extend (Faust.InlineViewComponent, Faust.ViewComponent);
 
 	Faust.VSpace = function(height) {
 		this.initViewComponent();
 		this.vSpaceHeight = height;
 	};
 
-	Y.augment (Faust.VSpace, Faust.BlockViewComponent);
+	Y.extend (Faust.VSpace, Faust.BlockViewComponent);
 
 	Faust.HSpace = function(width) {
 		this.initViewComponent();
 		this.hSpaceWidth = width;
 	};
 	
-	Y.augment (Faust.HSpace, Faust.InlineViewComponent);
+	Y.extend (Faust.HSpace, Faust.InlineViewComponent);
 	
 	Faust.Surface = function() {
 		this.initViewComponent();
 	};
+
+	Y.extend(Faust.Surface, Faust.BlockViewComponent);
+
 	Faust.Surface.prototype.position = function() {
 		this.x = 0;
 		this.y = 0;
 		// TODO: surface-specific layout
 	};
 
-	Y.augment(Faust.Surface, Faust.BlockViewComponent);
+
 			
 	Faust.Zone = function() {
 		this.initViewComponent();
 	};
-	
-	Y.augment(Faust.Zone, Faust.BlockViewComponent);
+
+	Y.extend(Faust.Zone, Faust.BlockViewComponent);
 	
 	Faust.Line = function(lineAttrs) {
 		this.initViewComponent();
 		this.lineAttrs = lineAttrs;
 	};
+
+	Y.extend(Faust.Line, Faust.ViewComponent);
+
 	Faust.Line.prototype.dimension = function() {
 	};
 
@@ -215,18 +223,22 @@ YUI.add('transcript', function (Y) {
 		else
 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 	};
-	Y.augment(Faust.Line, Faust.ViewComponent);
+
 	
 	Faust.Text = function(text, textAttrs) {
 		this.initViewComponent();
 		this.text = text.replace(/\s+/g, "\u00a0");
 		this.textAttrs = textAttrs;
 	};
+
+	Y.extend(Faust.Text, Faust.BlockViewComponent);
+
 	Faust.Text.prototype.dimension = function() {
 		var measured = this.measure();
 		this.width = measured.width;
 		this.height = measured.height;
 	};
+
 	Faust.Text.prototype.getHand = function() {
 		if (this.textAttrs.rewrite)
 			return this.textAttrs.rewrite;
@@ -291,9 +303,6 @@ YUI.add('transcript', function (Y) {
 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 
 	};
-
-
-	Y.augment(Faust.Text, Faust.BlockViewComponent);
 	
 	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
 		this.type =  type;
@@ -305,7 +314,7 @@ YUI.add('transcript', function (Y) {
 		this.initViewComponent();
 	};
 
-	Y.augment (Faust.SpanningVC, Faust.ViewComponent);
+	Y.extend (Faust.SpanningVC, Faust.ViewComponent);
 
 	Faust.InlineGraphic = function(type, imageUrl, imageWidth, imageHeight, displayWidth, displayHeight) {
 		this.type =  type;
@@ -317,25 +326,30 @@ YUI.add('transcript', function (Y) {
 		this.initViewComponent();
 	};
 
-	Y.augment (Faust.InlineGraphic, Faust.InlineViewComponent);
+	Y.extend (Faust.InlineGraphic, Faust.InlineViewComponent);
 
 	Faust.GLine = function() {
 		this.initViewComponent();
 	};
+
+	Y.extend(Faust.GLine, Faust.ViewComponent);
+
 	Faust.GLine.prototype.dimension = function() {
 		this.width = 40;
 		this.height = 20;
 	};
-	Y.augment(Faust.GLine, Faust.ViewComponent);
+
 
 	Faust.GBrace = function() {
 		this.initViewComponent();
 	};
+
+	Y.extend(Faust.GBrace, Faust.ViewComponent);
+
 	Faust.GBrace.prototype.dimension = function() {
 		this.width = 40;
 		this.height = 20;
 	};
-	Y.augment(Faust.GBrace, Faust.ViewComponent);
 
 	Faust.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
 		this.me = me;
@@ -384,7 +398,6 @@ YUI.add('transcript', function (Y) {
 
 	Faust.NullAlign.prototype.align = function() {
 	};
-
 
 	Faust.Dimensions = function() {};
 

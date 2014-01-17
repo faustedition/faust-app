@@ -182,6 +182,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 											);
 
 			var surfaceVC = new Faust.Surface();
+
 			this.buildVC(surfaceVC, tree, text);
 
 			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
@@ -195,7 +196,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
     });
 	
 }, '0.0', {
-	requires: ["adhoc-tree", "transcript", "text-annotation"]
+	requires: ["adhoc-tree", "transcript-svg", "text-annotation"]
 });
 
 
