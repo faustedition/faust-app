@@ -153,6 +153,16 @@ YUI.add('transcript', function (Y) {
 
 	Y.extend (Faust.InlineViewComponent, Faust.ViewComponent);
 
+	Faust.InlineViewComponent.prototype.defaultAligns = function () {
+
+		this.setAlign("vAlign", new Faust.NullAlign());
+
+		if (this.previous())
+			this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		else
+			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+	};
+
 	Faust.VSpace = function(height) {
 		this.initViewComponent();
 		this.vSpaceHeight = height;
@@ -231,7 +241,7 @@ YUI.add('transcript', function (Y) {
 		this.textAttrs = textAttrs;
 	};
 
-	Y.extend(Faust.Text, Faust.BlockViewComponent);
+	Y.extend(Faust.Text, Faust.InlineViewComponent);
 
 	Faust.Text.prototype.dimension = function() {
 		var measured = this.measure();
@@ -291,19 +301,6 @@ YUI.add('transcript', function (Y) {
 		return classes.reduce(function (x,y) {return x + " " + y});
 	};
 
-	Faust.Text.prototype.defaultAligns = function () {
-
-		//this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-		//this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-		this.setAlign("vAlign", new Faust.NullAlign());
-
-		if (this.previous())
-			this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-		else
-			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-
-	};
-	
 	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
 		this.type =  type;
 		this.imageUrl = imageUrl;
