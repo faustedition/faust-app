@@ -27,16 +27,20 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 					textAttrs.strikethrough = true;
 					if (a.data["hand"])
 						textAttrs.strikethroughHand = a.data["hand"].substring(1);
-				} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].indexOf("underline") >= 0) {
+				} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].split(' ').indexOf("underline") >= 0) {
 					textAttrs.underline = true;
 					if (a.data["hand"])
 						textAttrs.underlineHand = a.data["hand"].substring(1);
+				} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].split(' ').indexOf('sup') >= 0) {
+					textAttrs.sup = true;
+				} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].split(' ').indexOf('sub') >= 0) {
+					textAttrs.sub = true;
 				} else if (a.name.localName == "line") {
 					textAttrs.fontsize = ((a.data["type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
 				}
 
 			});				
-			return new Faust.Text(content, textAttrs);				
+			return new Faust.Text(content, textAttrs);
 		}
 		
 	};

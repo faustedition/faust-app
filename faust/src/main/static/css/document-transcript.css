@@ -126,6 +126,14 @@ svg.diplomatic .text.small {
 	font-size: 9pt;
 }
 
+svg.diplomatic .text.sup {
+    baseline-shift: super;
+}
+
+svg.diplomatic .text.sub {
+    baseline-shift: sub;
+}
+
 svg.diplomatic .bgBox {
 	fill: none;
 }
@@ -136,6 +144,6 @@ svg.diplomatic .invisible {
 
 /* graphical elements */
 
-svg.diplomatic Line {
+svg.diplomatic line {
     stroke: black;
 }

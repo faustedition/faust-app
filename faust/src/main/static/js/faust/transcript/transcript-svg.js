@@ -27,7 +27,6 @@ YUI.add('transcript-svg', function (Y) {
 		return wrapper;
 	};
 
-
 	Faust.ViewComponent.prototype.setCoord = function(coord, coordRotation) {
 		
 		var myRot = this.globalRotation();
@@ -75,20 +74,11 @@ YUI.add('transcript-svg', function (Y) {
 	};
 
 	Faust.ViewComponent.prototype.onRelayout = function() {
-		if (this.view) {
-			//this.view.setAttribute("x", this.x.toString());
-			//this.view.setAttribute("y", this.y.toString());
-			//this.view.setAttribute("transform", "translate(" + this.x.toString(), + "," + this.y.toString + ")");
-			//var translate = this.view.transform.baseVal.getItem(0);
-			//translate.setTranslate(this.x, this.y);
-			//this.setX(this.x);
-			//this.setY(this.y);
-			//this.view.transform.baseVal.replaceItem(0);
-		}
 	};
 	
 	Faust.ViewComponent.prototype.render = function() {
 		this.view = this.createView();
+		this.view.setAttribute('class', this.getClassesString());
 		this.svgContainer().appendChild(this.view);
 		this.rotate(this.rotation);
 		Y.each(this.children, function(c) { c.render(); });
@@ -105,14 +95,11 @@ YUI.add('transcript-svg', function (Y) {
 	
 	Faust.BlockViewComponent.prototype.createView = function() {
 		var view = this.svgDocument().createElementNS(SVG_NS, "g");
-		view.setAttribute('class', 'BlockViewComponent');
 		return view;
 	};
 
-
 	Faust.InlineViewComponent.prototype.createView = function() {
 		var view = this.svgDocument().createElementNS(SVG_NS, "g");
-		view.setAttribute('class', 'InlineViewComponent');
 		return view;
 	};
 
@@ -158,30 +145,22 @@ YUI.add('transcript-svg', function (Y) {
 		result.setAttributeNS(DRAG_NS, 'drag:enable', 'true');
 
 		return result;
-		
 	};
 	
 	Faust.Line.prototype.createView = function() {
 		var line = this.svgDocument().createElementNS(SVG_NS, "g");
-		line.setAttribute('class', 'Line');
 		return line;
 	};
 
 	Faust.Text.prototype.createView = function() {
 		var text = this.svgDocument().createElementNS(SVG_NS, "text");
-		text.setAttribute("class", "text " + this.computeClasses());
+		text.setAttribute("class", "text " + this.getClassesString());
 		text.appendChild(this.svgDocument().createTextNode(this.text));
 		return text;
 	};
 	
 	Faust.Text.prototype.onRelayout = function() {
-		if (this.view) {
-			//this.view.setAttribute("x", this.x.toString());
-			//this.view.setAttribute("y", this.y.toString());
-			//this.setX(this.x);
-			//this.setY(this.y);
-		}
-		
+
 		if (this.strikethrough) {
 			this.strikethrough.setAttribute("x1", this.x);
 			this.strikethrough.setAttribute("x2", this.x + this.width);
@@ -196,7 +175,6 @@ YUI.add('transcript-svg', function (Y) {
 			this.rewrite.setAttribute("x", this.x + offset);
 			this.rewrite.setAttribute("y", this.y - offset);
 			this.rewrite.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
-
 		}
 
 		var bbox = this.view.getBBox();
@@ -220,7 +198,7 @@ YUI.add('transcript-svg', function (Y) {
 
 		this.bgBox = this.svgDocument().createElementNS(SVG_NS, "rect");
 		this.svgContainer().appendChild(this.bgBox);
-		this.bgBox.setAttribute("class", "bgBox " + this.computeClasses());
+		this.bgBox.setAttribute("class", "bgBox " + this.getClassesString());
 
 		this.view = this.createView();
 		this.svgContainer().appendChild(this.view);
@@ -235,8 +213,6 @@ YUI.add('transcript-svg', function (Y) {
 			this.svgContainer().appendChild(this.strikethrough);		}
 		if ("underline" in this.textAttrs) {
 			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
-			this.view.setAttribute("class", 
-				this.view.getAttribute("class") + " underline");
 			if ("underlineHand" in this.textAttrs) {
 				var underlineHandClasses = this.computeHandClasses(this.textAttrs['underlineHand']);
 				this.underline.setAttribute('class', underlineHandClasses.join(' '));
@@ -248,6 +224,7 @@ YUI.add('transcript-svg', function (Y) {
 			this.rewrite = this.createView();
 			this.svgContainer().appendChild(this.rewrite);
 		}
+
 		this.rotate(this.rotation);	
 		Y.each(this.children, function(c) { c.render(); });
 	};

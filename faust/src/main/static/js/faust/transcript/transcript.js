@@ -2,7 +2,10 @@ YUI.add('transcript', function (Y) {
 
 	Faust.ENC_EXC_PREF = "ENCODING ERROR: ";
 	
-	Faust.ViewComponent = function() {};
+	Faust.ViewComponent = function() {
+		this.classes = [];
+		this.initViewComponent();
+	};
 	Faust.ViewComponent.prototype = {
 		rotation: 0,
 		elementName: '',
@@ -95,7 +98,7 @@ YUI.add('transcript', function (Y) {
 			this.vAlign.align();
 		},
 		computeClasses: function() { 
-			return ['element-' + this.elementName];
+			return (this.elementName ? ['element-' + this.elementName] : []).concat(this.classes);
 		},
 		rotX: function() {return 0 + this.globalRotation()},
 		rotY: function() {return 90 + this.globalRotation()},
@@ -103,8 +106,6 @@ YUI.add('transcript', function (Y) {
  		defaultAligns: function () {
  		
  			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-			//this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-			//this.setAlign("vAlign", new Faust.NullAlign());
 
  			if (this.previous())
  				this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
@@ -130,7 +131,7 @@ YUI.add('transcript', function (Y) {
 	};
 
 	Faust.BlockViewComponent = function() {
-		this.initViewComponent();
+		Faust.BlockViewComponent.superclass.constructor.call(this);
 	};
 
 	Y.extend (Faust.BlockViewComponent, Faust.ViewComponent);
@@ -146,7 +147,7 @@ YUI.add('transcript', function (Y) {
  	};
 
 	Faust.InlineViewComponent = function() {
-		this.initViewComponent();
+		Faust.InlineViewComponent.superclass.constructor.call(this);
 	};
 
 	Y.extend (Faust.InlineViewComponent, Faust.ViewComponent);
@@ -162,21 +163,21 @@ YUI.add('transcript', function (Y) {
 	};
 
 	Faust.VSpace = function(height) {
-		this.initViewComponent();
+		Faust.VSpace.superclass.constructor.call(this);
 		this.vSpaceHeight = height;
 	};
 
 	Y.extend (Faust.VSpace, Faust.BlockViewComponent);
 
 	Faust.HSpace = function(width) {
-		this.initViewComponent();
+		Faust.HSpace.superclass.constructor.call(this);
 		this.hSpaceWidth = width;
 	};
 	
 	Y.extend (Faust.HSpace, Faust.InlineViewComponent);
 	
 	Faust.Surface = function() {
-		this.initViewComponent();
+		Faust.Surface.superclass.constructor.call(this);
 	};
 
 	Y.extend(Faust.Surface, Faust.BlockViewComponent);
@@ -190,13 +191,13 @@ YUI.add('transcript', function (Y) {
 
 			
 	Faust.Zone = function() {
-		this.initViewComponent();
+		Faust.Zone.superclass.constructor.call(this);
 	};
 
 	Y.extend(Faust.Zone, Faust.BlockViewComponent);
 	
 	Faust.Line = function(lineAttrs) {
-		this.initViewComponent();
+		Faust.Line.superclass.constructor.call(this);
 		this.lineAttrs = lineAttrs;
 	};
 
@@ -234,9 +235,32 @@ YUI.add('transcript', function (Y) {
 
 	
 	Faust.Text = function(text, textAttrs) {
-		this.initViewComponent();
+		Faust.Text.superclass.constructor.call(this);
 		this.text = text.replace(/\s+/g, "\u00a0");
 		this.textAttrs = textAttrs;
+		for (var attr in this.textAttrs) {
+			if (attr == "hand") {
+				var handClasses = this.computeHandClasses(this.getHand());
+				this.classes = this.classes.concat(handClasses);
+			} else if (attr == "rewrite") {
+				this.classes.push("rewrite");
+			} else if (attr == "under") {
+				this.classes.push("under");
+			} else if (attr == "over") {
+				this.classes.push("over");
+			} else if (attr == "fontsize") {
+				var size = this.textAttrs["fontsize"];
+				if (size == "small") {
+					this.classes.push("small");
+				}
+			} else if (attr == 'sup') {
+				this.classes.push('sup');
+			} else if (attr == 'sub') {
+				this.classes.push('sub');
+		}
+
+	}
+
 	};
 
 	Y.extend(Faust.Text, Faust.InlineViewComponent);
@@ -277,54 +301,32 @@ YUI.add('transcript', function (Y) {
 		return classes;
 	};
 
-	Faust.Text.prototype.computeClasses = function() {
-		var classes = [""];
-		for (var attr in this.textAttrs) {
-			if (attr == "hand") {
-				var handClasses = this.computeHandClasses(this.getHand());
-				classes = classes.concat(handClasses);
-			} else if (attr == "rewrite") {
-				classes.push("rewrite");
-			} else if (attr == "under") {
-				classes.push("under");
-			} else if (attr == "over") {
-				classes.push("over");
-			} else if (attr == "fontsize") {
-				var size = this.textAttrs["fontsize"];
-				if (size == "small") {
-					classes.push("small");
-				}
-			}
-		}
-		return classes.reduce(function (x,y) {return x + " " + y});
-	};
-
 	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
+		Faust.SpanningVC.superclass.constructor.call(this);
 		this.type =  type;
 		this.imageUrl = imageUrl;
 		this.imageWidth = imageWidth;
 		this.imageHeight = imageHeight;
 		this.fixedWidth = fixedWidth;
 		this.fixedHeight = fixedHeight;
-		this.initViewComponent();
 	};
 
 	Y.extend (Faust.SpanningVC, Faust.ViewComponent);
 
 	Faust.InlineGraphic = function(type, imageUrl, imageWidth, imageHeight, displayWidth, displayHeight) {
+		Faust.InlineGraphic.superclass.constructor.call(this);
 		this.type =  type;
 		this.imageUrl = imageUrl;
 		this.imageWidth = imageWidth;
 		this.imageHeight = imageHeight;
 		this.displayWidth = displayWidth;
 		this.displayHeight = displayHeight;
-		this.initViewComponent();
 	};
 
 	Y.extend (Faust.InlineGraphic, Faust.InlineViewComponent);
 
 	Faust.GLine = function() {
-		this.initViewComponent();
+		Faust.GLine.superclass.constructor.call(this);
 	};
 
 	Y.extend(Faust.GLine, Faust.ViewComponent);
@@ -336,7 +338,7 @@ YUI.add('transcript', function (Y) {
 
 
 	Faust.GBrace = function() {
-		this.initViewComponent();
+		Faust.GBrace.superclass.constructor.call(this);
 	};
 
 	Y.extend(Faust.GBrace, Faust.ViewComponent);
