@@ -47,15 +47,15 @@ YUI.add('transcript-interaction', function (Y) {
 		// highlight hands
 
 		var sheet = Y.StyleSheet('#style-document-transcript-highlight-hands');
-		var zones = Y.all('svg.diplomatic .Zone');
+		var zones = Y.all('svg.diplomatic .element-zone');
 
 		zones.on("mouseenter", function () {
-			Y.all('.bgBox').transition('fadeIn');
+			Y.all('svg.diplomatic .bgBox').transition('fadeIn');
 			if (sheet) sheet.enable();
 		});
 
 		zones.on("mouseleave", function () {
-			Y.all('.bgBox').transition('fadeOut');
+			Y.all('svg.diplomatic .bgBox').transition('fadeOut');
 			//sheet.disable();
 		});
 
