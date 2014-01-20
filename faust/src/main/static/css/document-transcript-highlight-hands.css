@@ -3,6 +3,10 @@ svg.diplomatic .bgBox {
     fill: #a64d79;
 }
 
+svg.diplomatic .bgBox.noBackground {
+    visibility: hidden;
+}
+
 svg.diplomatic .bgBox.hand-g {
 	fill: White;
 }
