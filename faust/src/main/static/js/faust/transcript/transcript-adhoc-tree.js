@@ -158,7 +158,8 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 
 				// space at the beginning of each line, to give empty lines height
 				if (node.name().localName == "line") {
-					vc.add (Y.Faust.TranscriptLayout.createText("\u00a0", annotationStart, annotationEnd, text));
+					//vc.add (Y.Faust.TranscriptLayout.createText("\u00a0", annotationStart, annotationEnd, text));
+					vc.add (new Faust.Text("\u00a0", {}));
 				}
 
 				// 'end' callback after all children are constructed

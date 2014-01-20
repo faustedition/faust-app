@@ -259,7 +259,7 @@ YUI.add('transcript', function (Y) {
 				this.classes.push('sub');
 		}
 
-	}
+		}
 
 	};
 
