@@ -230,6 +230,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'overw' : {vc: function() {return new Faust.InlineViewComponent();}},
 
+				'patch' : { vc: function(){return new Faust.Patch();}},
+
 				'rdg' : { vc: function(){return new Faust.InlineViewComponent();}},
 
 				'seg' : {vc: function() {return new Faust.InlineViewComponent();}},

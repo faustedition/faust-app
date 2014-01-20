@@ -106,6 +106,16 @@ svg.diplomatic .text.script-lat {
     font-style: italic;
 }
 
+/* block level elements */
+
+svg.diplomatic rect.patchBackground {
+    fill: white;
+    stroke: black;
+    stroke-opacity: 1;
+    stroke-width: 0.2 em;
+    fill-opacity: 0.8;
+}
+
 /* various annotations */
 
 svg.diplomatic .text.rewrite {

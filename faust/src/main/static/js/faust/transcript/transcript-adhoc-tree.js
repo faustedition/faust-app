@@ -64,8 +64,8 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 			var vc = null;
 
 
-
-			if ((node instanceof Y.Faust.TextNode) && (parent != null)) { //&& (parent instanceof Faust.Line)) {
+			var ancestorNames = node.ancestors().map(function(node){return node.annotation.name.localName});
+			if ((node instanceof Y.Faust.TextNode) && (parent != null) && (ancestorNames.indexOf('line') >= 0)) {
 				if (Y.Faust.TranscriptConfiguration.stripWhitespace.indexOf(node.parent.name().localName) >= 0 && node.content().trimRight() == "") {
 					//only whitespace to be stripped, do not return a text representation
 				} else {

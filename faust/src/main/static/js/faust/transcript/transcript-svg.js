@@ -103,6 +103,24 @@ YUI.add('transcript-svg', function (Y) {
 		return view;
 	};
 
+	Faust.Patch.prototype.createView = function() {
+		this.patchBackground = this.svgDocument().createElementNS(SVG_NS, "rect");
+		this.svgContainer().appendChild(this.patchBackground);
+		this.patchBackground.setAttribute("class", "patchBackground " + this.getClassesString());
+		this.view = this.svgDocument().createElementNS(SVG_NS, "g");
+		var patchBox = this.view.getBBox();
+		return this.view;
+	}
+
+	Faust.Patch.prototype.onRelayout = function() {
+		var bbox = this.view.getBBox();
+		this.patchBackground.setAttribute("x", bbox.x);
+		this.patchBackground.setAttribute("y", bbox.y);
+		this.patchBackground.setAttribute("height", bbox.height);
+		this.patchBackground.setAttribute("width", bbox.width);
+		this.patchBackground.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
+	}
+
 	Faust.VSpace.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "rect");
 		result.setAttribute('class', 'VSpace');

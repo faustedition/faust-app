@@ -169,6 +169,14 @@ YUI.add('transcript', function (Y) {
 
 	Y.extend (Faust.VSpace, Faust.BlockViewComponent);
 
+
+	Faust.Patch = function() {
+		Faust.Patch.superclass.constructor.call(this);
+	};
+
+	Y.extend (Faust.Patch, Faust.BlockViewComponent);
+
+
 	Faust.HSpace = function(width) {
 		Faust.HSpace.superclass.constructor.call(this);
 		this.hSpaceWidth = width;

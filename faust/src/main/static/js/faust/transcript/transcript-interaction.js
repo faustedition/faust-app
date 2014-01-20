@@ -1,7 +1,8 @@
 YUI.add('transcript-interaction', function (Y) {
 	Y.on('faust:transcript-layout-done', function() {
 
-		// TOOLTIP
+		// ******* hand and material display *******
+		// tooltip
 
 		var tooltip = new Y.Overlay({
 			visible: false,
@@ -59,6 +60,17 @@ YUI.add('transcript-interaction', function (Y) {
 			//sheet.disable();
 		});
 
+		// ******* patches *******
+
+		var patches = Y.all('svg.diplomatic .element-patch');
+
+		patches.on("mouseenter", function (e) {
+			Y.all('svg.diplomatic .element-patch').transition('fadeOut');
+		});
+
+		patches.on("mouseleave", function () {
+			Y.all('svg.diplomatic .element-patch').transition('fadeIn');
+		});
 
 
 	})
