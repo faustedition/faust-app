@@ -87,7 +87,7 @@ def update():
     stop()
     backup()
     unzip()
-    read()
+    # read()
     start()
 
     print 'All done!'
