@@ -54,7 +54,7 @@ def unzip():
 
 def start():
     print 'Restarting app...'
-    check_call(['nohup java -Xmx1024m -server -Dfile.encoding=UTF-8 -jar app/lib/' + NAME +'.jar /mnt/data/config.properties >> faust-server.out 2>> faust-server.err &']
+    check_call(['nohup java -Xmx1024m -server -Dfile.encoding=UTF-8 -jar app/lib/' + NAME +'.jar /mnt/data/config.properties >> faust-server.out 2>> faust-server.err &'])
 
 def stop():
     sys.stdout.write('Stopping running application...')
