@@ -232,8 +232,8 @@ YUI.add('transcript-svg', function (Y) {
 		if ("underline" in this.textAttrs) {
 			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
 			if ("underlineHand" in this.textAttrs) {
-				var underlineHandClasses = this.computeHandClasses(this.textAttrs['underlineHand']);
-				this.underline.setAttribute('class', underlineHandClasses.join(' '));
+				//var underlineHandClasses = this.computeHandClasses(this.textAttrs['underlineHand']);
+				//this.underline.setAttribute('class', underlineHandClasses.join(' '));
 			}
 			this.svgContainer().appendChild(this.underline);
 

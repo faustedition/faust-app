@@ -12,9 +12,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 
 
 			Y.each(annotations, function(a) {
-				if (a.name.localName == "hand") {
-					textAttrs.hand = a.data["value"].substring(1);
-				} else if (a.name.localName == "rewrite") {
+				if (a.name.localName == "rewrite") {
 					if (a.data["hand"]) {
 						textAttrs.rewrite = a.data["hand"].substring(1);
 					} else {
@@ -184,7 +182,8 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 		
 		transcriptVC: function(jsonRepresentation) {
 			
-			var structuralNames = Object.keys(Y.Faust.TranscriptConfiguration.names);
+			var structuralNames = Object.keys(Y.Faust.TranscriptConfiguration.names)
+				.filter(function(name){return 'vc' in Y.Faust.TranscriptConfiguration.names[name]});
 
 			var text = Y.Faust.Text.create(jsonRepresentation);
 

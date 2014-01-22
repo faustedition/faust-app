@@ -247,16 +247,8 @@ YUI.add('transcript', function (Y) {
 		this.text = text.replace(/\s+/g, "\u00a0");
 		this.textAttrs = textAttrs;
 		for (var attr in this.textAttrs) {
-			if (attr == "hand") {
-				var handClasses = this.computeHandClasses(this.getHand());
-				this.classes = this.classes.concat(handClasses);
-			} else if (attr == "rewrite") {
+			if (attr == "rewrite") {
 				this.classes.push("rewrite");
-			} else if (attr == "fontsize") {
-				var size = this.textAttrs["fontsize"];
-				if (size == "small") {
-					this.classes.push("small");
-				}
 			} else if (attr == 'sup') {
 				this.classes.push('sup');
 			} else if (attr == 'sub') {
@@ -273,36 +265,6 @@ YUI.add('transcript', function (Y) {
 		var measured = this.measure();
 		this.width = measured.width;
 		this.height = measured.height;
-	};
-
-	Faust.Text.prototype.getHand = function() {
-		if (this.textAttrs.rewrite)
-			return this.textAttrs.rewrite;
-		else
-			return this.textAttrs["hand"];
-	};
-
-	Faust.Text.prototype.writer = function (hand) {
-		return hand.split('_')[0];
-	};
-
-	Faust.Text.prototype.material = function (hand) {
-		return hand.split('_')[1];
-	};
-
-	Faust.Text.prototype.script = function (hand) {
-		return hand.split('_')[2];
-	};
-
-	Faust.Text.prototype.computeHandClasses = function(hand) {
-		var classes = [""];
-		if (this.writer(hand))
-			classes.push("hand-" + this.writer(hand));
-		if (this.material(this.getHand()))
-			classes.push("material-" + this.material(hand));
-		if (this.script(this.getHand()))
-			classes.push("script-" + this.script(hand));
-		return classes;
 	};
 
 	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {

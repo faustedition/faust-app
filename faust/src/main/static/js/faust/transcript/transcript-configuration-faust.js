@@ -161,6 +161,23 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
+				'hand' : {
+
+					text: function(annotation, textVC) {
+						var hand = annotation.data["value"].substring(1).split('_');
+						var writer = hand[0];
+						var material = 	hand[1];
+						var script = hand[2];
+
+						if (writer)
+							textVC.classes.push("hand-" + writer);
+						if (material)
+							textVC.classes.push("material-" + material);
+						if (script)
+							textVC.classes.push("script-" + script);
+					}
+				},
+
 				'hspace':  {
 					vc: function(node, text, layoutState) {
 						switch (node.data()["unit"]) {
