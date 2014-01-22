@@ -174,10 +174,13 @@ YUI.add('transcript-svg', function (Y) {
 		var text = this.svgDocument().createElementNS(SVG_NS, "text");
 		text.setAttribute("class", "text " + this.getClassesString());
 		text.appendChild(this.svgDocument().createTextNode(this.text));
+		Y.each (this.decorations, function(decoration) {decoration.render()});
 		return text;
 	};
 	
 	Faust.Text.prototype.onRelayout = function() {
+
+
 
 		if (this.strikethrough) {
 			this.strikethrough.setAttribute("x1", this.x);
@@ -202,14 +205,7 @@ YUI.add('transcript-svg', function (Y) {
 		this.bgBox.setAttribute("width", bbox.width);
 		this.bgBox.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 		
-		if (this.underline) {
-			this.underline.setAttribute("x1", this.x);
-			this.underline.setAttribute("x2", this.x + this.width);
-			var yOffset = this.height / 10.0;
-			this.underline.setAttribute("y1", this.y + yOffset);
-			this.underline.setAttribute("y2", this.y + yOffset);
-			this.underline.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
-		}
+		Y.each (this.decorations, function(decoration) {decoration.layout()});
 	};
 
 	Faust.Text.prototype.render = function() {
@@ -229,15 +225,7 @@ YUI.add('transcript-svg', function (Y) {
 				this.strikethrough.setAttribute('class', strikethroughHandClasses.join(' '));
 			}
 			this.svgContainer().appendChild(this.strikethrough);		}
-		if ("underline" in this.textAttrs) {
-			this.underline = this.svgDocument().createElementNS(SVG_NS, "line");
-			if ("underlineHand" in this.textAttrs) {
-				//var underlineHandClasses = this.computeHandClasses(this.textAttrs['underlineHand']);
-				//this.underline.setAttribute('class', underlineHandClasses.join(' '));
-			}
-			this.svgContainer().appendChild(this.underline);
 
-		}
 		if ("rewrite" in this.textAttrs) {
 			this.rewrite = this.createView();
 			this.svgContainer().appendChild(this.rewrite);
@@ -320,6 +308,25 @@ YUI.add('transcript-svg', function (Y) {
 		path.setAttribute("fill", "transparent");
 		return path;
 	};
+
+	Faust.Underline.prototype.render = function() {
+		this.underline = this.text.svgDocument().createElementNS(SVG_NS, "line");
+		//if ("underlineHand" in this.textAttrs) {
+			//var underlineHandClasses = this.computeHandClasses(this.textAttrs['underlineHand']);
+			//this.underline.setAttribute('class', underlineHandClasses.join(' '));
+		//}
+		this.text.svgContainer().appendChild(this.underline);
+	};
+
+	Faust.Underline.prototype.layout = function() {
+		this.underline.setAttribute("x1", this.text.x);
+		this.underline.setAttribute("x2", this.text.x + this.text.width);
+		var yOffset = this.text.height / 10.0;
+		this.underline.setAttribute("y1", this.text.y + yOffset);
+		this.underline.setAttribute("y2", this.text.y + yOffset);
+		this.underline.transform.baseVal.initialize(this.text.view.transform.baseVal.consolidate());
+	};
+
 
 }, '0.0', {
 	requires: ["node", "dom", "event", "transcript", "event-mouseenter",

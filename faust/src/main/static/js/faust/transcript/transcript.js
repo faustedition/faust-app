@@ -241,9 +241,9 @@ YUI.add('transcript', function (Y) {
 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 	};
 
-	
 	Faust.Text = function(text, textAttrs) {
 		Faust.Text.superclass.constructor.call(this);
+		this.decorations = [];
 		this.text = text.replace(/\s+/g, "\u00a0");
 		this.textAttrs = textAttrs;
 		for (var attr in this.textAttrs) {
@@ -313,6 +313,21 @@ YUI.add('transcript', function (Y) {
 		this.width = 40;
 		this.height = 20;
 	};
+
+	Faust.TextDecoration = function(text) {
+		this.text = text;
+	};
+
+	Faust.TextDecoration.prototype.layout = function() {};
+
+	Faust.TextDecoration.prototype.layout = function() {};
+
+	Faust.Underline = function(text) {
+		Faust.Underline.superclass.constructor.call(this, text);
+	}
+
+	Y.extend(Faust.Underline, Faust.TextDecoration);
+
 
 	Faust.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
 		this.me = me;

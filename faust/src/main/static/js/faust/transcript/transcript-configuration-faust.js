@@ -178,6 +178,17 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
+				'hi' : {
+					text: function (annotation, textVC) {
+						if (annotation.data["rend"] && annotation.data["rend"].split(' ').indexOf("underline") >= 0) {
+							//if (annotationa.data["hand"])
+							//textVC.underlineHand = annotation.data["hand"].substring(1);
+
+							textVC.decorations.push(new Faust.Underline(textVC));
+						}
+					}
+				},
+
 				'hspace':  {
 					vc: function(node, text, layoutState) {
 						switch (node.data()["unit"]) {
