@@ -225,8 +225,14 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							lineAttrs.between = true;
 
 						return new Faust.Line(lineAttrs);
+					},
+					text: function(annotation, textVC) {
+						var fontsize = ((annotation.data["type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
+						textVC.classes.push(fontsize);
 					}
 				},
+
+				'over' : {text: function(annotation, textVC){ textVC.classes.push('over'); }},
 
 				'overw' : {vc: function() {return new Faust.InlineViewComponent();}},
 
@@ -265,18 +271,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				},
 
 				'under' : {
-					vc: function() {
-						var vc =  new Faust.InlineViewComponent();
-						vc.defaultAligns = function () {
-
-							this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 1, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-
-							if (this.previous())
-								this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-							else
-								this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
-						};
-						return vc;
+					text: function(annotation, textVC) {
+						textVC.classes.push('under');
 					}
 				},
 
@@ -314,7 +310,9 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						return vc;
 					}
 				}
-			}
+			},
+
+
 		}
 	});
 

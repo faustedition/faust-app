@@ -10,6 +10,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 			//ignore empty annotations at the borders
 				.filter(function(x){var r = x.target().range; return r.start !== r.end});
 
+
 			Y.each(annotations, function(a) {
 				if (a.name.localName == "hand") {
 					textAttrs.hand = a.data["value"].substring(1);
@@ -19,10 +20,6 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 					} else {
 						textAttrs.rewrite = textAttrs.hand;
 					}
-				} else if (a.name.localName == "under") {
-					textAttrs.under = true;
-				} else if (a.name.localName == "over") {
-					textAttrs.over = true;
 				} else if (a.name.localName == "st") {
 					textAttrs.strikethrough = true;
 					if (a.data["hand"])
@@ -35,12 +32,19 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 					textAttrs.sup = true;
 				} else if (a.name.localName == "hi" && a.data["rend"] && a.data["rend"].split(' ').indexOf('sub') >= 0) {
 					textAttrs.sub = true;
-				} else if (a.name.localName == "line") {
-					textAttrs.fontsize = ((a.data["type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
 				}
 
-			});				
-			return new Faust.Text(content, textAttrs);
+			});
+			var textVC = new Faust.Text(content, textAttrs);
+
+			Y.each(annotations, function(annotation) {
+				if (annotation.name.localName in Y.Faust.TranscriptConfiguration.names
+					&& Y.Faust.TranscriptConfiguration.names[annotation.name.localName].text) {
+					Y.Faust.TranscriptConfiguration.names[annotation.name.localName].text(annotation, textVC);
+				}
+			});
+
+			return textVC;
 		}
 		
 	};
@@ -77,7 +81,8 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				var annotationEnd = node.annotation.target().range.end;
 
 				//ioc: configurable modules handle the construction of the view
-				if (node.name().localName in Y.Faust.TranscriptConfiguration.names) {
+				if (node.name().localName in Y.Faust.TranscriptConfiguration.names
+					&& 'vc' in Y.Faust.TranscriptConfiguration.names[node.name().localName]) {
 					var nameHandler = Y.Faust.TranscriptConfiguration.names[node.name().localName];
 					if (nameHandler.vc) {
 						vc = nameHandler.vc(node, text, this);

@@ -252,10 +252,6 @@ YUI.add('transcript', function (Y) {
 				this.classes = this.classes.concat(handClasses);
 			} else if (attr == "rewrite") {
 				this.classes.push("rewrite");
-			} else if (attr == "under") {
-				this.classes.push("under");
-			} else if (attr == "over") {
-				this.classes.push("over");
 			} else if (attr == "fontsize") {
 				var size = this.textAttrs["fontsize"];
 				if (size == "small") {
