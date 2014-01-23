@@ -1,5 +1,23 @@
 YUI.add('transcript-configuration-faust', function (Y) {
 
+
+	function classesFromHandValue(hand) {
+		var tokens = hand.substring(1).split('_');
+
+		var writer = tokens[0];
+		var material = tokens[1];
+		var script = tokens[2];
+
+		var classes = [];
+		if (writer)
+			classes.push("hand-" + writer);
+		if (material)
+			classes.push("material-" + material);
+		if (script)
+			classes.push("script-" + script);
+		return classes;
+	}
+
 	// A configuration defines how markup is rendered by providing handler
 	// functions in Y.Faust.TranscriptConfiguration.
 
@@ -164,27 +182,24 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				'hand' : {
 
 					text: function(annotation, textVC) {
-						var hand = annotation.data["value"].substring(1).split('_');
-						var writer = hand[0];
-						var material = 	hand[1];
-						var script = hand[2];
-
-						if (writer)
-							textVC.classes.push("hand-" + writer);
-						if (material)
-							textVC.classes.push("material-" + material);
-						if (script)
-							textVC.classes.push("script-" + script);
+						var hand = annotation.data["value"];
+						var classes = classesFromHandValue(hand);
+						textVC.classes = textVC.classes.concat(classes);
 					}
 				},
 
 				'hi' : {
 					text: function (annotation, textVC) {
 						if (annotation.data["rend"] && annotation.data["rend"].split(' ').indexOf("underline") >= 0) {
-							//if (annotationa.data["hand"])
-							//textVC.underlineHand = annotation.data["hand"].substring(1);
+							var classes = [];
+							if (annotation.data["hand"]) {
+								var hand = annotation.data["hand"].substring(1);
+								classes = classesFromHandValue(hand);
 
-							textVC.decorations.push(new Faust.Underline(textVC));
+							}
+							var underline = new Faust.Underline(textVC, classes);
+
+							textVC.decorations.push(underline);
 						}
 					}
 				},

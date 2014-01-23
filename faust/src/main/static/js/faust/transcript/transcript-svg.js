@@ -309,22 +309,18 @@ YUI.add('transcript-svg', function (Y) {
 		return path;
 	};
 
-	Faust.Underline.prototype.render = function() {
-		this.underline = this.text.svgDocument().createElementNS(SVG_NS, "line");
-		//if ("underlineHand" in this.textAttrs) {
-			//var underlineHandClasses = this.computeHandClasses(this.textAttrs['underlineHand']);
-			//this.underline.setAttribute('class', underlineHandClasses.join(' '));
-		//}
-		this.text.svgContainer().appendChild(this.underline);
+	Faust.Underline.prototype.createView = function() {
+		var view = this.text.svgDocument().createElementNS(SVG_NS, "line");
+		return view;
 	};
 
 	Faust.Underline.prototype.layout = function() {
-		this.underline.setAttribute("x1", this.text.x);
-		this.underline.setAttribute("x2", this.text.x + this.text.width);
+		this.view.setAttribute("x1", this.text.x);
+		this.view.setAttribute("x2", this.text.x + this.text.width);
 		var yOffset = this.text.height / 10.0;
-		this.underline.setAttribute("y1", this.text.y + yOffset);
-		this.underline.setAttribute("y2", this.text.y + yOffset);
-		this.underline.transform.baseVal.initialize(this.text.view.transform.baseVal.consolidate());
+		this.view.setAttribute("y1", this.text.y + yOffset);
+		this.view.setAttribute("y2", this.text.y + yOffset);
+		this.view.transform.baseVal.initialize(this.text.view.transform.baseVal.consolidate());
 	};
 
 

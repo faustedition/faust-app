@@ -314,20 +314,25 @@ YUI.add('transcript', function (Y) {
 		this.height = 20;
 	};
 
-	Faust.TextDecoration = function(text) {
+	Faust.TextDecoration = function(text, classes) {
 		this.text = text;
+		this.classes = classes;
+		this.classes.push('text-decoration');
+	};
+
+	Faust.TextDecoration.prototype.render = function() {
+		this.view = this.createView();
+		this.view.setAttribute('class', this.classes.join(' '));
+		this.text.svgContainer().appendChild(this.view);
 	};
 
 	Faust.TextDecoration.prototype.layout = function() {};
 
-	Faust.TextDecoration.prototype.layout = function() {};
-
-	Faust.Underline = function(text) {
-		Faust.Underline.superclass.constructor.call(this, text);
+	Faust.Underline = function(text, classes) {
+		Faust.Underline.superclass.constructor.call(this, text, classes);
 	}
 
 	Y.extend(Faust.Underline, Faust.TextDecoration);
-
 
 	Faust.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
 		this.me = me;
