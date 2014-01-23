@@ -18,10 +18,6 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 					} else {
 						textAttrs.rewrite = textAttrs.hand;
 					}
-				} else if (a.name.localName == "st") {
-					textAttrs.strikethrough = true;
-					if (a.data["hand"])
-						textAttrs.strikethroughHand = a.data["hand"].substring(1);
 				}
 
 			});

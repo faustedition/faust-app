@@ -318,11 +318,11 @@ YUI.add('transcript', function (Y) {
 
 	Faust.TextDecoration.prototype.layout = function() {};
 
-	Faust.Underline = function(text, classes) {
-		Faust.Underline.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-underline']));
+	Faust.LineDecoration = function(text, classes, name, yOffset) {
+		Faust.LineDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
+		this.yOffset = yOffset;
 	}
-
-	Y.extend(Faust.Underline, Faust.TextDecoration);
+	Y.extend(Faust.LineDecoration, Faust.TextDecoration);
 
 	Faust.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
 		this.me = me;

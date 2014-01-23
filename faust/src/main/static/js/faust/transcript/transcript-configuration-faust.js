@@ -201,12 +201,13 @@ YUI.add('transcript-configuration-faust', function (Y) {
 									var hand = annotation.data["hand"];
 									classes = classes.concat(classesFromHandValue(hand));
 								}
-								var underline = new Faust.Underline(textVC, classes);
+								var underline = new Faust.LineDecoration(textVC, classes, 'underline', 0.1);
 								textVC.decorations.push(underline);
-
-							} else if (rendTokens.indexOf('sup') >= 0) {
+							}
+							if (rendTokens.indexOf('sup') >= 0) {
 								textVC.classes.push('sup');
-							} else if (rendTokens.indexOf('sub') >= 0) {
+							}
+							if (rendTokens.indexOf('sub') >= 0) {
 								textVC.classes.push('sub');
 							}
 						}
@@ -293,6 +294,18 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				'rdg' : { vc: function(){return new Faust.InlineViewComponent();}},
 
 				'seg' : {vc: function() {return new Faust.InlineViewComponent();}},
+
+				'st' : {
+					text : function (annotation, textVC, layoutState) {
+						var classes = [];
+						if (annotation.data["hand"]) {
+							var hand = annotation.data["hand"];
+							classes = classes.concat(classesFromHandValue(hand));
+						}
+						var strikethrough = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2);
+						textVC.decorations.push(strikethrough);
+					}
+				},
 
 				'supplied' : {
 					vc : function (node, text, layoutState) {

@@ -183,15 +183,6 @@ YUI.add('transcript-svg', function (Y) {
 	
 	Faust.Text.prototype.onRelayout = function() {
 
-		if (this.strikethrough) {
-			this.strikethrough.setAttribute("x1", this.x);
-			this.strikethrough.setAttribute("x2", this.x + this.width);
-			this.strikethrough.setAttribute("y1", this.y - this.measure().height / 6);
-			this.strikethrough.setAttribute("y2", this.y - this.measure().height / 6);
-			//this.strikethrough.transform.baseVal = this.view.transform.baseVal;
-			this.strikethrough.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
-		}
-
 		if (this.rewrite) {
 			var offset = this.measure().height / 20.0;
 			this.rewrite.setAttribute("x", this.x + offset);
@@ -218,14 +209,6 @@ YUI.add('transcript-svg', function (Y) {
 		this.view = this.createView();
 		this.svgContainer().appendChild(this.view);
 		var textBox = this.view.getBBox();
-
-		if ("strikethrough" in this.textAttrs) {
-			this.strikethrough = this.svgDocument().createElementNS(SVG_NS, "line");
-			if ("strikethroughHand" in this.textAttrs) {
-				var strikethroughHandClasses = this.computeHandClasses(this.textAttrs['strikethroughHand']);
-				this.strikethrough.setAttribute('class', strikethroughHandClasses.join(' '));
-			}
-			this.svgContainer().appendChild(this.strikethrough);		}
 
 		if ("rewrite" in this.textAttrs) {
 			this.rewrite = this.createView();
@@ -325,20 +308,19 @@ YUI.add('transcript-svg', function (Y) {
 		this.text.view.appendChild(this.view);
 	};
 
-	Faust.Underline.prototype.createView = function() {
+	Faust.LineDecoration.prototype.createView = function() {
 		var view = this.text.svgDocument().createElementNS(SVG_NS, "line");
 		return view;
 	};
 
-	Faust.Underline.prototype.layout = function() {
+	Faust.LineDecoration.prototype.layout = function() {
 		var textBBox = this.text.textElement.getBBox();
 		this.view.setAttribute("x1", textBBox.x);
 		this.view.setAttribute("x2", textBBox.x + textBBox.width);
-		var yOffset = textBBox.height / 10.0;
-		this.view.setAttribute("y1", yOffset);
-		this.view.setAttribute('y2', yOffset);
+		var y = textBBox.height * this.yOffset;
+		this.view.setAttribute("y1", y);
+		this.view.setAttribute('y2', y);
 	};
-
 
 }, '0.0', {
 	requires: ["node", "dom", "event", "transcript", "event-mouseenter",

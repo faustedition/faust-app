@@ -29,6 +29,7 @@ svg.diplomatic .bgBox {
 
 /* text decorations */
 .tooltip-caption-decoration-underline:before {content: 'Unterstreichung';}
+.tooltip-caption-decoration-strikethrough:before {content: 'Durchstreichung';}
 
 
 /* scribal hands */
