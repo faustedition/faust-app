@@ -3,7 +3,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 	var TranscriptLayout = {
 		// Text factory; the current model only delivers text nodes, some additional elements (gaps, insertion marks) need 
 		// to be delivered to know their tree context (hands...) for visualisation
-		createText : function(content, start, end, text){
+		createText : function(content, start, end, text, layoutState){
 			if (content.length < 1) throw "Cannot create empty text!";
 			var textAttrs = {};
 			var annotations = text.find(start, end)
@@ -34,7 +34,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 			Y.each(annotations, function(annotation) {
 				if (annotation.name.localName in Y.Faust.TranscriptConfiguration.names
 					&& Y.Faust.TranscriptConfiguration.names[annotation.name.localName].text) {
-					Y.Faust.TranscriptConfiguration.names[annotation.name.localName].text(annotation, textVC);
+					Y.Faust.TranscriptConfiguration.names[annotation.name.localName].text(annotation, textVC, layoutState);
 				}
 			});
 
@@ -56,8 +56,8 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 	
 	Y.extend(TranscriptAdhocTree, Object, {
 
-		buildVC: function(parent, node, text) {
-			
+		buildVC: function(parent, node, text, layoutState) {
+
 			if (node == null) return null;
 			var vc = null;
 
@@ -67,7 +67,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				if (Y.Faust.TranscriptConfiguration.stripWhitespace.indexOf(node.parent.name().localName) >= 0 && node.content().trimRight() == "") {
 					//only whitespace to be stripped, do not return a text representation
 				} else {
-					vc = Y.Faust.TranscriptLayout.createText(node.content(), node.range.start, node.range.end, text);
+					vc = Y.Faust.TranscriptLayout.createText(node.content(), node.range.start, node.range.end, text, layoutState);
 				}
 			} else if (node instanceof Y.Faust.AnnotationNode) {
 
@@ -79,7 +79,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 					&& 'vc' in Y.Faust.TranscriptConfiguration.names[node.name().localName]) {
 					var nameHandler = Y.Faust.TranscriptConfiguration.names[node.name().localName];
 					if (nameHandler.vc) {
-						vc = nameHandler.vc(node, text, this);
+						vc = nameHandler.vc(node, text, layoutState);
 					} else {
 						vc = new Faust.InlineViewComponent();
 					}
@@ -151,13 +151,12 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 
 			var that = this;
 
-			Y.each(node.children(), function(c) { that.buildVC(parent, c, text); });
+			Y.each(node.children(), function(c) { that.buildVC(parent, c, text, layoutState); });
 			
 			if (node instanceof Y.Faust.AnnotationNode) {
 
 				// space at the beginning of each line, to give empty lines height
 				if (node.name().localName == "line") {
-					//vc.add (Y.Faust.TranscriptLayout.createText("\u00a0", annotationStart, annotationEnd, text));
 					var emptyProp = new Faust.Text("\u00a0", {noBackground: true});
 					emptyProp.classes.push('noBackground');
 					vc.add (emptyProp);
@@ -190,7 +189,10 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 
 			var surfaceVC = new Faust.Surface();
 
-			this.buildVC(surfaceVC, tree, text);
+
+			var layoutState = {};
+			Y.Faust.TranscriptConfiguration.initialize(layoutState);
+			this.buildVC(surfaceVC, tree, text, layoutState);
 
 			Y.each(this.postBuildDeferred, function(f) {f.apply(this)});
 

@@ -25,6 +25,10 @@ YUI.add('transcript-configuration-faust', function (Y) {
 		TranscriptConfiguration: 	 {
 			overlay : "overlay",
 			stripWhitespace : ['overw'],
+			initialize : function (layoutState) {
+				layoutState.idMap = {};
+				layoutState.textDecorationNum = 0;
+			},
 	        names: {
 				'anchor': {
 					vc: function(node, text, layoutState) {
@@ -181,7 +185,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'hand' : {
 
-					text: function(annotation, textVC) {
+					text: function(annotation, textVC, layoutState) {
 						var hand = annotation.data["value"];
 						var classes = classesFromHandValue(hand);
 						textVC.classes = textVC.classes.concat(classes);
@@ -189,17 +193,20 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				},
 
 				'hi' : {
-					text: function (annotation, textVC) {
+					text: function (annotation, textVC, layoutState) {
 						if (annotation.data["rend"] && annotation.data["rend"].split(' ').indexOf("underline") >= 0) {
-							var classes = [];
+							var textDecorationNumClass = 'text-decoration-num-' + String(layoutState.textDecorationNum);
+							var classes = [textDecorationNumClass];
 							if (annotation.data["hand"]) {
 								var hand = annotation.data["hand"].substring(1);
-								classes = classesFromHandValue(hand);
+								classes = classes.concat(classesFromHandValue(hand));
 
 							}
 							var underline = new Faust.Underline(textVC, classes);
 
+
 							textVC.decorations.push(underline);
+							layoutState.textDecorationNum++;
 						}
 					}
 				},
@@ -314,7 +321,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				},
 
 				'under' : {
-					text: function(annotation, textVC) {
+					text: function(annotation, textVC, layoutState) {
 						textVC.classes.push('under');
 					}
 				},

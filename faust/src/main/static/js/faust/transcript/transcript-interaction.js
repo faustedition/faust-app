@@ -25,9 +25,17 @@ YUI.add('transcript-interaction', function (Y) {
 			var handValue = decodeClassValue(classValue, 'hand-');
 			var materialValue = decodeClassValue(classValue, 'material-');
 			var scriptValue = decodeClassValue(classValue, 'script-');
+
+
 			var content = '<div class="tooltip-hand"><span class="tooltip-caption-hand-' + handValue + '"></span></div>'
 				+ '<div class="tooltip-material"><span class="tooltip-caption-material-' + materialValue + '"></span></div>'
 				+ '<div class="tooltip-script"><span class="tooltip-caption-script-' + scriptValue + '"></span></div>'
+
+			Y.each(Y.one(e.target).all('.text-decoration'), function(decoration){
+				content = content + '<div>Text-Decoration</div>'
+			});
+
+
 			tooltip.setStdModContent('body', content);
 			var tooltipWidth = parseFloat(tooltip.get('boundingBox').getComputedStyle('width'));
 			var tooltipHeight = parseFloat(tooltip.get('boundingBox').getComputedStyle('height'));
