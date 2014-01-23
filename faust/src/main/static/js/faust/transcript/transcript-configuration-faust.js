@@ -27,7 +27,6 @@ YUI.add('transcript-configuration-faust', function (Y) {
 			stripWhitespace : ['overw'],
 			initialize : function (layoutState) {
 				layoutState.idMap = {};
-				layoutState.textDecorationNum = 0;
 			},
 	        names: {
 				'anchor': {
@@ -195,18 +194,14 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				'hi' : {
 					text: function (annotation, textVC, layoutState) {
 						if (annotation.data["rend"] && annotation.data["rend"].split(' ').indexOf("underline") >= 0) {
-							var textDecorationNumClass = 'text-decoration-num-' + String(layoutState.textDecorationNum);
-							var classes = [textDecorationNumClass];
+							var classes = [];
 							if (annotation.data["hand"]) {
-								var hand = annotation.data["hand"].substring(1);
+								var hand = annotation.data["hand"];
 								classes = classes.concat(classesFromHandValue(hand));
-
 							}
 							var underline = new Faust.Underline(textVC, classes);
-
-
 							textVC.decorations.push(underline);
-							layoutState.textDecorationNum++;
+
 						}
 					}
 				},

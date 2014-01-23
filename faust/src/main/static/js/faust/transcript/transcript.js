@@ -246,6 +246,7 @@ YUI.add('transcript', function (Y) {
 		this.decorations = [];
 		this.text = text.replace(/\s+/g, "\u00a0");
 		this.textAttrs = textAttrs;
+		this.textElement = null;
 		for (var attr in this.textAttrs) {
 			if (attr == "rewrite") {
 				this.classes.push("rewrite");
@@ -320,16 +321,11 @@ YUI.add('transcript', function (Y) {
 		this.classes.push('text-decoration');
 	};
 
-	Faust.TextDecoration.prototype.render = function() {
-		this.view = this.createView();
-		this.view.setAttribute('class', this.classes.join(' '));
-		this.text.svgContainer().appendChild(this.view);
-	};
 
 	Faust.TextDecoration.prototype.layout = function() {};
 
 	Faust.Underline = function(text, classes) {
-		Faust.Underline.superclass.constructor.call(this, text, classes);
+		Faust.Underline.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-underline']));
 	}
 
 	Y.extend(Faust.Underline, Faust.TextDecoration);

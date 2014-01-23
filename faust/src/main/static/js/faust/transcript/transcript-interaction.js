@@ -20,19 +20,34 @@ YUI.add('transcript-interaction', function (Y) {
 			return end >= 0 ? rightSide.substring(0, end) : rightSide;
 		}
 
-		function showTooltip(e) {
-			var classValue = e.target.getAttribute('class');
+		function handDisplayContent(classValue) {
 			var handValue = decodeClassValue(classValue, 'hand-');
 			var materialValue = decodeClassValue(classValue, 'material-');
 			var scriptValue = decodeClassValue(classValue, 'script-');
 
 
-			var content = '<div class="tooltip-hand"><span class="tooltip-caption-hand-' + handValue + '"></span></div>'
-				+ '<div class="tooltip-material"><span class="tooltip-caption-material-' + materialValue + '"></span></div>'
-				+ '<div class="tooltip-script"><span class="tooltip-caption-script-' + scriptValue + '"></span></div>'
+			var content = '<div>'
+				+ '<span class="tooltip-hand"><span class="tooltip-caption-hand-' + handValue + '"></span></span>'
+				+ '<span class="tooltip-material"><span class="tooltip-caption-material-' + materialValue + '"></span></span>'
+				+ '<span class="tooltip-script"><span class="tooltip-caption-script-' + scriptValue + '"></span></span>'
+				+ '</div>';
+			return Y.Node.create(content);
+		};
 
-			Y.each(Y.one(e.target).all('.text-decoration'), function(decoration){
-				content = content + '<div>Text-Decoration</div>'
+		function showTooltip(e) {
+			var textClassValue = e.target.getAttribute('class');
+			var content = Y.Node.create('<div></div>');
+			var textHandDisplay = handDisplayContent(textClassValue);
+			content.append(textHandDisplay);
+			Y.each(Y.one(e.target).ancestor('.text-wrapper').all('.text-decoration'), function(decoration){
+				var decorationClassValue = decoration.getAttribute('class');
+				var decorationType = decodeClassValue(decorationClassValue, 'text-decoration-type-');
+				var decorationDisplay = Y.Node.create('<div class="tooltip-decoration"><div><span class="tooltip-caption-decoration-'
+					+ decorationType + '"></span></div></div>');
+				var decorationHandDisplay = handDisplayContent(decorationClassValue);
+				decorationDisplay.append(decorationHandDisplay);
+				content.append(decorationDisplay);
+				content.append();
 			});
 
 

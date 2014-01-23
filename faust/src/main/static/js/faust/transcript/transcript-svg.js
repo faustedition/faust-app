@@ -171,16 +171,17 @@ YUI.add('transcript-svg', function (Y) {
 	};
 
 	Faust.Text.prototype.createView = function() {
-		var text = this.svgDocument().createElementNS(SVG_NS, "text");
-		text.setAttribute("class", "text " + this.getClassesString());
-		text.appendChild(this.svgDocument().createTextNode(this.text));
-		Y.each (this.decorations, function(decoration) {decoration.render()});
-		return text;
+		// wrapper will contain text decorations
+		var wrapper = this.svgDocument().createElementNS(SVG_NS, "g");
+		wrapper.setAttribute('class', 'text-wrapper');
+		this.textElement = this.svgDocument().createElementNS(SVG_NS, "text");
+		this.textElement.setAttribute("class", "text " + this.getClassesString());
+		this.textElement.appendChild(this.svgDocument().createTextNode(this.text));
+		wrapper.appendChild(this.textElement);
+		return wrapper;
 	};
 	
 	Faust.Text.prototype.onRelayout = function() {
-
-
 
 		if (this.strikethrough) {
 			this.strikethrough.setAttribute("x1", this.x);
@@ -231,9 +232,18 @@ YUI.add('transcript-svg', function (Y) {
 			this.svgContainer().appendChild(this.rewrite);
 		}
 
-		this.rotate(this.rotation);	
+		this.rotate(this.rotation);
+		Y.each (this.decorations, function(decoration) {decoration.render()});
 		Y.each(this.children, function(c) { c.render(); });
 	};
+
+	Faust.Text.prototype.getExt = function(coordRotation) {
+		// only measure the text extent without the decorations
+		var matrix = this.textElement.viewportElement.createSVGMatrix();
+		matrix = matrix.rotate(coordRotation);
+		return Y.SvgUtils.boundingBox(this.textElement, matrix).width;
+	};
+
 
 	Faust.SpanningVC.prototype.createView = function() {
 		this.spanningRect = this.svgDocument().createElementNS(SVG_NS, 'use');
@@ -309,18 +319,24 @@ YUI.add('transcript-svg', function (Y) {
 		return path;
 	};
 
+	Faust.TextDecoration.prototype.render = function() {
+		this.view = this.createView();
+		this.view.setAttribute('class', this.classes.join(' '));
+		this.text.view.appendChild(this.view);
+	};
+
 	Faust.Underline.prototype.createView = function() {
 		var view = this.text.svgDocument().createElementNS(SVG_NS, "line");
 		return view;
 	};
 
 	Faust.Underline.prototype.layout = function() {
-		this.view.setAttribute("x1", this.text.x);
-		this.view.setAttribute("x2", this.text.x + this.text.width);
-		var yOffset = this.text.height / 10.0;
-		this.view.setAttribute("y1", this.text.y + yOffset);
-		this.view.setAttribute("y2", this.text.y + yOffset);
-		this.view.transform.baseVal.initialize(this.text.view.transform.baseVal.consolidate());
+		var textBBox = this.text.textElement.getBBox();
+		this.view.setAttribute("x1", textBBox.x);
+		this.view.setAttribute("x2", textBBox.x + textBBox.width);
+		var yOffset = textBBox.height / 10.0;
+		this.view.setAttribute("y1", yOffset);
+		this.view.setAttribute('y2', yOffset);
 	};
 
 
