@@ -23,14 +23,25 @@ svg.diplomatic .bgBox {
 
 .tooltip-decoration {
     margin-top: 1em;
-    background-color: white;
 }
 
+.tooltip-property {
+    margin-top: 1em;
+}
+
+/* text properties */
+
+.tooltip-caption-property-under:before {content: 'darunterstehend';}
+.tooltip-caption-property-over:before {content: 'Daraufschreibung';}
+.tooltip-caption-property-patch:before {content: 'Aufklebung';}
+.tooltip-caption-property-interline:before {content: 'eingefügte Zeile';}
+.tooltip-caption-property-gap:before {content: 'nicht lesbar';}
+.tooltip-caption-property-supplied:before {content: 'editorische Ergaenzung';}
 
 /* text decorations */
+
 .tooltip-caption-decoration-underline:before {content: 'Unterstreichung';}
 .tooltip-caption-decoration-strikethrough:before {content: 'Durchstreichung';}
-
 
 /* scribal hands */
 

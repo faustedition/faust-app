@@ -280,7 +280,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						return new Faust.Line(lineAttrs);
 					},
 					text: function(annotation, textVC) {
-						var fontsize = ((annotation.data["type"] || "").indexOf("inter") >= 0 ? "small" : "normal");
+						var fontsize = ((annotation.data["type"] || "").indexOf("inter") >= 0 ? "interline" : "normal");
 						textVC.classes.push(fontsize);
 					}
 				},

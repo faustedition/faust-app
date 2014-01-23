@@ -19,6 +19,11 @@ YUI.add('svg-utils', function (Y) {
 		return element;
 	}
 
+	function hasClass(element, classValue) {
+		var classTokens = element.getDOMNode().getAttribute('class').split(' ');
+		return classTokens.indexOf(classValue) >= 0;
+	}
+
 	function svgStyles(element, styles) {
 		Y.Object.each(styles, function(v, k) {
 			element.style[k] = v;
@@ -187,6 +192,7 @@ YUI.add('svg-utils', function (Y) {
 		qscale: qscale,
 		svgElement: svgElement,
 		svgAttrs: svgAttrs,
+		hasClass: hasClass,
 		svgStyles: svgStyles,
 		svg: svg,
 		empty: empty,

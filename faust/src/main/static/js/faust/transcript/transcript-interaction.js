@@ -34,11 +34,36 @@ YUI.add('transcript-interaction', function (Y) {
 			return Y.Node.create(content);
 		};
 
+
+
 		function showTooltip(e) {
+
+			// display the hand, material and script of the text
 			var textClassValue = e.target.getAttribute('class');
 			var content = Y.Node.create('<div></div>');
 			var textHandDisplay = handDisplayContent(textClassValue);
 			content.append(textHandDisplay);
+
+			//display text properties or annotations
+			var propertiesToDisplay = {
+				under: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'under'); },
+				over: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'over'); },
+				patch: function(textElement){ return textElement.ancestor('.element-patch'); },
+				interline: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'interline');},
+				gap: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'element-gap');},
+				supplied: function(textElement){ return textElement.ancestor('.element-supplied'); }
+
+
+			}
+			Y.each(Object.keys(propertiesToDisplay), function(key) {
+				if (propertiesToDisplay[key](e.target)) {
+					var propertyDisplay = Y.Node.create('<div class="tooltip-property"><div><span class="tooltip-caption-property-'
+						+ key + '"></span></div></div>');
+					content.append(propertyDisplay);
+				}
+			});
+
+			// display all text decorations such as strikethrough, underline, ...
 			Y.each(Y.one(e.target).ancestor('.text-wrapper').all('.text-decoration'), function(decoration){
 				var decorationClassValue = decoration.getAttribute('class');
 				var decorationType = decodeClassValue(decorationClassValue, 'text-decoration-type-');
@@ -47,9 +72,9 @@ YUI.add('transcript-interaction', function (Y) {
 				var decorationHandDisplay = handDisplayContent(decorationClassValue);
 				decorationDisplay.append(decorationHandDisplay);
 				content.append(decorationDisplay);
-				content.append();
 			});
 
+			//display
 
 			tooltip.setStdModContent('body', content);
 			var tooltipWidth = parseFloat(tooltip.get('boundingBox').getComputedStyle('width'));
@@ -98,5 +123,5 @@ YUI.add('transcript-interaction', function (Y) {
 
 	})
 }, '0.0', {
-	requires: ['event-custom', 'node', 'overlay', 'widget-anim']
+	requires: ['event-custom', 'node', 'overlay', 'widget-anim', 'svg-utils']
 });

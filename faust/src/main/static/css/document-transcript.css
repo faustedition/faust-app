@@ -134,7 +134,7 @@ svg.diplomatic .text.over {
     baseline-shift: super;
 }
 
-svg.diplomatic .text.small {
+svg.diplomatic .text.interline {
 	font-size: 9pt;
 }
 
