@@ -250,14 +250,8 @@ YUI.add('transcript', function (Y) {
 		for (var attr in this.textAttrs) {
 			if (attr == "rewrite") {
 				this.classes.push("rewrite");
-			} else if (attr == 'sup') {
-				this.classes.push('sup');
-			} else if (attr == 'sub') {
-				this.classes.push('sub');
+			}
 		}
-
-		}
-
 	};
 
 	Y.extend(Faust.Text, Faust.InlineViewComponent);

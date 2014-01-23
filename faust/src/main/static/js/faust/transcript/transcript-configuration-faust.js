@@ -193,15 +193,22 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'hi' : {
 					text: function (annotation, textVC, layoutState) {
-						if (annotation.data["rend"] && annotation.data["rend"].split(' ').indexOf("underline") >= 0) {
-							var classes = [];
-							if (annotation.data["hand"]) {
-								var hand = annotation.data["hand"];
-								classes = classes.concat(classesFromHandValue(hand));
-							}
-							var underline = new Faust.Underline(textVC, classes);
-							textVC.decorations.push(underline);
+						if (annotation.data["rend"]) {
+							var rendTokens = annotation.data["rend"].split(' ');
+							if (rendTokens.indexOf("underline") >= 0) {
+								var classes = [];
+								if (annotation.data["hand"]) {
+									var hand = annotation.data["hand"];
+									classes = classes.concat(classesFromHandValue(hand));
+								}
+								var underline = new Faust.Underline(textVC, classes);
+								textVC.decorations.push(underline);
 
+							} else if (rendTokens.indexOf('sup') >= 0) {
+								textVC.classes.push('sup');
+							} else if (rendTokens.indexOf('sub') >= 0) {
+								textVC.classes.push('sub');
+							}
 						}
 					}
 				},
