@@ -67,6 +67,16 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				var annotationEnd = node.annotation.target().range.end;
 
 				//ioc: configurable modules handle the construction of the view
+
+				// 'start' callback before the construction of any view components
+
+				if (node.name().localName in Y.Faust.TranscriptConfiguration.names) {
+					var nameHandler = Y.Faust.TranscriptConfiguration.names[node.name().localName];
+					if (nameHandler.start) {
+						nameHandler.start.call(node, text, layoutState);
+					}
+				}
+
 				if (node.name().localName in Y.Faust.TranscriptConfiguration.names
 					&& 'vc' in Y.Faust.TranscriptConfiguration.names[node.name().localName]) {
 					var nameHandler = Y.Faust.TranscriptConfiguration.names[node.name().localName];
@@ -160,7 +170,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				if (node.name().localName in Y.Faust.TranscriptConfiguration.names) {
 					var nameHandler = Y.Faust.TranscriptConfiguration.names[node.name().localName];
 					if (nameHandler.end) {
-						nameHandler.end.call(vc, node, text, this);
+						nameHandler.end.call(vc, node, text, layoutState);
 					}
 				}
 			}

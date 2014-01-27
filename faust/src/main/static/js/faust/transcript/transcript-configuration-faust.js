@@ -44,37 +44,6 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'document': {
 
-					'unclear' : {
-					vc : function (node, text, layoutState) {
-
-						var annotationStart = node.annotation.target().range.start;
-						var annotationEnd = node.annotation.target().range.end;
-						var vc = new Faust.InlineViewComponent();
-						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
-						vc.add (Y.Faust.TranscriptLayout.createText(startMarker, annotationStart, annotationEnd, text));
-
-						return vc;
-					},
-					end: function(node, text, layoutState) {
-						var annotationStart = node.annotation.target().range.start;
-						var annotationEnd = node.annotation.target().range.end;
-						var endMarker = node.data()['cert'] == 'low' ? '}}' : '}';
-						this.add (Y.Faust.TranscriptLayout.createText(endMarker, annotationStart, annotationEnd, text));
-
-						// hide the component if it is a less probable alternative of a choice
-						if (node.parent.name().localName == 'choice') {
-							var sibling_cert_values = node.parent.children().map(
-								function(annotation){return annotation.data()['cert']});
-							if (node.data()['cert'] == 'low' && sibling_cert_values.indexOf('high') >= 0) {
-								this.computeClasses = function(){
-									return ['invisible'];
-								};
-							}
-						}
-					}
-				},
-				
-
 					vc: function(node, text, layoutState) {
 						return new Faust.Surface();
 					}
@@ -296,6 +265,9 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				'seg' : {vc: function() {return new Faust.InlineViewComponent();}},
 
 				'st' : {
+					start: function (annotation, text, layoutState) {
+						console.log('<');
+					},
 					text : function (annotation, textVC, layoutState) {
 						var classes = [];
 						if (annotation.data["hand"]) {
@@ -304,7 +276,11 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						}
 						var strikethrough = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2);
 						textVC.decorations.push(strikethrough);
+					},
+					end: function (annotation, text, layoutState) {
+						console.log('>');
 					}
+
 				},
 
 				'supplied' : {
@@ -334,6 +310,38 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						return new Faust.Surface();
 					}
 				},
+
+
+				'unclear' : {
+					vc : function (node, text, layoutState) {
+
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						var vc = new Faust.InlineViewComponent();
+						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
+						vc.add (Y.Faust.TranscriptLayout.createText(startMarker, annotationStart, annotationEnd, text));
+						return vc;
+					},
+					end: function(node, text, layoutState) {
+						var annotationStart = node.annotation.target().range.start;
+						var annotationEnd = node.annotation.target().range.end;
+						var endMarker = node.data()['cert'] == 'low' ? '}}' : '}';
+						this.add (Y.Faust.TranscriptLayout.createText(endMarker, annotationStart, annotationEnd, text));
+
+						// hide the component if it is a less probable alternative of a choice
+						if (node.parent.name().localName == 'choice') {
+							var sibling_cert_values = node.parent.children().map(
+								function(annotation){return annotation.data()['cert']});
+							if (node.data()['cert'] == 'low' && sibling_cert_values.indexOf('high') >= 0) {
+								this.computeClasses = function(){
+									return ['invisible'];
+								};
+							}
+						}
+					}
+				},
+
+
 
 				'under' : {
 					text: function(annotation, textVC, layoutState) {
