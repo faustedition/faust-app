@@ -195,7 +195,7 @@ public class FaustApplication extends Application implements InitializingBean {
 	public static class EntryPageRedirectionResource extends ServerResource {
 		@Override
 		protected Representation doHandle() throws ResourceException {
-			getResponse().redirectTemporary(new Reference(getReference(), "archive/"));
+			getResponse().redirectTemporary(new Reference(getReference(), "project/about"));
 			return null;
 		}
 	}
