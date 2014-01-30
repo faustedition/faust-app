@@ -23,6 +23,8 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 			});
 			var textVC = new Faust.Text(content, textAttrs);
 
+			// reset custom state of current text representation
+			layoutState.textState = {};
 			Y.each(annotations, function(annotation) {
 				if (annotation.name.localName in Y.Faust.TranscriptConfiguration.names
 					&& Y.Faust.TranscriptConfiguration.names[annotation.name.localName].text) {

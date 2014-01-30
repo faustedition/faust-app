@@ -265,22 +265,21 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				'seg' : {vc: function() {return new Faust.InlineViewComponent();}},
 
 				'st' : {
-					start: function (annotation, text, layoutState) {
-						console.log('<');
-					},
 					text : function (annotation, textVC, layoutState) {
+						// count the number of strikethroughs
+						layoutState.textState.numSt = 'numSt' in layoutState.textState ?
+							layoutState.textState.numSt : 0;
 						var classes = [];
 						if (annotation.data["hand"]) {
 							var hand = annotation.data["hand"];
 							classes = classes.concat(classesFromHandValue(hand));
 						}
-						var strikethrough = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2);
+						var yOffsetPerStrikethrough = 0.15;
+						var yOffset = yOffsetPerStrikethrough * layoutState.textState.numSt;
+						var strikethrough = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
 						textVC.decorations.push(strikethrough);
+						layoutState.textState.numSt = layoutState.textState.numSt + 1;
 					},
-					end: function (annotation, text, layoutState) {
-						console.log('>');
-					}
-
 				},
 
 				'supplied' : {
