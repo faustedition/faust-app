@@ -43,7 +43,12 @@ YUI.add('transcript-interaction', function (Y) {
 				+ '<span class="tooltip-material"><span class="tooltip-caption-material-' + materialValue + '"></span></span>'
 				+ '<span class="tooltip-script"><span class="tooltip-caption-script-' + scriptValue + '"></span></span>'
 				+ '</div>';
-			return Y.Node.create(content);
+			if (handValue || materialValue || scriptValue) {
+				return Y.Node.create(content);
+			} else {
+				return [];
+			}
+
 		};
 
 
