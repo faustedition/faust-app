@@ -12,6 +12,18 @@ YUI.add('transcript-interaction', function (Y) {
 		tooltip.anim.get('animShow').set('duration', 0.6);
 		tooltip.render();
 
+		//display text properties or annotations
+		var propertiesToDisplay = {
+			under: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'under'); },
+			over: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'over'); },
+			patch: function(textElement){ return textElement.ancestor('.element-patch'); },
+			interline: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'interline');},
+			gap: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'element-gap');},
+			supplied: function(textElement){ return textElement.ancestor('.element-supplied'); },
+			'unclear-cert-high': function(textElement){ return textElement.ancestor('.unclear-cert-high'); },
+			'unclear-cert-low': function(textElement){ return textElement.ancestor('.unclear-cert-low'); }
+		}
+
 		function decodeClassValue(classValue, key) {
 			var start = classValue.indexOf(key);
 			if (start < 0) return '';
@@ -44,17 +56,6 @@ YUI.add('transcript-interaction', function (Y) {
 			var textHandDisplay = handDisplayContent(textClassValue);
 			content.append(textHandDisplay);
 
-			//display text properties or annotations
-			var propertiesToDisplay = {
-				under: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'under'); },
-				over: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'over'); },
-				patch: function(textElement){ return textElement.ancestor('.element-patch'); },
-				interline: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'interline');},
-				gap: function(textElement){ return Y.SvgUtils.hasClass(textElement, 'element-gap');},
-				supplied: function(textElement){ return textElement.ancestor('.element-supplied'); }
-
-
-			}
 			Y.each(Object.keys(propertiesToDisplay), function(key) {
 				if (propertiesToDisplay[key](e.target)) {
 					var propertyDisplay = Y.Node.create('<div class="tooltip-property"><div><span class="tooltip-caption-property-'

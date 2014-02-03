@@ -318,6 +318,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						var annotationEnd = node.annotation.target().range.end;
 						var vc = new Faust.InlineViewComponent();
 						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
+						var certainty = node.data()['cert'] == 'low' ? 'low' : 'high';
+						vc.classes.push('unclear-cert-' + certainty);
 						vc.add (Y.Faust.TranscriptLayout.createText(startMarker, annotationStart, annotationEnd, text));
 						return vc;
 					},

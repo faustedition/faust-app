@@ -36,7 +36,9 @@ svg.diplomatic .bgBox {
 .tooltip-caption-property-patch:before {content: 'Aufklebung';}
 .tooltip-caption-property-interline:before {content: 'eingefügte Zeile';}
 .tooltip-caption-property-gap:before {content: 'nicht lesbar';}
-.tooltip-caption-property-supplied:before {content: 'editorische Ergaenzung';}
+.tooltip-caption-property-supplied:before {content: 'editorische Ergänzung';}
+.tooltip-caption-property-unclear-cert-high:before {content: 'Unsichere Lesung (wahrscheinlich)';}
+.tooltip-caption-property-unclear-cert-low:before {content: 'Unsichere Lesung (vielleicht)';}
 
 /* text decorations */
 
