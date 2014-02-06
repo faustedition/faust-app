@@ -154,8 +154,17 @@ svg.diplomatic .invisible {
     display: none;
 }
 
+svg.diplomatic line.text-decoration-type-underdots {
+    stroke-dasharray: 0.0001em, 0.5em;
+    stroke-width: 0.2em;
+    stroke-dashoffset: -0.1em;
+    stroke-linecap: round;
+}
+
+
 /* graphical elements */
 
 svg.diplomatic line {
     stroke: black;
+    stroke-width: 0.1em;
 }

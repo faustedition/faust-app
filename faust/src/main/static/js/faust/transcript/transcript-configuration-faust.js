@@ -164,21 +164,23 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					text: function (annotation, textVC, layoutState) {
 						if (annotation.data["rend"]) {
 							var rendTokens = annotation.data["rend"].split(' ');
+
+							var handClasses = [];
+							if (annotation.data["hand"]) {
+								var hand = annotation.data["hand"];
+								handClasses = classesFromHandValue(hand);
+							}
+
 							if (rendTokens.indexOf("underline") >= 0) {
-								var classes = [];
-								if (annotation.data["hand"]) {
-									var hand = annotation.data["hand"];
-									classes = classes.concat(classesFromHandValue(hand));
-								}
-								var underline = new Faust.LineDecoration(textVC, classes, 'underline', 0.1);
+								var underline = new Faust.LineDecoration(textVC, handClasses, 'underline', 0.1);
 								textVC.decorations.push(underline);
-							} else if (rendTokens.indexOf("overline") >= 0) {
-								var classes = [];
-								if (annotation.data["hand"]) {
-									var hand = annotation.data["hand"];
-									classes = classes.concat(classesFromHandValue(hand));
-								}
-								var overline = new Faust.LineDecoration(textVC, classes, 'overline', -0.7);
+							}
+							if (rendTokens.indexOf("underdots") >= 0) {
+								var underdots = new Faust.LineDecoration(textVC, handClasses, 'underdots', 0.2);
+								textVC.decorations.push(underdots);
+							}
+							if (rendTokens.indexOf("overline") >= 0) {
+								var overline = new Faust.LineDecoration(textVC, handClasses, 'overline', -0.7);
 								textVC.decorations.push(overline);
 							}
 
