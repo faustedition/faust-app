@@ -164,7 +164,8 @@ svg.diplomatic line.text-decoration-type-underdots {
 
 /* graphical elements */
 
-svg.diplomatic line {
+svg.diplomatic line, svg.diplomatic rect.inline-decoration-type-rect {
     stroke: black;
     stroke-width: 0.1em;
+    fill: none;
 }

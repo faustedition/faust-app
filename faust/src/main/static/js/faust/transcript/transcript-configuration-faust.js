@@ -161,6 +161,16 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				},
 
 				'hi' : {
+					vc: function(node, text, layoutState) {
+						if (node.data()["rend"]) {
+							var rendTokens = node.data()["rend"].split(' ');
+							if (rendTokens.indexOf("frame") >= 0) {
+								return new Faust.InlineRectDecoration();
+							}
+						}
+
+					},
+
 					text: function (annotation, textVC, layoutState) {
 						if (annotation.data["rend"]) {
 							var rendTokens = annotation.data["rend"].split(' ');

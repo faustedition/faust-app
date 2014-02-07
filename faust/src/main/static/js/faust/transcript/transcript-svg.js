@@ -263,6 +263,23 @@ YUI.add('transcript-svg', function (Y) {
 		this.spanningRect.setAttribute('transform', transform);
 	};
 
+	Faust.InlineRectDecoration.prototype.createView = function() {
+		this.shape = this.svgDocument().createElementNS(SVG_NS, "rect");
+		this.shape.setAttribute('class', 'inline-decoration-type-rect inline-decoration');
+		this.svgContainer().appendChild(this.shape);
+		return Faust.InlineRectDecoration.superclass.createView();
+	}
+
+	Faust.InlineRectDecoration.prototype.onRelayout = function() {
+		var bbox = this.view.getBBox();
+		var padding = bbox.height / 10.0;
+		this.shape.setAttribute("x", bbox.x - padding);
+		this.shape.setAttribute("y", bbox.y - padding);
+		this.shape.setAttribute("height", bbox.height + 2 * padding);
+		this.shape.setAttribute("width", bbox.width + 2 * padding);
+		this.shape.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
+	};
+
 	Faust.InlineGraphic.prototype.createView = function() {
 		// FIXME: a g element must be used as a wrapper, because we cannot set the transform attribute on the element
 		// returned by createView() directly (as that is overwritten by layout). TODO: wrap the output of createView

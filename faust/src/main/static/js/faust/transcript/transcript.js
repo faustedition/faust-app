@@ -183,7 +183,7 @@ YUI.add('transcript', function (Y) {
 	};
 	
 	Y.extend (Faust.HSpace, Faust.InlineViewComponent);
-	
+
 	Faust.Surface = function() {
 		Faust.Surface.superclass.constructor.call(this);
 	};
@@ -273,6 +273,15 @@ YUI.add('transcript', function (Y) {
 	};
 
 	Y.extend (Faust.SpanningVC, Faust.ViewComponent);
+
+	Faust.InlineRectDecoration = function() {
+		Faust.InlineRectDecoration.superclass.constructor.call(this);
+		this.classes.push('inline-decoration-type-rect');
+		this.classes.push('inline-decoration');
+	};
+
+	Y.extend (Faust.InlineRectDecoration, Faust.InlineViewComponent);
+
 
 	Faust.InlineGraphic = function(type, imageUrl, imageWidth, imageHeight, displayWidth, displayHeight) {
 		Faust.InlineGraphic.superclass.constructor.call(this);

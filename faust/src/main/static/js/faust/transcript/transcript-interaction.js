@@ -80,6 +80,18 @@ YUI.add('transcript-interaction', function (Y) {
 				content.append(decorationDisplay);
 			});
 
+			// display all inline decorations such as rect, circle, ...
+			Y.each(Y.one(e.target).ancestors('.inline-decoration'), function(decoration){
+				var decorationClassValue = decoration.getAttribute('class');
+				var decorationType = decodeClassValue(decorationClassValue, 'inline-decoration-type-');
+				var decorationDisplay = Y.Node.create('<div class="tooltip-decoration"><div><span class="tooltip-caption-decoration-'
+					+ decorationType + '"></span></div></div>');
+				var decorationHandDisplay = handDisplayContent(decorationClassValue);
+				decorationDisplay.append(decorationHandDisplay);
+				content.append(decorationDisplay);
+			});
+
+
 			//display
 
 			tooltip.setStdModContent('body', content);

@@ -47,6 +47,9 @@ svg.diplomatic .bgBox {
 .tooltip-caption-decoration-strikethrough:before {content: 'Durchstreichung';}
 .tooltip-caption-decoration-underdots:before {content: 'Unterpungierung';}
 
+/* inline decorations */
+.tooltip-caption-decoration-rect:before {content: 'Umkästelung';}
+
 /* scribal hands */
 
 .tooltip-caption-hand-g:before {content: 'Goethe';}
