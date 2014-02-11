@@ -46,9 +46,11 @@ svg.diplomatic .bgBox {
 .tooltip-caption-decoration-overline:before {content: 'Überstreichung';}
 .tooltip-caption-decoration-strikethrough:before {content: 'Durchstreichung';}
 .tooltip-caption-decoration-underdots:before {content: 'Unterpungierung';}
+.tooltip-caption-decoration-rewrite:before {content: 'Fixierung';}
 
 /* inline decorations */
 .tooltip-caption-decoration-rect:before {content: 'Umkästelung';}
+.tooltip-caption-decoration-circle:before {content: 'Einkreisung';}
 
 /* scribal hands */
 

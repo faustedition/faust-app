@@ -183,13 +183,6 @@ YUI.add('transcript-svg', function (Y) {
 	
 	Faust.Text.prototype.onRelayout = function() {
 
-		if (this.rewrite) {
-			var offset = this.measure().height / 20.0;
-			this.rewrite.setAttribute("x", this.x + offset);
-			this.rewrite.setAttribute("y", this.y - offset);
-			this.rewrite.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
-		}
-
 		var bbox = this.view.getBBox();
 		this.bgBox.setAttribute("x", bbox.x);
 		this.bgBox.setAttribute("y", bbox.y);
@@ -209,11 +202,6 @@ YUI.add('transcript-svg', function (Y) {
 		this.view = this.createView();
 		this.svgContainer().appendChild(this.view);
 		var textBox = this.view.getBBox();
-
-		if ("rewrite" in this.textAttrs) {
-			this.rewrite = this.createView();
-			this.svgContainer().appendChild(this.rewrite);
-		}
 
 		this.rotate(this.rotation);
 		Y.each (this.decorations, function(decoration) {decoration.render()});
@@ -279,6 +267,8 @@ YUI.add('transcript-svg', function (Y) {
 		this.shape.setAttribute("width", bbox.width + 2 * padding);
 		this.shape.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 	};
+
+
 
 	Faust.CircleInlineDecoration.prototype.createView = function() {
 		this.shape = this.svgDocument().createElementNS(SVG_NS, "ellipse");
@@ -355,6 +345,23 @@ YUI.add('transcript-svg', function (Y) {
 		this.view.setAttribute("y1", y);
 		this.view.setAttribute('y2', y);
 	};
+
+	Faust.CloneDecoration.prototype.createView = function() {
+		var view = this.text.createView();
+		return view;
+	};
+
+	Faust.CloneDecoration.prototype.layout = function() {
+		var textBBox = this.text.textElement.getBBox();
+		var matrix = this.view.viewportElement.createSVGMatrix();
+
+		matrix = matrix.translate(this.xOffset * textBBox.height, this.yOffset * textBBox.height);
+		var transform = this.view.viewportElement.createSVGTransformFromMatrix(matrix);
+		this.view.transform.baseVal.consolidate();
+		this.view.transform.baseVal.appendItem(transform);
+		this.view.transform.baseVal.consolidate();
+	};
+
 
 }, '0.0', {
 	requires: ["node", "dom", "event", "transcript", "event-mouseenter",

@@ -291,6 +291,15 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'rdg' : { vc: function(){return new Faust.InlineViewComponent();}},
 
+				'rewrite' : {
+
+					text: function (annotation, textVC, layoutState) {
+						var rewrite = new Faust.CloneDecoration(textVC, [], 'rewrite', 0.005, -0.005);
+						textVC.decorations.push(rewrite);
+
+					}
+				},
+
 				'seg' : {vc: function() {return new Faust.InlineViewComponent();}},
 
 				'st' : {

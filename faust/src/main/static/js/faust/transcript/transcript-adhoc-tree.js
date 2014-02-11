@@ -10,17 +10,6 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 			//ignore empty annotations at the borders
 				.filter(function(x){var r = x.target().range; return r.start !== r.end});
 
-
-			Y.each(annotations, function(a) {
-				if (a.name.localName == "rewrite") {
-					if (a.data["hand"]) {
-						textAttrs.rewrite = a.data["hand"].substring(1);
-					} else {
-						textAttrs.rewrite = textAttrs.hand;
-					}
-				}
-
-			});
 			var textVC = new Faust.Text(content, textAttrs);
 
 			// reset custom state of current text representation

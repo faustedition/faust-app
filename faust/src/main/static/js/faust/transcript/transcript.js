@@ -241,17 +241,11 @@ YUI.add('transcript', function (Y) {
 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
 	};
 
-	Faust.Text = function(text, textAttrs) {
+	Faust.Text = function(text) {
 		Faust.Text.superclass.constructor.call(this);
 		this.decorations = [];
 		this.text = text.replace(/\s+/g, "\u00a0");
-		this.textAttrs = textAttrs;
 		this.textElement = null;
-		for (var attr in this.textAttrs) {
-			if (attr == "rewrite") {
-				this.classes.push("rewrite");
-			}
-		}
 	};
 
 	Y.extend(Faust.Text, Faust.InlineViewComponent);
@@ -338,7 +332,6 @@ YUI.add('transcript', function (Y) {
 		this.classes.push('text-decoration');
 	};
 
-
 	Faust.TextDecoration.prototype.layout = function() {};
 
 	Faust.LineDecoration = function(text, classes, name, yOffset) {
@@ -346,6 +339,13 @@ YUI.add('transcript', function (Y) {
 		this.yOffset = yOffset;
 	}
 	Y.extend(Faust.LineDecoration, Faust.TextDecoration);
+
+	Faust.CloneDecoration = function(text, classes, name, xOffset, yOffset) {
+		Faust.CloneDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
+		this.xOffset = xOffset;
+		this.yOffset = yOffset;
+	}
+	Y.extend(Faust.CloneDecoration, Faust.TextDecoration);
 
 	Faust.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
 		this.me = me;
