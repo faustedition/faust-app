@@ -162,10 +162,17 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'hi' : {
 					vc: function(node, text, layoutState) {
+
+						var handClasses = [];
+						if (node.data["hand"]) {
+							var hand = node.data["hand"];
+							handClasses = classesFromHandValue(hand);
+						}
+
 						if (node.data()["rend"]) {
 							var rendTokens = node.data()["rend"].split(' ');
 							if (rendTokens.indexOf("frame") >= 0) {
-								return new Faust.InlineRectDecoration();
+								return new Faust.InlineRectDecoration(handClasses);
 							}
 						}
 

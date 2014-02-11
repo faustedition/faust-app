@@ -88,7 +88,7 @@ svg.diplomatic .text.material-bl {
 	fill: #808080;
 }
 
-svg.diplomatic Line.material-bl {
+svg.diplomatic Line.material-bl, svg.diplomatic Rect.element-hi.material-bl {
 	stroke: #808080;
 }
 
@@ -96,7 +96,7 @@ svg.diplomatic .text.material-t {
 	fill: black;
 }
 
-svg.diplomatic Line.material-t {
+svg.diplomatic Line.material-t, svg.diplomatic Rect.element-hi.material-t {
 	stroke: black;
 }
 

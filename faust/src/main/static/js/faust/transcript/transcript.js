@@ -274,8 +274,9 @@ YUI.add('transcript', function (Y) {
 
 	Y.extend (Faust.SpanningVC, Faust.ViewComponent);
 
-	Faust.InlineRectDecoration = function() {
+	Faust.InlineRectDecoration = function(classes) {
 		Faust.InlineRectDecoration.superclass.constructor.call(this);
+		this.classes = this.classes.concat(classes);
 		this.classes.push('inline-decoration-type-rect');
 		this.classes.push('inline-decoration');
 	};
