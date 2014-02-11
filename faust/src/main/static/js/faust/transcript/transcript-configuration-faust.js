@@ -172,10 +172,11 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (node.data()["rend"]) {
 							var rendTokens = node.data()["rend"].split(' ');
 							if (rendTokens.indexOf("frame") >= 0) {
-								return new Faust.InlineRectDecoration(handClasses);
+								return new Faust.RectInlineDecoration(handClasses);
+							} else if (rendTokens.indexOf("circle") >= 0) {
+								return new Faust.CircleInlineDecoration(handClasses);
 							}
 						}
-
 					},
 
 					text: function (annotation, textVC, layoutState) {

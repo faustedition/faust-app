@@ -263,20 +263,37 @@ YUI.add('transcript-svg', function (Y) {
 		this.spanningRect.setAttribute('transform', transform);
 	};
 
-	Faust.InlineRectDecoration.prototype.createView = function() {
+	Faust.RectInlineDecoration.prototype.createView = function() {
 		this.shape = this.svgDocument().createElementNS(SVG_NS, "rect");
 		this.shape.setAttribute('class', 'inline-decoration-type-rect inline-decoration');
 		this.svgContainer().appendChild(this.shape);
-		return Faust.InlineRectDecoration.superclass.createView();
+		return Faust.RectInlineDecoration.superclass.createView();
 	}
 
-	Faust.InlineRectDecoration.prototype.onRelayout = function() {
+	Faust.RectInlineDecoration.prototype.onRelayout = function() {
 		var bbox = this.view.getBBox();
 		var padding = bbox.height / 10.0;
 		this.shape.setAttribute("x", bbox.x - padding);
 		this.shape.setAttribute("y", bbox.y - padding);
 		this.shape.setAttribute("height", bbox.height + 2 * padding);
 		this.shape.setAttribute("width", bbox.width + 2 * padding);
+		this.shape.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
+	};
+
+	Faust.CircleInlineDecoration.prototype.createView = function() {
+		this.shape = this.svgDocument().createElementNS(SVG_NS, "ellipse");
+		this.shape.setAttribute('class', 'inline-decoration-type-circle inline-decoration');
+		this.svgContainer().appendChild(this.shape);
+		return Faust.CircleInlineDecoration.superclass.createView();
+	}
+
+	Faust.CircleInlineDecoration.prototype.onRelayout = function() {
+		var bbox = this.view.getBBox();
+		var padding = bbox.height / 10.0;
+		this.shape.setAttribute("cx", bbox.x + bbox.width / 2.0);
+		this.shape.setAttribute("cy", bbox.y + bbox.height / 2.0);
+		this.shape.setAttribute("rx", bbox.width / 2.0 +  padding);
+		this.shape.setAttribute("ry", bbox.height / 2.0 + padding);
 		this.shape.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 	};
 

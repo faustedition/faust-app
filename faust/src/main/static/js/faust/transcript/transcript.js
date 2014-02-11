@@ -274,14 +274,27 @@ YUI.add('transcript', function (Y) {
 
 	Y.extend (Faust.SpanningVC, Faust.ViewComponent);
 
-	Faust.InlineRectDecoration = function(classes) {
-		Faust.InlineRectDecoration.superclass.constructor.call(this);
+	Faust.InlineDecoration = function(classes) {
+		Faust.InlineDecoration.superclass.constructor.call(this);
 		this.classes = this.classes.concat(classes);
-		this.classes.push('inline-decoration-type-rect');
 		this.classes.push('inline-decoration');
 	};
 
-	Y.extend (Faust.InlineRectDecoration, Faust.InlineViewComponent);
+	Y.extend (Faust.InlineDecoration, Faust.InlineViewComponent);
+
+	Faust.RectInlineDecoration = function(classes) {
+		Faust.RectInlineDecoration.superclass.constructor.call(this);
+		this.classes.push('inline-decoration-type-rect');
+	};
+
+	Y.extend (Faust.RectInlineDecoration, Faust.InlineDecoration);
+
+	Faust.CircleInlineDecoration = function(classes) {
+		Faust.CircleInlineDecoration.superclass.constructor.call(this);
+		this.classes.push('inline-decoration-type-circle');
+	};
+
+	Y.extend (Faust.CircleInlineDecoration, Faust.InlineDecoration);
 
 
 	Faust.InlineGraphic = function(type, imageUrl, imageWidth, imageHeight, displayWidth, displayHeight) {
