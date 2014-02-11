@@ -49,7 +49,7 @@ svg.diplomatic .bgBox {
 .tooltip-caption-decoration-rewrite:before {content: 'Fixierung';}
 
 /* inline decorations */
-.tooltip-caption-decoration-rect:before {content: 'Umkästelung';}
+.tooltip-caption-decoration-rect:before {content: 'Einkästelung';}
 .tooltip-caption-decoration-circle:before {content: 'Einkreisung';}
 
 /* scribal hands */
