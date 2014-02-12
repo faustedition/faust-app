@@ -24,11 +24,11 @@
 	.zone { border: 1px dashed #ccc; margin: 3em 0; padding: 1em}	
 </#assign>
 <#assign header>
-	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
+	<link rel="stylesheet" type="text/css" href="${cp}/static/lib/imageviewer/css/iip.css" />
 
-	<script type="text/javascript" src="${cp}/static/js/dragsvg.js"></script>
+	<script type="text/javascript" src="${cp}/static/lib/dragsvg.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/goddag.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/innersvg.js"></script>
+	<script type="text/javascript" src="${cp}/static/lib/innersvg.js"></script>
 	<script type="text/javascript"> var imageLinkBase = "${imageLinkBase}" </script>
 	
 </#assign>

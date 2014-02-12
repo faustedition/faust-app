@@ -4,13 +4,13 @@
 	<#assign title>${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
 	<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
 	<#assign header>
-	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
+	<link rel="stylesheet" type="text/css" href="${cp}/static/lib/imageviewer/css/iip.css" />
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-text.css"/>
     <link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript.css"/>
     <link rel="stylesheet" type="text/css" id="style-document-transcript-highlight-hands" href="${cp}/static/css/document-transcript-highlight-hands.css"/>
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript-interaction.css"/>
-	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
+	<script type="text/javascript" src="${cp}/static/lib/swfobject.js"></script>
+	<script type="text/javascript" src="${cp}/static/lib/raphael-min.js"></script>
 	<script type="text/javascript"> Faust.imageLinkBase = "${imageLinkBase}" </script>
 
 	<@faust.passMessages ["page_abbrev", "document.old_version", "document.facsimile",

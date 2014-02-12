@@ -1,5 +1,5 @@
 <#assign header>
-	<script type="text/javascript" src="${cp}/static/js/protovis-r3.2.js"></script>
+	<script type="text/javascript" src="${cp}/static/lib/protovis-r3.2.js"></script>
 </#assign>
 <@faust.page title=message("genesis.sample") header=header>
 	<h2>${message("genesis.sample")}</h2>

@@ -26,7 +26,7 @@ YUI.GlobalConfig = {
 				"transcript-interaction" : { path: 'faust/transcript/transcript-interaction.js' },
 				'document-text' : { path: 'faust/document/document-text.js' },
 				'materialunit' : { path: 'faust/document/materialunit.js' },
-				'protovis': { path: "protovis-r3.2.js"},
+				'protovis': { path: "../lib/protovis-r3.2.js"},
 				'search': { path: "faust/search/search.js"},
 				'svg-utils' : { path: "faust/svg-utils/svg-utils.js"},
 				'text-annotation': { path: "faust/text-annotation/text-annotation.js"},

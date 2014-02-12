@@ -21,13 +21,9 @@ var Faust = { contextPath: cp, FacsimileServer: "${facsimilieIIPUrl}" };
     <script type="text/javascript" src="${cp}/static/js/yui-config.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
 
-	<link rel="stylesheet" type="text/css" href="${cp}/static/js/imageviewer/css/iip.css" />
-
     <script type="text/javascript" src="${cp}/static/yui3/build/yui/yui-debug.js"></script>
     <script type="text/javascript" src="${cp}/static/js/yui-config.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/faust.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
 
 </head>
 	<body style="margin: 0px;">

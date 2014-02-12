@@ -18,9 +18,9 @@
 </#assign>
 <#assign header>
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/facsimile.css">
-	<script type="text/javascript" src="${cp}/static/js/mootools-1.2-core-compressed.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/mootools-1.2-more-compressed.js"></script>
-	<script type="text/javascript" src="${cp}/static/js/swfobject.js"></script>
+	<script type="text/javascript" src="${cp}/static/lib/mootools-1.2-core-compressed.js"></script>
+	<script type="text/javascript" src="${cp}/static/lib/mootools-1.2-more-compressed.js"></script>
+	<script type="text/javascript" src="${cp}/static/lib/swfobject.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/goddag.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document/facsimile.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/document/materialunit.js"></script>
