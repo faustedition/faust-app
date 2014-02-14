@@ -220,6 +220,8 @@ YUI.add('document-app', function (Y) {
 
 			var diplomaticContent = diplomaticContainer.one('.diplomaticContent');
 
+			diplomaticContent.setStyle('overflow', 'auto');
+
 			this.addAjaxLoader(diplomaticContent);
 
 			var that = this;

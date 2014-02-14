@@ -67,7 +67,7 @@ YUI.add('transcript-view', function (Y) {
 				{
 					fn : function() {
 						that.intoView(innerContainer, svgRoot);
-						that.center(svgRoot, container);
+						//that.center(svgRoot, container);
 					},
 					timeout: 10,
 					iterations: 1,
