@@ -89,23 +89,22 @@ YUI.add('transcript-configuration-faust', function (Y) {
 										representation += gapUncertainChar;
 									}
 									return Y.Faust.TranscriptLayout.createText (representation + gapChar,
-										annotationStart,
-										annotationEnd,
-										text);
+										annotationStart, annotationEnd,	text, layoutState);
 								} else if (node.data()['quantity']) {
 									var representation = '';
 									for (var nrChars=0; nrChars < node.data()["quantity"]; nrChars++) {
 										//representation += '\u2715'; //capital X
 										representation += gapChar; // small X
 									}
-									return Y.Faust.TranscriptLayout.createText (representation, annotationStart, annotationEnd, text);
+									return Y.Faust.TranscriptLayout.createText (representation, annotationStart,
+										annotationEnd, text, layoutState);
 								} else if(node.data()['atLeast']) {
 									var representation = gapChar;
 									for (var nrChars=2; nrChars < node.data()["atLeast"]; nrChars++) {
 										representation += gapUncertainChar;
 									}
 									return Y.Faust.TranscriptLayout.createText (representation + gapChar, annotationStart,
-										annotationEnd, text);
+										annotationEnd, text, layoutState);
 
 								} else {
 									throw (Faust.ENC_EXC_PREF + "Please specify either @qunatity or @atLeast");
@@ -254,7 +253,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						// insertion mark
 						if (node.data()["f:orient"] === "right") {
 							var insertionSign = node.data()['f:at'].substring(1) in layoutState.idMap ? "\u230a" : "\u2308";
-							vc.add (Y.Faust.TranscriptLayout.createText(insertionSign, annotationStart, annotationEnd, text));
+							vc.add (Y.Faust.TranscriptLayout.createText(insertionSign, annotationStart, annotationEnd,
+								text, layoutState));
 						}
 						return vc;
 					},
@@ -264,7 +264,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							var annotationStart = node.annotation.target().range.start;
 							var annotationEnd = node.annotation.target().range.end;
 							var insertionSign = node.data()['f:at'].substring(1) in layoutState.idMap ? "\u230b" : "\u2309";
-							this.add (Y.Faust.TranscriptLayout.createText(insertionSign, annotationStart, annotationEnd, text));
+							this.add (Y.Faust.TranscriptLayout.createText(insertionSign, annotationStart, annotationEnd,
+								text, layoutState));
 						}
 					}
 				},
@@ -345,13 +346,15 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
 						var vc = new Faust.InlineViewComponent();
-						vc.add (Y.Faust.TranscriptLayout.createText('[', annotationStart, annotationEnd, text));
+						vc.add (Y.Faust.TranscriptLayout.createText('[', annotationStart, annotationEnd, text,
+							layoutState));
 						return vc;
 					},
 					end: function(node, text, layoutState) {
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
-						this.add (Y.Faust.TranscriptLayout.createText(']', annotationStart, annotationEnd, text));
+						this.add (Y.Faust.TranscriptLayout.createText(']', annotationStart, annotationEnd, text,
+							layoutState));
 					}
 				},
 
@@ -377,14 +380,16 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
 						var certainty = node.data()['cert'] == 'low' ? 'low' : 'high';
 						vc.classes.push('unclear-cert-' + certainty);
-						vc.add (Y.Faust.TranscriptLayout.createText(startMarker, annotationStart, annotationEnd, text));
+						vc.add (Y.Faust.TranscriptLayout.createText(startMarker, annotationStart, annotationEnd, text,
+							layoutState));
 						return vc;
 					},
 					end: function(node, text, layoutState) {
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
 						var endMarker = node.data()['cert'] == 'low' ? '}}' : '}';
-						this.add (Y.Faust.TranscriptLayout.createText(endMarker, annotationStart, annotationEnd, text));
+						this.add (Y.Faust.TranscriptLayout.createText(endMarker, annotationStart, annotationEnd, text,
+							layoutState));
 
 						// hide the component if it is a less probable alternative of a choice
 						if (node.parent.name().localName == 'choice') {
