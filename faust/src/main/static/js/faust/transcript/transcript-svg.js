@@ -170,14 +170,14 @@ YUI.add('transcript-svg', function (Y) {
 
 	Faust.Zone.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "g");
-		var box0 = this.svgDocument().createElementNS(SVG_NS, 'rect');
-		box0.setAttribute('class', 'ZoneDot');
-		box0.setAttribute('width', '0.1em');
-		box0.setAttribute('height', '0.1em');
-		box0.setAttribute('x', '0');
-		box0.setAttribute('y', '0');
-		box0.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden');
-		result.appendChild(box0);
+//		var box0 = this.svgDocument().createElementNS(SVG_NS, 'rect');
+//		box0.setAttribute('class', 'ZoneDot');
+//		box0.setAttribute('width', '0.1em');
+//		box0.setAttribute('height', '0.1em');
+//		box0.setAttribute('x', '0');
+//		box0.setAttribute('y', '0');
+//		box0.setAttribute('style', 'fill: transparent; stroke: black; visibility: hidden');
+//		result.appendChild(box0);
 		result.setAttribute('class', 'Zone');
 		result.setAttributeNS(DRAG_NS, 'drag:enable', 'true');
 
