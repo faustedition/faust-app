@@ -47,6 +47,7 @@ svg.diplomatic .bgBox {
 .tooltip-caption-decoration-strikethrough:before {content: 'Durchstreichung';}
 .tooltip-caption-decoration-underdots:before {content: 'Unterpungierung';}
 .tooltip-caption-decoration-rewrite:before {content: 'Fixierung';}
+.tooltip-caption-decoration-erase:before {content: 'Rasur';}
 
 /* inline decorations */
 .tooltip-caption-decoration-rect:before {content: 'Einkästelung';}

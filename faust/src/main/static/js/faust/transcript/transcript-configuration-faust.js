@@ -332,11 +332,21 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							var hand = annotation.data["hand"];
 							classes = classes.concat(classesFromHandValue(hand));
 						}
+
 						var yOffsetPerStrikethrough = 0.15;
 						var yOffset = yOffsetPerStrikethrough * layoutState.textState.numSt;
-						var strikethrough = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
-						textVC.decorations.push(strikethrough);
+						var decoration;
+						var rendTokens = annotation.data['rend'] ? annotation.data['rend'].split(' ') : [];
+						if (rendTokens.indexOf('erase') >= 0) {
+							textVC.classes.push('erase');
+							decoration = new Faust.CloneDecoration(textVC, [], 'erase', 0, 0);
+
+						} else {
+							decoration = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
+						}
+						textVC.decorations.push(decoration);
 						layoutState.textState.numSt = layoutState.textState.numSt + 1;
+
 					},
 				},
 
