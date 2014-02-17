@@ -157,6 +157,11 @@ svg.diplomatic .text.sub {
     baseline-shift: sub;
 }
 
+.text.inbetween {
+    baseline-shift: super;
+
+}
+
 svg.diplomatic .bgBox {
 	fill: none;
     stroke: none;

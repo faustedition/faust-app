@@ -320,7 +320,19 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
-				'seg' : {vc: function() {return new Faust.InlineViewComponent();}},
+				'seg' : {
+
+					vc: function() {return new Faust.InlineViewComponent();},
+
+					text : function (annotation, textVC, layoutState) {
+						if (annotation.data['rend']) {
+							var rendTokens = annotation.data['rend'] ? annotation.data['rend'].split(' ') : [];
+							if (rendTokens.indexOf('inbetween') >= 0 || rendTokens.indexOf('between') >= 0) {
+								textVC.classes.push('inbetween');
+							}
+						}
+					}
+				},
 
 				'st' : {
 					text : function (annotation, textVC, layoutState) {

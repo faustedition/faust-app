@@ -35,6 +35,7 @@ svg.diplomatic .bgBox {
 .tooltip-caption-property-over:before {content: 'Daraufschreibung';}
 .tooltip-caption-property-patch:before {content: 'Aufklebung';}
 .tooltip-caption-property-interline:before {content: 'eingefügte Zeile';}
+.tooltip-caption-property-inbetween:before {content: 'Dazwischenschreibung';}
 .tooltip-caption-property-gap:before {content: 'nicht lesbar';}
 .tooltip-caption-property-supplied:before {content: 'editorische Ergänzung';}
 .tooltip-caption-property-unclear-cert-high:before {content: 'Unsichere Lesung (wahrscheinlich)';}
