@@ -41,7 +41,8 @@ YUI.add('transcript-interaction', function (Y) {
 			'gap': function(textElement){ return Y.SvgUtils.hasClass(textElement, 'element-gap');},
 			'supplied': function(textElement){ return textElement.ancestor('.element-supplied'); },
 			'unclear-cert-high': function(textElement){ return textElement.ancestor('.unclear-cert-high'); },
-			'unclear-cert-low': function(textElement){ return textElement.ancestor('.unclear-cert-low'); }
+			'unclear-cert-low': function(textElement){ return textElement.ancestor('.unclear-cert-low'); },
+			'used': function(textElement){ return Y.SvgUtils.hasClass(textElement, 'used'); }
 		}
 
 		function decodeClassValue(classValue, key) {
@@ -81,14 +82,6 @@ YUI.add('transcript-interaction', function (Y) {
 			var textHandDisplay = handDisplayContent(textClassValue);
 			content.append(textHandDisplay);
 
-			Y.each(Object.keys(propertiesToDisplay), function(key) {
-				if (propertiesToDisplay[key](e.target)) {
-					var propertyDisplay = Y.Node.create('<div class="tooltip-property"><div><span class="tooltip-caption-property-'
-						+ key + '"></span></div></div>');
-					content.append(propertyDisplay);
-				}
-			});
-
 			// display all text decorations such as strikethrough, underline, ...
 			Y.each(Y.one(e.target).ancestor('.text-wrapper').all('.text-decoration'), function(decoration){
 				var decorationClassValue = decoration.getAttribute('class');
@@ -109,6 +102,15 @@ YUI.add('transcript-interaction', function (Y) {
 				var decorationHandDisplay = handDisplayContent(decorationClassValue);
 				decorationDisplay.append(decorationHandDisplay);
 				content.append(decorationDisplay);
+			});
+
+			// display various properties
+			Y.each(Object.keys(propertiesToDisplay), function(key) {
+				if (propertiesToDisplay[key](e.target)) {
+					var propertyDisplay = Y.Node.create('<div class="tooltip-property"><div><span class="tooltip-caption-property-'
+						+ key + '"></span></div></div>');
+					content.append(propertyDisplay);
+				}
 			});
 
 

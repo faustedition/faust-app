@@ -40,6 +40,7 @@ svg.diplomatic .bgBox {
 .tooltip-caption-property-supplied:before {content: 'editorische Ergänzung';}
 .tooltip-caption-property-unclear-cert-high:before {content: 'Unsichere Lesung (wahrscheinlich)';}
 .tooltip-caption-property-unclear-cert-low:before {content: 'Unsichere Lesung (vielleicht)';}
+.tooltip-caption-property-used:before {content: 'als erledigt markiert';}
 
 /* text decorations */
 
