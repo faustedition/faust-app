@@ -336,29 +336,42 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'st' : {
 					text : function (annotation, textVC, layoutState) {
-						// count the number of strikethroughs
-						layoutState.textState.numSt = 'numSt' in layoutState.textState ?
-							layoutState.textState.numSt : 0;
-						var classes = [];
-						if (annotation.data["hand"]) {
-							var hand = annotation.data["hand"];
-							classes = classes.concat(classesFromHandValue(hand));
-						}
-
-						var yOffsetPerStrikethrough = 0.15;
-						var yOffset = yOffsetPerStrikethrough * layoutState.textState.numSt;
-						var decoration;
 						var rendTokens = annotation.data['rend'] ? annotation.data['rend'].split(' ') : [];
-						if (rendTokens.indexOf('erase') >= 0) {
-							textVC.classes.push('erase');
-							decoration = new Faust.CloneDecoration(textVC, [], 'erase', 0, 0);
-
+						if (rendTokens.indexOf('vertical') >= 0) {
+							if (typeof layoutState.stVertVCs === 'undefined') {layoutState.stVertVCs = {};}
+							if (!(annotation.id in layoutState.stVertVCs)) {
+								var imgPath = cp + '/static/img/transcript/';
+								var stVertVC = new Faust.FloatImage('grLine', imgPath + 'grLineStraightVertical.svg#img',
+									100, 100, 100, 100, layoutState.rootVC);
+								layoutState.stVertVCs[annotation.id] = stVertVC;
+								layoutState.currentZone.addFloat(stVertVC);
+							}
+							layoutState.stVertVCs[annotation.id].coveredVCs.push(textVC);
+							textVC.classes.push('st-vertical');
 						} else {
-							decoration = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
-						}
-						textVC.decorations.push(decoration);
-						layoutState.textState.numSt = layoutState.textState.numSt + 1;
+							// count the number of strikethroughs
+							layoutState.textState.numSt = 'numSt' in layoutState.textState ?
+								layoutState.textState.numSt : 0;
+							var classes = [];
+							if (annotation.data["hand"]) {
+								var hand = annotation.data["hand"];
+								classes = classes.concat(classesFromHandValue(hand));
+							}
 
+							var yOffsetPerStrikethrough = 0.15;
+							var yOffset = yOffsetPerStrikethrough * layoutState.textState.numSt;
+							var decoration;
+
+							if (rendTokens.indexOf('erase') >= 0) {
+								textVC.classes.push('erase');
+								decoration = new Faust.CloneDecoration(textVC, [], 'erase', 0, 0);
+
+							} else {
+								decoration = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
+							}
+							textVC.decorations.push(decoration);
+							layoutState.textState.numSt = layoutState.textState.numSt + 1;
+						}
 					},
 				},
 
