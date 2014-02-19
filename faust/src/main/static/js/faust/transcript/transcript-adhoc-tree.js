@@ -203,7 +203,10 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 			var surfaceVC = new Faust.Surface();
 
 
-			var layoutState = {};
+			var layoutState = {
+				rootVC : surfaceVC
+			};
+
 			Y.Faust.TranscriptConfiguration.initialize(layoutState);
 			this.buildVC(surfaceVC, tree, text, layoutState);
 

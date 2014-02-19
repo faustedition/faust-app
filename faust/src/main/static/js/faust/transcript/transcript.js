@@ -219,9 +219,25 @@ YUI.add('transcript', function (Y) {
 			
 	Faust.Zone = function() {
 		Faust.Zone.superclass.constructor.call(this);
+		this.floats = [];
 	};
 
 	Y.extend(Faust.Zone, Faust.BlockViewComponent);
+
+	Faust.Zone.prototype.addFloat = function (vc) {
+		vc.parent = this;
+		vc.pos = this.children.length;
+		this.floats.push(vc);
+		vc.defaultAligns();
+		return vc;
+	};
+
+	Faust.Zone.prototype.layout = function() {
+		Faust.Zone.superclass.layout.call(this);
+		Y.each(this.floats, function(float) {
+			float.layout();
+		});
+	}
 	
 	Faust.Line = function(lineAttrs) {
 		Faust.Line.superclass.constructor.call(this);
@@ -274,6 +290,21 @@ YUI.add('transcript', function (Y) {
 		this.width = measured.width;
 		this.height = measured.height;
 	};
+
+	Faust.FloatImage = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight, floatParent) {
+		Faust.SpanningVC.superclass.constructor.call(this);
+		this.type =  type;
+		this.imageUrl = imageUrl;
+		this.imageWidth = imageWidth;
+		this.imageHeight = imageHeight;
+		this.fixedWidth = fixedWidth;
+		this.fixedHeight = fixedHeight;
+		this.coveredVCs = [];
+		this.floatParent = floatParent;
+	};
+
+	Y.extend (Faust.FloatImage, Faust.ViewComponent);
+
 
 	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
 		Faust.SpanningVC.superclass.constructor.call(this);

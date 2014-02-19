@@ -204,6 +204,14 @@ YUI.add('svg-utils', function (Y) {
 		return createRect(min.x, min.y, max.x - min.x, max.y - min.y);
 	};
 
+	var containingRect = function(rect1, rect2) {
+		var x = Math.min(rect1.x, rect2.x);
+		var y = Math.min(rect1.y, rect2.y);
+		var width = Math.max(rect1.x + rect1.width, rect2.x + rect2.width) - x;
+		var height = Math.max(rect1.y + rect1.height, rect2.y + rect2.height) - y;
+		return {x: x, y: y, width: width, height: height};
+	}
+
 
 	Y.mix(Y.namespace("SvgUtils"), {
 		SVG_NS: SVG_NS,
@@ -215,7 +223,8 @@ YUI.add('svg-utils', function (Y) {
 		svgStyles: svgStyles,
 		svg: svg,
 		empty: empty,
-		getScreenBBox: getScreenBBox
+		getScreenBBox: getScreenBBox,
+		containingRect: containingRect
 	});
 	
 }, '0.0', {

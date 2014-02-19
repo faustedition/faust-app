@@ -434,6 +434,25 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
+				'used' : {
+					text: function(annotation, textVC, layoutState) {
+						if (typeof layoutState.usedVCs === 'undefined') {layoutState.usedVCs = {};}
+						if (!(annotation.id in layoutState.usedVCs)) {
+
+							var imgPath = cp + '/static/img/transcript/';
+							var usedVC = new Faust.FloatImage('grLine', imgPath + 'usedMarker.svg#svgroot',
+								100, 100, 100, 100, layoutState.rootVC);
+//							usedVC.setAlign("hAlign", new Faust.Align(usedVC, textVC, layoutState.currentZone.rotX(),
+//								0, 0, Faust.Align.EXPLICIT));
+//							usedVC.setAlign("vAlign", new Faust.Align(usedVC, textVC, layoutState.currentZone.rotY(),
+//								0, 0, Faust.Align.EXPLICIT));
+							layoutState.usedVCs[annotation.id] = usedVC;
+							layoutState.currentZone.addFloat(usedVC);
+						}
+						layoutState.usedVCs[annotation.id].coveredVCs.push(textVC);
+					}
+				},
+
 				'vspace': {
 					vc: function(node, text, layoutState) {
 
@@ -464,7 +483,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 								vc.setAlign('hAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
 								vc.setAlign('vAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
 							}
-						} 
+						}
+						layoutState.currentZone = vc;
 						return vc;
 					}
 				}

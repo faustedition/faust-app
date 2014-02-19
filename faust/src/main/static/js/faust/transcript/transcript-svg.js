@@ -168,6 +168,11 @@ YUI.add('transcript-svg', function (Y) {
 		return surface;
 	};
 
+	Faust.Zone.prototype.render = function() {
+		Faust.Zone.superclass.render.call(this);
+		Y.each(this.floats, function(float) { float.render(); });
+	};
+
 	Faust.Zone.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "g");
 //		var box0 = this.svgDocument().createElementNS(SVG_NS, 'rect');
@@ -233,6 +238,58 @@ YUI.add('transcript-svg', function (Y) {
 		matrix = matrix.rotate(coordRotation);
 		return Y.SvgUtils.boundingBox(this.textElement, matrix).width;
 	};
+
+	Faust.FloatImage.prototype.createView = function() {
+		this.spanningImage = this.svgDocument().createElementNS(SVG_NS, 'use');
+		this.spanningImage.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
+		this.spanningImage.setAttribute('class', this.type);
+		this.spanningImage.setAttribute('x', 0);
+		this.spanningImage.setAttribute('y', 0);
+		this.spanningImage.setAttribute('width', this.imageWidth);
+		this.spanningImage.setAttribute('height', this.imageHeight);
+		this.spanningImage.setAttribute('transform', 'scale(1)');
+		var result = this.svgDocument().createElementNS(SVG_NS, "g");
+		result.appendChild(this.spanningImage);
+		return result;
+	};
+
+	Faust.FloatImage.prototype.svgContainer = function() {
+		return this.floatParent.view;
+	};
+
+	Faust.FloatImage.prototype.containingRect = function() {
+		var that = this;
+		var coveredRects = this.coveredVCs.map(function(vc) {
+			return {
+				x: vc.getCoord(that.rotX()),
+				y: vc.getCoord(that.rotY()),
+				width: vc.getExt(that.rotX()),
+				height: vc.getExt(that.rotY())
+			}
+		});
+		var containingRect = coveredRects.reduce(Y.SvgUtils.containingRect);
+		return containingRect;
+	}
+
+	Faust.FloatImage.prototype.onRelayout = function() {
+		var containingRect = this.containingRect();
+		// +1 works around a behaviour in firefox where the use element initially has width/height of 0, maybe due to
+		// deferred resource loading
+		var currentWidth = this.getExt(this.rotX()) + 1;
+		var currentHeight = this.getExt(this.rotY()) + 1;
+		var transform = this.spanningImage.viewportElement.createSVGTransform();
+		transform.setScale(containingRect.width / currentWidth, containingRect.height / currentHeight);
+		this.spanningImage.transform.baseVal.consolidate();
+		this.spanningImage.transform.baseVal.appendItem(transform);
+		this.spanningImage.transform.baseVal.consolidate();
+	};
+
+	Faust.FloatImage.prototype.position = function() {
+		var containingRect = this.containingRect();
+		this.setCoord(containingRect.x, this.rotX());
+		this.setCoord(containingRect.y, this.rotY());
+	}
+
 
 
 	Faust.SpanningVC.prototype.createView = function() {
