@@ -194,7 +194,7 @@ svg.diplomatic .text-decoration-type-erase text {
 /* graphical elements */
 
 svg.diplomatic line, svg.diplomatic rect.inline-decoration-type-rect,
-svg.diplomatic ellipse.inline-decoration-type-circle, svg.diplomatic {
+svg.diplomatic ellipse.inline-decoration-type-circle {
     stroke: black;
     stroke-width: 0.1em;
     fill: none;

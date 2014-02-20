@@ -339,24 +339,27 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 						var rendTokens = annotation.data['rend'] ? annotation.data['rend'].split(' ') : [];
 						var classes = [];
-						var decoration;
+
 
 						if (annotation.data["hand"]) {
 							var hand = annotation.data["hand"];
 							classes = classes.concat(classesFromHandValue(hand));
 						}
 
-						if (rendTokens.indexOf('vertical') >= 0) {
+						if (rendTokens.indexOf('vertical') >= 0 || rendTokens.indexOf('diagonal') >= 0 ) {
 							if (typeof layoutState.stVertVCs === 'undefined') {layoutState.stVertVCs = {};}
 							if (!(annotation.id in layoutState.stVertVCs)) {
 								var imgPath = cp + '/static/img/transcript/';
-								var stVertVC = new Faust.FloatImage('grLine', classes, imgPath + 'grLineStraightVertical.svg#img',
+								var imgFilename = rendTokens.indexOf('vertical') >= 0 ? 'grLineStraightVertical.svg#img'
+									:'grLineDiagonalFalling.svg#img';
+								var stVertVC = new Faust.FloatImage('grLine', classes, imgPath + imgFilename,
 									100, 100, layoutState.rootVC);
 
 								layoutState.stVertVCs[annotation.id] = stVertVC;
 								layoutState.currentZone.addFloat(stVertVC);
 
-								decoration = new Faust.NullDecoration(textVC, classes, 'strikethrough');
+								var decoration = new Faust.NullDecoration(textVC, classes, 'strikethrough');
+								textVC.decorations.push(decoration);
 							}
 							layoutState.stVertVCs[annotation.id].coveredVCs.push(textVC);
 							textVC.classes.push('st-vertical');
@@ -371,14 +374,17 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 							if (rendTokens.indexOf('erase') >= 0) {
 								textVC.classes.push('erase');
-								decoration = new Faust.CloneDecoration(textVC, [], 'erase', 0, 0);
+								var decoration = new Faust.CloneDecoration(textVC, [], 'erase', 0, 0);
+								textVC.decorations.push(decoration);
 
 							} else {
-								decoration = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
+								var decoration = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
+								textVC.decorations.push(decoration);
 							}
+
 							layoutState.textState.numSt = layoutState.textState.numSt + 1;
 						}
-						textVC.decorations.push(decoration);
+
 					}
 				},
 
