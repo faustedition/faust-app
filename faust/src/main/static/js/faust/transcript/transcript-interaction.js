@@ -153,15 +153,21 @@ YUI.add('transcript-interaction', function (Y) {
 		var patches = Y.all('svg.diplomatic .element-patch');
 
 		patches.on("mouseenter", function (e) {
-			Y.all('svg.diplomatic .element-patch').transition('fadeOut');
+			Y.all('svg.diplomatic .element-patch').transition({
+				duration: 1,
+				opacity: 0.1
+			});
 		});
 
 		patches.on("mouseleave", function () {
-			Y.all('svg.diplomatic .element-patch').transition('fadeIn');
+			Y.all('svg.diplomatic .element-patch').transition({
+				duration: 1,
+				opacity: 1
+			});
 		});
 
 
 	})
 }, '0.0', {
-	requires: ['event-custom', 'node', 'overlay', 'widget-anim', 'svg-utils']
+	requires: ['event-custom', 'node', 'overlay', 'widget-anim', 'transition', 'svg-utils']
 });
