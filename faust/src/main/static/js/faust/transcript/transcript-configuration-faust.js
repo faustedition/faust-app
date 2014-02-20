@@ -336,7 +336,16 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'st' : {
 					text : function (annotation, textVC, layoutState) {
+
 						var rendTokens = annotation.data['rend'] ? annotation.data['rend'].split(' ') : [];
+						var classes = [];
+						var decoration;
+
+						if (annotation.data["hand"]) {
+							var hand = annotation.data["hand"];
+							classes = classes.concat(classesFromHandValue(hand));
+						}
+
 						if (rendTokens.indexOf('vertical') >= 0) {
 							if (typeof layoutState.stVertVCs === 'undefined') {layoutState.stVertVCs = {};}
 							if (!(annotation.id in layoutState.stVertVCs)) {
@@ -345,6 +354,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 									100, 100, 100, 100, layoutState.rootVC);
 								layoutState.stVertVCs[annotation.id] = stVertVC;
 								layoutState.currentZone.addFloat(stVertVC);
+
+								decoration = new Faust.NullDecoration(textVC, classes, 'strikethrough');
 							}
 							layoutState.stVertVCs[annotation.id].coveredVCs.push(textVC);
 							textVC.classes.push('st-vertical');
@@ -352,15 +363,10 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							// count the number of strikethroughs
 							layoutState.textState.numSt = 'numSt' in layoutState.textState ?
 								layoutState.textState.numSt : 0;
-							var classes = [];
-							if (annotation.data["hand"]) {
-								var hand = annotation.data["hand"];
-								classes = classes.concat(classesFromHandValue(hand));
-							}
 
 							var yOffsetPerStrikethrough = 0.15;
 							var yOffset = yOffsetPerStrikethrough * layoutState.textState.numSt;
-							var decoration;
+
 
 							if (rendTokens.indexOf('erase') >= 0) {
 								textVC.classes.push('erase');
@@ -369,10 +375,10 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							} else {
 								decoration = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
 							}
-							textVC.decorations.push(decoration);
 							layoutState.textState.numSt = layoutState.textState.numSt + 1;
 						}
-					},
+						textVC.decorations.push(decoration);
+					}
 				},
 
 				'supplied' : {

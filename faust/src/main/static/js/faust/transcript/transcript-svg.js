@@ -408,6 +408,14 @@ YUI.add('transcript-svg', function (Y) {
 		this.text.view.appendChild(this.view);
 	};
 
+	Faust.NullDecoration.prototype.createView = function() {
+		var view = this.text.svgDocument().createElementNS(SVG_NS, "g");
+		return view;
+	};
+
+	Faust.NullDecoration.prototype.layout = function() {
+	};
+
 	Faust.LineDecoration.prototype.createView = function() {
 		var view = this.text.svgDocument().createElementNS(SVG_NS, "line");
 		return view;

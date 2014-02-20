@@ -384,6 +384,11 @@ YUI.add('transcript', function (Y) {
 
 	Faust.TextDecoration.prototype.layout = function() {};
 
+	Faust.NullDecoration = function(text, classes, name) {
+		Faust.NullDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
+	}
+	Y.extend(Faust.NullDecoration, Faust.TextDecoration);
+
 	Faust.LineDecoration = function(text, classes, name, yOffset) {
 		Faust.LineDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
 		this.yOffset = yOffset;
