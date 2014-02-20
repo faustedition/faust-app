@@ -350,8 +350,9 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							if (typeof layoutState.stVertVCs === 'undefined') {layoutState.stVertVCs = {};}
 							if (!(annotation.id in layoutState.stVertVCs)) {
 								var imgPath = cp + '/static/img/transcript/';
-								var stVertVC = new Faust.FloatImage('grLine', imgPath + 'grLineStraightVertical.svg#img',
-									100, 100, 100, 100, layoutState.rootVC);
+								var stVertVC = new Faust.FloatImage('grLine', classes, imgPath + 'grLineStraightVertical.svg#img',
+									100, 100, layoutState.rootVC);
+
 								layoutState.stVertVCs[annotation.id] = stVertVC;
 								layoutState.currentZone.addFloat(stVertVC);
 
@@ -458,8 +459,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (typeof layoutState.usedVCs === 'undefined') {layoutState.usedVCs = {};}
 						if (!(annotation.id in layoutState.usedVCs)) {
 							var imgPath = cp + '/static/img/transcript/';
-							var usedVC = new Faust.FloatImage('grLine', imgPath + 'usedMarker.svg#svgroot',
-								100, 100, 100, 100, layoutState.rootVC);
+							var usedVC = new Faust.FloatImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
+								100, 100, layoutState.rootVC);
 							layoutState.usedVCs[annotation.id] = usedVC;
 							layoutState.currentZone.addFloat(usedVC);
 						}

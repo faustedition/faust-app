@@ -21,7 +21,8 @@
 /* global */
 
 svg.diplomatic {
-  font-family: faust-serif, serif; 
+  font-family: faust-serif, serif;
+    stroke: black;
 }
 
 #editor-toolbar {
@@ -193,7 +194,7 @@ svg.diplomatic .text-decoration-type-erase text {
 /* graphical elements */
 
 svg.diplomatic line, svg.diplomatic rect.inline-decoration-type-rect,
-svg.diplomatic ellipse.inline-decoration-type-circle {
+svg.diplomatic ellipse.inline-decoration-type-circle, svg.diplomatic {
     stroke: black;
     stroke-width: 0.1em;
     fill: none;

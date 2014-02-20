@@ -245,8 +245,6 @@ YUI.add('transcript-svg', function (Y) {
 		this.spanningImage.setAttribute('class', this.type);
 		this.spanningImage.setAttribute('x', 0);
 		this.spanningImage.setAttribute('y', 0);
-		this.spanningImage.setAttribute('width', this.imageWidth);
-		this.spanningImage.setAttribute('height', this.imageHeight);
 		this.spanningImage.setAttribute('transform', 'scale(1)');
 		var result = this.svgDocument().createElementNS(SVG_NS, "g");
 		result.appendChild(this.spanningImage);

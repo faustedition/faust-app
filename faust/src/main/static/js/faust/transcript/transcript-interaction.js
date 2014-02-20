@@ -155,7 +155,7 @@ YUI.add('transcript-interaction', function (Y) {
 		patches.on("mouseenter", function (e) {
 			Y.all('svg.diplomatic .element-patch').transition({
 				duration: 1,
-				opacity: 0.1
+				opacity: 0.2
 			});
 		});
 

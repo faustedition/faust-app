@@ -291,16 +291,16 @@ YUI.add('transcript', function (Y) {
 		this.height = measured.height;
 	};
 
-	Faust.FloatImage = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight, floatParent) {
-		Faust.SpanningVC.superclass.constructor.call(this);
+	Faust.FloatImage = function(type, classes, imageUrl, fixedWidth, fixedHeight, floatParent) {
+		Faust.FloatImage.superclass.constructor.call(this);
+		this.classes = this.classes.concat(classes);
 		this.type =  type;
 		this.imageUrl = imageUrl;
-		this.imageWidth = imageWidth;
-		this.imageHeight = imageHeight;
 		this.fixedWidth = fixedWidth;
 		this.fixedHeight = fixedHeight;
 		this.coveredVCs = [];
 		this.floatParent = floatParent;
+		this.classes.push('use-image');
 	};
 
 	Y.extend (Faust.FloatImage, Faust.ViewComponent);
@@ -314,6 +314,7 @@ YUI.add('transcript', function (Y) {
 		this.imageHeight = imageHeight;
 		this.fixedWidth = fixedWidth;
 		this.fixedHeight = fixedHeight;
+		this.classes.push('use-image');
 	};
 
 	Y.extend (Faust.SpanningVC, Faust.ViewComponent);
@@ -349,6 +350,7 @@ YUI.add('transcript', function (Y) {
 		this.imageHeight = imageHeight;
 		this.displayWidth = displayWidth;
 		this.displayHeight = displayHeight;
+		this.classes.push('use-image');
 	};
 
 	Y.extend (Faust.InlineGraphic, Faust.InlineViewComponent);
