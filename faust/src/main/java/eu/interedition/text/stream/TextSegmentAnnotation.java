@@ -17,7 +17,7 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.textstream;
+package eu.interedition.text.stream;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Range;

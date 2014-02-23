@@ -1,16 +1,16 @@
 package de.faustedition.transcript;
 
 import com.google.common.base.Predicate;
-import de.faustedition.textstream.NamespaceMapping;
-import de.faustedition.textstream.TextAnnotationStart;
+import eu.interedition.text.stream.NamespaceMapping;
+import eu.interedition.text.stream.TextAnnotationStart;
 import de.faustedition.textstream.TextTemplateAnnotationHandler;
-import de.faustedition.textstream.TextToken;
+import eu.interedition.text.stream.TextToken;
 
 import javax.xml.namespace.QName;
 import java.util.Set;
 
-import static de.faustedition.textstream.NamespaceMapping.TEI_NS_URI;
-import static de.faustedition.textstream.TextTokenPredicates.xmlName;
+import static eu.interedition.text.stream.NamespaceMapping.TEI_NS_URI;
+import static eu.interedition.text.stream.TextTokenPredicates.xmlName;
 
 /**
 * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

@@ -1,31 +1,29 @@
 package de.faustedition.transcript;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import de.faustedition.textstream.FileBasedTextStream;
-import de.faustedition.textstream.LineBreaker;
-import de.faustedition.textstream.NamespaceMapping;
-import de.faustedition.textstream.SegmentRangeFilter;
-import de.faustedition.textstream.TextAnnotationEnd;
-import de.faustedition.textstream.TextAnnotationStart;
-import de.faustedition.textstream.TextContent;
-import de.faustedition.textstream.TextRangeFilter;
-import de.faustedition.textstream.TextToken;
-import de.faustedition.textstream.WhitespaceCompressor;
-import de.faustedition.textstream.XMLElementContextFilter;
+import eu.interedition.text.stream.LineBreaker;
+import eu.interedition.text.stream.NamespaceMapping;
+import eu.interedition.text.stream.SegmentRangeFilter;
+import eu.interedition.text.stream.TextAnnotationStart;
+import eu.interedition.text.stream.TextContent;
+import eu.interedition.text.stream.TextRangeFilter;
+import eu.interedition.text.stream.TextToken;
+import eu.interedition.text.stream.WhitespaceCompressor;
+import eu.interedition.text.stream.XMLElementContextFilter;
 
 import javax.xml.namespace.QName;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
-import static de.faustedition.textstream.NamespaceMapping.TEI_NS_URI;
-import static de.faustedition.textstream.NamespaceMapping.TEI_SIG_GE_URI;
-import static de.faustedition.textstream.TextTokenPredicates.xmlName;
+import static eu.interedition.text.stream.NamespaceMapping.TEI_NS_URI;
+import static eu.interedition.text.stream.NamespaceMapping.TEI_SIG_GE_URI;
+import static eu.interedition.text.stream.TextTokenPredicates.xmlName;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

@@ -16,7 +16,7 @@ import de.faustedition.index.Index;
 import de.faustedition.index.TranscriptExcerpts;
 import de.faustedition.index.TranscriptTokenAnnotationCodec;
 import de.faustedition.text.Texts;
-import de.faustedition.textstream.NamespaceMapping;
+import eu.interedition.text.stream.NamespaceMapping;
 import de.faustedition.transcript.TranscriptCollator;
 import de.faustedition.transcript.TranscriptSegments;
 import de.faustedition.transcript.Transcripts;

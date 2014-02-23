@@ -4,19 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterators;
 import de.faustedition.textstream.FileBasedTextStream;
-import de.faustedition.textstream.LineBreaker;
-import de.faustedition.textstream.NamespaceMapping;
-import de.faustedition.textstream.TextToken;
-import de.faustedition.textstream.WhitespaceCompressor;
-import de.faustedition.textstream.XMLElementContextFilter;
+import eu.interedition.text.stream.LineBreaker;
+import eu.interedition.text.stream.NamespaceMapping;
+import eu.interedition.text.stream.TextToken;
+import eu.interedition.text.stream.WhitespaceCompressor;
+import eu.interedition.text.stream.XMLElementContextFilter;
 import de.faustedition.transcript.TEIMilestoneMarkupProcessor;
-import de.faustedition.transcript.TranscriptMarkupHandler;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
-import static de.faustedition.textstream.TextTokenPredicates.xmlName;
+import static eu.interedition.text.stream.TextTokenPredicates.xmlName;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

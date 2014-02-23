@@ -7,11 +7,11 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
-import de.faustedition.textstream.TextAnnotationEnd;
-import de.faustedition.textstream.TextAnnotationStart;
-import de.faustedition.textstream.TextContent;
-import de.faustedition.textstream.TextSegmentAnnotation;
-import de.faustedition.textstream.TextToken;
+import eu.interedition.text.stream.TextAnnotationEnd;
+import eu.interedition.text.stream.TextAnnotationStart;
+import eu.interedition.text.stream.TextContent;
+import eu.interedition.text.stream.TextSegmentAnnotation;
+import eu.interedition.text.stream.TextToken;
 
 import java.util.Iterator;
 import java.util.List;

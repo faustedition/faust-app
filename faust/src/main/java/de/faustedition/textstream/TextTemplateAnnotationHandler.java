@@ -1,5 +1,7 @@
 package de.faustedition.textstream;
 
+import eu.interedition.text.stream.TextAnnotationStart;
+
 import java.util.Set;
 
 /**

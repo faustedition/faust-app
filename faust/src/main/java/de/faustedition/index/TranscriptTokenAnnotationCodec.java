@@ -2,10 +2,10 @@ package de.faustedition.index;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Predicate;
-import de.faustedition.textstream.NamespaceMapping;
-import de.faustedition.textstream.TextAnnotationStart;
-import de.faustedition.textstream.TextToken;
-import de.faustedition.textstream.TextTokenPredicates;
+import eu.interedition.text.stream.NamespaceMapping;
+import eu.interedition.text.stream.TextAnnotationStart;
+import eu.interedition.text.stream.TextToken;
+import eu.interedition.text.stream.TextTokenPredicates;
 import de.faustedition.transcript.Hand;
 import org.apache.lucene.index.Payload;
 
@@ -20,9 +20,9 @@ import static de.faustedition.index.TranscriptTokenAnnotation.HAND_SCRIBE;
 import static de.faustedition.index.TranscriptTokenAnnotation.SPEAKER;
 import static de.faustedition.index.TranscriptTokenAnnotation.STAGE;
 import static de.faustedition.index.TranscriptTokenAnnotation.VERSE;
-import static de.faustedition.textstream.NamespaceMapping.FAUST_NS_URI;
-import static de.faustedition.textstream.NamespaceMapping.TEI_NS_URI;
-import static de.faustedition.textstream.NamespaceMapping.map;
+import static eu.interedition.text.stream.NamespaceMapping.FAUST_NS_URI;
+import static eu.interedition.text.stream.NamespaceMapping.TEI_NS_URI;
+import static eu.interedition.text.stream.NamespaceMapping.map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

@@ -7,13 +7,13 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ForwardingIterator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import de.faustedition.textstream.TextAnnotationEnd;
-import de.faustedition.textstream.TextAnnotationStart;
-import de.faustedition.textstream.NamespaceMapping;
-import de.faustedition.textstream.TextContent;
-import de.faustedition.textstream.TextToken;
-import de.faustedition.textstream.XML;
-import de.faustedition.textstream.XMLEvent2TextToken;
+import eu.interedition.text.stream.TextAnnotationEnd;
+import eu.interedition.text.stream.TextAnnotationStart;
+import eu.interedition.text.stream.NamespaceMapping;
+import eu.interedition.text.stream.TextContent;
+import eu.interedition.text.stream.TextToken;
+import eu.interedition.text.stream.XML;
+import eu.interedition.text.stream.XMLEvent2TextToken;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -23,10 +23,10 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static de.faustedition.textstream.NamespaceMapping.FAUST_NS_URI;
-import static de.faustedition.textstream.NamespaceMapping.TEI_NS_URI;
-import static de.faustedition.textstream.NamespaceMapping.TEI_SIG_GE_URI;
-import static de.faustedition.textstream.NamespaceMapping.map;
+import static eu.interedition.text.stream.NamespaceMapping.FAUST_NS_URI;
+import static eu.interedition.text.stream.NamespaceMapping.TEI_NS_URI;
+import static eu.interedition.text.stream.NamespaceMapping.TEI_SIG_GE_URI;
+import static eu.interedition.text.stream.NamespaceMapping.map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

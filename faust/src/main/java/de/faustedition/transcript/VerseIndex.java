@@ -14,12 +14,12 @@ import de.faustedition.Database;
 import de.faustedition.db.Tables;
 import de.faustedition.document.Documents;
 import de.faustedition.index.Index;
-import de.faustedition.textstream.NamespaceMapping;
-import de.faustedition.textstream.TextAnnotationEnd;
-import de.faustedition.textstream.TextAnnotationStart;
-import de.faustedition.textstream.TextContent;
-import de.faustedition.textstream.TextToken;
-import de.faustedition.textstream.TextTokenPredicates;
+import eu.interedition.text.stream.NamespaceMapping;
+import eu.interedition.text.stream.TextAnnotationEnd;
+import eu.interedition.text.stream.TextAnnotationStart;
+import eu.interedition.text.stream.TextContent;
+import eu.interedition.text.stream.TextToken;
+import eu.interedition.text.stream.TextTokenPredicates;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
@@ -49,8 +49,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static de.faustedition.textstream.NamespaceMapping.TEI_NS_URI;
-import static de.faustedition.textstream.NamespaceMapping.map;
+import static eu.interedition.text.stream.NamespaceMapping.TEI_NS_URI;
+import static eu.interedition.text.stream.NamespaceMapping.map;
 
 
 /**

@@ -1,20 +1,16 @@
 package de.faustedition.text;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Functions;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
-import de.faustedition.textstream.NamespaceMapping;
+import eu.interedition.text.stream.NamespaceMapping;
 import de.faustedition.xml.Sources;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -6,10 +6,10 @@ import com.google.common.collect.Iterables;
 import de.faustedition.Database;
 import de.faustedition.Templates;
 import de.faustedition.db.Tables;
-import de.faustedition.textstream.TextAnnotationEnd;
-import de.faustedition.textstream.TextAnnotationStart;
-import de.faustedition.textstream.TextContent;
-import de.faustedition.textstream.TextToken;
+import eu.interedition.text.stream.TextAnnotationEnd;
+import eu.interedition.text.stream.TextAnnotationStart;
+import eu.interedition.text.stream.TextContent;
+import eu.interedition.text.stream.TextToken;
 import org.jooq.DSLContext;
 
 import javax.inject.Inject;

@@ -17,7 +17,7 @@
  * along with CollateX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.textstream;
+package eu.interedition.text.stream;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ForwardingIterator;

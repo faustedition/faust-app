@@ -1,4 +1,4 @@
-package de.faustedition.textstream;
+package eu.interedition.text.stream;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ForwardingIterator;

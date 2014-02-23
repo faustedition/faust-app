@@ -1,4 +1,4 @@
-package de.faustedition.textstream;
+package eu.interedition.text.stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -16,7 +16,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import static de.faustedition.textstream.NamespaceMapping.map;
+import static eu.interedition.text.stream.NamespaceMapping.map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

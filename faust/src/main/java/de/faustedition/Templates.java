@@ -18,7 +18,7 @@ import de.faustedition.facsimile.InternetImageServer;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.graph.NodeWrapperCollectionTemplateModel;
 import de.faustedition.http.LastModified;
-import de.faustedition.textstream.NamespaceMapping;
+import eu.interedition.text.stream.NamespaceMapping;
 import de.faustedition.textstream.TextTemplateAnnotationHandler;
 import de.faustedition.textstream.TextTemplateDirective;
 import de.faustedition.transcript.DramaAnnotationTemplateMarkupHandler;
