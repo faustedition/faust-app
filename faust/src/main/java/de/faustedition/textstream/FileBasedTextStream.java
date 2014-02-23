@@ -6,6 +6,13 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterators;
 import de.faustedition.http.LastModified;
+import eu.interedition.text.stream.NamespaceMapping;
+import eu.interedition.text.stream.TextAnnotationEnd;
+import eu.interedition.text.stream.TextAnnotationStart;
+import eu.interedition.text.stream.TextContent;
+import eu.interedition.text.stream.TextToken;
+import eu.interedition.text.stream.XML;
+import eu.interedition.text.stream.XMLEvent2TextToken;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -62,7 +69,7 @@ public class FileBasedTextStream implements Iterable<TextToken>, LastModified {
                         try {
                             XML.closeQuietly(xmlEvents);
                             xmlEvents = XML.inputFactory().createXMLEventReader(new StreamSource(sourceIt.next()));
-                            tokenIt = Iterators.transform(XML.stream(xmlEvents), new XMLEvent2TextToken(objectMapper, namespaceMapping).withIds(ids));
+                            tokenIt = Iterators.transform(XML.stream(xmlEvents), new XMLEvent2TextToken(objectMapper, namespaceMapping).withIds(ids).withNodePath());
                         } catch (XMLStreamException e) {
                             XML.closeQuietly(xmlEvents);
                             throw Throwables.propagate(e);
