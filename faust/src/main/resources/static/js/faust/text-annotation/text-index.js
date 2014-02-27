@@ -209,14 +209,16 @@ YUI.add('text-index', function (Y) {
         return single_rotate(root, dir);
     }
 
-    var RedBlackTree = function (comparator, keyFunction) {
+    var NS = Y.namespace("Faust");
+
+    NS.RedBlackTree = function (comparator, keyFunction) {
         this._root = null;
         this._comparator = comparator;
         this._keyFunction = keyFunction || function(d) { return d; };
         this.size = 0;
     };
 
-    Y.extend(RedBlackTree, TreeBase, {
+    Y.extend(NS.RedBlackTree, TreeBase, {
         // returns true if inserted, false if duplicate
         insert: function (data) {
             var key = this._keyFunction(data);
@@ -387,8 +389,6 @@ YUI.add('text-index', function (Y) {
         }
     });
 
-    var NS = Y.namespace("Faust");
-
     var segmentComparator = function(a, b) {
         return ((a[0] == b[0]) ? (b[1] - a[1]) : (a[0] - b[0]));
     };
@@ -403,7 +403,7 @@ YUI.add('text-index', function (Y) {
         this._index(this._root);
     };
 
-    Y.extend(NS.SegmentIndex, RedBlackTree, {
+    Y.extend(NS.SegmentIndex, NS.RedBlackTree, {
         find: function (segment) {
             var result = [];
             this._find(this._root, segment, result);

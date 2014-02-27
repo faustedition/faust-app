@@ -1,4 +1,4 @@
-YUI.add('text-annotation', function (Y) {
+YUI.add('legacy-text-annotation', function (Y) {
 
     var Range = function (start, end) {
         this.start = start;
@@ -198,6 +198,68 @@ YUI.add('text-annotation', function (Y) {
             }
         }
     }, {
+        adopt: function (text) {
+            var NAMESPACES = {
+                "xml": "http://www.w3.org/XML/1998/namespace",
+                "xmlns": "http://www.w3.org/2000/xmlns/",
+                "rng": "http://relaxng.org/ns/structure/1.0",
+                "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                "xsd": "http://www.w3.org/2001/XMLSchema",
+                "tei": "http://www.tei-c.org/ns/1.0",
+                "clix": "http://lmnl.net/clix",
+                "txt": "http://interedition.eu/text/ns",
+                "f": "http://www.faustedition.net/ns",
+                "ge": "http://www.tei-c.org/ns/geneticEditions",
+                "svg": "http://www.w3.org/2000/svg",
+                "xlink": "http://www.w3.org/1999/xlink"
+            };
+
+            var nameComponents = function(a) {
+                var name = a["xml:name"], ci = name.indexOf(":");
+                return (ci < 0 ? ["", name] : [name.substring(0, ci), name.substring(ci + 1)]);
+            };
+            var annotationData = function(a, nc) {
+                var data = {}, ns = (nc ? (nc + ":") : "");
+                Y.Object.each(a, function(v, k) {
+                    switch (k) {
+                        case "id":
+                        case "xml:name":
+                        case "txt:segment":
+                            break;
+                        case "xml:path":
+                            data["xml:node"] = v.join("/")
+                            break;
+                        default:
+                            data[ns && k.indexOf(ns) === 0 ? k.substring(ns.length ) : k] = v;
+                            break;
+                    }
+                });
+                return data;
+            };
+
+            var legacyText = new Text(1, [0, text.length, 1], text.length, new Range(0, text.length), text.content());
+            legacyText.rangeIndex = new Y.Faust.RedBlackTree(Range.sort, function (a) { return a.targetIn(legacyText).range; });
+            legacyText.localNameIndex = {};
+            legacyText.annotations = [];
+
+            Y.Object.each(text.annotations, function (a) {
+                if (!a["xml:name"]) return;
+
+                var segment = a["txt:segment"],
+                    nc = nameComponents(a),
+                    name = new Name(nc[0] ? NAMESPACES[nc[0]] || null : null, nc[1]),
+                    data = annotationData(a, nc),
+                    ln = name.localName;
+
+                var annotation = new Annotation(name, data, [ new TextTarget(legacyText, new Range(segment[0], segment[1])) ], legacyText.annotations.length + 1);
+                legacyText.annotations.push(annotation);
+                legacyText.rangeIndex.insert(annotation);
+                legacyText.localNameIndex[ln] = (legacyText.localNameIndex[ln] || []).concat(annotation);
+            });
+            legacyText._setupRangeIndexNode(legacyText.rangeIndex._root);
+
+            return legacyText;
+        },
         create: function (data) {
             var text = new Text(data.text.id, data.text.t, data.text.l, data.textRange, data.textContent), names = {};
             Y.Object.each(data.names, function (v, k) {
@@ -287,5 +349,5 @@ YUI.add('text-annotation', function (Y) {
         Annotation: Annotation
     });
 }, '0.0', {
-    requires: ["text-index", "base", "array-extras"]
+    requires: ["text-annotation", "text-index", "base", "array-extras"]
 });

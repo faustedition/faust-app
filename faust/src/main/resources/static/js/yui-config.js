@@ -25,6 +25,7 @@ YUI.GlobalConfig = {
                 'rangy-textrange': { path: "rangy-1.3alpha.772/rangy-textrange.js", requires: [ "rangy-core" ] },
                 'search': { path: "faust/search/search.js"},
 				'svg-utils' : { path: "faust/svg-utils/svg-utils.js"},
+                'legacy-text-annotation': { path: "faust/text-annotation/legacy-text-annotation.js"},
                 'text-annotation': { path: "faust/text-annotation/text-annotation.js"},
                 'text-annotation-view': { path: "faust/text-annotation/text-annotation-view.js" },
 				'text-display': { path: "faust/text-display/text-display.js"},

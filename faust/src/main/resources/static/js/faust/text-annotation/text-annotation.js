@@ -2,7 +2,7 @@ YUI.add('text-annotation', function (Y) {
 
     var Text = function(content, annotations, tree, segment, length) {
         this._content = (content || "");
-        this.annotations = (annotations || []);
+        this.annotations = (annotations || {});
         this.length = (length || this._content.length);
         this.segment = (segment || [0, this.length]);
 

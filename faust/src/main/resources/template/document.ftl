@@ -77,11 +77,13 @@
 </div>
 
 <script type="text/javascript">
-    YUI().use("node", "datasource", "util", "document-structure-view", "text-annotation-view", function(Y) {
+    YUI().use("node", "datasource", "util", "document-structure-view", "text-annotation-view", "legacy-text-annotation", function(Y) {
         var documentModel = [@json id=id metadata=metadata references=references /],
             documentaryTranscript = Y.Faust.TextSchema.parse([@json documentaryTranscript=documentaryTranscript /]),
             textualTranscript = Y.Faust.TextSchema.parse([@json textualTranscript=textualTranscript /]),
             collation = new Y.Faust.Collation([@json collation=collation /]);
+
+        legacyText = Y.Faust.Legacy.Text.adopt(documentaryTranscript);
 
         new Y.Faust.IOStatus({ render: true });
         new Y.Faust.DocumentTree({ container: ".document-structure", collapseAll: true }).render();
@@ -144,8 +146,6 @@
 
         documentaryView.render(".transcript-documentary");
         textualView.render(".transcript-textual");
-
-        Y.log(Y.Faust.SortedArray.search([1, 2, 3, 4, 5, 6], 5, Y.Faust.compareNumbers, 0, 5));
     });
 </script>
 [/@faust.page]
