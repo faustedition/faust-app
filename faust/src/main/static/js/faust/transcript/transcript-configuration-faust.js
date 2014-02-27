@@ -117,10 +117,18 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				},
 
 				'grBrace':  {
-					vc: function(node, text, layoutState) {
-						//return new Faust.GBrace();
-					}
+
+					vc: function() {}
 				},
+//					vc: function(node, text, layoutState) {
+//						var imgPath = cp + '/static/img/transcript/';
+//						var imgFilename = 'grLineDiagonalFalling.svg#img';
+//						var float = new Faust.CoveringImage('grBrace', [], imgPath + imgFilename,
+//							100, 100, layoutState.rootVC);
+//						layoutState.currentZone.addFloat(float);
+//						return null;
+//					}
+//				},
 
 				'grLine':  {
 					vc: function(node, text, layoutState) {
@@ -309,6 +317,29 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'patch' : { vc: function(){return new Faust.Patch();}},
 
+				'point' : {
+					vc: function (node, text, layoutState) {
+
+						var grBraceAnnotation = node.ancestors().filter(function(ancestor){
+							return ancestor.annotation.name.localName === 'grBrace'}
+						)[0].annotation;
+						if (typeof layoutState.grBraceVCs === 'undefined') {layoutState.grBraceVCs = {};}
+						if (!(grBraceAnnotation.id in layoutState.grBraceVCs)) {
+							var imgPath = cp + '/static/img/transcript/';
+							var grBraceVC = new Faust.CoveringImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
+								100, 100, layoutState.rootVC);
+							layoutState.grBraceVCs[grBraceAnnotation.id] = grBraceVC;
+							layoutState.currentZone.addFloat(grBraceVC);
+						}
+
+						var pointVC = new Faust.Text('O', {});
+						layoutState.grBraceVCs[grBraceAnnotation.id].coveredVCs.push(pointVC);
+						layoutState.currentZone.addFloat(pointVC);
+
+						return null;
+					}
+				},
+
 				'rdg' : { vc: function(){return new Faust.InlineViewComponent();}},
 
 				'rewrite' : {
@@ -352,7 +383,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 								var imgPath = cp + '/static/img/transcript/';
 								var imgFilename = rendTokens.indexOf('vertical') >= 0 ? 'grLineStraightVertical.svg#img'
 									:'grLineDiagonalFalling.svg#img';
-								var stVertVC = new Faust.FloatImage('grLine', classes, imgPath + imgFilename,
+								var stVertVC = new Faust.CoveringImage('grLine', classes, imgPath + imgFilename,
 									100, 100, layoutState.rootVC);
 
 								layoutState.stVertVCs[annotation.id] = stVertVC;
@@ -465,7 +496,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (typeof layoutState.usedVCs === 'undefined') {layoutState.usedVCs = {};}
 						if (!(annotation.id in layoutState.usedVCs)) {
 							var imgPath = cp + '/static/img/transcript/';
-							var usedVC = new Faust.FloatImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
+							var usedVC = new Faust.CoveringImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
 								100, 100, layoutState.rootVC);
 							layoutState.usedVCs[annotation.id] = usedVC;
 							layoutState.currentZone.addFloat(usedVC);

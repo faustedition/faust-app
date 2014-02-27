@@ -291,19 +291,37 @@ YUI.add('transcript', function (Y) {
 		this.height = measured.height;
 	};
 
-	Faust.FloatImage = function(type, classes, imageUrl, fixedWidth, fixedHeight, floatParent) {
-		Faust.FloatImage.superclass.constructor.call(this);
+	Faust.FloatVC = function(classes, floatParent) {
+		Faust.FloatVC.superclass.constructor.call(this);
 		this.classes = this.classes.concat(classes);
+		this.floatParent = floatParent;
+	};
+
+	Y.extend (Faust.FloatVC, Faust.ViewComponent);
+
+	Faust.CoveringImage = function(type, classes, imageUrl, fixedWidth, fixedHeight, floatParent) {
+		Faust.CoveringImage.superclass.constructor.call(this, classes, floatParent);
 		this.type =  type;
 		this.imageUrl = imageUrl;
 		this.fixedWidth = fixedWidth;
 		this.fixedHeight = fixedHeight;
 		this.coveredVCs = [];
-		this.floatParent = floatParent;
 		this.classes.push('use-image');
 	};
 
-	Y.extend (Faust.FloatImage, Faust.ViewComponent);
+	Y.extend (Faust.CoveringImage, Faust.FloatVC);
+
+	Faust.StretchingImage = function(type, classes, imageUrl, fixedWidth, fixedHeight, floatParent) {
+			Faust.StretchingImage.superclass.constructor.call(this, classes, floatParent);
+			this.type =  type;
+			this.imageUrl = imageUrl;
+			this.fixedWidth = fixedWidth;
+			this.fixedHeight = fixedHeight;
+			this.coveredVCs = [];
+			this.classes.push('use-image');
+	};
+
+	Y.extend(Faust.StretchingImage, Faust.FloatVC);
 
 
 	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {

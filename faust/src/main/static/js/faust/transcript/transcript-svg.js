@@ -239,7 +239,7 @@ YUI.add('transcript-svg', function (Y) {
 		return Y.SvgUtils.boundingBox(this.textElement, matrix).width;
 	};
 
-	Faust.FloatImage.prototype.createView = function() {
+	Faust.CoveringImage.prototype.createView = function() {
 		this.spanningImage = this.svgDocument().createElementNS(SVG_NS, 'use');
 		this.spanningImage.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
 		this.spanningImage.setAttribute('class', this.type);
@@ -251,11 +251,11 @@ YUI.add('transcript-svg', function (Y) {
 		return result;
 	};
 
-	Faust.FloatImage.prototype.svgContainer = function() {
+	Faust.CoveringImage.prototype.svgContainer = function() {
 		return this.floatParent.view;
 	};
 
-	Faust.FloatImage.prototype.containingRect = function() {
+	Faust.CoveringImage.prototype.containingRect = function() {
 		var that = this;
 		var coveredRects = this.coveredVCs.map(function(vc) {
 			return {
@@ -269,7 +269,7 @@ YUI.add('transcript-svg', function (Y) {
 		return containingRect;
 	}
 
-	Faust.FloatImage.prototype.onRelayout = function() {
+	Faust.CoveringImage.prototype.onRelayout = function() {
 		var containingRect = this.containingRect();
 		// +1 works around a behaviour in firefox where the use element initially has width/height of 0, maybe due to
 		// deferred resource loading
@@ -282,7 +282,7 @@ YUI.add('transcript-svg', function (Y) {
 		this.spanningImage.transform.baseVal.consolidate();
 	};
 
-	Faust.FloatImage.prototype.position = function() {
+	Faust.CoveringImage.prototype.position = function() {
 		var containingRect = this.containingRect();
 		this.setCoord(containingRect.x, this.rotX());
 		this.setCoord(containingRect.y, this.rotY());
