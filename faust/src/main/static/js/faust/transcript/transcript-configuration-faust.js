@@ -61,6 +61,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'choice' : { vc: function(){return new Y.FaustTranscript.InlineViewComponent();}},
 
+				'corr' : { vc: function(){return new Y.FaustTranscript.InlineViewComponent();}},
+
 				'document': {
 
 					vc: function(node, text, layoutState) {

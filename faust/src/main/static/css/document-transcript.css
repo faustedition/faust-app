@@ -69,9 +69,12 @@ svg.diplomatic .text {
 
 /* hidden elements */
 
-svg.diplomatic .element-corr, svg.diplomatic .element-ex, svg.diplomatic .element-expan, svg.diplomatic .element-reg,
-svg.diplomatic .element-rdg {
-    display: none;
+svg.diplomatic .element-corr, svg.diplomatic .element-corr *,
+svg.diplomatic .element-ex, svg.diplomatic .element-ex *,
+svg.diplomatic .element-expan, svg.diplomatic .element-expan *,
+svg.diplomatic .element-reg, svg.diplomatic .element-reg *,
+svg.diplomatic .element-rdg, svg.diplomatic .element-rdg * {
+    display: none !important;
 }
 
 
