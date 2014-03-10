@@ -29,7 +29,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 			//ignore empty annotations at the borders
 				.filter(function(x){var r = x.target().range; return r.start !== r.end});
 
-			var textVC = new Faust.Text(content, textAttrs);
+			var textVC = new Y.FaustTranscript.Text(content, textAttrs);
 
 			// reset custom state of current text representation
 			if (typeof layoutState !== 'undefined')
@@ -94,7 +94,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 					if (nameHandler.vc) {
 						vc = nameHandler.vc(node, text, layoutState);
 					} else {
-						vc = new Faust.InlineViewComponent();
+						vc = new Y.FaustTranscript.InlineViewComponent();
 					}
 				}
 
@@ -105,7 +105,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				Y.each(aligningAttributes, function(a){
 					if (a in node.data()) {
 						if (!vc) {
-							vc = new Faust.InlineViewComponent();
+							vc = new Y.FaustTranscript.InlineViewComponent();
 						}
 						//FIXME id hash hack; do real resolution of references
 						var anchorId = node.data()[a].substring(1);
@@ -121,9 +121,9 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 							function(){
 								var anchor = that.idMap[anchorId];
 								if (!anchor)
-									throw (Faust.ENC_EXC_PREF + "Reference to #" + anchorId + " cannot be resolved!");
+									throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "Reference to #" + anchorId + " cannot be resolved!");
 								var globalCoordRot = coordRot + anchor.globalRotation();
-								vc.setAlign(alignName, new Faust.Align(vc, anchor, globalCoordRot, myJoint, yourJoint, Faust.Align.EXPLICIT));
+								vc.setAlign(alignName, new Y.FaustTranscript.Align(vc, anchor, globalCoordRot, myJoint, yourJoint, Y.FaustTranscript.Align.EXPLICIT));
 							});
 					}						
 				});
@@ -131,11 +131,11 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 				// TODO special treatment of zones
 				if ("rend" in node.data()) {
 					if (node.data()["rend"] == "right") {
-				 		vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 1, 1, Faust.Align.REND_ATTR));
+				 		vc.setAlign("hAlign", new Y.FaustTranscript.Align(vc, parent, parent.globalRotation(), 1, 1, Y.FaustTranscript.Align.REND_ATTR));
 					} else if (node.data()["rend"] == "left") {
-				 		vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0, 0, Faust.Align.REND_ATTR));
+				 		vc.setAlign("hAlign", new Y.FaustTranscript.Align(vc, parent, parent.globalRotation(), 0, 0, Y.FaustTranscript.Align.REND_ATTR));
 					} else if (node.data()["rend"] == "centered") {
-				 		vc.setAlign("hAlign", new Faust.Align(vc, parent, parent.globalRotation(), 0.5, 0.5, Faust.Align.REND_ATTR));
+				 		vc.setAlign("hAlign", new Y.FaustTranscript.Align(vc, parent, parent.globalRotation(), 0.5, 0.5, Y.FaustTranscript.Align.REND_ATTR));
 					}
 
 
@@ -170,7 +170,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 
 				// space at the beginning of each line, to give empty lines height
 				if (node.name().localName == "line") {
-					var emptyProp = new Faust.Text("\u00a0", {noBackground: true});
+					var emptyProp = new Y.FaustTranscript.Text("\u00a0", {noBackground: true});
 					emptyProp.classes.push('noBackground');
 					vc.add (emptyProp);
 				}
@@ -200,7 +200,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 											 Y.Faust.XMLNodeUtils.isDescendant
 											);
 
-			var surfaceVC = new Faust.Surface();
+			var surfaceVC = new Y.FaustTranscript.Surface();
 
 
 			var layoutState = {
@@ -216,7 +216,7 @@ YUI.add('transcript-adhoc-tree', function (Y) {
 		}
 	});
 	
-	Y.mix(Y.namespace("Faust"), {
+	Y.mix(Y.namespace("FaustTranscript"), {
         TranscriptAdhocTree: TranscriptAdhocTree
     });
 	

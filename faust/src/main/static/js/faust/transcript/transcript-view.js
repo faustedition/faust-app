@@ -116,7 +116,7 @@ YUI.add('transcript-view', function (Y) {
 				container.getDOMNode().appendChild(svgRoot);
 
 				try {
-					var documentBuilder = new Y.Faust.TranscriptAdhocTree();
+					var documentBuilder = new Y.FaustTranscript.TranscriptAdhocTree();
 					var visComponent = documentBuilder.transcriptVC(this.get('transcript'));
 					var innerContainer = document.createElementNS(SVG_NS, "g");
 					innerContainer.setAttribute("id", "transcript_container");
@@ -131,7 +131,7 @@ YUI.add('transcript-view', function (Y) {
 					visComponent.render();
 					this.relayout(visComponent, svgRoot, innerContainer, container);
 				} catch (error) {
-					if (typeof error === 'string' && error.substring(0, Faust.ENC_EXC_PREF.length) === Faust.ENC_EXC_PREF)
+					if (typeof error === 'string' && error.substring(0, Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX.length) === Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX)
 						this.displayError(error);
 					else
 						throw (error);
@@ -151,7 +151,7 @@ YUI.add('transcript-view', function (Y) {
 		}
 	});
 
-	Y.mix(Y.namespace("Faust"), {
+	Y.mix(Y.namespace("FaustTranscript"), {
         DiplomaticTranscriptView: DiplomaticTranscriptView
 	});
 	

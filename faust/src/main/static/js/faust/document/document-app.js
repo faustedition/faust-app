@@ -19,8 +19,6 @@
 
 YUI.add('document-app', function (Y) {
 
-	Faust.ENC_EXC_PREF = "ENCODING ERROR: ";
-
 	Y.NavigationModel = Y.Base.create('navigationModel', Y.Model, [], {
 
 	}, {
@@ -229,7 +227,7 @@ YUI.add('document-app', function (Y) {
 
 			var initTranscriptView = function(transcript) {
 					that.removeAjaxLoader(diplomaticContent);
-					var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
+					var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
 						container: diplomaticContainer.one('.diplomaticContent'),
 						transcript: transcript,
 						source: source,

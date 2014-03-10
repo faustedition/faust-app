@@ -19,13 +19,15 @@
 
 YUI.add('transcript', function (Y) {
 
-	Faust.ENC_EXC_PREF = "ENCODING ERROR: ";
-	
-	Faust.ViewComponent = function() {
+	Y.mix(Y.namespace("FaustTranscript"), {
+		ENCODING_EXCEPTION_PREFIX : "ENCODING ERROR: "
+	});
+
+	Y.FaustTranscript.ViewComponent = function() {
 		this.classes = [];
 		this.initViewComponent();
 	};
-	Faust.ViewComponent.prototype = {
+	Y.FaustTranscript.ViewComponent.prototype = {
 		rotation: 0,
 		elementName: '',
 		globalRotation: function () {
@@ -66,7 +68,7 @@ YUI.add('transcript', function (Y) {
 		layout: function() {
 			this.computeDimension();			
 			this.computePosition();
-			var dimensions = new Faust.Dimensions();
+			var dimensions = new Y.FaustTranscript.Dimensions();
 			if (this.children.length <= 0) 
 				dimensions.update(this.x, this.y, this.x + this.width, this.y + this.height);
 			else {
@@ -124,12 +126,12 @@ YUI.add('transcript', function (Y) {
 		
  		defaultAligns: function () {
  		
- 			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotY(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 
  			if (this.previous())
- 				this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 				this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.previous(), this.rotX(), 0, 1, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
  			else
- 				this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 				this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 
 		},
 		setAlign: function (name, align) {
@@ -137,9 +139,9 @@ YUI.add('transcript', function (Y) {
 				
 				if (align.priority === this[name].priority){
 					var xmlId = this.xmlId ? this.xmlId : '';
-					throw(Faust.ENC_EXC_PREF + "Conflicting alignment instructions for element " 
+					throw(Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "Conflicting alignment instructions for element "
 							+ this.elementName + " #" + xmlId + " (" + name + ", " 
-							+ Faust.Align[align.priority] + " )"); 
+							+ Y.FaustTranscript.Align[align.priority] + " )");
 				}
 				else if (align.priority > this[name].priority)
 					this[name] = align;
@@ -149,67 +151,67 @@ YUI.add('transcript', function (Y) {
 		}
 	};
 
-	Faust.BlockViewComponent = function() {
-		Faust.BlockViewComponent.superclass.constructor.call(this);
+	Y.FaustTranscript.BlockViewComponent = function() {
+		Y.FaustTranscript.BlockViewComponent.superclass.constructor.call(this);
 	};
 
-	Y.extend (Faust.BlockViewComponent, Faust.ViewComponent);
+	Y.extend (Y.FaustTranscript.BlockViewComponent, Y.FaustTranscript.ViewComponent);
 
-	Faust.BlockViewComponent.prototype.defaultAligns = function () {
+	Y.FaustTranscript.BlockViewComponent.prototype.defaultAligns = function () {
 		
-		this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+		this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 		
 		if (this.previous())
-			this.setAlign("vAlign", new Faust.Align(this, this.previous(), this.rotY(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.previous(), this.rotY(), 0, 1, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 		else
-			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotY(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
  	};
 
-	Faust.InlineViewComponent = function() {
-		Faust.InlineViewComponent.superclass.constructor.call(this);
+	Y.FaustTranscript.InlineViewComponent = function() {
+		Y.FaustTranscript.InlineViewComponent.superclass.constructor.call(this);
 	};
 
-	Y.extend (Faust.InlineViewComponent, Faust.ViewComponent);
+	Y.extend (Y.FaustTranscript.InlineViewComponent, Y.FaustTranscript.ViewComponent);
 
-	Faust.InlineViewComponent.prototype.defaultAligns = function () {
+	Y.FaustTranscript.InlineViewComponent.prototype.defaultAligns = function () {
 
-		this.setAlign("vAlign", new Faust.NullAlign());
+		this.setAlign("vAlign", new Y.FaustTranscript.NullAlign());
 
 		if (this.previous())
-			this.setAlign("hAlign", new Faust.Align(this, this.previous(), this.rotX(), 0, 1, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.previous(), this.rotX(), 0, 1, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 		else
-			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 	};
 
-	Faust.VSpace = function(height) {
-		Faust.VSpace.superclass.constructor.call(this);
+	Y.FaustTranscript.VSpace = function(height) {
+		Y.FaustTranscript.VSpace.superclass.constructor.call(this);
 		this.vSpaceHeight = height;
 	};
 
-	Y.extend (Faust.VSpace, Faust.BlockViewComponent);
+	Y.extend (Y.FaustTranscript.VSpace, Y.FaustTranscript.BlockViewComponent);
 
 
-	Faust.Patch = function() {
-		Faust.Patch.superclass.constructor.call(this);
+	Y.FaustTranscript.Patch = function() {
+		Y.FaustTranscript.Patch.superclass.constructor.call(this);
 	};
 
-	Y.extend (Faust.Patch, Faust.BlockViewComponent);
+	Y.extend (Y.FaustTranscript.Patch, Y.FaustTranscript.BlockViewComponent);
 
 
-	Faust.HSpace = function(width) {
-		Faust.HSpace.superclass.constructor.call(this);
+	Y.FaustTranscript.HSpace = function(width) {
+		Y.FaustTranscript.HSpace.superclass.constructor.call(this);
 		this.hSpaceWidth = width;
 	};
 	
-	Y.extend (Faust.HSpace, Faust.InlineViewComponent);
+	Y.extend (Y.FaustTranscript.HSpace, Y.FaustTranscript.InlineViewComponent);
 
-	Faust.Surface = function() {
-		Faust.Surface.superclass.constructor.call(this);
+	Y.FaustTranscript.Surface = function() {
+		Y.FaustTranscript.Surface.superclass.constructor.call(this);
 	};
 
-	Y.extend(Faust.Surface, Faust.BlockViewComponent);
+	Y.extend(Y.FaustTranscript.Surface, Y.FaustTranscript.BlockViewComponent);
 
-	Faust.Surface.prototype.position = function() {
+	Y.FaustTranscript.Surface.prototype.position = function() {
 		this.x = 0;
 		this.y = 0;
 		// TODO: surface-specific layout
@@ -217,14 +219,14 @@ YUI.add('transcript', function (Y) {
 
 
 			
-	Faust.Zone = function() {
-		Faust.Zone.superclass.constructor.call(this);
+	Y.FaustTranscript.Zone = function() {
+		Y.FaustTranscript.Zone.superclass.constructor.call(this);
 		this.floats = [];
 	};
 
-	Y.extend(Faust.Zone, Faust.BlockViewComponent);
+	Y.extend(Y.FaustTranscript.Zone, Y.FaustTranscript.BlockViewComponent);
 
-	Faust.Zone.prototype.addFloat = function (vc) {
+	Y.FaustTranscript.Zone.prototype.addFloat = function (vc) {
 		vc.parent = this;
 		vc.pos = this.children.length;
 		this.floats.push(vc);
@@ -232,31 +234,31 @@ YUI.add('transcript', function (Y) {
 		return vc;
 	};
 
-	Faust.Zone.prototype.layout = function() {
-		Faust.Zone.superclass.layout.call(this);
+	Y.FaustTranscript.Zone.prototype.layout = function() {
+		Y.FaustTranscript.Zone.superclass.layout.call(this);
 		Y.each(this.floats, function(float) {
 			float.layout();
 		});
 	}
 	
-	Faust.Line = function(lineAttrs) {
-		Faust.Line.superclass.constructor.call(this);
+	Y.FaustTranscript.Line = function(lineAttrs) {
+		Y.FaustTranscript.Line.superclass.constructor.call(this);
 		this.lineAttrs = lineAttrs;
 	};
 
-	Y.extend(Faust.Line, Faust.ViewComponent);
+	Y.extend(Y.FaustTranscript.Line, Y.FaustTranscript.ViewComponent);
 
-	Faust.Line.prototype.dimension = function() {
+	Y.FaustTranscript.Line.prototype.dimension = function() {
 	};
 
- 	Faust.Line.prototype.defaultAligns = function () {
+ 	Y.FaustTranscript.Line.prototype.defaultAligns = function () {
 			
 		if ("indent" in this.lineAttrs) 
- 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, this.lineAttrs["indent"], Faust.Align.INDENT_ATTR));
+ 			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, this.lineAttrs["indent"], Y.FaustTranscript.Align.INDENT_ATTR));
 		else if ("indentCenter" in this.lineAttrs)
-			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0.5, this.lineAttrs["indentCenter"], Faust.Align.INDENT_CENTER_ATTR));
+			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0.5, this.lineAttrs["indentCenter"], Y.FaustTranscript.Align.INDENT_CENTER_ATTR));
 		else
- 			this.setAlign("hAlign", new Faust.Align(this, this.parent, this.rotX(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+ 			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 
  		
 		if (this.previous()) {
@@ -270,37 +272,37 @@ YUI.add('transcript', function (Y) {
 				yourJoint = ("over" in this.lineAttrs)? 0.5 : yourJoint;
 			}
 									
-			this.setAlign("vAlign", new Faust.Align(this, this.previous(), this.rotY(), 0, yourJoint, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.previous(), this.rotY(), 0, yourJoint, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 		}
 		else
-			this.setAlign("vAlign", new Faust.Align(this, this.parent, this.rotY(), 0, 0, Faust.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotY(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 	};
 
-	Faust.Text = function(text) {
-		Faust.Text.superclass.constructor.call(this);
+	Y.FaustTranscript.Text = function(text) {
+		Y.FaustTranscript.Text.superclass.constructor.call(this);
 		this.decorations = [];
 		this.text = text.replace(/\s+/g, "\u00a0");
 		this.textElement = null;
 	};
 
-	Y.extend(Faust.Text, Faust.InlineViewComponent);
+	Y.extend(Y.FaustTranscript.Text, Y.FaustTranscript.InlineViewComponent);
 
-	Faust.Text.prototype.dimension = function() {
+	Y.FaustTranscript.Text.prototype.dimension = function() {
 		var measured = this.measure();
 		this.width = measured.width;
 		this.height = measured.height;
 	};
 
-	Faust.FloatVC = function(classes, floatParent) {
-		Faust.FloatVC.superclass.constructor.call(this);
+	Y.FaustTranscript.FloatVC = function(classes, floatParent) {
+		Y.FaustTranscript.FloatVC.superclass.constructor.call(this);
 		this.classes = this.classes.concat(classes);
 		this.floatParent = floatParent;
 	};
 
-	Y.extend (Faust.FloatVC, Faust.ViewComponent);
+	Y.extend (Y.FaustTranscript.FloatVC, Y.FaustTranscript.ViewComponent);
 
-	Faust.CoveringImage = function(type, classes, imageUrl, fixedWidth, fixedHeight, floatParent) {
-		Faust.CoveringImage.superclass.constructor.call(this, classes, floatParent);
+	Y.FaustTranscript.CoveringImage = function(type, classes, imageUrl, fixedWidth, fixedHeight, floatParent) {
+		Y.FaustTranscript.CoveringImage.superclass.constructor.call(this, classes, floatParent);
 		this.type =  type;
 		this.imageUrl = imageUrl;
 		this.fixedWidth = fixedWidth;
@@ -309,10 +311,10 @@ YUI.add('transcript', function (Y) {
 		this.classes.push('use-image');
 	};
 
-	Y.extend (Faust.CoveringImage, Faust.FloatVC);
+	Y.extend (Y.FaustTranscript.CoveringImage, Y.FaustTranscript.FloatVC);
 
-	Faust.StretchingImage = function(type, classes, imageUrl, fixedWidth, fixedHeight, floatParent) {
-			Faust.StretchingImage.superclass.constructor.call(this, classes, floatParent);
+	Y.FaustTranscript.StretchingImage = function(type, classes, imageUrl, fixedWidth, fixedHeight, floatParent) {
+			Y.FaustTranscript.StretchingImage.superclass.constructor.call(this, classes, floatParent);
 			this.type =  type;
 			this.imageUrl = imageUrl;
 			this.fixedWidth = fixedWidth;
@@ -321,11 +323,11 @@ YUI.add('transcript', function (Y) {
 			this.classes.push('use-image');
 	};
 
-	Y.extend(Faust.StretchingImage, Faust.FloatVC);
+	Y.extend(Y.FaustTranscript.StretchingImage, Y.FaustTranscript.FloatVC);
 
 
-	Faust.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
-		Faust.SpanningVC.superclass.constructor.call(this);
+	Y.FaustTranscript.SpanningVC = function(type, imageUrl, imageWidth, imageHeight, fixedWidth, fixedHeight) {
+		Y.FaustTranscript.SpanningVC.superclass.constructor.call(this);
 		this.type =  type;
 		this.imageUrl = imageUrl;
 		this.imageWidth = imageWidth;
@@ -335,33 +337,33 @@ YUI.add('transcript', function (Y) {
 		this.classes.push('use-image');
 	};
 
-	Y.extend (Faust.SpanningVC, Faust.ViewComponent);
+	Y.extend (Y.FaustTranscript.SpanningVC, Y.FaustTranscript.ViewComponent);
 
-	Faust.InlineDecoration = function(classes) {
-		Faust.InlineDecoration.superclass.constructor.call(this);
+	Y.FaustTranscript.InlineDecoration = function(classes) {
+		Y.FaustTranscript.InlineDecoration.superclass.constructor.call(this);
 		this.classes = this.classes.concat(classes);
 		this.classes.push('inline-decoration');
 	};
 
-	Y.extend (Faust.InlineDecoration, Faust.InlineViewComponent);
+	Y.extend (Y.FaustTranscript.InlineDecoration, Y.FaustTranscript.InlineViewComponent);
 
-	Faust.RectInlineDecoration = function(classes) {
-		Faust.RectInlineDecoration.superclass.constructor.call(this);
+	Y.FaustTranscript.RectInlineDecoration = function(classes) {
+		Y.FaustTranscript.RectInlineDecoration.superclass.constructor.call(this);
 		this.classes.push('inline-decoration-type-rect');
 	};
 
-	Y.extend (Faust.RectInlineDecoration, Faust.InlineDecoration);
+	Y.extend (Y.FaustTranscript.RectInlineDecoration, Y.FaustTranscript.InlineDecoration);
 
-	Faust.CircleInlineDecoration = function(classes) {
-		Faust.CircleInlineDecoration.superclass.constructor.call(this);
+	Y.FaustTranscript.CircleInlineDecoration = function(classes) {
+		Y.FaustTranscript.CircleInlineDecoration.superclass.constructor.call(this);
 		this.classes.push('inline-decoration-type-circle');
 	};
 
-	Y.extend (Faust.CircleInlineDecoration, Faust.InlineDecoration);
+	Y.extend (Y.FaustTranscript.CircleInlineDecoration, Y.FaustTranscript.InlineDecoration);
 
 
-	Faust.InlineGraphic = function(type, imageUrl, imageWidth, imageHeight, displayWidth, displayHeight) {
-		Faust.InlineGraphic.superclass.constructor.call(this);
+	Y.FaustTranscript.InlineGraphic = function(type, imageUrl, imageWidth, imageHeight, displayWidth, displayHeight) {
+		Y.FaustTranscript.InlineGraphic.superclass.constructor.call(this);
 		this.type =  type;
 		this.imageUrl = imageUrl;
 		this.imageWidth = imageWidth;
@@ -371,58 +373,58 @@ YUI.add('transcript', function (Y) {
 		this.classes.push('use-image');
 	};
 
-	Y.extend (Faust.InlineGraphic, Faust.InlineViewComponent);
+	Y.extend (Y.FaustTranscript.InlineGraphic, Y.FaustTranscript.InlineViewComponent);
 
-	Faust.GLine = function() {
-		Faust.GLine.superclass.constructor.call(this);
+	Y.FaustTranscript.GLine = function() {
+		Y.FaustTranscript.GLine.superclass.constructor.call(this);
 	};
 
-	Y.extend(Faust.GLine, Faust.ViewComponent);
+	Y.extend(Y.FaustTranscript.GLine, Y.FaustTranscript.ViewComponent);
 
-	Faust.GLine.prototype.dimension = function() {
+	Y.FaustTranscript.GLine.prototype.dimension = function() {
 		this.width = 40;
 		this.height = 20;
 	};
 
 
-	Faust.GBrace = function() {
-		Faust.GBrace.superclass.constructor.call(this);
+	Y.FaustTranscript.GBrace = function() {
+		Y.FaustTranscript.GBrace.superclass.constructor.call(this);
 	};
 
-	Y.extend(Faust.GBrace, Faust.ViewComponent);
+	Y.extend(Y.FaustTranscript.GBrace, Y.FaustTranscript.ViewComponent);
 
-	Faust.GBrace.prototype.dimension = function() {
+	Y.FaustTranscript.GBrace.prototype.dimension = function() {
 		this.width = 40;
 		this.height = 20;
 	};
 
-	Faust.TextDecoration = function(text, classes) {
+	Y.FaustTranscript.TextDecoration = function(text, classes) {
 		this.text = text;
 		this.classes = classes;
 		this.classes.push('text-decoration');
 	};
 
-	Faust.TextDecoration.prototype.layout = function() {};
+	Y.FaustTranscript.TextDecoration.prototype.layout = function() {};
 
-	Faust.NullDecoration = function(text, classes, name) {
-		Faust.NullDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
+	Y.FaustTranscript.NullDecoration = function(text, classes, name) {
+		Y.FaustTranscript.NullDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
 	}
-	Y.extend(Faust.NullDecoration, Faust.TextDecoration);
+	Y.extend(Y.FaustTranscript.NullDecoration, Y.FaustTranscript.TextDecoration);
 
-	Faust.LineDecoration = function(text, classes, name, yOffset) {
-		Faust.LineDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
+	Y.FaustTranscript.LineDecoration = function(text, classes, name, yOffset) {
+		Y.FaustTranscript.LineDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
 		this.yOffset = yOffset;
 	}
-	Y.extend(Faust.LineDecoration, Faust.TextDecoration);
+	Y.extend(Y.FaustTranscript.LineDecoration, Y.FaustTranscript.TextDecoration);
 
-	Faust.CloneDecoration = function(text, classes, name, xOffset, yOffset) {
-		Faust.CloneDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
+	Y.FaustTranscript.CloneDecoration = function(text, classes, name, xOffset, yOffset) {
+		Y.FaustTranscript.CloneDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
 		this.xOffset = xOffset;
 		this.yOffset = yOffset;
 	}
-	Y.extend(Faust.CloneDecoration, Faust.TextDecoration);
+	Y.extend(Y.FaustTranscript.CloneDecoration, Y.FaustTranscript.TextDecoration);
 
-	Faust.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
+	Y.FaustTranscript.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {
 		this.me = me;
 		this.you = you;
 		this.coordRotation = coordRotation;
@@ -431,50 +433,50 @@ YUI.add('transcript', function (Y) {
 		this.priority = priority;
 	};
 	
-	Faust.Align.IMPLICIT_BY_DOC_ORDER = 0;
-	Faust.Align['0'] = 'IMPLICIT_BY_DOC_ORDER';
-	Faust.Align.REND_ATTR = 5;
-	Faust.Align['5'] = 'REND_ATTR';
-	Faust.Align.INDENT_ATTR = 7;
-	Faust.Align['7'] = 'INDENT_ATTR';
-	Faust.Align.INDENT_ATTR = 7;
-	Faust.Align['8'] = 'INDENT_CENTER_ATTR';
-	Faust.Align.EXPLICIT = 10;	
-	Faust.Align['10'] = 'EXPLICIT';
-	Faust.Align.MAIN_ZONE = 15;	
-	Faust.Align['15'] = 'MAIN_ZONE';
+	Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER = 0;
+	Y.FaustTranscript.Align['0'] = 'IMPLICIT_BY_DOC_ORDER';
+	Y.FaustTranscript.Align.REND_ATTR = 5;
+	Y.FaustTranscript.Align['5'] = 'REND_ATTR';
+	Y.FaustTranscript.Align.INDENT_ATTR = 7;
+	Y.FaustTranscript.Align['7'] = 'INDENT_ATTR';
+	Y.FaustTranscript.Align.INDENT_ATTR = 7;
+	Y.FaustTranscript.Align['8'] = 'INDENT_CENTER_ATTR';
+	Y.FaustTranscript.Align.EXPLICIT = 10;
+	Y.FaustTranscript.Align['10'] = 'EXPLICIT';
+	Y.FaustTranscript.Align.MAIN_ZONE = 15;
+	Y.FaustTranscript.Align['15'] = 'MAIN_ZONE';
 
 	
-	Faust.Align.prototype.align = function() {
+	Y.FaustTranscript.Align.prototype.align = function() {
 		var value = this.you.getCoord(this.coordRotation);
 		value -= this.myJoint * this.me.getExt(this.coordRotation);
 		value += this.yourJoint * this.you.getExt(this.coordRotation);
 		this.me.setCoord(value, this.coordRotation);
 	};
 
-	Faust.AbsoluteAlign = function (me, coordRotation, coordinate, priority) {
+	Y.FaustTranscript.AbsoluteAlign = function (me, coordRotation, coordinate, priority) {
 		this.me = me;
 		this.coordRotation = coordRotation;
 		this.coordinate = coordinate;
 		this.priority = priority;
 	};
 	
-	Faust.AbsoluteAlign.prototype.align = function() {
+	Y.FaustTranscript.AbsoluteAlign.prototype.align = function() {
 		this.me.setCoord(this.coordinate, this.coordRotation);
 	};
 
-	Faust.NullAlign = function (priority) {
+	Y.FaustTranscript.NullAlign = function (priority) {
 		this.priority = priority;
 	};
 
-	Faust.NullAlign.prototype.align = function() {
+	Y.FaustTranscript.NullAlign.prototype.align = function() {
 	};
 
-	Faust.Dimensions = function() {};
+	Y.FaustTranscript.Dimensions = function() {};
 
-	Faust.Dimensions.prototype = function() {};
+	Y.FaustTranscript.Dimensions.prototype = function() {};
 	
-	Faust.Dimensions.prototype.update = function(xMin, yMin, xMax, yMax) {
+	Y.FaustTranscript.Dimensions.prototype.update = function(xMin, yMin, xMax, yMax) {
 
 		if (!this.xMin || this.xMin > xMin )
 			this.xMin = xMin;

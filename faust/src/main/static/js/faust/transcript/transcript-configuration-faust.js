@@ -53,24 +53,24 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						//use empty text element as an anchor
 						// FIXME make proper phrase/block context differentiation
 						if (node.parent.name().localName === "zone")
-							return new Faust.Line([]);
+							return new Y.FaustTranscript.Line([]);
 						else
-							return new Faust.Text("", {});
+							return new Y.FaustTranscript.Text("", {});
 					}
 				},
 
-				'choice' : { vc: function(){return new Faust.InlineViewComponent();}},
+				'choice' : { vc: function(){return new Y.FaustTranscript.InlineViewComponent();}},
 
 				'document': {
 
 					vc: function(node, text, layoutState) {
-						return new Faust.Surface();
+						return new Y.FaustTranscript.Surface();
 					}
 				},
 
-				'ex' : { vc: function(){return new Faust.InlineViewComponent();}},
+				'ex' : { vc: function(){return new Y.FaustTranscript.InlineViewComponent();}},
 
-				'expan' : { vc: function(){return new Faust.InlineViewComponent();}},
+				'expan' : { vc: function(){return new Y.FaustTranscript.InlineViewComponent();}},
 
 				'gap': {
 					vc:  function(node, text, layoutState) {
@@ -107,11 +107,11 @@ YUI.add('transcript-configuration-faust', function (Y) {
 										annotationEnd, text, layoutState);
 
 								} else {
-									throw (Faust.ENC_EXC_PREF + "Please specify either @qunatity or @atLeast");
+									throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "Please specify either @qunatity or @atLeast");
 								}
 								break;
 							default:
-								throw (Faust.ENC_EXC_PREF + "Invalid unit for gap element! Use 'chars'!");
+								throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "Invalid unit for gap element! Use 'chars'!");
 						}
 					}
 				},
@@ -123,7 +123,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 //					vc: function(node, text, layoutState) {
 //						var imgPath = cp + '/static/img/transcript/';
 //						var imgFilename = 'grLineDiagonalFalling.svg#img';
-//						var float = new Faust.CoveringImage('grBrace', [], imgPath + imgFilename,
+//						var float = new Y.FaustTranscript.CoveringImage('grBrace', [], imgPath + imgFilename,
 //							100, 100, layoutState.rootVC);
 //						layoutState.currentZone.addFloat(float);
 //						return null;
@@ -142,36 +142,36 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (node.data()['f:style'] == 'curly') {
 							if (node.data()['f:orient'] == 'horiz') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine', imgPath + 'grLineCurlyHorizontal.svg#img', 100, 100, 20 * EM, 2 * EM);
+									return new Y.FaustTranscript.InlineGraphic('grLine', imgPath + 'grLineCurlyHorizontal.svg#img', 100, 100, 20 * EM, 2 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine',imgPath + 'grLineCurlyHorizontal.svg#img',	100, 100, width, height);
+									return new Y.FaustTranscript.SpanningVC('grLine',imgPath + 'grLineCurlyHorizontal.svg#img',	100, 100, width, height);
 								}
 							} else if (node.data()['f:orient'] == 'vert') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
+									return new Y.FaustTranscript.InlineGraphic('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
 								} else {
-									return new Faust.SpanningVC('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
+									return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
 								}
 							}
 						} else if (node.data()['f:style'] == 'linear') {
 							if (node.data()['f:orient'] == 'horiz') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, 10 * EM, 2 * EM);
+									return new Y.FaustTranscript.InlineGraphic('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, 10 * EM, 2 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, null, 2 * EM);
+									return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, null, 2 * EM);
 								}
 							} else if (node.data()['f:orient'] == 'vert') {
 								if (inline) {
-									return new Faust.InlineGraphic('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, 1 * EM, 2 * EM);
+									return new Y.FaustTranscript.InlineGraphic('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, 1 * EM, 2 * EM);
 								} else {
-									return new Faust.SpanningVC('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, null, 2 * EM);
+									return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, null, 2 * EM);
 								}
 							}
 						} else if (node.data()['f:style'] == 's-left-right') {
 							if (inline) {
-								throw (Faust.ENC_EXC_PREF + "S-curve can't be inline!");
+								throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "S-curve can't be inline!");
 							} else {
-								return new Faust.SpanningVC('grLine', imgPath + 'grLineSLeftRight.svg#img', 100, 100, null, null);
+								return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineSLeftRight.svg#img', 100, 100, null, null);
 							}
 						}
 					}
@@ -198,9 +198,9 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (node.data()["rend"]) {
 							var rendTokens = node.data()["rend"].split(' ');
 							if (rendTokens.indexOf("frame") >= 0) {
-								return new Faust.RectInlineDecoration(handClasses);
+								return new Y.FaustTranscript.RectInlineDecoration(handClasses);
 							} else if (rendTokens.indexOf("circle") >= 0) {
-								return new Faust.CircleInlineDecoration(handClasses);
+								return new Y.FaustTranscript.CircleInlineDecoration(handClasses);
 							}
 						}
 					},
@@ -216,15 +216,15 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							}
 
 							if (rendTokens.indexOf("underline") >= 0) {
-								var underline = new Faust.LineDecoration(textVC, handClasses, 'underline', 0.1);
+								var underline = new Y.FaustTranscript.LineDecoration(textVC, handClasses, 'underline', 0.1);
 								textVC.decorations.push(underline);
 							}
 							if (rendTokens.indexOf("underdots") >= 0) {
-								var underdots = new Faust.LineDecoration(textVC, handClasses, 'underdots', 0.2);
+								var underdots = new Y.FaustTranscript.LineDecoration(textVC, handClasses, 'underdots', 0.2);
 								textVC.decorations.push(underdots);
 							}
 							if (rendTokens.indexOf("overline") >= 0) {
-								var overline = new Faust.LineDecoration(textVC, handClasses, 'overline', -0.7);
+								var overline = new Y.FaustTranscript.LineDecoration(textVC, handClasses, 'overline', -0.7);
 								textVC.decorations.push(overline);
 							}
 
@@ -244,11 +244,11 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							case "chars":
 								if (node.data()['quantity']) {
 									var width = String(node.data()['quantity']);
-									return new Faust.HSpace(width);
-								} else throw (Faust.ENC_EXC_PREF + "f:hspace: Please specify @qunatity");
+									return new Y.FaustTranscript.HSpace(width);
+								} else throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "f:hspace: Please specify @qunatity");
 								break;
 							default:
-								throw (Faust.ENC_EXC_PREF + "Invalid unit for hspace element! Use 'chars'!");
+								throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "Invalid unit for hspace element! Use 'chars'!");
 						}
 					}
 				},
@@ -257,7 +257,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					vc: function(node, text, layoutState) {
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
-						var vc = new Faust.InlineViewComponent();
+						var vc = new Y.FaustTranscript.InlineViewComponent();
 						// insertion mark
 						if (node.data()["f:orient"] === "right") {
 							var insertionSign = node.data()['f:at'].substring(1) in layoutState.idMap ? "\u230a" : "\u2308";
@@ -303,7 +303,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (position.indexOf("between") >= 0)
 							lineAttrs.between = true;
 
-						return new Faust.Line(lineAttrs);
+						return new Y.FaustTranscript.Line(lineAttrs);
 					},
 					text: function(annotation, textVC) {
 						var fontsize = ((annotation.data["type"] || "").indexOf("inter") >= 0 ? "interline" : "normal");
@@ -313,9 +313,9 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'over' : {text: function(annotation, textVC){ textVC.classes.push('over'); }},
 
-				'overw' : {vc: function() {return new Faust.InlineViewComponent();}},
+				'overw' : {vc: function() {return new Y.FaustTranscript.InlineViewComponent();}},
 
-				'patch' : { vc: function(){return new Faust.Patch();}},
+				'patch' : { vc: function(){return new Y.FaustTranscript.Patch();}},
 
 				'point' : {
 					vc: function (node, text, layoutState) {
@@ -326,13 +326,13 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (typeof layoutState.grBraceVCs === 'undefined') {layoutState.grBraceVCs = {};}
 						if (!(grBraceAnnotation.id in layoutState.grBraceVCs)) {
 							var imgPath = cp + '/static/img/transcript/';
-							var grBraceVC = new Faust.CoveringImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
+							var grBraceVC = new Y.FaustTranscript.CoveringImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
 								100, 100, layoutState.rootVC);
 							layoutState.grBraceVCs[grBraceAnnotation.id] = grBraceVC;
 							layoutState.currentZone.addFloat(grBraceVC);
 						}
 
-						var pointVC = new Faust.Text('O', {});
+						var pointVC = new Y.FaustTranscript.Text('O', {});
 						layoutState.grBraceVCs[grBraceAnnotation.id].coveredVCs.push(pointVC);
 						layoutState.currentZone.addFloat(pointVC);
 
@@ -340,12 +340,12 @@ YUI.add('transcript-configuration-faust', function (Y) {
 					}
 				},
 
-				'rdg' : { vc: function(){return new Faust.InlineViewComponent();}},
+				'rdg' : { vc: function(){return new Y.FaustTranscript.InlineViewComponent();}},
 
 				'rewrite' : {
 
 					text: function (annotation, textVC, layoutState) {
-						var rewrite = new Faust.CloneDecoration(textVC, [], 'rewrite', 0.005, -0.005);
+						var rewrite = new Y.FaustTranscript.CloneDecoration(textVC, [], 'rewrite', 0.005, -0.005);
 						textVC.decorations.push(rewrite);
 
 					}
@@ -353,7 +353,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'seg' : {
 
-					vc: function() {return new Faust.InlineViewComponent();},
+					vc: function() {return new Y.FaustTranscript.InlineViewComponent();},
 
 					text : function (annotation, textVC, layoutState) {
 						if (annotation.data['rend']) {
@@ -383,13 +383,13 @@ YUI.add('transcript-configuration-faust', function (Y) {
 								var imgPath = cp + '/static/img/transcript/';
 								var imgFilename = rendTokens.indexOf('vertical') >= 0 ? 'grLineStraightVertical.svg#img'
 									:'grLineDiagonalFalling.svg#img';
-								var stVertVC = new Faust.CoveringImage('grLine', classes, imgPath + imgFilename,
+								var stVertVC = new Y.FaustTranscript.CoveringImage('grLine', classes, imgPath + imgFilename,
 									100, 100, layoutState.rootVC);
 
 								layoutState.stVertVCs[annotation.id] = stVertVC;
 								layoutState.currentZone.addFloat(stVertVC);
 
-								var decoration = new Faust.NullDecoration(textVC, classes, 'strikethrough');
+								var decoration = new Y.FaustTranscript.NullDecoration(textVC, classes, 'strikethrough');
 								textVC.decorations.push(decoration);
 							}
 							layoutState.stVertVCs[annotation.id].coveredVCs.push(textVC);
@@ -405,11 +405,11 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 							if (rendTokens.indexOf('erase') >= 0) {
 								textVC.classes.push('erase');
-								var decoration = new Faust.CloneDecoration(textVC, [], 'erase', 0, 0);
+								var decoration = new Y.FaustTranscript.CloneDecoration(textVC, [], 'erase', 0, 0);
 								textVC.decorations.push(decoration);
 
 							} else {
-								var decoration = new Faust.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
+								var decoration = new Y.FaustTranscript.LineDecoration(textVC, classes, 'strikethrough', -0.2 - yOffset);
 								textVC.decorations.push(decoration);
 							}
 
@@ -424,7 +424,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
-						var vc = new Faust.InlineViewComponent();
+						var vc = new Y.FaustTranscript.InlineViewComponent();
 						vc.add (Y.Faust.TranscriptLayout.createText('[', annotationStart, annotationEnd, text,
 							layoutState));
 						return vc;
@@ -439,13 +439,13 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'surface': {
 					vc: function(node, text, layoutState) {
-						return new Faust.Surface();
+						return new Y.FaustTranscript.Surface();
 					}
 				},
 
 				'treeRoot': {
 					vc: function(node, text, layoutState) {
-						return new Faust.Surface();
+						return new Y.FaustTranscript.Surface();
 					}
 				},
 
@@ -455,7 +455,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 						var annotationStart = node.annotation.target().range.start;
 						var annotationEnd = node.annotation.target().range.end;
-						var vc = new Faust.InlineViewComponent();
+						var vc = new Y.FaustTranscript.InlineViewComponent();
 						var startMarker = node.data()['cert'] == 'low' ? '{{' : '{';
 						var certainty = node.data()['cert'] == 'low' ? 'low' : 'high';
 						vc.classes.push('unclear-cert-' + certainty);
@@ -496,7 +496,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (typeof layoutState.usedVCs === 'undefined') {layoutState.usedVCs = {};}
 						if (!(annotation.id in layoutState.usedVCs)) {
 							var imgPath = cp + '/static/img/transcript/';
-							var usedVC = new Faust.CoveringImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
+							var usedVC = new Y.FaustTranscript.CoveringImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
 								100, 100, layoutState.rootVC);
 							layoutState.usedVCs[annotation.id] = usedVC;
 							layoutState.currentZone.addFloat(usedVC);
@@ -513,28 +513,28 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						switch (node.data()["unit"]) {
 							case "lines":
 								if (node.data()['quantity']) {
-									return new Faust.VSpace(node.data()['quantity']);
-								} else throw (Faust.ENC_EXC_PREF + "f:vspace: Please specify @qunatity");
+									return new Y.FaustTranscript.VSpace(node.data()['quantity']);
+								} else throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "f:vspace: Please specify @qunatity");
 								break;
 							default:
-								throw (Faust.ENC_EXC_PREF + "Invalid unit for vspace element! Use 'lines'!");
+								throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "Invalid unit for vspace element! Use 'lines'!");
 						}
 					}
 				},
 
 				'zone':  { 
 					vc: function(node, text, layoutState) {
-						var vc = new Faust.Zone();
+						var vc = new Y.FaustTranscript.Zone();
 						if ("rotate" in node.data()) 
 							vc.rotation = parseInt(node.data()["rotate"]);
 						if ("type" in node.data() && node.data()["type"] == "main") {
 							if (layoutState.mainZone)
-								throw (Faust.ENC_EXC_PREF + "More than one main zone specified!");
+								throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "More than one main zone specified!");
 							else {
 								layoutState.mainZone = vc;
 								// main zone is absolutely anchored
-								vc.setAlign('hAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
-								vc.setAlign('vAlign', new Faust.AbsoluteAlign(vc, 0, 0, Faust.Align.MAIN_ZONE));
+								vc.setAlign('hAlign', new Y.FaustTranscript.AbsoluteAlign(vc, 0, 0, Y.FaustTranscript.Align.MAIN_ZONE));
+								vc.setAlign('vAlign', new Y.FaustTranscript.AbsoluteAlign(vc, 0, 0, Y.FaustTranscript.Align.MAIN_ZONE));
 							}
 						}
 						layoutState.currentZone = vc;

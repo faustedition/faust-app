@@ -28,25 +28,25 @@ YUI.add('transcript-svg', function (Y) {
 	// size, so in theory this could be exchanged with say a 
 	// HTML / CSS Transforms implementation
 
-	Faust.ViewComponent.prototype.getCoord = function(coordRotation) {
+	Y.FaustTranscript.ViewComponent.prototype.getCoord = function(coordRotation) {
 		var matrix = this.view.viewportElement.createSVGMatrix();
 		matrix = matrix.rotate(coordRotation);
 		return Y.SvgUtils.boundingBox(this.view, matrix).x;
 	};
 
-	Faust.ViewComponent.prototype.getExt = function(coordRotation) {
+	Y.FaustTranscript.ViewComponent.prototype.getExt = function(coordRotation) {
 		var matrix = this.view.viewportElement.createSVGMatrix();
 		matrix = matrix.rotate(coordRotation);
 		return Y.SvgUtils.boundingBox(this.view, matrix).width;
 	};
 
-	Faust.ViewComponent.prototype.wrap = function(view) {
+	Y.FaustTranscript.ViewComponent.prototype.wrap = function(view) {
 		var wrapper = this.svgDocument().createElementNS(SVG_NS, "g");
 		wrapper.appendChild(view);
 		return wrapper;
 	};
 
-	Faust.ViewComponent.prototype.setCoord = function(coord, coordRotation) {
+	Y.FaustTranscript.ViewComponent.prototype.setCoord = function(coord, coordRotation) {
 		
 		var myRot = this.globalRotation();
 		var myRotMx = this.view.viewportElement.createSVGMatrix().rotate(myRot);
@@ -68,14 +68,14 @@ YUI.add('transcript-svg', function (Y) {
 		this.view.transform.baseVal.consolidate();
 	};
 
-	Faust.ViewComponent.prototype.rotate = function(deg) {
+	Y.FaustTranscript.ViewComponent.prototype.rotate = function(deg) {
 		var matrix = this.view.viewportElement.createSVGMatrix();
 		matrix = matrix.rotate(deg);
 		var transform = this.view.viewportElement.createSVGTransformFromMatrix(matrix);
 		this.view.transform.baseVal.insertItemBefore(transform, 0);		
 	};
 	
-	Faust.ViewComponent.prototype.svgContainer = function() {
+	Y.FaustTranscript.ViewComponent.prototype.svgContainer = function() {
 		if (this.parent)
 			if (this.parent.view)
 				return this.parent.view;
@@ -88,14 +88,14 @@ YUI.add('transcript-svg', function (Y) {
 			throw ('Cannot find SVG container for view component');
 	};
 	
-	Faust.ViewComponent.prototype.svgDocument = function() {
+	Y.FaustTranscript.ViewComponent.prototype.svgDocument = function() {
 		return document;
 	};
 
-	Faust.ViewComponent.prototype.onRelayout = function() {
+	Y.FaustTranscript.ViewComponent.prototype.onRelayout = function() {
 	};
 	
-	Faust.ViewComponent.prototype.render = function() {
+	Y.FaustTranscript.ViewComponent.prototype.render = function() {
 		this.view = this.createView();
 		this.view.setAttribute('class', this.getClassesString());
 		this.svgContainer().appendChild(this.view);
@@ -103,26 +103,26 @@ YUI.add('transcript-svg', function (Y) {
 		Y.each(this.children, function(c) { c.render(); });
 	};
 
-	Faust.ViewComponent.prototype.measure = function() {
+	Y.FaustTranscript.ViewComponent.prototype.measure = function() {
 		var bbox = this.view.getBBox();
 		return { width: Math.round(bbox.width), height: Math.round(bbox.height)};		
 	};
 
-	Faust.ViewComponent.prototype.getClassesString = function() {
+	Y.FaustTranscript.ViewComponent.prototype.getClassesString = function() {
 		return this.computeClasses().join(' ');
 	};
 	
-	Faust.BlockViewComponent.prototype.createView = function() {
+	Y.FaustTranscript.BlockViewComponent.prototype.createView = function() {
 		var view = this.svgDocument().createElementNS(SVG_NS, "g");
 		return view;
 	};
 
-	Faust.InlineViewComponent.prototype.createView = function() {
+	Y.FaustTranscript.InlineViewComponent.prototype.createView = function() {
 		var view = this.svgDocument().createElementNS(SVG_NS, "g");
 		return view;
 	};
 
-	Faust.Patch.prototype.createView = function() {
+	Y.FaustTranscript.Patch.prototype.createView = function() {
 		this.patchBackground = this.svgDocument().createElementNS(SVG_NS, "rect");
 		this.svgContainer().appendChild(this.patchBackground);
 		this.patchBackground.setAttribute("class", "patchBackground " + this.getClassesString());
@@ -131,7 +131,7 @@ YUI.add('transcript-svg', function (Y) {
 		return this.view;
 	}
 
-	Faust.Patch.prototype.onRelayout = function() {
+	Y.FaustTranscript.Patch.prototype.onRelayout = function() {
 		var bbox = this.view.getBBox();
 		this.patchBackground.setAttribute("x", bbox.x);
 		this.patchBackground.setAttribute("y", bbox.y);
@@ -140,7 +140,7 @@ YUI.add('transcript-svg', function (Y) {
 		this.patchBackground.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 	}
 
-	Faust.VSpace.prototype.createView = function() {
+	Y.FaustTranscript.VSpace.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "rect");
 		result.setAttribute('class', 'VSpace');
 		result.setAttribute('width', '0.1em');
@@ -151,7 +151,7 @@ YUI.add('transcript-svg', function (Y) {
 		return result;
 	};
 
-	Faust.HSpace.prototype.createView = function() {
+	Y.FaustTranscript.HSpace.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "rect");
 		result.setAttribute('class', 'HSpace');
 		result.setAttribute('height', '0.1em');
@@ -162,18 +162,18 @@ YUI.add('transcript-svg', function (Y) {
 		return result;
 	};
 
-	Faust.Surface.prototype.createView = function() {
+	Y.FaustTranscript.Surface.prototype.createView = function() {
 		var surface = this.svgDocument().createElementNS(SVG_NS, "g");
 		surface.setAttribute('class', 'Surface');
 		return surface;
 	};
 
-	Faust.Zone.prototype.render = function() {
-		Faust.Zone.superclass.render.call(this);
+	Y.FaustTranscript.Zone.prototype.render = function() {
+		Y.FaustTranscript.Zone.superclass.render.call(this);
 		Y.each(this.floats, function(float) { float.render(); });
 	};
 
-	Faust.Zone.prototype.createView = function() {
+	Y.FaustTranscript.Zone.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "g");
 //		var box0 = this.svgDocument().createElementNS(SVG_NS, 'rect');
 //		box0.setAttribute('class', 'ZoneDot');
@@ -189,12 +189,12 @@ YUI.add('transcript-svg', function (Y) {
 		return result;
 	};
 	
-	Faust.Line.prototype.createView = function() {
+	Y.FaustTranscript.Line.prototype.createView = function() {
 		var line = this.svgDocument().createElementNS(SVG_NS, "g");
 		return line;
 	};
 
-	Faust.Text.prototype.createView = function() {
+	Y.FaustTranscript.Text.prototype.createView = function() {
 		// wrapper will contain text decorations
 		var wrapper = this.svgDocument().createElementNS(SVG_NS, "g");
 		wrapper.setAttribute('class', 'text-wrapper');
@@ -205,7 +205,7 @@ YUI.add('transcript-svg', function (Y) {
 		return wrapper;
 	};
 	
-	Faust.Text.prototype.onRelayout = function() {
+	Y.FaustTranscript.Text.prototype.onRelayout = function() {
 
 		var bbox = this.view.getBBox();
 		this.bgBox.setAttribute("x", bbox.x);
@@ -217,7 +217,7 @@ YUI.add('transcript-svg', function (Y) {
 		Y.each (this.decorations, function(decoration) {decoration.layout()});
 	};
 
-	Faust.Text.prototype.render = function() {
+	Y.FaustTranscript.Text.prototype.render = function() {
 
 		this.bgBox = this.svgDocument().createElementNS(SVG_NS, "rect");
 		this.svgContainer().appendChild(this.bgBox);
@@ -232,14 +232,14 @@ YUI.add('transcript-svg', function (Y) {
 		Y.each(this.children, function(c) { c.render(); });
 	};
 
-	Faust.Text.prototype.getExt = function(coordRotation) {
+	Y.FaustTranscript.Text.prototype.getExt = function(coordRotation) {
 		// only measure the text extent without the decorations
 		var matrix = this.textElement.viewportElement.createSVGMatrix();
 		matrix = matrix.rotate(coordRotation);
 		return Y.SvgUtils.boundingBox(this.textElement, matrix).width;
 	};
 
-	Faust.CoveringImage.prototype.createView = function() {
+	Y.FaustTranscript.CoveringImage.prototype.createView = function() {
 		this.spanningImage = this.svgDocument().createElementNS(SVG_NS, 'use');
 		this.spanningImage.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
 		this.spanningImage.setAttribute('class', this.type);
@@ -251,11 +251,11 @@ YUI.add('transcript-svg', function (Y) {
 		return result;
 	};
 
-	Faust.CoveringImage.prototype.svgContainer = function() {
+	Y.FaustTranscript.CoveringImage.prototype.svgContainer = function() {
 		return this.floatParent.view;
 	};
 
-	Faust.CoveringImage.prototype.containingRect = function() {
+	Y.FaustTranscript.CoveringImage.prototype.containingRect = function() {
 		var that = this;
 		var coveredRects = this.coveredVCs.map(function(vc) {
 			return {
@@ -269,7 +269,7 @@ YUI.add('transcript-svg', function (Y) {
 		return containingRect;
 	}
 
-	Faust.CoveringImage.prototype.onRelayout = function() {
+	Y.FaustTranscript.CoveringImage.prototype.onRelayout = function() {
 		var containingRect = this.containingRect();
 		// +1 works around a behaviour in firefox where the use element initially has width/height of 0, maybe due to
 		// deferred resource loading
@@ -282,7 +282,7 @@ YUI.add('transcript-svg', function (Y) {
 		this.spanningImage.transform.baseVal.consolidate();
 	};
 
-	Faust.CoveringImage.prototype.position = function() {
+	Y.FaustTranscript.CoveringImage.prototype.position = function() {
 		var containingRect = this.containingRect();
 		this.setCoord(containingRect.x, this.rotX());
 		this.setCoord(containingRect.y, this.rotY());
@@ -290,7 +290,7 @@ YUI.add('transcript-svg', function (Y) {
 
 
 
-	Faust.SpanningVC.prototype.createView = function() {
+	Y.FaustTranscript.SpanningVC.prototype.createView = function() {
 		this.spanningRect = this.svgDocument().createElementNS(SVG_NS, 'use');
 		this.spanningRect.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.imageUrl);
 		this.spanningRect.setAttribute('class', this.type);
@@ -310,7 +310,7 @@ YUI.add('transcript-svg', function (Y) {
 		return block;
 	};
 	
-	Faust.SpanningVC.prototype.onRelayout = function() {
+	Y.FaustTranscript.SpanningVC.prototype.onRelayout = function() {
 		var parentWidth = this.parent.getExt(this.rotX());
 		var parentHeight = this.parent.getExt(this.rotY());
 		var width = this.fixedWidth ? this.fixedWidth : parentWidth;
@@ -325,14 +325,14 @@ YUI.add('transcript-svg', function (Y) {
 		this.spanningRect.setAttribute('transform', transform);
 	};
 
-	Faust.RectInlineDecoration.prototype.createView = function() {
+	Y.FaustTranscript.RectInlineDecoration.prototype.createView = function() {
 		this.shape = this.svgDocument().createElementNS(SVG_NS, "rect");
 		this.shape.setAttribute('class', 'inline-decoration-type-rect inline-decoration');
 		this.svgContainer().appendChild(this.shape);
-		return Faust.RectInlineDecoration.superclass.createView();
+		return Y.FaustTranscript.RectInlineDecoration.superclass.createView();
 	}
 
-	Faust.RectInlineDecoration.prototype.onRelayout = function() {
+	Y.FaustTranscript.RectInlineDecoration.prototype.onRelayout = function() {
 		var bbox = this.view.getBBox();
 		var padding = bbox.height / 10.0;
 		this.shape.setAttribute("x", bbox.x - padding);
@@ -344,14 +344,14 @@ YUI.add('transcript-svg', function (Y) {
 
 
 
-	Faust.CircleInlineDecoration.prototype.createView = function() {
+	Y.FaustTranscript.CircleInlineDecoration.prototype.createView = function() {
 		this.shape = this.svgDocument().createElementNS(SVG_NS, "ellipse");
 		this.shape.setAttribute('class', 'inline-decoration-type-circle inline-decoration');
 		this.svgContainer().appendChild(this.shape);
-		return Faust.CircleInlineDecoration.superclass.createView();
+		return Y.FaustTranscript.CircleInlineDecoration.superclass.createView();
 	}
 
-	Faust.CircleInlineDecoration.prototype.onRelayout = function() {
+	Y.FaustTranscript.CircleInlineDecoration.prototype.onRelayout = function() {
 		var bbox = this.view.getBBox();
 		var padding = bbox.height / 10.0;
 		this.shape.setAttribute("cx", bbox.x + bbox.width / 2.0);
@@ -361,7 +361,7 @@ YUI.add('transcript-svg', function (Y) {
 		this.shape.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
 	};
 
-	Faust.InlineGraphic.prototype.createView = function() {
+	Y.FaustTranscript.InlineGraphic.prototype.createView = function() {
 		// FIXME: a g element must be used as a wrapper, because we cannot set the transform attribute on the element
 		// returned by createView() directly (as that is overwritten by layout). TODO: wrap the output of createView
 		// in a central place.
@@ -380,7 +380,7 @@ YUI.add('transcript-svg', function (Y) {
 		return g;
 	};
 
-	Faust.GLine.prototype.createView = function() {
+	Y.FaustTranscript.GLine.prototype.createView = function() {
 		var line = this.svgDocument().createElementNS(SVG_NS, "line");
 		line.setAttribute("x1", this.x);
 		line.setAttribute("y1", this.y - 10);
@@ -391,7 +391,7 @@ YUI.add('transcript-svg', function (Y) {
 		return line;
 	};
 
-	Faust.GBrace.prototype.createView = function() {
+	Y.FaustTranscript.GBrace.prototype.createView = function() {
 		var path = this.svgDocument().createElementNS(SVG_NS, "path");
 		path.setAttribute("d", "M " + (this.x) + " " + (this.y) + " q 5,-10 20,-5 q 5,0 10,-10 q -5,0 10,10 q 10,-5 20,5");
 		path.setAttribute("stroke-width", 1);
@@ -400,26 +400,26 @@ YUI.add('transcript-svg', function (Y) {
 		return path;
 	};
 
-	Faust.TextDecoration.prototype.render = function() {
+	Y.FaustTranscript.TextDecoration.prototype.render = function() {
 		this.view = this.createView();
 		this.view.setAttribute('class', this.classes.join(' '));
 		this.text.view.appendChild(this.view);
 	};
 
-	Faust.NullDecoration.prototype.createView = function() {
+	Y.FaustTranscript.NullDecoration.prototype.createView = function() {
 		var view = this.text.svgDocument().createElementNS(SVG_NS, "g");
 		return view;
 	};
 
-	Faust.NullDecoration.prototype.layout = function() {
+	Y.FaustTranscript.NullDecoration.prototype.layout = function() {
 	};
 
-	Faust.LineDecoration.prototype.createView = function() {
+	Y.FaustTranscript.LineDecoration.prototype.createView = function() {
 		var view = this.text.svgDocument().createElementNS(SVG_NS, "line");
 		return view;
 	};
 
-	Faust.LineDecoration.prototype.layout = function() {
+	Y.FaustTranscript.LineDecoration.prototype.layout = function() {
 		var textBBox = this.text.textElement.getBBox();
 		this.view.setAttribute("x1", textBBox.x);
 		this.view.setAttribute("x2", textBBox.x + textBBox.width);
@@ -428,12 +428,12 @@ YUI.add('transcript-svg', function (Y) {
 		this.view.setAttribute('y2', y);
 	};
 
-	Faust.CloneDecoration.prototype.createView = function() {
+	Y.FaustTranscript.CloneDecoration.prototype.createView = function() {
 		var view = this.text.createView();
 		return view;
 	};
 
-	Faust.CloneDecoration.prototype.layout = function() {
+	Y.FaustTranscript.CloneDecoration.prototype.layout = function() {
 		var textBBox = this.text.textElement.getBBox();
 		var matrix = this.view.viewportElement.createSVGMatrix();
 
