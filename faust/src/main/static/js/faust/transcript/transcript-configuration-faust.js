@@ -146,13 +146,15 @@ YUI.add('transcript-configuration-faust', function (Y) {
 								if (inline) {
 									return new Y.FaustTranscript.InlineGraphic('grLine', imgPath + 'grLineCurlyHorizontal.svg#img', 100, 100, 20 * EM, 2 * EM);
 								} else {
-									return new Y.FaustTranscript.SpanningVC('grLine',imgPath + 'grLineCurlyHorizontal.svg#img',	100, 100, width, height);
+									//return new Y.FaustTranscript.SpanningVC('grLine',imgPath + 'grLineCurlyHorizontal.svg#img',	100, 100, width, height);
+									return null;
 								}
 							} else if (node.data()['f:orient'] == 'vert') {
 								if (inline) {
 									return new Y.FaustTranscript.InlineGraphic('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
 								} else {
-									return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
+									//return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineCurlyVertical.svg#img', 100, 100, width, height);
+									return null;
 								}
 							}
 						} else if (node.data()['f:style'] == 'linear') {
@@ -160,20 +162,23 @@ YUI.add('transcript-configuration-faust', function (Y) {
 								if (inline) {
 									return new Y.FaustTranscript.InlineGraphic('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, 10 * EM, 2 * EM);
 								} else {
-									return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, null, 2 * EM);
+									//return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineStraightHorizontal.svg#img', 100, 20, null, 2 * EM);
+									return null;
 								}
 							} else if (node.data()['f:orient'] == 'vert') {
 								if (inline) {
 									return new Y.FaustTranscript.InlineGraphic('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, 1 * EM, 2 * EM);
 								} else {
-									return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, null, 2 * EM);
+									//return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineStraightVertical.svg#img', 20, 100, null, 2 * EM);
+									return null;
 								}
 							}
 						} else if (node.data()['f:style'] == 's-left-right') {
 							if (inline) {
 								throw (Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX + "S-curve can't be inline!");
 							} else {
-								return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineSLeftRight.svg#img', 100, 100, null, null);
+								//return new Y.FaustTranscript.SpanningVC('grLine', imgPath + 'grLineSLeftRight.svg#img', 100, 100, null, null);
+								return null;
 							}
 						}
 					}
@@ -319,28 +324,28 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'patch' : { vc: function(){return new Y.FaustTranscript.Patch();}},
 
-				'point' : {
-					vc: function (node, text, layoutState) {
-
-						var grBraceAnnotation = node.ancestors().filter(function(ancestor){
-							return ancestor.annotation.name.localName === 'grBrace'}
-						)[0].annotation;
-						if (typeof layoutState.grBraceVCs === 'undefined') {layoutState.grBraceVCs = {};}
-						if (!(grBraceAnnotation.id in layoutState.grBraceVCs)) {
-							var imgPath = cp + '/static/img/transcript/';
-							var grBraceVC = new Y.FaustTranscript.CoveringImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
-								100, 100, layoutState.rootVC);
-							layoutState.grBraceVCs[grBraceAnnotation.id] = grBraceVC;
-							layoutState.currentZone.addFloat(grBraceVC);
-						}
-
-						var pointVC = new Y.FaustTranscript.Text('O', {});
-						layoutState.grBraceVCs[grBraceAnnotation.id].coveredVCs.push(pointVC);
-						layoutState.currentZone.addFloat(pointVC);
-
-						return null;
-					}
-				},
+//				'point' : {
+//					vc: function (node, text, layoutState) {
+//
+//						var grBraceAnnotation = node.ancestors().filter(function(ancestor){
+//							return ancestor.annotation.name.localName === 'grBrace'}
+//						)[0].annotation;
+//						if (typeof layoutState.grBraceVCs === 'undefined') {layoutState.grBraceVCs = {};}
+//						if (!(grBraceAnnotation.id in layoutState.grBraceVCs)) {
+//							var imgPath = cp + '/static/img/transcript/';
+//							var grBraceVC = new Y.FaustTranscript.CoveringImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
+//								100, 100, layoutState.rootVC);
+//							layoutState.grBraceVCs[grBraceAnnotation.id] = grBraceVC;
+//							layoutState.currentZone.addFloat(grBraceVC);
+//						}
+//
+//						var pointVC = new Y.FaustTranscript.Text('O', {});
+//						layoutState.grBraceVCs[grBraceAnnotation.id].coveredVCs.push(pointVC);
+//						layoutState.currentZone.addFloat(pointVC);
+//
+//						return null;
+//					}
+//				},
 
 				'rdg' : { vc: function(){return new Y.FaustTranscript.InlineViewComponent();}},
 
