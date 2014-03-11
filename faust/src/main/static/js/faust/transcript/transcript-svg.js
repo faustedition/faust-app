@@ -277,6 +277,7 @@ YUI.add('transcript-svg', function (Y) {
 		var currentHeight = this.getExt(this.rotY()) + 1;
 		var transform = this.spanningImage.viewportElement.createSVGTransform();
 		transform.setScale(containingRect.width / currentWidth, containingRect.height / currentHeight);
+		//transform.setScale(1, 1);
 		this.spanningImage.transform.baseVal.consolidate();
 		this.spanningImage.transform.baseVal.appendItem(transform);
 		this.spanningImage.transform.baseVal.consolidate();

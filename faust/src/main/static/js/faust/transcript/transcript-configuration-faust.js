@@ -390,11 +390,12 @@ YUI.add('transcript-configuration-faust', function (Y) {
 								var imgPath = cp + '/static/img/transcript/';
 								var imgFilename = rendTokens.indexOf('vertical') >= 0 ? 'grLineStraightVertical.svg#img'
 									:'grLineDiagonalFalling.svg#img';
-								var stVertVC = new Y.FaustTranscript.CoveringImage('grLine', classes, imgPath + imgFilename,
+								var stVC = new Y.FaustTranscript.CoveringImage('grLine', classes, imgPath + imgFilename,
 									100, 100, layoutState.rootVC);
+								stVC.rotation = layoutState.currentZone.rotation;
 
-								layoutState.stVertVCs[annotation.id] = stVertVC;
-								layoutState.currentZone.addFloat(stVertVC);
+								layoutState.stVertVCs[annotation.id] = stVC;
+								layoutState.currentZone.addFloat(stVC);
 
 								var decoration = new Y.FaustTranscript.NullDecoration(textVC, classes, 'strikethrough');
 								textVC.decorations.push(decoration);
@@ -505,6 +506,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							var imgPath = cp + '/static/img/transcript/';
 							var usedVC = new Y.FaustTranscript.CoveringImage('grLine',[], imgPath + 'usedMarker.svg#svgroot',
 								100, 100, layoutState.rootVC);
+							usedVC.rotation = layoutState.currentZone.rotation;
 							layoutState.usedVCs[annotation.id] = usedVC;
 							layoutState.currentZone.addFloat(usedVC);
 						}
@@ -532,7 +534,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				'zone':  { 
 					vc: function(node, text, layoutState) {
 						var vc = new Y.FaustTranscript.Zone();
-						if ("rotate" in node.data()) 
+						if ("rotate" in node.data())
 							vc.rotation = parseInt(node.data()["rotate"]);
 						if ("type" in node.data() && node.data()["type"] == "main") {
 							if (layoutState.mainZone)

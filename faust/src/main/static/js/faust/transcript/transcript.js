@@ -301,6 +301,11 @@ YUI.add('transcript', function (Y) {
 
 	Y.extend (Y.FaustTranscript.FloatVC, Y.FaustTranscript.ViewComponent);
 
+	Y.FaustTranscript.FloatVC.prototype.globalRotation = function() {
+		// Floats are always global
+		return this.rotation;
+	};
+
 	Y.FaustTranscript.CoveringImage = function(type, classes, imageUrl, fixedWidth, fixedHeight, floatParent) {
 		Y.FaustTranscript.CoveringImage.superclass.constructor.call(this, classes, floatParent);
 		this.type =  type;
