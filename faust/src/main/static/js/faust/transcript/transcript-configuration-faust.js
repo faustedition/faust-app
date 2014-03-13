@@ -384,7 +384,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 							classes = classes.concat(classesFromHandValue(hand));
 						}
 
-						if (rendTokens.indexOf('vertical') >= 0 || rendTokens.indexOf('diagonal') >= 0 ) {
+						if (rendTokens.indexOf('vertical') >= 0 || rendTokens.indexOf('block') >= 0 ) {
 							if (typeof layoutState.stVertVCs === 'undefined') {layoutState.stVertVCs = {};}
 							if (!(annotation.id in layoutState.stVertVCs)) {
 								var imgPath = cp + '/static/img/transcript/';
