@@ -127,7 +127,6 @@ YUI.add('transcript-svg', function (Y) {
 		this.svgContainer().appendChild(this.patchBackground);
 		this.patchBackground.setAttribute("class", "patchBackground " + this.getClassesString());
 		this.view = this.svgDocument().createElementNS(SVG_NS, "g");
-		var patchBox = this.view.getBBox();
 		return this.view;
 	}
 
@@ -225,8 +224,6 @@ YUI.add('transcript-svg', function (Y) {
 
 		this.view = this.createView();
 		this.svgContainer().appendChild(this.view);
-		var textBox = this.view.getBBox();
-
 		this.rotate(this.rotation);
 		Y.each (this.decorations, function(decoration) {decoration.render()});
 		Y.each(this.children, function(c) { c.render(); });
