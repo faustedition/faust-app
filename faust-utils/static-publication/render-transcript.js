@@ -63,10 +63,7 @@ if (system.args.length < 3 || system.args.length > 5) {
 			}
 
 			console.log(' waiting for layout to finish');
-			if (page.evaluate(hasPageLoaded))
-				waitAndCheckLayoutStatus();
-			else
-				takeScreenshot();
+			waitAndCheckLayoutStatus();
 		}
     });
 }

@@ -6,7 +6,7 @@ latex_header = """\\documentclass[11pt,oneside]{book}
 \\usepackage{graphicx}
 \\usepackage[german]{babel} 
 \\usepackage[utf8]{inputenc}
-
+\usepackage[hmargin=1cm,vmargin=1.5cm]{geometry}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
@@ -69,12 +69,13 @@ def render_document(url, tmp_dir):
         pagenum = i + 1 
         out_filepath = generate_out_filepath(page_url, tmp_dir)
         print " rendering page ", pagenum, ": ", page_url
-        if not os.path.exists(out_filepath):
-            print "   (rendering to      " + out_filepath  + ")"
-            check_call(['phantomjs', 'render-transcript.js', url + '?view=transcript-bare#' + str(i+1), out_filepath]) 
-            check_call(['mogrify', '-resize', '6000x6000', out_filepath])
-        else:
-            print "   (already exists at " + out_filepath + ")"
+        if not page_url == 'faust://self/none/':
+            if not os.path.exists(out_filepath):
+                print "   (rendering to      " + out_filepath  + ")"
+                check_call(['phantomjs', 'render-transcript.js', url + '?view=transcript-bare#' + str(i+1), out_filepath]) 
+                check_call(['mogrify', '-resize', '6000x6000', out_filepath])
+            else:
+                print "   (already exists at " + out_filepath + ")"
 
 def latex_escape_text(text):
     return text\
@@ -136,7 +137,7 @@ def generate_latex(manuscript_urls, tmp_dir):
                 else: 
                     transcript_graphic_path = generate_out_filepath(page_url, tmp_dir)
                     if os.path.exists(transcript_graphic_path):
-                        result = result + u'\includegraphics[width=\\linewidth,height=0.9\\textheight,keepaspectratio]{' + transcript_graphic_path  + u'}\n'
+                        result = result + u'\centering\includegraphics[width=\\linewidth,height=0.9\\textheight,keepaspectratio]{' + transcript_graphic_path  + u'}\n'
                     else:
                         result = result + u'[Fehler beim generieren des Transkripts]'
         except Exception as e:

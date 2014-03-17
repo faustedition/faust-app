@@ -21,8 +21,9 @@
 /* global */
 
 svg.diplomatic {
-  font-family: faust-serif, serif;
+    font-family: faust-serif, serif;
     stroke: black;
+    font-size: 11pt;
 }
 
 #editor-toolbar {
