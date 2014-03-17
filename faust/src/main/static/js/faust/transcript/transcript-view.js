@@ -75,7 +75,9 @@ YUI.add('transcript-view', function (Y) {
 				},
 				{
 					fn: function() {
-						Y.fire('faust:transcript-layout-done', {});						
+						var classValue = container.getAttribute('class') + ' transcript-layout-complete';
+						container.setAttribute('class', classValue);
+						Y.fire('faust:transcript-layout-done', {});
 					},
 					timeout: 10,
 					iterations: 1
