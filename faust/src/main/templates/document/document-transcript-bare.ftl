@@ -57,7 +57,7 @@ YUI().use("node", "event", "materialunit", "transcript-view", "transcript-config
 
 		page.transcriptionFromRanges(function(t) {
 
-			var diplomaticTranscriptView = new Y.Faust.DiplomaticTranscriptView({
+			var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
 				container: diplomaticContent,
 				transcript: t,
 			});
