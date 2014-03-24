@@ -104,7 +104,7 @@ YUI.add('transcript-svg', function (Y) {
 	};
 
 	Y.FaustTranscript.ViewComponent.prototype.measure = function() {
-		var bbox = this.view.getBBox();
+		var bbox = Y.SvgUtils.boundingBox(this.view);
 		return { width: Math.round(bbox.width), height: Math.round(bbox.height)};		
 	};
 
@@ -131,7 +131,7 @@ YUI.add('transcript-svg', function (Y) {
 	}
 
 	Y.FaustTranscript.Patch.prototype.onRelayout = function() {
-		var bbox = this.view.getBBox();
+		var bbox = Y.SvgUtils.boundingBox(this.view);
 		this.patchBackground.setAttribute("x", bbox.x);
 		this.patchBackground.setAttribute("y", bbox.y);
 		this.patchBackground.setAttribute("height", bbox.height);
@@ -206,7 +206,7 @@ YUI.add('transcript-svg', function (Y) {
 	
 	Y.FaustTranscript.Text.prototype.onRelayout = function() {
 
-		var bbox = this.view.getBBox();
+		var bbox = Y.SvgUtils.boundingBox(this.view);
 		this.bgBox.setAttribute("x", bbox.x);
 		this.bgBox.setAttribute("y", bbox.y);
 		this.bgBox.setAttribute("height", bbox.height);
@@ -331,7 +331,7 @@ YUI.add('transcript-svg', function (Y) {
 	}
 
 	Y.FaustTranscript.RectInlineDecoration.prototype.onRelayout = function() {
-		var bbox = this.view.getBBox();
+		var bbox = Y.SvgUtils.boundingBox(this.view);
 		var padding = bbox.height / 10.0;
 		this.shape.setAttribute("x", bbox.x - padding);
 		this.shape.setAttribute("y", bbox.y - padding);
@@ -350,7 +350,7 @@ YUI.add('transcript-svg', function (Y) {
 	}
 
 	Y.FaustTranscript.CircleInlineDecoration.prototype.onRelayout = function() {
-		var bbox = this.view.getBBox();
+		var bbox = Y.SvgUtils.boundingBox(this.view);
 		var padding = bbox.height / 10.0;
 		this.shape.setAttribute("cx", bbox.x + bbox.width / 2.0);
 		this.shape.setAttribute("cy", bbox.y + bbox.height / 2.0);

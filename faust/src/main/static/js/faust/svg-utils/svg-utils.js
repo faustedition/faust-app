@@ -130,8 +130,31 @@ YUI.add('svg-utils', function (Y) {
 		return createRect(min.x, min.y, max.x - min.x, max.y - min.y);
 	}
 
+
 	/**
-	 * Return the bounding box of element as seen from the coordinate system given by matrix.
+	 * Safely get and return the bounding box of element as seen from its local coordinate system.
+	 */
+
+	function localBoundingBox(element) {
+
+		// Firefox will throw an exception when calling getBBox() on an element with display: none
+		// see https://bugzilla.mozilla.org/show_bug.cgi?id=612118
+		var visible = Y.one(element).ancestors(
+			function(ancestor){
+				return ancestor.getComputedStyle('display') === 'none';
+			}, true).isEmpty();
+
+		// local bounding box in local coordinates
+		if (visible) {
+			return element.getBBox();
+		} else {
+			return {x:0, y:0, width:0, height:0};
+		}
+	}
+
+	/**
+	 * Return the bounding box of element as seen from the coordinate system given by matrix. If matrix is not
+	 * given, the local coordinate system of element is assumed.
 	 */
 
 	function boundingBox(element, matrix) {
@@ -154,10 +177,11 @@ YUI.add('svg-utils', function (Y) {
 			return rect;
 		}
 
-		// local bounding box in local coordinates
-		var box = element.getBBox();
+		var box = localBoundingBox(element);
 
-
+		if (typeof matrix === 'undefined') {
+			return box;
+		}
 
 		var inv = matrix.inverse();
 
@@ -228,5 +252,5 @@ YUI.add('svg-utils', function (Y) {
 	});
 	
 }, '0.0', {
-	requires: []
+	requires: ['node']
 });
