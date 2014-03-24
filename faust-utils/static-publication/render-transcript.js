@@ -1,3 +1,6 @@
+var LAYOUT_CHECK_INTERVAL = 1000;
+var LAYOUT_TIMEOUT = 15000;
+
 var page = require('webpage').create(),
     system = require('system'),
     address, output, size;
@@ -52,10 +55,13 @@ if (system.args.length < 3 || system.args.length > 5) {
                     phantom.exit();				
 			}
 
+			var checkCounter = 0;
+
 			function waitAndCheckLayoutStatus() {
-				if (page.evaluate(isLayoutOngoing)) {
+				if (checkCounter * LAYOUT_CHECK_INTERVAL < LAYOUT_TIMEOUT && page.evaluate(isLayoutOngoing)) {
 					console.log(' .');
-					setTimeout(waitAndCheckLayoutStatus, 500);
+					checkCounter++;
+					setTimeout(waitAndCheckLayoutStatus, LAYOUT_CHECK_INTERVAL);
 				} else {
 					console.log(' layout finished');
 					takeScreenshot();
@@ -64,6 +70,7 @@ if (system.args.length < 3 || system.args.length > 5) {
 
 			console.log(' waiting for layout to finish');
 			waitAndCheckLayoutStatus();
+
 		}
     });
 }
