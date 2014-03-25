@@ -1,36 +1,58 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 YUI.GlobalConfig = {
     debug: false,
-    combine: true,
+    combine: false,
     comboBase: cp + '/resources?',
     root: 'yui3/build/',
     groups: {
         faust: {
             base: cp + '/static/js/',
-            combine: true,
+            combine: false,
             comboBase: cp + '/resources?',
             filter: "raw",
             root: 'js/',
             modules: {
+                'adhoc-tree': { path: 'faust/text-annotation/adhoc-tree.js'},
                 'facsimile': { path: 'faust/facsimile/facsimile.js'},
                 'facsimile-svgpane': { path: 'faust/facsimile/facsimile-svgpane.js' },
                 'facsimile-highlightpane': { path: 'faust/facsimile/facsimile-highlightpane.js' },
                 'util': { path: "faust/util/util.js"},
-				'document': { path: "faust/document/document.js" },
-				'document-view' : { path: 'faust/document/document-view.js' },
-				'document-yui-view' : { path: 'faust/document/document-yui-view.js' },
+				"transcript-adhoc-tree" : { path: 'faust/transcript/transcript-adhoc-tree.js' },
+	            'document-app' : { path: 'faust/document/document-app.js' },
+				"transcript-configuration-faust" : { path: 'faust/transcript/transcript-configuration-faust.js' },
+				"transcript-view" : { path: 'faust/transcript/transcript-view.js' },
 				'document-structure-view' : { path: 'faust/document/document-structure-view.js' },
-				'document-view-svg' : { path: 'faust/document/document-view-svg.js' },
-				'document-controller' : { path: 'faust/document/document-controller.js' },
-				'document-ranges' : { path: 'faust/document/document-ranges.js' },
-				'document-model' : { path: 'faust/document/document-model.js' },
+				"transcript-svg" : { path: 'faust/transcript/transcript-svg.js' },
+				"transcript" : { path: 'faust/transcript/transcript.js' },
+				"transcript-interaction" : { path: 'faust/transcript/transcript-interaction.js' },
 				'document-text' : { path: 'faust/document/document-text.js' },
 				'materialunit' : { path: 'faust/document/materialunit.js' },
-                'protovis': { path: "protovis-r3.2.js"},
-                'search': { path: "faust/search/search.js"},
+				'protovis': { path: "../lib/protovis-r3.2.js"},
+				'search': { path: "faust/search/search.js"},
 				'svg-utils' : { path: "faust/svg-utils/svg-utils.js"},
-                'text-annotation': { path: "faust/text-annotation/text-annotation.js"},
-                'text-index': { path: 'faust/text-annotation/text-index.js'}
-            }
-        }
-    }
+				'text-annotation': { path: "faust/text-annotation/text-annotation.js"},
+				'text-display': { path: "faust/text-display/text-display.js"},
+				'paged-text-display': { path: 'faust/text-display/paged-text-display.js'},
+				'text-index': { path: 'faust/text-annotation/text-index.js'}
+			}
+		}
+	}
 };

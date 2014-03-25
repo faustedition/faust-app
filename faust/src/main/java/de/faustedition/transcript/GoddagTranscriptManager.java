@@ -1,11 +1,37 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.transcript;
 
-import com.google.common.collect.Iterables;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.tei.WhitespaceUtil;
-import de.faustedition.xml.*;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
+import static de.faustedition.xml.Namespaces.TEI_SIG_GE_URI;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -20,17 +46,18 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import com.google.common.collect.Iterables;
 
-import static de.faustedition.xml.Namespaces.TEI_NS_URI;
-import static de.faustedition.xml.Namespaces.TEI_SIG_GE_URI;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.tei.WhitespaceUtil;
+import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.MultiplexingContentHandler;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLFragmentFilter;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 
 @Component
 public class GoddagTranscriptManager {

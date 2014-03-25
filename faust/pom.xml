@@ -32,18 +32,52 @@
 			<groupId>org.goddag4j</groupId>
 			<artifactId>goddag4j</artifactId>
 			<version>1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.neo4j</groupId>
+					<artifactId>neo4j-kernel</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
         <dependency>
             <groupId>eu.interedition</groupId>
-            <artifactId>text</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <artifactId>text-core</artifactId>
+            <version>1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>11.0.2</version>
 		</dependency>
-        <dependency>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j</artifactId>
+      <version>1.8</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-cypher</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-graph-matching</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-graph-algo</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-jmx</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.neo4j</groupId>
+          <artifactId>neo4j-udc</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
@@ -74,6 +108,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>1.6.2</version>
 		</dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.10</version>
+        </dependency>
 		<dependency>
 			<groupId>org.restlet.jse</groupId>
 			<artifactId>org.restlet</artifactId>
@@ -94,12 +133,6 @@
 			<artifactId>org.restlet.ext.simple</artifactId>
             <version>${restlet.version}</version>
         </dependency>
-		<dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j</artifactId>
-			<version>1.2.M04</version>
-			<type>pom</type>
-		</dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -140,8 +173,6 @@
 			<artifactId>jing</artifactId>
 			<version>20030619</version>
 		</dependency>
-		<!-- <dependency> <groupId>com.hp.hpl.jena</groupId> <artifactId>jena</artifactId> <version>2.6.3</version> </dependency> <dependency> 
-			<groupId>org.freemarker</groupId> <artifactId>freemarker</artifactId> <version>2.3.16</version> </dependency> -->
         <dependency>
             <groupId>net.middell</groupId>
             <artifactId>combo-resource</artifactId>
@@ -279,6 +310,17 @@
         <repository>
             <id>osgeo-geotools</id>
             <url>http://download.osgeo.org/webdav/geotools/</url>
+        </repository>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 	<distributionManagement>

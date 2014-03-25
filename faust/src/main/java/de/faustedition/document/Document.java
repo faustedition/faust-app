@@ -1,17 +1,31 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.document;
 
-import static org.neo4j.graphdb.Direction.OUTGOING;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import de.faustedition.FaustURI;
+import de.faustedition.genesis.MacrogeneticRelationManager;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.NodeWrapper;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -20,14 +34,17 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-
-import de.faustedition.FaustURI;
-import de.faustedition.genesis.MacrogeneticRelationManager;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.NodeWrapper;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexManager;
-import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Nullable;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class Document extends MaterialUnit {
 	private static final String PREFIX = FaustGraph.PREFIX + ".document";
@@ -61,7 +78,6 @@ public class Document extends MaterialUnit {
 
 	/**
 	 * @param geneticSource filter; can be null
-	 * @return
 	 */
 	public Set<Document> geneticallyRelatedTo(FaustURI geneticSource /*, RelationshipType type*/) {
 		RelationshipType type = MacrogeneticRelationManager.TEMP_PRE_REL;
@@ -103,7 +119,17 @@ public class Document extends MaterialUnit {
 			db.index().forNodes(PREFIX + "id").query(query),
 			newWrapperFunction(Document.class));
 	}
-	
+
+    public Iterable<MaterialUnit> getPages() {
+        Predicate<MaterialUnit> isPage = new Predicate<MaterialUnit>() {
+            @Override
+            public boolean apply(@Nullable MaterialUnit input) {
+                return input != null && Type.PAGE.equals(input.getType());
+            }
+        };
+        return Iterables.filter(getSortedContents(), isPage);
+    }
+
 	public void index() {
 		final IndexManager indexManager = node.getGraphDatabase().index();
 

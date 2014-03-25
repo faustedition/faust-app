@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.xml;
 
 import java.io.ByteArrayOutputStream;
@@ -11,6 +30,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -107,17 +127,26 @@ public class XMLUtil {
 	}
 
 	public static void serialize(Node node, Writer writer) throws TransformerException {
-		transformerFactory().newTransformer().transform(new DOMSource(node), new StreamResult(writer));
+		Transformer transformer = transformerFactory().newTransformer();
+		Properties outputProperties = new Properties();
+		outputProperties.setProperty("method", "xml");
+		outputProperties.setProperty("omit-xml-declaration", "yes");
+		transformer.setOutputProperties(outputProperties);
+		transformer.transform(new DOMSource(node), new StreamResult(writer));
 	}
 
 	public static void serialize(Node node, File file) throws TransformerException {
 		transformerFactory().newTransformer().transform(new DOMSource(node), new StreamResult(file));
 	}
-
+	
 	public static String toString(Node node) throws TransformerException {
-		StringWriter out = new StringWriter();
-		serialize(node, out);
-		return out.toString();
+		if (node.getNodeValue() != null)
+			return node.getNodeValue();
+		else {
+			StringWriter out = new StringWriter();
+			serialize(node, out);
+			return out.toString();
+		}
 	}
 
 	public static boolean isSpacePreserved(Node node) {

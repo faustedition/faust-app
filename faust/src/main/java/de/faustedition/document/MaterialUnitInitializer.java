@@ -1,9 +1,26 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.document;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.xml.XMLStorage;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +33,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StopWatch;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.xml.XMLStorage;
 
 @Component
 @DependsOn(value = "archiveInitializer")
@@ -54,6 +74,11 @@ public class MaterialUnitInitializer implements InitializingBean {
 		logger.info("Initializing material unit graph");
 		StopWatch sw = new StopWatch();
 		sw.start();
+        int documentCount = 0;
+        for (final FaustURI documentDescriptor : xml.iterate(DOCUMENT_BASE_URI)) {
+            documentCount++;
+        }
+		logger.debug("Importing " + documentCount + " document descriptors.");
 		for (final FaustURI documentDescriptor : xml.iterate(DOCUMENT_BASE_URI)) {
 			try {
 				logger.debug("Importing document " + documentDescriptor);
@@ -63,7 +88,9 @@ public class MaterialUnitInitializer implements InitializingBean {
 			} catch (IOException e) {
 				logger.error("I/O error while adding document " + documentDescriptor, e);
 			} catch (DocumentDescriptorInvalidException e) {
-				logger.error("Metadata descriptor invalid for document " + documentDescriptor, e);				
+				logger.error("Metadata descriptor invalid for document " + documentDescriptor, e);
+			} catch (Exception e) {
+				logger.error("Error while importing document " + documentDescriptor, e);
 			}
 		}
 		sw.stop();

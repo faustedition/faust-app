@@ -1,12 +1,30 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.transcript;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.collect.*;
-import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.VerseInterval;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -21,11 +39,16 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+
+import de.faustedition.JsonRepresentationFactory;
+import de.faustedition.VerseInterval;
+import de.faustedition.document.Document;
+import de.faustedition.document.MaterialUnit;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 YUI.add('svg-utils', function (Y) {
 	
 	var SVG_NS = "http://www.w3.org/2000/svg";
@@ -17,6 +36,11 @@ YUI.add('svg-utils', function (Y) {
 			element.setAttribute(k, v);
 		});
 		return element;
+	}
+
+	function hasClass(element, classValue) {
+		var classTokens = element.getDOMNode().getAttribute('class').split(' ');
+		return classTokens.indexOf(classValue) >= 0;
 	}
 
 	function svgStyles(element, styles) {
@@ -106,17 +130,127 @@ YUI.add('svg-utils', function (Y) {
 		return createRect(min.x, min.y, max.x - min.x, max.y - min.y);
 	}
 
+
+	/**
+	 * Safely get and return the bounding box of element as seen from its local coordinate system.
+	 */
+
+	function localBoundingBox(element) {
+
+		// Firefox will throw an exception when calling getBBox() on an element with display: none
+		// see https://bugzilla.mozilla.org/show_bug.cgi?id=612118
+		var visible = Y.one(element).ancestors(
+			function(ancestor){
+				return ancestor.getComputedStyle('display') === 'none';
+			}, true).isEmpty();
+
+		// local bounding box in local coordinates
+		if (visible) {
+			return element.getBBox();
+		} else {
+			return {x:0, y:0, width:0, height:0};
+		}
+	}
+
+	/**
+	 * Return the bounding box of element as seen from the coordinate system given by matrix. If matrix is not
+	 * given, the local coordinate system of element is assumed.
+	 */
+
+	function boundingBox(element, matrix) {
+
+		// macro to create an SVGPoint object
+		function createPoint (x, y) {
+			var point = element.viewportElement.createSVGPoint();
+			point.x = x;
+			point.y = y;
+			return point;
+		}
+
+		// macro to create an SVGRect object
+		function createRect (x, y, width, height) {
+			var rect = element.viewportElement.createSVGRect();
+			rect.x = x;
+			rect.y = y;
+			rect.width = width;
+			rect.height = height;
+			return rect;
+		}
+
+		var box = localBoundingBox(element);
+
+		if (typeof matrix === 'undefined') {
+			return box;
+		}
+
+		var inv = matrix.inverse();
+
+		inv = inv.multiply(element.getCTM());
+
+		// create an array of SVGPoints for each corner
+		// of the bounding box and update their location
+		// with the transform matrix
+		var corners = [];
+		var point = createPoint(box.x, box.y);
+		corners.push(point.matrixTransform(inv) );
+		point.x = box.x + box.width;
+		point.y = box.y;
+		corners.push( point.matrixTransform(inv) );
+		point.x = box.x + box.width;
+		point.y = box.y + box.height;
+		corners.push( point.matrixTransform(inv) );
+		point.x = box.x;
+		point.y = box.y + box.height;
+		corners.push( point.matrixTransform(inv) );
+		var max = createPoint(corners[0].x, corners[0].y);
+		var min = createPoint(corners[0].x, corners[0].y);
+
+		// identify the new corner coordinates of the
+		// fully transformed bounding box
+		for (var i = 1; i < corners.length; i++) {
+			var x = corners[i].x;
+			var y = corners[i].y;
+			if (x < min.x) {
+				min.x = x;
+			}
+			else if (x > max.x) {
+				max.x = x;
+			}
+			if (y < min.y) {
+				min.y = y;
+			}
+			else if (y > max.y) {
+				max.y = y;
+			}
+		}
+
+		// return the bounding box as an SVGRect object
+		return createRect(min.x, min.y, max.x - min.x, max.y - min.y);
+	};
+
+	var containingRect = function(rect1, rect2) {
+		var x = Math.min(rect1.x, rect2.x);
+		var y = Math.min(rect1.y, rect2.y);
+		var width = Math.max(rect1.x + rect1.width, rect2.x + rect2.width) - x;
+		var height = Math.max(rect1.y + rect1.height, rect2.y + rect2.height) - y;
+		return {x: x, y: y, width: width, height: height};
+	}
+
+
 	Y.mix(Y.namespace("SvgUtils"), {
 		SVG_NS: SVG_NS,
+		boundingBox: boundingBox,
 		qscale: qscale,
 		svgElement: svgElement,
 		svgAttrs: svgAttrs,
+		hasClass: hasClass,
 		svgStyles: svgStyles,
 		svg: svg,
 		empty: empty,
-		getScreenBBox: getScreenBBox
+		getScreenBBox: getScreenBBox,
+		containingRect: containingRect
 	});
 	
 }, '0.0', {
-	requires: []
+	requires: ['node']
 });

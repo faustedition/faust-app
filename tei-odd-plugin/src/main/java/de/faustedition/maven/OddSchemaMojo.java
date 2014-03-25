@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import javax.xml.transform.stream.StreamSource;
 
-import net.sf.saxon.FeatureKeys;
+import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.Serializer;
@@ -122,7 +122,7 @@ public class OddSchemaMojo extends AbstractMojo {
 			processor.setConfigurationProperty(FeatureKeys.XINCLUDE, true);
 			XsltCompiler xsltCompiler = processor.newXsltCompiler();
 
-			XsltTransformer odd2relax = xsltCompiler.compile(new StreamSource(new URI(stylesheetsUrl).resolve("odds2/odd2relax.xsl").toASCIIString())).load();
+			XsltTransformer odd2relax = xsltCompiler.compile(new StreamSource(new URI(stylesheetsUrl).resolve("odds/odd2relax.xsl").toASCIIString())).load();
 			odd2relax.setDestination(serializer);
 			odd2relax.setParameter(new QName("verbose"), new XdmAtomicValue("false"));
 			odd2relax.setParameter(new QName("TEIC"), new XdmAtomicValue("true"));
@@ -131,7 +131,7 @@ public class OddSchemaMojo extends AbstractMojo {
 			odd2relax.setParameter(new QName("parameterize"), new XdmAtomicValue("false"));
 			odd2relax.setParameter(new QName("patternPrefix"), new XdmAtomicValue("_tei"));
 
-			XsltTransformer odd2odd = xsltCompiler.compile(new StreamSource(new URI(stylesheetsUrl).resolve("odds2/odd2odd.xsl").toASCIIString())).load();
+			XsltTransformer odd2odd = xsltCompiler.compile(new StreamSource(new URI(stylesheetsUrl).resolve("odds/odd2odd.xsl").toASCIIString())).load();
 
 			odd2odd.setParameter(new QName("selectedSchema"), new XdmAtomicValue("faust-tei"));
 			odd2odd.setParameter(new QName("verbose"), new XdmAtomicValue("false"));

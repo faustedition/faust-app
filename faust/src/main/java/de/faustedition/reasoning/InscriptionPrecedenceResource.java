@@ -1,28 +1,44 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.reasoning;
 
-import ch.qos.logback.classic.Logger;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
-import com.google.common.io.FileBackedOutputStream;
+import javax.annotation.Nullable;
 
-import de.faustedition.FaustURI;
-import de.faustedition.VerseInterval;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.genesis.GeneticSource;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.reasoning.PremiseBasedRelation.Premise;
-import de.faustedition.transcript.TranscribedVerseInterval;
-import edu.bath.transitivityutils.ImmutableRelation;
-import edu.bath.transitivityutils.Relation;
-import edu.bath.transitivityutils.Relations;
 import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -39,20 +55,26 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.*;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
+import com.google.common.io.FileBackedOutputStream;
+
+import de.faustedition.FaustURI;
+import de.faustedition.VerseInterval;
+import de.faustedition.document.MaterialUnit;
+import de.faustedition.genesis.GeneticSource;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.reasoning.PremiseBasedRelation.Premise;
+import de.faustedition.transcript.TranscribedVerseInterval;
+import edu.bath.transitivityutils.ImmutableRelation;
+import edu.bath.transitivityutils.Relation;
+import edu.bath.transitivityutils.Relations;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

@@ -4,11 +4,7 @@
 # Run XPath queries over all files
 #
 
-import sys
-import faust
-import lxml.etree
-import re
-import textwrap
+import sys, faust, lxml.etree, re, os.path
 
 kodiert_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='kodiert']"
 encoded_xp = "//tei:TEI/tei:teiHeader/tei:revisionDesc/tei:change[normalize-space(text())='encoded']"
@@ -33,16 +29,21 @@ def list_matches (files, xpath):
 			return [file, faust.xpath(xpath)(xml)]
 		except lxml.etree.XMLSyntaxError:
 			sys.stderr.write("XML syntax error: " + file + "\n")
-	return [entry for entry in map(matches_in_file, files) if entry != None]
+	return map(matches_in_file, files)
 
-
+def show_matches (matches_in_files):
+	for (file, matches) in [mf for mf in matches_in_files if mf]:
+		if matches:
+			print file
+			for match in matches:
+				print " " + str(match.attrib.get('n'))
 
 def non_wellformed (files):
 	''' List non-wellformed xml files. '''
 	def is_not_well (file):
 		try:
 			xml = lxml.etree.parse(file)
-		except lxml.etree.XMLSyntaxError as e:
+		except lxml.etree.XMLSyntaxError:
 			return True
 		return False
 	return filter(is_not_well, files)
@@ -53,7 +54,7 @@ def unique_values(files, xpath):
 	for f in files:
 		try:
 			xml = lxml.etree.parse(f)
-			results = faust.xpath(xpath)(xml)
+			results = [result.tag for result in faust.xpath(xpath)(xml)]
 			unique = unique.union(results)
 		except lxml.etree.XMLSyntaxError:
 			sys.stderr.write("XML syntax error: " + f + "\n")
@@ -96,10 +97,12 @@ if __name__ == "__main__":
 	# find all manuscripts with red ink
 	# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, '_tr')] | //*[contains(@hand,'_tr')]"):
 		# print f
-	# for f in matches(faust.transcript_files(), "//tei:gap"):	print f
-	# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, 'go_')]  | //*[contains(@hand,'go_')]"):	print f
+	# for f in matches(faust.transcript_files(), 
+	#		 """//tei:choice/text()[contains(., ' ') or contains(., '\t') or contains(., '\n')]"""):	print f
+	# for f in matches(faust.transcript_files(), u"//text()[contains(.,'\x84') or contains(.,'\x93')]"):	print f
 	# for val in unique_values (faust.transcript_files(), "//tei:facsimile/tei:graphic/@url"): print val
 	# for f in matches(faust.transcript_files(), "count(//tei:facsimile/tei:graphic/@url) > 1"): print f
+	# for f in matches(faust.transcript_files(), "//tei:gap[(not(@unit='chars') or not(@quantity)) and not(./ancestor::tei:rdg)]"): print f
 	# not_available_xp = "not (" + kodiert_xp + " or " + encoded_xp + " or " + deleatur_xp +  " )"
 	# for f in matches(faust.transcript_files(), not_available_xp):	print f
 	# unencoded =  matches(faust.transcript_files(), "not( " + encoded_xp + " )")
@@ -213,90 +216,126 @@ if __name__ == "__main__":
 # =========
 
 # ==== look for lines with soon, then instant revision ====
-	# for (file, matches) in list_matches(faust.transcript_files(), '//tei:p[./descendant::*[@f:revType="soon"]/following-sibling::*[@f:revType="instant"]]'):
+ 	# for (file, matches) in list_matches(faust.transcript_files(), '//tei:p[./descendant::*[@f:revType="soon"]/following-sibling::*[@f:revType="instant"]]'):
 	# 	if matches:
 	# 		print file
 	# 		# for match in matches:
 	# 			# print " " + str(match)
-
-# check metadata
-	structure_elems = ['archivalDocument', 'sheet', 'leaf', 'disjunctLeaf', 'page', 'patch', 'patchSurface']
-	metadata_fields = [
-
-		# Dokumenteigenschaften
-		('repository', ['typed']),
-		('subRepository', []),
-		('collection', []),
-		('idno', ['typed']),
-		('textTranscript', ['uri']),
-		('classification', ['typed']),
-		('history', []),
-		('container', []),
-		('binding', []),
-		('numbering', []),
-		('condition', []),
-
-		# Blatteigenschaften
-		('dimensions', []),
-		('format', ['typed']),
-		('bindingMaterial', []),
-		('stabMark', []),
-		('leafCondition', []),
-		('edges', ['typed']),
-
-		# Papiereigenschaften
-		('paperType', ['typed']),
-		('paperColour', []),
-		('chainLines', []),
-		('paperMill', []),
-		('watermarkID', []),
-		('countermarkID', []),
-
-		# Seiteneigenschaften
-		('docTranscript', ['uri']),
-		('references', []),
-
-		# Anbringungseigenschaften
-		('patchDimensions', []),
-		('patchType', ['typed']),
-		('patchPaperType', ['typed']),
-		('patchPaperColour', []),
-		('patchChainLines', []),
-		('patchPaperMill', []),
-		('patchWatermarkID', []),
-		('patchCountermarkID', []),
-		('patchReferences', ['uri']),
-		]
-
-
-	def note_for_structure_element(structure_elem):
-		return ('note FOR STRUCTURE ELEMENT ' + structure_elem, '//f:' + structure_elem + '/f:metadata/f:note[not(./preceding-sibling::*)]')
-
-	def note_for_metadata_field(elem):
-		return ('note FOR METADATA FIELD ' + elem, '//f:note[./preceding-sibling::f:' + elem + ']')
-
-	def metadata_field(elem):
-		return ('CONTENT OF METADATA FIELD ' + elem, '//f:' + elem)
+# =======			
 	
-	
-	fields = map(note_for_structure_element, structure_elems)
-	fields = fields + map(note_for_metadata_field, [x[0] for x in metadata_fields])
-	fields = fields + map(metadata_field, [x[0] for x in metadata_fields if not ('uri' in x[1] or 'typed' in x[1])])
-	
-	leave_out = ['none', 'n.s.']
-	for fieldname, xpath in fields:
-		print '# ', fieldname, ''
-		print
-		match_list = list_matches(faust.document_files(), xpath)
-		for (f, matches) in match_list:
-			if matches:
-				print '    ', f[f.find('/xml/'):]
-				for match in matches:
-					if match != None:
-						result =  lxml.etree.tostring(match, method='text', encoding='utf8').strip() 
-						if result != '' and result not in leave_out:
-							print
-							for line in textwrap.wrap(result, 75,  initial_indent='        ', subsequent_indent='        '):
-								print line
-							print
-			
+	# in which manuscripts are the line numbers not in final order (schroer)
+	# show_matches(list_matches(faust.transcript_files(), "//tei:l[number(@n) <  number(./preceding::tei:l[1]/@n)]"))
+#	for val in unique_values (faust.transcript_files(), "//ge:document//*"): print val
+
+# === find the subset of  manuscripts that doesn't contain certain markup
+
+	bad_markup = [
+            #X "//*[contains(@hand, 'lat')]",
+            #X "//tei:handShift[contains(@new, 'lat')]",
+            #X "//tei:unclear",
+            #X "//*[@rend='font-big']",
+            #X "//*[@rend='font-small']",
+            "//@f:pos",
+            "//ge:patch",
+            #X "//tei:reg",
+            #X "//tei:sic",
+            #X "//tei:corr",
+            "//tei:g[@ref='#parenthesis_left']",
+            "//tei:g[@ref='#parenthesis_right']",
+            "//tei:g[@ref='#truncation']",
+            "//tei:g[@ref='#ditto-quote']",
+            "//tei:g[@ref='#ditto-line']",
+            "//tei:g[@ref='#g_break']",
+            #X "//tei:g[@ref='#g_transp_1']",
+            #X "//tei:g[@ref='#g_transp_2']",
+            #X "//tei:g[@ref='#g_transp_3']",
+            #X "//tei:g[@ref='#g_transp_4']",
+            #X "//tei:g[@ref='#g_transp_5']",
+            #X "//tei:g[@ref='#g_transp_6']",
+            #X "//tei:g[@ref='#g_transp_7']",
+            #X "//tei:expan",
+            #X "//tei:ex",
+            #X "//*[@rend='underline']",
+            #X "//*[@rend='underline_double']",
+            #X "//*[@rend='underline_triple']",
+            #X "//*[@rend='underline_quadruple']",
+            "//*[@rend='']",
+            "//*[@rend='frame']",
+            "//*[@rend='overline']",
+            #X "//*[@rend='vertical']",
+            #X "//tei:g[@ref='']",
+            #X "//f:st//f:st",
+            #X "//f:st[@rend='erase']",
+            "//tei:hi[@rend='underdots']",
+            #X "//f:overw",
+            #X "//ge:rewrite",
+            #fixierung mit aenderung redundant
+            # "//tei:seg[@type='between']",
+            #X "//tei:seg[@rend='inbetween']",
+            #X "//f:grLine",
+            #X "//f:grBrace",
+            #X "//f:ins//f:ins",
+            #X "//comment()[contains(.,'S-Linie')]",
+            #X "//tei:gap[@atLeast or @atMost]",
+            #X "//tei:gap[not(@unit='chars')]",
+            #X "//tei:damage",
+            "//*[@cert='low']",
+            #X "//tei:certainty",
+            #X "//tei:supplied",
+            # u"//text()[contains(.,'\u0029')]",
+            # u"//text()[contains(.,'\u0026')]",
+            #X u"//text()[contains(.,'\u23BC')]",
+            #X u"//text()[contains(.,'\u23D1')]",
+            #X u"//text()[contains(.,'\u0301')]",
+            #X u"//text()[contains(.,'\u2114')]",
+            u"//text()[contains(.,'\u0370')]",
+            u"//text()[contains(.,'\u0371')]",
+            u"//text()[contains(.,'\u0372')]",
+            u"//text()[contains(.,'\u0373')]",
+            u"//text()[contains(.,'\u0374')]",
+            u"//text()[contains(.,'\u0375')]",
+            u"//text()[contains(.,'\u0376')]",
+            u"//text()[contains(.,'\u0377')]",
+            u"//text()[contains(.,'\u037A')]",
+            u"//text()[contains(.,'\u037B')]",
+            u"//text()[contains(.,'\u037C')]",
+            u"//text()[contains(.,'\u037D')]",
+            u"//text()[contains(.,'\u037E')]",
+            u"//text()[contains(.,'\u037F')]",
+            # ... TODO griechische Zeichen ausgelassen
+            #X u"//text()[contains(.,'\u203f')]", #8255
+            u"//text()[contains(.,'\u2044')]", #8260
+            u"//text()[contains(.,'\u204c')]", #8268
+            #X u"//text()[contains(.,'\u00b7')]", #183
+            #X u"//text()[contains(.,'\u231c')]", #8988
+            #X u"//text()[contains(.,'\u231d')]", #8989
+            #X u"//text()[contains(.,'\u231e')]", #8990
+            #X u"//text()[contains(.,'\u231f')]", #8991
+            #X u"//text()[contains(.,'\u2609')]", #9737
+            #X u"//text()[contains(.,'\u263d')]", #9789
+            u"//text()[contains(.,'\u0a50')]", #2640
+            #X u"//text()[contains(.,'\u2e13')]", #11795
+            #X u"//text()[contains(.,'\u2713')]", #10003
+            #X u"//text()[contains(.,'\u002B')]",
+            #X u"//text()[contains(.,'\u274C')]",
+            # u"//text()[contains(.,'\u00bc')]", # 188
+            # u"//text()[contains(.,'\u00bd')]", # 189
+            # u"//text()[contains(.,'\u00be')]", # 190
+            u"//text()[contains(.,'\u0391')]", # 913
+            u"//text()[contains(.,'\u0392')]", # 914
+            u"//text()[contains(.,'\u0393')]", # 915
+            u"//text()[contains(.,'\u0394')]", # 916
+            u"//text()[contains(.,'\u03b1')]", # 945
+            u"//text()[contains(.,'\u03b2')]", # 946
+            u"//text()[contains(.,'\u02e0')]", # 736
+            u"//text()[contains(.,'\u03b4')]", # 948
+            "//tei:change//comment()[contains(.,'Ritschel')]",
+            "//tei:change[@who='ritschel']"
+        ]
+	bad_markup_disjunction = ' | '.join(bad_markup)
+	all_documents = set(map (os.path.dirname, faust.transcript_files()))
+	# print bad_markup_disjunction.encode('utf-8')
+	bad_documents = set(map (os.path.dirname, matches(faust.transcript_files(), bad_markup_disjunction)))
+
+	for d in all_documents.difference(bad_documents):
+	 	print '/'.join(d.split('/')[-2:])

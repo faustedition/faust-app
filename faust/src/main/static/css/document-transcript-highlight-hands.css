@@ -1,0 +1,48 @@
+svg.diplomatic .bgBox {
+	fill-opacity: .40;
+    fill: #a64d79;
+}
+
+svg.diplomatic .bgBox.noBackground {
+    visibility: hidden;
+}
+
+svg.diplomatic .bgBox.hand-g {
+	fill: White;
+}
+
+svg.diplomatic .bgBox.hand-jo {
+    fill: #f9cb9c;
+}
+
+svg.diplomatic .bgBox.hand-st {
+    fill: #93c47d;
+}
+
+svg.diplomatic .bgBox.hand-gt {
+    fill: #a4c2f4;
+}
+
+svg.diplomatic .bgBox.hand-kr {
+    fill: #ff9900;
+}
+
+svg.diplomatic .bgBox.hand-ec {
+    fill: #ffff00;
+}
+
+svg.diplomatic .bgBox.hand-ri {
+    fill: #0000ff;
+}
+
+svg.diplomatic .bgBox.hand-go {
+    fill: #9900ff;
+}
+
+svg.diplomatic .bgBox.hand-sc, svg.diplomatic .bgBox.hand-zs {
+    fill: #ea9999;
+}
+
+svg.diplomatic .bgBox.hand-xx, svg.diplomatic .bgBox.hand-xy, svg.diplomatic .bgBox.hand-xz  {
+    fill: #b45f06;
+}

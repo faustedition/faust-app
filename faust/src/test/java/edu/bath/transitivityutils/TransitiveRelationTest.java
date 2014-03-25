@@ -1,14 +1,19 @@
 package edu.bath.transitivityutils;
 
+import static edu.bath.transitivityutils.RelationAssertions.assertDirectRelations;
+import static edu.bath.transitivityutils.RelationAssertions.assertRelations;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Random;
+import java.util.Set;
+
+import org.junit.After;
+import org.junit.Test;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
-import java.util.Random;
-import java.util.Set;
-import org.junit.After;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static edu.bath.transitivityutils.RelationAssertions.*;
 
 /**
  *

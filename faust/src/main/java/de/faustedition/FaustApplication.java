@@ -1,24 +1,28 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition;
 
-import de.faustedition.collation.CollationFinder;
-import de.faustedition.db.TransactionFilter;
-import de.faustedition.document.ArchiveRouter;
-import de.faustedition.document.DocumentRouter;
-import de.faustedition.facsimile.FacsimileFinder;
-import de.faustedition.genesis.GeneticGraphRouter;
-import de.faustedition.reasoning.InscriptionPrecedenceResource;
-import de.faustedition.search.SearchResource;
-import de.faustedition.security.LdapSecurityStore;
-import de.faustedition.security.SecurityConstants;
-import de.faustedition.structure.StructureFinder;
-import de.faustedition.tei.GoddagFinder;
-import de.faustedition.template.TemplateFinder;
-import de.faustedition.text.TextFinder;
-import de.faustedition.transcript.SceneStatisticsResource;
-import de.faustedition.transcript.TranscriptViewResource;
-import de.faustedition.transcript.TranscriptSourceResource;
-import de.faustedition.transcript.VerseStatisticsResource;
-import de.faustedition.xml.XMLFinder;
+import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
+
+import java.util.List;
+
 import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -45,9 +49,26 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.util.List;
-
-import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
+import de.faustedition.collation.CollationFinder;
+import de.faustedition.db.TransactionFilter;
+import de.faustedition.document.ArchiveRouter;
+import de.faustedition.document.DocumentRouter;
+import de.faustedition.facsimile.FacsimileFinder;
+import de.faustedition.genesis.GeneticGraphRouter;
+import de.faustedition.reasoning.InscriptionPrecedenceResource;
+import de.faustedition.search.SearchResource;
+import de.faustedition.security.LdapSecurityStore;
+import de.faustedition.security.SecurityConstants;
+import de.faustedition.structure.StructureFinder;
+import de.faustedition.tei.GoddagFinder;
+import de.faustedition.template.TemplateFinder;
+import de.faustedition.text.TextFinder;
+import de.faustedition.transcript.SceneStatisticsResource;
+import de.faustedition.transcript.TranscriptSourceResource;
+import de.faustedition.transcript.TranscriptViewResource;
+import de.faustedition.transcript.VerseStatisticsResource;
+import de.faustedition.xml.XMLFinder;
+import de.faustedition.xml.XMLQueryResource;
 
 @Component
 public class FaustApplication extends Application implements InitializingBean {
@@ -136,6 +157,7 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
 		router.attach("resources", comboResourceFinder);
+		router.attach("xml-query", restricted(contextResource(XMLQueryResource.class)));
 
 		if (environment.acceptsProfiles("development", "test")) {
 			final Filter dummyAuthenticator = new Filter() {
@@ -177,6 +199,14 @@ public class FaustApplication extends Application implements InitializingBean {
 		return authorizer;
 	}
 
+	private Restlet restricted(Restlet resource) {
+		final RoleAuthorizer authorizer = new RoleAuthorizer();
+		authorizer.getAuthorizedRoles().add(SecurityConstants.ADMIN_ROLE);
+		authorizer.getAuthorizedRoles().add(SecurityConstants.EDITOR_ROLE);
+		authorizer.setNext(resource);
+		return authorizer;
+	}
+
 	private Restlet transactional(Restlet resource) {
 		return new TransactionFilter(getContext(), resource, transactionManager);
 	}
@@ -184,7 +214,7 @@ public class FaustApplication extends Application implements InitializingBean {
 	public static class EntryPageRedirectionResource extends ServerResource {
 		@Override
 		protected Representation doHandle() throws ResourceException {
-			getResponse().redirectTemporary(new Reference(getReference(), "genesis/work"));
+			getResponse().redirectTemporary(new Reference(getReference(), "project/about"));
 			return null;
 		}
 	}

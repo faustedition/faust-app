@@ -1,12 +1,29 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.db;
 
-import com.jolbox.bonecp.BoneCPDataSource;
-import de.faustedition.transcript.TranscribedVerseInterval;
-import de.faustedition.transcript.Transcript;
-import eu.interedition.text.Annotation;
-import eu.interedition.text.Name;
-import eu.interedition.text.Text;
-import eu.interedition.text.TextTarget;
+import java.io.File;
+import java.io.IOException;
+
+import javax.sql.DataSource;
+
 import org.h2.Driver;
 import org.hibernate.SessionFactory;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -22,9 +39,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.sql.DataSource;
-import java.io.File;
-import java.io.IOException;
+import com.jolbox.bonecp.BoneCPDataSource;
+
+import de.faustedition.transcript.TranscribedVerseInterval;
+import de.faustedition.transcript.Transcript;
+import eu.interedition.text.Anchor;
+import eu.interedition.text.Layer;
+import eu.interedition.text.Name;
+import eu.interedition.text.Text;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -54,12 +76,14 @@ public class DatabaseConfiguration {
 	public SessionFactory sessionFactory() throws Exception {
 		return new LocalSessionFactoryBuilder(dataSource())
 			.addAnnotatedClasses(
-				Annotation.class,
+              /*
+				Layer.class,
 				Name.class,
 				Text.class,
-				TextTarget.class,
+				Anchor.class,
 				Transcript.class,
 				TranscribedVerseInterval.class
+				*/
 			).buildSessionFactory();
 	}
 

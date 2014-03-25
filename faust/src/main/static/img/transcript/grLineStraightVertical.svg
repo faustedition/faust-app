@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<g id="img" >
+			<line vector-effect="non-scaling-stroke" stroke-width="0.1em" id="svg_2" y2="95" x2="10" y1="5" x1="10"/>
+			<rect visibility="hidden" id="svg_3" height="98" width="18" y="1" x="1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="null" stroke-width="null" stroke="#000000"/>
+		</g>
+	</defs>
+</svg>

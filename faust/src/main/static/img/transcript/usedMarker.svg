@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" id="svgroot">
+	<defs>
+		<linearGradient id="gradient1">
+			<stop class="stop1" offset="0%" style="stop-color:rgb(255,255,0);stop-opacity:1"/>
+			<stop class="stop2" offset="50%" style="stop-color:rgb(0,0,0);stop-opacity:0"/>
+			<stop class="stop3" offset="100%" style="stop-color:rgb(255,255,0);stop-opacity:1"/>
+		</linearGradient>
+	</defs>
+	<g id="img">
+		<line vector-effect="non-scaling-stroke" stroke-width="0.05em" id="svg_17" y2="100" x2="100" y1="0" x1="0"
+		      stroke="black" fill="none"
+		      stroke-dasharray="0.5em, 0.75em"
+		/>
+	</g>
+
+</svg>

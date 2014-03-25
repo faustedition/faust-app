@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.document;
 
 import com.google.common.base.Throwables;
@@ -82,11 +101,16 @@ public class ArchiveRouter extends Router implements InitializingBean {
 			final SortedSet<Document> archivalUnits = new TreeSet<Document>(new Comparator<Document>() {
 				@Override
 				public int compare(Document o1, Document o2) {
-					final String o1cn = o1.toString();
-					final String o2cn = o2.toString();
-					return (o1cn == null || o2cn == null) ? 0 : o1cn.compareTo(o2cn);
+					final String o1cn = o1.getMetadataValue("callnumber");
+					final String o2cn = o2.getMetadataValue("callnumber");
+					if (o1cn != null && o2cn != null) {
+						int order = o1cn.compareTo(o2cn);
+						if (order != 0) return order;
+					}
+					return o1.getSource().compareTo(o2.getSource());
 				}
 			});
+
 			Iterables.addAll(archivalUnits, Iterables.filter(archive, Document.class));
 			model.put("archivalUnits", archivalUnits);
 

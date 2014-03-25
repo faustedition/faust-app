@@ -8,7 +8,7 @@
 	.archive-container { padding: 1em }
 </#assign>
 <#assign header>
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 </#assign>
 <@faust.page title=title css=css header=header>

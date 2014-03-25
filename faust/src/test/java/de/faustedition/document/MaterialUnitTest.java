@@ -1,12 +1,12 @@
 package de.faustedition.document;
 
-import com.google.common.collect.Iterables;
-import de.faustedition.AbstractContextTest;
-import de.faustedition.graph.FaustGraph;
+import java.util.Arrays;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
+import de.faustedition.AbstractContextTest;
+import de.faustedition.graph.FaustGraph;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

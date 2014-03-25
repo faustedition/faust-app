@@ -1,19 +1,46 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.text;
 
-import com.google.common.base.Strings;
-import com.google.common.io.Closeables;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.Runtime;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.tei.WhitespaceUtil;
-import de.faustedition.xml.*;
-import eu.interedition.text.Name;
-import eu.interedition.text.util.SimpleXMLTransformerConfiguration;
-import eu.interedition.text.xml.XML;
-import eu.interedition.text.xml.XMLTransformer;
-import eu.interedition.text.xml.XMLTransformerModule;
-import eu.interedition.text.xml.module.*;
+import static de.faustedition.xml.Namespaces.TEI_NS_URI;
+import static eu.interedition.text.TextConstants.TEI_NS;
+import static eu.interedition.text.TextConstants.XML_SOURCE_NAME;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.goddag4j.Element;
 import org.goddag4j.io.GoddagXMLReader;
@@ -35,16 +62,35 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import com.google.common.base.Strings;
+import com.google.common.io.Closeables;
 
-import static de.faustedition.xml.Namespaces.TEI_NS_URI;
-import static eu.interedition.text.TextConstants.TEI_NS;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.Runtime;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.tei.WhitespaceUtil;
+import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.MultiplexingContentHandler;
+import de.faustedition.xml.XMLFragmentFilter;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
+import eu.interedition.text.Anchor;
+import eu.interedition.text.Layer;
+import eu.interedition.text.Name;
+import eu.interedition.text.TextRepository;
+import eu.interedition.text.h2.H2TextRepository;
+import eu.interedition.text.h2.LayerRelation;
+import eu.interedition.text.xml.XML;
+import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.XMLTransformerConfigurationBase;
+import eu.interedition.text.xml.XMLTransformerModule;
+import eu.interedition.text.xml.module.CLIXAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.DefaultAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.LineElementXMLTransformerModule;
+import eu.interedition.text.xml.module.NotableCharacterXMLTransformerModule;
+import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
+import eu.interedition.text.xml.module.TextXMLTransformerModule;
 
 @Component
 public class TextManager extends Runtime implements Runnable {
@@ -69,19 +115,37 @@ public class TextManager extends Runtime implements Runnable {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    @Autowired
+    private TextRepository<JsonNode> textRepo;
+    
     private SortedMap<FaustURI, String> tableOfContents;
 
 	@Transactional
 	public Set<FaustURI> feedDatabase() {
-		final SimpleXMLTransformerConfiguration conf = new SimpleXMLTransformerConfiguration();
+		
+		final Random random = new Random();
+					
+		final XMLTransformerConfigurationBase<JsonNode> conf = new XMLTransformerConfigurationBase<JsonNode>(textRepo) {
 
-		final List<XMLTransformerModule> modules = conf.getModules();
-		modules.add(new LineElementXMLTransformerModule());
-		modules.add(new NotableCharacterXMLTransformerModule());
-		modules.add(new TextXMLTransformerModule());
-		modules.add(new DefaultAnnotationXMLTransformerModule(1000, true));
-		modules.add(new CLIXAnnotationXMLTransformerModule(1000));
-		modules.add(new TEIAwareAnnotationXMLTransformerModule(1000));
+			@Override
+			protected Layer<JsonNode> translate(Name name, Map<Name, String> attributes, Set<Anchor<JsonNode>> anchors) {
+
+				ObjectMapper mapper = new org.codehaus.jackson.map.ObjectMapper();
+				JsonNode data = mapper.valueToTree(attributes);	         
+				return new LayerRelation<JsonNode>(name, anchors, data, random.nextLong(), (H2TextRepository<JsonNode>)textRepo);
+
+			}
+
+		};
+
+
+		final List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
+		modules.add(new LineElementXMLTransformerModule<JsonNode>());
+		modules.add(new NotableCharacterXMLTransformerModule<JsonNode>());
+		modules.add(new TextXMLTransformerModule<JsonNode>());
+		modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
+		modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
+		modules.add(new TEIAwareAnnotationXMLTransformerModule<JsonNode>());
 
 		conf.addLineElement(new Name(TEI_NS, "div"));
 		conf.addLineElement(new Name(TEI_NS, "head"));
@@ -91,7 +155,7 @@ public class TextManager extends Runtime implements Runnable {
 		conf.addLineElement(new Name(TEI_NS, "lg"));
 		conf.addLineElement(new Name(TEI_NS, "l"));
 		conf.addLineElement(new Name(TEI_NS, "p"));
-		conf.addLineElement(new Name(null, "line"));
+		conf.addLineElement(new Name("", "line"));
 
 		conf.addContainerElement(new Name(TEI_NS, "text"));
 		conf.addContainerElement(new Name(TEI_NS, "div"));
@@ -107,16 +171,17 @@ public class TextManager extends Runtime implements Runnable {
 		conf.include(new Name(TEI_NS, "lem"));
 
 		final Session session = sessionFactory.getCurrentSession();
-		final XMLTransformer xmlTransformer = new XMLTransformer(session, conf);
+		final XMLTransformer<JsonNode> xmlTransformer = new XMLTransformer<JsonNode>(conf);
 
 		final Set<FaustURI> failed = new HashSet<FaustURI>();
 		logger.info("Importing texts");
 		for (FaustURI textSource : xml.iterate(new FaustURI(FaustAuthority.XML, "/text"))) {
-			InputStream xmlStream = null;
+			Reader xmlReader = null;
 			try {
 				logger.info("Importing text " + textSource);
-				xmlStream = xml.getInputSource(textSource).getByteStream();
-				final eu.interedition.text.Text xmlText = eu.interedition.text.Text.create(session, null, xmlInputFactory.createXMLStreamReader(xmlStream));
+				xmlReader = xml.getInputSource(textSource).getCharacterStream();
+				
+				final Layer<JsonNode> xmlText = textRepo.add(XML_SOURCE_NAME, xmlReader, null, Collections.<Anchor<JsonNode>>emptySet());
 				final eu.interedition.text.Text text = xmlTransformer.transform(xmlText);
 			} catch (IOException e) {
 				logger.error("I/O error while adding text " + textSource, e);
@@ -125,7 +190,7 @@ public class TextManager extends Runtime implements Runnable {
 				logger.error("XML error while adding text " + textSource, e);
 				failed.add(textSource);
 			} finally {
-				Closeables.closeQuietly(xmlStream);
+				Closeables.closeQuietly(xmlReader);
 			}
 		}
 		return failed;

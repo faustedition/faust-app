@@ -1,4 +1,23 @@
-YUI.add('document-text', function (Y) {		
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+YUI.add('document-text', function (Y) {
 
 	DocumentText = {
 		
@@ -36,9 +55,7 @@ YUI.add('document-text', function (Y) {
 				}
 				else {
 					stageColors.uniqueStageCount++;
-					console.log("Number of stages:" + stageColors.uniqueStageCount);
 					var index = stageColors.uniqueStageCount % stageColors.colors.length;
-					console.log('index: ' + index);
 					stageColors.map[stageName] = stageColors.colors[index];
 					return stageColors.map[stageName];
 				}
@@ -64,9 +81,7 @@ YUI.add('document-text', function (Y) {
 					});
 
 					forAnnotationDo('add', p, function() {
-						partitionNode.wrap('<sup/>');
-						//partitionNode.insert('</sup>', 'after');
-						
+						partitionNode.wrap('<sup/>');						
 					});
 
 
@@ -86,8 +101,6 @@ YUI.add('document-text', function (Y) {
 
 					forAnnotationDo('stage', p, function(a) {
 						var stageName = a.data['value'];
-						// partitionNode.insert('<', 'before');
-						// partitionNode.insert('>', 'after');
 						partitionNode.setStyle('color', stageColor(stageName));
 						partitionNode.setAttribute('title', stageName);
 					});

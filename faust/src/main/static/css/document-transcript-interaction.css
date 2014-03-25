@@ -1,0 +1,106 @@
+svg.diplomatic .bgBox {
+    /* initially hide text background */
+    opacity: 0;
+}
+
+.tooltip-hand {
+    font-style: normal;
+    font-weight: bold;
+    margin-right: 0.3em;
+}
+
+.tooltip-material {
+    font-style: italic;
+    font-weight: normal;
+    margin-right: 0.3em;
+}
+
+.tooltip-script {
+    font-style: normal;
+    font-weight: normal;
+    margin-right: 0.3em;
+}
+
+.tooltip-decoration {
+    margin-top: 1em;
+}
+
+.tooltip-property {
+    margin-top: 1em;
+}
+
+/* text properties */
+
+.tooltip-caption-property-under:before {content: 'darunterstehend';}
+.tooltip-caption-property-over:before {content: 'Daraufschreibung';}
+.tooltip-caption-property-patch:before {content: 'Aufklebung';}
+.tooltip-caption-property-interline:before {content: 'eingefügte Zeile';}
+.tooltip-caption-property-inbetween:before {content: 'Dazwischenschreibung';}
+.tooltip-caption-property-gap:before {content: 'nicht lesbar';}
+.tooltip-caption-property-supplied:before {content: 'editorische Ergänzung';}
+.tooltip-caption-property-unclear-cert-high:before {content: 'Unsichere Lesung (wahrscheinlich)';}
+.tooltip-caption-property-unclear-cert-low:before {content: 'Unsichere Lesung (vielleicht)';}
+.tooltip-caption-property-used:before {content: 'als erledigt markiert';}
+
+/* text decorations */
+
+.tooltip-caption-decoration-underline:before {content: 'Unterstreichung';}
+.tooltip-caption-decoration-overline:before {content: 'Überstreichung';}
+.tooltip-caption-decoration-strikethrough:before {content: 'Durchstreichung';}
+.tooltip-caption-decoration-underdots:before {content: 'Unterpungierung';}
+.tooltip-caption-decoration-rewrite:before {content: 'Fixierung';}
+.tooltip-caption-decoration-erase:before {content: 'Rasur';}
+
+/* inline decorations */
+.tooltip-caption-decoration-rect:before {content: 'Einkästelung';}
+.tooltip-caption-decoration-circle:before {content: 'Einkreisung';}
+
+/* scribal hands */
+
+.tooltip-caption-hand-g:before {content: 'Goethe';}
+.tooltip-caption-hand-aj:before {content: 'Anna Jameson';}
+.tooltip-caption-hand-ec:before {content: 'Eckermann';}
+.tooltip-caption-hand-f:before {content: 'Färber';}
+.tooltip-caption-hand-gt:before {content: 'Geist';}
+.tooltip-caption-hand-gh:before {content: 'Goechhausen';}
+.tooltip-caption-hand-go:before {content: 'Goettling';}
+.tooltip-caption-hand-hd:before {content: 'Herder';}
+.tooltip-caption-hand-jo:before {content: 'John';}
+.tooltip-caption-hand-kr:before {content: 'Kräuter';}
+.tooltip-caption-hand-m:before {content: 'Müller';}
+.tooltip-caption-hand-ovg:before {content: 'Ottilie von Goethe';}
+.tooltip-caption-hand-re:before {content: 'Reichel';}
+.tooltip-caption-hand-ri:before {content: 'Riemer';}
+.tooltip-caption-hand-st:before {content: 'Schuchardt';}
+.tooltip-caption-hand-sd:before {content: 'Seidler';}
+.tooltip-caption-hand-so:before {content: 'Soret';}
+.tooltip-caption-hand-sp:before {content: 'Spiegel';}
+.tooltip-caption-hand-sta:before {content: 'Stadelmann';}
+.tooltip-caption-hand-sti:before {content: 'Stieler';}
+.tooltip-caption-hand-ve:before {content: 'Varnhagen von Ense';}
+.tooltip-caption-hand-v:before {content: 'Helene Vulpius';}
+.tooltip-caption-hand-we:before {content: 'Weller';}
+.tooltip-caption-hand-wi:before {content: 'Maria Anna Katharina Theresia Willemer, genannt Marianne';}
+.tooltip-caption-hand-wo:before {content: 'Pius Alexander Wolff';}
+.tooltip-caption-hand-avg:before {content: 'August von Goethe';}
+.tooltip-caption-hand-w-owvg:before {content: 'Walther oder Wolfgang von Goethe';}
+.tooltip-caption-hand-wvg:before {content: 'Wolfgang von Goethe';}
+.tooltip-caption-hand-sc:before {content: 'Schreiberhand';}
+.tooltip-caption-hand-zs:before {content: 'zeitgenössische Schrift';}
+.tooltip-caption-hand-xx:before {content: 'fremde Hand #1';}
+.tooltip-caption-hand-xy:before {content: 'fremde Hand #2';}
+.tooltip-caption-hand-xz:before {content: 'fremde Hand #3';}
+
+/* materials */
+
+.tooltip-caption-material-t:before {content: 'Tinte';}
+.tooltip-caption-material-tr:before {content: 'rote/braune Tinte';}
+.tooltip-caption-material-bl:before {content: 'Bleistift';}
+.tooltip-caption-material-ro:before {content: 'Rötel';}
+.tooltip-caption-material-ko:before {content: 'Kohlestift';}
+.tooltip-caption-material-blau:before {content: 'blauer Bleistift';}
+
+/* script */
+
+.tooltip-caption-script-lat:before {content: 'lateinische Schrift';}
+.tooltip-caption-script-gr:before {content: 'griechische Schrift';}

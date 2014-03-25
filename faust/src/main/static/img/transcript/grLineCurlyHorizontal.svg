@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<g id="img">
+			<path vector-effect="non-scaling-stroke" stroke-width="0.1em" transform="rotate(90 57.625 49.875)" fill="none" stroke-dasharray="null" stroke-linejoin="round"
+			      stroke-linecap="round"
+			      d="m17.5,18.75c1,16.43245 80,1.35326 79.75,15.65916c-0.25,14.3059 -78.75,0.19332 -79.25,15.65916c-0.5,15.46584 79.75,-0.38665 79.75,15.46584c0,15.85249 -79.25,0.19333 -79.75,15.46584c-0.5,15.27252 79.75,0 79.5,15.46584"
+			      id="svg_16" stroke="#000000"/>
+		</g>
+	</defs>
+</svg>

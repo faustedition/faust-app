@@ -1,25 +1,42 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.document;
-
-import static de.faustedition.transcript.GoddagTranscript.TRANSCRIPT_RT;
-import static org.neo4j.graphdb.Direction.INCOMING;
-import static org.neo4j.graphdb.Direction.OUTGOING;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-
 import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapperCollection;
 import de.faustedition.transcript.GoddagTranscript;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import static de.faustedition.transcript.GoddagTranscript.TRANSCRIPT_RT;
+import static org.neo4j.graphdb.Direction.INCOMING;
+import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
 
@@ -93,7 +110,7 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		final String uri = (String) node.getProperty(PREFIX + ".facsimile", null);
 		return (uri == null ? null :FaustURI.parse(uri));
 	}
-	
+
 	public Type getType() {
 		return getType(node);
 	}
@@ -193,27 +210,31 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 	@Override
 	public String toString() {
 
-		final String waFaust = getMetadataValue("callnumber.wa-faust");
-		if (!Strings.isNullOrEmpty(waFaust) && !"-".equals(waFaust)) {
+        final String waFaust = getMetadataValue("callnumber.wa-faust");
+		if (!Strings.isNullOrEmpty(waFaust) && !"none".equals(waFaust)) {
 			return waFaust;
 		}
 
-		final String gsaOld = getMetadataValue("callnumber.gsa-old");
-		if (!Strings.isNullOrEmpty(gsaOld) && !"-".equals(gsaOld)) {
+		final String gsaNew = getMetadataValue("callnumber.gsa_2");
+		if (!Strings.isNullOrEmpty(gsaNew) && !"none".equals(gsaNew)) {
+			return gsaNew;
+		}
+		
+		final String gsaOld = getMetadataValue("callnumber.gsa_1");
+		if (!Strings.isNullOrEmpty(gsaOld) && !"none".equals(gsaOld)) {
 			return gsaOld;
 		}
 		
 		final String waId = getMetadataValue("wa-id");
-		if (!Strings.isNullOrEmpty(waId) && !"-".equals(waId)) {
+		if (!Strings.isNullOrEmpty(waId) && !"none".equals(waId)) {
 			return waId;
 		}
 		
 		final String callnumber = getMetadataValue("callnumber");
-		if (!Strings.isNullOrEmpty(callnumber) && !"-".equals(callnumber)) {
+		if (!Strings.isNullOrEmpty(callnumber) && !"none".equals(callnumber)) {
 			return new StringBuilder(getArchive().getId()).append("/").append(callnumber).toString();
 		}
 		
-
 		final FaustURI transcriptSource = getTranscriptSource();
 		if (transcriptSource != null) {
 			return transcriptSource.getFilename();

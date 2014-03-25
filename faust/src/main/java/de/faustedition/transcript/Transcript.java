@@ -1,7 +1,27 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.transcript;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
+import java.util.Collections;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,9 +34,13 @@ import javax.persistence.Transient;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import de.faustedition.graph.NodeWrapper;
+import eu.interedition.text.Anchor;
+import org.codehaus.jackson.JsonNode;
 import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,24 +52,28 @@ import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.transcript.input.TranscriptInvalidException;
 import de.faustedition.xml.XMLStorage;
-import eu.interedition.text.Text;
+import eu.interedition.text.Layer;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
 import eu.interedition.text.xml.XML;
 import eu.interedition.text.xml.XMLTransformer;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
-@Entity
-@Table(name = "faust_transcript")
-public class Transcript {
+public class Transcript extends NodeWrapper {
 	private static final Logger LOG = LoggerFactory.getLogger(Transcript.class);
 
 	private long id;
 	private String sourceURI;
-	private Text text;
+	private Layer<JsonNode> text;
 	private long materialUnitId;
 
-	@Id
+  public Transcript(Node node) {
+    super(node);
+  }
+
+  @Id
 	@GeneratedValue
 	public long getId() {
 		return id;
@@ -85,11 +113,11 @@ public class Transcript {
 
 	@ManyToOne
 	@JoinColumn(name = "text_id")
-	public Text getText() {
+	public Layer<JsonNode> getText() {
 		return text;
 	}
 
-	public void setText(Text text) {
+	public void setText(Layer<JsonNode> text) {
 		this.text = text;
 	}
 
@@ -98,45 +126,63 @@ public class Transcript {
 		return Objects.toStringHelper(this).addValue(getSource()).toString();
 	}
 
-	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit, XMLTransformer transformer)
-		throws IOException, XMLStreamException {
-		final FaustURI source = materialUnit.getTranscriptSource();
-		Preconditions.checkArgument(source != null);
+	private static Transcript doRead(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer<JsonNode> transformer)
+	throws IOException, XMLStreamException {
+			Preconditions.checkArgument(source != null);
 
-		final String sourceURI = source.toString();
-		Transcript transcript = (Transcript) session.createCriteria(Transcript.class)
-			.add(Restrictions.eq("sourceURI", sourceURI))
-			.setLockMode(LockMode.UPGRADE_NOWAIT)
-			.uniqueResult();
-		if (transcript == null) {
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Creating transcript for {}", sourceURI);
+			final String sourceURI = source.toString();
+			Transcript transcript = (Transcript) session.createCriteria(Transcript.class)
+				.add(Restrictions.eq("sourceURI", sourceURI))
+				.setLockMode(LockMode.UPGRADE_NOWAIT)
+				.uniqueResult();
+			if (transcript == null) {
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Creating transcript for {}", sourceURI);
+				}
+				transcript = new Transcript(null);
+				
+				transcript.setSourceURI(sourceURI);
+
 			}
-			transcript = new Transcript();
-			transcript.setMaterialUnitId(materialUnit.node.getId());
-			transcript.setSourceURI(sourceURI);
-			session.save(transcript);
-		}
 
-		if (transcript.getText() == null) {
-			transcript.setText(readText(session, xml, source, transformer));
-			TranscribedVerseInterval.register(session, transcript);
-		}
+			if (transcript.getText() == null) {
 
+				transcript.setText(readText(session, xml, source, textRepo, transformer));
+				TranscribedVerseInterval.register(session, textRepo, transcript);
+			}
+
+			return transcript;
+	}
+	
+	public static Transcript read(Session session, XMLStorage xml, MaterialUnit materialUnit, TextRepository<JsonNode> textRepo, XMLTransformer<JsonNode> transformer)
+	throws IOException, XMLStreamException {
+		final FaustURI source = materialUnit.getTranscriptSource();
+
+		Transcript transcript = doRead(session, xml, source, textRepo, transformer);
+		transcript.setMaterialUnitId(materialUnit.node.getId());
+		session.save(transcript);
 		return transcript;
 	}
 
-	private static Text readText(Session session, XMLStorage xml, FaustURI source, XMLTransformer transformer) 
+	public static Transcript read(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer<JsonNode> transformer)
+	throws IOException, XMLStreamException {
+		Transcript transcript = doRead(session, xml, source, textRepo, transformer);
+		session.save(transcript);
+		return transcript;
+	}
+	
+	
+	private static Layer<JsonNode> readText(Session session, XMLStorage xml, FaustURI source, TextRepository<JsonNode> textRepo, XMLTransformer<JsonNode> transformer)
 		throws XMLStreamException, IOException {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Transforming XML transcript from {}", source);
 		}
-		InputStream xmlStream = null;
+		Reader xmlStream = null;
 		XMLStreamReader xmlReader = null;
 		try {
-			xmlStream = xml.getInputSource(source).getByteStream();
-			xmlReader = XML.createXMLInputFactory().createXMLStreamReader(xmlStream);
-			return transformer.transform(Text.create(session, null, xmlReader));
+			xmlStream = xml.getInputSource(source).getCharacterStream();
+			//xmlReader = XML.createXMLInputFactory().createXMLStreamReader(xmlStream);
+			return transformer.transform(textRepo.add(TextConstants.XML_TARGET_NAME, xmlStream, null, Collections.<Anchor<JsonNode>>emptySet()));
 		} catch(IllegalArgumentException e) {
 			throw new TranscriptInvalidException(e);
 		} finally {

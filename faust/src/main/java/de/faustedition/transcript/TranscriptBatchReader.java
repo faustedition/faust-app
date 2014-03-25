@@ -1,10 +1,32 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.transcript;
 
-import java.io.IOException;
-
-import javax.xml.stream.XMLStreamException;
-
-import org.hibernate.SessionFactory;
+import com.google.common.collect.Sets;
+import de.faustedition.FaustURI;
+import de.faustedition.Runtime;
+import de.faustedition.document.DocumentDescriptorHandler;
+import de.faustedition.document.MaterialUnit;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.transcript.input.TranscriptInvalidException;
+import de.faustedition.xml.XMLStorage;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +35,11 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StopWatch;
 
-import de.faustedition.Runtime;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.transcript.input.TranscriptInvalidException;
-import de.faustedition.xml.XMLStorage;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Set;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -33,13 +54,13 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 	private TransactionTemplate transactionTemplate;
 
 	@Autowired
-	private SessionFactory sessionFactory;
-
-	@Autowired
 	private XMLStorage xml;
 
 	@Autowired
 	private Logger logger;
+	
+	@Autowired
+	private TranscriptManager transcriptManager;
 
 	@Override
 	public void run() {
@@ -47,35 +68,45 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		for (final MaterialUnit mu : graph.getMaterialUnits()) {
-//			if ((mu instanceof Document)) {
-//				continue;
-//			}
-			if (mu.getTranscriptSource() == null) {
+
+		final Set<FaustURI> imported = Sets.<FaustURI>newHashSet();
+
+		final Deque<MaterialUnit> queue = new ArrayDeque<MaterialUnit>(graph.getMaterialUnits());
+		while (!queue.isEmpty()) {
+			final MaterialUnit mu = queue.pop();
+			final String source = mu.getMetadataValue(DocumentDescriptorHandler.internalKeyDocumentSource);
+			final FaustURI transcriptSource = mu.getTranscriptSource();
+			for (MaterialUnit child: mu) {
+				if (!imported.contains(transcriptSource)) {
+					imported.add(transcriptSource);
+					queue.add(child);
+				}
+			//queue.addAll(mu);
+			}
+			if (mu.getTranscriptSource() == null || DocumentDescriptorHandler.noneURI.equals(transcriptSource)) {
 				continue;
 			}
 			transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					try {
-						logger.debug("Reading transcript of {}", mu);
-						if (mu instanceof Document) 
-							TextualTranscripts.read(sessionFactory.getCurrentSession(), xml, mu);
-						else
-							DocumentaryTranscripts.read(sessionFactory.getCurrentSession(), xml, mu);
-						
+						logger.debug("Reading transcript {} referenced in {}", transcriptSource, source);
+						transcriptManager.find(mu);
 					} catch (IOException e) {
 						if (logger.isWarnEnabled()) {
-							logger.warn("I/O error while reading transcript from " + mu, e);
+							logger.warn("I/O error while reading transcript from " + mu + ": "
+                                    + source, e);
 						}
 					} catch (XMLStreamException e) {
 						if (logger.isWarnEnabled()) {
-							logger.warn("XML error while reading transcript from " + mu, e);
+							logger.warn("XML error while reading transcript from " + mu + ": "
+                                    + source, e);
 						}
 					} catch (TranscriptInvalidException e) {
 						if (logger.isWarnEnabled()) {
-							logger.warn("Validation error while reading transcript from " + mu, e);
-						}						
+							logger.warn("Validation error while reading transcript from " + mu + ": "
+                                    + source, e);
+						}
 					}
 				}
 			});

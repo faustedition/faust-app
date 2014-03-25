@@ -1,57 +1,21 @@
 /*
-  IIPImage Javascript Viewer <http://iipimage.sourceforge.net>
-		      Version 1.1
-
-  Copyright (c) 2007-2008 Ruven Pillay <ruven@users.sourceforge.net>
-
-  Built using the Mootools 1.2 javascript framework <http://www.mootools.net>
-
-
-   ---------------------------------------------------------------------------
-
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307	 USA
-
-   ---------------------------------------------------------------------------
-
-
-  Example:
-
-   iip = new IIP( 'div_id', { server: '/fcgi-bin/iipsrv.fcgi',
-			      image: '/images/test.tif',
-			      credit: 'copyright me 2008',
-			      zoom: 2,
-			      render: 'random',
-			      showNavButtons: whether to show navigation buttons: true (default) or false
-			      scale: 100 } );
-
-   where the arguments are:
-	i) The id of the main div element in which to create the viewer window
-	ii) A hash containting:
-	      image: the full image path (or array of paths) on the server (required)
-	      server: the iipsrv server full URL (defaults to "/fcgi-bin/iipsrv.fcgi")
-	      credit: image copyright or information (optional)
-	      zoom: the initial zoom level (optional - defaults to 1)
-	      render: tile rendering style - 'spiral' for a spiral from the centre or
-		      'random' for a rendering of tiles in a random order
-	      scale: pixels per mm
-
-   Note: The new class instance must be assigned to the global variable "iip" in this version.
-       : Requires mootools version 1.2 <http://www.mootools.net>
-       : The page MUST have a standard-compliant XHTML declaration at the beginning
-
-*/
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 Faust.YUI().use("dom", "node", "io", "dump", function(Y) {
 	// Global instance of our IIP object for use by the TargetDrag class
 	iip = null;

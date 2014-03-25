@@ -19,7 +19,7 @@
 	.zone { border: 1px dashed #ccc; margin: 3em 0; padding: 1em}	
 </#assign>
 <#assign header>
-	<script type="text/javascript" src="${cp}/static/js/raphael-min.js"></script>
+	<script type="text/javascript" src="${cp}/static/lib/raphael-min.js"></script>
 	<script type="text/javascript" src="${cp}/static/js/structure.js"></script>
 </#assign>
 <@faust.page title=title css=css header=header>

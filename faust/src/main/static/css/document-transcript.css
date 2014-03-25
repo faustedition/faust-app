@@ -1,0 +1,205 @@
+/* diplomatic transcript */
+
+/* custom fonts */
+
+@font-face {
+  font-family: faust-serif;
+  src: url(../fonts/GenBkBasR.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: faust-sans-serif;
+  src: url(../fonts/RopaSans-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: faust-monospace;
+  src: url(../fonts/UbuntuMono-Regular.ttf) format("truetype");
+}
+
+
+/* global */
+
+svg.diplomatic {
+    font-family: faust-serif, serif;
+    stroke: black;
+    font-size: 11pt;
+}
+
+#editor-toolbar {
+    margin-bottom: 3em;
+    margin-top: 0px;
+    text-align: center;
+}
+
+#editor-toolbar a {
+  color: #90ee90;
+  margin-right: 3em;
+}
+
+
+#error-display {
+  background-color: red;
+  color: white; 
+}
+
+/* drag 'n drop of zones */
+
+svg.diplomatic g.Zone {
+  cursor: move;
+  -moz-user-select: none;-webkit-user-select: none;
+}
+
+/*
+svg.diplomatic g.Zone:hover {
+  stroke: black;
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+}
+*/
+
+/* text */
+
+svg.diplomatic .text {
+    font-size: 11pt;
+    font-family: faust-sans-serif, sans-serif;
+    fill: black;
+    stroke: none;
+    stroke-opacity: 0;
+}
+
+/* hidden elements */
+
+svg.diplomatic .element-corr, svg.diplomatic .element-corr *,
+svg.diplomatic .element-ex, svg.diplomatic .element-ex *,
+svg.diplomatic .element-expan, svg.diplomatic .element-expan *,
+svg.diplomatic .element-reg, svg.diplomatic .element-reg *,
+svg.diplomatic .element-rdg, svg.diplomatic .element-rdg * {
+    display: none !important;
+}
+
+
+/* writing hand / scribes */
+
+svg.diplomatic .text.hand-g {
+	font-family: faust-serif, serif;
+}
+
+svg.diplomatic .text.hand-xx {
+	font-family: faust-monospace, monospace;
+}
+
+/* writing material  */
+
+svg.diplomatic .material-bl {
+    fill: #808080;
+    stroke: #808080;
+}
+
+svg.diplomatic .material-t {
+    fill: black;
+    stroke:black;
+}
+
+svg.diplomatic .material-ro {
+    fill: #A02020;
+    stroke: #A02020;
+}
+
+svg.diplomatic .material-tr {
+    fill: #A02020;
+    stroke: #A02020;
+}
+
+svg.diplomatic .material-blau {
+    fill: #5050C0;
+    stroke: #5050C0;
+}
+
+/* script */
+
+svg.diplomatic .text.script-lat {
+    font-style: italic;
+}
+
+/* block level elements */
+
+svg.diplomatic rect.patchBackground {
+    fill: white;
+    stroke: black;
+    stroke-opacity: 1;
+    stroke-width: 0.2 em;
+    fill-opacity: 0.8;
+}
+
+/* various annotations */
+
+svg.diplomatic .text.rewrite {
+	font-weight: bold;
+}
+
+svg.diplomatic .text.under {
+	/* opacity: 0.5; */
+    font-size: 75%;
+    baseline-shift: sub;
+}
+
+svg.diplomatic .text.over {
+	/* font-weight: bold; */
+    font-size: 135%;
+    baseline-shift: super;
+}
+
+svg.diplomatic .text.interline {
+	font-size: 9pt;
+}
+
+svg.diplomatic .text.sup {
+    baseline-shift: super;
+}
+
+svg.diplomatic .text.sub {
+    baseline-shift: sub;
+}
+
+.text.inbetween {
+    baseline-shift: super;
+
+}
+
+svg.diplomatic .bgBox {
+	fill: none;
+    stroke: none;
+}
+
+svg.diplomatic .invisible {
+    display: none;
+}
+
+svg.diplomatic line.text-decoration-type-underdots {
+    stroke-dasharray: 0.0001em, 0.5em;
+    stroke-width: 0.2em;
+    stroke-dashoffset: -0.1em;
+    stroke-linecap: round;
+}
+
+.text.erase {
+    fill: none !important;
+    stroke-opacity: 1 !important;
+    stroke-width: 0.2em !important;
+}
+
+svg.diplomatic .text-decoration-type-erase text {
+    fill: white !important;
+    fill-opacity: 1 !important;
+    stroke: none !important;
+}
+
+/* graphical elements */
+
+svg.diplomatic line, svg.diplomatic rect.inline-decoration-type-rect,
+svg.diplomatic ellipse.inline-decoration-type-circle {
+    stroke: black;
+    stroke-width: 0.1em;
+    fill: none;
+}

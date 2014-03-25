@@ -1,11 +1,14 @@
 package edu.bath.transitivityutils;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
-import static org.junit.Assert.*;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  *

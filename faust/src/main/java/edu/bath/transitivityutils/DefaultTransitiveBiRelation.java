@@ -1,9 +1,10 @@
 package edu.bath.transitivityutils;
 
+import java.io.Serializable;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import java.io.Serializable;
 
 /**
  *

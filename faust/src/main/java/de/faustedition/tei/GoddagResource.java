@@ -1,11 +1,34 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.tei;
 
-import com.google.common.base.Throwables;
-import de.faustedition.FaustURI;
-import de.faustedition.JsonRespresentation;
-import de.faustedition.transcript.TranscriptType;
-import de.faustedition.xml.CustomNamespaceMap;
-import de.faustedition.xml.XMLUtil;
+import static org.restlet.data.MediaType.APPLICATION_XML;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Iterator;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.stream.StreamResult;
+
 import org.goddag4j.Element;
 import org.goddag4j.MultiRootedTree;
 import org.goddag4j.io.GoddagJSONWriter;
@@ -23,14 +46,13 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Iterator;
+import com.google.common.base.Throwables;
 
-import static org.restlet.data.MediaType.APPLICATION_XML;
+import de.faustedition.FaustURI;
+import de.faustedition.JsonRespresentation;
+import de.faustedition.transcript.TranscriptType;
+import de.faustedition.xml.CustomNamespaceMap;
+import de.faustedition.xml.XMLUtil;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)

@@ -1,6 +1,7 @@
 package de.faustedition;
 
-import com.google.common.base.Throwables;
+import java.io.IOException;
+
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -8,7 +9,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.test.context.support.GenericXmlContextLoader;
 
-import java.io.IOException;
+import com.google.common.base.Throwables;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

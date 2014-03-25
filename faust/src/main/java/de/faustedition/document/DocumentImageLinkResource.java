@@ -1,13 +1,29 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.document;
 
+import com.google.common.collect.Lists;
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.XMLDocumentImageLinker.IdGenerator;
-import de.faustedition.facsimile.FacsimileFinder;
 import de.faustedition.template.TemplateRepresentationFactory;
-import de.faustedition.transcript.DocumentaryGoddagTranscript;
-import de.faustedition.transcript.GoddagTranscript;
-import de.faustedition.transcript.TranscriptType;
 import de.faustedition.xml.XMLStorage;
 import de.faustedition.xml.XMLUtil;
 import de.faustedition.xml.XPathUtil;
@@ -41,6 +57,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -58,9 +75,6 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 
 	@Autowired
 	private IIPInfo iipInfo;
-
-	@Autowired
-	private FacsimileFinder facsimileFinder;
 
 	@Autowired
 	private XMLStorage xml;
@@ -109,7 +123,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 	@Put("svg")
 	public String store(InputRepresentation data) throws SAXException, IOException, TransformerException, XPathExpressionException, URISyntaxException {
 		final org.w3c.dom.Document svg = XMLUtil.parse(data.getStream());
-		final FaustURI transcriptURI = transcript().getSource();
+		final FaustURI transcriptURI = page().getTranscriptSource();
 		final org.w3c.dom.Document source = XMLUtil.parse(xml.getInputSource(transcriptURI));
 
 		IdGenerator newIds = new IdGenerator() {
@@ -117,8 +131,6 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 			/**
 			 * Maps a number to a string of lowercase alphabetic characters, 
 			 * which act as digits to base 26. (a, b, c, ..., aa, ab, ac, ...) 
-			 * @param n
-			 * @return
 			 */
 			private String alphabetify(int n) {
 				if (n > 25)
@@ -137,7 +149,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 			}
 		};
 
-		javax.xml.xpath.XPathExpression lines = XPathUtil.xpath(this.GE_LINE_XP);
+		javax.xml.xpath.XPathExpression lines = XPathUtil.xpath(GE_LINE_XP);
 
 		boolean hasSourceChanged = XMLDocumentImageLinker.link(source, new LineIdGenerator(), lines, svg, newIds);
 		if (hasSourceChanged)
@@ -196,40 +208,17 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 
 	protected MaterialUnit page() {
 
-		final Object[] contents = document.getSortedContents().toArray();
-		if (pageNum < 1 || contents.length < pageNum) {
-			final String msg = "Request for page " + pageNum + "; there are " + contents.length + " pages.";
+        final List<MaterialUnit> pages = Lists.newArrayList(document.getPages());
+        if (pageNum < 1 || pages.size() < pageNum) {
+			final String msg = "Request for page " + pageNum + "; there are " + pages.size() + " pages.";
 			throw new ResourceException(new Status(404), msg);
 		}
 
-		return (MaterialUnit) contents[pageNum - 1];
-	}
-
-	private DocumentaryGoddagTranscript transcript() {
-
-		final MaterialUnit mu = page();
-		final GoddagTranscript transcript = mu.getTranscript();
-
-		if (transcript == null) {
-			return null;
-		}
-		if (transcript.getType() != TranscriptType.DOCUMENTARY) {
-			return null;
-		}
-		final DocumentaryGoddagTranscript dt = (DocumentaryGoddagTranscript) transcript;
-		if (dt.getFacsimileReferences().isEmpty()) {
-			return null;
-		}
-		return dt;
+		return pages.get(pageNum - 1);
 	}
 
 	protected String facsimileUrl() {
-		final DocumentaryGoddagTranscript dt = transcript();
-		if (dt == null) {
-			final String msg = "There is no documentary transcript for this page!";
-			throw new ResourceException(new Status(404), msg);
-		}
-		final FaustURI facsimileURI = dt.getFacsimileReferences().first();
+		final FaustURI facsimileURI = page().getFacsimile();
 		return String.format(imageUrlTemplate, facsimileURI.getPath()
 			.replaceAll("^/", ""));
 	}
@@ -238,7 +227,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 	public Representation graphic() throws ResourceException, IOException,
 		SAXException, XPathExpressionException, URISyntaxException {
 
-		final FaustURI transcriptURI = transcript().getSource();
+		final FaustURI transcriptURI = page().getTranscriptSource();
 		final org.w3c.dom.Document source = XMLUtil.parse(xml
 			.getInputSource(transcriptURI));
 
@@ -252,7 +241,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 				.getInputSource(new FaustURI(linkDataURI)));
 
 			// adjust the links in the xp
-			final XPathExpression xp = XPathUtil.xpath(this.GE_LINE_XP);
+			final XPathExpression xp = XPathUtil.xpath(GE_LINE_XP);
 
 			XMLDocumentImageLinker.enumerateTarget(source, svg, xp, new LineIdGenerator(), new NullOutputStream());
 
@@ -296,7 +285,7 @@ public class DocumentImageLinkResource extends ServerResource implements Initial
 	@Get("json")
 	public Representation documentStructure() throws SAXException, IOException,
 		XPathExpressionException {
-		final FaustURI transcriptURI = transcript().getSource();
+		final FaustURI transcriptURI = page().getTranscriptSource();
 		final org.w3c.dom.Document source = XMLUtil.parse(xml
 			.getInputSource(transcriptURI));
 		final XPathExpression xp = XPathUtil.xpath(GE_LINE_XP);

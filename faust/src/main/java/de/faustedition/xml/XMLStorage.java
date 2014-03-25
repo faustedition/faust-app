@@ -1,17 +1,24 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.xml;
 
-import com.google.common.base.Preconditions;
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import org.neo4j.helpers.collection.IterableWrapper;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-
-import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,6 +27,21 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.xml.transform.TransformerException;
+
+import org.neo4j.helpers.collection.IterableWrapper;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+import com.google.common.base.Preconditions;
+
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
 
 @Component
 public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
@@ -34,8 +56,8 @@ public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.storageDirectory = environment.getRequiredProperty("xml.home", File.class);
-		Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getAbsolutePath() + " is a directory");
-		this.storagePath = storageDirectory.getAbsolutePath();
+		Preconditions.checkArgument(this.storageDirectory.isDirectory(), storageDirectory.getCanonicalPath() + " is a directory");
+		this.storagePath = storageDirectory.getCanonicalPath();
 	}
 
 	@Override
@@ -50,6 +72,7 @@ public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 	}
 
 	protected Iterable<FaustURI> iterate(File base) {
+		Preconditions.checkArgument(isInStore(base), base.getAbsolutePath() + " is not in XML storage");
 		final List<File> files = new LinkedList<File>();
 		listRecursively(files, base);
 		return new FileToUriWrapper(files);
@@ -116,19 +139,30 @@ public class XMLStorage implements Iterable<FaustURI>, InitializingBean {
 	protected File toFile(FaustURI uri) {
 		Preconditions.checkArgument(FaustAuthority.XML == uri.getAuthority(), uri + " not valid");
 		final File file = new File(storageDirectory, uri.getPath());
-		final String filePath = file.getAbsolutePath();
-		Preconditions.checkArgument(filePath.startsWith(storagePath), filePath + " is not in XML storage");
+		try {
+			Preconditions.checkArgument(isInStore(file), file.getCanonicalPath() + " is not in XML storage");
+		} catch (IOException e) {
+			throw new IllegalArgumentException(file.getAbsolutePath() + " is not in XML storage", e);
+		}
 		return file;
 	}
 
 	protected FaustURI toUri(File file) {
-		final String filePath = file.getAbsolutePath();
-		Preconditions.checkArgument(isInStore(file), filePath + " not in XML store");
-		return new FaustURI(FaustAuthority.XML, filePath.substring(storagePath.length()));
+		try {
+			final String filePath = file.getCanonicalPath();
+			Preconditions.checkArgument(isInStore(file), filePath + " not in XML store");
+			return new FaustURI(FaustAuthority.XML, filePath.substring(storagePath.length()));
+		} catch (IOException e) {
+			throw new IllegalArgumentException(file.getAbsolutePath() + " is not in XML storage", e);
+		}
 	}
 
 	protected boolean isInStore(File file) {
-		return file.getAbsolutePath().startsWith(storagePath);
+		try {
+			return file.getCanonicalPath().startsWith(storagePath);
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 	private class FileToUriWrapper extends IterableWrapper<FaustURI, File> {

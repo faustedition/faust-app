@@ -1,12 +1,40 @@
+/*
+ * Copyright (c) 2014 Faust Edition development team.
+ *
+ * This file is part of the Faust Edition.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package de.faustedition.document;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit.Type;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.GoddagTranscriptManager;
 import de.faustedition.transcript.TranscriptType;
-import de.faustedition.xml.*;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLBaseTracker;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -15,14 +43,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.util.*;
@@ -33,6 +53,10 @@ import java.util.*;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DocumentDescriptorHandler extends DefaultHandler {
+
+	private static final Logger LOG = LoggerFactory.getLogger(DocumentDescriptorHandler.class);
+	public static final FaustURI noneURI = new FaustURI(FaustAuthority.SELF, "/none/");
+	public static final String internalKeyDocumentSource = "document-source";
 
 	@Autowired
 	private FaustGraph graph;
@@ -60,7 +84,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 
 	private static final Set<String> materialUnitNames = ImmutableSet.of("archivalDocument",
 			"sheet", "leaf", "disjunctLeaf", "page", "patch", "patchSurface");
-	
+
 	private static final Map<String, String> legacyNames;
 	static {
 		legacyNames = new HashMap<String, String>();
@@ -74,8 +98,8 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		valueAttribute.put("textTranscript", "uri");
 		valueAttribute.put("docTranscript", "uri");
 	}
-	
-	
+
+
 	public Document handle(FaustURI source) throws IOException, SAXException {
 		this.source = source;
 		this.baseTracker = new XMLBaseTracker(source.toString());
@@ -86,6 +110,9 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			XMLUtil.saxParser().parse(xmlSource, this);
 			if (document != null) {
 				document.index();
+			}
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Read " + source + " into " + document + "[" +  document.node.getId() + "]");
 			}
 			return document;
 		} finally {
@@ -152,6 +179,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 		} else if ("metadata".equals(localName) && !materialUnitStack.isEmpty()) {
 			inMetadataSection = true;
 			metadata = new HashMap<String, List<String>>();
+            metadata.put(internalKeyDocumentSource, ImmutableList.<String>of(this.source.toString()));
 		} else if (inMetadataSection && metadataKey == null) {
 			// String type = attributes.getValue("type");
 			// metadataKey = type == null ? localName : localName + "_" + type;
@@ -159,18 +187,25 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			metadataKey = metadataKeyFromElement(localName, attributes);
 			
 			metadataValue = new StringBuilder();
-			if (valueAttribute.containsKey(localName))
-				metadataValue.append(attributes.getValue(valueAttribute.get(localName)));
-
+			if (valueAttribute.containsKey(localName)) {
+				String attributeVal = attributes.getValue(valueAttribute.get(localName));
+				metadataValue.append(attributeVal != null ? attributeVal : "none");
+			}
+			
 			// TODO: transcript uris as regular metadata
 			
-			if (localName == "textTranscript" || localName == "docTranscript") {
+			if ("textTranscript".equals(localName) || "docTranscript".equals(localName)) {
 				TranscriptType type = localName == "textTranscript" ? TranscriptType.TEXTUAL : 
 					TranscriptType.DOCUMENTARY;
 				final String transcript = metadataValue.toString();
 				if (transcript != null) {
 					final MaterialUnit unit = materialUnitStack.peek();
-					final FaustURI transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
+					final FaustURI transcriptSource;
+					if (!transcript.equals("none")) {
+						transcriptSource = new FaustURI(baseTracker.getBaseURI().resolve(transcript));
+					} else {
+						transcriptSource = noneURI;
+					}
 					unit.setTranscriptSource(transcriptSource);
 					unit.setTranscript(transcriptManager.find(transcriptSource, type));
 				}
