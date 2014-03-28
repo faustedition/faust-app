@@ -12,7 +12,7 @@
 		var archiveLat = parseFloat('${archive.geolocation.@lat?js_string}');
 		var archiveLng = parseFloat('${archive.geolocation.@lng?js_string}');
 	</script>
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 </#assign>
 <@faust.page title=(archive.name?html) header=header css=css menuhighlight="archives">
