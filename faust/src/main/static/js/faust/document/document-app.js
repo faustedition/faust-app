@@ -189,23 +189,39 @@ YUI.add('document-app', function (Y) {
 			if (facsimilePath) {
 				var facsimileURI = new Y.Faust.URI(facsimilePath);
 
-				facsimileContent.append('<div id="transcript-swf" style="height: 300px"></div>');
-				swfobject.switchOffAutoHideShow();
-				swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf",
-					"transcript-swf",
-					"100%", "100%",
-					"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
-						server: Faust.FacsimileServer,
-						image: facsimileURI.encodedPath() + '.tif',
-						navigation: true
-						//credit: "Copyright Digitale Faust-Edition"
-					}, {
-						scale: "exactfit",
-						bgcolor: "#000000",
-						allowfullscreen: "true",
-						allowscriptaccess: "always",
-						wmode: "opaque"
-					});
+//				facsimileContent.append('<div id="transcript-swf" style="height: 300px"></div>');
+//				swfobject.switchOffAutoHideShow();
+//				swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf",
+//					"transcript-swf",
+//					"100%", "100%",
+//					"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
+//						server: Faust.FacsimileServer,
+//						image: facsimileURI.encodedPath() + '.tif',
+//						navigation: true
+//						//credit: "Copyright Digitale Faust-Edition"
+//					}, {
+//						scale: "exactfit",
+//						bgcolor: "#000000",
+//						allowfullscreen: "true",
+//						allowscriptaccess: "always",
+//						wmode: "opaque"
+//					});
+
+				facsimileContent.append('<div id="facsimile-view" style="height: 600px"></div>');
+				var	facsimileViewer = new Y.Faust.FacsimileViewer({
+					srcNode: "#facsimile-view",
+					src: facsimileURI.components[0].substr(7),
+					view: { x: 0, y: 0, width: 600, height: 600 }
+				});
+				facsimileViewer.render();
+
+
+				var imageLinkPath = Faust.imageLinkBase + '/' + pagenum;
+				// display svg from imageLinkPath
+				facsimileViewer.plug(Y.Faust.SvgPane);
+				facsimileViewer.svg.loadSvg(imageLinkPath);
+
+
 			} else {
 				facsimileContent.append('<div>(none)</div>');
 			}
@@ -477,5 +493,5 @@ YUI.add('document-app', function (Y) {
 }, '0.0', {
 	requires: ["app", "node", "event", "slider", "document", "transcript-view", "transcript-interaction",
 		"document-structure-view", "button", "panel", "dd-plugin", "resize-plugin", "util",
-		"text-display", "materialunit"]
+		"text-display", "materialunit", "facsimile", "facsimile-svgpane"]
 });
