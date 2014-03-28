@@ -3,7 +3,7 @@
 </#assign>
 <#assign header>
 </#assign>
-<@faust.page title=title css=css header=header>
+<@faust.page title=title css=css header=header menuhighlight="xml-query">
 	
 	<div>
 		<form action="." method="get">

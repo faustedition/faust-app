@@ -1,4 +1,4 @@
-<@faust.page title="Genetic Analysis">
+<@faust.page title="Genetic Analysis" menuhighlight="genesis">
 
 <style type="text/css">
 	#genetic-analysis-app { margin: 2em; padding: 1em; }

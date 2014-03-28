@@ -21,7 +21,7 @@
 
 
 
-	<@faust.page title=title header=header layout="wide">
+	<@faust.page title=title header=header layout="wide" menuhighlight="archives">
 
 
 	<div id="document-navigation" style="height: 50px;">

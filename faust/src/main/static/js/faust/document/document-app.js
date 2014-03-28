@@ -63,7 +63,6 @@ YUI.add('document-app', function (Y) {
 				'   <input id="pagenum-display" value="1" style="width: 2em; margin-right: 1em" readonly="readonly"/>' +
 				'   <span id="pageslider"></span>' +
 				'   <button id="next_page_button">&gt;</button>' +
-				'   <span><a id="old_version_link" href="" style="margin-left: 2em">' + Faust.messages["document.old_version"] + '</a></span>' +
 				'</div>');
 
 			var pageslider = new Y.Slider({

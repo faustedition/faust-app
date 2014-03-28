@@ -1,4 +1,4 @@
-<@faust.page title="Impressum">
+<@faust.page title="Impressum" menuhighlight="imprint">
 	<h2>Teledienst-Anbieter</h2>
 
 	<p>Anbieter i.S.d. § 6 TDG und inhaltlich V.i.S.d.P.:</p>

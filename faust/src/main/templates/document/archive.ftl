@@ -15,7 +15,7 @@
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 </#assign>
-<@faust.page title=(archive.name?html) header=header css=css>
+<@faust.page title=(archive.name?html) header=header css=css menuhighlight="archives">
 	<div class="yui3-g">
 		<div class="yui3-u-1-2">
 			<@snippets.archiveData archive />

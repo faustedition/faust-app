@@ -1,4 +1,4 @@
-<@faust.page title="Das Projekt">
+<@faust.page title="Das Projekt" menuhighlight="about">
 	<div class="yui3-g">
 		<div class="yui3-u-1-3">
 			<p style="margin-right: 1em"><img src="${cp}/static/img/emblem.jpg" alt="Faust-Emblem" /></p>

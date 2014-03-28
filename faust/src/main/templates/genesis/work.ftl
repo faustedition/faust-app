@@ -62,7 +62,7 @@
     </script>
 </#assign>
 
-<@faust.page title=message("genesis.work") header=header>
+<@faust.page title=message("genesis.work") header=header menuhighlight="genesis">
 	<div class="yui3-g">
 		<div class="yui3-u-2-3">
 			<p style="margin-right: 1em">

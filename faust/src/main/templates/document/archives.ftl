@@ -2,16 +2,16 @@
 <#import "snippets.ftl" as snippets />
 <#assign title = message("menu.archives")>
 <#assign css>
-	#archives_map { text-align: center; margin: 2em auto; width: 800px; height: 400px }
-	#archives { margin: 1em; border-collapse: collapse; }
+	#archives_map { text-align: center; margin: 2em auto; width: 100%; height: 400px }
+	#archives { margin: 2em 0em; border-collapse: collapse; }
 	.archive-row {border-bottom: 1px solid #ccc }
-	.archive-container { padding: 1em }
+	.archive-container { padding: 1em 0em }
 </#assign>
 <#assign header>
 	<script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script>
 	<script type="text/javascript" src="${cp}/static/js/archive.js"></script>
 </#assign>
-<@faust.page title=title css=css header=header>
+<@faust.page title=title css=css header=header menuhighlight="archives">
 	<div id="archives">
 		<#list archives.archive as a>
 			<#if (a_index % 3) == 0><div class="yui3-g archive-row"></#if>
