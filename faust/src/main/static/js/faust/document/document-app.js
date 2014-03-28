@@ -433,17 +433,7 @@ YUI.add('document-app', function (Y) {
 
 					  app.set('fd', e.fd);
 
-					  var updateOldVersionLink = function() {
-						  var old_version_cp = "https://faustedition.uni-wuerzburg.de/dev";
-						  var pathname = window.location.pathname;
-						  var hash = window.location.hash.replace("/","");
-						  var old_version = old_version_cp + pathname.slice(pathname.indexOf('/document')) + hash;
-						  Y.one("#old_version_link").setAttribute('href', old_version);
-					  };
 
-					   app.after('faust:navigation-done', function() {
-					   		  updateOldVersionLink();
-					   });
 
 					  var navigationView = new Y.NavigationView({
 						  model: navigationModel,
