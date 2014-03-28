@@ -9,16 +9,16 @@
 
 
 	<!-- http://purecss.io/ -->
-	<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
+	<link rel="stylesheet" href="${cp}/static/css/pure-min.css">
 	<!-- http://fortawesome.github.io/Font-Awesome/ -->
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 	<!-- http://www.google.com/fonts/: light, normal, medium, bold -->
-	<link href="http://fonts.googleapis.com/css?family=Ubuntu:300,300italic,400,400italic,500,500italic,700,700italic" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,300italic,400,400italic,500,500italic,700,700italic" rel="stylesheet" type="text/css">
 	<!-- http://www.google.com/fonts/: normal, bold -->
-	<link href="http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,400italic,700,700italic" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,400italic,700,700italic" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="${cp}/static/css/pure-custom.css">
 	<link rel="stylesheet" href="${cp}/static/css/style.css">
-	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<#if layout!="wide"><script src="${cp}/static/js/functions.js"></script></#if>
 
 
