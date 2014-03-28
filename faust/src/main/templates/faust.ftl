@@ -193,12 +193,14 @@
 	</ul>
 </div>
 <nav class="pure-menu pure-menu-open pure-menu-horizontal pure-right">
+	<@restricted>
 	<ul>
 		<li <#if menuhighlight="archives">class="pure-menu-selected"</#if>><a href="${cp}/archive/">${message("menu.archives")}</a></li>
 		<li <#if menuhighlight="genesis">class="pure-menu-selected"</#if>><a href="${cp}/genesis/work/">${message("menu.genesis")}</a></li>
 		<li <#if menuhighlight="text">class="pure-menu-selected"</#if>><a href="#">Text</a></li>
 		<li><form class="pure-form"><input type="text" placeholder="${message("menu.search")}"></form></li>
 	</ul>
+	</@restricted>
 </nav>
 </div>
 
