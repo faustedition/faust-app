@@ -34,6 +34,7 @@ YUI.GlobalConfig = {
                 'facsimile': { path: 'faust/facsimile/facsimile.js'},
                 'facsimile-svgpane': { path: 'faust/facsimile/facsimile-svgpane.js' },
 				'facsimile-highlightpane': { path: 'faust/facsimile/facsimile-highlightpane.js' },
+				'facsimile-navigation': { path: 'faust/facsimile/facsimile-navigation.js' },
 				'facsimile-interaction': { path: 'faust/facsimile/facsimile-interaction.js' },
                 'util': { path: "faust/util/util.js"},
 				"transcript-adhoc-tree" : { path: 'faust/transcript/transcript-adhoc-tree.js' },

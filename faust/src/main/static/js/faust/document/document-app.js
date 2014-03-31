@@ -215,6 +215,9 @@ YUI.add('document-app', function (Y) {
 				});
 				facsimileViewer.render();
 
+				// show navigation buttons
+				facsimileViewer.plug(Y.Faust.FacsimileNavigation);
+
 
 				var imageLinkPath = Faust.imageLinkBase + '/' + pagenum;
 				// display svg from imageLinkPath
@@ -498,5 +501,5 @@ YUI.add('document-app', function (Y) {
 }, '0.0', {
 	requires: ["app", "node", "event", "slider", "document", "transcript-view", "transcript-interaction",
 		"document-structure-view", "button", "panel", "dd-plugin", "resize-plugin", "util",
-		"text-display", "materialunit", "facsimile", "facsimile-svgpane", "facsimile-interaction"]
+		"text-display", "materialunit", "facsimile", "facsimile-svgpane", "facsimile-interaction", "facsimile-navigation"]
 });
