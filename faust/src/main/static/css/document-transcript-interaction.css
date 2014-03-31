@@ -3,6 +3,12 @@ svg.diplomatic .bgBox {
     opacity: 0;
 }
 
+svg.diplomatic .bgBox.highlight {
+    opacity: 1;
+    stroke: #ffc20e;
+    stroke-width: 0.1em;
+}
+
 .tooltip-hand {
     font-style: normal;
     font-weight: bold;

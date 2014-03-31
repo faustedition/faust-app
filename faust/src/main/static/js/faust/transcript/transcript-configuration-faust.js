@@ -288,6 +288,11 @@ YUI.add('transcript-configuration-faust', function (Y) {
 				'line': {
 					vc: function(node, text, layoutState) {
 
+						if (typeof layoutState.lineCount === 'undefined') {
+							layoutState.lineCount = 0;
+						} else {
+							layoutState.lineCount++;
+						}
 						var lineAttrs = {};
 						var rendition = node.data()["rend"] || "";
 						if (rendition.indexOf("centered") >= 0) {
@@ -310,7 +315,9 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (position.indexOf("between") >= 0)
 							lineAttrs.between = true;
 
-						return new Y.FaustTranscript.Line(lineAttrs);
+						var vc = new Y.FaustTranscript.Line(lineAttrs);
+						vc.classes.push('lineNumber' + layoutState.lineCount);
+						return vc;
 					},
 					text: function(annotation, textVC) {
 						var fontsize = ((annotation.data["type"] || "").indexOf("inter") >= 0 ? "interline" : "normal");

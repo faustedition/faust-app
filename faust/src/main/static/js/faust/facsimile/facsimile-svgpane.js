@@ -34,6 +34,8 @@ YUI.add('facsimile-svgpane', function (Y) {
 						success: function(id, o, a) {
 							// FIXME this is a silly hack, use a different library
 							that.svgContainer.innerHTML = o.responseText;
+							Y.fire('faust:facsimile-svg-pane-loaded', {});
+
 						}, 
 						failure: function(id, o, a) { 
 							Y.log("ERROR " + id + " " + a, "info", "Faust") }

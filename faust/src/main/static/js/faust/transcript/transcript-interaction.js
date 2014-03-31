@@ -45,18 +45,10 @@ YUI.add('transcript-interaction', function (Y) {
 			'used': function(textElement){ return Y.SvgUtils.hasClass(textElement, 'used'); }
 		}
 
-		function decodeClassValue(classValue, key) {
-			var start = classValue.indexOf(key);
-			if (start < 0) return '';
-			var rightSide = classValue.substring(start + key.length);
-			var end = rightSide.search('\\s');
-			return end >= 0 ? rightSide.substring(0, end) : rightSide;
-		}
-
 		function handDisplayContent(classValue) {
-			var handValue = decodeClassValue(classValue, 'hand-');
-			var materialValue = decodeClassValue(classValue, 'material-');
-			var scriptValue = decodeClassValue(classValue, 'script-');
+			var handValue = Y.SvgUtils.decodeClassValue(classValue, 'hand-');
+			var materialValue = Y.SvgUtils.decodeClassValue(classValue, 'material-');
+			var scriptValue = Y.SvgUtils.decodeClassValue(classValue, 'script-');
 
 
 			var content = '<div>'
@@ -85,7 +77,7 @@ YUI.add('transcript-interaction', function (Y) {
 			// display all text decorations such as strikethrough, underline, ...
 			Y.each(Y.one(e.target).ancestor('.text-wrapper').all('.text-decoration'), function(decoration){
 				var decorationClassValue = decoration.getAttribute('class');
-				var decorationType = decodeClassValue(decorationClassValue, 'text-decoration-type-');
+				var decorationType = Y.SvgUtils.decodeClassValue(decorationClassValue, 'text-decoration-type-');
 				var decorationDisplay = Y.Node.create('<div class="tooltip-decoration"><div><span class="tooltip-caption-decoration-'
 					+ decorationType + '"></span></div></div>');
 				var decorationHandDisplay = handDisplayContent(decorationClassValue);
@@ -96,7 +88,7 @@ YUI.add('transcript-interaction', function (Y) {
 			// display all inline decorations such as rect, circle, ...
 			Y.each(Y.one(e.target).ancestors('.inline-decoration'), function(decoration){
 				var decorationClassValue = decoration.getAttribute('class');
-				var decorationType = decodeClassValue(decorationClassValue, 'inline-decoration-type-');
+				var decorationType = Y.SvgUtils.decodeClassValue(decorationClassValue, 'inline-decoration-type-');
 				var decorationDisplay = Y.Node.create('<div class="tooltip-decoration"><div><span class="tooltip-caption-decoration-'
 					+ decorationType + '"></span></div></div>');
 				var decorationHandDisplay = handDisplayContent(decorationClassValue);
@@ -130,8 +122,46 @@ YUI.add('transcript-interaction', function (Y) {
 		//FIXME: upgrade YUI and use event delegation to prevent memory leaking
 		// s. http://yuilibrary.com/projects/yui3/ticket/2532495
 		//Y.one('svg.diplomatic').delegate('mouseenter', showTooltip, '.text, .bgBox');
-		Y.all('svg.diplomatic .text, svg.diplomatic .bgBox').on('mousemove', showTooltip);
-		Y.all('svg.diplomatic .text, svg.diplomatic .bgBox').on('mouseleave', hideTooltip);
+		var allTextElements = Y.all('svg.diplomatic .text, svg.diplomatic .bgBox');
+
+		allTextElements.on('mousemove', function(e) {
+			showTooltip(e);
+			var containingLine = Y.one(e.target).ancestors('.element-line').item(0);
+			var lineClassValue = containingLine.getAttribute('class');
+			var lineNumber = Y.SvgUtils.decodeClassValue(lineClassValue, 'lineNumber');
+			Y.fire('faust:examine-line', { lineNumber: lineNumber});
+		});
+
+		allTextElements.on('mouseleave', function(e) {
+			hideTooltip(e);
+			var containingLine = Y.one(e.target).ancestors('.element-line').item(0);
+			var lineClassValue = containingLine.getAttribute('class');
+			var lineNumber = Y.SvgUtils.decodeClassValue(lineClassValue, 'lineNumber');
+			Y.fire('faust:stop-examine-line', { lineNumber: lineNumber});
+
+		});
+
+		Y.on('faust:examine-line', function(e) {
+			var bgBoxes = Y.all('svg.diplomatic .element-line.lineNumber' + e.lineNumber + ' .bgBox');
+			Y.each(bgBoxes, function(bgBox) {
+				var domNode = bgBox.getDOMNode();
+				Y.SvgUtils.addClass(bgBox, 'highlight');
+
+			});
+			bgBoxes.transition('fadeIn');
+
+		});
+
+		Y.on('faust:stop-examine-line', function(e) {
+			var bgBoxes = Y.all('svg.diplomatic .element-line.lineNumber' + e.lineNumber + ' .bgBox');
+			Y.each(bgBoxes, function(bgBox) {
+				var domNode = bgBox.getDOMNode();
+				Y.SvgUtils.removeClass(bgBox, 'highlight');
+
+			});
+			bgBoxes.transition('fadeOut');
+		});
+
 
 		// highlight hands
 
@@ -165,6 +195,7 @@ YUI.add('transcript-interaction', function (Y) {
 				opacity: 1
 			});
 		});
+
 
 
 	})

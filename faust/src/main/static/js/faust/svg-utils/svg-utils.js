@@ -21,6 +21,15 @@ YUI.add('svg-utils', function (Y) {
 	
 	var SVG_NS = "http://www.w3.org/2000/svg";
 
+	function decodeClassValue(classValue, key) {
+		var start = classValue.indexOf(key);
+		if (start < 0) return '';
+		var rightSide = classValue.substring(start + key.length);
+		var end = rightSide.search('\\s');
+		return end >= 0 ? rightSide.substring(0, end) : rightSide;
+	}
+
+
 	function qscale (degree) {
 		return function (val) {
 			return val * Math.pow(2, degree);
@@ -38,9 +47,27 @@ YUI.add('svg-utils', function (Y) {
 		return element;
 	}
 
-	function hasClass(element, classValue) {
-		var classTokens = element.getDOMNode().getAttribute('class').split(' ');
+	function hasClass(yuiNode, classValue) {
+		var classTokens = yuiNode.getDOMNode().getAttribute('class').split(' ');
 		return classTokens.indexOf(classValue) >= 0;
+	}
+
+	function addClass(yuiNode, newClass) {
+		var domNode = yuiNode.getDOMNode();
+		var classValue = domNode.getAttribute('class');
+		domNode.setAttribute('class', classValue + ' ' + newClass);
+	}
+
+	function removeClass(yuiNode, removeValue) {
+		var domNode = yuiNode.getDOMNode();
+		var classTokens = domNode.getAttribute('class').split(' ');
+		var newClassValue = '';
+		for (var i = 0; i < classTokens.length; i++) {
+			if (classTokens[i] !== removeValue) {
+				newClassValue = newClassValue + classTokens[i] + ' ';
+			}
+		}
+		domNode.setAttribute('class', newClassValue);
 	}
 
 	function svgStyles(element, styles) {
@@ -239,11 +266,14 @@ YUI.add('svg-utils', function (Y) {
 
 	Y.mix(Y.namespace("SvgUtils"), {
 		SVG_NS: SVG_NS,
+		decodeClassValue: decodeClassValue,
 		boundingBox: boundingBox,
 		qscale: qscale,
 		svgElement: svgElement,
 		svgAttrs: svgAttrs,
 		hasClass: hasClass,
+		addClass: addClass,
+		removeClass: removeClass,
 		svgStyles: svgStyles,
 		svg: svg,
 		empty: empty,
