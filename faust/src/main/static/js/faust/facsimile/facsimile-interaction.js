@@ -63,11 +63,11 @@ YUI.add('facsimile-interaction', function (Y) {
 		});
 		// ******* text-image-links *******
 		Y.on('faust:examine-line', function(e) {
-			Y.all('#facsimile-view #svgpane .linkedto-lineNumber' + e.lineNumber).transition({	duration: 0, opacity: 1});
+			Y.all('#facsimile-view #svgpane .linkedto-lineNumber' + e.lineNumber).transition({	duration: 1, opacity: 1});
 		});
 
 		Y.on('faust:stop-examine-line', function(e) {
-			Y.all('#facsimile-view #svgpane .linkedto-lineNumber' + e.lineNumber).transition({	duration: 0, opacity: 0});
+			Y.all('#facsimile-view #svgpane .linkedto-lineNumber' + e.lineNumber).transition({	duration: 1, opacity: 0});
 
 		});
 
