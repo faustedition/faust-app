@@ -241,14 +241,19 @@ YUI.add('document-app', function (Y) {
 			var page = this.get('pages')[pagenum - 1];
 
 			var initTranscriptView = function(transcript) {
-					that.removeAjaxLoader(diplomaticContent);
-					var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
-						container: diplomaticContainer.one('.diplomaticContent'),
-						transcript: transcript,
-						source: source,
-						pagenum: pagenum
-					});
-					diplomaticTranscriptView.render();
+				that.removeAjaxLoader(diplomaticContent);
+				diplomaticContent.transition({	duration: 0, opacity: 0.2});
+				Y.on('faust:transcript-layout-done', function(e){
+					diplomaticContent.transition({	duration: 3, opacity: 1});
+				});
+
+				var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
+					container: diplomaticContainer.one('.diplomaticContent'),
+					transcript: transcript,
+					source: source,
+					pagenum: pagenum
+				});
+				diplomaticTranscriptView.render();
 			}
 
 			if (page.transcript && page.transcript.source) {
