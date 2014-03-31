@@ -207,11 +207,15 @@ YUI.add('document-app', function (Y) {
 //						wmode: "opaque"
 //					});
 
+
+
 				facsimileContent.append('<div id="facsimile-view" style="height: 600px"></div>');
+				var viewWidth = parseInt(Y.one('#facsimile-view').getComputedStyle('width'));
+				var viewHeight = parseInt(Y.one('#facsimile-view').getComputedStyle('height'));
 				var	facsimileViewer = new Y.Faust.FacsimileViewer({
 					srcNode: "#facsimile-view",
 					src: facsimileURI.components[0].substr(7),
-					view: { x: 0, y: 0, width: 600, height: 600 }
+					view: { x: 0, y: 0, width: viewWidth, height: viewHeight }
 				});
 				facsimileViewer.render();
 
