@@ -62,9 +62,13 @@ YUI.add('facsimile-svgpane', function (Y) {
 			
 			// Set scale
 			var scale = view.imageHeight / image.height;
-			var zoomTransform = createTransform();
-			zoomTransform.setScale(scale, scale);
-			transforms.appendItem(zoomTransform);
+			// workaround for a firefox issue (?), where large (but less than infinite) numbers
+			// cause errors in the svg dom code
+			if (scale < 1e+100) {
+				var zoomTransform = createTransform();
+				zoomTransform.setScale(scale, scale);
+				transforms.appendItem(zoomTransform);
+			}
 
 		},
 		initializer: function(config) {
