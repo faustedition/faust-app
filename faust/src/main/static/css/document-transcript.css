@@ -7,9 +7,14 @@
   src: url(../fonts/GenBkBasR.ttf) format("truetype");
 }
 
+/*@font-face {*/
+  /*font-family: faust-sans-serif;*/
+  /*src: url(../fonts/RopaSans-Regular.ttf) format("truetype");*/
+/*}*/
+
 @font-face {
-  font-family: faust-sans-serif;
-  src: url(../fonts/RopaSans-Regular.ttf) format("truetype");
+    font-family: faust-sans-serif;
+    src: url(../fonts/Ubuntu-R.ttf) format("truetype");
 }
 
 @font-face {
