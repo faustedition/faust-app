@@ -162,7 +162,8 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("resources", comboResourceFinder);
 		router.attach("xml-query/", restricted(contextResource(XMLQueryResource.class)));
 
-		if (environment.acceptsProfiles("development", "test")) {
+		if (environment.acceptsProfiles("development", "test")
+				|| "no".equals(environment.getRequiredProperty("auth.required"))) {
 			final Filter dummyAuthenticator = new Filter() {
 				@Override
 				protected int beforeHandle(Request request, Response response) {
