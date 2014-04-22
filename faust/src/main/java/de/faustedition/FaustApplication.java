@@ -36,6 +36,7 @@ import org.restlet.resource.Finder;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Filter;
+import org.restlet.routing.Redirector;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 import org.restlet.security.Authenticator;
@@ -131,6 +132,8 @@ public class FaustApplication extends Application implements InitializingBean {
 
 		router.setDefaultMatchingMode(Template.MODE_STARTS_WITH);
 
+		//router.attach("{+path}", new Redirector(getContext(), "{path}blub", Redirector.MODE_CLIENT_PERMANENT));
+
 		router.attach("archive/", secured(transactional(archiveRouter)));
 		router.attach("collation/", secured(transactional(collationFinder)));
         	router.attach("demo/", secured(transactional(templateFinder)));
@@ -155,9 +158,9 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("transcript/{id}", secured(transactional(contextResource(TranscriptViewResource.class))));
 		router.attach("xml/", secured(xmlFinder));
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
-		router.attach("login", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
+		router.attach("login/", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
 		router.attach("resources", comboResourceFinder);
-		router.attach("xml-query", restricted(contextResource(XMLQueryResource.class)));
+		router.attach("xml-query/", restricted(contextResource(XMLQueryResource.class)));
 
 		if (environment.acceptsProfiles("development", "test")) {
 			final Filter dummyAuthenticator = new Filter() {
