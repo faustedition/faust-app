@@ -36,32 +36,38 @@ YUI.add('facsimile-navigation-buttons', function (Y) {
 
 			config.host.get('contentBox').append(navigationPanel);
 
-			navigationPanel.one('#button_zoom_in').on('click', function(){
+			navigationPanel.one('#button_zoom_in').on('click', function(e){
 				config.host.model.zoom(-1);
+				e.stopPropagation();
 			});
 
-			navigationPanel.one('#button_zoom_out').on('click', function(){
+			navigationPanel.one('#button_zoom_out').on('click', function(e){
 				config.host.model.zoom(1);
+				e.stopPropagation();
 			});
 
-			navigationPanel.one('#button_left').on('click', function(){
-				moveX = Math.floor(config.host.model.get('view').width / 40)
+			navigationPanel.one('#button_left').on('click', function(e){
+				moveX = Math.floor(config.host.model.get('view').width / 4)
 				config.host.model.pan(-moveX, 0);
+				e.stopPropagation();
 			});
 
-			navigationPanel.one('#button_right').on('click', function(){
+			navigationPanel.one('#button_right').on('click', function(e){
 				moveX = Math.floor(config.host.model.get('view').width / 4);
 				config.host.model.pan(moveX, 0);
+				e.stopPropagation();
 			});
 
-			navigationPanel.one('#button_up').on('click', function(){
+			navigationPanel.one('#button_up').on('click', function(e){
 				moveY = Math.floor(config.host.model.get('view').height / 4);
 				config.host.model.pan(0, -moveY);
+				e.stopPropagation();
 			});
 
-			navigationPanel.one('#button_down').on('click', function(){
+			navigationPanel.one('#button_down').on('click', function(e){
 				moveY = Math.floor(config.host.model.get('view').height / 4);
 				config.host.model.pan(0, moveY);
+				e.stopPropagation();
 			});
 
 
@@ -76,7 +82,7 @@ YUI.add('facsimile-navigation-buttons', function (Y) {
         }
     }, {
 		NAME : 'facsimileNavigationButtons',
-		NS : 'navigation',
+		NS : 'navigationButtons',
         ATTRS: {
             view: {},
             model: {}
