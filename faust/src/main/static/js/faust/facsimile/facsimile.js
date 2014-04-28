@@ -154,8 +154,7 @@ YUI.add('facsimile', function (Y) {
     var FacsimileViewer = Y.Base.create("facsimile-viewer", Y.Widget, [], {
         initializer: function (config) {
             var view = config.view || NULL_VIEW_VALUE;
-
-            var svgRoot = svg("svg", {
+			var svgRoot = svg("svg", {
                 "version": "1.1",
                 "width": view.width,
                 "height": view.height
@@ -200,8 +199,20 @@ YUI.add('facsimile', function (Y) {
                 zoom: zoom
             });
         },
-        syncUI: function () {
-            var view = this.model.get("view"),
+
+		fitViewToSrcNode: function() {
+			var srcNode = this.get('srcNode');
+			var srcNodeWidth = parseFloat(srcNode.getComputedStyle('width'));
+			var srcNodeHeight = parseFloat(srcNode.getComputedStyle('height'));
+			var view = this.model.get('view');
+			view.width = srcNodeWidth;
+			view.height = srcNodeHeight;
+			this.model.set('view', view);
+			this.syncUI();
+		},
+
+		syncUI: function () {
+			var view = this.model.get("view"),
                 tileSize = this.model.get("image").tileSize,
                 tiles = this.model.get("tiles"),
                 zoom = this.model.get("zoom"),
