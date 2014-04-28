@@ -170,8 +170,6 @@ YUI.add('facsimile', function (Y) {
             var contentBox = this.get("contentBox");
             this.view = contentBox.getDOMNode().appendChild(svgRoot).appendChild(svg("g"));
 
-            this.navigationSub = Y.one("body").on('key', Y.bind(this.navigate, this), 'down:37,38,39,40,48,67,107,109,187,189');
-
             this.model = new TiledViewModel({ view: view });
             this.modelChangeSub = this.model.after(["tilesChange", "viewChange", "imageChange"], this.syncUI, this);
 			this.src = config.src;
@@ -184,49 +182,7 @@ YUI.add('facsimile', function (Y) {
             });
         },
         destructor: function () {
-            this.navigationSub.detach();
             this.modelChangeSub.detach();
-        },
-        navigate: function(e) {
-            var view = this.model.get("view"), moveX = Math.floor(view.width / 4), moveY = Math.floor(view.height / 4);
-            switch (e.keyCode) {
-                case 37:
-                    // arrow left
-                    this.model.pan(-moveX, 0);
-                    break;
-                case 38:
-                    // arrow up
-                    this.model.pan(0, -moveY);
-                    break;
-                case 39:
-                    // arrow right
-                    this.model.pan(moveX, 0);
-                    break;
-                case 40:
-                    // arrow down
-                    this.model.pan(0, moveY);
-                    break;
-                case 48:
-                    // 0
-                    this.model.fitToView();
-                    this.model.center();
-                    break;
-                case 67:
-                    // c
-                    this.model.center();
-                    break;
-                case 107:
-                case 187:
-                    // +
-                    this.model.zoom(-1);
-                    return;
-                case 109:
-                case 189:
-                    // -
-                    this.model.zoom(1);
-                    return;
-            }
-
         },
         metadataReceived: function (transactionId, response) {
             this.model.set("image", Y.merge(this.get("image"), Y.JSON.parse(response.responseText)));

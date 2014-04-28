@@ -222,6 +222,8 @@ YUI.add('document-app', function (Y) {
 				// show navigation buttons
 				facsimileViewer.plug(Y.Faust.FacsimileNavigationButtons);
 				// enable mouse navigation
+				facsimileViewer.plug(Y.Faust.FacsimileNavigationKeyboard);
+				// enable mouse navigation
 				facsimileViewer.plug(Y.Faust.FacsimileNavigationMouse);
 
 
@@ -508,5 +510,5 @@ YUI.add('document-app', function (Y) {
 	requires: ["app", "node", "event", "slider", "document", "transcript-view", "transcript-interaction",
 		"document-structure-view", "button", "panel", "dd-plugin", "resize-plugin", "util",
 		"text-display", "materialunit", "facsimile", "facsimile-svgpane", "facsimile-interaction",
-		"facsimile-navigation-buttons", "facsimile-navigation-mouse"]
+		"facsimile-navigation-buttons", "facsimile-navigation-mouse", "facsimile-navigation-keyboard"]
 });

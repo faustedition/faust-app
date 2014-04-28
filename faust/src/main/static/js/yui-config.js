@@ -35,6 +35,7 @@ YUI.GlobalConfig = {
                 'facsimile-svgpane': { path: 'faust/facsimile/facsimile-svgpane.js' },
 				'facsimile-highlightpane': { path: 'faust/facsimile/facsimile-highlightpane.js' },
 				'facsimile-navigation-buttons': { path: 'faust/facsimile/facsimile-navigation-buttons.js' },
+				'facsimile-navigation-keyboard': { path: 'faust/facsimile/facsimile-navigation-keyboard.js' },
 				'facsimile-navigation-mouse': { path: 'faust/facsimile/facsimile-navigation-mouse.js' },
 				'facsimile-interaction': { path: 'faust/facsimile/facsimile-interaction.js' },
                 'util': { path: "faust/util/util.js"},
