@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-YUI.add('facsimile-navigation', function (Y) {
+YUI.add('facsimile-navigation-buttons', function (Y) {
 
 	SVG_NS = "http://www.w3.org/2000/svg";
 
-    var FacsimileNavigation = Y.Base.create("facsimile-navigation", Y.Base, [], {
+    var FacsimileNavigationButtons = Y.Base.create("facsimile-navigation-buttons", Y.Base, [], {
 
         initializer: function(config) {
 			var navigationPanel = Y.Node.create(
@@ -45,7 +45,7 @@ YUI.add('facsimile-navigation', function (Y) {
 			});
 
 			navigationPanel.one('#button_left').on('click', function(){
-				moveX = Math.floor(config.host.model.get('view').width / 4)
+				moveX = Math.floor(config.host.model.get('view').width / 40)
 				config.host.model.pan(-moveX, 0);
 			});
 
@@ -73,9 +73,9 @@ YUI.add('facsimile-navigation', function (Y) {
 
 		},
         destructor: function() {
-        },
+        }
     }, {
-		NAME : 'facsimileNavigation',
+		NAME : 'facsimileNavigationButtons',
 		NS : 'navigation',
         ATTRS: {
             view: {},
@@ -83,7 +83,7 @@ YUI.add('facsimile-navigation', function (Y) {
         }
     });
 
-    Y.mix(Y.namespace("Faust"), { FacsimileNavigation: FacsimileNavigation });
+    Y.mix(Y.namespace("Faust"), { FacsimileNavigationButtons: FacsimileNavigationButtons });
 
 }, '0.0', {
 	requires: ['facsimile', 'plugin', 'svg-utils']

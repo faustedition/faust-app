@@ -220,7 +220,7 @@ YUI.add('document-app', function (Y) {
 				facsimileViewer.render();
 
 				// show navigation buttons
-				facsimileViewer.plug(Y.Faust.FacsimileNavigation);
+				facsimileViewer.plug(Y.Faust.FacsimileNavigationButtons);
 
 
 				var imageLinkPath = Faust.imageLinkBase + '/' + pagenum;
@@ -505,5 +505,5 @@ YUI.add('document-app', function (Y) {
 }, '0.0', {
 	requires: ["app", "node", "event", "slider", "document", "transcript-view", "transcript-interaction",
 		"document-structure-view", "button", "panel", "dd-plugin", "resize-plugin", "util",
-		"text-display", "materialunit", "facsimile", "facsimile-svgpane", "facsimile-interaction", "facsimile-navigation"]
+		"text-display", "materialunit", "facsimile", "facsimile-svgpane", "facsimile-interaction", "facsimile-navigation-buttons"]
 });
