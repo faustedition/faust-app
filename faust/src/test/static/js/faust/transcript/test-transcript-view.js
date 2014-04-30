@@ -10,7 +10,7 @@ YUI.add('test-transcript-view', function (Y) {
 
 		testConstruction : function() {
 
-			var transcriptView = new Y.Faust.DiplomaticTranscriptView({
+			var transcriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
 				container: Y.one('#diplomaticTranscript'),
 				transcript: this.transcript
 			});
