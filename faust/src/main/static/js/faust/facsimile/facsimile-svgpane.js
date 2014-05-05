@@ -23,6 +23,16 @@ YUI.add('facsimile-svgpane', function (Y) {
 
     var SvgPane = Y.Base.create("svg-pane", Y.Base, [], {
 
+		createContainer : function() {
+			var container = Y.SvgUtils.svgElement('g');
+			this.svgPaneRoot.appendChild(container);
+			return container;
+		},
+
+		addSvg: function(svg) {
+		   this.createContainer().appendChild(svg);
+		},
+
         loadSvg : function(svgSrc){
 			var that = this;
 			if (svgSrc) {
@@ -33,7 +43,7 @@ YUI.add('facsimile-svgpane', function (Y) {
 					on: {
 						success: function(id, o, a) {
 							// FIXME this is a silly hack, use a different library
-							that.svgContainer.innerHTML = o.responseText;
+							that.createContainer().innerHTML = o.responseText;
 							Y.fire('faust:facsimile-svg-pane-loaded', {});
 
 						}, 
@@ -45,12 +55,12 @@ YUI.add('facsimile-svgpane', function (Y) {
 		},
 
 		adjustTransform: function() {
-			var svgContainer = this.svgContainer;
+			var svgPaneRoot = this.svgPaneRoot;
 			var createTransform = function(){
-				return svgContainer.viewportElement.createSVGTransform();
+				return svgPaneRoot.viewportElement.createSVGTransform();
 			};
 
-			var transforms = this.svgContainer.transform.baseVal;
+			var transforms = this.svgPaneRoot.transform.baseVal;
 			transforms.clear();
 			var view = this.host.model.get("view");
 			var image = this.host.model.get("image");
@@ -74,12 +84,12 @@ YUI.add('facsimile-svgpane', function (Y) {
 		initializer: function(config) {
 			this.host = config.host;
             var svgRoot = this.host.view.ownerSVGElement;
-            this.svgContainer = svg("g", {
+            this.svgPaneRoot = svg("g", {
                 id: "svgpane",
                 x: "0",
-                y: "0",
+                y: "0"
 			});
-			svgRoot.appendChild(this.svgContainer);
+			svgRoot.appendChild(this.svgPaneRoot);
 			this.modelChangeSub = this.host.model.after(["tilesChange", "viewChange", "imageChange"], this.adjustTransform, this);
 			this.loadSvg(config.svgSrc);
         },

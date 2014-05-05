@@ -178,6 +178,38 @@ YUI.add('document-app', function (Y) {
 			element.one('.ajax-placeholder').remove(true);
 		},
 
+		fitOverlay: function () {
+			Y.each(Y.all('#svgpane .element-line'), function (transcriptLine) {
+				var lineNum = Y.SvgUtils.decodeClassValue(transcriptLine.getAttribute('class'), 'lineNumber');
+				var imageLinkLine = Y.one('#svgpane .imageannotationLine.linkedto-lineNumber' + lineNum);
+
+				if (imageLinkLine) {
+					function fitToUnitSquare(element) {
+						element.getBBox();
+						var transform = element.ownerSVGElement.createSVGTransform();
+						transform.setScale();
+						tranform.setTranslate();
+					}
+
+					//console.log('line' + transcriptLine + ' --> ' + imageLinkLine);
+
+
+					var transcriptLineDOM = transcriptLine.getDOMNode();
+					var imageLinkLineDOM = imageLinkLine.getDOMNode();
+					//var matrix = transcriptLineDOM.getTransformToElement(imageLinkLine);
+					var matrix = transcriptLineDOM.getScreenCTM().inverse();
+					matrix = matrix.multiply(imageLinkLineDOM.getScreenCTM());
+					//var matrix = imageLinkLineDOM.getTransformToElement(transcriptLineDOM);
+					transcriptLineDOM.transform.baseVal.consolidate();
+					var transform = transcriptLineDOM.transform.baseVal.createSVGTransformFromMatrix(matrix);
+					transcriptLineDOM.transform.baseVal.appendItem(transform);
+
+					transcriptLineDOM.transform.baseVal.consolidate();
+				}
+
+			})
+		},
+
 		updateFacsimileView: function () {
 			var facsimileContainer = Y.one('.facsimile-container');
 			var facsimileContent = facsimileContainer.one('.yui3-widget-bd');
@@ -231,7 +263,13 @@ YUI.add('document-app', function (Y) {
 				// display svg from imageLinkPath
 				facsimileViewer.plug(Y.Faust.SvgPane);
 				facsimileViewer.svg.loadSvg(imageLinkPath);
-
+				var that = this;
+				Y.on('faust:transcript-layout-done', function(e){
+					var transcriptCopy = Y.one('svg.diplomatic').cloneNode(true);
+					facsimileViewer.svg.addSvg(transcriptCopy.getDOMNode());
+					transcriptCopy.transition({	duration: 3, opacity: 1});
+					that.fitOverlay();
+				});
 
 			} else {
 				facsimileContent.append('<div>(none)</div>');

@@ -10,14 +10,15 @@ YUI.add('test-transcript-view', function (Y) {
 
 		testConstruction : function() {
 
+			var sandbox =  Y.FaustTest.getTestSandbox('test-transcript-view');
 			var transcriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
-				container: Y.one('#diplomaticTranscript'),
+				container: sandbox,
 				transcript: this.transcript
 			});
 			transcriptView.render();
 
 
-			Y.assert(Y.one('#diplomaticTranscript').one('svg').one('g'),
+			Y.assert(sandbox.one('svg').one('g'),
 				'No transcript view was rendered.');
 		}
 	});
@@ -29,5 +30,5 @@ YUI.add('test-transcript-view', function (Y) {
     });
 
 }, '0.0', {
-    requires: ["yui-base", "transcript-view"]
+    requires: ["yui-base", "transcript-view", "test-utils"]
 });
