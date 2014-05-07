@@ -49,13 +49,13 @@ YUI.add('facsimile-interaction', function (Y) {
 			domNode.setAttribute('fill-opacity', '0.4');
 
 			// for better handling, increase the height of the highlight boxes
-/*
-			var heightFactor = 1.5;
+
+			var heightFactor = 2;
 			var height = domNode.getAttribute('height');
 			domNode.setAttribute('height', height * heightFactor);
 			var y = domNode.getAttribute('y');
 			domNode.setAttribute('y', y - ((heightFactor * height) - height));
-*/
+
 
 
 
@@ -63,6 +63,21 @@ YUI.add('facsimile-interaction', function (Y) {
 			var classVal = LINKEDTO_PREFIX + linkedLine.substring(1);
 			domNode.setAttribute('class', domNode.getAttribute('class') + ' ' + classVal);
 		});
+		// ******* transcript overlay on facsimile *******
+
+		Y.on('faust:examine-line', function(e) {
+			var transcriptLine = Y.all('.svgpane-transcript-overlay svg.diplomatic .element-line.lineNumber' + e.lineNumber);
+			transcriptLine.transition('fadeIn');
+
+		});
+
+		Y.on('faust:stop-examine-line', function(e) {
+			var transcriptLine = Y.all('.svgpane-transcript-overlay svg.diplomatic .element-line.lineNumber' + e.lineNumber);
+			transcriptLine.transition('fadeOut');
+
+		});
+
+
 		// ******* text-image-links *******
 		Y.on('faust:examine-line', function(e) {
 			Y.all('#facsimile-view #svgpane .linkedto-lineNumber' + e.lineNumber).transition({	duration: 1, opacity: 1});

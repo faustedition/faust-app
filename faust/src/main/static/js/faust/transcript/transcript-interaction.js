@@ -18,7 +18,7 @@
  */
 
 YUI.add('transcript-interaction', function (Y) {
-	Y.on('faust:transcript-layout-done', function() {
+	Y.on('faust:transcript-overlay-done', function() {
 
 		// ******* hand and material display *******
 		// tooltip
@@ -111,7 +111,7 @@ YUI.add('transcript-interaction', function (Y) {
 			tooltip.setStdModContent('body', content);
 			var tooltipWidth = parseFloat(tooltip.get('boundingBox').getComputedStyle('width'));
 			var tooltipHeight = parseFloat(tooltip.get('boundingBox').getComputedStyle('height'));
-			tooltip.move([e.pageX - (tooltipWidth / 2.0), e.pageY - tooltipHeight - 10]);
+			tooltip.move([e.pageX - (tooltipWidth / 2.0), e.pageY - tooltipHeight - 30]);
 			tooltip.show();
 		}
 

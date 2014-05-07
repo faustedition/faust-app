@@ -192,8 +192,13 @@ YUI.add('document-app', function (Y) {
 					//var bbox2 = Y.SvgUtils.boundingBox(transcriptLine.getDOMNode(), matrix);
 					//console.log(bbox1);
 					//console.log(bbox2);
-
+					transcriptLine.transition('fadeOut');
+				} else {
+					// if the transcript line is not linked to image, remove it
+					transcriptLine.remove(true);
 				}
+
+
 
 			})
 		},
@@ -252,15 +257,19 @@ YUI.add('document-app', function (Y) {
 				facsimileViewer.plug(Y.Faust.SvgPane);
 				facsimileViewer.svg.loadSvg(imageLinkPath, 'text-image-overlay');
 				var that = this;
+
 				Y.on('faust:transcript-layout-done', function(e){
-					var transcriptCopy = Y.one('svg.diplomatic').cloneNode(true);
-					transcriptCopy.one('*').setAttribute('transform', 'scale(50,50)');
+					var transcriptCopy = Y.one('.diplomaticContent svg.diplomatic').cloneNode(true);
 					var textImageSvg = Y.one ('.svgpane-text-image-overlay svg');
-					transcriptCopy.setAttribute('width', textImageSvg.getAttribute('width'));
-					transcriptCopy.setAttribute('height', textImageSvg.getAttribute('height'));
-					facsimileViewer.svg.addSvg(transcriptCopy.getDOMNode(), 'transcript-overlay');
-					transcriptCopy.transition({	duration: 3, opacity: 1});
-					that.fitOverlay();
+					if (textImageSvg) {
+						transcriptCopy.setAttribute('width', textImageSvg.getAttribute('width'));
+						transcriptCopy.setAttribute('height', textImageSvg.getAttribute('height'));
+						facsimileViewer.svg.addSvg(transcriptCopy.getDOMNode(), 'transcript-overlay');
+						//transcriptCopy.transition({	duration: 3, opacity: 1});
+						that.fitOverlay();
+						textImageSvg.remove(true);
+						Y.fire('faust:transcript-overlay-done');
+					}
 				});
 
 			} else {
@@ -489,7 +498,7 @@ YUI.add('document-app', function (Y) {
 												transition: 'slideLeft',
 												update: false
 											});
-							  this.fire('faust:navigation-done');
+						  this.fire('faust:navigation-done');
 					  });
 
 
