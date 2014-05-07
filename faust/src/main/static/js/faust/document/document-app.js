@@ -127,7 +127,7 @@ YUI.add('document-app', function (Y) {
 			});
 
 			this.on('faust:navigation-done', function () {
-				console.log('nav');
+
 			});
 
 		},
@@ -184,27 +184,15 @@ YUI.add('document-app', function (Y) {
 				var imageLinkLine = Y.one('#svgpane .imageannotationLine.linkedto-lineNumber' + lineNum);
 
 				if (imageLinkLine) {
-					function fitToUnitSquare(element) {
-						element.getBBox();
-						var transform = element.ownerSVGElement.createSVGTransform();
-						transform.setScale();
-						tranform.setTranslate();
-					}
+					transcriptLine.setAttribute('transform', 'scale(50,50)');
+					Y.SvgUtils.fitTo(transcriptLine.getDOMNode(), imageLinkLine.getDOMNode());
 
-					//console.log('line' + transcriptLine + ' --> ' + imageLinkLine);
+					//var matrix = transcriptLine.getDOMNode().ownerSVGElement.createSVGMatrix();
+					//var bbox1 = Y.SvgUtils.boundingBox(imageLinkLine.getDOMNode(), matrix);
+					//var bbox2 = Y.SvgUtils.boundingBox(transcriptLine.getDOMNode(), matrix);
+					//console.log(bbox1);
+					//console.log(bbox2);
 
-
-					var transcriptLineDOM = transcriptLine.getDOMNode();
-					var imageLinkLineDOM = imageLinkLine.getDOMNode();
-					//var matrix = transcriptLineDOM.getTransformToElement(imageLinkLine);
-					var matrix = transcriptLineDOM.getScreenCTM().inverse();
-					matrix = matrix.multiply(imageLinkLineDOM.getScreenCTM());
-					//var matrix = imageLinkLineDOM.getTransformToElement(transcriptLineDOM);
-					transcriptLineDOM.transform.baseVal.consolidate();
-					var transform = transcriptLineDOM.transform.baseVal.createSVGTransformFromMatrix(matrix);
-					transcriptLineDOM.transform.baseVal.appendItem(transform);
-
-					transcriptLineDOM.transform.baseVal.consolidate();
 				}
 
 			})
@@ -262,11 +250,15 @@ YUI.add('document-app', function (Y) {
 				var imageLinkPath = Faust.imageLinkBase + '/' + pagenum;
 				// display svg from imageLinkPath
 				facsimileViewer.plug(Y.Faust.SvgPane);
-				facsimileViewer.svg.loadSvg(imageLinkPath);
+				facsimileViewer.svg.loadSvg(imageLinkPath, 'text-image-overlay');
 				var that = this;
 				Y.on('faust:transcript-layout-done', function(e){
 					var transcriptCopy = Y.one('svg.diplomatic').cloneNode(true);
-					facsimileViewer.svg.addSvg(transcriptCopy.getDOMNode());
+					transcriptCopy.one('*').setAttribute('transform', 'scale(50,50)');
+					var textImageSvg = Y.one ('.svgpane-text-image-overlay svg');
+					transcriptCopy.setAttribute('width', textImageSvg.getAttribute('width'));
+					transcriptCopy.setAttribute('height', textImageSvg.getAttribute('height'));
+					facsimileViewer.svg.addSvg(transcriptCopy.getDOMNode(), 'transcript-overlay');
 					transcriptCopy.transition({	duration: 3, opacity: 1});
 					that.fitOverlay();
 				});

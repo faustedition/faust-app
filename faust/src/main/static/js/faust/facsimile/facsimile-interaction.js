@@ -49,11 +49,13 @@ YUI.add('facsimile-interaction', function (Y) {
 			domNode.setAttribute('fill-opacity', '0.4');
 
 			// for better handling, increase the height of the highlight boxes
+/*
 			var heightFactor = 1.5;
 			var height = domNode.getAttribute('height');
 			domNode.setAttribute('height', height * heightFactor);
 			var y = domNode.getAttribute('y');
 			domNode.setAttribute('y', y - ((heightFactor * height) - height));
+*/
 
 
 

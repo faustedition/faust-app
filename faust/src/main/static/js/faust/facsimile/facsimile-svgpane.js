@@ -23,17 +23,18 @@ YUI.add('facsimile-svgpane', function (Y) {
 
     var SvgPane = Y.Base.create("svg-pane", Y.Base, [], {
 
-		createContainer : function() {
+		createContainer : function(name) {
 			var container = Y.SvgUtils.svgElement('g');
+			container.setAttribute('class', 'svgpane-' + name);
 			this.svgPaneRoot.appendChild(container);
 			return container;
 		},
 
-		addSvg: function(svg) {
-		   this.createContainer().appendChild(svg);
+		addSvg: function(svg, name) {
+		   this.createContainer(name).appendChild(svg);
 		},
 
-        loadSvg : function(svgSrc){
+        loadSvg : function(svgSrc, name){
 			var that = this;
 			if (svgSrc) {
 				Y.io(svgSrc, {
@@ -43,7 +44,7 @@ YUI.add('facsimile-svgpane', function (Y) {
 					on: {
 						success: function(id, o, a) {
 							// FIXME this is a silly hack, use a different library
-							that.createContainer().innerHTML = o.responseText;
+							that.createContainer(name).innerHTML = o.responseText;
 							Y.fire('faust:facsimile-svg-pane-loaded', {});
 
 						}, 

@@ -264,6 +264,58 @@ YUI.add('svg-utils', function (Y) {
 	}
 
 
+	var fitTo = function(element, target) {
+
+		function fitToUnitSquare(element, targetBBox) {
+			var bbox = element.getBBox();
+
+			var translate1 = element.ownerSVGElement.createSVGTransform();
+			var scale1 = element.ownerSVGElement.createSVGTransform();
+			var translate2 = element.ownerSVGElement.createSVGTransform();
+			var scale2 = element.ownerSVGElement.createSVGTransform();
+
+			translate2.setTranslate(targetBBox.x, targetBBox.y);
+			//scale2.setScale(targetBBox.width, targetBBox.height);
+			scale1.setScale(targetBBox.width/bbox.width, targetBBox.height/bbox.height);
+			translate1.setTranslate(-bbox.x, -bbox.y);
+
+			element.transform.baseVal.appendItem(translate2);
+			//element.transform.baseVal.appendItem(scale2);
+
+			element.transform.baseVal.appendItem(scale1);
+			element.transform.baseVal.appendItem(translate1);
+			element.transform.baseVal.consolidate();
+		}
+
+		// account for the different transforms of the objects
+		var matrix = target.getTransformToElement(element);
+		element.transform.baseVal.consolidate();
+		var transform = element.transform.baseVal.createSVGTransformFromMatrix(matrix);
+		element.transform.baseVal.appendItem(transform);
+		element.transform.baseVal.consolidate();
+
+		// account for the different local sizes of the objects
+		var targetBBox = target.getBBox();
+		fitToUnitSquare(element, targetBBox);
+		//Y.SvgUtils.drawBBox(element);
+
+	}
+
+	var drawBBox = function (element) {
+		var bbox = element.getBBox();
+		var rect = Y.SvgUtils.svgElement('rect');
+		rect.setAttribute('x', bbox.x);
+		rect.setAttribute('y', bbox.y);
+		rect.setAttribute('width', bbox.width);
+		rect.setAttribute('height', bbox.height);
+		rect.setAttribute('stroke', 'gray');
+		rect.setAttribute('fill', 'none');
+		rect.setAttribute('transform', element.getAttribute('transform'));
+		element.parentElement.appendChild(rect);
+		return rect;
+	}
+
+
 	Y.mix(Y.namespace("SvgUtils"), {
 		SVG_NS: SVG_NS,
 		decodeClassValue: decodeClassValue,
@@ -278,7 +330,9 @@ YUI.add('svg-utils', function (Y) {
 		svg: svg,
 		empty: empty,
 		getScreenBBox: getScreenBBox,
-		containingRect: containingRect
+		containingRect: containingRect,
+		fitTo: fitTo,
+		drawBBox: drawBBox
 	});
 	
 }, '0.0', {

@@ -18,7 +18,7 @@
  */
 
 YUI.GlobalConfig = {
-    debug: true,
+    debug: false,
     combine: false,
     comboBase: cp + '/resources?',
     root: 'yui3/build/',
