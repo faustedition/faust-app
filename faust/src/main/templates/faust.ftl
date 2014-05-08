@@ -183,7 +183,7 @@
 
 <div class="pure-menu pure-menu-open pure-menu-horizontal pure-submenu pure-right">
 	<ul>
-		<@restricted><li <#if menuhighlight="xml-query/">class="pure-menu-selected"</#if>><a href="${cp}/xml-query"> <i class="icon-wrench"></i> Query</a></li></@restricted>
+		<@restricted><li <#if menuhighlight="xml-query/">class="pure-menu-selected"</#if>><a href="${cp}/xml-query/"> <i class="icon-wrench"></i> Query</a></li></@restricted>
 		<#if !roles?seq_contains("editor") && !roles?seq_contains("external")>
 			<li <#if menuhighlight="login">class="pure-menu-selected"</#if>><a href="${cp}/login/">Login</a></li>
 		</#if>
