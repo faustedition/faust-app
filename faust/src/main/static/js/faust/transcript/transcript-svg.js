@@ -211,18 +211,16 @@ YUI.add('transcript-svg', function (Y) {
 		this.bgBox.setAttribute("y", bbox.y);
 		this.bgBox.setAttribute("height", bbox.height);
 		this.bgBox.setAttribute("width", bbox.width);
-		this.bgBox.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
-
 		Y.each (this.decorations, function(decoration) {decoration.layout()});
+
 	};
 
 	Y.FaustTranscript.Text.prototype.render = function() {
 
-		this.bgBox = this.svgDocument().createElementNS(SVG_NS, "rect");
-		this.svgContainer().appendChild(this.bgBox);
-		this.bgBox.setAttribute("class", "bgBox " + this.getClassesString());
-
 		this.view = this.createView();
+		this.bgBox = this.svgDocument().createElementNS(SVG_NS, "rect");
+		this.view.appendChild(this.bgBox);
+		this.bgBox.setAttribute("class", "bgBox " + this.getClassesString());
 		this.svgContainer().appendChild(this.view);
 		this.rotate(this.rotation);
 		Y.each (this.decorations, function(decoration) {decoration.render()});
