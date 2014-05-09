@@ -36,6 +36,7 @@ YUI.add('facsimile-navigation-mouse', function (Y) {
 				hasDragged = false;
 				isDragging = true;
 				dragStart = {x: e.clientX, y: e.clientY};
+				e.preventDefault();
 			});
 
 			contentBox.on('mousemove', function(e) {
@@ -45,6 +46,7 @@ YUI.add('facsimile-navigation-mouse', function (Y) {
 					var dy = dragStart.y - e.clientY;
 					dragStart = {x: e.clientX, y: e.clientY};
 					config.host.model.pan(dx, dy);
+					e.preventDefault();
 				}
 			});
 
@@ -58,6 +60,7 @@ YUI.add('facsimile-navigation-mouse', function (Y) {
 
 			// click to zoom in
 
+/*
 			contentBox.on('click', function(e) {
 				if (!hasDragged) {
 					var contentBox = config.host.get('contentBox');
@@ -74,6 +77,7 @@ YUI.add('facsimile-navigation-mouse', function (Y) {
 					config.host.model.zoom(-1);
 				}
 			});
+*/
 		},
         destructor: function() {
         }

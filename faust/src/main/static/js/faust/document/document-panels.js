@@ -17,9 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-YUI.add('document-app', function (Y) {
-
-	var VIEW_MODES = ['facsimile', 'diplomatic', 'text'];
+YUI.add('document-panels', function (Y) {
 
 	Y.NavigationModel = Y.Base.create('navigationModel', Y.Model, [], {
 
@@ -41,9 +39,9 @@ YUI.add('document-app', function (Y) {
 			},
 
 			viewMode: {
-				value: VIEW_MODES[0],
+				value: 'transcript',
 				validator: function (value) {
-					return VIEW_MODES.indexOf(value) >= 0;
+					return Y.Lang.isNumber(value) && value in {'transcript': 1, 'facsimile': 1}
 				}
 			}
 		}
@@ -60,11 +58,11 @@ YUI.add('document-app', function (Y) {
 
 
 			container.append('<div style="margin:0em 0em; width:600">' +
-				'   <button  class="button-pure" id="prev_page_button">&lt;</button>' +
+				'   <button id="prev_page_button">&lt;</button>' +
 				'   ' + Faust.messages["page_abbrev"] +
 				'   <input id="pagenum-display" value="1" style="width: 2em; margin-right: 1em" readonly="readonly"/>' +
 				'   <span id="pageslider"></span>' +
-				'   <button class="button-pure" id="next_page_button">&gt;</button>' +
+				'   <button id="next_page_button">&gt;</button>' +
 				'</div>');
 
 			var pageslider = new Y.Slider({
@@ -122,47 +120,14 @@ YUI.add('document-app', function (Y) {
 		}
 	});
 
-	Y.ModeView = Y.Base.create("mode-view", Y.View, [], {
-
-		render: function () {
-			var model = this.get('model');
-			var container = Y.one(this.get('container'));
-			var button = Y.Node.create('<button class="pure-button"></button>');
-			button.append('<span>' + model.get('viewMode') + '</span>');
-			container.append(button);
-
-
-			model.after('viewModeChange', function (e) {
-				button.empty();
-				button.append('<span>' + e.newVal + '</span>');
-			});
-
-			button.on('click', function() {
-				// cycle through mode domain
-				var currentIndex = VIEW_MODES.indexOf(model.get('viewMode'));
-				var nextIndex = (currentIndex + 1) % VIEW_MODES.length;
-				model.set('viewMode', VIEW_MODES[nextIndex]);
-			})
-		}
-	});
-
-
 	Y.DocumentView = Y.Base.create("document-view", Y.View, [], {
 		initializer: function () {
-			var that = this;
-			this.get('model').after('pagenumberChange', this.render, this);
-
-			this.get('model').after('viewModeChange', function (e) {
-				that.updateViewMode(e.newVal);
+			this.get('model').after('change', this.render, this);
+			this.get('container').after('change', function () {
 			});
 
+			this.on('faust:navigation-done', function () {
 
-			// prevent selection when dragging the mouse
-			Y.one('body').on('mousedown', function(e) {
-				e.preventDefault();
-			});
-			Y.one('body').on('mousemove', function(e) {
-				e.preventDefault();
 			});
 
 		},
@@ -170,6 +135,37 @@ YUI.add('document-app', function (Y) {
 			//this.get('diplomaticPanel') && this.get('diplomaticPanel').destroy();
 			//this.get('facsimilePanel') && this.get('facsimilePanel').destroy();
 			this.get('container').empty();
+		},
+
+		panel: function (name, title, attrs) {
+
+			var container = this.get('container');
+			var widthAvailable = parseInt(Y.one('#document-app').getComputedStyle('width')) - 40;
+
+			panelContainer = Y.Node.create(
+				'<div class="' + name + '-container yui3-panel-loading">' +
+					'   <div class="yui3-widget-hd">' + title + '</div>' +
+					'   <div class="yui3-widget-bd" style="overflow:hidden">' +
+					'   <div class="' + name + 'Content"></div></div>' +
+					'   <div class="yui3-widget-ft"></div>' +
+					'</div>'
+			);
+
+			container.append(panelContainer);
+
+
+			panelAttrs = Y.merge({
+				srcNode: panelContainer,
+				width: widthAvailable / 2,
+				preventOverlap: true,
+				zIndex: 10,
+				render: true
+			}, attrs);
+
+			var panel = new Y.Panel(panelAttrs);
+			panel.plug(Y.Plugin.Drag, {handles: ['.yui3-widget-hd']});
+			panel.plug(Y.Plugin.Resize);
+			return panel;
 		},
 
 		addAjaxLoader: function (element) {
@@ -180,18 +176,6 @@ YUI.add('document-app', function (Y) {
 
 		removeAjaxLoader: function (element) {
 			element.one('.ajax-placeholder').remove(true);
-		},
-
-		updateViewMode: function (viewMode) {
-			Y.all('#document-app .mode-switchable').each(function(node){
-				if (node.hasClass(viewMode + '-container')) {
-					node.transition('fadeIn');
-					node.setStyle('zIndex', '10');
-				} else {
-					node.transition('fadeOut');
-					node.setStyle('zIndex', '9');
-				}
-			});
 		},
 
 		fitOverlay: function () {
@@ -214,12 +198,14 @@ YUI.add('document-app', function (Y) {
 					transcriptLine.remove(true);
 				}
 
+
+
 			})
 		},
 
 		updateFacsimileView: function () {
 			var facsimileContainer = Y.one('.facsimile-container');
-			var facsimileContent = facsimileContainer.one('.facsimile-content');
+			var facsimileContent = facsimileContainer.one('.yui3-widget-bd');
 			var pagenum = this.get('model').get('pagenumber');
 			facsimileContent.empty();
 
@@ -227,6 +213,26 @@ YUI.add('document-app', function (Y) {
 
 			if (facsimilePath) {
 				var facsimileURI = new Y.Faust.URI(facsimilePath);
+
+//				facsimileContent.append('<div id="transcript-swf" style="height: 300px"></div>');
+//				swfobject.switchOffAutoHideShow();
+//				swfobject.embedSWF(Faust.contextPath + "/static/swf/IIPZoom.swf",
+//					"transcript-swf",
+//					"100%", "100%",
+//					"9.0.0", Faust.contextPath + "/static/swf/expressInstall.swf", {
+//						server: Faust.FacsimileServer,
+//						image: facsimileURI.encodedPath() + '.tif',
+//						navigation: true
+//						//credit: "Copyright Digitale Faust-Edition"
+//					}, {
+//						scale: "exactfit",
+//						bgcolor: "#000000",
+//						allowfullscreen: "true",
+//						allowscriptaccess: "always",
+//						wmode: "opaque"
+//					});
+
+
 
 				facsimileContent.append('<div id="facsimile-view" style="height: 600px"></div>');
 				var viewWidth = parseInt(Y.one('#facsimile-view').getComputedStyle('width'));
@@ -238,7 +244,6 @@ YUI.add('document-app', function (Y) {
 				});
 				facsimileViewer.render();
 
-
 				// show navigation buttons
 				facsimileViewer.plug(Y.Faust.FacsimileNavigationButtons);
 				// enable mouse navigation
@@ -246,7 +251,6 @@ YUI.add('document-app', function (Y) {
 				// enable mouse navigation
 				facsimileViewer.plug(Y.Faust.FacsimileNavigationMouse);
 
-				//facsimileViewer.model.fitToView(viewWidth, viewHeight);
 
 				var imageLinkPath = Faust.imageLinkBase + '/' + pagenum;
 				// display svg from imageLinkPath
@@ -254,19 +258,16 @@ YUI.add('document-app', function (Y) {
 				facsimileViewer.svg.loadSvg(imageLinkPath, 'text-image-overlay');
 				var that = this;
 
-				Y.Faust.aggregateEvents ('faust:transcript-layout-done', 'faust:facsimile-svg-pane-loaded',
-				'faust:transcript-overlay-start');
-				Y.on('faust:transcript-overlay-start', function(e){
-					var transcriptCopy = Y.one('.diplomatic-content svg.diplomatic').cloneNode(true);
+				Y.on('faust:transcript-layout-done', function(e){
+					var transcriptCopy = Y.one('.diplomaticContent svg.diplomatic').cloneNode(true);
 					var textImageSvg = Y.one ('.svgpane-text-image-overlay svg');
 					if (textImageSvg) {
-						textImageSvg.show();
 						transcriptCopy.setAttribute('width', textImageSvg.getAttribute('width'));
 						transcriptCopy.setAttribute('height', textImageSvg.getAttribute('height'));
 						facsimileViewer.svg.addSvg(transcriptCopy.getDOMNode(), 'transcript-overlay');
 						//transcriptCopy.transition({	duration: 3, opacity: 1});
 						that.fitOverlay();
-						textImageSvg.hide();
+						textImageSvg.remove(true);
 						Y.fire('faust:transcript-overlay-done');
 					}
 				});
@@ -280,7 +281,7 @@ YUI.add('document-app', function (Y) {
 			var pagenum = this.get('model').get('pagenumber');
 			var diplomaticContainer = Y.one('.diplomatic-container');
 
-			var diplomaticContent = diplomaticContainer.one('.diplomatic-content');
+			var diplomaticContent = diplomaticContainer.one('.diplomaticContent');
 
 			diplomaticContent.setStyle('overflow', 'auto');
 
@@ -297,7 +298,7 @@ YUI.add('document-app', function (Y) {
 				});
 
 				var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
-					container: diplomaticContainer.one('.diplomatic-content'),
+					container: diplomaticContainer.one('.diplomaticContent'),
 					transcript: transcript,
 					source: source,
 					pagenum: pagenum
@@ -324,10 +325,11 @@ YUI.add('document-app', function (Y) {
 
 			structureView.render();
 
+
 		},
 
 		updateTextView: function () {
-			var textContent = Y.one('.text-content');
+			var textContent = Y.one('.textContent');
 			this.addAjaxLoader(textContent);
 			var that = this;
 
@@ -369,11 +371,79 @@ YUI.add('document-app', function (Y) {
 		},
 
 		render: function () {
+			var pagenum = this.get('model').get('pagenumber');
+			var container = this.get('container');
 			var widthAvailable = parseInt(Y.one('#document-app').getComputedStyle('width')) - 40;
+
+
+			var facsimileContainer = Y.one('.facsimile-container');
+			if (!facsimileContainer) {
+				facsimilePanel = this.panel('facsimile', Faust.messages["document.facsimile"], {
+					height: 600,
+					align: {
+						node: '#document-app',
+						points: [
+							Y.WidgetPositionAlign.TL,
+							Y.WidgetPositionAlign.TL
+						]
+					}
+				});
+			}
+
+			var diplomaticContainer = Y.one('.diplomatic-container');
+			if (!diplomaticContainer) {
+
+				var diplomaticPanel = this.panel('diplomatic', Faust.messages["document.diplomatic_transcript"], {
+					align: {
+						node: '#document-app',
+						points: [
+							Y.WidgetPositionAlign.TR,
+							Y.WidgetPositionAlign.TR
+						]
+					}
+				});
+			}
+
+			var structureContainer = Y.one('.structure-container');
+			if (!structureContainer) {
+
+				var diplomaticPanel = this.panel('structure', Faust.messages["document.document_structure"], {
+					zIndex: 11,
+					align: {
+						node: '#document-app',
+						points: [
+							Y.WidgetPositionAlign.BR,
+							Y.WidgetPositionAlign.BR
+						]
+					}
+				});
+				this.updateStructureView();
+
+			}
+
+			var textContainer = Y.one('.text-container');
+			if (!textContainer) {
+
+				var textPanel = this.panel('text', Faust.messages["document.document_text"], {
+					zIndex: 11,
+					align: {
+						node: '#document-app',
+						points: [
+							Y.WidgetPositionAlign.BL,
+							Y.WidgetPositionAlign.BL
+						]
+					}
+				});
+
+
+				this.updateTextView();
+			}
+
+
 			this.updateFacsimileView();
+
 			this.updateDiplomaticTranscriptView();
-			this.updateTextView();
-			this.updateViewMode(this.get('model').get('viewMode'));
+
 
 		}
 
@@ -392,8 +462,6 @@ YUI.add('document-app', function (Y) {
 				  Y.on('faust:document-data-arrives', function(e) {
 					  Y.one('#document-app').removeClass('faust-ajax-loading');
 
-					  //Y.one('#document-app').setStyle('height',Y.one('#main').get('scrollHeight'));
-
 					  var navigationModel = new Y.NavigationModel({
 						  numberOfPages: e.pages.length
 					  });
@@ -401,6 +469,7 @@ YUI.add('document-app', function (Y) {
 					  app = new Y.App({
 						  container: '#document-app',
 						  root: cp +  path.replace('faust://', '/'),
+						  //linkSelector: ("#" + this.get("id") + " a"),
 						  transitions: false,
 						  scrollToTop: false,
 						  serverRouting: false,
@@ -410,7 +479,7 @@ YUI.add('document-app', function (Y) {
 								  preserve: true
 							  }
 						  },
-						  model: navigationModel,
+						  model: navigationModel
 					  });
 
 					  app.route("/:page", function(req, res, next) {
@@ -441,18 +510,14 @@ YUI.add('document-app', function (Y) {
 						  model: navigationModel,
 						  container: Y.one('#document-navigation')
 					  });
+
+
+
 					  navigationView.render();
 
-
-					  var modeView = new Y.ModeView({
-						  model: navigationModel,
-						  container: Y.one('#document-mode')
-					  });
-					  modeView.render();
-
-
-
 					  app.render().dispatch();
+
+
 				  });
 
 
@@ -482,7 +547,7 @@ YUI.add('document-app', function (Y) {
 
 }, '0.0', {
 	requires: ["app", "node", "event", "slider", "document", "transcript-view", "transcript-interaction",
-		"document-structure-view", "button", "dd-plugin", "resize-plugin", "util",
+		"document-structure-view", "button", "panel", "dd-plugin", "resize-plugin", "util",
 		"text-display", "materialunit", "facsimile", "facsimile-svgpane", "facsimile-interaction",
 		"facsimile-navigation-buttons", "facsimile-navigation-mouse", "facsimile-navigation-keyboard"]
 });

@@ -24,11 +24,27 @@
 	<@faust.page title=title header=header layout="wide" menuhighlight="archives">
 
 
-	<div id="document-navigation" style="height: 50px;">
 
-</div>
-	<div id="document-app" class="yui-u-1" style="min-height: 600px;"></div>
+	<div id="document-app" class="yui-u-1" style="min-height: 600px;">
+		<div class="facsimile-container mode-switchable" style="position: absolute; top: 0em; left: 0em; width: 100%;
+		overflow:hidden;">
+			<div class="facsimile-content">
+			</div>
+		</div>
+		<div class="diplomatic-container mode-switchable" style="position: absolute; top: 4em; left: 0em; width: 100%;
+		overflow: auto; height: 100%">
+			<div class="diplomatic-content text-center">
+			</div>
+		</div>
+		<div class="text-container mode-switchable" style="position: absolute; top: 4em; left: 0em; width: 100%;
+		overflow: auto; height: 100%">
+			<div class="text-content" style="width: 40em; display: block; margin-left: auto; margin-right: auto;">
+			</div>
+		</div>
 
+	</div>
+	<div id="document-navigation" style="z-index: 20; height: 50px; position: absolute; top: 1em; left: 2em;"></div>
+	<div id="document-mode" style="z-index: 20; height: 50px; position: absolute; bottom: 2em; right: 2em;"></div>
 	<script type="text/javascript">
 
 YUI().use("stylesheet", "document-app", function(Y) {

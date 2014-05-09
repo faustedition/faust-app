@@ -29,6 +29,9 @@ YUI.add('transcript-interaction', function (Y) {
 		}).plug(Y.Plugin.WidgetAnim);
 		tooltip.anim.get('animHide').set('duration', 0.6);
 		tooltip.anim.get('animShow').set('duration', 0.6);
+		tooltip.on('mousedown', function(e) {e.preventDefault();});
+		tooltip.on('mousemove', function(e) {e.preventDefault();});
+
 		tooltip.render();
 
 		//display text properties or annotations

@@ -61,6 +61,13 @@ YUI.add('facsimile', function (Y) {
                 Math.max(view.imageHeight - view.height, 0) / 2
             );
         },
+		centerTop: function () {
+			var view = this.get("view");
+			this.panTo(
+				Math.max(view.imageWidth - view.width, 0) / 2,
+				-100
+			);
+		},
         centerOn: function (x, y) {
             var view = this.get("view");
             this.panTo(
@@ -102,10 +109,13 @@ YUI.add('facsimile', function (Y) {
             var image = this.get("image"), view = this.get("view");
             return Math.round(Math.log(Math.max(((width || image.width) / view.width), ((height || image.height) / view.height))) / Math.log(2));
         },
-        fitToView: function (width, height) {
+		fitToView: function (width, height) {
             this.zoom(this.fittingZoom(width, height) - this.get("zoom"));
-        }
-    }, {
+        },
+		fitWidthToView: function (width) {
+			this.zoom(this.fittingZoom(width, 0.0001) - this.get("zoom"));
+		}
+	}, {
         ATTRS: {
             image: {
                 value: NULL_IMAGE_VALUE,
@@ -159,8 +169,8 @@ YUI.add('facsimile', function (Y) {
                 "width": view.width,
                 "height": view.height
             }, {
-                background: "black",
-                margin: "1em auto",
+                background: "white",
+                margin: "0em auto",
                 border: 0,
                 padding: 0,
                 position: "relative",
@@ -185,8 +195,8 @@ YUI.add('facsimile', function (Y) {
         },
         metadataReceived: function (transactionId, response) {
             this.model.set("image", Y.merge(this.get("image"), Y.JSON.parse(response.responseText)));
-            this.model.fitToView();
-            this.model.center();
+            this.model.fitWidthToView();
+            this.model.centerTop();
         },
         imageSrc: function () {
 			return cp + this.src;

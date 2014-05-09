@@ -72,8 +72,8 @@ YUI.add('facsimile-navigation-buttons', function (Y) {
 
 
 			navigationPanel.setStyles({
-				top: '4em',
-				right: '2em',
+				top: '1em',
+				right: '1em',
 				position: 'absolute'
 			});
 

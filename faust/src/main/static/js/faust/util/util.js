@@ -33,6 +33,25 @@ YUI.add('util', function (Y) {
         return encodePath(this.components[2]);
     };
 
+	var aggregateEvents = function (event1, event2, targetEvent) {
+		var eventsFired = [];
+		Y.once(event1, function() {
+			eventsFired.push(event1);
+			if (eventsFired.indexOf(event2) >= 0) {
+				eventsFired.splice(0);
+				Y.fire(targetEvent);
+			}
+		});
+
+		Y.once(event2, function() {
+			eventsFired.push(event2);
+			if (eventsFired.indexOf(event1) >= 0) {
+				eventsFired.splice(0);
+				Y.fire(targetEvent);
+			}
+		});
+	};
+
     Y.mix(Y.namespace("Faust"), {
         encodePath:encodePath,
         URI:URI,
@@ -52,6 +71,7 @@ YUI.add('util', function (Y) {
                     }
                 });
             });
+
         },
         xml:function (uri, callback) {
             Y.io(cp + "/" + uri, {
@@ -65,8 +85,9 @@ YUI.add('util', function (Y) {
                     }
                 }
             });
-        }
+        },
+		aggregateEvents: aggregateEvents
     });
 }, '0.0', {
-    requires:["io"]
+    requires:["io", "event"]
 });

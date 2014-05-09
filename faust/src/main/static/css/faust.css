@@ -16,7 +16,8 @@ table, td, th, tr { border: 0 }
 #footer { margin-top: 2em; font-size: smaller; text-align: center; }
 
 #main { padding: 0 1em;}
-#main.layout-wide { padding: 5em 1em 1em 1em;}
+/* top padding must match header height */
+#main.layout-wide { top: 3.35em; padding: 0em 0em 0em 0em; position: fixed; width: 100%}
 
 .hidden { visibility: hidden; }
 
@@ -130,4 +131,10 @@ a.edit-permissions {
 	background-repeat: no-repeat;
 	background-position: center;
 	min-height: 100px;
+}
+
+/* modifications to external webdesign */
+
+header.compressed {
+    height: 3.35em;
 }
