@@ -63,6 +63,32 @@ YUI.add('facsimile-interaction', function (Y) {
 			var classVal = LINKEDTO_PREFIX + linkedLine.substring(1);
 			domNode.setAttribute('class', domNode.getAttribute('class') + ' ' + classVal);
 		});
+
+		// ******* button to hide/show facsimile *******
+
+		var showingTranscriptOverlay = true;
+
+		var showHideButton = Y.Node.create('<button class="pure-button button-opaque svgpane-show-hide"' +
+			' style="position: absolute; bottom: 2em; left: 1em;"></button>');
+		showHideButton.append('<i class="icon-font"></i> transcription visible');
+		showHideButton.on("click", function() {
+			var allLines = Y.all('.svgpane-transcript-overlay svg.diplomatic .element-line');
+			if (showingTranscriptOverlay) {
+				allLines.transition('fadeOut');
+				showHideButton.empty().append('<i class="icon-font"></i> transcription hidden');
+				showingTranscriptOverlay = false;
+
+			} else {
+				allLines.transition('fadeIn');
+				showHideButton.empty().append('<i class="icon-font"></i> transcription visible');
+				showingTranscriptOverlay = true;
+			}
+
+		});
+
+		Y.one('#facsimile-view').append(showHideButton);
+
+
 		// ******* transcript overlay on facsimile *******
 
 		Y.on('faust:examine-line', function(e) {
@@ -73,9 +99,12 @@ YUI.add('facsimile-interaction', function (Y) {
 
 		Y.on('faust:stop-examine-line', function(e) {
 			var transcriptLine = Y.all('.svgpane-transcript-overlay svg.diplomatic .element-line.lineNumber' + e.lineNumber);
-			transcriptLine.transition('fadeOut');
+			if (!showingTranscriptOverlay) {
+				transcriptLine.transition('fadeOut');
+			}
 
 		});
+
 
 
 		// ******* text-image-links *******

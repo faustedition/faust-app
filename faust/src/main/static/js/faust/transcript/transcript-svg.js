@@ -219,7 +219,7 @@ YUI.add('transcript-svg', function (Y) {
 
 		this.view = this.createView();
 		this.bgBox = this.svgDocument().createElementNS(SVG_NS, "rect");
-		this.view.appendChild(this.bgBox);
+		this.view.insertBefore(this.bgBox, this.view.childNodes[0]);
 		this.bgBox.setAttribute("class", "bgBox " + this.getClassesString());
 		this.svgContainer().appendChild(this.view);
 		this.rotate(this.rotation);

@@ -60,11 +60,11 @@ YUI.add('document-app', function (Y) {
 
 
 			container.append('<div style="margin:0em 0em; width:600">' +
-				'   <button  class="button-pure" id="prev_page_button">&lt;</button>' +
+				'   <button  class="button-pure button-opaque" id="prev_page_button">&lt;</button>' +
 				'   ' + Faust.messages["page_abbrev"] +
 				'   <input id="pagenum-display" value="1" style="width: 2em; margin-right: 1em" readonly="readonly"/>' +
 				'   <span id="pageslider"></span>' +
-				'   <button class="button-pure" id="next_page_button">&gt;</button>' +
+				'   <button class="button-pure button-opaque" id="next_page_button">&gt;</button>' +
 				'</div>');
 
 			var pageslider = new Y.Slider({
@@ -124,20 +124,29 @@ YUI.add('document-app', function (Y) {
 
 	Y.ModeView = Y.Base.create("mode-view", Y.View, [], {
 
+		updateButton: function(viewMode) {
+			this.button.empty();
+			var displayText = {
+				facsimile: '<i class="icon-picture"></i> facsimile',
+				diplomatic: '<i class="icon-font"></i> transcript',
+				text: '<i class="icon-align-left"></i> text'
+			}
+			this.button.append('<span>' + displayText[viewMode] + '</span>');
+		},
+
 		render: function () {
 			var model = this.get('model');
 			var container = Y.one(this.get('container'));
-			var button = Y.Node.create('<button class="pure-button"></button>');
-			button.append('<span>' + model.get('viewMode') + '</span>');
-			container.append(button);
+			this.button = Y.Node.create('<button class="pure-button button-opaque" style="min-width: 10em"></button>');
+			this.updateButton(model.get('viewMode'));
+			container.append(this.button);
 
-
+			var that = this;
 			model.after('viewModeChange', function (e) {
-				button.empty();
-				button.append('<span>' + e.newVal + '</span>');
+				that.updateButton(e.newVal);
 			});
 
-			button.on('click', function() {
+			this.button.on('click', function() {
 				// cycle through mode domain
 				var currentIndex = VIEW_MODES.indexOf(model.get('viewMode'));
 				var nextIndex = (currentIndex + 1) % VIEW_MODES.length;
@@ -200,15 +209,17 @@ YUI.add('document-app', function (Y) {
 				var imageLinkLine = Y.one('#svgpane .imageannotationLine.linkedto-lineNumber' + lineNum);
 
 				if (imageLinkLine) {
+					transcriptLine.setStyle('opacity', '0');
 					transcriptLine.setAttribute('transform', 'scale(50,50)');
 					Y.SvgUtils.fitTo(transcriptLine.getDOMNode(), imageLinkLine.getDOMNode());
+					transcriptLine.transition('fadeIn');
 
 					//var matrix = transcriptLine.getDOMNode().ownerSVGElement.createSVGMatrix();
 					//var bbox1 = Y.SvgUtils.boundingBox(imageLinkLine.getDOMNode(), matrix);
 					//var bbox2 = Y.SvgUtils.boundingBox(transcriptLine.getDOMNode(), matrix);
 					//console.log(bbox1);
 					//console.log(bbox2);
-					transcriptLine.transition('fadeOut');
+					//transcriptLine.transition('fadeOut');
 				} else {
 					// if the transcript line is not linked to image, remove it
 					transcriptLine.remove(true);

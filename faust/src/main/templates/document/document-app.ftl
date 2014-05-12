@@ -44,7 +44,7 @@
 
 	</div>
 	<div id="document-navigation" style="z-index: 20; height: 50px; position: absolute; top: 1em; left: 2em;"></div>
-	<div id="document-mode" style="z-index: 20; height: 50px; position: absolute; bottom: 2em; right: 2em;"></div>
+	<div id="document-mode" style="z-index: 20; position: absolute; bottom: 2em; right: 2em;"></div>
 	<script type="text/javascript">
 
 YUI().use("stylesheet", "document-app", function(Y) {

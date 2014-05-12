@@ -93,6 +93,8 @@ YUI.add('facsimile-svgpane', function (Y) {
 			svgRoot.appendChild(this.svgPaneRoot);
 			this.modelChangeSub = this.host.model.after(["tilesChange", "viewChange", "imageChange"], this.adjustTransform, this);
 			this.loadSvg(config.svgSrc);
+
+
         },
         destructor: function() {
 			this.modelChangeSub.detach();
@@ -109,5 +111,5 @@ YUI.add('facsimile-svgpane', function (Y) {
     Y.mix(Y.namespace("Faust"), { SvgPane: SvgPane });
 
 }, '0.0', {
-	requires: ['facsimile', 'plugin', 'svg-utils']
+	requires: ['facsimile', 'plugin', 'svg-utils', 'node']
 });
