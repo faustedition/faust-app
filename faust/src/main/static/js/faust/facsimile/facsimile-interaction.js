@@ -66,22 +66,23 @@ YUI.add('facsimile-interaction', function (Y) {
 
 		// ******* button to hide/show facsimile *******
 
-		var showingTranscriptOverlay = true;
+
+		Y.mix(Y.namespace("Faust"), { showingTranscriptOverlay: true });
 
 		var showHideButton = Y.Node.create('<button class="pure-button button-opaque svgpane-show-hide"' +
 			' style="position: absolute; bottom: 2em; left: 1em;"></button>');
 		showHideButton.append('<i class="icon-font"></i> transcription visible');
 		showHideButton.on("click", function() {
 			var allLines = Y.all('.svgpane-transcript-overlay svg.diplomatic .element-line');
-			if (showingTranscriptOverlay) {
+			if (Y.Faust.showingTranscriptOverlay) {
 				allLines.transition('fadeOut');
 				showHideButton.empty().append('<i class="icon-font"></i> transcription hidden');
-				showingTranscriptOverlay = false;
+				Y.Faust.showingTranscriptOverlay = false;
 
 			} else {
 				allLines.transition('fadeIn');
 				showHideButton.empty().append('<i class="icon-font"></i> transcription visible');
-				showingTranscriptOverlay = true;
+				Y.Faust.showingTranscriptOverlay = true;
 			}
 
 		});
@@ -99,7 +100,7 @@ YUI.add('facsimile-interaction', function (Y) {
 
 		Y.on('faust:stop-examine-line', function(e) {
 			var transcriptLine = Y.all('.svgpane-transcript-overlay svg.diplomatic .element-line.lineNumber' + e.lineNumber);
-			if (!showingTranscriptOverlay) {
+			if (!Y.Faust.showingTranscriptOverlay) {
 				transcriptLine.transition('fadeOut');
 			}
 

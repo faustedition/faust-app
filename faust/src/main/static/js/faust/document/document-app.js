@@ -204,6 +204,7 @@ YUI.add('document-app', function (Y) {
 		},
 
 		fitOverlay: function () {
+			Y.Faust.showingTranscriptOverlay = true;
 			Y.each(Y.all('#svgpane .element-line'), function (transcriptLine) {
 				var lineNum = Y.SvgUtils.decodeClassValue(transcriptLine.getAttribute('class'), 'lineNumber');
 				var imageLinkLine = Y.one('#svgpane .imageannotationLine.linkedto-lineNumber' + lineNum);
