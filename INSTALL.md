@@ -147,7 +147,7 @@ template. Extract it to the installation directory
 After editing the `config-local.properties` file, start the server with
 the config file path as its argument.
 
-       java -Xmx512m -server -Dfile.encoding=UTF-8 -jar app/lib/faust-1.3-SNAPSHOT.jar /opt/faustedition/config-local.properties
+       java -Xmx512m -server -Dfile.encoding=UTF-8 -jar /opt/faustedition/app/lib/faust-1.3-SNAPSHOT.jar /opt/faustedition/config-local.properties
 
 Building from Source
 --------------------
