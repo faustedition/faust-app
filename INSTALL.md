@@ -183,8 +183,18 @@ Building from Source
 
 ### Starting the Web Application
 
-       export MAVEN_OPTS="-server -Xmx1024m"
-       mvn exec:java -Dexec.mainClass="de.faustedition.Server"
+The application looks for data in default directories. If you want to use your own directories, you need to specify them in a confing file.
 
-This relies on pre-build Maven artifacts from other servers. TODO: How
-to build those.
+       cp target/classes/config-default.properties config-local.properties
+
+Edit the file config-local.properties, creating the appropriate directories.
+
+Populate the database from XML data
+
+       export MAVEN_OPTS="-server -Xmx1024m"
+
+       mvn exec:java -Dexec.mainClass="de.faustedition.transcript.TranscriptBatchReader" -Dexec.args="config-local.properties"
+
+Start the webapp
+
+       mvn exec:java -Dexec.mainClass="de.faustedition.Server" -Dexec.args="config-local.properties"
