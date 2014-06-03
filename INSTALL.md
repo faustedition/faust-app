@@ -31,7 +31,7 @@ These installation instructions are based on a fresh minimal install of
 [Ubuntu Linux Server 14.04 LTS](http://www.ubuntu.com/download/server).
 For other systems, they might need to be modified accordingly.
 
-These instructions assume you to have root priviledges.
+These instructions assume you to have root privileges. 
 
 The application relies on the following libraries/packages: Java 7
 Runtime Environment
@@ -111,7 +111,9 @@ To download it, type
 
 The web server runs on port 80 (HTTP) by default. If you want to change
 this (for example for a reverse proxy setup), please see section
-[Changing the Configuration](#Changing_the_Configuration "wikilink")
+[Changing the Configuration](#Changing_the_Configuration "wikilink").
+The server (and data import) can also be run as a non-root dedicated user, 
+which has to have write access to `/var/opt/faustedition/db`
 
 Editing the Edition Data
 ------------------------
@@ -145,7 +147,7 @@ template. Extract it to the installation directory
 After editing the `config-local.properties` file, start the server with
 the config file path as its argument.
 
-       java -Xmx512m -server -Dfile.encoding=UTF-8 -jar app/lib/faust-1.3-SNAPSHOT.jar /opt/faustedition/config-local.properties
+       java -Xmx512m -server -Dfile.encoding=UTF-8 -jar /opt/faustedition/app/lib/faust-1.3-SNAPSHOT.jar /opt/faustedition/config-local.properties
 
 Building from Source
 --------------------
