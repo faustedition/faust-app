@@ -93,17 +93,17 @@ To download it, type
 ### Downloading the Binaries
 
        cd /opt/faustedition
-       wget --no-check-certificate --content-disposition 'https://faustedition.uni-wuerzburg.de/nexus/service/local/repositories/releases/content/de/faustedition/faust/1.3/faust-1.3-app.zip'
+       wget --no-check-certificate --content-disposition 'https://faustedition.uni-wuerzburg.de/nexus/service/local/artifact/maven/redirect?r=snapshots&g=de.faustedition&a=faust&c=app&p=zip&v=LATEST'
        unzip faust-*-app.zip
 
 ### Populating the Database from XML data
 
        rm -rf /var/opt/faustedition/db/*
-       java -Xmx512m -Dfile.encoding=UTF-8 -cp /opt/faustedition/app/lib/faust-1.3.jar de.faustedition.transcript.TranscriptBatchReader
+       java -Xmx512m -Dfile.encoding=UTF-8 -cp /opt/faustedition/app/lib/faust-1.4-SNAPSHOT.jar de.faustedition.transcript.TranscriptBatchReader
 
 ### Starting the Server
 
-       java -Xmx512m -server -Dfile.encoding=UTF-8 -jar /opt/faustedition/app/lib/faust-1.3.jar
+       java -Xmx512m -server -Dfile.encoding=UTF-8 -jar /opt/faustedition/app/lib/faust-1.4-SNAPSHOT.jar
 
 The web server runs on port 80 (HTTP) by default. If you want to change
 this (for example for a reverse proxy setup), please see section
@@ -137,13 +137,13 @@ The edition contains a default config file that can be used as a
 template. Extract it to the installation directory
 
        cd /opt/faustedition
-       unzip app/lib/faust-1.3.jar config-default.properties
+       unzip app/lib/faust-1.4-SNAPSHOT.jar config-default.properties
        mv config-default.properties config-local.properties
 
 After editing the `config-local.properties` file, start the server with
 the config file path as its argument.
 
-       java -Xmx512m -server -Dfile.encoding=UTF-8 -jar /opt/faustedition/app/lib/faust-1.3.jar /opt/faustedition/config-local.properties
+       java -Xmx512m -server -Dfile.encoding=UTF-8 -jar /opt/faustedition/app/lib/faust-1.4-SNAPSHOT.jar /opt/faustedition/config-local.properties
 
 Building from Source
 --------------------
