@@ -54,9 +54,6 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 	private TransactionTemplate transactionTemplate;
 
 	@Autowired
-	private XMLStorage xml;
-
-	@Autowired
 	private Logger logger;
 	
 	@Autowired
