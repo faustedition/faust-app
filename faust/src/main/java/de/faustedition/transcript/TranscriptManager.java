@@ -117,13 +117,6 @@ public class TranscriptManager {
 			LOG.debug("Transforming XML transcript from {}", source);
 		}
 
-		final XMLTransformerConfigurationBase<JsonNode> conf = configure(new XMLTransformerConfigurationBase<JsonNode>(textRepository) {
-
-			@Override
-			protected Layer<JsonNode> translate(Name name, Map<Name, String> attributes, Set<Anchor<JsonNode>> anchors) {
-				return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors, null);
-			}
-		}, materialUnit);
 
 		try {
 			final StringWriter xmlString = new StringWriter();
@@ -131,8 +124,18 @@ public class TranscriptManager {
 					new SAXSource(xml.getInputSource(source)),
 					new StreamResult(xmlString)
 			);
+
 			final Layer<JsonNode> sourceLayer = textRepository.add(TextConstants.XML_TARGET_NAME, new StringReader(xmlString.toString()), null, Collections.<Anchor<JsonNode>>emptySet());
+
+			final XMLTransformerConfigurationBase<JsonNode> conf = configure(new XMLTransformerConfigurationBase<JsonNode>(textRepository) {
+				@Override
+				protected Layer<JsonNode> translate(Name name, Map<Name, String> attributes, Set<Anchor<JsonNode>> anchors) {
+					return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors, null);
+				}
+			}, materialUnit);
+
 			final LayerNode<JsonNode> transcriptLayer = (LayerNode<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
+			
 			transcriptLayer.node.createRelationshipTo(materialUnit.node, TRANSCRIPT_RT);
 			return transcriptLayer;
 		} catch (IllegalArgumentException e) {
