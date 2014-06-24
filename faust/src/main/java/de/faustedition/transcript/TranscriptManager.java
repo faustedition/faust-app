@@ -19,8 +19,33 @@
 
 package de.faustedition.transcript;
 
-import com.google.common.collect.Ordering;
-import com.google.common.collect.TreeMultimap;
+import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
+import static eu.interedition.text.TextConstants.TEI_NS;
+import static org.neo4j.graphdb.Direction.INCOMING;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
@@ -46,37 +71,10 @@ import eu.interedition.text.xml.module.LineElementXMLTransformerModule;
 import eu.interedition.text.xml.module.NotableCharacterXMLTransformerModule;
 import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
 import eu.interedition.text.xml.module.TextXMLTransformerModule;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.neo4j.graphdb.Relationship;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-
-import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
-import static eu.interedition.text.TextConstants.TEI_NS;
-import static org.neo4j.graphdb.Direction.INCOMING;
 
 @Component
-public class TranscriptManager implements InitializingBean {
+@DependsOn(value = "materialUnitInitializer")
+public class TranscriptManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TranscriptManager.class);
 
@@ -94,6 +92,7 @@ public class TranscriptManager implements InitializingBean {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+/*  TODO Currently under construction (transcribedVerseIndex will be reimplemented) but sill useful.
 	private TreeMultimap<Short, MaterialUnit> transcribedVerseIndex = TreeMultimap.create(Ordering.natural(), new Comparator<MaterialUnit>() {
 		@Override
 		public int compare(MaterialUnit o1, MaterialUnit o2) {
@@ -101,6 +100,7 @@ public class TranscriptManager implements InitializingBean {
 			return (idDiff == 0 ? 0 : (idDiff < 0 ? -1 : 1));
 		}
 	});
+*/
 
 	public Layer<JsonNode> find(MaterialUnit materialUnit) throws IOException, XMLStreamException {
 		final Relationship rel = materialUnit.node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
@@ -185,21 +185,11 @@ public class TranscriptManager implements InitializingBean {
 				modules.add(new HandsXMLTransformerModule(conf));
 				modules.add(new FacsimilePathXMLTransformerModule(materialUnit));
 				break;
+			default: break;
 		}
 
 		modules.add(new TEIAwareAnnotationXMLTransformerModule<JsonNode>());
 
 		return conf;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		Executors.newSingleThreadExecutor().submit(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-
-				return null;  //To change body of implemented methods use File | Settings | File Templates.
-			}
-		});
 	}
 }

@@ -100,7 +100,7 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 	}
 
 
-	public Document handle(FaustURI source) throws IOException, SAXException {
+	public void handle(FaustURI source) throws IOException, SAXException {
 		this.source = source;
 		this.baseTracker = new XMLBaseTracker(source.toString());
 		this.materialUnitCollection = graph.getMaterialUnits();
@@ -114,7 +114,6 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Read " + source + " into " + document + "[" +  document.node.getId() + "]");
 			}
-			return document;
 		} finally {
 			xmlSource.getByteStream().close();
 		}

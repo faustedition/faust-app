@@ -3,3 +3,6 @@ target
 *.iml
 *.pyc
 faust-utils/local.ini
+.classpath
+.project
+.settings

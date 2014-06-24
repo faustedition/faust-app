@@ -28,6 +28,7 @@ import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapperCollection;
 
+/** This class represents an archive. The archives name and id are accessible via getter/setter methods. Further the archive related to a document can be determined with the getArchive() method */
 public class Archive extends NodeWrapperCollection<MaterialUnit> {
 	private static final FaustRelationshipType IN_ARCHIVE_RT = new FaustRelationshipType("in-archive");
 	private static final String PREFIX = FaustGraph.PREFIX + ".archive";

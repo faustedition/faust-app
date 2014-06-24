@@ -75,6 +75,7 @@ public class MaterialUnitInitializer implements InitializingBean {
 		StopWatch sw = new StopWatch();
 		sw.start();
         int documentCount = 0;
+        // This iteration is only to count the number of documents for the following log-message
         for (final FaustURI documentDescriptor : xml.iterate(DOCUMENT_BASE_URI)) {
             documentCount++;
         }
