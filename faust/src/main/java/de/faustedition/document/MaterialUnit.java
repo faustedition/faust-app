@@ -92,6 +92,10 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		}
 	}
 
+	public void setFacsimile(FaustURI uri) {
+		node.setProperty(PREFIX + ".facsimile", uri.toString());
+	}
+
 	public static Type getType(Node node) {
 		return Type.valueOf(((String) node.getProperty(PREFIX + ".type")).replaceAll("\\-", "_").toUpperCase());
 	}
@@ -115,10 +119,6 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		return getType(node);
 	}
 
-	public void setFacsimile(FaustURI uri) {
-		node.setProperty(PREFIX + ".facsimile", uri.toString());
-	}
-	
 	public void setType(Type type) {
 		node.setProperty(PREFIX + ".type", type.name().toLowerCase().replaceAll("_", "-"));
 	}
