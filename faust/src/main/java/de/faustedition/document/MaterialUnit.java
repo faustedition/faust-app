@@ -39,7 +39,7 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
 
 	public enum Type {
-		ARCHIVALDOCUMENT, DOCUMENT, SHEET, LEAF, DISJUNCTLEAF, PAGE, PATCH, PATCHSURFACE
+		ARCHIVALDOCUMENT, DOCUMENT, SHEET, LEAF, DISJUNCTLEAF, PAGE, PATCH, PATCHSURFACE, PRINT
 	}
 
 	protected static final String PREFIX = FaustGraph.PREFIX + ".material-unit";
