@@ -26,7 +26,6 @@ import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit.Type;
 import de.faustedition.graph.FaustGraph;
-import de.faustedition.transcript.GoddagTranscriptManager;
 import de.faustedition.transcript.TranscriptType;
 import de.faustedition.xml.Namespaces;
 import de.faustedition.xml.XMLBaseTracker;
@@ -60,9 +59,6 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 
 	@Autowired
 	private FaustGraph graph;
-
-	@Autowired
-	private GoddagTranscriptManager transcriptManager;
 
 	@Autowired
 	private GraphDatabaseService db;
@@ -206,7 +202,6 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 						transcriptSource = noneURI;
 					}
 					unit.setTranscriptSource(transcriptSource);
-					unit.setTranscript(transcriptManager.find(transcriptSource, type));
 				}
 			}
 

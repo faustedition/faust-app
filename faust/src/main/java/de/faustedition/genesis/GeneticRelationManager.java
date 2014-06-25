@@ -29,10 +29,6 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.goddag4j.Element;
-import org.goddag4j.GoddagNode;
-import org.goddag4j.GoddagTreeNode;
-import org.goddag4j.visit.GoddagVisitor;
 import org.joda.time.LocalDate;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
@@ -49,8 +45,6 @@ import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.text.Text;
-import de.faustedition.transcript.GoddagTranscript;
 import de.faustedition.transcript.TranscriptType;
 
 @Component
@@ -75,6 +69,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 	public void feedGraph() {
 		final Pattern numbers = Pattern.compile("\\d+");
 		Transaction tx = db.beginTx();
+		/* //TODO change to new range model
 		try {
 			final SortedMap<Integer, Element> textLineIndex = textLineIndex();
 			for (GoddagTranscript t : graph.getTranscripts()) {
@@ -84,18 +79,20 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 
 				logger.debug(t.toString());
 				final Element root = t.getDefaultRoot();
+
+
 				new GoddagVisitor() {
 					public void startElement(Element root, Element element) {
 						if ("tei:l".equals(element.getQName())) {
 							String lineNumbers = element.getAttributeValue("tei", "n");
 							if (lineNumbers != null) {
 								Matcher lnMatcher = numbers.matcher(lineNumbers);
-								while (lnMatcher.find()) {									
+								while (lnMatcher.find()) {
 									final Integer lineNumber = Integer.valueOf(lnMatcher.group());
 									final Element target = textLineIndex.get(lineNumber);
 									if (target != null) {
 										element.node.createRelationshipTo(target.node, GENETIC_REL);
-										
+
 									}
 								}
 							}
@@ -103,14 +100,16 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 					};
 				}.visit(root, root);
 
+
 			}
 			tx.success();
 		} finally {
 			tx.finish();
 		}
-
+        */
 	}
 
+/*  //TODO change to new text model
 	protected SortedMap<Integer, Element> textLineIndex() {
 		final SortedMap<Integer, Element> index = new TreeMap<Integer, Element>();
 		Transaction tx = db.beginTx();
@@ -145,6 +144,7 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 		}
 		return index;
 	}
+*/
 
 	protected void manuscriptDating() throws IOException {
 		final InputStream sourceStream = getClass().getResourceAsStream("manuscript-dating.csv");
@@ -195,6 +195,8 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 		}
 	}
 
+/*
+	//TODO change to new text model
 	public Set<Document> findRelatedDocuments(Element l) {
 		Set<Document> related = new HashSet<Document>();
 		for (Relationship r : l.node.getRelationships(GENETIC_REL)) {
@@ -216,4 +218,5 @@ public class GeneticRelationManager extends Runtime implements Runnable {
 		}
 		return related;
 	}
+*/
 }

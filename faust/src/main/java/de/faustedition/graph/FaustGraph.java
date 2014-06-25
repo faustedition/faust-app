@@ -31,8 +31,6 @@ import org.springframework.stereotype.Component;
 import de.faustedition.document.ArchiveCollection;
 import de.faustedition.document.MaterialUnitCollection;
 import de.faustedition.genesis.GeneticSourceCollection;
-import de.faustedition.text.TextCollection;
-import de.faustedition.transcript.GoddagTranscriptCollection;
 
 @Component
 public class FaustGraph {
@@ -58,16 +56,8 @@ public class FaustGraph {
 		return new ArchiveCollection(root(ARCHIVES_ROOT_NAME));
 	}
 
-	public GoddagTranscriptCollection getTranscripts() {
-		return new GoddagTranscriptCollection(root(TRANSCRIPTS_ROOT_NAME));
-	}
-
 	public MaterialUnitCollection getMaterialUnits() {
 		return new MaterialUnitCollection(root(MATERIAL_UNITS_ROOT_NAME));
-	}
-
-	public TextCollection getTexts() {
-		return new TextCollection(root(TEXTS_ROOT_NAME));
 	}
 
 	public GeneticSourceCollection getGeneticSources() {
