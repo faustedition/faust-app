@@ -23,7 +23,7 @@ import static de.faustedition.xml.Namespaces.TEI_NS_PREFIX;
 
 import java.net.URI;
 
-import org.goddag4j.io.NamespaceMap;
+import de.faustedition.xml.NamespaceMap;
 
 @SuppressWarnings("serial")
 public class CustomNamespaceMap extends NamespaceMap implements Namespaces {
