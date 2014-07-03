@@ -19,9 +19,9 @@
 
 package de.faustedition.collation;
 
-import java.util.Iterator;
-
 import com.google.common.collect.Iterators;
+
+import java.util.Iterator;
 
 public class Alignment {
 

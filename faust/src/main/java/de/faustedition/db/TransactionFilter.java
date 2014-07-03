@@ -19,10 +19,6 @@
 
 package de.faustedition.db;
 
-import static de.faustedition.db.ChainedTransactionManager.TX_ATTRIBUTE;
-
-import java.util.Map;
-
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -31,6 +27,10 @@ import org.restlet.routing.Filter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import java.util.Map;
+
+import static de.faustedition.db.ChainedTransactionManager.TX_ATTRIBUTE;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

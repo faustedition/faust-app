@@ -19,18 +19,17 @@
 
 package de.faustedition;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-
-import org.restlet.data.Status;
-import org.restlet.resource.ResourceException;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

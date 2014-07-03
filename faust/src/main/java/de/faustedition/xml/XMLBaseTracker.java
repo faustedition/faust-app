@@ -19,18 +19,16 @@
 
 package de.faustedition.xml;
 
-import java.net.URI;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Iterator;
-
-import javax.xml.XMLConstants;
-
+import com.google.common.base.Preconditions;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.common.base.Preconditions;
+import javax.xml.XMLConstants;
+import java.net.URI;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
 
 public class XMLBaseTracker extends DefaultHandler {
 	private static final String NULL_BASE = "";

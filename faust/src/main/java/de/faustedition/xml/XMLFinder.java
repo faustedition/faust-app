@@ -19,15 +19,7 @@
 
 package de.faustedition.xml;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Deque;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
-
+import de.faustedition.FaustURI;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.MediaType;
@@ -40,7 +32,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
 
-import de.faustedition.FaustURI;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Deque;
 
 @Component
 public class XMLFinder extends Finder {

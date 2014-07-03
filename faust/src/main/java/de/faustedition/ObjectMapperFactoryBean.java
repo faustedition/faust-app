@@ -19,11 +19,10 @@
 
 package de.faustedition;
 
+import de.faustedition.json.CompactTextModule;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.stereotype.Component;
-
-import de.faustedition.json.CompactTextModule;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

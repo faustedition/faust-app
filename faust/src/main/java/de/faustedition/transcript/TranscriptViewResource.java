@@ -19,8 +19,8 @@
 
 package de.faustedition.transcript;
 
-import java.io.IOException;
-
+import de.faustedition.document.Archive;
+import de.faustedition.document.MaterialUnit.Type;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -28,8 +28,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 
-import de.faustedition.document.Archive;
-import de.faustedition.document.MaterialUnit.Type;
+import java.io.IOException;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

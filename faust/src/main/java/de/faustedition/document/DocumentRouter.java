@@ -19,13 +19,12 @@
 
 package de.faustedition.document;
 
+import de.faustedition.template.TemplateFinder;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import de.faustedition.template.TemplateFinder;
 
 @Component
 public class DocumentRouter extends Router implements InitializingBean {

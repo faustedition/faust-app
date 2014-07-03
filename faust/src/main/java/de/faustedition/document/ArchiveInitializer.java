@@ -19,10 +19,14 @@
 
 package de.faustedition.document;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.io.IOException;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +40,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
+import java.io.IOException;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.xml.Namespaces;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Component
 public class ArchiveInitializer implements InitializingBean {

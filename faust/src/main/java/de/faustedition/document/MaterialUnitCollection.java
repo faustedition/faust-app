@@ -19,10 +19,9 @@
 
 package de.faustedition.document;
 
+import de.faustedition.graph.NodeWrapperCollection;
 import org.neo4j.graphdb.Node;
 import org.neo4j.helpers.collection.IterableWrapper;
-
-import de.faustedition.graph.NodeWrapperCollection;
 
 public class MaterialUnitCollection extends NodeWrapperCollection<MaterialUnit> {
 

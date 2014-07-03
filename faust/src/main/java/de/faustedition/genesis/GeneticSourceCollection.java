@@ -19,9 +19,8 @@
 
 package de.faustedition.genesis;
 
-import org.neo4j.graphdb.Node;
-
 import de.faustedition.graph.NodeWrapperCollection;
+import org.neo4j.graphdb.Node;
 
 public class GeneticSourceCollection extends NodeWrapperCollection<GeneticSource> {
 

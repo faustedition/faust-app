@@ -33,7 +33,6 @@ import org.neo4j.graphdb.Relationship;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {

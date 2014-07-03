@@ -19,22 +19,16 @@
 
 package de.faustedition.xml;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Preconditions;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
-
-import com.google.common.base.Preconditions;
+import java.net.URI;
+import java.util.*;
 
 public class CustomNamespaceContext implements NamespaceContext {
-	private Map<String, String> prefixToNamespaceUri = new HashMap<String, String>();
-	private Map<String, List<String>> namespaceUriToPrefixes = new HashMap<String, List<String>>();
+	private final Map<String, String> prefixToNamespaceUri = new HashMap<String, String>();
+	private final Map<String, List<String>> namespaceUriToPrefixes = new HashMap<String, List<String>>();
 
 	private String defaultNamespaceUri = "";
 

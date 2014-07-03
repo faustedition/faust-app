@@ -19,12 +19,10 @@
 
 package de.faustedition.tei;
 
-import java.io.IOException;
-
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.Runtime;
+import de.faustedition.xml.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,14 +32,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.SAXException;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.Runtime;
-import de.faustedition.xml.Namespaces;
-import de.faustedition.xml.NodeListWrapper;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
-import de.faustedition.xml.XPathUtil;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 
 @Component
 public class TeiTemplater extends Runtime implements Runnable {

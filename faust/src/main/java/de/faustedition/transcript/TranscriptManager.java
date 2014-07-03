@@ -19,33 +19,6 @@
 
 package de.faustedition.transcript;
 
-import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
-import static eu.interedition.text.TextConstants.TEI_NS;
-import static org.neo4j.graphdb.Direction.INCOMING;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.neo4j.graphdb.Relationship;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
-
 import de.faustedition.FaustURI;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
@@ -65,12 +38,32 @@ import eu.interedition.text.simple.SimpleLayer;
 import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfigurationBase;
 import eu.interedition.text.xml.XMLTransformerModule;
-import eu.interedition.text.xml.module.CLIXAnnotationXMLTransformerModule;
-import eu.interedition.text.xml.module.DefaultAnnotationXMLTransformerModule;
-import eu.interedition.text.xml.module.LineElementXMLTransformerModule;
-import eu.interedition.text.xml.module.NotableCharacterXMLTransformerModule;
-import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
-import eu.interedition.text.xml.module.TextXMLTransformerModule;
+import eu.interedition.text.xml.module.*;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
+import static eu.interedition.text.TextConstants.TEI_NS;
+import static org.neo4j.graphdb.Direction.INCOMING;
 
 @Component
 @DependsOn(value = "materialUnitInitializer")

@@ -19,11 +19,13 @@
 
 package de.faustedition.search;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-
+import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import de.faustedition.JsonRepresentationFactory;
+import de.faustedition.document.Document;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
@@ -38,14 +40,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.document.Document;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

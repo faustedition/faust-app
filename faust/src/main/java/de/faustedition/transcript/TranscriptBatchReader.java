@@ -26,7 +26,6 @@ import de.faustedition.document.DocumentDescriptorHandler;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.input.TranscriptInvalidException;
-import de.faustedition.xml.XMLStorage;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,7 +65,7 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 
-		final Set<FaustURI> imported = Sets.<FaustURI>newHashSet();
+		final Set<FaustURI> imported = Sets.newHashSet();
 
 		final Deque<MaterialUnit> queue = new ArrayDeque<MaterialUnit>(graph.getMaterialUnits());
 		while (!queue.isEmpty()) {

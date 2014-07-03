@@ -19,11 +19,11 @@
 
 package de.faustedition.transcript;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import de.faustedition.JsonRepresentationFactory;
+import de.faustedition.VerseInterval;
+import de.faustedition.document.MaterialUnit;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -37,12 +37,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.VerseInterval;
-import de.faustedition.document.MaterialUnit;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

@@ -19,9 +19,9 @@
 
 package de.faustedition.structure;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.xml.XMLStorage;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Finder;
@@ -31,9 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.xml.XMLStorage;
+import java.util.ArrayDeque;
+import java.util.Arrays;
 
 @Component
 public class StructureFinder extends Finder {

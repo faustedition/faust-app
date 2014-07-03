@@ -20,11 +20,11 @@
 package de.faustedition.reasoning;
 
 
+import edu.bath.transitivityutils.ImmutableRelation;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
-import edu.bath.transitivityutils.ImmutableRelation;
 
 
 /**

@@ -21,7 +21,6 @@ package de.faustedition.reasoning;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-
 import edu.bath.transitivityutils.Relation;
 
 public class MultimapBasedRelation<E> implements Relation<E> {

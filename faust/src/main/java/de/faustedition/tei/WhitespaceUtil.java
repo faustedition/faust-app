@@ -19,22 +19,18 @@
 
 package de.faustedition.tei;
 
-import static de.faustedition.xml.Namespaces.FAUST_NS_URI;
-import static de.faustedition.xml.Namespaces.TEI_NS_URI;
-import static de.faustedition.xml.Namespaces.TEI_SIG_GE_URI;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import de.faustedition.xml.XMLUtil;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
-
-import de.faustedition.xml.XMLUtil;
+import static de.faustedition.xml.Namespaces.*;
 
 public class WhitespaceUtil {
 	private static final Map<String, Set<String>> CONTAINER_ELEMENTS = new HashMap<String, Set<String>>();

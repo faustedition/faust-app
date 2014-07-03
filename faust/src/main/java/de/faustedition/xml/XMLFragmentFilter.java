@@ -19,12 +19,12 @@
 
 package de.faustedition.xml;
 
-import java.util.Stack;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+
+import java.util.Stack;
 
 public class XMLFragmentFilter implements ContentHandler {
 

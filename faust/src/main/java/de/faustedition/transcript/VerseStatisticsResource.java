@@ -19,12 +19,15 @@
 
 package de.faustedition.transcript;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import de.faustedition.JsonRepresentationFactory;
+import de.faustedition.VerseInterval;
+import de.faustedition.document.Document;
+import de.faustedition.document.MaterialUnit;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -39,16 +42,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
-
-import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.VerseInterval;
-import de.faustedition.document.Document;
-import de.faustedition.document.MaterialUnit;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

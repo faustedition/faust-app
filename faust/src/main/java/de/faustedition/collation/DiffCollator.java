@@ -19,12 +19,12 @@
 
 package de.faustedition.collation;
 
+import com.google.common.collect.Iterables;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-
-import com.google.common.collect.Iterables;
 
 public class DiffCollator {
 	public List<Alignment> align(Iterable<Token> a, Iterable<Token> b) {
@@ -68,12 +68,16 @@ public class DiffCollator {
 
 		return alignments;
 	}
-	
-	private static Comparator<Token> DEFAULT_MATCHER = new Comparator<Token>() {
 
-		@Override
-		public int compare(Token o1, Token o2) {
-			return o1.text().trim().compareToIgnoreCase(o2.text().trim());
-		}
-	};
+	private static final Comparator<Token> DEFAULT_MATCHER;
+
+	static {
+		DEFAULT_MATCHER = new Comparator<Token>() {
+
+			@Override
+			public int compare(Token o1, Token o2) {
+				return o1.text().trim().compareToIgnoreCase(o2.text().trim());
+			}
+		};
+	}
 }

@@ -21,12 +21,7 @@ package de.faustedition.graph;
 
 import freemarker.ext.beans.BeanModel;
 import freemarker.ext.beans.BeansWrapper;
-import freemarker.template.SimpleCollection;
-import freemarker.template.TemplateCollectionModel;
-import freemarker.template.TemplateHashModel;
-import freemarker.template.TemplateModel;
-import freemarker.template.TemplateModelException;
-import freemarker.template.TemplateModelIterator;
+import freemarker.template.*;
 
 public class NodeWrapperCollectionTemplateModel implements TemplateCollectionModel, TemplateHashModel {
 

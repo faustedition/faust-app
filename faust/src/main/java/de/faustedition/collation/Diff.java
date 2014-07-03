@@ -18,14 +18,7 @@
  */
 package de.faustedition.collation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Compares two lists, returning a list of the additions, changes, and deletions
@@ -41,17 +34,17 @@ public class Diff<Type> {
     /**
      * The source list, AKA the "from" values.
      */
-    protected List<Type> a;
+    protected final List<Type> a;
 
     /**
      * The target list, AKA the "to" values.
      */
-    protected List<Type> b;
+    protected final List<Type> b;
 
     /**
      * The list of differences, as <code>Difference</code> instances.
      */
-    protected List<Difference> diffs = new ArrayList<Difference>();
+    protected final List<Difference> diffs = new ArrayList<Difference>();
 
     /**
      * The pending, uncommitted difference.
@@ -61,7 +54,7 @@ public class Diff<Type> {
     /**
      * The comparator used, if any.
      */
-    private Comparator<Type> comparator;
+    private final Comparator<Type> comparator;
 
     /**
      * The thresholds.
@@ -294,8 +287,7 @@ public class Diff<Type> {
         }
 
         for (int bi = bStart; bi <= bEnd; ++bi) {
-            Type element = b.get(bi);
-            Type key = element;
+			Type key = b.get(bi);
             List<Integer> positions = bMatches.get(key);
 
             if (positions == null) {

@@ -19,11 +19,7 @@
 
 package de.faustedition.xml;
 
-import static de.faustedition.xml.Namespaces.TEI_NS_PREFIX;
-
 import java.net.URI;
-
-import de.faustedition.xml.NamespaceMap;
 
 @SuppressWarnings("serial")
 public class CustomNamespaceMap extends NamespaceMap implements Namespaces {

@@ -19,14 +19,13 @@
 
 package de.faustedition.document;
 
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.graph.NodeWrapperCollection;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.IterableWrapper;
-
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.graph.NodeWrapperCollection;
 
 /** This class represents an archive. The archives name and id are accessible via getter/setter methods. Further the archive related to a document can be determined with the getArchive() method */
 public class Archive extends NodeWrapperCollection<MaterialUnit> {

@@ -19,16 +19,15 @@
 
 package de.faustedition.json;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-
+import eu.interedition.text.Anchor;
+import eu.interedition.text.Text;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 
-import eu.interedition.text.Anchor;
-import eu.interedition.text.Text;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

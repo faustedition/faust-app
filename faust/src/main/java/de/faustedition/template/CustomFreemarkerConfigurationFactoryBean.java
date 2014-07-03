@@ -19,16 +19,15 @@
 
 package de.faustedition.template;
 
-import java.io.File;
-import java.util.Collections;
-
+import freemarker.cache.FileTemplateLoader;
+import freemarker.template.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import freemarker.cache.FileTemplateLoader;
-import freemarker.template.Configuration;
+import java.io.File;
+import java.util.Collections;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

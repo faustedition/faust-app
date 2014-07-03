@@ -19,8 +19,9 @@
 
 package de.faustedition.graph;
 
-import static org.neo4j.graphdb.Direction.OUTGOING;
-
+import de.faustedition.document.ArchiveCollection;
+import de.faustedition.document.MaterialUnitCollection;
+import de.faustedition.genesis.GeneticSourceCollection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -28,9 +29,7 @@ import org.neo4j.graphdb.RelationshipType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.faustedition.document.ArchiveCollection;
-import de.faustedition.document.MaterialUnitCollection;
-import de.faustedition.genesis.GeneticSourceCollection;
+import static org.neo4j.graphdb.Direction.OUTGOING;
 
 @Component
 public class FaustGraph {

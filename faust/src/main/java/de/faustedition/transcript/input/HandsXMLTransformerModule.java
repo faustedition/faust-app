@@ -19,15 +19,7 @@
 
 package de.faustedition.transcript.input;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import de.faustedition.xml.Namespaces;
 import eu.interedition.text.Anchor;
 import eu.interedition.text.Name;
@@ -37,6 +29,9 @@ import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfiguration;
 import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
 import org.codehaus.jackson.JsonNode;
+
+import javax.xml.namespace.QName;
+import java.util.Map;
 
 public class HandsXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode> {
 
@@ -78,8 +73,7 @@ public class HandsXMLTransformerModule extends XMLTransformerModuleAdapter<JsonN
 			if (newAttribute == null)
 				throw new TranscriptInvalidException("Element handShift doesn't have a 'new' attribute.");
 
-			String newValue = (String) newAttribute;
-			lastHandsChangeValue = newValue;
+			lastHandsChangeValue = (String) newAttribute;
 			lastHandsChangeOffset = transformer.getTextOffset();
 		}
 	}		

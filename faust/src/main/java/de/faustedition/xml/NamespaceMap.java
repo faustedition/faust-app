@@ -19,11 +19,10 @@
 
 package de.faustedition.xml;
 
+import javax.xml.XMLConstants;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.XMLConstants;
 
 @SuppressWarnings("serial")
 public class NamespaceMap extends HashMap<URI, String> {

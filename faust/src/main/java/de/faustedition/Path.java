@@ -19,17 +19,15 @@
 
 package de.faustedition;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-
-import javax.annotation.Nullable;
-
-import org.restlet.data.Reference;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.restlet.data.Reference;
+
+import javax.annotation.Nullable;
+import java.util.ArrayDeque;
+import java.util.Arrays;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

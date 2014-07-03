@@ -19,13 +19,13 @@
 
 package de.faustedition;
 
+import com.google.common.base.Preconditions;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
-
-import com.google.common.base.Preconditions;
 
 public class FaustURI implements Comparable<FaustURI> {
 	public static final String FAUST_SCHEME = "faust";

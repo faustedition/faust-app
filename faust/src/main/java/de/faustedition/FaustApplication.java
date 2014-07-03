@@ -19,37 +19,6 @@
 
 package de.faustedition;
 
-import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
-
-import java.util.List;
-
-import org.restlet.Application;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.Restlet;
-import org.restlet.data.CharacterSet;
-import org.restlet.data.Reference;
-import org.restlet.engine.application.Encoder;
-import org.restlet.representation.Representation;
-import org.restlet.resource.Directory;
-import org.restlet.resource.Finder;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
-import org.restlet.routing.Filter;
-import org.restlet.routing.Redirector;
-import org.restlet.routing.Router;
-import org.restlet.routing.Template;
-import org.restlet.security.Authenticator;
-import org.restlet.security.ChallengeAuthenticator;
-import org.restlet.security.Role;
-import org.restlet.security.RoleAuthorizer;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-
 import de.faustedition.db.TransactionFilter;
 import de.faustedition.document.ArchiveRouter;
 import de.faustedition.document.DocumentRouter;
@@ -67,6 +36,35 @@ import de.faustedition.transcript.TranscriptViewResource;
 import de.faustedition.transcript.VerseStatisticsResource;
 import de.faustedition.xml.XMLFinder;
 import de.faustedition.xml.XMLQueryResource;
+import org.restlet.Application;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.Restlet;
+import org.restlet.data.CharacterSet;
+import org.restlet.data.Reference;
+import org.restlet.engine.application.Encoder;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Directory;
+import org.restlet.resource.Finder;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.ServerResource;
+import org.restlet.routing.Filter;
+import org.restlet.routing.Router;
+import org.restlet.routing.Template;
+import org.restlet.security.Authenticator;
+import org.restlet.security.ChallengeAuthenticator;
+import org.restlet.security.Role;
+import org.restlet.security.RoleAuthorizer;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.List;
+
+import static org.restlet.data.ChallengeScheme.HTTP_BASIC;
 
 @Component
 public class FaustApplication extends Application implements InitializingBean {

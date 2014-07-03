@@ -19,15 +19,15 @@
 
 package de.faustedition;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.restlet.data.CharacterSet;
 import org.restlet.data.MediaType;
 import org.restlet.representation.OutputRepresentation;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 public abstract class JsonRespresentation extends OutputRepresentation {
 

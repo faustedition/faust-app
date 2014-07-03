@@ -19,14 +19,14 @@
 
 package de.faustedition.db;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author mh
@@ -93,7 +93,7 @@ public class MultiTransactionStatus implements TransactionStatus {
 	}
 
 	private static class SavePoints {
-		Map<TransactionStatus,Object> savepoints=new HashMap<TransactionStatus, Object>();
+		final Map<TransactionStatus,Object> savepoints = new HashMap<TransactionStatus, Object>();
 
 		private void addSavePoint(TransactionStatus status, Object savepoint) {
 			this.savepoints.put(status, savepoint);

@@ -19,14 +19,7 @@
 
 package de.faustedition.transcript.input;
 
-import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
-
-import java.util.HashMap;
-
-import javax.xml.namespace.QName;
-
 import com.google.common.collect.Maps;
-
 import de.faustedition.xml.Namespaces;
 import eu.interedition.text.Anchor;
 import eu.interedition.text.Name;
@@ -36,6 +29,11 @@ import eu.interedition.text.xml.XMLTransformer;
 import eu.interedition.text.xml.XMLTransformerConfiguration;
 import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
 import org.codehaus.jackson.JsonNode;
+
+import javax.xml.namespace.QName;
+import java.util.HashMap;
+
+import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
 
 public class StageXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode> {
 

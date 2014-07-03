@@ -19,17 +19,16 @@
 
 package de.faustedition.reasoning;
 
-import java.util.Map;
-
-import org.neo4j.graphdb.Node;
-
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
 import edu.bath.transitivityutils.ImmutableRelation;
+import org.neo4j.graphdb.Node;
+
+import java.util.Map;
 
 public class GraphBasedRelation<E> implements ImmutableRelation<E> {
 
-	private Map<E, Node> nodeMap;
+	private final Map<E, Node> nodeMap;
 	
 	private FaustURI geneticSource = null;
 	

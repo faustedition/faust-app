@@ -19,19 +19,19 @@
 
 package de.faustedition.graph;
 
-import static org.neo4j.graphdb.Direction.INCOMING;
-import static org.neo4j.graphdb.Direction.OUTGOING;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.helpers.collection.IterableWrapper;
+import org.neo4j.helpers.collection.IteratorUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.helpers.collection.IterableWrapper;
-import org.neo4j.helpers.collection.IteratorUtil;
+import static org.neo4j.graphdb.Direction.INCOMING;
+import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class NodeWrapperCollection<T extends NodeWrapper> extends NodeWrapper implements Collection<T> {
 	private static final FaustRelationshipType IN_COLLECTION_RT = new FaustRelationshipType("in-collection");
@@ -109,7 +109,7 @@ public class NodeWrapperCollection<T extends NodeWrapper> extends NodeWrapper im
 	public boolean add(T e) {
 		e.node.createRelationshipTo(node, collectionType);
 		return true;
-	};
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -175,7 +175,7 @@ public class NodeWrapperCollection<T extends NodeWrapper> extends NodeWrapper im
 		for (T e : asList()) {
 			remove(e);
 		}
-	};
+	}
 
 	public void delete() {
 		final List<Relationship> elementRels = new ArrayList<Relationship>();

@@ -69,8 +69,8 @@ class Dfs<E> {
     protected void postVisit(E value) { }
 
     private enum Color {
-        BLACK, GRAY;
-    }
+        BLACK, GRAY
+	}
 
     private static class NodeCursor<E> {
         final E value;

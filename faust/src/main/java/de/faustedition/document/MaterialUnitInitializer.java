@@ -19,8 +19,10 @@
 
 package de.faustedition.document;
 
-import java.io.IOException;
-
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.xml.XMLStorage;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +35,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StopWatch;
 import org.xml.sax.SAXException;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.xml.XMLStorage;
+import java.io.IOException;
 
 @Component
 @DependsOn(value = "archiveInitializer")

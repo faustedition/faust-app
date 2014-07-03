@@ -19,13 +19,14 @@
 
 package de.faustedition.genesis;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
+import de.faustedition.FaustAuthority;
+import de.faustedition.FaustURI;
+import de.faustedition.document.Document;
+import de.faustedition.graph.FaustGraph;
+import de.faustedition.graph.FaustRelationshipType;
+import de.faustedition.xml.Namespaces;
+import de.faustedition.xml.XMLStorage;
+import de.faustedition.xml.XMLUtil;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
@@ -36,14 +37,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.faustedition.FaustAuthority;
-import de.faustedition.FaustURI;
-import de.faustedition.document.Document;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.FaustRelationshipType;
-import de.faustedition.xml.Namespaces;
-import de.faustedition.xml.XMLStorage;
-import de.faustedition.xml.XMLUtil;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class MacrogeneticRelationManager {
@@ -87,7 +86,7 @@ public class MacrogeneticRelationManager {
 		for (GeneticSource gs :faustGraph.getGeneticSources())
 			logger.debug(gs.getUri().toString());
 		return failed;
-	};
+	}
 
 	private void evaluate(FaustURI source) throws SAXException, IOException {
 		if (logger.isDebugEnabled()) {

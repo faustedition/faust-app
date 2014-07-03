@@ -19,11 +19,7 @@
 
 package de.faustedition.db;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.sql.DataSource;
-
+import com.jolbox.bonecp.BoneCPDataSource;
 import org.h2.Driver;
 import org.hibernate.SessionFactory;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -39,14 +35,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.jolbox.bonecp.BoneCPDataSource;
-
-import de.faustedition.transcript.TranscribedVerseInterval;
-import de.faustedition.transcript.Transcript;
-import eu.interedition.text.Anchor;
-import eu.interedition.text.Layer;
-import eu.interedition.text.Name;
-import eu.interedition.text.Text;
+import javax.sql.DataSource;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

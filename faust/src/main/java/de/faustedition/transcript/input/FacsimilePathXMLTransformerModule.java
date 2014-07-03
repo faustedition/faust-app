@@ -30,7 +30,7 @@ import org.codehaus.jackson.JsonNode;
 public class FacsimilePathXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode> {
 
 	private boolean read = false;
-	private MaterialUnit materialUnit;
+	private final MaterialUnit materialUnit;
 
 	public FacsimilePathXMLTransformerModule(MaterialUnit materialUnit) {
 		this.materialUnit = materialUnit;

@@ -86,7 +86,7 @@ public final class OrderList<E> implements Iterable<OrderList.Node<E>>, Serializ
      * is already deleted, or the node is the base node.
      */
     public boolean delete(OrderList.Node<E> node) {
-        Node<E> n = (Node<E>)node;
+        Node<E> n = node;
         if (!n.isValid()) return false;
         if (node == base) return false;
         n.prev.next = n.next;
@@ -118,7 +118,7 @@ public final class OrderList<E> implements Iterable<OrderList.Node<E>>, Serializ
      * @throws IllegalStateException if the specified node has been deleted
      */
     public OrderList.Node<E> addAfter(OrderList.Node<E> node, E value) {
-        Node<E> n = ((Node<E>)node);
+        Node<E> n = node;
         Preconditions.checkState(n.isValid(), "Node has been deleted");
         Preconditions.checkState(size != Integer.MAX_VALUE, "Too many elements"); //just for good conscience; never going to happen
 
@@ -294,7 +294,7 @@ public final class OrderList<E> implements Iterable<OrderList.Node<E>>, Serializ
         public final boolean precedes(OrderList.Node<?> n) {
             Preconditions.checkState(isValid(), "This node is deleted");
             Preconditions.checkState(n.isValid(), "The argument node is deleted");
-            return tag < ((Node<?>)n).tag;
+            return tag < n.tag;
         }
 
         /**

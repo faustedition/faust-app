@@ -19,14 +19,13 @@
 
 package de.faustedition.xml;
 
-import java.util.Iterator;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import java.util.Iterator;
 
 public class NodeListWrapper<T extends Node> implements Iterable<T> {
 

@@ -19,25 +19,15 @@
 
 package de.faustedition.transcript;
 
-import static eu.interedition.text.Query.and;
-import static eu.interedition.text.Query.name;
-import static eu.interedition.text.Query.text;
-
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.collect.*;
+import de.faustedition.VerseInterval;
+import de.faustedition.document.MaterialUnit;
+import eu.interedition.text.Layer;
+import eu.interedition.text.Name;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
 import org.codehaus.jackson.JsonNode;
 import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
@@ -50,20 +40,15 @@ import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
+import javax.annotation.Nullable;
+import javax.persistence.*;
+import javax.persistence.Table;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import de.faustedition.VerseInterval;
-import de.faustedition.document.MaterialUnit;
-import eu.interedition.text.Layer;
-import eu.interedition.text.Name;
-import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextRepository;
+import static eu.interedition.text.Query.*;
 
 
 /**

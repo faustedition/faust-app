@@ -20,7 +20,6 @@
 package de.faustedition.transcript.input;
 
 import com.google.common.collect.Maps;
-import de.faustedition.xml.Namespaces;
 import eu.interedition.text.Anchor;
 import eu.interedition.text.Name;
 import eu.interedition.text.TextRange;
@@ -30,7 +29,6 @@ import eu.interedition.text.xml.XMLTransformerConfiguration;
 import eu.interedition.text.xml.module.XMLTransformerModuleAdapter;
 import org.codehaus.jackson.JsonNode;
 
-import javax.xml.namespace.QName;
 import java.util.Map;
 
 import static de.faustedition.xml.Namespaces.FAUST_NS_URI;
@@ -47,7 +45,7 @@ public class StXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode
 
 	private class StData {
 
-		public long startOffset;
+		public final long startOffset;
 		public String handValue;
 
 		public StData(String handValue, long startOffset) {
@@ -56,7 +54,7 @@ public class StXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode
 		}
 	}
 
-	private Map<String, StData> pending = Maps.<String, StData>newHashMap();
+	private Map<String, StData> pending = Maps.newHashMap();
 	private XMLTransformerConfiguration<JsonNode> conf;
 
 

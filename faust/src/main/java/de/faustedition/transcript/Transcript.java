@@ -19,23 +19,20 @@
 
 package de.faustedition.transcript;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Collections;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.io.Closeables;
+import de.faustedition.FaustURI;
+import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.NodeWrapper;
+import de.faustedition.transcript.input.TranscriptInvalidException;
+import de.faustedition.xml.XMLStorage;
 import eu.interedition.text.Anchor;
+import eu.interedition.text.Layer;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
+import eu.interedition.text.xml.XML;
+import eu.interedition.text.xml.XMLTransformer;
 import org.codehaus.jackson.JsonNode;
 import org.hibernate.LockMode;
 import org.hibernate.Session;
@@ -44,19 +41,12 @@ import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.io.Closeables;
-
-import de.faustedition.FaustURI;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.transcript.input.TranscriptInvalidException;
-import de.faustedition.xml.XMLStorage;
-import eu.interedition.text.Layer;
-import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextRepository;
-import eu.interedition.text.xml.XML;
-import eu.interedition.text.xml.XMLTransformer;
+import javax.persistence.*;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Collections;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>

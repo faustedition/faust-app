@@ -19,11 +19,9 @@
 
 package de.faustedition;
 
-import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.collect.Iterables;
+import de.faustedition.tei.TeiValidator;
+import de.faustedition.transcript.TranscriptBatchReader;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 import org.restlet.util.ClientList;
@@ -32,10 +30,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import com.google.common.collect.Iterables;
-
-import de.faustedition.tei.TeiValidator;
-import de.faustedition.transcript.TranscriptBatchReader;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @org.springframework.stereotype.Component
 public class Server extends Runtime implements Runnable, InitializingBean {

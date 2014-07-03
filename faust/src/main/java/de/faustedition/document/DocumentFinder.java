@@ -19,12 +19,11 @@
 
 package de.faustedition.document;
 
-import java.util.Deque;
-
+import de.faustedition.FaustURI;
 import org.restlet.resource.ServerResource;
 import org.springframework.stereotype.Component;
 
-import de.faustedition.FaustURI;
+import java.util.Deque;
 
 @Component
 public class DocumentFinder extends AbstractDocumentFinder {
