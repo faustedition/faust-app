@@ -19,7 +19,7 @@
 
 YUI.add('facsimile-navigation-mouse', function (Y) {
 
-	SVG_NS = "http://www.w3.org/2000/svg";
+	var SVG_NS = "http://www.w3.org/2000/svg";
 
     var FacsimileNavigationMouse = Y.Base.create("facsimile-navigation-mouse", Y.Base, [], {
 

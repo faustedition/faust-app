@@ -55,8 +55,8 @@ YUI.add('adhoc-tree', function (Y) {
 
 		// is a following b in document order?
 		isFollowing : function(a,b) {
-			return XMLNodeUtils.documentOrderSort(a, b) > 0 ? true : false;
-		},		
+			return XMLNodeUtils.documentOrderSort(a, b) > 0;
+		}
 	};
 
 
@@ -65,8 +65,7 @@ YUI.add('adhoc-tree', function (Y) {
 			return a.targets[0].range.end - b.targets[0].range.end;
 		else
 			return a.targets[0].range.start - b.targets[0].range.start;
-	};
-
+	}
 	function _nextOutermostAnnotationCandidates(transcript, start, end, filter, siblings, ancestors, parent,
 												documentOrderSort, isDescendant) {
 
@@ -113,8 +112,7 @@ YUI.add('adhoc-tree', function (Y) {
 		//return nextOutermostAnnotationCandidates;
 		return firstAnnotations.sort(documentOrderSort);
 
-	};
-
+	}
 	function _nextOutermostAnnotation(transcript, start, end, filter, siblings, ancestors, parent,
 									  documentOrderSort, isDescendant) {
 
@@ -152,8 +150,7 @@ YUI.add('adhoc-tree', function (Y) {
 
 	function AdhocNode(parent) {
 		this.parent = parent;
-	};
-
+	}
 	Y.extend(AdhocNode, Object, {
 		ancestors : function() {
 			var node = this;
@@ -181,7 +178,7 @@ YUI.add('adhoc-tree', function (Y) {
 		}, 
 		filter  : function() {
 			return this._getAncestorProperty('_filter');
-		}, 
+		}
 	});
 
 	function TextNode(range, parent) {
@@ -202,8 +199,7 @@ YUI.add('adhoc-tree', function (Y) {
 	function AnnotationNode(annotation, parent) {
 		AnnotationNode.superclass.constructor.call(this, parent);	
 		this.annotation = annotation;
-	};
-
+	}
 	Y.extend(AnnotationNode, AdhocNode, {
 
 		_textNodesForPartitions: function(start, end, parent) {
@@ -300,7 +296,7 @@ YUI.add('adhoc-tree', function (Y) {
 		},
 		data: function() {
 			return {};
-		},
+		}
 
 	});
 	Y.mix(Y.namespace("Faust"), {

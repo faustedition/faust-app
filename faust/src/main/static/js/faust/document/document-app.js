@@ -130,7 +130,7 @@ YUI.add('document-app', function (Y) {
 				facsimile: '<i class="icon-picture"></i> facsimile',
 				diplomatic: '<i class="icon-font"></i> transcript',
 				text: '<i class="icon-align-left"></i> text'
-			}
+			};
 			this.button.append('<span>' + displayText[viewMode] + '</span>');
 		},
 
@@ -301,11 +301,11 @@ YUI.add('document-app', function (Y) {
 			var that = this;
 			var page = this.get('pages')[pagenum - 1];
 
-			var initTranscriptView = function(transcript) {
+			var initTranscriptView = function (transcript) {
 				that.removeAjaxLoader(diplomaticContent);
-				diplomaticContent.transition({	duration: 0, opacity: 0.2});
-				Y.on('faust:transcript-layout-done', function(e){
-					diplomaticContent.transition({	duration: 3, opacity: 1});
+				diplomaticContent.transition({    duration: 0, opacity: 0.2});
+				Y.on('faust:transcript-layout-done', function (e) {
+					diplomaticContent.transition({    duration: 3, opacity: 1});
 				});
 
 				var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
@@ -315,7 +315,7 @@ YUI.add('document-app', function (Y) {
 					pagenum: pagenum
 				});
 				diplomaticTranscriptView.render();
-			}
+			};
 
 			if (page.transcript && page.transcript.source) {
 				var source = page.transcript.source;
@@ -350,8 +350,7 @@ YUI.add('document-app', function (Y) {
 				if (stageNum.stages[name] === undefined)
 					stageNum.stages[name] = stageNum.stagecount++;
 				return stageNum.stages[name];
-			};
-
+			}
 			var handleSpecialAnnotations = function (annotation, prefix, partitionNode, lineNode, isFirst, isLast) {
 
 				if (annotation.name.localName == 'stage')
@@ -398,6 +397,8 @@ YUI.add('document-app', function (Y) {
 
 	var DocumentApp = {};
 
+	var app;
+
 	DocumentApp.initializeFn = function(path, documentSource) {
 		return	function() {
 				  Y.one('#document-app').addClass('faust-ajax-loading');
@@ -422,7 +423,7 @@ YUI.add('document-app', function (Y) {
 								  preserve: true
 							  }
 						  },
-						  model: navigationModel,
+						  model: navigationModel
 					  });
 
 					  app.route("/:page", function(req, res, next) {
@@ -462,8 +463,6 @@ YUI.add('document-app', function (Y) {
 					  });
 					  modeView.render();
 
-
-
 					  app.render().dispatch();
 				  });
 
@@ -473,7 +472,7 @@ YUI.add('document-app', function (Y) {
 
 					  var pages = [];
 					  var descendants = fd.descendants();
-					  for (i=0; i < descendants.length; i++)
+					  for (var i=0; i < descendants.length; i++)
 						  if (descendants[i].type === 'page' /* && descendants[i].transcript */)
 							  pages.push(descendants[i]);
 

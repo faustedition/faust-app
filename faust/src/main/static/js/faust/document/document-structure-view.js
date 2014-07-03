@@ -32,7 +32,7 @@ YUI.add('document-structure-view', function (Y) {
 
 			// TODO: cleanup
 
-			FaustStructure = function(){};
+			var FaustStructure = function(){};
 
 			var minD = 15;
 			var minLength = 180;
@@ -61,7 +61,7 @@ YUI.add('document-structure-view', function (Y) {
 				envWidth = envelope.width;
 
 				//facsHeight = envelope.width * 1.5;
-				facsHeight = 0;
+				var facsHeight = 0;
 
 				//facsLefthand =  paper.image("", minD, minD, envelope.width, facsHeight);
 				//facsLefthand.hide();
@@ -179,9 +179,9 @@ YUI.add('document-structure-view', function (Y) {
 			FaustStructure.linearizeMetadata = function (node) {
 
 				var txt = "";
-				
-				for ( var i = 0; i < node.childNodes.length; i++) {
-					
+
+				for (var i = 0; i < node.childNodes.length; i++) {
+
 					var childNode = node.childNodes[i];
 					if (childNode.nodeType == childNode.ELEMENT_NODE)
 						txt += childNode.nodeName + ": ";
@@ -193,36 +193,36 @@ YUI.add('document-structure-view', function (Y) {
 					if (childNode.nodeType == childNode.ELEMENT_NODE)
 						txt += ". ";
 
-				}	
-				
+				}
+
 				return txt;
-			}
+			};
 
 
-			FaustStructure.setSrc = function(pageDisplay, uri) {
+			FaustStructure.setSrc = function (pageDisplay, uri) {
 
 				// first, set blank until image is loaded.
 				pageDisplay.attr("src", "");
 
 				// fixme: a better way to validate uris
 				if (uri && uri.components) {
-					pageDisplay.attr("src", "https://faustedition.uni-wuerzburg.de/images/iipsrv.fcgi?FIF=" +  uri.encodedPath()
-									 + ".tif&SDS=0,90&CNT=1.0&WID="+ envWidth + "&QLT=99&CVT=jpeg");
+					pageDisplay.attr("src", "https://faustedition.uni-wuerzburg.de/images/iipsrv.fcgi?FIF=" + uri.encodedPath()
+						+ ".tif&SDS=0,90&CNT=1.0&WID=" + envWidth + "&QLT=99&CVT=jpeg");
 
 					// link to transcript
 
 					var transcriptPath = uriMap[uri.components[2]];
 					if (transcriptPath) {
 						pageDisplay.attr({
-							cursor:"pointer",
-							href: Faust.contextPath + transcriptPath,
+							cursor: "pointer",
+							href: Faust.contextPath + transcriptPath
 						});
 
 					}
 					else {
 						pageDisplay.attr({
 							cursor: "not-allowed",
-							href: null,
+							href: null
 						});
 
 
@@ -235,17 +235,14 @@ YUI.add('document-structure-view', function (Y) {
 					pageDisplay.href = null;
 				}
 
-				
-				
 
+			};
 
-			}
+			FaustStructure.displayMetadata = function (metadataDisplay, metadata) {
 
-			FaustStructure.displayMetadata = function(metadataDisplay, metadata) {
-				
 				metadataDisplay.appendChild(document.createElement("br"));
 				for (var i in metadata) {
-					
+
 					var header = document.createElement("b");
 					var title = document.createTextNode(i + ": ");
 					var br = document.createElement("br");
@@ -253,37 +250,36 @@ YUI.add('document-structure-view', function (Y) {
 					metadataDisplay.appendChild(header);
 					metadataDisplay.appendChild(document.createTextNode(metadata[i]));
 					metadataDisplay.appendChild(br);
-					
-					
+
 
 				}
-			}
+			};
 
 			FaustStructure.test = function() {
 
-				var paper = Raphael(document.getElementById('canvas'), x = 800, y = 600,
-									r = 100);
+				var paper = Raphael(document.getElementById('canvas'), 800, 600,
+									100);
 
 				var d1 = new FaustStructure.Doppelblatt();
-				d4 = new FaustStructure.Doppelblatt();
-				d5 = new FaustStructure.Doppelblatt();
-				d6 = new FaustStructure.Doppelblatt();
+				var d4 = new FaustStructure.Doppelblatt();
+				var d5 = new FaustStructure.Doppelblatt();
+				var d6 = new FaustStructure.Doppelblatt();
 
 				d1.children.push(d4);
 				d4.children.push(d5);
 				d4.children.push(d6);
 
-				e1 = new FaustStructure.Blatt();
+				var e1 = new FaustStructure.Blatt();
 				d4.children.push(e1);
 
-				d2 = new FaustStructure.Doppelblatt();
-				a1 = new FaustStructure.Anbringung();
-				a2 = new FaustStructure.Anbringung();
-				a3 = new FaustStructure.Anbringung();
+				var d2 = new FaustStructure.Doppelblatt();
+				var a1 = new FaustStructure.Anbringung();
+				var a2 = new FaustStructure.Anbringung();
+				var a3 = new FaustStructure.Anbringung();
 
 
-				a4 = new FaustStructure.Anbringung();
-				a5 = new FaustStructure.Anbringung();
+				var a4 = new FaustStructure.Anbringung();
+				var a5 = new FaustStructure.Anbringung();
 
 				d2.first.recto.children.push(a1);
 				d2.first.recto.children.push(a2);
@@ -293,8 +289,8 @@ YUI.add('document-structure-view', function (Y) {
 				d4.first.verso.children.push(a5);
 
 
-				d3 = new FaustStructure.Doppelblatt();
-				l1 = new FaustStructure.Lage();
+				var d3 = new FaustStructure.Doppelblatt();
+				var l1 = new FaustStructure.Lage();
 				l1.children.push(d2);
 				l1.children.push(d3);
 				d1.children.push(l1);
@@ -308,7 +304,7 @@ YUI.add('document-structure-view', function (Y) {
 
 			//***** button *****
 
-			FaustStructure.Button = function(x, y, width, height, topblatt, bottomblatt) {
+			FaustStructure.Button = function (x, y, width, height, topblatt, bottomblatt) {
 
 				var button = paper.rect(x, y, width, height);
 				button.attr("stroke", "none");
@@ -326,13 +322,13 @@ YUI.add('document-structure-view', function (Y) {
 					// if (this.topblatt) {
 					// 	FaustStructure.setSrc(facsLefthand, this.topblatt.verso.metadata.digitalisat);
 					// 	facsLefthand.show();
-					// } else 
+					// } else
 					// 	facsLefthand.hide();
 
 					// if (this.bottomblatt) {
 					// 	FaustStructure.setSrc(facsRighthand, this.bottomblatt.recto.metadata.digitalisat);
 					// 	facsRighthand.show();
-					// } else 
+					// } else
 					// 	facsRighthand.hide();
 
 				}, function (event) {
@@ -341,13 +337,13 @@ YUI.add('document-structure-view', function (Y) {
 					// if (lockButton.topblatt) {
 					// 	FaustStructure.setSrc(facsLefthand, lockButton.topblatt.verso.metadata.digitalisat);
 					// 	facsLefthand.show();
-					// } else 
+					// } else
 					// 	facsLefthand.hide();
 
 					// if (lockButton.bottomblatt) {
 					// 	FaustStructure.setSrc(facsRighthand, lockButton.bottomblatt.recto.metadata.digitalisat);
 					// 	facsRighthand.show();
-					// } else 
+					// } else
 					// 	facsRighthand.hide();
 
 
@@ -361,18 +357,18 @@ YUI.add('document-structure-view', function (Y) {
 					var height = this.attrs.height;
 
 					lockButton.animate({"fill-opacity": .7,
-										"x": x,
-										"y": y,
-										"width": width,
-										"height": height,
-									   }, 0, ">");
+						"x": x,
+						"y": y,
+						"width": width,
+						"height": height
+					}, 0, ">");
 					lockButton.toFront();
 					lockButton.topblatt = this.topblatt;
 					lockButton.bottomblatt = this.bottomblatt;
 				});
 
 
-			}
+			};
 
 			//***** envelope *****
 
@@ -872,73 +868,73 @@ YUI.add('document-structure-view', function (Y) {
 
 			var uriMap = {
 				//IH.32
-				"gsa/391282/391282_0002":"/document/faust/2.1/gsa_391282.xml#1",
-				"gsa/391282/391282_0003":"/document/faust/2.1/gsa_391282.xml#2",
-				"gsa/391282/391282_0004":"/document/faust/2.1/gsa_391282.xml#2",
-				"gsa/391282/391282_0005":"/document/faust/2.1/gsa_391282.xml#4",
-				"gsa/391282/391282_0006":"/document/faust/2.1/gsa_391282.xml#6",
-				"gsa/391282/391282_0007":"/document/faust/2.1/gsa_391282.xml#6",
-				"gsa/391282/391282_0008":"/document/faust/2.1/gsa_391282.xml#6",
-				"gsa/391282/391282_0009":"/document/faust/2.1/gsa_391282.xml#9",
-				"gsa/391282/391282_0010":"/document/faust/2.1/gsa_391282.xml#9",
-				"gsa/391282/391282_0011":"/document/faust/2.1/gsa_391282.xml#9",
-				"gsa/391282/391282_0012":"/document/faust/2.1/gsa_391282.xml#11",
-				"gsa/391282/391282_0013":"/document/faust/2.1/gsa_391282.xml#12",
-				"gsa/391282/391282_0014":"/document/faust/2.1/gsa_391282.xml#13",
-				"gsa/391282/391282_0015":"/document/faust/2.1/gsa_391282.xml#15",
-				"gsa/391282/391282_0016":"/document/faust/2.1/gsa_391282.xml#15",
-				"gsa/391282/391282_0017":"/document/faust/2.1/gsa_391282.xml#16",
-				"gsa/391282/391282_00F":"/document/faust/2.1/gsa_391282.xml#17",
-				
-				//VH.2
-				"gsa/390883/390883_0002":"/document/faust/2.5/gsa_390883.xml#1",
-				"gsa/390883/390883_0003":"/document/faust/2.5/gsa_390883.xml#2",
-				"gsa/390883/390883_0004":"/document/faust/2.5/gsa_390883.xml#3",
-				"gsa/390883/390883_0005":"/document/faust/2.5/gsa_390883.xml#4",
-				"gsa/390883/390883_0006":"/document/faust/2.5/gsa_390883.xml#5",
-				"gsa/390883/390883_0008":"/document/faust/2.5/gsa_390883.xml#6",
-				"gsa/390883/390883_0007":"/document/faust/2.5/gsa_390883.xml#7",
-				"gsa/390883/390883_0009":"/document/faust/2.5/gsa_390883.xml#8",
-				"gsa/390883/390883_0010":"/document/faust/2.5/gsa_390883.xml#8",
-				"gsa/390883/390883_0011":"/document/faust/2.5/gsa_390883.xml#9",
-				"gsa/390883/390883_0012":"/document/faust/2.5/gsa_390883.xml#9",
-				"gsa/390883/390883_0013":"/document/faust/2.5/gsa_390883.xml#10",
-				"gsa/390883/FA_124_0002":"/document/faust/2.5/gsa_390883.xml#11",				
-				"gsa/390883/390883_0014":"/document/faust/2.5/gsa_390883.xml#12",
-				"gsa/390883/390883_0015":"/document/faust/2.5/gsa_390883.xml#13",
-				"gsa/390883/390883_0016":"/document/faust/2.5/gsa_390883.xml#13",
-				"gsa/390883/390883_0017":"/document/faust/2.5/gsa_390883.xml#14",
-				"gsa/390883/390883_0018":"/document/faust/2.5/gsa_390883.xml#15",
-				"gsa/390883/390883_0019":"/document/faust/2.5/gsa_390883.xml#15",
-				"gsa/390883/390883_0025":"/document/faust/2.5/gsa_390883.xml#16",
-				"gsa/390883/390883_0026":"/document/faust/2.5/gsa_390883.xml#16",
-				"gsa/390883/FA_124_0005":"/document/faust/2.5/gsa_390883.xml#17",
-				"gsa/390883/390883_0023":"/document/faust/2.5/gsa_390883.xml#18",
-				"gsa/390883/390883_0024":"/document/faust/2.5/gsa_390883.xml#18",
-				"gsa/390883/390883_0020":"/document/faust/2.5/gsa_390883.xml#19",
-				"gsa/390883/390883_0027":"/document/faust/2.5/gsa_390883.xml#20",
-				"gsa/390883/390883_0028":"/document/faust/2.5/gsa_390883.xml#20",
-				"gsa/390883/390883_0029":"/document/faust/2.5/gsa_390883.xml#21",
-				"gsa/390883/390883_0030":"/document/faust/2.5/gsa_390883.xml#21",
-				"gsa/390883/390883_0021":"/document/faust/2.5/gsa_390883.xml#22",
-				"gsa/390883/390883_0022":"/document/faust/2.5/gsa_390883.xml#22",
-				"gsa/390883/390883_0031":"/document/faust/2.5/gsa_390883.xml#22",
-				"gsa/390883/390883_0032":"/document/faust/2.5/gsa_390883.xml#22",
-				"gsa/390883/390883_0033":"/document/faust/2.5/gsa_390883.xml#23",
-				"gsa/390883/390883_0034":"/document/faust/2.5/gsa_390883.xml#23",
-				"gsa/390883/390883_0035":"/document/faust/2.5/gsa_390883.xml#24",
-				"gsa/390883/390883_0036":"/document/faust/2.5/gsa_390883.xml#25",
-				"gsa/390883/390883_0037":"/document/faust/2.5/gsa_390883.xml#25",
-				"gsa/390883/390883_0038":"/document/faust/2.5/gsa_390883.xml#26",
-				"gsa/390883/390883_0039":"/document/faust/2.5/gsa_390883.xml#26",
-				"gsa/390883/390883_0040":"/document/faust/2.5/gsa_390883.xml#26",
-				"gsa/390883/390883_0041":"/document/faust/2.5/gsa_390883.xml#27",
+				"gsa/391282/391282_0002": "/document/faust/2.1/gsa_391282.xml#1",
+				"gsa/391282/391282_0003": "/document/faust/2.1/gsa_391282.xml#2",
+				"gsa/391282/391282_0004": "/document/faust/2.1/gsa_391282.xml#2",
+				"gsa/391282/391282_0005": "/document/faust/2.1/gsa_391282.xml#4",
+				"gsa/391282/391282_0006": "/document/faust/2.1/gsa_391282.xml#6",
+				"gsa/391282/391282_0007": "/document/faust/2.1/gsa_391282.xml#6",
+				"gsa/391282/391282_0008": "/document/faust/2.1/gsa_391282.xml#6",
+				"gsa/391282/391282_0009": "/document/faust/2.1/gsa_391282.xml#9",
+				"gsa/391282/391282_0010": "/document/faust/2.1/gsa_391282.xml#9",
+				"gsa/391282/391282_0011": "/document/faust/2.1/gsa_391282.xml#9",
+				"gsa/391282/391282_0012": "/document/faust/2.1/gsa_391282.xml#11",
+				"gsa/391282/391282_0013": "/document/faust/2.1/gsa_391282.xml#12",
+				"gsa/391282/391282_0014": "/document/faust/2.1/gsa_391282.xml#13",
+				"gsa/391282/391282_0015": "/document/faust/2.1/gsa_391282.xml#15",
+				"gsa/391282/391282_0016": "/document/faust/2.1/gsa_391282.xml#15",
+				"gsa/391282/391282_0017": "/document/faust/2.1/gsa_391282.xml#16",
+				"gsa/391282/391282_00F": "/document/faust/2.1/gsa_391282.xml#17",
 
-			}
+				//VH.2
+				"gsa/390883/390883_0002": "/document/faust/2.5/gsa_390883.xml#1",
+				"gsa/390883/390883_0003": "/document/faust/2.5/gsa_390883.xml#2",
+				"gsa/390883/390883_0004": "/document/faust/2.5/gsa_390883.xml#3",
+				"gsa/390883/390883_0005": "/document/faust/2.5/gsa_390883.xml#4",
+				"gsa/390883/390883_0006": "/document/faust/2.5/gsa_390883.xml#5",
+				"gsa/390883/390883_0008": "/document/faust/2.5/gsa_390883.xml#6",
+				"gsa/390883/390883_0007": "/document/faust/2.5/gsa_390883.xml#7",
+				"gsa/390883/390883_0009": "/document/faust/2.5/gsa_390883.xml#8",
+				"gsa/390883/390883_0010": "/document/faust/2.5/gsa_390883.xml#8",
+				"gsa/390883/390883_0011": "/document/faust/2.5/gsa_390883.xml#9",
+				"gsa/390883/390883_0012": "/document/faust/2.5/gsa_390883.xml#9",
+				"gsa/390883/390883_0013": "/document/faust/2.5/gsa_390883.xml#10",
+				"gsa/390883/FA_124_0002": "/document/faust/2.5/gsa_390883.xml#11",
+				"gsa/390883/390883_0014": "/document/faust/2.5/gsa_390883.xml#12",
+				"gsa/390883/390883_0015": "/document/faust/2.5/gsa_390883.xml#13",
+				"gsa/390883/390883_0016": "/document/faust/2.5/gsa_390883.xml#13",
+				"gsa/390883/390883_0017": "/document/faust/2.5/gsa_390883.xml#14",
+				"gsa/390883/390883_0018": "/document/faust/2.5/gsa_390883.xml#15",
+				"gsa/390883/390883_0019": "/document/faust/2.5/gsa_390883.xml#15",
+				"gsa/390883/390883_0025": "/document/faust/2.5/gsa_390883.xml#16",
+				"gsa/390883/390883_0026": "/document/faust/2.5/gsa_390883.xml#16",
+				"gsa/390883/FA_124_0005": "/document/faust/2.5/gsa_390883.xml#17",
+				"gsa/390883/390883_0023": "/document/faust/2.5/gsa_390883.xml#18",
+				"gsa/390883/390883_0024": "/document/faust/2.5/gsa_390883.xml#18",
+				"gsa/390883/390883_0020": "/document/faust/2.5/gsa_390883.xml#19",
+				"gsa/390883/390883_0027": "/document/faust/2.5/gsa_390883.xml#20",
+				"gsa/390883/390883_0028": "/document/faust/2.5/gsa_390883.xml#20",
+				"gsa/390883/390883_0029": "/document/faust/2.5/gsa_390883.xml#21",
+				"gsa/390883/390883_0030": "/document/faust/2.5/gsa_390883.xml#21",
+				"gsa/390883/390883_0021": "/document/faust/2.5/gsa_390883.xml#22",
+				"gsa/390883/390883_0022": "/document/faust/2.5/gsa_390883.xml#22",
+				"gsa/390883/390883_0031": "/document/faust/2.5/gsa_390883.xml#22",
+				"gsa/390883/390883_0032": "/document/faust/2.5/gsa_390883.xml#22",
+				"gsa/390883/390883_0033": "/document/faust/2.5/gsa_390883.xml#23",
+				"gsa/390883/390883_0034": "/document/faust/2.5/gsa_390883.xml#23",
+				"gsa/390883/390883_0035": "/document/faust/2.5/gsa_390883.xml#24",
+				"gsa/390883/390883_0036": "/document/faust/2.5/gsa_390883.xml#25",
+				"gsa/390883/390883_0037": "/document/faust/2.5/gsa_390883.xml#25",
+				"gsa/390883/390883_0038": "/document/faust/2.5/gsa_390883.xml#26",
+				"gsa/390883/390883_0039": "/document/faust/2.5/gsa_390883.xml#26",
+				"gsa/390883/390883_0040": "/document/faust/2.5/gsa_390883.xml#26",
+				"gsa/390883/390883_0041": "/document/faust/2.5/gsa_390883.xml#27"
+
+			};
 			
 			FaustStructure.render(this.get('document'), this.get('container'));
-		},
-		
+		}
+
 	} , {
 		ATTRS: {
 			rootVC: { validator: function(v) { return true; } }
@@ -946,7 +942,7 @@ YUI.add('document-structure-view', function (Y) {
 	});
 
 	Y.mix(Y.namespace("Faust"), {
-        DocumentStructureView: DocumentStructureView,
+        DocumentStructureView: DocumentStructureView
 	});
 	
 }, '0.0', {

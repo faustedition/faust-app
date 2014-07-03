@@ -101,25 +101,25 @@ YUI.add('paged-text-display', function(Y){
 					this.set('currentPage', --currentPage);
 					this.render(currentPage);
 				}
-			},
-			
-			
-			
-			
+			}
+
+
+
+
 		}, {
 			ATTRS: {
 				linesPerPage : {value: Infinity},
-				currentPage : {value: 0},
+				currentPage : {value: 0}
 			}
 		});
 		
 		Y.mix(Y.namespace('Faust'), {
-			PagedTextDisplayView: PagedTextDisplayView,
+			PagedTextDisplayView: PagedTextDisplayView
 		});
 	
 	},
 	'0.0',
 	{
-		requires: ['text-display', 'text-annotation'],
+		requires: ['text-display', 'text-annotation']
 	}
 );

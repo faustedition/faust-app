@@ -19,13 +19,13 @@
 
 if (typeof Faust === "undefined") Faust = {};
 
-Faust.encodePath = function(path) {
+Faust.encodePath = function (path) {
 	var encoded = "";
 	var pathComponents = path.split("/");
 	for (var pc = 0; pc < pathComponents.length; pc++)
 		encoded += (encoded.length == 0 ? "" : "/") + encodeURI(pathComponents[pc]);
-	return encoded;		
-}
+	return encoded;
+};
 
 Faust.URI = function(uri) { 
 	this.components = uri.match(/^faust:\/\/([^\/]+)\/(.*)/);

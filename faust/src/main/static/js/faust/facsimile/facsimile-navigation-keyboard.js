@@ -19,11 +19,11 @@
 
 YUI.add('facsimile-navigation-keyboard', function (Y) {
 
-	SVG_NS = "http://www.w3.org/2000/svg";
+	var SVG_NS = "http://www.w3.org/2000/svg";
 
     var FacsimileNavigationKeyboard = Y.Base.create("facsimile-navigation-keyboard", Y.Base, [], {
 
-		navigate: function(model, keyCode) {
+		navigate: function (model, keyCode) {
 
 			var view = model.get("view");
 			var moveX = Math.floor(view.width / 4);
@@ -69,25 +69,25 @@ YUI.add('facsimile-navigation-keyboard', function (Y) {
 
 		},
 
-		initializer: function(config) {
+		initializer: function (config) {
 			var model = config.host.model;
 			var navigate = this.navigate;
-			this.navigationSub = Y.one("body").on('key', function(e) {
-				navigate (model, e.keyCode);
+			this.navigationSub = Y.one("body").on('key', function (e) {
+				navigate(model, e.keyCode);
 			}, 'down:37,38,39,40,48,67,107,109,187,189');
 
 		},
-		destructor: function() {
+		destructor: function () {
 			this.navigationSub.detach();
 		}
-    }, {
-		NAME : 'facsimileNavigationKeyboard',
-		NS : 'navigationKeyboard',
-        ATTRS: {
-            view: {},
-            model: {}
-        }
-    })
+	}, {
+		NAME: 'facsimileNavigationKeyboard',
+		NS: 'navigationKeyboard',
+		ATTRS: {
+			view: {},
+			model: {}
+		}
+	});
 
     Y.mix(Y.namespace("Faust"), { FacsimileNavigationKeyboard: FacsimileNavigationKeyboard });
 

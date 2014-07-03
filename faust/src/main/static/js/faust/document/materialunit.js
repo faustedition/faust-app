@@ -62,7 +62,7 @@ YUI.add('materialunit', function (Y) {
 				return new Faust.URI(value);				
 			}
 			if (key === "facsimiles") {
-				var facsimiles = []
+				var facsimiles = [];
 				for (var vc = 0; vc < value.length; vc++)
 					facsimiles.push(new Faust.URI(value[vc]));
 				return facsimiles;

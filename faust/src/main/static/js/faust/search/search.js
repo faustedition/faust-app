@@ -26,7 +26,7 @@ YUI.add('search', function (Y) {
                 source: cp + "/search/{query}",
                 resultListLocator: "documents",
                 resultTextLocator: function(document) {
-                	uri_parts = Y.Array.map(document.uris, function(uri) {
+                	var uri_parts = Y.Array.map(document.uris, function(uri) {
                 		return uri.substring("faust://document/".length);
                 	});
                     return Y.Array.map(document.waIds.concat(document.callnumbers.concat(uri_parts)), function(id) {

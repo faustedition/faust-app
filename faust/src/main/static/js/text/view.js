@@ -57,7 +57,7 @@ Faust.YUI().use("node", "dom", "event", "overlay", "dump", function(Y) {
 				});
 				this.container.append(p);
 			}, this);
-		},
+		}
 	};
 	
 	Faust.GeneticGanttChart = function(container, graph) {
@@ -65,65 +65,79 @@ Faust.YUI().use("node", "dom", "event", "overlay", "dump", function(Y) {
 		this.gr = graph.geneticRelations;
 	};
 	Faust.GeneticGanttChart.prototype = {
-		render: function() {
+		render: function () {
 			var documents = this.gr.related;
-			if (documents.length == 0) return;			
-			documents.sort(function(a, b) { 
-				if (a.sigil < b.sigil) return -1; 
-				else if (a.sigil > b.sigil) return 1; 
-				return 0; 
+			if (documents.length == 0) return;
+			documents.sort(function (a, b) {
+				if (a.sigil < b.sigil) return -1;
+				else if (a.sigil > b.sigil) return 1;
+				return 0;
 			});
-			
+
 			var width = 350;
 			var height = 20 * documents.length;
 			var lineScale = pv.Scale.linear(this.gr.interval[0], this.gr.interval[1]).range(0, width);
 			var barColor = pv.Scale.linear(0, documents.length).range('#805F40', '#999');
-			
+
 			var panel = new pv.Panel().canvas(this.container)
 				.width(width)
 				.height(height)
 				.top(25)
 				.bottom(25)
 				.left(50);
-			
+
 			panel.add(pv.Rule)
 				.data(pv.range(documents.length))
 				.strokeStyle("#eee")
-				.top(function(d) { return d * this.parent.height() / documents.length })
+				.top(function (d) {
+					return d * this.parent.height() / documents.length
+				})
 				.anchor("left")
-					.add(pv.Label)
-					.text(function(d) { return documents[d].sigil })
-					.textMargin(10);
-		
+				.add(pv.Label)
+				.text(function (d) {
+					return documents[d].sigil
+				})
+				.textMargin(10);
+
 			panel.add(pv.Rule)
 				.data(lineScale.ticks(5))
 				.strokeStyle("#eee")
 				.left(lineScale)
 				.anchor("bottom")
-					.add(pv.Label)
-					.text(lineScale.tickFormat);
-					
+				.add(pv.Label)
+				.text(lineScale.tickFormat);
+
 			panel.add(pv.Panel)
 				.data(this.gr.related)
 				.height(height / (documents.length * 2))
-				.top(function(d) { return  (this.index * this.parent.height() / documents.length) - this.height() / 2 })
-					.add(pv.Bar)
-					.data(function(d) { return d.intervals })
-					.left(function(d) { return lineScale(d[0]) })
-					.width(function(d) { return lineScale(d[1]) - lineScale(d[0]) })
-					.fillStyle(function() { return barColor(this.parent.index) })
-					.event("click", function(n) { 
-						var d = this.parent.data();
-						alert("==> " + d.document + " [ " + d.sigil + " ]; " + Y.dump(n));
-					});
-										
-			panel.render();			
+				.top(function (d) {
+					return  (this.index * this.parent.height() / documents.length) - this.height() / 2
+				})
+				.add(pv.Bar)
+				.data(function (d) {
+					return d.intervals
+				})
+				.left(function (d) {
+					return lineScale(d[0])
+				})
+				.width(function (d) {
+					return lineScale(d[1]) - lineScale(d[0])
+				})
+				.fillStyle(function () {
+					return barColor(this.parent.index)
+				})
+				.event("click", function (n) {
+					var d = this.parent.data();
+					alert("==> " + d.document + " [ " + d.sigil + " ]; " + Y.dump(n));
+				});
+
+			panel.render();
 		}
-	}
-	Faust.GeneticTree = function(container, graph) {
+	};
+	Faust.GeneticTree = function (container, graph) {
 		this.container = container;
 		this.gr = graph.geneticRelations;
-	}
+	};
 	Faust.GeneticTree.prototype = {
 		render: function() {
 			if (this.gr.related.length == 0) return;

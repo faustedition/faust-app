@@ -36,17 +36,37 @@ YUI.add('transcript-interaction', function (Y) {
 
 		//display text properties or annotations
 		var propertiesToDisplay = {
-			'under': function(textElement){ return Y.SvgUtils.hasClass(textElement, 'under'); },
-			'over': function(textElement){ return Y.SvgUtils.hasClass(textElement, 'over'); },
-			'patch': function(textElement){ return textElement.ancestor('.element-patch'); },
-			'interline': function(textElement){ return Y.SvgUtils.hasClass(textElement, 'interline');},
-			'inbetween': function(textElement){ return Y.SvgUtils.hasClass(textElement, 'inbetween');},
-			'gap': function(textElement){ return Y.SvgUtils.hasClass(textElement, 'element-gap');},
-			'supplied': function(textElement){ return textElement.ancestor('.element-supplied'); },
-			'unclear-cert-high': function(textElement){ return textElement.ancestor('.unclear-cert-high'); },
-			'unclear-cert-low': function(textElement){ return textElement.ancestor('.unclear-cert-low'); },
-			'used': function(textElement){ return Y.SvgUtils.hasClass(textElement, 'used'); }
-		}
+			'under': function (textElement) {
+				return Y.SvgUtils.hasClass(textElement, 'under');
+			},
+			'over': function (textElement) {
+				return Y.SvgUtils.hasClass(textElement, 'over');
+			},
+			'patch': function (textElement) {
+				return textElement.ancestor('.element-patch');
+			},
+			'interline': function (textElement) {
+				return Y.SvgUtils.hasClass(textElement, 'interline');
+			},
+			'inbetween': function (textElement) {
+				return Y.SvgUtils.hasClass(textElement, 'inbetween');
+			},
+			'gap': function (textElement) {
+				return Y.SvgUtils.hasClass(textElement, 'element-gap');
+			},
+			'supplied': function (textElement) {
+				return textElement.ancestor('.element-supplied');
+			},
+			'unclear-cert-high': function (textElement) {
+				return textElement.ancestor('.unclear-cert-high');
+			},
+			'unclear-cert-low': function (textElement) {
+				return textElement.ancestor('.unclear-cert-low');
+			},
+			'used': function (textElement) {
+				return Y.SvgUtils.hasClass(textElement, 'used');
+			}
+		};
 
 		function handDisplayContent(classValue) {
 			var handValue = Y.SvgUtils.decodeClassValue(classValue, 'hand-');
@@ -65,10 +85,7 @@ YUI.add('transcript-interaction', function (Y) {
 				return [];
 			}
 
-		};
-
-
-
+		}
 		function showTooltip(e) {
 
 			// display the hand, material and script of the text

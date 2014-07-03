@@ -19,7 +19,7 @@
 
 YUI.add('facsimile-navigation-buttons', function (Y) {
 
-	SVG_NS = "http://www.w3.org/2000/svg";
+	var SVG_NS = "http://www.w3.org/2000/svg";
 
     var FacsimileNavigationButtons = Y.Base.create("facsimile-navigation-buttons", Y.Base, [], {
 
@@ -47,25 +47,25 @@ YUI.add('facsimile-navigation-buttons', function (Y) {
 			});
 
 			navigationPanel.one('#button_left').on('click', function(e){
-				moveX = Math.floor(config.host.model.get('view').width / 4)
+				var moveX = Math.floor(config.host.model.get('view').width / 4);
 				config.host.model.pan(-moveX, 0);
 				e.stopPropagation();
 			});
 
 			navigationPanel.one('#button_right').on('click', function(e){
-				moveX = Math.floor(config.host.model.get('view').width / 4);
+				var moveX = Math.floor(config.host.model.get('view').width / 4);
 				config.host.model.pan(moveX, 0);
 				e.stopPropagation();
 			});
 
 			navigationPanel.one('#button_up').on('click', function(e){
-				moveY = Math.floor(config.host.model.get('view').height / 4);
+				var moveY = Math.floor(config.host.model.get('view').height / 4);
 				config.host.model.pan(0, -moveY);
 				e.stopPropagation();
 			});
 
 			navigationPanel.one('#button_down').on('click', function(e){
-				moveY = Math.floor(config.host.model.get('view').height / 4);
+				var moveY = Math.floor(config.host.model.get('view').height / 4);
 				config.host.model.pan(0, moveY);
 				e.stopPropagation();
 			});

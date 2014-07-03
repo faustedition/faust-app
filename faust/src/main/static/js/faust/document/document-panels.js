@@ -142,7 +142,7 @@ YUI.add('document-panels', function (Y) {
 			var container = this.get('container');
 			var widthAvailable = parseInt(Y.one('#document-app').getComputedStyle('width')) - 40;
 
-			panelContainer = Y.Node.create(
+			var panelContainer = Y.Node.create(
 				'<div class="' + name + '-container yui3-panel-loading">' +
 					'   <div class="yui3-widget-hd">' + title + '</div>' +
 					'   <div class="yui3-widget-bd" style="overflow:hidden">' +
@@ -154,7 +154,7 @@ YUI.add('document-panels', function (Y) {
 			container.append(panelContainer);
 
 
-			panelAttrs = Y.merge({
+			var panelAttrs = Y.merge({
 				srcNode: panelContainer,
 				width: widthAvailable / 2,
 				preventOverlap: true,
@@ -290,11 +290,11 @@ YUI.add('document-panels', function (Y) {
 			var that = this;
 			var page = this.get('pages')[pagenum - 1];
 
-			var initTranscriptView = function(transcript) {
+			var initTranscriptView = function (transcript) {
 				that.removeAjaxLoader(diplomaticContent);
-				diplomaticContent.transition({	duration: 0, opacity: 0.2});
-				Y.on('faust:transcript-layout-done', function(e){
-					diplomaticContent.transition({	duration: 3, opacity: 1});
+				diplomaticContent.transition({    duration: 0, opacity: 0.2});
+				Y.on('faust:transcript-layout-done', function (e) {
+					diplomaticContent.transition({    duration: 3, opacity: 1});
 				});
 
 				var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
@@ -304,7 +304,7 @@ YUI.add('document-panels', function (Y) {
 					pagenum: pagenum
 				});
 				diplomaticTranscriptView.render();
-			}
+			};
 
 			if (page.transcript && page.transcript.source) {
 				var source = page.transcript.source;
@@ -340,8 +340,7 @@ YUI.add('document-panels', function (Y) {
 				if (stageNum.stages[name] === undefined)
 					stageNum.stages[name] = stageNum.stagecount++;
 				return stageNum.stages[name];
-			};
-
+			}
 			var handleSpecialAnnotations = function (annotation, prefix, partitionNode, lineNode, isFirst, isLast) {
 
 				if (annotation.name.localName == 'stage')
@@ -378,7 +377,7 @@ YUI.add('document-panels', function (Y) {
 
 			var facsimileContainer = Y.one('.facsimile-container');
 			if (!facsimileContainer) {
-				facsimilePanel = this.panel('facsimile', Faust.messages["document.facsimile"], {
+				var facsimilePanel = this.panel('facsimile', Faust.messages["document.facsimile"], {
 					height: 600,
 					align: {
 						node: '#document-app',
@@ -466,7 +465,7 @@ YUI.add('document-panels', function (Y) {
 						  numberOfPages: e.pages.length
 					  });
 
-					  app = new Y.App({
+					  var app = new Y.App({
 						  container: '#document-app',
 						  root: cp +  path.replace('faust://', '/'),
 						  //linkSelector: ("#" + this.get("id") + " a"),
@@ -526,7 +525,7 @@ YUI.add('document-panels', function (Y) {
 
 					  var pages = [];
 					  var descendants = fd.descendants();
-					  for (i=0; i < descendants.length; i++)
+					  for (var i=0; i < descendants.length; i++)
 						  if (descendants[i].type === 'page' /* && descendants[i].transcript */)
 							  pages.push(descendants[i]);
 

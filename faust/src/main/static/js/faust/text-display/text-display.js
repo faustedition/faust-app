@@ -94,7 +94,7 @@ YUI.add('text-display', function (Y) {
 			container: {}, 
 			text: {},
 			cssPrefix: {value: ""},
-			renderCallback: {value: function(){}},
+			renderCallback: {value: function(){}}
 		}
 	});
 	

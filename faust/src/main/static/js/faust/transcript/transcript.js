@@ -234,12 +234,12 @@ YUI.add('transcript', function (Y) {
 		return vc;
 	};
 
-	Y.FaustTranscript.Zone.prototype.layout = function() {
+	Y.FaustTranscript.Zone.prototype.layout = function () {
 		Y.FaustTranscript.Zone.superclass.layout.call(this);
-		Y.each(this.floats, function(float) {
+		Y.each(this.floats, function (float) {
 			float.layout();
 		});
-	}
+	};
 	
 	Y.FaustTranscript.Line = function(lineAttrs) {
 		Y.FaustTranscript.Line.superclass.constructor.call(this);
@@ -411,22 +411,22 @@ YUI.add('transcript', function (Y) {
 
 	Y.FaustTranscript.TextDecoration.prototype.layout = function() {};
 
-	Y.FaustTranscript.NullDecoration = function(text, classes, name) {
+	Y.FaustTranscript.NullDecoration = function (text, classes, name) {
 		Y.FaustTranscript.NullDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
-	}
+	};
 	Y.extend(Y.FaustTranscript.NullDecoration, Y.FaustTranscript.TextDecoration);
 
-	Y.FaustTranscript.LineDecoration = function(text, classes, name, yOffset) {
+	Y.FaustTranscript.LineDecoration = function (text, classes, name, yOffset) {
 		Y.FaustTranscript.LineDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
 		this.yOffset = yOffset;
-	}
+	};
 	Y.extend(Y.FaustTranscript.LineDecoration, Y.FaustTranscript.TextDecoration);
 
-	Y.FaustTranscript.CloneDecoration = function(text, classes, name, xOffset, yOffset) {
+	Y.FaustTranscript.CloneDecoration = function (text, classes, name, xOffset, yOffset) {
 		Y.FaustTranscript.CloneDecoration.superclass.constructor.call(this, text, classes.concat(['text-decoration-type-' + name]));
 		this.xOffset = xOffset;
 		this.yOffset = yOffset;
-	}
+	};
 	Y.extend(Y.FaustTranscript.CloneDecoration, Y.FaustTranscript.TextDecoration);
 
 	Y.FaustTranscript.Align = function(me, you, coordRotation, myJoint, yourJoint, priority) {

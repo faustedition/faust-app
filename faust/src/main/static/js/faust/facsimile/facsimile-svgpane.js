@@ -98,14 +98,14 @@ YUI.add('facsimile-svgpane', function (Y) {
         },
         destructor: function() {
 			this.modelChangeSub.detach();
-        },
-    }, {
+        }
+	}, {
 		NAME : 'svgPane',
 		NS : 'svg',
         ATTRS: {
             view: {},
-            model: {},
-        }
+            model: {}
+		}
     });
 
     Y.mix(Y.namespace("Faust"), { SvgPane: SvgPane });

@@ -557,7 +557,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						return vc;
 					}
 				}
-			},
+			}
 
 
 		}

@@ -122,22 +122,22 @@ YUI.add('transcript-svg', function (Y) {
 		return view;
 	};
 
-	Y.FaustTranscript.Patch.prototype.createView = function() {
+	Y.FaustTranscript.Patch.prototype.createView = function () {
 		this.patchBackground = this.svgDocument().createElementNS(SVG_NS, "rect");
 		this.svgContainer().appendChild(this.patchBackground);
 		this.patchBackground.setAttribute("class", "patchBackground " + this.getClassesString());
 		this.view = this.svgDocument().createElementNS(SVG_NS, "g");
 		return this.view;
-	}
+	};
 
-	Y.FaustTranscript.Patch.prototype.onRelayout = function() {
+	Y.FaustTranscript.Patch.prototype.onRelayout = function () {
 		var bbox = Y.SvgUtils.boundingBox(this.view);
 		this.patchBackground.setAttribute("x", bbox.x);
 		this.patchBackground.setAttribute("y", bbox.y);
 		this.patchBackground.setAttribute("height", bbox.height);
 		this.patchBackground.setAttribute("width", bbox.width);
 		this.patchBackground.transform.baseVal.initialize(this.view.transform.baseVal.consolidate());
-	}
+	};
 
 	Y.FaustTranscript.VSpace.prototype.createView = function() {
 		var result = this.svgDocument().createElementNS(SVG_NS, "rect");
@@ -250,9 +250,9 @@ YUI.add('transcript-svg', function (Y) {
 		return this.floatParent.view;
 	};
 
-	Y.FaustTranscript.CoveringImage.prototype.containingRect = function() {
+	Y.FaustTranscript.CoveringImage.prototype.containingRect = function () {
 		var that = this;
-		var coveredRects = this.coveredVCs.map(function(vc) {
+		var coveredRects = this.coveredVCs.map(function (vc) {
 			return {
 				x: vc.getCoord(that.rotX()),
 				y: vc.getCoord(that.rotY()),
@@ -262,7 +262,7 @@ YUI.add('transcript-svg', function (Y) {
 		});
 		var containingRect = coveredRects.reduce(Y.SvgUtils.containingRect);
 		return containingRect;
-	}
+	};
 
 	Y.FaustTranscript.CoveringImage.prototype.onRelayout = function() {
 		var containingRect = this.containingRect();
@@ -278,11 +278,11 @@ YUI.add('transcript-svg', function (Y) {
 		this.spanningImage.transform.baseVal.consolidate();
 	};
 
-	Y.FaustTranscript.CoveringImage.prototype.position = function() {
+	Y.FaustTranscript.CoveringImage.prototype.position = function () {
 		var containingRect = this.containingRect();
 		this.setCoord(containingRect.x, this.rotX());
 		this.setCoord(containingRect.y, this.rotY());
-	}
+	};
 
 
 
@@ -321,12 +321,12 @@ YUI.add('transcript-svg', function (Y) {
 		this.spanningRect.setAttribute('transform', transform);
 	};
 
-	Y.FaustTranscript.RectInlineDecoration.prototype.createView = function() {
+	Y.FaustTranscript.RectInlineDecoration.prototype.createView = function () {
 		this.shape = this.svgDocument().createElementNS(SVG_NS, "rect");
 		this.shape.setAttribute('class', 'inline-decoration-type-rect inline-decoration');
 		this.svgContainer().appendChild(this.shape);
 		return Y.FaustTranscript.RectInlineDecoration.superclass.createView();
-	}
+	};
 
 	Y.FaustTranscript.RectInlineDecoration.prototype.onRelayout = function() {
 		var bbox = Y.SvgUtils.boundingBox(this.view);
@@ -340,12 +340,12 @@ YUI.add('transcript-svg', function (Y) {
 
 
 
-	Y.FaustTranscript.CircleInlineDecoration.prototype.createView = function() {
+	Y.FaustTranscript.CircleInlineDecoration.prototype.createView = function () {
 		this.shape = this.svgDocument().createElementNS(SVG_NS, "ellipse");
 		this.shape.setAttribute('class', 'inline-decoration-type-circle inline-decoration');
 		this.svgContainer().appendChild(this.shape);
 		return Y.FaustTranscript.CircleInlineDecoration.superclass.createView();
-	}
+	};
 
 	Y.FaustTranscript.CircleInlineDecoration.prototype.onRelayout = function() {
 		var bbox = Y.SvgUtils.boundingBox(this.view);

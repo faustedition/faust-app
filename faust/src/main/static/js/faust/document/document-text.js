@@ -19,7 +19,7 @@
 
 YUI.add('document-text', function (Y) {
 
-	DocumentText = {
+	var DocumentText = {
 		
 		forAnnotationDo: function (annotationName, partition, f) {
 			var annotations = transcript.find(partition.start, partition.end, [annotationName]);
@@ -39,14 +39,14 @@ YUI.add('document-text', function (Y) {
 
 
 		renderText : function(t) {
-			transcript = Y.Faust.Text.create(t);
+			var transcript = Y.Faust.Text.create(t);
 			var textNode = Y.Node.create('<div></div>');
 
-			stageColors = {
+			var stageColors = {
 				colors: ["red", "blue", "green", "yellow", "purple", "grey", "magenta", "cyan"],
 				map: {},
 				uniqueStageCount: 0
-			}
+			};
 			
 			function stageColor(stageName) {
 				if (stageColors.map[stageName] !== undefined) {
@@ -118,7 +118,7 @@ YUI.add('document-text', function (Y) {
 	};
 
 	Y.mix(Y.namespace("Faust"), {
-        DocumentText : DocumentText,
+        DocumentText : DocumentText
 	});
 	
 }, '0.0', {

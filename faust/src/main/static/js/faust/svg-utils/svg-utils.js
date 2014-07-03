@@ -253,18 +253,17 @@ YUI.add('svg-utils', function (Y) {
 
 		// return the bounding box as an SVGRect object
 		return createRect(min.x, min.y, max.x - min.x, max.y - min.y);
-	};
-
-	var containingRect = function(rect1, rect2) {
+	}
+	var containingRect = function (rect1, rect2) {
 		var x = Math.min(rect1.x, rect2.x);
 		var y = Math.min(rect1.y, rect2.y);
 		var width = Math.max(rect1.x + rect1.width, rect2.x + rect2.width) - x;
 		var height = Math.max(rect1.y + rect1.height, rect2.y + rect2.height) - y;
 		return {x: x, y: y, width: width, height: height};
-	}
+	};
 
 
-	var fitTo = function(element, target) {
+	var fitTo = function (element, target) {
 
 		function fitToUnitSquare(element, targetBBox) {
 			var bbox = element.getBBox();
@@ -276,7 +275,7 @@ YUI.add('svg-utils', function (Y) {
 
 			translate2.setTranslate(targetBBox.x, targetBBox.y);
 			//scale2.setScale(targetBBox.width, targetBBox.height);
-			scale1.setScale(targetBBox.width/bbox.width, targetBBox.height/bbox.height);
+			scale1.setScale(targetBBox.width / bbox.width, targetBBox.height / bbox.height);
 			translate1.setTranslate(-bbox.x, -bbox.y);
 
 			element.transform.baseVal.appendItem(translate2);
@@ -299,7 +298,7 @@ YUI.add('svg-utils', function (Y) {
 		fitToUnitSquare(element, targetBBox);
 		//Y.SvgUtils.drawBBox(element);
 
-	}
+	};
 
 	var drawBBox = function (element) {
 		var bbox = element.getBBox();
@@ -313,7 +312,7 @@ YUI.add('svg-utils', function (Y) {
 		rect.setAttribute('transform', element.getAttribute('transform'));
 		element.parentElement.appendChild(rect);
 		return rect;
-	}
+	};
 
 
 	Y.mix(Y.namespace("SvgUtils"), {
