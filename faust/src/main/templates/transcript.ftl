@@ -1,8 +1,8 @@
 <#assign hasWaId=(waId?has_content && waId != "-")>
 <#assign title><#if hasWaId>${waId?html}<#else>${callnumber!"–"?html}</#if></#assign>
 <#assign header>
-<link href="${cp}/static/google-code-prettify/prettify.css" type="text/css" rel="stylesheet" />
-<script src="${cp}/static/google-code-prettify/prettify.js" type="text/javascript"></script>
+<link href="${cp}/static/lib/google-code-prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script src="${cp}/static/lib/google-code-prettify/prettify.js" type="text/javascript"></script>
 </#assign>
 <@faust.page title=title header=header>
 	<h2>
