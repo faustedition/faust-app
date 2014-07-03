@@ -39,7 +39,7 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
 
 	public enum Type {
-		ARCHIVALDOCUMENT, DOCUMENT, SHEET, LEAF, DISJUNCTLEAF, PAGE, PATCH, PATCHSURFACE
+		ARCHIVALDOCUMENT, DOCUMENT, SHEET, LEAF, DISJUNCTLEAF, PAGE, PATCH, PATCHSURFACE, PRINT
 	}
 
 	protected static final String PREFIX = FaustGraph.PREFIX + ".material-unit";
@@ -90,6 +90,10 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		}
 	}
 
+	public void setFacsimile(FaustURI uri) {
+		node.setProperty(PREFIX + ".facsimile", uri.toString());
+	}
+
 	public static Type getType(Node node) {
 		return Type.valueOf(((String) node.getProperty(PREFIX + ".type")).replaceAll("\\-", "_").toUpperCase());
 	}
@@ -113,10 +117,6 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		return getType(node);
 	}
 
-	public void setFacsimile(FaustURI uri) {
-		node.setProperty(PREFIX + ".facsimile", uri.toString());
-	}
-	
 	public void setType(Type type) {
 		node.setProperty(PREFIX + ".type", type.name().toLowerCase().replaceAll("_", "-"));
 	}

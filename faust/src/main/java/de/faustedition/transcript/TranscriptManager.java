@@ -120,6 +120,7 @@ public class TranscriptManager {
 
 		try {
 			final StringWriter xmlString = new StringWriter();
+			// TODO Is this really necessary? It seems as if only the XML-'header' is modified.
 			TransformerFactory.newInstance().newTransformer().transform(
 					new SAXSource(xml.getInputSource(source)),
 					new StreamResult(xmlString)
