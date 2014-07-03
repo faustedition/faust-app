@@ -10,6 +10,14 @@
 	font-weight: bold;
 }
 
+.ann-speaker-first {
+    margin-left: 8em;
+}
+
+.ann-stage-first {
+    margin-left: 8em;
+}
+
 .ann-expan-first:before, .ann-ex-first:before{
 	content: "[";
 }
@@ -18,19 +26,23 @@
 	content: "]";
 }
 
-.ann-stage-0{
+/*
+.ann-gestage-0{
 	color: red;
 }
-.ann-stage-1{
+.ann-gestage-1{
 	color: blue;
 }
-.ann-stage-2{
+.ann-gestage-2{
 	color: green;
 }
+*/
 
 .linenum{
 	display: inline-block;
 	font-size: small;
 	color: grey;
 	width: 3em;
+    text-align: right;
+    margin-right: 2em;
 }

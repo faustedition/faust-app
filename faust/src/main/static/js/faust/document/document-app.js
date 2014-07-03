@@ -356,8 +356,11 @@ YUI.add('document-app', function (Y) {
 				if (annotation.name.localName == 'stage')
 					return [prefix + 'stage-' + stageNum(annotation.data['value'])];
 
-				if (annotation.name.localName == 'l' && isFirst)
-					partitionNode.insert('<span class="linenum">' + parseInt(annotation.data['n']) + '</span>', lineNode);
+				if (annotation.name.localName == 'l' && isFirst) {
+					var parsedLineNumber = parseInt(annotation.data['n']);
+					var displayedLineNumber = isNaN(parsedLineNumber) ? '---' : parsedLineNumber;
+					partitionNode.insert('<span class="linenum">' + displayedLineNumber + '</span>', lineNode);
+				}
 
 				return [];
 			};
