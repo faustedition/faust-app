@@ -128,12 +128,12 @@
 					.data(verseData)
 					.height(height / (verseData.length * 2))
 					.top(function(d) { return  (this.index * this.parent.height() / verseData.length) - this.height() / 2 })
-					/*.event("click", function(d) { Y.getLocation().assign(cp + "/transcript/" + verseData[this.index].transcript); })*/
 					.event("click", function(d) { Y.getLocation().assign(cp + verseData[this.index].source.replace('faust://xml', '', '')); })
 					.add(pv.Bar)
 					.data(function(m) { return m.intervals })
 					.left(function(d) { return lineScale(d.start) })
-					.width(function(d) { return lineScale(d.end) - lineScale(d.start) })
+					// intervals are "closed", i.e. they include end and start line, thus width = end - start + 1
+					.width(function(d) { return (lineScale(d.end + 1) - lineScale(d.start)) })
 					.title(function (d) {return '[' + d.start + ', ' + d.end + ']'})
 					.fillStyle(function() { return barColor(this.parent.index) });
 

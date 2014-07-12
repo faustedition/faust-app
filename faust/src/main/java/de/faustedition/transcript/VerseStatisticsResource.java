@@ -71,7 +71,7 @@ public class VerseStatisticsResource extends ServerResource {
 		super.doInit();
 		from = Math.max(0, Integer.parseInt((String) getRequestAttributes().get("from")));
 		to = Math.max(from, Integer.parseInt((String) getRequestAttributes().get("to")));
-		if (from >= to) {
+		if (from > to) {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid interval");
 		}
 

@@ -108,7 +108,7 @@ public class VerseManager {
 				next++;
 			} else if (verse > next) {
 				if (start >= 0) {
-					final GraphVerseInterval vi = new GraphVerseInterval(faustGraph.getDb(), (int)start, (int)next);
+					final GraphVerseInterval vi = new GraphVerseInterval(faustGraph.getDb(), (int)start, (int)next - 1);
 					vi.setTranscript(transcript);
 					verseIndex.add(vi.node, "start", ValueContext.numeric(vi.getStart()));
 					verseIndex.add(vi.node, "end", ValueContext.numeric(vi.getEnd()));
@@ -120,7 +120,7 @@ public class VerseManager {
 			}
 
 			if (!it.hasNext() && start >= 0) {
-				final GraphVerseInterval vi = new GraphVerseInterval(faustGraph.getDb(), (int)start, (int)verse + 1);
+				final GraphVerseInterval vi = new GraphVerseInterval(faustGraph.getDb(), (int)start, (int)verse);
 				vi.setTranscript(transcript);
 				verseIndex.add(vi.node, "start", ValueContext.numeric(vi.getStart()));
 				verseIndex.add(vi.node, "end", ValueContext.numeric(vi.getEnd()));
