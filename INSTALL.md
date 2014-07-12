@@ -81,14 +81,14 @@ databases, type
 ### Downloading Example Data
 
 A small set of example data is being maintaned at
-<https://github.com/faustedition/data>
+<https://github.com/faustedition/faust-example-data>
 
 To download it, type
 
        cd /var/opt/faustedition
-       wget --content-disposition https://codeload.github.com/faustedition/data/zip/master
-       unzip data-master.zip
-       mv data-master data
+       wget --content-disposition https://codeload.github.com/faustedition/faust-example-data/zip/master
+       unzip faust-example-data-master.zip
+       mv faust-example-data-master data
 
 ### Downloading the Binaries
 
