@@ -20,6 +20,7 @@
 package de.faustedition.transcript;
 
 import de.faustedition.FaustURI;
+import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
@@ -64,6 +65,7 @@ import java.util.Set;
 import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
 import static eu.interedition.text.TextConstants.TEI_NS;
 import static org.neo4j.graphdb.Direction.INCOMING;
+import static org.neo4j.graphdb.Direction.OUTGOING;
 
 @Component
 @DependsOn(value = "materialUnitInitializer")
@@ -85,7 +87,11 @@ public class TranscriptManager {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-/*  TODO Currently under construction (transcribedVerseIndex will be reimplemented) but sill useful.
+	@Autowired
+	private VerseManager verseManager;
+
+//	TODO Currently under construction (transcribedVerseIndex will be reimplemented) but sill useful.
+/*
 	private TreeMultimap<Short, MaterialUnit> transcribedVerseIndex = TreeMultimap.create(Ordering.natural(), new Comparator<MaterialUnit>() {
 		@Override
 		public int compare(MaterialUnit o1, MaterialUnit o2) {
@@ -95,9 +101,20 @@ public class TranscriptManager {
 	});
 */
 
+
 	public Layer<JsonNode> find(MaterialUnit materialUnit) throws IOException, XMLStreamException {
 		final Relationship rel = materialUnit.node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
 		return (rel == null ? read(materialUnit) : new LayerNode<JsonNode>(textRepository, rel.getStartNode()));
+	}
+
+	public MaterialUnit materialUnitForTranscript(LayerNode transcript) {
+		final Relationship rel = transcript.node.getSingleRelationship(TRANSCRIPT_RT, OUTGOING);
+		MaterialUnit mu = new MaterialUnit(rel.getEndNode());
+		if (MaterialUnit.Type.ARCHIVALDOCUMENT.equals(mu.getType())) {
+			return new Document(rel.getEndNode());
+		} else {
+			return mu;
+		}
 	}
 
 	private LayerNode<JsonNode> read(MaterialUnit materialUnit) throws IOException, XMLStreamException {
@@ -129,7 +146,9 @@ public class TranscriptManager {
 			}, materialUnit);
 
 			final LayerNode<JsonNode> transcriptLayer = (LayerNode<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
-			
+
+			verseManager.register(faustGraph, textRepository, transcriptLayer);
+
 			transcriptLayer.node.createRelationshipTo(materialUnit.node, TRANSCRIPT_RT);
 			return transcriptLayer;
 		} catch (IllegalArgumentException e) {

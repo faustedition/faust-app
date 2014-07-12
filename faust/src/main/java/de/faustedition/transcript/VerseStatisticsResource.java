@@ -25,11 +25,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import de.faustedition.JsonRepresentationFactory;
+import de.faustedition.SimpleVerseInterval;
 import de.faustedition.VerseInterval;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -55,19 +54,20 @@ import java.util.Map;
 public class VerseStatisticsResource extends ServerResource {
 
 	@Autowired
-	private SessionFactory sessionFactory;
-
-	@Autowired
 	private GraphDatabaseService graphDb;
 
 	@Autowired
+	private VerseManager verseManager;
+
+	@Autowired
 	private JsonRepresentationFactory jsonRepresentationFactory;
-	private ImmutableMap<MaterialUnit,Collection<TranscribedVerseInterval>> verseStatistics;
+	private ImmutableMap<MaterialUnit,Collection<GraphVerseInterval>> verseStatistics;
 	private int from;
 	private int to;
 
 	@Override
 	protected void doInit() throws ResourceException {
+
 		super.doInit();
 		from = Math.max(0, Integer.parseInt((String) getRequestAttributes().get("from")));
 		to = Math.max(from, Integer.parseInt((String) getRequestAttributes().get("to")));
@@ -75,8 +75,8 @@ public class VerseStatisticsResource extends ServerResource {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid interval");
 		}
 
-		final Session session = sessionFactory.getCurrentSession();
-		verseStatistics = TranscribedVerseInterval.indexByMaterialUnit(graphDb, TranscribedVerseInterval.forInterval(session, new VerseInterval(null, from, to))).asMap();
+		verseStatistics = verseManager.indexByMaterialUnit(verseManager.forInterval(new GraphVerseInterval(graphDb, from, to))).asMap();
+
 	}
 
 	@Get("json")
@@ -90,7 +90,7 @@ public class VerseStatisticsResource extends ServerResource {
 		});
 		for (String documentDesc : Ordering.natural().immutableSortedCopy(documentIndex.keySet())) {
 			final List<Map<String, Object>> intervals = Lists.newLinkedList();
-			for (TranscribedVerseInterval interval : Ordering.from(VerseInterval.INTERVAL_COMPARATOR).immutableSortedCopy(verseStatistics.get(documentIndex.get(documentDesc)))) {
+			for (VerseInterval interval : Ordering.from(VerseManager.INTERVAL_COMPARATOR).immutableSortedCopy(verseStatistics.get(documentIndex.get(documentDesc)))) {
 				intervals.add(new ModelMap()
 					.addAttribute("start", Math.max(from, interval.getStart()))
 					.addAttribute("end", Math.min(to, interval.getEnd()))

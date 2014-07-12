@@ -26,6 +26,9 @@ import de.faustedition.document.DocumentDescriptorHandler;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.input.TranscriptInvalidException;
+import eu.interedition.text.Layer;
+import eu.interedition.text.TextRepository;
+import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,6 +61,13 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 	@Autowired
 	private TranscriptManager transcriptManager;
 
+	@Autowired
+	private TextRepository textRepository;
+
+	@Autowired
+	private VerseManager verseManager;
+
+
 	@Override
 	public void run() {
 		logger.debug("Reading transcripts in the background");
@@ -87,7 +97,8 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					try {
 						logger.debug("Reading transcript {} referenced in {}", transcriptSource, source);
-						transcriptManager.find(mu);
+						Layer<JsonNode> transcript = transcriptManager.find(mu);
+
 					} catch (IOException e) {
 						if (logger.isWarnEnabled()) {
 							logger.warn("I/O error while reading transcript from " + mu + ": "
@@ -110,7 +121,9 @@ public class TranscriptBatchReader extends Runtime implements Runnable {
 		stopWatch.stop();
 
 		logger.debug("Read transcripts in the background: {} s", stopWatch.getTotalTimeSeconds());
+
 	}
+
 
 	public static void main(String... args) throws Exception {
 		main(TranscriptBatchReader.class, args);

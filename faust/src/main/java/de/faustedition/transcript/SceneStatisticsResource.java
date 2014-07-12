@@ -23,11 +23,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import de.faustedition.JsonRepresentationFactory;
 import de.faustedition.VerseInterval;
-import de.faustedition.document.MaterialUnit;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
@@ -37,7 +34,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -63,6 +59,7 @@ public class SceneStatisticsResource extends ServerResource {
 
 	@Override
 	protected void doInit() throws ResourceException {
+		/*
 		super.doInit();
 
 		sceneStatistics = Maps.newTreeMap(VerseInterval.INTERVAL_COMPARATOR);
@@ -77,10 +74,10 @@ public class SceneStatisticsResource extends ServerResource {
 		}
 
 		final Session session = sessionFactory.getCurrentSession();
-		final Map<MaterialUnit, Collection<TranscribedVerseInterval>> intervalIndex = TranscribedVerseInterval.indexByMaterialUnit(graphDb, TranscribedVerseInterval.all(session)).asMap();
-		for (Map.Entry<MaterialUnit, Collection<TranscribedVerseInterval>> indexEntry : intervalIndex.entrySet()) {
+		final Map<MaterialUnit, Collection<VerseInterval>> intervalIndex = VerseInterval.indexByMaterialUnit(graphDb, VerseInterval.all(session)).asMap();
+		for (Map.Entry<MaterialUnit, Collection<VerseInterval>> indexEntry : intervalIndex.entrySet()) {
 			for (VerseInterval sceneInterval : sceneStatistics.keySet()) {
-				for (TranscribedVerseInterval documentInterval : indexEntry.getValue()) {
+				for (VerseInterval documentInterval : indexEntry.getValue()) {
 					if (sceneInterval.overlapsWith(documentInterval)) {
 						sceneStatistics.put(sceneInterval, sceneStatistics.get(sceneInterval) + 1);
 						break;
@@ -89,6 +86,7 @@ public class SceneStatisticsResource extends ServerResource {
 			}
 
 		}
+		*/
 	}
 
 	@Get("json")

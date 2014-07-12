@@ -34,7 +34,6 @@ import de.faustedition.document.MaterialUnit;
 import de.faustedition.genesis.GeneticSource;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.reasoning.PremiseBasedRelation.Premise;
-import de.faustedition.transcript.TranscribedVerseInterval;
 import edu.bath.transitivityutils.ImmutableRelation;
 import edu.bath.transitivityutils.Relation;
 import edu.bath.transitivityutils.Relations;
@@ -92,12 +91,12 @@ public class InscriptionPrecedenceResource extends ServerResource {
 
 	@Override
 	protected void doInit() throws ResourceException {
-		super.doInit();
+		/*super.doInit();
 
 		final VerseInterval verseInterval = VerseInterval.fromRequestAttibutes(getRequestAttributes());
-		final Multimap<String, TranscribedVerseInterval> intervalIndex = Multimaps.index(TranscribedVerseInterval.forInterval(sessionFactory.getCurrentSession(), verseInterval), new Function<TranscribedVerseInterval, String>() {		
+		final Multimap<String, VerseInterval> intervalIndex = Multimaps.index(VerseInterval.forInterval(sessionFactory.getCurrentSession(), verseInterval), new Function<VerseInterval, String>() {
 			@Override
-			public String apply(@Nullable TranscribedVerseInterval input) {
+			public String apply(@Nullable VerseInterval input) {
 				final Node materialUnitNode = graphDb.getNodeById(input.getTranscript().getMaterialUnitId());
 				final String sigil = MaterialUnit.forNode(materialUnitNode).toString(); // + "_" + materialUnitNode.getId();
 				return sigil;
@@ -108,7 +107,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 		inscriptions = Sets.newHashSet();
 		for (String sigil : Ordering.natural().immutableSortedCopy(intervalIndex.keySet())) {
 			final Inscription inscription = new Inscription(sigil);
-			for (TranscribedVerseInterval interval : intervalIndex.get(sigil)) {
+			for (VerseInterval interval : intervalIndex.get(sigil)) {
 				inscription.addInterval(interval.getStart(), interval.getEnd());
 			}
 			Preconditions.checkState(!inscription.isEmpty());
@@ -163,7 +162,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 				", Recall: " + Statistics.recall(precedence, check, inscriptions) * 100 +
 				", Accuracy : "+ Statistics.correctness(precedence, check, inscriptions) * 100
 
-				) ;
+				) ;*/
 		
 	}
 
