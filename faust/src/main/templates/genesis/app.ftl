@@ -1,4 +1,4 @@
-<@faust.page title="Genetic Analysis" menuhighlight="genesis">
+<@faust.page title="Genetic Analysis" menuhighlight="genesis"  layout="wide">
 
 <style type="text/css">
 	#genetic-analysis-app { margin: 2em; padding: 1em; }
@@ -6,12 +6,15 @@
 	.title { text-align: center; font-size: 108%; }
 	.title li { display: inline-block; margin: 0 2em }
 	.scene-statistics { position: relative; width: 800px; height: 400px; }
-	.verse-chart { width: 800px; height: 400px; overflow: auto; }
+	.verse-chart { overflow: auto; }
 </style>
+
+<br/>
+
 <div id="genetic-analysis-app"></div>
 
 <script type="text/javascript">
-	YUI().use("app", "node", "event", "json", "io", "charts", "array-extras", "substitute", "protovis", function(Y) {
+	YUI().use("app", "node", "event", "json", "io", "charts", "array-extras", "substitute", "protovis", "interaction", function(Y) {
 		var partTitles = [ "Faust - Prolog", "Faust I", "Faust II"];
 
 		Y.VerseView = Y.Base.create("genetic-anaylsis-verse-view", Y.View, [], {
@@ -63,6 +66,7 @@
 				];
 				var verseData = Y.JSON.parse(response.responseText);
 
+/*
 				var minLine = 100000;
 				var maxLine = 0;
 				Y.Array.each(verseData, function(m) {
@@ -71,14 +75,18 @@
 						maxLine = Math.max(maxLine, i.end);
 					});
 				});
+*/
 
+				minLine = this.get('from');
+				maxLine = this.get('to');
+			    var chartWidth = parseInt(this._chartNode.getComputedStyle('width')) - 200;
 				var width = (maxLine - minLine) * 5;
 				var height = verseData.length * 20;
-				var lineScale = pv.Scale.linear(minLine, maxLine).range(0, width);
+				var lineScale = pv.Scale.linear(minLine, maxLine).range(0, chartWidth);
 				var barColor = pv.Scale.linear(0, verseData.length - 1).range('#805F40', '#999');
 
 				var panel = new pv.Panel().canvas(this._chartNode.getDOMNode())
-					.width(width)
+					.width(chartWidth)
 					.height(height)
 					.top(25)
 					.bottom(25)
@@ -111,9 +119,23 @@
 					.data(function(m) { return m.intervals })
 					.left(function(d) { return lineScale(d.start) })
 					.width(function(d) { return lineScale(d.end) - lineScale(d.start) })
+					.title(function (d) {return '[' + d.start + ', ' + d.end + ']'})
 					.fillStyle(function() { return barColor(this.parent.index) });
 
 				panel.render();
+
+				this._chartNode.all('svg a').on('mousemove', function(e) {
+					Y.fire('faust:mouseover-info',
+							{
+								info: e.currentTarget.getAttribute("title"),
+								mouseoverEvent: e
+							});
+				});
+
+				this._chartNode.all('svg a').on('mouseleave', function(e) {
+					Y.fire('faust:mouseover-info-hide', {});
+				});
+
 			}
 		}, {
 			ATTRS: {

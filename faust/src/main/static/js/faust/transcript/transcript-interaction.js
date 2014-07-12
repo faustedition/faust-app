@@ -21,18 +21,6 @@ YUI.add('transcript-interaction', function (Y) {
 	Y.on('faust:transcript-overlay-done', function() {
 
 		// ******* hand and material display *******
-		// tooltip
-
-		var tooltip = new Y.Overlay({
-			visible: false,
-			zIndex: 1300
-		}).plug(Y.Plugin.WidgetAnim);
-		tooltip.anim.get('animHide').set('duration', 0.6);
-		tooltip.anim.get('animShow').set('duration', 0.6);
-		tooltip.on('mousedown', function(e) {e.preventDefault();});
-		tooltip.on('mousemove', function(e) {e.preventDefault();});
-
-		tooltip.render();
 
 		//display text properties or annotations
 		var propertiesToDisplay = {
@@ -86,7 +74,8 @@ YUI.add('transcript-interaction', function (Y) {
 			}
 
 		}
-		function showTooltip(e) {
+
+		function infoDisplay(e) {
 
 			// display the hand, material and script of the text
 			var textClassValue = e.target.getAttribute('class');
@@ -95,7 +84,7 @@ YUI.add('transcript-interaction', function (Y) {
 			content.append(textHandDisplay);
 
 			// display all text decorations such as strikethrough, underline, ...
-			Y.each(Y.one(e.target).ancestor('.text-wrapper').all('.text-decoration'), function(decoration){
+			Y.each(Y.one(e.target).ancestor('.text-wrapper').all('.text-decoration'), function (decoration) {
 				var decorationClassValue = decoration.getAttribute('class');
 				var decorationType = Y.SvgUtils.decodeClassValue(decorationClassValue, 'text-decoration-type-');
 				var decorationDisplay = Y.Node.create('<div class="tooltip-decoration"><div><span class="tooltip-caption-decoration-'
@@ -106,7 +95,7 @@ YUI.add('transcript-interaction', function (Y) {
 			});
 
 			// display all inline decorations such as rect, circle, ...
-			Y.each(Y.one(e.target).ancestors('.inline-decoration'), function(decoration){
+			Y.each(Y.one(e.target).ancestors('.inline-decoration'), function (decoration) {
 				var decorationClassValue = decoration.getAttribute('class');
 				var decorationType = Y.SvgUtils.decodeClassValue(decorationClassValue, 'inline-decoration-type-');
 				var decorationDisplay = Y.Node.create('<div class="tooltip-decoration"><div><span class="tooltip-caption-decoration-'
@@ -117,26 +106,14 @@ YUI.add('transcript-interaction', function (Y) {
 			});
 
 			// display various properties
-			Y.each(Object.keys(propertiesToDisplay), function(key) {
+			Y.each(Object.keys(propertiesToDisplay), function (key) {
 				if (propertiesToDisplay[key](e.target)) {
 					var propertyDisplay = Y.Node.create('<div class="tooltip-property"><div><span class="tooltip-caption-property-'
 						+ key + '"></span></div></div>');
 					content.append(propertyDisplay);
 				}
 			});
-
-
-			//display
-
-			tooltip.setStdModContent('body', content);
-			var tooltipWidth = parseFloat(tooltip.get('boundingBox').getComputedStyle('width'));
-			var tooltipHeight = parseFloat(tooltip.get('boundingBox').getComputedStyle('height'));
-			tooltip.move([e.pageX - (tooltipWidth / 2.0), e.pageY - tooltipHeight - 30]);
-			tooltip.show();
-		}
-
-		function hideTooltip(e) {
-			tooltip.hide();
+			return content;
 		}
 
 		//FIXME: upgrade YUI and use event delegation to prevent memory leaking
@@ -145,7 +122,15 @@ YUI.add('transcript-interaction', function (Y) {
 		var allTextElements = Y.all('svg.diplomatic .text, svg.diplomatic .bgBox');
 
 		allTextElements.on('mousemove', function(e) {
-			showTooltip(e);
+
+			var info = infoDisplay(e);
+
+			Y.fire('faust:mouseover-info',
+					{
+						info: info,
+						mouseoverEvent: e
+					});
+
 			var containingLine = Y.one(e.target).ancestors('.element-line').item(0);
 			var lineClassValue = containingLine.getAttribute('class');
 			var lineNumber = Y.SvgUtils.decodeClassValue(lineClassValue, 'lineNumber');
@@ -153,12 +138,12 @@ YUI.add('transcript-interaction', function (Y) {
 		});
 
 		allTextElements.on('mouseleave', function(e) {
-			hideTooltip(e);
+			Y.fire('faust:mouseover-info-hide', {});
+
 			var containingLine = Y.one(e.target).ancestors('.element-line').item(0);
 			var lineClassValue = containingLine.getAttribute('class');
 			var lineNumber = Y.SvgUtils.decodeClassValue(lineClassValue, 'lineNumber');
 			Y.fire('faust:stop-examine-line', { lineNumber: lineNumber});
-
 		});
 
 		Y.on('faust:examine-line', function(e) {
@@ -216,9 +201,7 @@ YUI.add('transcript-interaction', function (Y) {
 			});
 		});
 
-
-
 	})
 }, '0.0', {
-	requires: ['event-custom', 'node', 'overlay', 'widget-anim', 'transition', 'svg-utils']
+	requires: ['interaction', 'event-custom', 'node', 'overlay', 'widget-anim', 'transition', 'svg-utils']
 });
