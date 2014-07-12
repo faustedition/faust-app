@@ -128,7 +128,7 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("genesis/inscriptions/{part}/{act_scene}/{scene}/", inscriptionPrecendence);
 		router.attach("genesis/inscriptions/{part}/{act_scene}/", inscriptionPrecendence);
 		router.attach("genesis/work", secured(templateFinder));
-		router.attach("genesis/app/", secured(templateFinder));
+		router.attach("genesis/lines/", secured(templateFinder));
 		router.attach("genesis/", secured(transactional(geneticGraphRouter)));
 		router.attach("project/", templateFinder);
 		router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));

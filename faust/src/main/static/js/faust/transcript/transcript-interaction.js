@@ -128,7 +128,7 @@ YUI.add('transcript-interaction', function (Y) {
 			Y.fire('faust:mouseover-info',
 					{
 						info: info,
-						mouseoverEvent: e
+						mouseEvent: e
 					});
 
 			var containingLine = Y.one(e.target).ancestors('.element-line').item(0);

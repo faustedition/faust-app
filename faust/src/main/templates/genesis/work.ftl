@@ -1,6 +1,6 @@
 <#assign header>
     <script type="text/javascript">
-    		var Y = Faust.YUI().use('node', 'event',
+    		var Y = Faust.YUI().use('node', 'event', 'interaction',
 						function(Y) {
 							Y.on('domready', function() {
 							
@@ -48,13 +48,28 @@
 										var start = line.start;
 										var end = line.end;											
 										var element = ynodes.item(i);																							
+
 										element.on('click', function(e){
-											window.location.href = '${cp}/genesis/app/#/' + start + '/' + end;
+											window.location.href = '${cp}/genesis/lines/#/' + start + '/' + end;
 										});
+
 										var domElement = element.getDOMNode();
+
 										title = domElement.ownerDocument.createElementNS("http://www.w3.org/2000/svg", "title");
 										title.appendChild(domElement.ownerDocument.createTextNode(line.title));
-										element.insert(title, 0);								
+										element.insert(title, 0);
+										element.on('mousemove', function(e) {
+											Y.fire('faust:mouseover-info',
+													{
+														info: line.title,
+														mouseEvent: e
+													});
+										});
+										element.on('mouseleave', function(e) {
+											Y.fire('faust:mouseover-info-hide', {});
+										});
+
+
 									})();
 								}
 							});

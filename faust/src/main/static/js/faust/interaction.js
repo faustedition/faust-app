@@ -44,7 +44,7 @@ YUI.add('interaction', function (Y) {
 	}
 
 	Y.on('faust:mouseover-info', function(e) {
-		     showTooltip(e.info, e.mouseoverEvent);
+		     showTooltip(e.info, e.mouseEvent);
 	});
 
 	Y.on('faust:mouseover-info-hide', function(e) {

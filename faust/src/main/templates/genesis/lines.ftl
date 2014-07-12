@@ -1,7 +1,8 @@
 <@faust.page title="Genetic Analysis" menuhighlight="genesis"  layout="wide">
 
 <style type="text/css">
-	#genetic-analysis-app { margin: 2em; padding: 1em; }
+	#main {position:  static !important;}
+	#genetic-analysis-app { margin-top: 4em; padding: 1em; }
 	.yui3-app-views { overflow: hidden; }
 	.title { text-align: center; font-size: 108%; }
 	.title li { display: inline-block; margin: 0 2em }
@@ -9,13 +10,27 @@
 	.verse-chart { overflow: auto; }
 </style>
 
-<br/>
 
-<div id="genetic-analysis-app"></div>
+<div id="genetic-analysis-app">
+
+	<div id="navigation" style="text-align: center">
+		<button class="pure-button" id="button_left"><i class="icon-arrow-left"></i></button>
+		<button class="pure-button" id="button_zoom_in"><i class="icon-zoom-in"></i></button>
+		<button class="pure-button" id="button_zoom_out"><i class="icon-zoom-out"></i></button>
+		<button class="pure-button" id="button_right"><i class="icon-arrow-right"></i></button>
+	</div>
+
+</div>
 
 <script type="text/javascript">
 	YUI().use("app", "node", "event", "json", "io", "charts", "array-extras", "substitute", "protovis", "interaction", function(Y) {
+
+		var FAUST_MIN_LINE_NUM = 1;
+		var FAUST_MAX_LINE_NUM = 12500;
+
 		var partTitles = [ "Faust - Prolog", "Faust I", "Faust II"];
+
+
 
 		Y.VerseView = Y.Base.create("genetic-anaylsis-verse-view", Y.View, [], {
 			render: function() {
@@ -83,7 +98,7 @@
 				var width = (maxLine - minLine) * 5;
 				var height = verseData.length * 20;
 				var lineScale = pv.Scale.linear(minLine, maxLine).range(0, chartWidth);
-				var barColor = pv.Scale.linear(0, verseData.length - 1).range('#805F40', '#999');
+				var barColor = pv.Scale.linear(0, verseData.length - 1).range('#000', '#000');
 
 				var panel = new pv.Panel().canvas(this._chartNode.getDOMNode())
 					.width(chartWidth)
@@ -128,7 +143,7 @@
 					Y.fire('faust:mouseover-info',
 							{
 								info: e.currentTarget.getAttribute("title"),
-								mouseoverEvent: e
+								mouseEvent: e
 							});
 				});
 
@@ -139,8 +154,14 @@
 			}
 		}, {
 			ATTRS: {
-				from: { validator: function(v) { return Y.Lang.isNumber(v) && (v >= 0); } },
-				to: { validator: function(v) { return Y.Lang.isNumber(v) && (v >= 0); } }
+				from: {
+					validator: function(v) { return Y.Lang.isNumber(v) && (v >= 0); },
+					setter: function(v) {return Math.max(FAUST_MIN_LINE_NUM, v);}
+				},
+				to: {
+					validator: function(v) { return Y.Lang.isNumber(v) && (v >= 0); },
+					setter: function(v) {return Math.min(FAUST_MAX_LINE_NUM, v);}
+				}
 			}
 		});
 
@@ -229,11 +250,48 @@
 				}
 			});
 
+			Y.one('#button_zoom_in').on('click', function(e){
+				var view = app.get('activeView'); var from = view.get("from");
+				var to = view.get("to"); var change = Math.ceil((to - from) * 0.1);
+				app.navigate("/" + (from + change) + "/" +  (to - change))
+			});
+
+			Y.one('#button_zoom_out').on('click', function(e){
+				var view = app.get('activeView'); var from = view.get("from");
+				var to = view.get("to"); var change = Math.ceil((to - from) * 0.1);
+				app.navigate("/" + (from - change) + "/" +  (to + change))
+			});
+
+			Y.one('#button_left').on('click', function(e){
+				var view = app.get('activeView'); var from = view.get("from");
+				var to = view.get("to"); var change = Math.ceil((to - from) * 0.1);
+				app.navigate("/" + (from - change) + "/" +  (to - change))
+
+			});
+
+			Y.one('#button_right').on('click', function(e){
+				var view = app.get('activeView'); var from = view.get("from");
+				var to = view.get("to"); var change = Math.ceil((to - from) * 0.1);
+				app.navigate("/" + (from + change) + "/" +  (to + change))
+
+			});
+
+
 			app.route("/", function() {
 				this.navigate("/5000/7000");
 			});
+
 			app.route("/:from/:to", function(req) {
-				this.showView("verse", { from: parseInt(req.params.from), to: parseInt(req.params.to) });
+				var from = parseInt(req.params.from);
+				var to = parseInt(req.params.to);
+				if (from < FAUST_MIN_LINE_NUM || to > FAUST_MAX_LINE_NUM || from >= to) {
+					var correctedFrom = Math.min(Math.max(FAUST_MIN_LINE_NUM, from), to - 1);
+					var correctedTo = Math.max(Math.min(to, FAUST_MAX_LINE_NUM), from + 1);
+					this.navigate("/" + correctedFrom +
+							"/" + correctedTo);
+					return;
+				}
+				this.showView("verse", { from: from, to: to });
 			});
 			app.route("/:part", function(req) {
 				this.showView("part", { part: parseInt(req.params.part) });
