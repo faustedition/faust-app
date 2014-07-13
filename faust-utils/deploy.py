@@ -11,7 +11,7 @@ from subprocess import check_call, call
 
 SRC_DIR = '/mnt/data/src/app/'
 APP_DIR = '/mnt/data/'
-NAME = 'faust-1.3-SNAPSHOT'
+NAME = 'faust-1.4-SNAPSHOT'
 KILL_TIMEOUT = 20.0
 
 def is_alive (name):
