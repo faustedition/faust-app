@@ -143,7 +143,7 @@ a.edit-permissions {
 
 }
 
-/* modifications to external webdesign */
+/* ==== FROM HERE: MODIFICATIONS TO EXTERNAL WEBDESIGN. TODO COMBINE WITH FINAL STYLESHEET ==== */
 
 header.compressed {
     height: 3.35em;
@@ -157,4 +157,32 @@ header.compressed {
         0em 0.1em 0.1em rgba(255, 255, 255, 0.5);
 
     background: rgba(220, 220, 220, 0.50);
+}
+
+/* override styles of pure-menu to make quicksearch results visible */
+
+.yui3-aclist-list {
+    position: static !important;
+    width: 500px !important;
+}
+
+.pure-menu ul.yui3-aclist-list {
+    visibility: visible;
+}
+
+.pure-menu .yui3-aclist-hidden {
+    visibility: hidden;
+    display: none;
+
+}
+
+.pure-menu .pure-form input {
+    margin: 0 0.7em;
+    width:142px;
+    transition: width 0.3s;
+}
+
+.pure-menu .pure-form input:focus {
+    width: 300px;
+    transition:width 0.3s;
 }

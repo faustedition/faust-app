@@ -26,14 +26,16 @@ YUI.add('search', function (Y) {
                 source: cp + "/search/{query}",
                 resultListLocator: "documents",
                 resultTextLocator: function(document) {
-                	var uri_parts = Y.Array.map(document.uris, function(uri) {
-                		return uri.substring("faust://document/".length);
-                	});
-                    return Y.Array.map(document.waIds.concat(document.callnumbers.concat(uri_parts)), function(id) {
-                        return "<" + id + ">"
-                    }).join("; ");
+                	var uri_part = document.source.substring("faust://xml/document/".length);
+					//var result = "<" + document.idnos + "; " + uri_part + ">";
+					var result = "<" + document.idnos + ">";
+					return result;
                 },
-                resultHighlighter:'phraseMatch'
+                resultHighlighter:'phraseMatch',
+				align: {
+					node  : this.get('contentBox'),
+					points: ['tr', 'br']
+				}
             });
             this.searchAutoComplete.render();
         },
@@ -42,7 +44,8 @@ YUI.add('search', function (Y) {
         },
         _select:function (e) {
             e.preventDefault();
-            Y.getLocation().href = cp + Y.substitute("/transcript/{id}", e.result.raw);
+			var source = e.result.raw.source;
+            Y.getLocation().href = cp + "/document/" + source.slice("faust://xml/document/".length);
         }
     }, {});
 

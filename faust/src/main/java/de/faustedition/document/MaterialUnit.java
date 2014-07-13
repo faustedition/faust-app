@@ -146,23 +146,30 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 		final String metadataKey = METADATA_PREFIX + key;
 		return node.hasProperty(metadataKey) ? (String[]) node.getProperty(metadataKey) : null;
 	}
-	
-	public Iterable<String> getMetadataKeys() {
+
+	public Iterable<String> getAllMetadataKeys() {
+
+		final String prefix = METADATA_PREFIX;
+
+		Iterable<String> prefixPruned = getMetadataKeys(prefix);
 		
+		return prefixPruned;
+	}
+
+	public Iterable<String> getMetadataKeys(final String prefix) {
 		Iterable<String> prefixFiltered = Iterables.filter(node.getPropertyKeys(), new Predicate<String>() {
 			@Override
 			public boolean apply(String input) {
-				return input.startsWith(METADATA_PREFIX);
+
+				return input.startsWith(prefix);
 			}
 		});
-		
-		Iterable<String> prefixPruned =  Iterables.transform(prefixFiltered, new Function<String, String>() {
+
+		return Iterables.transform(prefixFiltered, new Function<String, String>() {
 		@Override
 		public String apply(String input) {
-			return input.substring(METADATA_PREFIX.length());
+			return input.substring(prefix.length());
 		}});
-		
-		return prefixPruned;
 	}
 
 	public void setMetadata(String key, String[] values) {

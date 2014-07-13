@@ -19,9 +19,12 @@
 
 package de.faustedition.document;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import de.faustedition.FaustURI;
 import de.faustedition.genesis.MacrogeneticRelationManager;
 import de.faustedition.graph.FaustGraph;
@@ -39,9 +42,7 @@ import org.neo4j.graphdb.index.IndexManager;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -53,6 +54,7 @@ public class Document extends MaterialUnit {
 	private static final String URI_KEY = PREFIX + "uri";
 	private static final String URI_PART_KEY = PREFIX + "uri-part";	
 	private static final String CALLNUMBER_KEY = METADATA_PREFIX + "callnumber";
+	private static final String ALL_IDNOS_KEY = METADATA_PREFIX + "all-idnos";
 	private static final String WA_ID_KEY = METADATA_PREFIX + "wa-id";
 
 	private static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("[a-zA-Z0-9]");
@@ -111,7 +113,7 @@ public class Document extends MaterialUnit {
 
 	public static Iterable<Document> find(GraphDatabaseService db, String id) {
 		final BooleanQuery query = new BooleanQuery();
-		query.add(new WildcardQuery(new Term(CALLNUMBER_KEY, id)), BooleanClause.Occur.SHOULD);
+		query.add(new WildcardQuery(new Term(ALL_IDNOS_KEY, id)), BooleanClause.Occur.SHOULD);
 		query.add(new WildcardQuery(new Term(WA_ID_KEY, id)), BooleanClause.Occur.SHOULD);
 		query.add(new WildcardQuery(new Term(URI_PART_KEY, id)), BooleanClause.Occur.SHOULD);
 
@@ -129,6 +131,7 @@ public class Document extends MaterialUnit {
         };
         return Iterables.filter(getSortedContents(), isPage);
     }
+
 
 	public void index() {
 		final IndexManager indexManager = node.getGraphDatabase().index();
@@ -151,16 +154,31 @@ public class Document extends MaterialUnit {
 					//do nothing
 				}
 				
-		}		
-		
+		}
+
+		String allIdnosToIndex = allIdnos();
+
 
 		for (String callnumber : Objects.firstNonNull(getMetadata("callnumber"), new String[0])) {
-			idIndex.add(node, CALLNUMBER_KEY, callnumber.toLowerCase());
+			idIndex.add(node, ALL_IDNOS_KEY, allIdnosToIndex.toLowerCase());
 		}
 		for (String waId : Objects.firstNonNull(getMetadata("wa-id"), new String[0])) {
 			if (ALPHA_NUMERIC_PATTERN.matcher(waId).find()) {
 				idIndex.add(node, WA_ID_KEY, waId.toLowerCase());
 			}
 		}
+	}
+
+	public String allIdnos() {
+		Iterable<String> idnoTypes = getMetadataKeys(CALLNUMBER_KEY + ".");
+
+		Iterable<String> idnoValues = Iterables.transform(idnoTypes, new Function<String, String>() {
+			@Override
+			public String apply(@Nullable String input) {
+				return getMetadataValue("callnumber" + "." + input);
+			}
+		});
+
+		return Joiner.on("; ").join(idnoValues);
 	}
 }

@@ -82,9 +82,9 @@
 		//Y.one("#top-navigation").plug(Y.Plugin.NodeMenuNav);
 		Y.one("html").removeClass("yui3-loading");
 
-		//var quickSearch = Y.one("#quick-search");
-		//new Y.Faust.QuickSearch({ srcNode: quickSearch }).render();
-		//quickSearch.focus();
+		var quickSearch = Y.one("#quick-search");
+		new Y.Faust.QuickSearch({ srcNode: quickSearch }).render();
+		quickSearch.focus();
 	});
 </script>
 </body>
@@ -198,7 +198,7 @@
 		<li <#if menuhighlight="archives">class="pure-menu-selected"</#if>><a href="${cp}/archive/">${message("menu.archives")}</a></li>
 		<li <#if menuhighlight="genesis">class="pure-menu-selected"</#if>><a href="${cp}/genesis/work/">${message("menu.genesis")}</a></li>
 		<li <#if menuhighlight="text">class="pure-menu-selected"</#if>><a href="#">Text</a></li>
-		<li><form class="pure-form"><input type="text" placeholder="${message("menu.search")}"></form></li>
+		<li><form class="pure-form"><input id="quick-search" type="text" placeholder="${message("menu.search")}"></form></li>
 	</ul>
 	</@restricted>
 </nav>

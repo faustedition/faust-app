@@ -52,7 +52,6 @@ public class GraphVerseInterval extends NodeWrapper implements VerseInterval {
 		super(db.createNode());
 		setStart(start);
 		setEnd(end);
-		LOG.debug("created vi: " + this);
 	}
 
 	public GraphVerseInterval(Node node) {

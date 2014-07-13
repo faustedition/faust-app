@@ -89,8 +89,8 @@ public class SearchResource extends ServerResource {
 			final Map<String, Object> documentDesc = Maps.newHashMap();
 			documentDesc.put("id", document.node.getId());
 			documentDesc.put("callnumbers", toSortedValues(document.getMetadata("callnumber")));
-			documentDesc.put("waIds", toSortedValues(document.getMetadata("wa-id")));
-			documentDesc.put("uris", toSortedValues(document.getMetadata("uri")));		
+			documentDesc.put("idnos", document.allIdnos());
+			documentDesc.put("source", document.getSource().toString());
 			documentDescs.add(documentDesc);
 		}
 		return jsonFactory.map(results, false);
