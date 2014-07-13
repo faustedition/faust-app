@@ -30,8 +30,6 @@
 
 		var partTitles = [ "Faust - Prolog", "Faust I", "Faust II"];
 
-
-
 		Y.VerseView = Y.Base.create("genetic-anaylsis-verse-view", Y.View, [], {
 			render: function() {
 				var container = this.get("container");
@@ -81,24 +79,13 @@
 				];
 				var verseData = Y.JSON.parse(response.responseText);
 
-/*
-				var minLine = 100000;
-				var maxLine = 0;
-				Y.Array.each(verseData, function(m) {
-					Y.Array.each(m.intervals, function(i) {
-						minLine = Math.min(minLine, i.start);
-						maxLine = Math.max(maxLine, i.end);
-					});
-				});
-*/
 
 				minLine = this.get('from');
 				maxLine = this.get('to');
-			    var chartWidth = parseInt(this._chartNode.getComputedStyle('width')) - 200;
+			    var chartWidth = parseInt(Y.one("#genetic-analysis-app").getComputedStyle('width')) - 200;
 				var width = (maxLine - minLine) * 5;
 				var height = verseData.length * 20;
 				var lineScale = pv.Scale.linear(minLine, maxLine).range(0, chartWidth);
-				var barColor = pv.Scale.linear(0, verseData.length - 1).range('#000', '#000');
 
 				var panel = new pv.Panel().canvas(this._chartNode.getDOMNode())
 					.width(chartWidth)
@@ -135,7 +122,7 @@
 					// intervals are "closed", i.e. they include end and start line, thus width = end - start + 1
 					.width(function(d) { return (lineScale(d.end + 1) - lineScale(d.start)) })
 					.title(function (d) {return '[' + d.start + ', ' + d.end + ']'})
-					.fillStyle(function() { return barColor(this.parent.index) });
+					.fillStyle(function() { return '#000'});
 
 				panel.render();
 
