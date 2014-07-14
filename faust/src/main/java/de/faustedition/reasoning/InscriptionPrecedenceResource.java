@@ -19,19 +19,11 @@
 
 package de.faustedition.reasoning;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
-import de.faustedition.FaustURI;
-import de.faustedition.VerseInterval;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.genesis.GeneticSource;
+import de.faustedition.genesis.dating.GeneticSource;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.reasoning.PremiseBasedRelation.Premise;
 import edu.bath.transitivityutils.ImmutableRelation;
@@ -53,13 +45,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.*;

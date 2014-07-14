@@ -17,34 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.genesis;
+package de.faustedition.genesis.dating;
 
-import de.faustedition.FaustURI;
-import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.NodeWrapper;
-import org.neo4j.graphdb.GraphDatabaseService;
+import de.faustedition.graph.NodeWrapperCollection;
 import org.neo4j.graphdb.Node;
 
-public class GeneticSource extends NodeWrapper {
+public class GeneticSourceCollection extends NodeWrapperCollection<GeneticSource> {
 
-	public static final String PREFIX = FaustGraph.PREFIX + ".geneticSource";
-	public static final String SOURCE_KEY = PREFIX + ".source";
-	public static final String URI_KEY = PREFIX + ".uri";
-
-	public GeneticSource(Node node) {
-		super(node);
-	}
-
-	public GeneticSource(GraphDatabaseService db, FaustURI uri) {
-		this(db.createNode());
-		setUri(uri);
-	}
-
-	public void setUri(FaustURI uri) {
-		node.setProperty(URI_KEY, uri.toString());
-	}
-
-	public FaustURI getUri() {
-		return FaustURI.parse((String) node.getProperty(URI_KEY));
+	public GeneticSourceCollection(Node node) {
+		super(node, GeneticSource.class);
 	}
 }

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.transcript;
+package de.faustedition.genesis.lines;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

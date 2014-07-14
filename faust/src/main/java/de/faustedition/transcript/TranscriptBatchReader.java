@@ -24,6 +24,7 @@ import de.faustedition.FaustURI;
 import de.faustedition.Runtime;
 import de.faustedition.document.DocumentDescriptorHandler;
 import de.faustedition.document.MaterialUnit;
+import de.faustedition.genesis.lines.VerseManager;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.input.TranscriptInvalidException;
 import eu.interedition.text.Layer;

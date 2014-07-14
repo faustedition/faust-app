@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.transcript;
+package de.faustedition.genesis.lines;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
@@ -25,7 +25,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.SimpleVerseInterval;
 import de.faustedition.VerseInterval;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;

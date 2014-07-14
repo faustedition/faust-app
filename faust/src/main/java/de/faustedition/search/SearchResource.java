@@ -27,7 +27,7 @@ import com.google.common.collect.Sets;
 import de.faustedition.JsonRepresentationFactory;
 import de.faustedition.document.Document;
 import de.faustedition.transcript.TranscriptManager;
-import de.faustedition.transcript.VerseManager;
+import de.faustedition.genesis.lines.VerseManager;
 import eu.interedition.text.Anchor;
 import eu.interedition.text.Layer;
 import eu.interedition.text.neo4j.LayerNode;

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.genesis;
+package de.faustedition.genesis.dating;
 
 import de.faustedition.FaustAuthority;
 import de.faustedition.FaustURI;

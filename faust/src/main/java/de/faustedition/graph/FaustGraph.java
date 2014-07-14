@@ -21,7 +21,7 @@ package de.faustedition.graph;
 
 import de.faustedition.document.ArchiveCollection;
 import de.faustedition.document.MaterialUnitCollection;
-import de.faustedition.genesis.GeneticSourceCollection;
+import de.faustedition.genesis.dating.GeneticSourceCollection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;

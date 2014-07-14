@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition.transcript;
+package de.faustedition.genesis.lines;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -28,6 +28,7 @@ import de.faustedition.VerseInterval;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.search.Normalization;
+import de.faustedition.transcript.TranscriptManager;
 import eu.interedition.text.*;
 import eu.interedition.text.neo4j.LayerNode;
 import eu.interedition.text.neo4j.Neo4jTextRepository;

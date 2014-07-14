@@ -22,6 +22,7 @@ package de.faustedition.transcript;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
+import de.faustedition.genesis.lines.VerseManager;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.transcript.input.FacsimilePathXMLTransformerModule;
 import de.faustedition.transcript.input.HandsXMLTransformerModule;
