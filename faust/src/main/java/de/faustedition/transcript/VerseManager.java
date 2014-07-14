@@ -27,19 +27,21 @@ import de.faustedition.SimpleVerseInterval;
 import de.faustedition.VerseInterval;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
-import eu.interedition.text.Layer;
-import eu.interedition.text.Name;
-import eu.interedition.text.TextConstants;
-import eu.interedition.text.TextRepository;
+import de.faustedition.search.Normalization;
+import eu.interedition.text.*;
 import eu.interedition.text.neo4j.LayerNode;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.NumericRangeQuery;
+import eu.interedition.text.neo4j.Neo4jTextRepository;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.*;
+import org.apache.lucene.search.spans.SpanMultiTermQueryWrapper;
+import org.apache.lucene.search.spans.SpanNearQuery;
 import org.codehaus.jackson.JsonNode;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.graphdb.index.IndexManager;
+import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.index.lucene.ValueContext;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
@@ -50,6 +52,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -65,7 +68,9 @@ import static eu.interedition.text.Query.*;
 @DependsOn(value = "transcriptManager")
 public class VerseManager {
 
-	private static final String VERSE_INTERVAL_INDEX_NAME = GraphVerseInterval.PREFIX + "verse-interval-index";
+	private static final String INDEX_VERSE_INTERVAL = "index-verse-interval";
+
+	private static final String INDEX_VERSE_FULLTEXT = "index-verse-text";
 
 	private static final Pattern VERSE_NUMBER_PATTERN = Pattern.compile("[0-9]+");
 
@@ -80,11 +85,13 @@ public class VerseManager {
 	@Autowired
 	private TranscriptManager transcriptManager;
 
-	public void register(FaustGraph faustGraph, TextRepository<JsonNode> textRepo, Layer<JsonNode> transcript) {
+	public void register(FaustGraph faustGraph, Neo4jTextRepository<JsonNode> textRepo, MaterialUnit mu, LayerNode<JsonNode> transcript) {
 
 		for (VerseInterval vi : registeredFor(transcript)) {
 			((GraphVerseInterval)vi).node.delete();
 		}
+		Index<Node> verseTextIndex = faustGraph.getDb().index().forNodes(INDEX_VERSE_FULLTEXT,
+				MapUtil.stringMap(IndexManager.PROVIDER, "lucene", "type", "fulltext") );
 
 		final SortedSet<Long> verses = Sets.newTreeSet();
 		for (Layer<JsonNode> verse : textRepo.query(and(text(transcript), name(new Name(TextConstants.TEI_NS, "l"))))) {
@@ -96,9 +103,19 @@ public class VerseManager {
 				verses.add(lineNum);
 			}
 
+			Anchor<JsonNode> anchor = Iterables.getOnlyElement(verse.getAnchors());
+			try {
+				String verseText = anchor.getText().read(anchor.getRange());
+				LOG.trace("Indexing verse: " + verseText);
+				verseTextIndex.add(((LayerNode)verse).node, "fulltext",
+						Normalization.normalize(verseText));
+
+			} catch (IOException e) {
+				LOG.error("Error indexing line " + lineNum);
+			}
 		}
 
-		Index<Node> verseIndex = faustGraph.getDb().index().forNodes(VERSE_INTERVAL_INDEX_NAME);
+		Index<Node> verseIndex = faustGraph.getDb().index().forNodes(INDEX_VERSE_INTERVAL);
 
 		long start = -1;
 		long next = -1;
@@ -124,7 +141,6 @@ public class VerseManager {
 				vi.setTranscript(transcript);
 				verseIndex.add(vi.node, "start", ValueContext.numeric(vi.getStart()));
 				verseIndex.add(vi.node, "end", ValueContext.numeric(vi.getEnd()));
-
 
 			}
 		}
@@ -154,7 +170,7 @@ public class VerseManager {
 	public Iterable<GraphVerseInterval> forInterval(GraphVerseInterval verseInterval) {
 
 		// find all intervals for which start < verseInterval.getEnd() and end > verseInterval.getStart()
-		Index<Node> verseIndex = faustGraph.getDb().index().forNodes(VERSE_INTERVAL_INDEX_NAME);
+		Index<Node> verseIndex = faustGraph.getDb().index().forNodes(INDEX_VERSE_INTERVAL);
 		BooleanQuery andQuery = new BooleanQuery();
 		NumericRangeQuery<Integer> startQuery = NumericRangeQuery.newIntRange("start", 0, verseInterval.getEnd(), true, true);
 		NumericRangeQuery<Integer> endQuery = NumericRangeQuery.newIntRange("end", verseInterval.getStart(), Integer.MAX_VALUE, true, true);
@@ -231,6 +247,41 @@ public class VerseManager {
 			throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
 		}
 	}
+
+
+	public Iterable<LayerNode<JsonNode>> fulltextQuery (String queryString) {
+		Preconditions.checkState(this.faustGraph.getDb().index().existsForNodes(INDEX_VERSE_FULLTEXT));
+		Index<Node> verseFulltextIndex = this.faustGraph.getDb().index().forNodes(INDEX_VERSE_FULLTEXT);
+
+		// construct a fuzzy query
+		String normalizedQueryString = Normalization.normalize(queryString);
+		ArrayList<String> tokens = Lists.newArrayList(normalizedQueryString.split(" "));
+		Function<String, SpanMultiTermQueryWrapper> stringToQuery = new Function<String, SpanMultiTermQueryWrapper>() {
+			@Override
+			public SpanMultiTermQueryWrapper apply(@Nullable String input) {
+				Term term = new Term("fulltext", input.toLowerCase());
+				FuzzyQuery fuzzyQuery = new FuzzyQuery(term);
+				SpanMultiTermQueryWrapper spanMultiTermQueryWrapper = new SpanMultiTermQueryWrapper(fuzzyQuery);
+				return spanMultiTermQueryWrapper;
+			}
+		};
+
+		SpanMultiTermQueryWrapper[] clauses =
+				(Lists.newArrayList(Iterables.transform(tokens, stringToQuery)).toArray(new SpanMultiTermQueryWrapper[tokens.size()]));
+
+		SpanNearQuery query = new SpanNearQuery(clauses, 5, false);
+		IndexHits<Node> verseResults = verseFulltextIndex.query(query);
+
+		Function <Node, LayerNode<JsonNode>> wrapLayerNodes = new Function<Node, LayerNode<JsonNode>>() {
+			@Override
+			public LayerNode apply(@Nullable Node input) {
+				return new LayerNode<JsonNode>(textRepository, input);
+			}
+		};
+
+		return Iterables.transform(verseResults, wrapLayerNodes);
+	}
+
 
 	public static VerseInterval ofPart(int part) {
 		switch (part) {

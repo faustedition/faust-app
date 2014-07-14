@@ -23,7 +23,6 @@ import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
-import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.transcript.input.FacsimilePathXMLTransformerModule;
 import de.faustedition.transcript.input.HandsXMLTransformerModule;
 import de.faustedition.transcript.input.StageXMLTransformerModule;
@@ -73,8 +72,6 @@ public class TranscriptManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TranscriptManager.class);
 
-	public static final FaustRelationshipType TRANSCRIPT_RT = new FaustRelationshipType("transcribes");
-
 	@Autowired
 	private Neo4jTextRepository<JsonNode> textRepository;
 
@@ -90,25 +87,13 @@ public class TranscriptManager {
 	@Autowired
 	private VerseManager verseManager;
 
-//	TODO Currently under construction (transcribedVerseIndex will be reimplemented) but sill useful.
-/*
-	private TreeMultimap<Short, MaterialUnit> transcribedVerseIndex = TreeMultimap.create(Ordering.natural(), new Comparator<MaterialUnit>() {
-		@Override
-		public int compare(MaterialUnit o1, MaterialUnit o2) {
-			final long idDiff = o1.node.getId() - o2.node.getId();
-			return (idDiff == 0 ? 0 : (idDiff < 0 ? -1 : 1));
-		}
-	});
-*/
-
-
 	public Layer<JsonNode> find(MaterialUnit materialUnit) throws IOException, XMLStreamException {
-		final Relationship rel = materialUnit.node.getSingleRelationship(TRANSCRIPT_RT, INCOMING);
+		final Relationship rel = materialUnit.node.getSingleRelationship(MaterialUnit.TRANSCRIPT_RT, INCOMING);
 		return (rel == null ? read(materialUnit) : new LayerNode<JsonNode>(textRepository, rel.getStartNode()));
 	}
 
 	public MaterialUnit materialUnitForTranscript(LayerNode transcript) {
-		final Relationship rel = transcript.node.getSingleRelationship(TRANSCRIPT_RT, OUTGOING);
+		final Relationship rel = transcript.node.getSingleRelationship(MaterialUnit.TRANSCRIPT_RT, OUTGOING);
 		MaterialUnit mu = new MaterialUnit(rel.getEndNode());
 		if (MaterialUnit.Type.ARCHIVALDOCUMENT.equals(mu.getType())) {
 			return new Document(rel.getEndNode());
@@ -146,10 +131,10 @@ public class TranscriptManager {
 			}, materialUnit);
 
 			final LayerNode<JsonNode> transcriptLayer = (LayerNode<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
+			transcriptLayer.node.createRelationshipTo(materialUnit.node, MaterialUnit.TRANSCRIPT_RT);
 
-			verseManager.register(faustGraph, textRepository, transcriptLayer);
+			verseManager.register(faustGraph, textRepository, materialUnit, transcriptLayer);
 
-			transcriptLayer.node.createRelationshipTo(materialUnit.node, TRANSCRIPT_RT);
 			return transcriptLayer;
 		} catch (IllegalArgumentException e) {
 			throw new TranscriptInvalidException(e);

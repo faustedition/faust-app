@@ -26,10 +26,15 @@ YUI.add('search', function (Y) {
                 source: cp + "/search/{query}",
                 resultListLocator: "documents",
                 resultTextLocator: function(document) {
-                	var uri_part = document.source.substring("faust://xml/document/".length);
-					//var result = "<" + document.idnos + "; " + uri_part + ">";
-					var result = "<" + document.idnos + ">";
-					return result;
+
+					if (document.fulltextWindow) {
+						return document.fulltextWindow + ' <' + document.callnumber + '>';
+					} else {
+						var uri_part = document.source.substring("faust://xml/document/".length);
+						//var result = "<" + document.idnos + "; " + uri_part + ">";
+						var result = "<" + document.idnos + ">";
+						return result;
+					}
                 },
                 resultHighlighter:'phraseMatch',
 				align: {

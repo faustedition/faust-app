@@ -38,6 +38,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
 
 import javax.annotation.Nullable;
@@ -60,6 +61,13 @@ public class Document extends MaterialUnit {
 	private static final Pattern ALPHA_NUMERIC_PATTERN = Pattern.compile("[a-zA-Z0-9]");
 
 	public static final String GENETIC_SOURCE_PROPERTY = "genetic-source";
+
+	/* Indices */
+
+	public static final  String INDEX_ID = "index-id";
+	public static final String INDEX_SOURCE = "index-source";
+	public static final String INDEX_URI = "index-uri";
+
 
 	public Document(Node node) {
 		super(node);
@@ -97,13 +105,13 @@ public class Document extends MaterialUnit {
 	}
 
 	public static Document findBySource(GraphDatabaseService db, FaustURI source) {
-		final Node node = db.index().forNodes(SOURCE_KEY).get(SOURCE_KEY, source).getSingle();
+		final Node node = db.index().forNodes(INDEX_SOURCE).get(SOURCE_KEY, source).getSingle();
 		return (node == null ? null : new Document(node));
 	}
 
 	public static Document findByUri(GraphDatabaseService db, FaustURI uri) {
 		try {
-			final Node node = db.index().forNodes(URI_KEY).get(URI_KEY, uri).getSingle();
+			final Node node = db.index().forNodes(INDEX_URI).get(URI_KEY, uri).getSingle();
 			return (node == null ? null : new Document(node));
 		} catch(NoSuchElementException e) {
 			return null;
@@ -112,14 +120,15 @@ public class Document extends MaterialUnit {
 
 
 	public static Iterable<Document> find(GraphDatabaseService db, String id) {
-		final BooleanQuery query = new BooleanQuery();
-		query.add(new WildcardQuery(new Term(ALL_IDNOS_KEY, id)), BooleanClause.Occur.SHOULD);
-		query.add(new WildcardQuery(new Term(WA_ID_KEY, id)), BooleanClause.Occur.SHOULD);
-		query.add(new WildcardQuery(new Term(URI_PART_KEY, id)), BooleanClause.Occur.SHOULD);
 
-		return Iterables.transform(
-			db.index().forNodes(PREFIX + "id").query(query),
-			newWrapperFunction(Document.class));
+		// query by idno
+		final BooleanQuery idQuery = new BooleanQuery();
+		idQuery.add(new WildcardQuery(new Term(ALL_IDNOS_KEY, id)), BooleanClause.Occur.SHOULD);
+		idQuery.add(new WildcardQuery(new Term(WA_ID_KEY, id)), BooleanClause.Occur.SHOULD);
+		idQuery.add(new WildcardQuery(new Term(URI_PART_KEY, id)), BooleanClause.Occur.SHOULD);
+		IndexHits<Node> idResults = db.index().forNodes(INDEX_ID).query(idQuery);
+
+		return Iterables.transform(idResults, newWrapperFunction(Document.class));
 	}
 
     public Iterable<MaterialUnit> getPages() {
@@ -136,14 +145,14 @@ public class Document extends MaterialUnit {
 	public void index() {
 		final IndexManager indexManager = node.getGraphDatabase().index();
 
-		indexManager.forNodes(SOURCE_KEY).add(node, SOURCE_KEY, getSource());
+		indexManager.forNodes(INDEX_SOURCE).add(node, SOURCE_KEY, getSource());
 
-		final Index<Node> idIndex = indexManager.forNodes(PREFIX + "id");
+		final Index<Node> idIndex = indexManager.forNodes(INDEX_ID);
 
 		for (String uri: Objects.firstNonNull(getMetadata("uri"), new String[0])) {
 
 				try {
-					indexManager.forNodes(URI_KEY).add(node, URI_KEY, new FaustURI(new URI(uri)));
+					indexManager.forNodes(INDEX_URI).add(node, URI_KEY, new FaustURI(new URI(uri)));
 				} catch (Exception e) {
 					// TODO error logging
 	                //logger.error("error!", e);

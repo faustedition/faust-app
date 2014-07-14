@@ -27,15 +27,20 @@ import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapperCollection;
+import eu.interedition.text.Layer;
+import org.codehaus.jackson.JsonNode;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
+
+	public static final FaustRelationshipType TRANSCRIPT_RT = new FaustRelationshipType("transcribes");
 
 	public enum Type {
 		ARCHIVALDOCUMENT, DOCUMENT, SHEET, LEAF, DISJUNCTLEAF, PAGE, PATCH, PATCHSURFACE, PRINT

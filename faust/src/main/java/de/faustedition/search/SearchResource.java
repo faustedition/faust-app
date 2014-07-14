@@ -26,6 +26,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import de.faustedition.JsonRepresentationFactory;
 import de.faustedition.document.Document;
+import de.faustedition.transcript.TranscriptManager;
+import de.faustedition.transcript.VerseManager;
+import eu.interedition.text.Anchor;
+import eu.interedition.text.Layer;
+import eu.interedition.text.neo4j.LayerNode;
+import org.codehaus.jackson.JsonNode;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
@@ -40,10 +46,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -60,7 +64,14 @@ public class SearchResource extends ServerResource {
 	@Autowired
 	private GraphDatabaseService db;
 
+	@Autowired
+	private VerseManager verseManager;
+
+	@Autowired
+	private TranscriptManager transcriptManager;
+
 	private String searchTerm;
+
 
 	@Override
 	protected void doInit() throws ResourceException {
@@ -81,23 +92,52 @@ public class SearchResource extends ServerResource {
 		final List<Map<String, Object>> documentDescs = Lists.newArrayList();
 		results.put("documents", documentDescs);
 
-		List<Document> documents = query(searchTerm);
+		List<Document> documents = idnoQuery(searchTerm);
 		if (documents.isEmpty()) {
-			documents = query(toQuery(searchTerm));
+			documents = idnoQuery(toQuery(searchTerm));
 		}
 		for (Document document : documents) {
-			final Map<String, Object> documentDesc = Maps.newHashMap();
-			documentDesc.put("id", document.node.getId());
-			documentDesc.put("callnumbers", toSortedValues(document.getMetadata("callnumber")));
-			documentDesc.put("idnos", document.allIdnos());
-			documentDesc.put("source", document.getSource().toString());
+			final Map<String, Object> documentDesc = documentDescMap(document);
 			documentDescs.add(documentDesc);
+		}
+
+		List<LayerNode<JsonNode>> lines = fulltextQuery(searchTerm);
+		for (Layer<JsonNode> line : lines) {
+			Anchor<JsonNode> anchor = Iterables.getOnlyElement(line.getAnchors());
+			LayerNode<JsonNode> transcript = (LayerNode<JsonNode>) anchor.getText();
+
+			try {
+				String verseText = anchor.getText().read(anchor.getRange());
+				LOG.trace("Found verse: " + verseText);
+				Document document = ((Document) transcriptManager.materialUnitForTranscript(transcript));
+
+				final Map<String, Object> documentDesc = documentDescMap(document);
+				documentDesc.put("fulltextWindow", verseText);
+
+				documentDescs.add(documentDesc);
+
+			} catch (IOException e) {
+				LOG.error("Error reading line.");
+			}
 		}
 		return jsonFactory.map(results, false);
 	}
 
-	private List<Document> query(String term) {
-		return Lists.newArrayList(Iterables.limit(Document.find(db, term), 25));
+	private Map<String, Object> documentDescMap(Document document) {
+		final Map<String, Object> documentDesc = Maps.newHashMap();
+		documentDesc.put("id", document.node.getId());
+		documentDesc.put("callnumber", document.getMetadata("callnumber"));
+		documentDesc.put("idnos", document.allIdnos());
+		documentDesc.put("source", document.getSource().toString());
+		return documentDesc;
+	}
+
+	private List<LayerNode<JsonNode>> fulltextQuery(String term) {
+		return Lists.newArrayList(Iterables.limit(verseManager.fulltextQuery(term), 15));
+	}
+
+	private List<Document> idnoQuery(String term) {
+		return Lists.newArrayList(Iterables.limit(Document.find(db, term), 10));
 	}
 
 	public static String toQuery(String search) {
