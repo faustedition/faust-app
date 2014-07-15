@@ -28,7 +28,7 @@ YUI.add('search', function (Y) {
                 resultTextLocator: function(document) {
 
 					if (document.fulltextWindow) {
-						return document.fulltextWindow + ' <' + document.callnumber + '>';
+						return document.fulltextWindow + ' <' + document.name + '>';
 					} else {
 						var uri_part = document.source.substring("faust://xml/document/".length);
 						//var result = "<" + document.idnos + "; " + uri_part + ">";

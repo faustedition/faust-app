@@ -19,7 +19,6 @@
 
 package de.faustedition.genesis.lines;
 
-import de.faustedition.VerseInterval;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapper;

@@ -22,7 +22,6 @@ package de.faustedition.genesis.lines;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.VerseInterval;
 import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.restlet.representation.Representation;

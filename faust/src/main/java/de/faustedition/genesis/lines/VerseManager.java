@@ -23,8 +23,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
-import de.faustedition.SimpleVerseInterval;
-import de.faustedition.VerseInterval;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.search.Normalization;
@@ -168,7 +166,7 @@ public class VerseManager {
 	}
 */
 
-	public Iterable<GraphVerseInterval> forInterval(GraphVerseInterval verseInterval) {
+	public Iterable<GraphVerseInterval> forInterval(VerseInterval verseInterval) {
 
 		// find all intervals for which start < verseInterval.getEnd() and end > verseInterval.getStart()
 		Index<Node> verseIndex = faustGraph.getDb().index().forNodes(INDEX_VERSE_INTERVAL);

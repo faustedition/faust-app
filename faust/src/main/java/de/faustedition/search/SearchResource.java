@@ -126,7 +126,7 @@ public class SearchResource extends ServerResource {
 	private Map<String, Object> documentDescMap(Document document) {
 		final Map<String, Object> documentDesc = Maps.newHashMap();
 		documentDesc.put("id", document.node.getId());
-		documentDesc.put("callnumber", document.getMetadata("callnumber"));
+		documentDesc.put("name", document.toString());
 		documentDesc.put("idnos", document.allIdnos());
 		documentDesc.put("source", document.getSource().toString());
 		return documentDesc;

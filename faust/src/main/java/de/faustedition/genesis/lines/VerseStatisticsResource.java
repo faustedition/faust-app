@@ -25,7 +25,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import de.faustedition.JsonRepresentationFactory;
-import de.faustedition.VerseInterval;
 import de.faustedition.document.Document;
 import de.faustedition.document.MaterialUnit;
 import org.neo4j.graphdb.GraphDatabaseService;

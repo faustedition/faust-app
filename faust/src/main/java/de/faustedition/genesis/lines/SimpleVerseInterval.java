@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.faustedition;
+package de.faustedition.genesis.lines;
 
 /**
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
@@ -26,9 +26,6 @@ public class SimpleVerseInterval implements VerseInterval {
 	protected String name;
 	protected int start;
 	protected int end;
-
-	public SimpleVerseInterval() {
-	}
 
 	public SimpleVerseInterval(String name, int start, int end) {
 		this.name = name;
