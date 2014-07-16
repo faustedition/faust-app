@@ -1,167 +1,163 @@
 <@faust.page title=message("text.sample")>
+
+<script type="text/javascript">
+	Faust.YUI().use('event', 'node', 'base', 'io', 'json', 'interaction', function(Y) {
+		var lines = Y.all('.ann-l');
+
+		function lineNumberForLine(line) {
+			return parseInt(
+					line.getAttribute('class')
+							.split(' ')[1]
+							.slice('linenum-'.length)
+			)
+		}
+
+		var lineNumbers = [];
+		lines.each(function(line){
+			lineNumbers.push(lineNumberForLine(line));
+		});
+
+		function augmentText(id, o, args) {
+			var variants = Y.JSON.parse(o.responseText);
+	        lines.each(function(line) {
+		        var variantsForLine = variants[lineNumberForLine(line)];
+		        var numOfVariantsForLine = variantsForLine.length;
+		        var c = 255 - (Math.min(numOfVariantsForLine - 1, 10) * 5);
+		        line.setStyle('backgroundColor', 'rgb(' + c + ',' + c + ',' + c + ')');
+
+
+		        line.on('mouseenter', function(e) {
+			        Y.fire('faust:mouseover-info', { info: numOfVariantsForLine + ' variants.', mouseEvent: e });
+		        });
+
+		        line.on('mouseleave', function(e) { Y.fire('faust:mouseover-info-hide', {})});
+
+		        line.on('click', function(e) {
+			        Y.all('.variant').remove(true);
+
+			        line.ancestor().insert('<div class="variant"><br/></div>', line);
+			        Y.each(variantsForLine, function(variant) {
+				        line.ancestor().insert(
+						        '<div class="variant">' +
+								        variant.variantText +
+								        ' <a href="' + cp + variant.source.slice('faust://xml'.length) + '">'
+								        + variant.name + '</a></div>', line);
+			        })
+		        });
+
+	        });
+		}
+
+
+		var ioConfig = {
+			method: 'POST',
+			data: Y.JSON.stringify(lineNumbers),
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			on: {
+				success: augmentText
+			}
+		};
+
+		Y.io(cp + '/genesis/variants', ioConfig);
+
+	});
+</script>
+
+
 	<div class="yui3-g" style="margin-top: 2em">
-	<div class="yui3-u-1-3">
-	<p class="center small-caps color-1">Großer Vorhof des Pallasts.</p>
+	<div class="yui3-u-1-5"></div>
 
-	<p class="center small-caps color-1">Fackeln.</p>
+	<div class="yui3-u-3-5">
 
-	<p class="center color-2">Mephist. <span class="small-caps color-1">(als Aufseher, voran)</span></p>
 
-	<p>Herbey herbey! herein herein!<br />
-	Ihr schlotternden Lemuren,<br />
-	Aus Bändern, Sehnen und Gebein<br />
-	Geflickte Halbnaturen.</p>
+	<div class="text-center color-1">Vor dem Palaste des Menelas zu Sparta.</div>
 
-	<p class="center color-2">Lemuren <span class="small-caps color-1">im Chor</span></p>
+	<div class="text-center color-1">Helena tritt auf und Chor gefangener Trojanerinnen. Panthalis Chorführerin.</div>
 
-	<p>Wir treten dir sogleich zur Hand<sup class="add-color-1">[11515]</sup><br />
-	Und, wie wir halb vernommen,<br />
-	Es gilt wohl gar ein weites Land<br />
-	Das sollen wir bekommen.</p>
 
-	<p>Gespitzte Pfähle, die sind da,<br />
-	Die Kette lang fürs Messen;<sup class="add-color-1">[11525]</sup><br />
-	Warum an uns der Ruf geschah<br />
-	Das haben wir vergessen.</p>
+	<div class="text-center color-1">Helena.</div>
 
-	<p class="center color-2">Mephisto.</p>
+	<div class="ann-l linenum-8488">Bewundert viel und viel gescholten Helena</div>
 
-	<p>Hier gilt kein künstlerisch Bemühn;<br />
-	Verfahret nur nach eigenen Maaßen;<br />
-	Der Längste lege längelang sich hin;<sup class="add-color-1">[11525]</sup><br />
-	Ihr andern lüftet ringsumher den Rasen;<br />
-	Wie mans für unsere Väter that,<br />
-	Vertieft ein längliches Quadrat!<br />
-	Aus dem Pallast ins enge Haus,<br />
-	So dumm läuft es am Ende doch hinaus.<sup class="add-color-1">[11530]</sup></p>
+	<div class="ann-l linenum-8489">Vom Strande komm' ich wo wir erst gelandet sind,</div>
 
-	<p class="center color-2">Lemuren. <span class="small-caps color-1">(mit neckischen Gebärden grabend)</span></p>
+	<div class="ann-l linenum-8490">Noch immer trunken von des Gewoges regsamem</div>
 
-	<p>Wie jung ich war und lebt und liebt,<br />
-	Mich däucht das war wohl süße,<br />
-	Wo’s fröhlich klang und lustig ging<br />
-	Da rührten sich meine Füße.</p>
+	<div class="ann-l linenum-8491">Geschaukel, das vom phrygischen Blachgefild uns her</div>
 
-	<p>Nun hat das tückische Alter mich<sup class="add-color-1">[11535]</sup><br />
-	Mit seiner Krücke getroffen;<br />
-	Ich stolpert’ über Grabes Thür,<br />
-	Warum stand sie just offen!</p>
+	<div class="ann-l linenum-8492">Auf sträubig-hohem Rücken, durch Poseidons Gunst</div>
 
-	<p class="center color-2">Faust. <span class="small-caps color-1">(aus dem Pallaste tretend, tastet an den Thürpfosten)</span></p>
+	<div class="ann-l linenum-8493">Und Euros Kraft, in vaterländische Buchten trug.</div>
 
-	<p>Wie das Geklirr der Spaten mich ergötzt!<br />
-	Es ist die Menge, die mir fröhnet,<sup class="add-color-1">[11540]</sup><br />
-	Die Erde mit sich selbst versöhnet,<br />
-	Den Wellen ihre Gränze setzt,<br />
-	Das Meer mit strengem Band umzieht.</p>
+	<div class="ann-l linenum-8494">Dort unten freuet nun der König Menelas</div>
 
-	</div>
-	<div class="yui3-u-1-3">
-	<p class="center color-2">Mephist. <span class="small-caps color-1">(bey Seite)</span></p>
+	<div class="ann-l linenum-8495">Der Rückkehr sammt den tapfersten seiner Krieger sich.</div>
 
-	<p>Du bist doch nur für uns bemüht<br />
-	Mit deinem Dämmen deinen Buhnen;<sup class="add-color-1">[11545]</sup><br />
-	Denn du bereitest schon Neptunen,<br />
-	Dem Wasserteufel, großen Schmaus.<br />
-	In jeder Art seyd ihr verloren,<br />
-	Die Elemente sind mit uns verschworen,<br />
-	Und auf Vernichtung läufts hinaus.<sup class="add-color-1">[11550]</sup></p>
+	<div class="ann-l linenum-8496">Du aber heiße mich willkommen, hohes Haus,</div>
 
-	<p class="center color-2">Faust.</p>
+	<div class="ann-l linenum-8497">Das Tyndareos, mein Vater, nah dem Hange sich</div>
 
-	<p>Aufseher!</p>
+	<div class="ann-l linenum-8498">Von Pallas Hügel wiederkehrend aufgebaut</div>
 
-	<p class="center color-2">Mephist.</p>
+	<div class="ann-l linenum-8499">Und, als ich hier mit Klytämnestren schwesterlich,</div>
 
-	<p>Hier!</p>
+	<div class="ann-l linenum-8500">Mit Castor auch und Pollux fröhlich spielend wuchs,</div>
 
-	<p class="center color-2">Faust.</p>
+	<div class="ann-l linenum-8501">Vor allen Häusern Sparta's herrlich ausgeschmückt.</div>
 
-	<p>Wie es auch möglich sey<br />
-	Arbeiter schaffe Meng’ auf Menge,<br />
-	Ermuntere durch Genuß und Strenge,<br />
-	Bezahle, locke, presse bey!<br />
-	Mit jedem Tage will ich Nachricht haben<sup class="add-color-1">[11555]</sup><br />
-	Wie sich verlängt der unternommene Graben.</p>
+	<div class="ann-l linenum-8502">Gegrüßet seid mir, der ehrnen Pforte Flügel ihr!</div>
 
-	<p class="center color-2">Mephist. <span class="small-caps color-1">(halblaut)</span></p>
+	<div class="ann-l linenum-8503">Durch euer gastlich ladendes Weiteröffnen einst</div>
 
-	<p>Man spricht, wie man mir Nachricht gab,<br />
-	Von keinem Graben doch vom Grab.</p>
+	<div class="ann-l linenum-8504">Geschah's daß mir, erwählt aus vielen, Menelas</div>
 
-	<p class="center color-2">Faust.</p>
+	<div class="ann-l linenum-8505">In Bräutigams-Gestalt entgegen leuchtete.</div>
 
-	<p>Ein Sumpf zieht am Gebirge hin,<br />
-	Verpestet alles schon Errungene;<sup class="add-color-1">[11560]</sup><br />
-	Den faulen Pfuhl auch abzuziehn<br />
-	Das Letzte wär das Höchsterrungene.<br />
-	Eröffn’ ich Räume vielen Millionen,<br />
-	Nicht sicher zwar, doch thätig-frey zu wohnen.<br />
-	Grün das Gefilde, fruchtbar; Mensch und Heerde<sup class="add-color-1">[11565]</sup><br />
-	Sogleich behaglich auf der neuesten Erde,<br />
-	Gleich angesiedelt an des Hügels Kraft,<br />
-	Den aufgewälzt kühn-emsige Völkerschaft.<br />
-	Im Inneren hier ein paradiesisch Land,<br />
-	Da rase draußen Fluth bis auf zum Rand,<sup class="add-color-1">[11570]</sup><br />
-	Und wie sie nascht gewaltsam einzuschließen,<br />
-	Gemeindrang eilt die Lücke zu verschließen.<br />
-	Ja diesem Sinne bin ich ganz ergeben,<br />
-	Das ist der Weisheit letzter Schluß:<br />
-	Nur der verdient sich Freyheit wie das Leben,<sup class="add-color-1">[11575]</sup><br />
-	Der täglich sie erobern muß.</p>
-	</div>
 
-	<div class="yui3-u-1-3">
-	<p>Und so verbringt, umrungen von Gefahr,<br />
-	Hier Kindheit, Mann und Greis sein tüchtig Jahr.<br />
-	Solch ein Gewimmel möcht ich sehn,<br />
-	Auf freyem Grund mit freyem Volke stehn.<sup class="add-color-1">[11580]</sup><br />
-	Zum Augenblicke dürft’ ich sagen:<br />
-	Verweile doch, Du bist so schön!<br />
-	Es kann die Spur von meinen Erdetagen<br />
-	Nicht in Aeonen untergehn. –<br />
-	Im Vorgefühl von solchem hohen Glück<sup class="add-color-1">[11585]</sup><br />
-	Genieß ich jetzt den höchsten Augenblick.</p>
+	<div class="ann-l linenum-8506">Eröffnet mir sie wieder, daß ich ein Eilgebot</div>
 
-	<p class="center color-2">(Faust <span class="small-caps color-1">sinkt zurück, die <span class="normal-variant color-2">Lemuren</span> fassen ihn auf und legen ihn auf den Boden)</span>.</p>
+	<div class="ann-l linenum-8507">Des Königs treu erfülle, wie der Gattin ziemt.</div>
 
-	<p class="center color-2">Mephisto.</p>
+	<div class="ann-l linenum-8508">Laßt mich hinein! und alles bleibe hinter mir,</div>
 
-	<p>Ihn sättigt keine Lust, ihm gnügt kein Glück,<br />
-	So buhlt er fort nach wechselnden Gestalten;<br />
-	Den letzten, schlechten, leeren Augenblick<br />
-	Der Arme wünscht ihn fest zu halten.<sup class="add-color-1">[11590]</sup><br />
-	Der mir so kräftig widerstand,<br />
-	Die Zeit wird Herr, der Greis hier liegt im Sand.<br />
-	Die Uhr steht still –</p>
+	<div class="ann-l linenum-8509">Was mich umstürmte bis hieher, verhängnißvoll.</div>
 
-	<p class="center color-2">Chor.</p>
+	<div class="ann-l linenum-8510">Denn seit ich diese Schwelle sorgenlos verließ,</div>
 
-	<p>Steht still! Sie schweigt wie Mitternacht.<br />
-	Der Zeiger fällt.</p>
+	<div class="ann-l linenum-8511">Cytherens Tempel besuchend, heiliger Pflicht gemäß,</div>
 
-	<p class="center color-2">Meph.</p>
+	<div class="ann-l linenum-8512">Mich aber dort ein Räuber griff, der phrygische,</div>
 
-	<p>Er fällt, es ist vollbracht.</p>
+	<div class="ann-l linenum-8513">Ist viel geschehen, was die Menschen weit und breit</div>
 
-	<p class="center color-2">Chor.</p>
+	<div class="ann-l linenum-8514">So gern erzählen, aber der nicht gerne hört</div>
 
-	<p>Es ist vorbey.<sup class="add-color-1">[11595]</sup></p>
+	<div class="ann-l linenum-8515">Von dem die Sage wachsend sich zum Mährchen spann.</div>
 
-	<p class="center color-2">Mephist.</p>
 
-	<p>Vorbey! ein dummes Wort.<br />
-	Warum vorbey?<br />
-	Vorbey und reines Nicht, vollkommnes Einerley.<br />
-	Was soll uns denn as ewge Schaffen,<br />
-	Geschaffenes zu nichts hinwegzuraffen?<br />
-	Da ists vorbey! Was ist daran zu lesen?<sup class="add-color-1">[11600]</sup><br />
-	Es ist so gut als wär es nicht gewesen,<br />
-	Und treibt sich doch im Kreis als wenn es wäre.<br />
-	Ich liebte mir dafür das Ewig-Leere.</p>
+
+	<div class="text-center color-1">Chor.</div>
+
+	<div class="ann-l linenum-8516">Verschmähe nicht, o herrliche Frau,</div>
+
+	<div class="ann-l linenum-8517">Des höchsten Gutes Ehrenbesitz!</div>
+
+	<div class="ann-l linenum-8518">Denn das größte Glück ist dir einzig beschert,</div>
+
+	<div class="ann-l linenum-8519">Der Schönheit Ruhm der vor allen sich hebt.</div>
+
+	<div class="ann-l linenum-8520">Dem Helden tönt sein Name voran,</div>
+
+	<div class="ann-l linenum-8521">Drum schreitet er stolz,</div>
+
+	<div class="ann-l linenum-8522">Doch beugt sogleich hartnäckigster Mann</div>
+
+	<div class="ann-l linenum-8523">Vor der allbezwingenden Schöne den Sinn.</div>
+
 
 	</div>
 	</div>
-	
-	<p class="font-size-2 center" style="margin-top: 2em">Johann Wolfgang Goethe. Sämtliche Werke nach Epochen seines Schaffens (Münchener Ausgabe). Band 18.1. München, Wien. 1997. S.&#160;333-336.</p>
+
 </@faust.page>

@@ -136,6 +136,7 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
 		router.attach("search/{term}", secured(transactional(contextResource(SearchResource.class))));
 		router.attach("structure/", secured(transactional(structureFinder)));
+		router.attach("text/", secured(templateFinder));
 		router.attach("transcript/by-scene/{part}", secured(transactional(contextResource(SceneStatisticsResource.class))));
 		router.attach("transcript/by-verse/{from}/{to}", secured(transactional(contextResource(VerseStatisticsResource.class))));
 		router.attach("transcript/source/{id}", secured(transactional(contextResource(TranscriptSourceResource.class))));
