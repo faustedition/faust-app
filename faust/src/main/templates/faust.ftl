@@ -197,7 +197,7 @@
 	<ul>
 		<li <#if menuhighlight="archives">class="pure-menu-selected"</#if>><a href="${cp}/archive/">${message("menu.archives")}</a></li>
 		<li <#if menuhighlight="genesis">class="pure-menu-selected"</#if>><a href="${cp}/genesis/work/">${message("menu.genesis")}</a></li>
-		<li <#if menuhighlight="text">class="pure-menu-selected"</#if>><a href="#">Text</a></li>
+		<li <#if menuhighlight="text">class="pure-menu-selected"</#if>><a href="${cp}/text/sample">Text</a></li>
 		<li><form class="pure-form"><input id="quick-search" type="text" placeholder="${message("menu.search")}"></form></li>
 	</ul>
 	</@restricted>
