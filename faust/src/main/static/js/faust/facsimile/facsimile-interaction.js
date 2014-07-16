@@ -38,7 +38,7 @@ YUI.add('facsimile-interaction', function (Y) {
 
 	Y.on('faust:facsimile-svg-pane-loaded', function() {
 		var allLineHighlights = Y.all('#facsimile-view #svgpane .imageannotationLine.imageannotationLinked');
-		allLineHighlights.on('mousemove', hoverLineHighlight);
+		allLineHighlights.on('mouseenter', hoverLineHighlight);
 		allLineHighlights.on('mouseleave', stopHoverLineHighlight);
 		Y.each(allLineHighlights, function(svgElement){
 			// prepare the text-image-overlay

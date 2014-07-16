@@ -121,7 +121,7 @@ YUI.add('transcript-interaction', function (Y) {
 		//Y.one('svg.diplomatic').delegate('mouseenter', showTooltip, '.text, .bgBox');
 		var allTextElements = Y.all('svg.diplomatic .text, svg.diplomatic .bgBox');
 
-		allTextElements.on('mousemove', function(e) {
+		allTextElements.on('mouseenter', function(e) {
 
 			var info = infoDisplay(e);
 
