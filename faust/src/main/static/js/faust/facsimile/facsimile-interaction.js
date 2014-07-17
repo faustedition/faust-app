@@ -70,7 +70,7 @@ YUI.add('facsimile-interaction', function (Y) {
 		Y.mix(Y.namespace("Faust"), { showingTranscriptOverlay: true });
 
 		var showHideButton = Y.Node.create('<button class="pure-button button-opaque svgpane-show-hide"' +
-			' style="position: absolute; bottom: 2em; left: 1em;"></button>');
+			' style="position: fixed; bottom: 2em; left: 1em;"></button>');
 		showHideButton.append('<i class="icon-font"></i> transcription visible');
 		showHideButton.on("click", function() {
 			var allLines = Y.all('.svgpane-transcript-overlay svg.diplomatic .element-line');
