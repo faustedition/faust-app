@@ -27,15 +27,13 @@ import de.faustedition.FaustURI;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.graph.FaustRelationshipType;
 import de.faustedition.graph.NodeWrapperCollection;
-import eu.interedition.text.Layer;
-import org.codehaus.jackson.JsonNode;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements Comparable<MaterialUnit> {
@@ -53,6 +51,13 @@ public class MaterialUnit extends NodeWrapperCollection<MaterialUnit> implements
 
 	public MaterialUnit(Node node) {
 		super(node, MaterialUnit.class, MATERIAL_PART_OF_RT);
+		// type check
+		try {
+			this.getType();
+		} catch (NotFoundException e) {
+			throw new IllegalArgumentException("Node with id " + node.getId() + " is not a material unit node");
+		}
+
 	}
 
 	public MaterialUnit(Node node, Type type) {

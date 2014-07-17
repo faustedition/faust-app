@@ -19,10 +19,8 @@
 
 package de.faustedition.document;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
+import com.google.common.base.*;
 import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import de.faustedition.FaustURI;
 import de.faustedition.genesis.dating.MacrogeneticRelationManager;
@@ -70,6 +68,8 @@ public class Document extends MaterialUnit {
 
 	public Document(Node node) {
 		super(node);
+		// type check
+		Preconditions.checkArgument(Type.ARCHIVALDOCUMENT.equals(this.getType()));
 	}
 
 	public Document(Node node, Type type, FaustURI source) {

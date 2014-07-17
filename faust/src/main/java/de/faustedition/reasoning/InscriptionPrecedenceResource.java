@@ -19,16 +19,29 @@
 
 package de.faustedition.reasoning;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.FileBackedOutputStream;
+import de.faustedition.FaustURI;
+import de.faustedition.document.Document;
+import de.faustedition.document.MaterialUnit;
 import de.faustedition.genesis.dating.GeneticSource;
+import de.faustedition.genesis.lines.GraphVerseInterval;
+import de.faustedition.genesis.lines.VerseInterval;
+import de.faustedition.genesis.lines.VerseManager;
 import de.faustedition.graph.FaustGraph;
 import de.faustedition.reasoning.PremiseBasedRelation.Premise;
+import de.faustedition.transcript.TranscriptManager;
 import edu.bath.transitivityutils.ImmutableRelation;
 import edu.bath.transitivityutils.Relation;
 import edu.bath.transitivityutils.Relations;
+import eu.interedition.text.neo4j.Neo4jTextRepository;
 import org.hibernate.SessionFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -45,10 +58,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.*;
@@ -71,6 +87,15 @@ public class InscriptionPrecedenceResource extends ServerResource {
 	
 	@Autowired
 	private FaustGraph faustGraph;
+
+	@Autowired
+	private TranscriptManager transcriptManager;
+
+	@Autowired
+	private VerseManager verseManager;
+
+	@Autowired
+	private Neo4jTextRepository textRepo;
 	
 	@Autowired
 	private org.slf4j.Logger logger;
@@ -80,14 +105,18 @@ public class InscriptionPrecedenceResource extends ServerResource {
 
 	@Override
 	protected void doInit() throws ResourceException {
-		/*super.doInit();
+		super.doInit();
 
-		final VerseInterval verseInterval = VerseInterval.fromRequestAttibutes(getRequestAttributes());
-		final Multimap<String, VerseInterval> intervalIndex = Multimaps.index(VerseInterval.forInterval(sessionFactory.getCurrentSession(), verseInterval), new Function<VerseInterval, String>() {
+		final VerseInterval verseInterval = VerseManager.fromRequestAttibutes(getRequestAttributes());
+
+
+
+		final Multimap<String, GraphVerseInterval> intervalIndex = Multimaps.index(verseManager.forInterval(verseInterval), new Function<GraphVerseInterval, String>() {
 			@Override
-			public String apply(@Nullable VerseInterval input) {
-				final Node materialUnitNode = graphDb.getNodeById(input.getTranscript().getMaterialUnitId());
-				final String sigil = MaterialUnit.forNode(materialUnitNode).toString(); // + "_" + materialUnitNode.getId();
+			public String apply(@Nullable GraphVerseInterval input) {
+
+				//final String sigil = transcriptManager.materialUnitForTranscript(input.getTranscript(textRepo)).toString();
+				final String sigil = ((Document)(transcriptManager.materialUnitForTranscript(input.getTranscript(textRepo)))).getSource().toString();
 				return sigil;
 			}
 
@@ -101,8 +130,9 @@ public class InscriptionPrecedenceResource extends ServerResource {
 			}
 			Preconditions.checkState(!inscription.isEmpty());
 			inscriptions.add(inscription);
-			long materialUnitId = intervalIndex.get(sigil).iterator().next().getTranscript().getMaterialUnitId();
-			Node node = graphDb.getNodeById(materialUnitId);
+			//long materialUnitId = intervalIndex.get(sigil).iterator().next().getTranscript(textRepo).getMaterialUnitId();
+			//Node node = graphDb.getNodeById(materialUnitId);
+			Node node = transcriptManager.materialUnitForTranscript(intervalIndex.get(sigil).iterator().next().getTranscript(textRepo)).node;
 			nodeMap.put(inscription, node);
 			
 		}
@@ -151,7 +181,7 @@ public class InscriptionPrecedenceResource extends ServerResource {
 				", Recall: " + Statistics.recall(precedence, check, inscriptions) * 100 +
 				", Accuracy : "+ Statistics.correctness(precedence, check, inscriptions) * 100
 
-				) ;*/
+				) ;
 		
 	}
 

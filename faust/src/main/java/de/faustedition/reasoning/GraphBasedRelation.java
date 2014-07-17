@@ -19,6 +19,8 @@
 
 package de.faustedition.reasoning;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import de.faustedition.FaustURI;
 import de.faustedition.document.Document;
 import edu.bath.transitivityutils.ImmutableRelation;
@@ -37,6 +39,10 @@ public class GraphBasedRelation<E> implements ImmutableRelation<E> {
 	}
 
 	public GraphBasedRelation(Map<E, Node> nodeMap, FaustURI geneticSource) {
+		// type check
+		for (Node node : nodeMap.values()) {
+			Preconditions.checkNotNull(new Document(node));
+		}
 		this.nodeMap = nodeMap;
 		this.geneticSource = geneticSource;
 	}
