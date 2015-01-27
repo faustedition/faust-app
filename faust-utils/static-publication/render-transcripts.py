@@ -56,7 +56,7 @@ def get_doc_src(doc_data):
     return doc_src if doc_src else "Keine URI"
 
 def quote_filename(filename):
-    return urllib.quote_plus(filename.encode('utf-8').replace('.', '_') + u'.png').replace('%', '_')
+    return urllib.quote_plus(filename.encode('utf-8').replace('.', '_')).replace('%', '_')
 
 def generate_out_filepath(page_url, tmp_dir):
         out_filename = quote_filename(page_url)
@@ -68,14 +68,15 @@ def render_document(url, tmp_dir):
         #pagenumbers starting from 1
         pagenum = i + 1 
         out_filepath = generate_out_filepath(page_url, tmp_dir)
+        out_filepath_png = out_filepath + '.png'
         print " rendering page ", pagenum, ": ", page_url
         if not page_url == 'faust://self/none/':
-            if not os.path.exists(out_filepath):
-                print "   (rendering to      " + out_filepath  + ")"
+            if not os.path.exists(out_filepath_png):
+                print "   (rendering to      " + out_filepath_png  + ")"
                 check_call(['phantomjs', 'render-transcript.js', url + '?view=transcript-bare#' + str(i+1), out_filepath]) 
-                check_call(['mogrify', '-resize', '6000x6000', out_filepath])
+                check_call(['mogrify', '-resize', '6000x6000', out_filepath_png])
             else:
-                print "   (already exists at " + out_filepath + ")"
+                print "   (already exists at " + out_filepath_png + ")"
 
 def latex_escape_text(text):
     return text\
@@ -135,7 +136,7 @@ def generate_latex(manuscript_urls, tmp_dir):
                 if "self/none"  in page_url:
                     result = result + u"[Leere Seite]"
                 else: 
-                    transcript_graphic_path = generate_out_filepath(page_url, tmp_dir)
+                    transcript_graphic_path = generate_out_filepath(page_url, tmp_dir) + '.png'
                     if os.path.exists(transcript_graphic_path):
                         result = result + u'\centering\includegraphics[width=\\linewidth,height=0.9\\textheight,keepaspectratio]{' + transcript_graphic_path  + u'}\n'
                     else:

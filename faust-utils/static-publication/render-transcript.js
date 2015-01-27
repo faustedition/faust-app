@@ -2,6 +2,7 @@ var LAYOUT_CHECK_INTERVAL = 1000;
 var LAYOUT_TIMEOUT = 15000;
 
 var page = require('webpage').create(),
+    fs = require('fs'),
     system = require('system'),
     address, output, size;
 
@@ -50,8 +51,23 @@ if (system.args.length < 3 || system.args.length > 5) {
 				return document.getElementsByClassName('diplomatic').length > 0;
 			}
 			
+			function serializeSVG () {
+				    var svgNode = document.getElementsByClassName('diplomatic').item(0);
+				    var serializer = new XMLSerializer();
+				    var serializedSVG = serializer.serializeToString(svgNode);
+				    return serializedSVG;
+
+			}
+
 			function takeScreenshot() {
-                    page.render(output);
+
+				    // save a PNG image
+                    page.render(output + '.png');
+
+				    // save an SVG image
+    			    var serializedSVG = page.evaluate(serializeSVG);
+				    fs.write(output + '.svg', serializedSVG, 'w');
+
                     phantom.exit();				
 			}
 
