@@ -304,22 +304,40 @@ YUI.add('document-app', function (Y) {
 			var page = this.get('pages')[pagenum - 1];
 
 			var initTranscriptView = function (transcript) {
+
+				//fade in after loading
 				that.removeAjaxLoader(diplomaticContent);
 				diplomaticContent.transition({    duration: 0, opacity: 0.2});
 				Y.on('faust:transcript-layout-done', function (e) {
 					diplomaticContent.transition({    duration: 3, opacity: 1});
 				});
 
-//				var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
-//					container: diplomaticContainer.one('.diplomatic-content'),
-//					transcript: transcript,
-//					source: source,
-//					pagenum: pagenum
-//				});
-//				diplomaticTranscriptView.render();
-				var source = page.transcript.source.components[0];
-				var cachedTranscript = source.substring('faust://xml/transcript'.length, source.length - '.xml'.length) + '.svg';
-				that.insertSvgFromUrl(cp + '/transcriptcache/' + cachedTranscript, Y.one('.diplomatic-content'));
+				//try to load a cached SVG layout
+				var sourceUri = page.transcript.source.components[0];
+				var cachedTranscript = sourceUri.substring('faust://xml/transcript'.length, sourceUri.length - '.xml'.length) + '.svg';
+				Y.io(cp + '/transcriptcache/' + cachedTranscript, {
+						on: {
+							success: function (id, o, args) {
+								Y.one('.diplomatic-content').append(o.responseText);
+								Y.fire('faust:transcript-layout-done', {});
+							},
+
+							//if there is no cached version, fall back to layout client-side
+							failure: function (id, o, args) {
+								//load the layout module dynamically
+								Y.use('transcript-view', function() {
+									var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
+										container: diplomaticContainer.one('.diplomatic-content'),
+										transcript: transcript,
+										source: page.transcript.source,
+										pagenum: pagenum
+									});
+									diplomaticTranscriptView.render();
+								})
+							}
+						}
+					}
+				);
 				//Y.one('.diplomatic-content').append('<h3>Placeholder</h3>');
 			};
 
@@ -341,19 +359,6 @@ YUI.add('document-app', function (Y) {
 
 			structureView.render();
 
-		},
-
-		insertSvgFromUrl: function(url, container) {
-			Y.io(url, {
-					on: {
-						success: function (id, o, args) {
-						    container.append(o.responseText);
-							Y.fire('faust:transcript-layout-done', {});
-
-						}
-					}
-				}
-			);
 		},
 
 		updateTextView: function () {
@@ -513,7 +518,7 @@ YUI.add('document-app', function (Y) {
 
 
 }, '0.0', {
-	requires: ["app", "node", "event", "slider", "document", /*"transcript-view",*/ "transcript-interaction",
+	requires: ["app", "node", "event", "slider", "document", /*"transcript-view"*/, "transcript-interaction",
 		"document-structure-view", "button", "dd-plugin", "resize-plugin", "util",
 		"text-display", "materialunit", "facsimile", "facsimile-svgpane", "facsimile-interaction",
 		"facsimile-navigation-buttons", "facsimile-navigation-mouse", "facsimile-navigation-keyboard"]
