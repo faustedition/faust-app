@@ -288,6 +288,8 @@ YUI.add('document-app', function (Y) {
 			}
 		},
 
+
+
 		updateDiplomaticTranscriptView: function () {
 			var pagenum = this.get('model').get('pagenumber');
 			var diplomaticContainer = Y.one('.diplomatic-container');
@@ -308,13 +310,16 @@ YUI.add('document-app', function (Y) {
 					diplomaticContent.transition({    duration: 3, opacity: 1});
 				});
 
-				var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
-					container: diplomaticContainer.one('.diplomatic-content'),
-					transcript: transcript,
-					source: source,
-					pagenum: pagenum
-				});
-				diplomaticTranscriptView.render();
+//				var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
+//					container: diplomaticContainer.one('.diplomatic-content'),
+//					transcript: transcript,
+//					source: source,
+//					pagenum: pagenum
+//				});
+//				diplomaticTranscriptView.render();
+
+				that.insertSvgFromUrl(cp + '/static/img/logo.svg', Y.one('.diplomatic-content'));
+				//Y.one('.diplomatic-content').append('<h3>Placeholder</h3>');
 			};
 
 			if (page.transcript && page.transcript.source) {
@@ -336,6 +341,17 @@ YUI.add('document-app', function (Y) {
 
 			structureView.render();
 
+		},
+
+		insertSvgFromUrl: function(url, container) {
+			Y.io(url, {
+					on: {
+						success: function (id, o, args) {
+						    container.append(Y.one(o.responseXML).one('svg'));
+						}
+					}
+				}
+			);
 		},
 
 		updateTextView: function () {
