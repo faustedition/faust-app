@@ -317,13 +317,13 @@ YUI.add('document-app', function (Y) {
 //					pagenum: pagenum
 //				});
 //				diplomaticTranscriptView.render();
-
-				that.insertSvgFromUrl(cp + '/static/img/logo.svg', Y.one('.diplomatic-content'));
+				var source = page.transcript.source.components[0];
+				var cachedTranscript = source.substring('faust://xml/transcript'.length, source.length - '.xml'.length) + '.svg';
+				that.insertSvgFromUrl(cp + '/transcriptcache/' + cachedTranscript, Y.one('.diplomatic-content'));
 				//Y.one('.diplomatic-content').append('<h3>Placeholder</h3>');
 			};
 
 			if (page.transcript && page.transcript.source) {
-				var source = page.transcript.source;
 				page.transcriptionFromRanges(initTranscriptView);
 			} else {
 				initTranscriptView(null);
@@ -347,7 +347,9 @@ YUI.add('document-app', function (Y) {
 			Y.io(url, {
 					on: {
 						success: function (id, o, args) {
-						    container.append(Y.one(o.responseXML).one('svg'));
+						    container.append(o.responseText);
+							Y.fire('faust:transcript-layout-done', {});
+
 						}
 					}
 				}
@@ -511,7 +513,7 @@ YUI.add('document-app', function (Y) {
 
 
 }, '0.0', {
-	requires: ["app", "node", "event", "slider", "document", "transcript-view", "transcript-interaction",
+	requires: ["app", "node", "event", "slider", "document", /*"transcript-view",*/ "transcript-interaction",
 		"document-structure-view", "button", "dd-plugin", "resize-plugin", "util",
 		"text-display", "materialunit", "facsimile", "facsimile-svgpane", "facsimile-interaction",
 		"facsimile-navigation-buttons", "facsimile-navigation-mouse", "facsimile-navigation-keyboard"]

@@ -59,7 +59,9 @@ def quote_filename(filename):
     return urllib.quote_plus(filename.encode('utf-8').replace('.', '_')).replace('%', '_')
 
 def generate_out_filepath(page_url, tmp_dir):
-        out_filename = quote_filename(page_url)
+        #out_filename = quote_filename(page_url)
+        #cutoff .xml extension, latex can't handle it
+        out_filename = page_url[len('faust://xml/transcript/'):-len('.xml')]
         return os.path.join(tmp_dir, 'graphics',  out_filename)
 
 def render_document(url, tmp_dir):    

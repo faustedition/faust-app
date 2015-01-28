@@ -106,10 +106,12 @@ public class FaustApplication extends Application implements InitializingBean {
 	private LdapSecurityStore ldapSecurityStore;
 
 	private String staticResourcePath;
+	private String transcriptCacheResourcePath;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		this.staticResourcePath = environment.getRequiredProperty("static.home");
+		this.transcriptCacheResourcePath = environment.getRequiredProperty("transcriptcache.home");
 		this.getMetadataService().setDefaultCharacterSet(CharacterSet.UTF_8);
 	}
 
@@ -141,6 +143,7 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("transcript/by-verse/{from}/{to}", secured(transactional(contextResource(VerseStatisticsResource.class))));
 		router.attach("transcript/source/{id}", secured(transactional(contextResource(TranscriptSourceResource.class))));
 		router.attach("transcript/{id}", secured(transactional(contextResource(TranscriptViewResource.class))));
+		router.attach("transcriptcache/", new Directory(getContext().createChildContext(), "file://" + transcriptCacheResourcePath + "/"));
 		router.attach("xml/", secured(xmlFinder));
 		router.attach("", EntryPageRedirectionResource.class, Template.MODE_EQUALS);
 		router.attach("login/", secured(new Finder(getContext().createChildContext(), EntryPageRedirectionResource.class)));
