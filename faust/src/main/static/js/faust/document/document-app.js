@@ -518,7 +518,7 @@ YUI.add('document-app', function (Y) {
 
 
 }, '0.0', {
-	requires: ["app", "node", "event", "slider", "document", /*"transcript-view"*/, "transcript-interaction",
+	requires: ["app", "node", "event", "slider", "document", "text-annotation", "transcript-interaction",
 		"document-structure-view", "button", "dd-plugin", "resize-plugin", "util",
 		"text-display", "materialunit", "facsimile", "facsimile-svgpane", "facsimile-interaction",
 		"facsimile-navigation-buttons", "facsimile-navigation-mouse", "facsimile-navigation-keyboard"]
