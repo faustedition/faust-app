@@ -52,7 +52,7 @@ public abstract class AbstractDocumentFinder extends Finder {
 
 		try {
 
-			final DocumentPath docPath = getDocument(request);
+			final DocumentPath docPath = getDocument(request.getResourceRef().getRelativeRef().getPath());
 			final Document document = docPath.document;
 			final Deque<String> remainder = docPath.remainder;
 			final Deque<String> walked = docPath.walked;
@@ -73,8 +73,8 @@ public abstract class AbstractDocumentFinder extends Finder {
 
 	}
 
-	protected DocumentPath getDocument(Request request) {
-		final Deque<String> path = FaustURI.toPathDeque(request.getResourceRef().getRelativeRef().getPath());
+	protected DocumentPath getDocument(String requestPath) {
+		final Deque<String> path = FaustURI.toPathDeque(requestPath);
 		path.addFirst("document");
 
 		logger.debug("Finding document resource for " + path);

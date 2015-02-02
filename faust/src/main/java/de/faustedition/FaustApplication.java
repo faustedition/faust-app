@@ -25,6 +25,7 @@ import de.faustedition.document.DocumentRouter;
 import de.faustedition.facsimile.FacsimileFinder;
 import de.faustedition.genesis.dating.GeneticGraphRouter;
 import de.faustedition.genesis.lines.VerseVariantResource;
+import de.faustedition.query.QueryResource;
 import de.faustedition.reasoning.InscriptionPrecedenceResource;
 import de.faustedition.search.SearchResource;
 import de.faustedition.security.LdapSecurityStore;
@@ -135,6 +136,7 @@ public class FaustApplication extends Application implements InitializingBean {
 		router.attach("genesis/variants", secured(transactional(contextResource(VerseVariantResource.class))));
 		router.attach("genesis/", secured(transactional(geneticGraphRouter)));
 		router.attach("project/", templateFinder);
+		router.attach("query/{term}", secured(transactional(contextResource(QueryResource.class))));
 		router.attach("static/", new Directory(getContext().createChildContext(), "file://" + staticResourcePath + "/"));
 		router.attach("search/{term}", secured(transactional(contextResource(SearchResource.class))));
 		router.attach("structure/", secured(transactional(structureFinder)));
