@@ -412,6 +412,8 @@ YUI.add('document-app', function (Y) {
 			this.updateTextView();
 			this.updateViewMode(this.get('model').get('viewMode'));
 
+			this.updateStructureView();
+
 		}
 
 	}, {
@@ -506,10 +508,8 @@ YUI.add('document-app', function (Y) {
 						  fd: fd,
 						  pages: pages
 					  });
-				  });
-
-
-			  };
+			});
+		};
 	};
 
 	Y.mix(Y.namespace("Faust"), {

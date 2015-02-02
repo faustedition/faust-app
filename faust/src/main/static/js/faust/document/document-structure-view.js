@@ -50,8 +50,7 @@ YUI.add('document-structure-view', function (Y) {
 			//***** main *****
 
 			FaustStructure.render = function(document, container) {
-				paper = Raphael(container.getDOMNode(), 800, 600,
-								100);
+				paper = Raphael(container.getDOMNode(), minLength * 1.3, 600);
 
 				var envelope = new FaustStructure.Envelope();
 

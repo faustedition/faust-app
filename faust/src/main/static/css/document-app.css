@@ -1,0 +1,21 @@
+.structure-container {
+    z-index: 20;
+    height: 50px;
+    position: absolute;
+    top: 4em;
+    right: 0em;
+
+}
+
+.structureContent {
+    background-color: white;
+    opacity: 0.3;
+    transition-duration: 1s;
+}
+
+.structureContent:hover {
+    opacity: 0.8;
+    transition-duration: 1s;
+}
+
+

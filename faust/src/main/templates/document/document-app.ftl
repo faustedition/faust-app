@@ -4,6 +4,7 @@
 	<#assign title>${callnumber?html}<#if waId?has_content> &ndash; ${waId?html}</#if></#assign>
 	<#assign imageLinkBase>${cp}/document/imagelink/${document.source?replace('faust://xml/document/', '')}</#assign>
 	<#assign header>
+	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-app.css"/>
 	<link rel="stylesheet" type="text/css" href="${cp}/static/css/document-text.css"/>
     <link rel="stylesheet" type="text/css" href="${cp}/static/css/document-transcript.css"/>
     <link rel="stylesheet" type="text/css" id="style-document-transcript-highlight-hands" href="${cp}/static/css/document-transcript-highlight-hands.css"/>
@@ -42,6 +43,10 @@
 
 	</div>
 	<div id="document-navigation" style="z-index: 20; height: 50px; position: absolute; top: 1em; left: 2em;"></div>
+	<div class="structure-container">
+		<div class="structureContent"></div>
+	</div>
+
 	<div id="document-mode" style="z-index: 20; position: fixed; bottom: 2em; right: 2em;"></div>
 	<script type="text/javascript">
 
