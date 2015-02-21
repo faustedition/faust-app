@@ -9,7 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author <a href="http://gregor.middell.net/" title="Homepage">Gregor Middell</a>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/application-context.xml"}, loader = CustomContextLoader.class)
+@ContextConfiguration(locations = {"classpath:/application-context.xml", "classpath:/test-context.xml"},
+		loader = CustomContextLoader.class)
 @Transactional
 public abstract class AbstractContextTest {
 
