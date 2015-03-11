@@ -147,6 +147,9 @@ public class DocumentDescriptorHandler extends DefaultHandler {
 					case DOCUMENT:
 					case ARCHIVALDOCUMENT:
 						unit = new Document(db.createNode(), type, source);
+						FaustURI canonicURI = new FaustURI(FaustAuthority.DOCUMENT,
+								this.source.getPath().substring("/document".length()));
+						unit.setMetadata("uri",	new String[]{canonicURI.toString()});
 						break;
 					default:
 						unit = new MaterialUnit(db.createNode(), type);

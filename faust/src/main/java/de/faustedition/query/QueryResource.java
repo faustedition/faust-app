@@ -40,6 +40,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
 
 @Component
@@ -84,7 +85,7 @@ public class QueryResource extends ServerResource {
 						@Override
 						public String apply(@Nullable Document input) {
 
-							return Objects.firstNonNull(input.getMetadata("uri"), "X").toString();
+							return Iterables.getFirst(Arrays.asList(input.getMetadata("uri")), "none");
 						}
 					});
 
