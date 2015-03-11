@@ -315,7 +315,7 @@ YUI.add('document-app', function (Y) {
 				//try to load a cached SVG layout
 				var sourceUri = page.transcript.source.components[0];
 				var cachedTranscript = sourceUri.substring('faust://xml/transcript'.length, sourceUri.length - '.xml'.length) + '.svg';
-				Y.io(cp + '/transcriptcache/' + cachedTranscript, {
+				Y.io(cp + '/transcriptcache/transcript/' + cachedTranscript, {
 						on: {
 							success: function (id, o, args) {
 								Y.one('.diplomatic-content').append(o.responseText);
