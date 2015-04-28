@@ -1,0 +1,112 @@
+svg.diplomatic .bgBox {
+    /* initially hide text background */
+    opacity: 0;
+}
+
+svg.diplomatic .bgBox.highlight {
+    opacity: 1;
+    stroke: #ffc20e;
+    stroke-width: 0.1em;
+}
+
+.tooltip-hand {
+    font-style: normal;
+    font-weight: bold;
+    margin-right: 0.3em;
+}
+
+.tooltip-material {
+    font-style: italic;
+    font-weight: normal;
+    margin-right: 0.3em;
+}
+
+.tooltip-script {
+    font-style: normal;
+    font-weight: normal;
+    margin-right: 0.3em;
+}
+
+.tooltip-decoration {
+    margin-top: 1em;
+}
+
+.tooltip-property {
+    margin-top: 1em;
+}
+
+/* text properties */
+
+.tooltip-caption-property-under:before {content: 'written underneath';}
+.tooltip-caption-property-over:before {content: 'Overwriting';}
+.tooltip-caption-property-patch:before {content: 'Glued on';}
+.tooltip-caption-property-interline:before {content: 'inserted Line';}
+.tooltip-caption-property-inbetween:before {content: 'written in-between';}
+.tooltip-caption-property-gap:before {content: 'illegible';}
+.tooltip-caption-property-supplied:before {content: 'editorial addition';}
+.tooltip-caption-property-unclear-cert-high:before {content: 'uncertain reading (probable)';}
+.tooltip-caption-property-unclear-cert-low:before {content: 'uncertain reading (possible)';}
+.tooltip-caption-property-used:before {content: 'marked as used';}
+
+/* text decorations */
+
+.tooltip-caption-decoration-underline:before {content: 'underlined';}
+.tooltip-caption-decoration-overline:before {content: 'overlined';}
+.tooltip-caption-decoration-strikethrough:before {content: 'struck through';}
+.tooltip-caption-decoration-underdots:before {content: 'underdotted';}
+.tooltip-caption-decoration-rewrite:before {content: 'rewritten (fixated)';}
+.tooltip-caption-decoration-erase:before {content: 'erasure';}
+
+/* inline decorations */
+.tooltip-caption-decoration-rect:before {content: 'boxed in';}
+.tooltip-caption-decoration-circle:before {content: 'circled';}
+
+/* scribal hands */
+
+.tooltip-caption-hand-g:before {content: 'Goethe';}
+.tooltip-caption-hand-aj:before {content: 'Anna Jameson';}
+.tooltip-caption-hand-ec:before {content: 'Eckermann';}
+.tooltip-caption-hand-f:before {content: 'Färber';}
+.tooltip-caption-hand-gt:before {content: 'Geist';}
+.tooltip-caption-hand-gh:before {content: 'Goechhausen';}
+.tooltip-caption-hand-go:before {content: 'Goettling';}
+.tooltip-caption-hand-hd:before {content: 'Herder';}
+.tooltip-caption-hand-jo:before {content: 'John';}
+.tooltip-caption-hand-kr:before {content: 'Kräuter';}
+.tooltip-caption-hand-m:before {content: 'Müller';}
+.tooltip-caption-hand-ovg:before {content: 'Ottilie von Goethe';}
+.tooltip-caption-hand-re:before {content: 'Reichel';}
+.tooltip-caption-hand-ri:before {content: 'Riemer';}
+.tooltip-caption-hand-st:before {content: 'Schuchardt';}
+.tooltip-caption-hand-sd:before {content: 'Seidler';}
+.tooltip-caption-hand-so:before {content: 'Soret';}
+.tooltip-caption-hand-sp:before {content: 'Spiegel';}
+.tooltip-caption-hand-sta:before {content: 'Stadelmann';}
+.tooltip-caption-hand-sti:before {content: 'Stieler';}
+.tooltip-caption-hand-ve:before {content: 'Varnhagen von Ense';}
+.tooltip-caption-hand-v:before {content: 'Helene Vulpius';}
+.tooltip-caption-hand-we:before {content: 'Weller';}
+.tooltip-caption-hand-wi:before {content: 'Maria Anna Katharina Theresia Willemer, genannt Marianne';}
+.tooltip-caption-hand-wo:before {content: 'Pius Alexander Wolff';}
+.tooltip-caption-hand-avg:before {content: 'August von Goethe';}
+.tooltip-caption-hand-w-owvg:before {content: 'Walther oder Wolfgang von Goethe';}
+.tooltip-caption-hand-wvg:before {content: 'Wolfgang von Goethe';}
+.tooltip-caption-hand-sc:before {content: 'scribe\'s hand';}
+.tooltip-caption-hand-zs:before {content: 'contemporary hand';}
+.tooltip-caption-hand-xx:before {content: 'external hand #1';}
+.tooltip-caption-hand-xy:before {content: 'external hand #2';}
+.tooltip-caption-hand-xz:before {content: 'external hand #3';}
+
+/* materials */
+
+.tooltip-caption-material-t:before {content: 'Ink';}
+.tooltip-caption-material-tr:before {content: 'red/brown Ink';}
+.tooltip-caption-material-bl:before {content: 'pencil';}
+.tooltip-caption-material-ro:before {content: 'reddle';}
+.tooltip-caption-material-ko:before {content: 'charcoal';}
+.tooltip-caption-material-blau:before {content: 'blue pencil';}
+
+/* script */
+
+.tooltip-caption-script-lat:before {content: 'Latin script';}
+.tooltip-caption-script-gr:before {content: 'Greek script';}

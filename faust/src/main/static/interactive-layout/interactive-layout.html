@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html class="yui3-loading">
+<head>
+	<title>Digitale Faust-Edition: Transcript Live Preview</title>
+
+
+	<!-- http://purecss.io/ -->
+	<link rel="stylesheet" href="/static/css/pure-min.css">
+	<!-- http://fortawesome.github.io/Font-Awesome/ -->
+	<!--<link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">-->
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+	<!-- http://www.google.com/fonts/: light, normal, medium, bold -->
+	<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,300italic,400,400italic,500,500italic,700,700italic" rel="stylesheet" type="text/css">
+	<!-- http://www.google.com/fonts/: normal, bold -->
+	<link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,400italic,700,700italic" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="/static/css/pure-custom.css">
+	<link rel="stylesheet" href="/static/css/style.css">
+
+	<!--<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>-->
+
+	<link rel="stylesheet" type="text/css" href="/static/yui3/build/cssreset/reset-min.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/yui3/build/cssgrids/grids-min.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/yui3/build/cssbase/base-min.css"/>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/faust.css"/>
+
+	<script type="text/javascript">
+		var cp = '';
+		var Faust = { contextPath: ''};
+	</script>
+	<script type="text/javascript" src="/static/yui3/build/yui/yui-debug.js"></script>
+	<script type="text/javascript" src="/static/js/yui-config.js"></script>
+	<script type="text/javascript" src="/static/js/faust.js"></script>
+
+	<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+	<link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" />
+	<meta name="DC.format" scheme="DCTERMS.IMT" content="text/html" />
+	<meta name="DC.type" scheme="DCTERMS.DCMIType" content="Text" />
+	<meta name="DC.publisher" content="Digitale Faust-Edition" />
+	<meta name="DC.creator" content="Digitale Faust-Edition" />
+	<meta name="DC.subject" content="Faust, Johann Wolfgang von Goethe, Historisch-kritische Edition, digital humanities" />
+	<!--
+	<meta name="DCTERMS.license"  scheme="DCTERMS.URI" content="http://www.gnu.org/copyleft/fdl.html">
+	<meta name="DCTERMS.rightsHolder" content="Wikimedia Foundation Inc.">
+	 -->
+
+	<link rel="stylesheet" type="text/css" href="/static/css/document-app.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/document-text.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/document-transcript.css"/>
+	<link rel="stylesheet" type="text/css" id="style-document-transcript-highlight-hands" href="/static/css/document-transcript-highlight-hands.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/document-transcript-interaction-en.css"/>
+
+	<style>.narrow-menu li a {margin: 0.1em;}</style>
+
+
+</head>
+<body class="yui3-skin-sam layout-wide">
+
+<header class="compressed">
+	<div class="center">
+		<a class="logo" href="http://faustedition.de" title="Faustedition">
+			<img src="/static/img/logo.svg" width="380" height="30" alt="Faustedition">
+		</a>
+
+		<nav class="example-links pure-menu pure-menu-open pure-menu-horizontal pure-right">
+			<ul class="pure-menu-list narrow-menu">
+				<li ><a href="/static/interactive-layout/example-xml/01.xml">01</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/04.xml">04</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/05.xml">05</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/06.xml">06</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/07.xml">07</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/08.xml">08</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/09.xml">09</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/10.xml">10</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/11.xml">11</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/12.xml">12</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/13.xml">13</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/14.xml">14</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/15.xml">15</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/16.xml">16</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/17.xml">17</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/18.xml">18</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/19.xml">19</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/20.xml">20</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/21.xml">21</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/22.xml">22</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/23.xml">23</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/24.xml">24</a></li>
+				<li ><a href="/static/interactive-layout/example-xml/25.xml">25</a></li>
+
+			</ul>
+		</nav>
+	</div>
+
+</header>
+
+
+<div id="main" class="layout-wide">
+
+	<div class="yui3-g">
+		<div class="yui3-u-1-2">
+			<textarea id="xmlInput" style="width: 95%; height: 40em;"></textarea>
+		</div>
+
+			<div class="yui3-u-1-2 diplomatic-container">
+				<div id="svgResult" class="diplomatic-content" style="overflow: scroll; width: 100%; height: 40em;"></div>
+				<div id="statusDisplay" style="position: absolute; left: 70%; top: 40%"></div>
+			</div>
+
+	</div>
+</div>
+
+<footer>
+	<b>Digitale Faust-Edition</b> • Copyright (c) 2009-2014 • Freies Deutsches Hochstift Frankfurt • Klassik Stiftung Weimar • Universität Würzburg
+</footer>
+
+<script type="text/javascript">
+	YUI().use("node", "event", "io", "transcript-view", "transcript-interaction", function(Y) {
+		Y.one("html").removeClass("yui3-loading");
+
+		Y.on('faust:transcript-layout-done', function() {
+			statusDisplay('none');
+			Y.fire('faust:transcript-overlay-done');
+		});
+
+		Y.on('faust:encoding-error', function() {statusDisplay('error')});
+
+
+		var lastChanged = 0;
+
+		function statusDisplay (status) {
+			var display = Y.one('#statusDisplay');
+			display.empty();
+			if (status === 'refresh')
+				display.append('<i class="fa fa-3x fa-refresh fa-spin"></i>');
+			else if (status === 'error')
+				display.append('<i class="fa fa-3x fa-ban"></i>');
+		}
+
+		function updateSVG () {
+
+			statusDisplay('refresh');
+			Y.io("/", {
+				method: "POST",
+				data: Y.one("#xmlInput").get("value"),
+				headers: {"Content-Type":"text/xml"},
+				on: {
+					success: function(id, o, a) {
+						var svgResult = Y.one("#svgResult");
+						svgResult.empty(); //.append(o.response);
+						var diplomaticTranscriptView = new Y.FaustTranscript.DiplomaticTranscriptView({
+							container: svgResult,
+							transcript: Y.JSON.parse(o.responseText),
+							source: "",
+							pagenum: 1
+						});
+						diplomaticTranscriptView.render();
+					},
+					failure: function(id, o, a) {
+						Y.log("ERROR " + id + " " + a, "info", "Faust")
+						statusDisplay('error');
+					}
+				}
+			});
+
+		}
+
+		Y.one("#xmlInput").on("valuechange", function(){
+
+			statusDisplay('refresh');
+
+			// deferred processing
+			var timeOfChange = Date.now();
+			lastChanged = timeOfChange;
+			setTimeout(function(){
+				// has no other change happened in the meantime?
+				if (timeOfChange === lastChanged) {
+					updateSVG();
+				}
+			}, 3000)
+		});
+
+		function loadExample (link) {
+			var href = link.getAttribute('href');
+			Y.io(href, {
+				method: "GET",
+				on: {
+					success: function(id, o, a) {
+						var xmlInput = Y.one("#xmlInput");
+						xmlInput.set('value', o.responseText);
+						updateSVG();
+					},
+					failure: function(id, o, a) {
+						Y.log("ERROR " + id + " " + a, "info", "Faust")
+						statusDisplay('error');
+
+					}
+
+				}
+			});
+		}
+
+		Y.all(".example-links li a").on("click", function(e){
+			e.preventDefault();
+			loadExample(e.target);
+
+		});
+
+		loadExample(Y.one(".example-links li a"));
+	});
+</script>
+</body>
+</html>

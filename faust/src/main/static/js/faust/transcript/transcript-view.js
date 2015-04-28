@@ -133,8 +133,10 @@ YUI.add('transcript-view', function (Y) {
 					visComponent.render();
 					this.relayout(visComponent, svgRoot, innerContainer, container);
 				} catch (error) {
-					if (typeof error === 'string' && error.substring(0, Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX.length) === Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX)
+					if (typeof error === 'string' && error.substring(0, Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX.length) === Y.FaustTranscript.ENCODING_EXCEPTION_PREFIX) {
+						Y.fire('faust:encoding-error');
 						this.displayError(error);
+					}
 					else
 						throw (error);
 				}
