@@ -62,8 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
-import static eu.interedition.text.TextConstants.TEI_NS;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -144,40 +142,11 @@ public class TranscriptManager {
 		}
 	}
 
-	protected XMLTransformerConfigurationBase<JsonNode> configure(XMLTransformerConfigurationBase<JsonNode> conf, MaterialUnit materialUnit) {
-		conf.addLineElement(new Name(TEI_NS, "text"));
-		conf.addLineElement(new Name(TEI_NS, "div"));
-		conf.addLineElement(new Name(TEI_NS, "head"));
-		conf.addLineElement(new Name(TEI_NS, "sp"));
-		conf.addLineElement(new Name(TEI_NS, "stage"));
-		conf.addLineElement(new Name(TEI_NS, "speaker"));
-		conf.addLineElement(new Name(TEI_NS, "lg"));
-		conf.addLineElement(new Name(TEI_NS, "l"));
-		conf.addLineElement(new Name(TEI_NS, "p"));
-		conf.addLineElement(new Name(TEI_NS, "ab"));
-		conf.addLineElement(new Name(TEI_NS, "line"));
-		conf.addLineElement(new Name(TEI_SIG_GE, "document"));
+	protected static XMLTransformerConfigurationBase<JsonNode> configure(XMLTransformerConfigurationBase<JsonNode> conf, MaterialUnit materialUnit) {
 
-		conf.addContainerElement(new Name(TEI_NS, "text"));
-		conf.addContainerElement(new Name(TEI_NS, "div"));
-		conf.addContainerElement(new Name(TEI_NS, "lg"));
-		conf.addContainerElement(new Name(TEI_NS, "subst"));
-		conf.addContainerElement(new Name(TEI_NS, "choice"));
-		conf.addContainerElement(new Name(TEI_NS, "zone"));
+		TranscriptTransformerConfiguration.configure(conf);
 
-		conf.exclude(new Name(TEI_NS, "teiHeader"));
-		conf.exclude(new Name(TEI_NS, "front"));
-		conf.exclude(new Name(TEI_NS, "app"));
-
-		conf.include(new Name(TEI_NS, "lem"));
-
-		final List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
-		modules.add(new LineElementXMLTransformerModule<JsonNode>());
-		modules.add(new NotableCharacterXMLTransformerModule<JsonNode>());
-		modules.add(new TextXMLTransformerModule<JsonNode>());
-		modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
-		modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
-
+		List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
 		switch (materialUnit.getType()) {
 			case ARCHIVALDOCUMENT:
 			case DOCUMENT:
@@ -194,4 +163,5 @@ public class TranscriptManager {
 
 		return conf;
 	}
+
 }

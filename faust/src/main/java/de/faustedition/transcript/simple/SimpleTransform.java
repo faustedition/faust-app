@@ -23,8 +23,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import de.faustedition.document.MaterialUnit;
 import de.faustedition.json.CompactTextModule;
+import de.faustedition.transcript.TranscriptTransformerConfiguration;
 import de.faustedition.transcript.input.HandsXMLTransformerModule;
 import de.faustedition.transcript.input.StageXMLTransformerModule;
+import de.faustedition.transcript.input.WhitespaceXMLTransformerModule;
 import eu.interedition.text.*;
 import eu.interedition.text.simple.SimpleLayer;
 import eu.interedition.text.simple.SimpleTextRepository;
@@ -47,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.*;
 
 import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
@@ -61,38 +64,11 @@ import static eu.interedition.text.TextConstants.TEI_NS;
 public class SimpleTransform {
 
 	protected static XMLTransformerConfigurationBase<JsonNode> configure(XMLTransformerConfigurationBase<JsonNode> conf, MaterialUnit.Type type) {
-		conf.addLineElement(new Name(TEI_NS, "text"));
-		conf.addLineElement(new Name(TEI_NS, "div"));
-		conf.addLineElement(new Name(TEI_NS, "head"));
-		conf.addLineElement(new Name(TEI_NS, "sp"));
-		conf.addLineElement(new Name(TEI_NS, "stage"));
-		conf.addLineElement(new Name(TEI_NS, "speaker"));
-		conf.addLineElement(new Name(TEI_NS, "lg"));
-		conf.addLineElement(new Name(TEI_NS, "l"));
-		conf.addLineElement(new Name(TEI_NS, "p"));
-		conf.addLineElement(new Name(TEI_NS, "ab"));
-		conf.addLineElement(new Name(TEI_NS, "line"));
-		conf.addLineElement(new Name(TEI_SIG_GE, "document"));
 
-		conf.addContainerElement(new Name(TEI_NS, "text"));
-		conf.addContainerElement(new Name(TEI_NS, "div"));
-		conf.addContainerElement(new Name(TEI_NS, "lg"));
-		conf.addContainerElement(new Name(TEI_NS, "subst"));
-		conf.addContainerElement(new Name(TEI_NS, "choice"));
-		conf.addContainerElement(new Name(TEI_NS, "zone"));
 
-		conf.exclude(new Name(TEI_NS, "teiHeader"));
-		conf.exclude(new Name(TEI_NS, "front"));
-		conf.exclude(new Name(TEI_NS, "app"));
+		TranscriptTransformerConfiguration.configure(conf);
 
-		conf.include(new Name(TEI_NS, "lem"));
-
-		final List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
-		modules.add(new LineElementXMLTransformerModule<JsonNode>());
-		modules.add(new NotableCharacterXMLTransformerModule<JsonNode>());
-		modules.add(new TextXMLTransformerModule<JsonNode>());
-		modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
-		modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
+		List<XMLTransformerModule<JsonNode>> modules = conf.getModules();
 
 		switch (type) {
 			case ARCHIVALDOCUMENT:
@@ -101,6 +77,7 @@ public class SimpleTransform {
 				break;
 			case PAGE:
 				modules.add(new HandsXMLTransformerModule(conf));
+				modules.add(new WhitespaceXMLTransformerModule(conf));
 				// modules.add(new FacsimilePathXMLTransformerModule(materialUnit));
 				break;
 			default: break;
@@ -145,6 +122,7 @@ public class SimpleTransform {
 				return new SimpleLayer<JsonNode>(name, "", objectMapper.valueToTree(attributes), anchors, null);
 			}
 		}, MaterialUnit.Type.PAGE);
+
 
 		final SimpleLayer<JsonNode> transcriptLayer = (SimpleLayer<JsonNode>) new XMLTransformer<JsonNode>(conf).transform(sourceLayer);
 

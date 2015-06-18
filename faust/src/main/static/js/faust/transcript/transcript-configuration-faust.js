@@ -43,7 +43,7 @@ YUI.add('transcript-configuration-faust', function (Y) {
 	Y.mix(Y.namespace("Faust"), {
 		TranscriptConfiguration: 	 {
 			overlay : "overlay",
-			stripWhitespace : ['overw'],
+			stripWhitespace : ['overw'], // elements in which whitespace is stripped
 			initialize : function (layoutState) {
 				layoutState.idMap = {};
 			},
