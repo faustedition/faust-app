@@ -268,6 +268,10 @@ YUI.add('svg-utils', function (Y) {
 		function fitToUnitSquare(element, targetBBox) {
 			var bbox = element.getBBox();
 
+			// hack: make all lines the same height
+			bbox.height = targetBBox.height * .15;
+			bbox.y = -bbox.height;
+
 			var translate1 = element.ownerSVGElement.createSVGTransform();
 			var scale1 = element.ownerSVGElement.createSVGTransform();
 			var translate2 = element.ownerSVGElement.createSVGTransform();
