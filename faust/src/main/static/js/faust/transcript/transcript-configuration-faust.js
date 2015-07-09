@@ -356,6 +356,8 @@ YUI.add('transcript-configuration-faust', function (Y) {
 
 				'rdg' : { vc: function(){return new Y.FaustTranscript.InlineViewComponent();}},
 
+				'reg' : { vc: function() {return new Y.FaustTranscript.InlineViewComponent();}},
+
 				'rewrite' : {
 
 					text: function (annotation, textVC, layoutState) {
