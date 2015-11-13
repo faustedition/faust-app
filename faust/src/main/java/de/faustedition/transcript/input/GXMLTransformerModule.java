@@ -48,7 +48,7 @@ public class GXMLTransformerModule extends XMLTransformerModuleAdapter<JsonNode>
 			.put("#g_transp_2a", "⫢")
 			.put("#g_transp_3", "⫢")
 			.put("#g_transp_3S", "⎱")
-			// .put("#g_transp_4", "") // TODO: implement custom glyph
+			.put("#g_transp_4", "+") // TODO: implement custom glyph
 			.put("#g_transp_5", "✓")
 			.put("#g_transp_6", "#")
 			.put("#g_transp_7", "◶")
