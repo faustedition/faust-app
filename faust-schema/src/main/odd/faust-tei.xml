@@ -248,7 +248,20 @@
 							</attDef>
 						</attList>
 					</classSpec>
-
+					
+					<elementSpec ident="corr" module="core" mode="change">
+						<attList>
+							<attDef ident="type" mode="change">
+								<valList mode="add" type="closed">
+									<valItem ident="correction">
+										<desc>Korrektur eines trivialen Fehlers.</desc>
+									</valItem>
+									<!-- primarily without the following values: emendation, conjecture, see https://faustedition.uni-wuerzburg.de/xml/schema/printed_editions_neu.rng -->
+								</valList>
+							</attDef>
+						</attList>
+					</elementSpec>
+					
 					<!-- ================== TEI-SIG Genetic Editions: START ================== -->
 
 					<classSpec ident="att.staged" type="atts" mode="add" module="tei">
