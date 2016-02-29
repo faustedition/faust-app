@@ -37,17 +37,17 @@
 	<repositories>
 		<repository>
 			<id>faustedition-releases</id>
-			<url>https://faustedition.uni-wuerzburg.de/nexus/content/repositories/releases</url>
+			<url>http://faustedition.uni-wuerzburg.de/nexus/content/repositories/releases</url>
 		</repository>
 	</repositories>
 	<distributionManagement>
 		<repository>
 			<id>faustedition-releases</id>
-			<url>https://faustedition.uni-wuerzburg.de/nexus/content/repositories/releases</url>
+			<url>http://faustedition.uni-wuerzburg.de/nexus/content/repositories/releases</url>
 		</repository>
 		<snapshotRepository>
 			<id>faustedition-snapshots</id>
-			<url>https://faustedition.uni-wuerzburg.de/nexus/content/repositories/snapshots</url>
+			<url>http://faustedition.uni-wuerzburg.de/nexus/content/repositories/snapshots</url>
 		</snapshotRepository>
 		<site>
 			<id>faustedition-schema</id>
