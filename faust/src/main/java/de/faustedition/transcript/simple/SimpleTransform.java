@@ -19,41 +19,49 @@
 
 package de.faustedition.transcript.simple;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import de.faustedition.document.MaterialUnit;
-import de.faustedition.json.CompactTextModule;
-import de.faustedition.transcript.TranscriptTransformerConfiguration;
-import de.faustedition.transcript.input.HandsXMLTransformerModule;
-import de.faustedition.transcript.input.StageXMLTransformerModule;
-import de.faustedition.transcript.input.WhitespaceXMLTransformerModule;
-import eu.interedition.text.*;
-import eu.interedition.text.simple.SimpleLayer;
-import eu.interedition.text.simple.SimpleTextRepository;
-import eu.interedition.text.xml.XMLTransformer;
-import eu.interedition.text.xml.XMLTransformerConfigurationBase;
-import eu.interedition.text.xml.XMLTransformerModule;
-import eu.interedition.text.xml.module.*;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.ui.ModelMap;
-import org.xml.sax.InputSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.*;
 
-import static de.faustedition.xml.Namespaces.TEI_SIG_GE;
-import static eu.interedition.text.TextConstants.TEI_NS;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.ui.ModelMap;
+import org.xml.sax.InputSource;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import de.faustedition.document.MaterialUnit;
+import de.faustedition.json.CompactTextModule;
+import de.faustedition.transcript.TranscriptTransformerConfiguration;
+import de.faustedition.transcript.input.HandsXMLTransformerModule;
+import de.faustedition.transcript.input.StageXMLTransformerModule;
+import de.faustedition.transcript.input.WhitespaceXMLTransformerModule;
+import eu.interedition.text.Anchor;
+import eu.interedition.text.Layer;
+import eu.interedition.text.Name;
+import eu.interedition.text.TextConstants;
+import eu.interedition.text.TextRepository;
+import eu.interedition.text.simple.SimpleLayer;
+import eu.interedition.text.simple.SimpleTextRepository;
+import eu.interedition.text.xml.XMLTransformer;
+import eu.interedition.text.xml.XMLTransformerConfigurationBase;
+import eu.interedition.text.xml.XMLTransformerModule;
+import eu.interedition.text.xml.module.TEIAwareAnnotationXMLTransformerModule;
 
 
 /**
@@ -107,7 +115,7 @@ public class SimpleTransform {
 		final StringWriter xmlString = new StringWriter();
 
 		TransformerFactory.newInstance().newTransformer().transform(
-				new SAXSource(new InputSource(xmlInput)),
+				new SAXSource(new InputSource(new InputStreamReader(xmlInput, "UTF-8"))),
 				new StreamResult(xmlString)
 		);
 
