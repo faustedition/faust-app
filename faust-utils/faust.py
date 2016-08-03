@@ -60,6 +60,8 @@ def document_files():
 def metadata_files():
 	return [f for f in xml_files() if relative_path(f).startswith("metadata/")]
 
+def macrogenesis_files():
+	return [f for f in xml_files() if relative_path(f).startswith("macrogenesis/")]
 
 def is_tei_document(xml_file):
 	"""Determines whether a XML file is a TEI document by checking the namespace of the first element encountered"""
