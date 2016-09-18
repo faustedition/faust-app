@@ -155,11 +155,12 @@ def main():
     # highlight a single node and its neighbors
     # highlighted_node = 'faust://document/wa/2_I_H.17'
     for highlighted_node in graph_imported:
-        highlighted_bunch = graph_imported.neighbors(highlighted_node)
+        # highlighted_bunch = graph_imported.neighbors(highlighted_node)
+        highlighted_bunch = list(networkx.all_neighbors(graph_imported, highlighted_node))
         highlighted_bunch.append(highlighted_node)
         graph_highlighted_subgraph = graph_imported.subgraph(nbunch=highlighted_bunch)
         macrogenesis.insert_minimal_edges_from_absolute_datings(graph_highlighted_subgraph)
-        agraph_highlighted_subgraph = agraph_from(graph_highlighted_subgraph, edge_labels=True)
+        agraph_highlighted_subgraph = agraph_from(graph_highlighted_subgraph) #, edge_labels=True)
         write_agraph_layout(agraph_highlighted_subgraph, output_dir, highlighted_base_filename(highlighted_node))
 
 

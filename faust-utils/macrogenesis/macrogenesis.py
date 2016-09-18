@@ -197,7 +197,6 @@ def add_item_node(graph, item_uri):
 
 def import_graph():
     imported_graph = networkx.MultiDiGraph()
-    # FIXME parse whole set of files
     for macrogenetic_file in faust.macrogenesis_files():  # [10:13]:#[3:6]:
         parse(macrogenetic_file, imported_graph)
 
