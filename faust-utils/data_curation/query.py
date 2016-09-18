@@ -51,13 +51,19 @@ def non_wellformed (files):
 def unique_values(files, xpath):
 	''' List all unique values for matches of an xpath.'''
 	unique = set()
+	def to_str(val):
+		try:
+			return val.tag
+		except AttributeError:
+			return str(val)
 	for f in files:
 		try:
 			xml = lxml.etree.parse(f)
-			results = [result.tag for result in faust.xpath(xpath)(xml)]
+			results = [to_str(result) for result in faust.xpath(xpath)(xml)]
 			unique = unique.union(results)
-		except lxml.etree.XMLSyntaxError:
+		except lxml.etree.XMLSyntaxError as e:
 			sys.stderr.write("XML syntax error: " + f + "\n")
+			sys.stderr.write(str(e))
 	return unique
 
 def print_statistics():
@@ -97,7 +103,7 @@ if __name__ == "__main__":
 	# find all manuscripts with red ink
 	# for f in matches(faust.transcript_files(), "//tei:handShift[contains(@new, '_tr')] | //*[contains(@hand,'_tr')]"):
 		# print f
-	# for f in matches(faust.transcript_files(), 
+	# for f in matches(faust.transcript_files(),
 	#		 """//tei:choice/text()[contains(., ' ') or contains(., '\t') or contains(., '\n')]"""):	print f
 	# for f in matches(faust.transcript_files(), u"//text()[contains(.,'\x84') or contains(.,'\x93')]"):	print f
 	# for val in unique_values (faust.transcript_files(), "//tei:facsimile/tei:graphic/@url"): print val
@@ -150,7 +156,7 @@ if __name__ == "__main__":
 	# 		value = m[1][0].encode('utf8')
 	# 		if ('egh' in value):
 	# 			eigenhaendig = eigenhaendig + len(pages)
-				
+
 	# 		else:
 	# 			schreiber = schreiber + len(pages)
 	# 		print value,
@@ -195,9 +201,9 @@ if __name__ == "__main__":
 	# print
 	# for f in faust.transcript_files():
 	# 		if not f in assigned:
-	# 			if (not f in encoded_transcripts) and (not f in deleatur_transcripts): 
+	# 			if (not f in encoded_transcripts) and (not f in deleatur_transcripts):
 	# 				print '   ',  f
-			
+
 # =========
 
 # ==== ARCHIVAL UNITS ====
@@ -209,10 +215,10 @@ if __name__ == "__main__":
 
 
 	# pgs = matches(faust.files_in('document/'), '//f:materialUnit')
-	
+
 	# print len(arch_units)
 	# # print len(pgs)
-	
+
 # =========
 
 # ==== look for lines with soon, then instant revision ====
@@ -221,8 +227,8 @@ if __name__ == "__main__":
 	# 		print file
 	# 		# for match in matches:
 	# 			# print " " + str(match)
-# =======			
-	
+# =======
+
 	# in which manuscripts are the line numbers not in final order (schroer)
 	# show_matches(list_matches(faust.transcript_files(), "//tei:l[number(@n) <  number(./preceding::tei:l[1]/@n)]"))
 #	for val in unique_values (faust.transcript_files(), "//ge:document//*"): print val
