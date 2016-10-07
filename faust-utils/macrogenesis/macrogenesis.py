@@ -36,10 +36,12 @@ class AbsoluteDating:
             date_average = self.when
         else:
             if self.first_possible() is not None and self.last_possible() is None:
-                date_average = self.first_possible()
+                # for an open interval, add a second so it is > compared to pure @when date
+                date_average = self.first_possible() + datetime.timedelta(seconds=1)
             else:
                 if self.last_possible() is not None and self.first_possible() is None:
-                    date_average = self.last_possible()
+                    # for an open interval, subtract a second so it is < compared to pure @when date
+                    date_average = self.last_possible() - datetime.timedelta(seconds=1)
                 else:
                     if self.first_possible() is not None and self.last_possible() is not None:
                         date_average = self.first_possible() + ((self.last_possible() - self.first_possible()) / 2)
@@ -86,16 +88,31 @@ def parse_datestr(datestr):
     return None if datestr is None else datetime.datetime.strptime(datestr, '%Y-%m-%d')
 
 
+def average_absolute_date(node_attr):
+    # TODO average of all dates, not just first one
+    return node_attr[KEY_ABSOLUTE_DATINGS][0].average
+
 def insert_minimal_edges_from_absolute_datings(graph):
+    absolutely_dated_nodes = absolutely_dated_nodes_sorted(graph)
+    same_dates_count = 0
+    previous_dated_node_id = None
+    previous_date = None
+    for node in absolutely_dated_nodes:
+        if previous_dated_node_id is not None:
+            if previous_date == average_absolute_date(node[1]):
+                same_dates_count += 1
+            graph.add_edge(previous_dated_node_id, node[0], attr_dict={KEY_RELATION_NAME: VALUE_IMPLICIT_FROM_ABSOLUTE})
+        previous_dated_node_id = node[0]
+        previous_date = average_absolute_date(node[1])
+    return same_dates_count
+
+
+def absolutely_dated_nodes_sorted(graph):
     # list of (node_id, node_attr) tuples
     absolutely_dated_nodes = [(n, graph.node[n]) for n in graph.nodes() if KEY_ABSOLUTE_DATINGS in graph.node[n].keys()]
     logging.debug("Sorting dates")
-    absolutely_dated_nodes.sort(key=lambda n: n[1][KEY_ABSOLUTE_DATINGS][0].average)
-    previous_dated_node = None
-    for node in absolutely_dated_nodes:
-        if previous_dated_node is not None:
-            graph.add_edge(previous_dated_node, node[0], attr_dict={KEY_RELATION_NAME: VALUE_IMPLICIT_FROM_ABSOLUTE})
-        previous_dated_node = node[0]
+    absolutely_dated_nodes.sort(key=lambda n: average_absolute_date(n[1]))
+    return absolutely_dated_nodes
 
 
 # call parse_relationships() first to initialize graph

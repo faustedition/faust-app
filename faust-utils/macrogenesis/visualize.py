@@ -7,8 +7,13 @@ import pickle
 import base64
 
 # styles and defaults
+KEY_HIGHLIGHT = 'highlight'
+VALUE_TRUE = 'true'
 
 DEFAULT_EDGE_WEIGHT = '1'
+STYLE_ABSOLUTE_DATING_CLUSTER_COLOR = 'grey'
+STYLE_ABSOLUTE_DATING_COLOR = '#ffffff00'
+
 # this causes errors in graphviz in big graphs
 # DEFAULT_EDGE_PENWIDTH = '1'
 EDGE_STYLES = [(macrogenesis.KEY_RELATION_NAME, 'temp-pre', 'weight', '1'),
@@ -20,9 +25,10 @@ EDGE_STYLES = [(macrogenesis.KEY_RELATION_NAME, 'temp-pre', 'weight', '1'),
                (macrogenesis.KEY_RELATION_NAME, macrogenesis.VALUE_IMPLICIT_FROM_ABSOLUTE, 'weight', '10'),
                (macrogenesis.KEY_RELATION_NAME, macrogenesis.VALUE_IMPLICIT_FROM_ABSOLUTE, 'color', 'grey')]
 
-NODE_STYLES = []
-STYLE_ABSOLUTE_DATING_CLUSTER_COLOR = 'grey'
-STYLE_ABSOLUTE_DATING_COLOR = '#ffffff00'
+NODE_STYLES = [(KEY_HIGHLIGHT, VALUE_TRUE, 'fillcolor', 'black'),
+               (KEY_HIGHLIGHT, VALUE_TRUE, 'fontcolor', 'white'),
+               (KEY_HIGHLIGHT, VALUE_TRUE, 'style', 'filled')]
+
 
 
 def label_from_uri(uri):
@@ -158,9 +164,11 @@ def main():
         # highlighted_bunch = graph_imported.neighbors(highlighted_node)
         highlighted_bunch = list(networkx.all_neighbors(graph_imported, highlighted_node))
         highlighted_bunch.append(highlighted_node)
-        graph_highlighted_subgraph = graph_imported.subgraph(nbunch=highlighted_bunch)
+        graph_highlighted_subgraph = graph_imported.subgraph(nbunch=highlighted_bunch).copy()
+        graph_highlighted_subgraph.node[highlighted_node][KEY_HIGHLIGHT]= VALUE_TRUE
         macrogenesis.insert_minimal_edges_from_absolute_datings(graph_highlighted_subgraph)
         agraph_highlighted_subgraph = agraph_from(graph_highlighted_subgraph) #, edge_labels=True)
+        #agraph_highlighted_subgraph.node_attr[highlighted_node]['color'] = 'red'
         write_agraph_layout(agraph_highlighted_subgraph, output_dir, highlighted_base_filename(highlighted_node))
 
 
