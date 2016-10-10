@@ -5,6 +5,8 @@ import faust
 import macrogenesis
 import pickle
 import base64
+import textwrap
+import math
 
 # styles and defaults
 KEY_HIGHLIGHT = 'highlight'
@@ -154,22 +156,21 @@ def main():
 
     # draw raw input data
     graph_imported = macrogenesis.import_graph()
-    agraph_imported = agraph_from(graph_imported)
     logging.info("Generating raw data graph.")
-    write_agraph_layout (agraph_imported, output_dir, '00_raw_data')
+    #UUU write_agraph_layout(agraph_from(graph_imported), output_dir, '00_raw_data')
 
     # highlight a single node and its neighbors
     # highlighted_node = 'faust://document/wa/2_I_H.17'
     for highlighted_node in graph_imported:
-        # highlighted_bunch = graph_imported.neighbors(highlighted_node)
         highlighted_bunch = list(networkx.all_neighbors(graph_imported, highlighted_node))
         highlighted_bunch.append(highlighted_node)
         graph_highlighted_subgraph = graph_imported.subgraph(nbunch=highlighted_bunch).copy()
         graph_highlighted_subgraph.node[highlighted_node][KEY_HIGHLIGHT]= VALUE_TRUE
         macrogenesis.insert_minimal_edges_from_absolute_datings(graph_highlighted_subgraph)
-        agraph_highlighted_subgraph = agraph_from(graph_highlighted_subgraph) #, edge_labels=True)
+        #, edge_labels=True)
         #agraph_highlighted_subgraph.node_attr[highlighted_node]['color'] = 'red'
-        write_agraph_layout(agraph_highlighted_subgraph, output_dir, highlighted_base_filename(highlighted_node))
+        #UUU write_agraph_layout(agraph_from(graph_highlighted_subgraph), output_dir,
+        #UUU                    highlighted_base_filename(highlighted_node))
 
 
     # add relationships implicit in absolute datings
@@ -177,28 +178,47 @@ def main():
     graph_absolute_edges = graph_imported
     macrogenesis.insert_minimal_edges_from_absolute_datings(graph_absolute_edges)
     del graph_imported
-    agraph_absolute_edges = agraph_from(graph_absolute_edges)
-    write_agraph_layout(agraph_absolute_edges, output_dir, '10_absolute_edges')
+    #UUU write_agraph_layout(agraph_from(graph_absolute_edges), output_dir, '10_absolute_edges')
     # again with edge labels
     # TODO this breaks graphviz
     # agraph_absolute_edges_edge_labels = agraph_from(graph_absolute_edges, edge_labels=True)
     # write_agraph_layout(agraph_absolute_edges_edge_labels, output_dir, '15_absolute_edges_edge_labels')
+
+    logging.info("Generating condensation.")
+    strongly_connected_components = list(networkx.strongly_connected_components(graph_absolute_edges))
+
+    graph_condensation = networkx.condensation(graph_absolute_edges, scc=strongly_connected_components)
+    for node in graph_condensation:
+        label = ', '.join([label_from_uri(uri) for uri in graph_condensation.node[node]['members']])
+        graph_condensation.node[node]['label'] = textwrap.fill(label, int(2 * math.sqrt(len(label))), break_long_words=False)
+        component_filename_pattern = '16_strongly_connected_component_%i%s'
+        # make a hyperlink to subgraph of the component
+        if len(graph_condensation.node[node]['members']) > 1:
+            graph_condensation.node[node]['URL'] = component_filename_pattern % (node, '.svg')
+    write_agraph_layout(agraph_from(graph_condensation), output_dir, '15_condensation')
+
+    for (component_index, component) in enumerate(strongly_connected_components):
+        # don't generate subgraphs consisting of a single node
+        if len(component) > 1:
+            graph_component = graph_absolute_edges.subgraph(nbunch=component).copy()
+            #macrogenesis.insert_minimal_edges_from_absolute_datings(graph_component)
+            # , edge_labels=True)
+            write_agraph_layout(agraph_from(graph_component), output_dir,
+                                component_filename_pattern % (component_index, ''))
 
     # transitive closure, don't draw
     logging.info("Generating transitive closure graph.")
     transitive_closure = networkx.transitive_closure(graph_absolute_edges)
     logging.info("{0} nodes, {1} edges in transtive closure.".format(transitive_closure.number_of_nodes(),
                                                                      transitive_closure.number_of_edges()))
-    agraph_transitive_closure = agraph_from(transitive_closure)
+    #UUU agraph_transitive_closure = agraph_from(transitive_closure)
 
     # draw transitive reduction
     logging.info("Generating transitive reduction graph.")
-    agraph_transitive_reduction = agraph_transitive_closure.tred(copy=True)
-    logging.info("{0} nodes, {1} edges in transtive reduction.".format(agraph_transitive_reduction.number_of_nodes(),
-                                                                       agraph_transitive_reduction.number_of_edges()))
-    agraph_transitive_reduction.layout(prog='dot')
-    agraph_transitive_reduction.draw(os.path.join(output_dir, '30_transitive_reduction.svg'))
-
+    #UUU agraph_transitive_reduction = agraph_transitive_closure.tred(copy=True)
+    #UUU logging.info("{0} nodes, {1} edges in transtive reduction.".format(agraph_transitive_reduction.number_of_nodes(),
+    #UUU                                                                   agraph_transitive_reduction.number_of_edges()))
+    #UUU write_agraph_layout(agraph_transitive_reduction, output_dir, '30_transitive_reduction')
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

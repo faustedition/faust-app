@@ -189,6 +189,7 @@ def parse_relationships(macrogenetic_document, graph):
                                                   edges_from_previous_to_this if
                                                   edge[2].has_key(KEY_BIBLIOGRAPHIC_SOURCE)]
                     if not source_uri in used_bibliographic_sources:
+                        #if not relation_name == 'temp-syn':
                         graph.add_edge(previous_item_uri, item_uri, attr_dict=edge_attr_dict)
                         # make edges two directional for synchronous relation?
                         # if relation_name == 'temp-syn':

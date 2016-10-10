@@ -13,8 +13,7 @@ def analyse_graph(graph):
     num_equal_absolute_datings = macrogenesis.insert_minimal_edges_from_absolute_datings(graph)
     print "{0} equal absolute datings.".format(num_equal_absolute_datings)
 
-
-
+    print "{0} strongly connected components (conflicts).".format(networkx.number_strongly_connected_components(graph))
 
     transitive_closure = networkx.transitive_closure(graph)
     print "transitive closure"
@@ -39,5 +38,5 @@ if __name__ == '__main__':
     graph = macrogenesis.import_graph()
     macrogenesis.insert_minimal_edges_from_absolute_datings(graph)
 
-    #analyse_graph(graph)
-    order_inscriptions(graph)
+    analyse_graph(graph)
+    #order_inscriptions(graph)
