@@ -169,8 +169,8 @@ def main():
         macrogenesis.insert_minimal_edges_from_absolute_datings(graph_highlighted_subgraph)
         #, edge_labels=True)
         #agraph_highlighted_subgraph.node_attr[highlighted_node]['color'] = 'red'
-        #UUU write_agraph_layout(agraph_from(graph_highlighted_subgraph), output_dir,
-        #UUU                    highlighted_base_filename(highlighted_node))
+        write_agraph_layout(agraph_from(graph_highlighted_subgraph), output_dir,
+                           highlighted_base_filename(highlighted_node))
 
 
     # add relationships implicit in absolute datings
@@ -178,7 +178,7 @@ def main():
     graph_absolute_edges = graph_imported
     macrogenesis.insert_minimal_edges_from_absolute_datings(graph_absolute_edges)
     del graph_imported
-    #UUU write_agraph_layout(agraph_from(graph_absolute_edges), output_dir, '10_absolute_edges')
+    write_agraph_layout(agraph_from(graph_absolute_edges), output_dir, '10_absolute_edges')
     # again with edge labels
     # TODO this breaks graphviz
     # agraph_absolute_edges_edge_labels = agraph_from(graph_absolute_edges, edge_labels=True)
@@ -211,14 +211,14 @@ def main():
     transitive_closure = networkx.transitive_closure(graph_absolute_edges)
     logging.info("{0} nodes, {1} edges in transtive closure.".format(transitive_closure.number_of_nodes(),
                                                                      transitive_closure.number_of_edges()))
-    #UUU agraph_transitive_closure = agraph_from(transitive_closure)
+    agraph_transitive_closure = agraph_from(transitive_closure)
 
     # draw transitive reduction
     logging.info("Generating transitive reduction graph.")
-    #UUU agraph_transitive_reduction = agraph_transitive_closure.tred(copy=True)
-    #UUU logging.info("{0} nodes, {1} edges in transtive reduction.".format(agraph_transitive_reduction.number_of_nodes(),
-    #UUU                                                                   agraph_transitive_reduction.number_of_edges()))
-    #UUU write_agraph_layout(agraph_transitive_reduction, output_dir, '30_transitive_reduction')
+    agraph_transitive_reduction = agraph_transitive_closure.tred(copy=True)
+    logging.info("{0} nodes, {1} edges in transtive reduction.".format(agraph_transitive_reduction.number_of_nodes(),
+                                                                      agraph_transitive_reduction.number_of_edges()))
+    write_agraph_layout(agraph_transitive_reduction, output_dir, '30_transitive_reduction')
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
