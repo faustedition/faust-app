@@ -315,6 +315,12 @@ YUI.add('transcript-configuration-faust', function (Y) {
 						if (position.indexOf("between") >= 0)
 							lineAttrs.between = true;
 
+						var type = node.data()["type"] || "";
+						if (type.indexOf("inter") >= 0) {
+							lineAttrs.interline = true;
+						}
+
+
 						var vc = new Y.FaustTranscript.Line(lineAttrs);
 						vc.classes.push('lineNumber' + layoutState.lineCount);
 						return vc;

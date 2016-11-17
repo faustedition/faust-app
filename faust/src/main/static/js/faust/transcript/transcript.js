@@ -124,14 +124,14 @@ YUI.add('transcript', function (Y) {
 		rotX: function() {return 0 + this.globalRotation()},
 		rotY: function() {return 90 + this.globalRotation()},
 		
- 		defaultAligns: function () {
- 		
- 			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotY(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
+		defaultAligns: function () {
 
- 			if (this.previous())
- 				this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.previous(), this.rotX(), 0, 1, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
- 			else
- 				this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotY(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
+
+			if (this.previous())
+				this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.previous(), this.rotX(), 0, 1, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
+			else
+				this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 
 		},
 		setAlign: function (name, align) {
@@ -165,7 +165,7 @@ YUI.add('transcript', function (Y) {
 			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.previous(), this.rotY(), 0, 1, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 		else
 			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotY(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
- 	};
+	};
 
 	Y.FaustTranscript.InlineViewComponent = function() {
 		Y.FaustTranscript.InlineViewComponent.superclass.constructor.call(this);
@@ -251,18 +251,30 @@ YUI.add('transcript', function (Y) {
 	Y.FaustTranscript.Line.prototype.dimension = function() {
 	};
 
- 	Y.FaustTranscript.Line.prototype.defaultAligns = function () {
+	Y.FaustTranscript.Line.prototype.previous = function() {
+			if (this.parent == null || this.pos <= 0)
+				return null;
+			pre = this.parent.children[this.pos - 1];
+
+			if (typeof pre.lineAttrs !== 'undefined' && pre.lineAttrs['interline'] === true)
+				return pre.previous()
+			else
+				return pre
+		},
+
+
+	Y.FaustTranscript.Line.prototype.defaultAligns = function () {
 			
 		if ("indent" in this.lineAttrs) 
- 			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, this.lineAttrs["indent"], Y.FaustTranscript.Align.INDENT_ATTR));
+			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, this.lineAttrs["indent"], Y.FaustTranscript.Align.INDENT_ATTR));
 		else if ("indentCenter" in this.lineAttrs)
 			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0.5, this.lineAttrs["indentCenter"], Y.FaustTranscript.Align.INDENT_CENTER_ATTR));
 		else
- 			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 
- 		
+
 		if (this.previous()) {
-			var yourJoint = 1.5;
+			var yourJoint = this.lineAttrs['interline'] ? 0.75 : 1.5;
 			if (Y.Faust.TranscriptConfiguration.overlay === "overlay") {
 				//yourJoint = ("between" in this.lineAttrs)? 1 : 1;				
 				yourJoint = ("over" in this.lineAttrs)? 0.1 : yourJoint;
@@ -489,10 +501,10 @@ YUI.add('transcript', function (Y) {
 		if (!this.yMin || this.yMin > yMin )
 			this.yMin = yMin;
 
- 		if (!this.xMax || this.xMax < xMax )
+		if (!this.xMax || this.xMax < xMax )
 			this.xMax = xMax;
 
- 		if (!this.yMax || this.yMax < yMax )
+		if (!this.yMax || this.yMax < yMax )
 			this.yMax = yMax;
 	}
 }, '0.0', {
