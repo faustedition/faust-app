@@ -251,21 +251,21 @@ YUI.add('transcript', function (Y) {
 	Y.FaustTranscript.Line.prototype.dimension = function() {
 	};
 
-	Y.FaustTranscript.Line.prototype.previous = function() {
+	Y.FaustTranscript.Line.prototype.previousNonIntermediateLine = function() {
 			if (this.parent == null || this.pos <= 0)
 				return null;
 			pre = this.parent.children[this.pos - 1];
 
 			if (typeof pre.lineAttrs !== 'undefined' && pre.lineAttrs['interline'] === true)
-				return pre.previous()
+				return pre.previousNonIntermediateLine();
 			else
-				return pre
-		},
+				return pre;
+	};
 
 
 	Y.FaustTranscript.Line.prototype.defaultAligns = function () {
-			
-		if ("indent" in this.lineAttrs) 
+
+		if ("indent" in this.lineAttrs)
 			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, this.lineAttrs["indent"], Y.FaustTranscript.Align.INDENT_ATTR));
 		else if ("indentCenter" in this.lineAttrs)
 			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0.5, this.lineAttrs["indentCenter"], Y.FaustTranscript.Align.INDENT_CENTER_ATTR));
@@ -273,7 +273,7 @@ YUI.add('transcript', function (Y) {
 			this.setAlign("hAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotX(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 
 
-		if (this.previous()) {
+		if (this.previousNonIntermediateLine()) {
 			var yourJoint = this.lineAttrs['interline'] ? 0.75 : 1.5;
 			if (Y.Faust.TranscriptConfiguration.overlay === "overlay") {
 				//yourJoint = ("between" in this.lineAttrs)? 1 : 1;				
@@ -284,7 +284,7 @@ YUI.add('transcript', function (Y) {
 				yourJoint = ("over" in this.lineAttrs)? 0.5 : yourJoint;
 			}
 									
-			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.previous(), this.rotY(), 0, yourJoint, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
+			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.previousNonIntermediateLine(), this.rotY(), 0, yourJoint, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
 		}
 		else
 			this.setAlign("vAlign", new Y.FaustTranscript.Align(this, this.parent, this.rotY(), 0, 0, Y.FaustTranscript.Align.IMPLICIT_BY_DOC_ORDER));
