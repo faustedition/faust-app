@@ -252,14 +252,16 @@ YUI.add('transcript', function (Y) {
 	};
 
 	Y.FaustTranscript.Line.prototype.previousNonIntermediateLine = function() {
-			if (this.parent == null || this.pos <= 0)
-				return null;
-			pre = this.parent.children[this.pos - 1];
+		if (this.pos == 1)
+			return this.parent.children[0];
+		if (this.parent == null || this.pos <= 0)
+			return null;
+		pre = this.parent.children[this.pos - 1];
 
-			if (typeof pre.lineAttrs !== 'undefined' && pre.lineAttrs['interline'] === true)
-				return pre.previousNonIntermediateLine();
-			else
-				return pre;
+		if (typeof pre.lineAttrs !== 'undefined' && pre.lineAttrs['interline'] === true)
+			return pre.previousNonIntermediateLine();
+		else
+			return pre;
 	};
 
 
