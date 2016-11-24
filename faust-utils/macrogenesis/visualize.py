@@ -3,7 +3,6 @@ import os.path
 import networkx
 import faust
 import macrogenesis
-import pickle
 import base64
 import textwrap
 import math
@@ -118,7 +117,7 @@ def visualize_absolute_datings_2(agraph):
     for node in agraph.nodes():
         if macrogenesis.KEY_ABSOLUTE_DATINGS_PICKLED in node.attr.keys():
             logging.debug("Adding cluster for absolute datings of node {0}".format(node))
-            absolute_datings = pickle.loads(node.attr[macrogenesis.KEY_ABSOLUTE_DATINGS_PICKLED])
+            absolute_datings = macrogenesis.deserialize_from_graphviz(node.attr[macrogenesis.KEY_ABSOLUTE_DATINGS_PICKLED])
             absolute_dating_nodes = []
             for absolute_dating in absolute_datings:
                 date_id = 'date_{0}'.format(absolute_dating_index)
@@ -142,10 +141,11 @@ def write_html_wrapper(svg_filename, html_filename):
         html_file.close()
 
 def write_agraph_layout (agraph, dir, basename):
+    agraph.write(os.path.join(dir, '%s.%s' % (basename, 'dot')))
     agraph.layout(prog='dot')
     agraph.draw(os.path.join(dir, '%s.%s' % (basename, 'svg')))
     # write_html_wrapper('%s.%s' % (basename, 'svg'), os.path.join(dir, '%s.%s' % (basename, 'html')))
-    agraph.write(os.path.join(dir, '%s.%s' % (basename, 'dot')))
+
 
 def highlighted_base_filename (highlighted_node_url):
     return '20_highlighted_%s' % base64.urlsafe_b64encode(highlighted_node_url)

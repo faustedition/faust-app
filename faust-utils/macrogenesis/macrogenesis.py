@@ -4,6 +4,7 @@ import lxml.etree as etree
 import logging
 import faust
 import datetime
+import base64
 
 KEY_RELATION_NAME = 'relation_name'
 KEY_ABSOLUTE_DATINGS = 'absolute_datings'
@@ -87,6 +88,14 @@ def parse(macrogenetic_file, graph):
 def parse_datestr(datestr):
     return None if datestr is None else datetime.datetime.strptime(datestr, '%Y-%m-%d')
 
+# serialize a python object to be stored in graphviz attributes
+def serialize_for_graphviz(obj):
+    return base64.b64encode(pickle.dumps(obj))
+
+# deserialize a python object transported in graphviz attributes
+def deserialize_from_graphviz(serialized):
+    return pickle.loads(base64.b64decode(serialized))
+
 
 def average_absolute_date(node_attr):
     # TODO average of all dates, not just first one
@@ -150,7 +159,7 @@ def parse_dates(macrogenetic_document, graph):
             if len(absolute_datings) > 0:
                 graph.node[item_uri][KEY_ABSOLUTE_DATINGS] = absolute_datings
                 # Also pickle this because when converting to an AGraph attribute values must be strings
-                graph.node[item_uri][KEY_ABSOLUTE_DATINGS_PICKLED] = pickle.dumps(absolute_datings)
+                graph.node[item_uri][KEY_ABSOLUTE_DATINGS_PICKLED] = serialize_for_graphviz(absolute_datings)
 
         except Exception as e:
             logging.error("Invalid absolute dating in %s" % (macrogenetic_document.docinfo.URL))
