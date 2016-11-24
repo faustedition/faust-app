@@ -146,13 +146,13 @@ svg.diplomatic .text.rewrite {
 svg.diplomatic .text.under {
 	/* opacity: 0.5; */
     font-size: 75%;
-    baseline-shift: sub;
+    /* baseline-shift: sub; */
 }
 
 svg.diplomatic .text.over {
-	/* font-weight: bold; */
-    font-size: 135%;
-    baseline-shift: super;
+	font-weight: bold;
+    /* font-size: 135%; */
+    /* baseline-shift: super; */
 }
 
 svg.diplomatic .text.interline {
@@ -160,15 +160,15 @@ svg.diplomatic .text.interline {
 }
 
 svg.diplomatic .text.sup {
-    baseline-shift: super;
+    /* baseline-shift: super; */
 }
 
 svg.diplomatic .text.sub {
-    baseline-shift: sub;
+    /* baseline-shift: sub; */
 }
 
 .text.inbetween {
-    baseline-shift: super;
+    /* baseline-shift: super; */
 
 }
 
