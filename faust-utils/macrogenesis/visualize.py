@@ -190,7 +190,8 @@ def main():
     graph_condensation = networkx.condensation(graph_absolute_edges, scc=strongly_connected_components)
     for node in graph_condensation:
         label = ', '.join([label_from_uri(uri) for uri in graph_condensation.node[node]['members']])
-        graph_condensation.node[node]['label'] = textwrap.fill(label, int(2 * math.sqrt(len(label))), break_long_words=False)
+        label_width = int(2 * math.sqrt(len(label)))
+        graph_condensation.node[node]['label'] = textwrap.fill(label, label_width, break_long_words=False).replace('\n','\\n')
         component_filename_pattern = '16_strongly_connected_component_%i%s'
         # make a hyperlink to subgraph of the component
         if len(graph_condensation.node[node]['members']) > 1:
