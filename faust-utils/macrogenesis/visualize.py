@@ -1,6 +1,8 @@
 import logging
 import os.path
 import networkx
+import shutil
+
 import faust
 import macrogenesis
 import base64
@@ -53,8 +55,13 @@ def label_from_uri(uri):
 
     return uri
 
+def set_node_url(attr, url):
+    link_suffix = 'html'
+    attr['URL'] = ('%s.%s' % (url, link_suffix))
+    attr['target'] = "_top"
 
 def apply_agraph_styles(agraph, edge_labels=False):
+
     for edge in agraph.edges():
         edge.attr['weight'] = DEFAULT_EDGE_WEIGHT
         #edge.attr['penwidth'] = DEFAULT_EDGE_PENWIDTH
@@ -80,7 +87,7 @@ def apply_agraph_styles(agraph, edge_labels=False):
 
         if macrogenesis.KEY_NODE_TYPE in node.attr.keys() and node.attr[macrogenesis.KEY_NODE_TYPE] == macrogenesis.VALUE_ITEM_NODE:
             # link to subgraph for single node neighborhood
-            node.attr['URL']='%s.%s' % (highlighted_base_filename(node), 'svg')
+            set_node_url(node.attr, highlighted_base_filename(node))
             node.attr['label'] = label_from_uri(node)
             node.attr['tooltip'] = '%s &#013;&#013; %s ' \
                                    % (label_from_uri(node), node)
@@ -133,7 +140,7 @@ def visualize_absolute_datings_2(agraph):
             cluster_index += 1
 
 def html_template(content):
-    return '<html><head><script src="macrogenesis_interaction.js" type=></script></head>'\
+    return '<html><head><script src="js/svg-pan-zoom.min.js" type="text/javascript"></script></head>'\
     '<body>%s</body>'\
     '</html>' % content
 
@@ -145,7 +152,9 @@ def write_agraph_layout (agraph, dir, basename):
     agraph.draw(os.path.join(dir, svg_filename))
     html_filename = os.path.join(dir, '%s.%s' % (basename, 'html'))
     with open(html_filename, mode='w') as html_file:
-        html_file.write(html_template('<object data="%s" type="image/svg+xml"></object>' % svg_filename))
+        html_file.write(html_template('<object id="genesis_graph" data="%s" type="image/svg+xml" style="width: 100%%;\
+        height: 100%%; border:1px solid black; "></object> <script type="text/javascript">window.onload = function()\
+         {svgPanZoom("#genesis_graph", {zoomEnabled: true, controlIconsEnabled: true});};</script>' % svg_filename))
 
 
 def highlighted_base_filename (highlighted_node_url):
@@ -153,6 +162,13 @@ def highlighted_base_filename (highlighted_node_url):
 
 def main():
     output_dir = faust.config.get("macrogenesis", "output-dir")
+
+    # copy resources
+    try:
+        shutil.copytree('macrogenesis/resources/js', os.path.join(output_dir, 'js'))
+    except OSError as e:
+        logging.warn(e)
+
 
     #collect hyperlinks to selected graphs for the TOC as [(link_text_1, relative_link_to_file_1), ...]
     links = []
@@ -192,15 +208,20 @@ def main():
     logging.info("Generating condensation.")
     strongly_connected_components = list(networkx.strongly_connected_components(graph_absolute_edges))
 
+    #condensation
     graph_condensation = networkx.condensation(graph_absolute_edges, scc=strongly_connected_components)
     for node in graph_condensation:
         label = ', '.join([label_from_uri(uri) for uri in graph_condensation.node[node]['members']])
         label_width = int(2 * math.sqrt(len(label)))
         graph_condensation.node[node]['label'] = textwrap.fill(label, label_width, break_long_words=False).replace('\n','\\n')
-        component_filename_pattern = '16_strongly_connected_component_%i%s'
+        component_filename_pattern = '16_strongly_connected_component_%i'
         # make a hyperlink to subgraph of the component
         if len(graph_condensation.node[node]['members']) > 1:
-            graph_condensation.node[node]['URL'] = component_filename_pattern % (node, '.svg')
+            set_node_url(graph_condensation.node[node], component_filename_pattern % node)
+        else:
+            # TODO just link to normal neighborhood subgraph for single nodes
+            pass
+
     base_filename_condensation = '15_condensation'
     write_agraph_layout(agraph_from(graph_condensation), output_dir, base_filename_condensation)
     links.append(('Condensation', base_filename_condensation))
@@ -212,7 +233,7 @@ def main():
             #macrogenesis.insert_minimal_edges_from_absolute_datings(graph_component)
             # , edge_labels=True)
             write_agraph_layout(agraph_from(graph_component), output_dir,
-                                component_filename_pattern % (component_index, ''))
+                                component_filename_pattern % (component_index))
 
     # transitive closure, don't draw
     logging.info("Generating transitive closure graph.")
@@ -235,6 +256,7 @@ def main():
     html_links = ['<a href="{1}.html">{0}</a>'.format(*link) for link in links]
     with open(os.path.join(output_dir, 'index.html'), mode='w') as html_file:
         html_file.write(html_template('<h1>macrogenesis graphs</h1>' + ('<br/> '.join(html_links))))
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
