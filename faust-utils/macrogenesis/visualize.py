@@ -1,13 +1,20 @@
+import argparse
 import logging
+import multiprocessing
 import os.path
 import networkx
 import shutil
+
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
+import watchdog
 
 import faust
 import macrogenesis
 import base64
 import textwrap
 import math
+import time
 
 # styles and defaults
 KEY_HIGHLIGHT = 'highlight'
@@ -260,4 +267,40 @@ def main():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--watch", action="store_true",
+                        help="keep monitoring and run rendering process whenever source xml files change")
+    args = parser.parse_args()
+
+    if args.watch:
+        # watch xml directory for changes
+        logging.info("Starting in watch mode.")
+
+        class WatchHandler(FileSystemEventHandler):
+            def __init__(self):
+                self.counter = 0
+                self.running_job = None
+            def on_modified(self, event):
+                if self.running_job is not None and self.running_job.is_alive():
+                    logging.info("Another render job already running, terminate.")
+                    self.running_job.terminate()
+
+                logging.info("Starting new rendering process")
+                def run_job():
+                    main()
+                self.running_job = multiprocessing.Process(target=run_job)
+                self.running_job.start()
+                self.counter += 1
+
+        event_handler = WatchHandler()
+        observer = watchdog.observers.Observer()
+        macrogenesis_xml_dir = os.path.join(faust.xml_dir, 'macrogenesis')
+        observer.schedule(event_handler, path=macrogenesis_xml_dir, recursive=True)
+        observer.start()
+
+        while True:
+            time.sleep(5)
+        observer.join()
+
+    else:
+        main()
