@@ -132,27 +132,30 @@ def visualize_absolute_datings_2(agraph):
                                 color=STYLE_ABSOLUTE_DATING_CLUSTER_COLOR)
             cluster_index += 1
 
-def write_html_wrapper(svg_filename, html_filename):
-    with open(html_filename, mode='w') as html_file:
-        html_file.write('<html><head><script src="macrogenesis_interaction.js" type=></script></head>'
-                        '<body><object data="%s" type="image/svg+xml"></object></body>'
-                        '</html>'
-                        % (svg_filename))
-        html_file.close()
+def html_template(content):
+    return '<html><head><script src="macrogenesis_interaction.js" type=></script></head>'\
+    '<body>%s</body>'\
+    '</html>' % content
+
 
 def write_agraph_layout (agraph, dir, basename):
     agraph.write(os.path.join(dir, '%s.%s' % (basename, 'dot')))
     agraph.layout(prog='dot')
-    agraph.draw(os.path.join(dir, '%s.%s' % (basename, 'svg')))
-    # write_html_wrapper('%s.%s' % (basename, 'svg'), os.path.join(dir, '%s.%s' % (basename, 'html')))
+    svg_filename = '%s.%s' % (basename, 'svg')
+    agraph.draw(os.path.join(dir, svg_filename))
+    html_filename = os.path.join(dir, '%s.%s' % (basename, 'html'))
+    with open(html_filename, mode='w') as html_file:
+        html_file.write(html_template('<object data="%s" type="image/svg+xml"></object>' % svg_filename))
 
 
 def highlighted_base_filename (highlighted_node_url):
     return '20_highlighted_%s' % base64.urlsafe_b64encode(highlighted_node_url)
 
-
 def main():
     output_dir = faust.config.get("macrogenesis", "output-dir")
+
+    #collect hyperlinks to selected graphs for the TOC as [(link_text_1, relative_link_to_file_1), ...]
+    links = []
 
     # draw raw input data
     graph_imported = macrogenesis.import_graph()
@@ -178,7 +181,9 @@ def main():
     graph_absolute_edges = graph_imported
     macrogenesis.insert_minimal_edges_from_absolute_datings(graph_absolute_edges)
     del graph_imported
-    write_agraph_layout(agraph_from(graph_absolute_edges), output_dir, '10_absolute_edges')
+    base_filename_absolute_edges = '10_absolute_edges'
+    write_agraph_layout(agraph_from(graph_absolute_edges), output_dir, base_filename_absolute_edges)
+    links.append(('Raw datings (relative and absolute)', base_filename_absolute_edges))
     # again with edge labels
     # TODO this breaks graphviz
     # agraph_absolute_edges_edge_labels = agraph_from(graph_absolute_edges, edge_labels=True)
@@ -196,7 +201,9 @@ def main():
         # make a hyperlink to subgraph of the component
         if len(graph_condensation.node[node]['members']) > 1:
             graph_condensation.node[node]['URL'] = component_filename_pattern % (node, '.svg')
-    write_agraph_layout(agraph_from(graph_condensation), output_dir, '15_condensation')
+    base_filename_condensation = '15_condensation'
+    write_agraph_layout(agraph_from(graph_condensation), output_dir, base_filename_condensation)
+    links.append(('Condensation', base_filename_condensation))
 
     for (component_index, component) in enumerate(strongly_connected_components):
         # don't generate subgraphs consisting of a single node
@@ -219,7 +226,15 @@ def main():
     agraph_transitive_reduction = agraph_transitive_closure.tred(copy=True)
     logging.info("{0} nodes, {1} edges in transtive reduction.".format(agraph_transitive_reduction.number_of_nodes(),
                                                                       agraph_transitive_reduction.number_of_edges()))
-    write_agraph_layout(agraph_transitive_reduction, output_dir, '30_transitive_reduction')
+    base_filename_transitive_reduction = '30_transitive_reduction'
+    write_agraph_layout(agraph_transitive_reduction, output_dir, base_filename_transitive_reduction)
+    links.append(('Transitive reduction', base_filename_transitive_reduction))
+
+    # generate index.html
+    logging.info("Generating index.html")
+    html_links = ['<a href="{1}.html">{0}</a>'.format(*link) for link in links]
+    with open(os.path.join(output_dir, 'index.html'), mode='w') as html_file:
+        html_file.write(html_template('<h1>macrogenesis graphs</h1>' + ('<br/> '.join(html_links))))
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
