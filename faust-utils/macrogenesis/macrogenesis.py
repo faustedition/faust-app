@@ -23,6 +23,7 @@ GENETIC_RELATION_MAP = {'temp-pre': 'temp-pre',
 
 
 class AbsoluteDating:
+    """Represent an absolute dating"""
     # None can be passed for missing values
     def __init__(self, when, from_, to, not_before, not_after, bibliographic_source=None, source_file=None):
         self.when = when
@@ -72,6 +73,7 @@ class AbsoluteDating:
 
 # datetime.strftime cannot handle years before 1900, so we have to roll our own
 def format_date(date):
+    """Return a string representing a datetime object"""
     if date is None:
         return '...'
     else:
@@ -79,6 +81,7 @@ def format_date(date):
 
 
 def parse(macrogenetic_file, graph):
+    """Parse one XML file and augment graph by the extracted information."""
     logging.info("Parsing file {0}".format(str(macrogenetic_file)))
     macrogenetic_document = etree.parse(macrogenetic_file)
     parse_relationships(macrogenetic_document, graph)
@@ -86,37 +89,51 @@ def parse(macrogenetic_file, graph):
 
 
 def parse_datestr(datestr):
+    """Parse a datestring and return a datetime object"""
     return None if datestr is None else datetime.datetime.strptime(datestr, '%Y-%m-%d')
 
-# serialize a python object to be stored in graphviz attributes
+
 def serialize_for_graphviz(obj):
+    """Serialize a python object to be stored in graphviz attributes"""
     return base64.b64encode(pickle.dumps(obj))
 
-# deserialize a python object transported in graphviz attributes
+
 def deserialize_from_graphviz(serialized):
+    """Deserialize a python object transported in graphviz attributes"""
     return pickle.loads(base64.b64decode(serialized))
 
 
 def average_absolute_date(node_attr):
+    """Read and return the stored average date from a node"""
     # TODO average of all dates, not just first one
     return node_attr[KEY_ABSOLUTE_DATINGS][0].average
 
 def insert_minimal_edges_from_absolute_datings(graph):
+    """
+    Append a networkx graph with information that is in the absolute datings.
+    This is done by ordering the nodes by absoulte dating and inserting edges between adjacent entries in the list.
+    This provides a minimal set of edges spanning the whole graph.
+    """
     absolutely_dated_nodes = absolutely_dated_nodes_sorted(graph)
     same_dates_count = 0
     previous_dated_node_id = None
+    last_differently_dated_node_id = None
     previous_date = None
     for node in absolutely_dated_nodes:
         if previous_dated_node_id is not None:
             if previous_date == average_absolute_date(node[1]):
                 same_dates_count += 1
-            graph.add_edge(previous_dated_node_id, node[0], attr_dict={KEY_RELATION_NAME: VALUE_IMPLICIT_FROM_ABSOLUTE})
+            else:
+                last_differently_dated_node_id = previous_dated_node_id
+            if last_differently_dated_node_id is not None:
+                graph.add_edge(last_differently_dated_node_id, node[0], attr_dict={KEY_RELATION_NAME: VALUE_IMPLICIT_FROM_ABSOLUTE})
         previous_dated_node_id = node[0]
         previous_date = average_absolute_date(node[1])
     return same_dates_count
 
 
 def absolutely_dated_nodes_sorted(graph):
+    """Sort nodes according to their absolute datings"""
     # list of (node_id, node_attr) tuples
     absolutely_dated_nodes = [(n, graph.node[n]) for n in graph.nodes() if KEY_ABSOLUTE_DATINGS in graph.node[n].keys()]
     logging.debug("Sorting dates")
@@ -126,6 +143,7 @@ def absolutely_dated_nodes_sorted(graph):
 
 # call parse_relationships() first to initialize graph
 def parse_dates(macrogenetic_document, graph):
+    """Parse one XML document for absolute datings and augment graph with the extracted data"""
     dates = macrogenetic_document.getroot().findall('f:date', namespaces=faust.namespaces)
 
     for (date_index, date) in enumerate(dates):
@@ -166,6 +184,7 @@ def parse_dates(macrogenetic_document, graph):
 
 
 def parse_relationships(macrogenetic_document, graph):
+    """Parse one XML document for relative datings and augment graph with the extracted data"""
     relations = macrogenetic_document.getroot().findall('f:relation', namespaces=faust.namespaces)
     for relation in relations:
         try:

@@ -5,6 +5,7 @@ import networkx
 import macrogenesis
 
 def analyse_graph(graph):
+    """Print statistics about the macrogenenesis graph"""
     print "graph"
     print "{0} nodes, {1} edges in macrogenetic graph.".format(graph.number_of_nodes(),
                                                                      graph.number_of_edges())
@@ -23,6 +24,7 @@ def analyse_graph(graph):
 
 
 def order_inscriptions(graph):
+    """Print a list of inscriptions heuristically ordered by their date of writing"""
 
     transitive_closure = networkx.transitive_closure(graph)
     logging.info("{0} nodes, {1} edges in transtive closure.".format(transitive_closure.number_of_nodes(),

@@ -42,6 +42,7 @@ NODE_STYLES = [(KEY_HIGHLIGHT, VALUE_TRUE, 'fillcolor', 'black'),
 
 
 def label_from_uri(uri):
+    """Returns a readable label from a uri of a document, inscription, bibliographical source, etc."""
     # label = uri[len('faust://'):]
 
     if (uri.startswith('faust://document/wa/')):
@@ -63,12 +64,13 @@ def label_from_uri(uri):
     return uri
 
 def set_node_url(attr, url):
+    """Set the URL for a hyperlink for a node"""
     link_suffix = 'html'
     attr['URL'] = ('%s.%s' % (url, link_suffix))
     attr['target'] = "_top"
 
 def apply_agraph_styles(agraph, edge_labels=False):
-
+    """Set style properties of a dot graph for rendering"""
     for edge in agraph.edges():
         edge.attr['weight'] = DEFAULT_EDGE_WEIGHT
         #edge.attr['penwidth'] = DEFAULT_EDGE_PENWIDTH
@@ -106,6 +108,7 @@ def apply_agraph_styles(agraph, edge_labels=False):
 
 
 def agraph_from(graph, edge_labels=False):
+    """Returns a graphviz graph from a networkx graph"""
     # append_absolute_date_nodes(graph)
 
     logging.info(" Generating agraph.")
@@ -124,6 +127,11 @@ def agraph_from(graph, edge_labels=False):
 
 
 def visualize_absolute_datings_2(agraph):
+    """
+    Add visualisations for absolute datings to a graphviz graph.
+    It is (ab)using the subgraph feature, so that a subgraph contains the inscription node and a node for all absolute
+    dating labels.
+    """
     cluster_index = 0
     absolute_dating_index = 0
     dated_nodes = []
@@ -153,6 +161,7 @@ def html_template(content):
 
 
 def write_agraph_layout (agraph, dir, basename):
+    """Layout a graphviz graph and write it to disk as svg with an html wrapper."""
     agraph.write(os.path.join(dir, '%s.%s' % (basename, 'dot')))
     agraph.layout(prog='dot')
     svg_filename = '%s.%s' % (basename, 'svg')
@@ -165,11 +174,11 @@ def write_agraph_layout (agraph, dir, basename):
 
 
 def highlighted_base_filename (highlighted_node_url):
+    """Calculate and return a unique filename for a subgraph of the neighborhood of a certain ("highlighted") node"""
     return '20_highlighted_%s' % base64.urlsafe_b64encode(highlighted_node_url)
 
 def main():
     output_dir = faust.config.get("macrogenesis", "output-dir")
-
     # copy resources
     try:
         shutil.copytree('macrogenesis/resources/js', os.path.join(output_dir, 'js'))
