@@ -202,10 +202,17 @@ def main():
         graph_highlighted_subgraph = graph_imported.subgraph(nbunch=highlighted_bunch).copy()
         graph_highlighted_subgraph.node[highlighted_node][KEY_HIGHLIGHT]= VALUE_TRUE
         macrogenesis.insert_minimal_edges_from_absolute_datings(graph_highlighted_subgraph)
-        #, edge_labels=True)
+
         #agraph_highlighted_subgraph.node_attr[highlighted_node]['color'] = 'red'
         write_agraph_layout(agraph_from(graph_highlighted_subgraph), output_dir,
                            highlighted_base_filename(highlighted_node))
+        # try again with edge labels, sometimes this genereats segfaults in dot, then there is the already
+        # generated graph without edge labels already there
+        try:
+            write_agraph_layout(agraph_from(graph_highlighted_subgraph, edge_labels=True), output_dir,
+                highlighted_base_filename(highlighted_node))
+        except Exception:
+            logging.error("Dot failed generating a graph")
 
 
     # add relationships implicit in absolute datings
