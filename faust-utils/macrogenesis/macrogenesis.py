@@ -1,3 +1,6 @@
+"""
+Parse macrogenetic XML files into a networkx graph
+"""
 import pickle
 import networkx
 import lxml.etree as etree

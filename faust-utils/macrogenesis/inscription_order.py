@@ -1,3 +1,7 @@
+"""
+Calculate a heuristic absolute temporal ordering of all inscriptions
+"""
+
 import logging
 
 import networkx
