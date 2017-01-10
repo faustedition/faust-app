@@ -1,1 +1,15 @@
+faust-utils/macrogenesis
+########################
+
 These utilities analyse and process the macrogenetic data XML files in the macrogenesis/ directory.
+
+Directory Contents
+==================
+
+- ``dot-combine.sh`` is a shell script used to process Graphviz .dot files. It was called from the Java webapp
+  but is probably obsolete and can be removed (TODO check)
+- ``genetic_data_transcripts.py``
+- ``inscription_order.py`` calculates a heuristic absolute temporal ordering of all inscriptions
+- ``macrogenesis.py`` parses the macrogenesis XML files into a networkx graph
+- ``visualize.py`` transforms the genetic networkx graph generated from ``macrogenesis.py`` into a PyGraphviz
+  AGraph object for visualization
