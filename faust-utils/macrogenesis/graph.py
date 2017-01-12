@@ -56,8 +56,8 @@ class AbsoluteDating:
         self.average = date_average
 
     def __str__(self):
-        return "{0}".format(format_date(self.when)) if self.when is not None else "{0} - {1}" \
-            .format(format_date(self.first_possible()), format_date(self.last_possible()), format_date(self.average))
+        return "{0}".format(_format_date(self.when)) if self.when is not None else "{0} - {1}" \
+            .format(_format_date(self.first_possible()), _format_date(self.last_possible()), _format_date(self.average))
 
     # Returns not_before or, if not available, from date
     def first_possible(self):
@@ -75,7 +75,7 @@ class AbsoluteDating:
 
 
 # datetime.strftime cannot handle years before 1900, so we have to roll our own
-def format_date(date):
+def _format_date(date):
     """Return a string representing a datetime object"""
     if date is None:
         return '...'
@@ -83,15 +83,15 @@ def format_date(date):
         return '{0}.{1}.{2}'.format(date.day, date.month, date.year)
 
 
-def parse(macrogenetic_file, graph):
+def _parse(macrogenetic_file, graph):
     """Parse one XML file and augment graph by the extracted information."""
     logging.info("Parsing file {0}".format(str(macrogenetic_file)))
     macrogenetic_document = etree.parse(macrogenetic_file)
-    parse_relationships(macrogenetic_document, graph)
-    parse_dates(macrogenetic_document, graph)
+    _parse_relationships(macrogenetic_document, graph)
+    _parse_dates(macrogenetic_document, graph)
 
 
-def parse_datestr(datestr):
+def _parse_datestr(datestr):
     """Parse a datestring and return a datetime object"""
     return None if datestr is None else datetime.datetime.strptime(datestr, '%Y-%m-%d')
 
@@ -106,7 +106,7 @@ def deserialize_from_graphviz(serialized):
     return pickle.loads(base64.b64decode(serialized))
 
 
-def average_absolute_date(node_attr):
+def _average_absolute_date(node_attr):
     """Read and return the stored average date from a node"""
     # TODO average of all dates, not just first one
     return node_attr[KEY_ABSOLUTE_DATINGS][0].average
@@ -117,35 +117,35 @@ def insert_minimal_edges_from_absolute_datings(graph):
     This is done by ordering the nodes by absoulte dating and inserting edges between adjacent entries in the list.
     This provides a minimal set of edges spanning the whole graph.
     """
-    absolutely_dated_nodes = absolutely_dated_nodes_sorted(graph)
+    absolutely_dated_nodes = _absolutely_dated_nodes_sorted(graph)
     same_dates_count = 0
     previous_dated_node_id = None
     last_differently_dated_node_id = None
     previous_date = None
     for node in absolutely_dated_nodes:
         if previous_dated_node_id is not None:
-            if previous_date == average_absolute_date(node[1]):
+            if previous_date == _average_absolute_date(node[1]):
                 same_dates_count += 1
             else:
                 last_differently_dated_node_id = previous_dated_node_id
             if last_differently_dated_node_id is not None:
                 graph.add_edge(last_differently_dated_node_id, node[0], attr_dict={KEY_RELATION_NAME: VALUE_IMPLICIT_FROM_ABSOLUTE})
         previous_dated_node_id = node[0]
-        previous_date = average_absolute_date(node[1])
+        previous_date = _average_absolute_date(node[1])
     return same_dates_count
 
 
-def absolutely_dated_nodes_sorted(graph):
+def _absolutely_dated_nodes_sorted(graph):
     """Sort nodes according to their absolute datings"""
     # list of (node_id, node_attr) tuples
     absolutely_dated_nodes = [(n, graph.node[n]) for n in graph.nodes() if KEY_ABSOLUTE_DATINGS in graph.node[n].keys()]
     logging.debug("Sorting dates")
-    absolutely_dated_nodes.sort(key=lambda n: average_absolute_date(n[1]))
+    absolutely_dated_nodes.sort(key=lambda n: _average_absolute_date(n[1]))
     return absolutely_dated_nodes
 
 
 # call parse_relationships() first to initialize graph
-def parse_dates(macrogenetic_document, graph):
+def _parse_dates(macrogenetic_document, graph):
     """Parse one XML document for absolute datings and augment graph with the extracted data"""
     dates = macrogenetic_document.getroot().findall('f:date', namespaces=faust.namespaces)
 
@@ -156,11 +156,11 @@ def parse_dates(macrogenetic_document, graph):
             source_uri = date.find('f:source', namespaces=faust.namespaces).attrib['uri']
 
             absolute_dating = AbsoluteDating(
-                parse_datestr(date.attrib["when"] if date.attrib.has_key("when") else None),
-                parse_datestr(date.attrib["from"] if date.attrib.has_key("from") else None),
-                parse_datestr(date.attrib["to"] if date.attrib.has_key("to") else None),
-                parse_datestr(date.attrib["notBefore"] if date.attrib.has_key("notBefore") else None),
-                parse_datestr(date.attrib["notAfter"] if date.attrib.has_key("notAfter") else None),
+                _parse_datestr(date.attrib["when"] if date.attrib.has_key("when") else None),
+                _parse_datestr(date.attrib["from"] if date.attrib.has_key("from") else None),
+                _parse_datestr(date.attrib["to"] if date.attrib.has_key("to") else None),
+                _parse_datestr(date.attrib["notBefore"] if date.attrib.has_key("notBefore") else None),
+                _parse_datestr(date.attrib["notAfter"] if date.attrib.has_key("notAfter") else None),
                 bibliographic_source=source_uri, source_file=macrogenetic_document.docinfo.URL)
 
             date_id = 'date_{0}'.format(date_index)
@@ -173,7 +173,7 @@ def parse_dates(macrogenetic_document, graph):
                 # TODO normalize uris
                 item_uri = item.attrib["uri"]
                 if not item_uri in graph.node:
-                    add_item_node(graph, item_uri)
+                    _add_item_node(graph, item_uri)
 
                 absolute_datings.append(absolute_dating)
 
@@ -186,7 +186,7 @@ def parse_dates(macrogenetic_document, graph):
             logging.error("Invalid absolute dating in %s" % (macrogenetic_document.docinfo.URL))
 
 
-def parse_relationships(macrogenetic_document, graph):
+def _parse_relationships(macrogenetic_document, graph):
     """Parse one XML document for relative datings and augment graph with the extracted data"""
     relations = macrogenetic_document.getroot().findall('f:relation', namespaces=faust.namespaces)
     for relation in relations:
@@ -200,7 +200,7 @@ def parse_relationships(macrogenetic_document, graph):
             for item in items:
                 item_uri = item.attrib["uri"]
                 # TODO create label in visualization component
-                add_item_node(graph, item_uri)
+                _add_item_node(graph, item_uri)
                 if previous_item is None:
                     info_message += '   '
                 else:
@@ -240,14 +240,14 @@ def parse_relationships(macrogenetic_document, graph):
             # dates =  macrogenetic_document.getroot().findall('f:date', namespaces=faust.namespaces)
 
 
-def add_item_node(graph, item_uri):
+def _add_item_node(graph, item_uri):
     graph.add_node(item_uri, attr_dict={KEY_NODE_TYPE: VALUE_ITEM_NODE})
 
 
 def import_graph():
     imported_graph = networkx.MultiDiGraph()
     for macrogenetic_file in faust.macrogenesis_files():  # [10:13]:#[3:6]:
-        parse(macrogenetic_file, imported_graph)
+        _parse(macrogenetic_file, imported_graph)
 
     logging.info(
         "{0} nodes, {1} edges read.".format(imported_graph.number_of_nodes(), imported_graph.number_of_edges()))

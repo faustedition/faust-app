@@ -39,7 +39,7 @@ NODE_STYLES = [(KEY_HIGHLIGHT, VALUE_TRUE, 'fillcolor', 'black'),
 
 
 
-def label_from_uri(uri):
+def _label_from_uri(uri):
     """Returns a readable label from a uri of a document, inscription, bibliographical source, etc."""
     # label = uri[len('faust://'):]
 
@@ -61,13 +61,13 @@ def label_from_uri(uri):
 
     return uri
 
-def set_node_url(attr, url):
+def _set_node_url(attr, url):
     """Set the URL for a hyperlink for a node"""
     link_suffix = 'html'
     attr['URL'] = ('%s.%s' % (url, link_suffix))
     attr['target'] = "_top"
 
-def apply_agraph_styles(agraph, edge_labels=False):
+def _apply_agraph_styles(agraph, edge_labels=False):
     """Set style properties of a dot graph for rendering"""
     for edge in agraph.edges():
         edge.attr['weight'] = DEFAULT_EDGE_WEIGHT
@@ -77,14 +77,14 @@ def apply_agraph_styles(agraph, edge_labels=False):
 
         if graph.KEY_BIBLIOGRAPHIC_SOURCE in edge.attr.keys():
             edge_tooltip = 's. %s &#013;&#013;%s    ->    %s&#013;&#013;Source file: %s' % (
-                label_from_uri(edge.attr[graph.KEY_BIBLIOGRAPHIC_SOURCE]),
-                label_from_uri(edge[0]), label_from_uri(edge[1]),
+                _label_from_uri(edge.attr[graph.KEY_BIBLIOGRAPHIC_SOURCE]),
+                _label_from_uri(edge[0]), _label_from_uri(edge[1]),
                 edge.attr[graph.KEY_SOURCE_FILE])
             edge.attr['tooltip'] = edge_tooltip
             edge.attr['labeltooltip'] = edge_tooltip
 
             if edge_labels:
-                edge.attr['label'] = label_from_uri(edge.attr[graph.KEY_BIBLIOGRAPHIC_SOURCE])
+                edge.attr['label'] = _label_from_uri(edge.attr[graph.KEY_BIBLIOGRAPHIC_SOURCE])
 
         for (genetic_key, genetic_value, style_key, style_value) in EDGE_STYLES:
             if genetic_key in edge.attr.keys() and edge.attr[genetic_key] == genetic_value:
@@ -94,10 +94,10 @@ def apply_agraph_styles(agraph, edge_labels=False):
 
         if graph.KEY_NODE_TYPE in node.attr.keys() and node.attr[graph.KEY_NODE_TYPE] == graph.VALUE_ITEM_NODE:
             # link to subgraph for single node neighborhood
-            set_node_url(node.attr, highlighted_base_filename(node))
-            node.attr['label'] = label_from_uri(node)
+            _set_node_url(node.attr, _highlighted_base_filename(node))
+            node.attr['label'] = _label_from_uri(node)
             node.attr['tooltip'] = '%s &#013;&#013; %s ' \
-                                   % (label_from_uri(node), node)
+                                   % (_label_from_uri(node), node)
 
         for (genetic_key, genetic_value, style_key, style_value) in NODE_STYLES:
             if genetic_key in node.attr.keys() and node.attr[genetic_key] == genetic_value:
@@ -105,7 +105,7 @@ def apply_agraph_styles(agraph, edge_labels=False):
 
 
 
-def agraph_from(graph, edge_labels=False):
+def _agraph_from(graph, edge_labels=False):
     """Returns a graphviz graph from a networkx graph"""
     # append_absolute_date_nodes(graph)
 
@@ -116,15 +116,15 @@ def agraph_from(graph, edge_labels=False):
     # agraph.graph_attr['overlap'] = "1"
     # agraph.graph_attr['concentrate'] = "true"
 
-    visualize_absolute_datings_2(agraph)
+    _visualize_absolute_datings(agraph)
 
-    apply_agraph_styles(agraph, edge_labels)
+    _apply_agraph_styles(agraph, edge_labels)
     agraph.graph_attr['tooltip'] = ' '
 
     return agraph
 
 
-def visualize_absolute_datings_2(agraph):
+def _visualize_absolute_datings(agraph):
     """
     Add visualisations for absolute datings to a graphviz graph.
     It is (ab)using the subgraph feature, so that a subgraph contains the inscription node and a node for all absolute
@@ -144,7 +144,7 @@ def visualize_absolute_datings_2(agraph):
                 date_label = str(absolute_dating)
                 agraph.add_node(date_id, label=date_label, date_average=absolute_dating.average, shape='box',
                                 color=STYLE_ABSOLUTE_DATING_COLOR, tooltip='s. %s &#013;&#013;Source file: %s'
-                                % (label_from_uri(absolute_dating.bibliographic_source), absolute_dating.source_file))
+                                % (_label_from_uri(absolute_dating.bibliographic_source), absolute_dating.source_file))
                 absolute_dating_nodes.append(date_id)
                 absolute_dating_index += 1
             cluster_id = 'cluster{0}'.format(cluster_index)
@@ -152,13 +152,13 @@ def visualize_absolute_datings_2(agraph):
                                 color=STYLE_ABSOLUTE_DATING_CLUSTER_COLOR)
             cluster_index += 1
 
-def html_template(content):
+def _html_template(content):
     return '<html><head><script src="js/svg-pan-zoom.min.js" type="text/javascript"></script></head>'\
     '<body>%s</body>'\
     '</html>' % content
 
 
-def write_agraph_layout (agraph, dir, basename):
+def _write_agraph_layout (agraph, dir, basename):
     """Layout a graphviz graph and write it to disk as svg with an html wrapper."""
     agraph.write(os.path.join(dir, '%s.%s' % (basename, 'dot')))
     agraph.layout(prog='dot')
@@ -166,12 +166,12 @@ def write_agraph_layout (agraph, dir, basename):
     agraph.draw(os.path.join(dir, svg_filename))
     html_filename = os.path.join(dir, '%s.%s' % (basename, 'html'))
     with open(html_filename, mode='w') as html_file:
-        html_file.write(html_template('<object id="genesis_graph" data="%s" type="image/svg+xml" style="width: 100%%;\
+        html_file.write(_html_template('<object id="genesis_graph" data="%s" type="image/svg+xml" style="width: 100%%;\
         height: 100%%; border:1px solid black; "></object> <script type="text/javascript">window.onload = function()\
          {svgPanZoom("#genesis_graph", {zoomEnabled: true, controlIconsEnabled: true});};</script>' % svg_filename))
 
 
-def highlighted_base_filename (highlighted_node_url):
+def _highlighted_base_filename (highlighted_node_url):
     """Calculate and return a unique filename for a subgraph of the neighborhood of a certain ("highlighted") node"""
     return '20_highlighted_%s' % base64.urlsafe_b64encode(highlighted_node_url)
 
@@ -202,13 +202,13 @@ def visualize():
         graph.insert_minimal_edges_from_absolute_datings(graph_highlighted_subgraph)
 
         #agraph_highlighted_subgraph.node_attr[highlighted_node]['color'] = 'red'
-        write_agraph_layout(agraph_from(graph_highlighted_subgraph), output_dir,
-                           highlighted_base_filename(highlighted_node))
+        _write_agraph_layout(_agraph_from(graph_highlighted_subgraph), output_dir,
+                             _highlighted_base_filename(highlighted_node))
         # try again with edge labels, sometimes this genereats segfaults in dot, then there is the already
         # generated graph without edge labels already there
         try:
-            write_agraph_layout(agraph_from(graph_highlighted_subgraph, edge_labels=True), output_dir,
-                highlighted_base_filename(highlighted_node))
+            _write_agraph_layout(_agraph_from(graph_highlighted_subgraph, edge_labels=True), output_dir,
+                                 _highlighted_base_filename(highlighted_node))
         except Exception:
             logging.error("Dot failed generating a graph")
 
@@ -219,7 +219,7 @@ def visualize():
     graph.insert_minimal_edges_from_absolute_datings(graph_absolute_edges)
     del graph_imported
     base_filename_absolute_edges = '10_absolute_edges'
-    write_agraph_layout(agraph_from(graph_absolute_edges), output_dir, base_filename_absolute_edges)
+    _write_agraph_layout(_agraph_from(graph_absolute_edges), output_dir, base_filename_absolute_edges)
     links.append(('Raw datings (relative and absolute)', base_filename_absolute_edges))
     # again with edge labels
     # TODO this breaks graphviz
@@ -232,19 +232,19 @@ def visualize():
     #condensation
     graph_condensation = networkx.condensation(graph_absolute_edges, scc=strongly_connected_components)
     for node in graph_condensation:
-        label = ', '.join([label_from_uri(uri) for uri in graph_condensation.node[node]['members']])
+        label = ', '.join([_label_from_uri(uri) for uri in graph_condensation.node[node]['members']])
         label_width = int(2 * math.sqrt(len(label)))
         graph_condensation.node[node]['label'] = textwrap.fill(label, label_width, break_long_words=False).replace('\n','\\n')
         component_filename_pattern = '16_strongly_connected_component_%i'
         # make a hyperlink to subgraph of the component
         if len(graph_condensation.node[node]['members']) > 1:
-            set_node_url(graph_condensation.node[node], component_filename_pattern % node)
+            _set_node_url(graph_condensation.node[node], component_filename_pattern % node)
         else:
             # TODO just link to normal neighborhood subgraph for single nodes
             pass
 
     base_filename_condensation = '15_condensation'
-    write_agraph_layout(agraph_from(graph_condensation), output_dir, base_filename_condensation)
+    _write_agraph_layout(_agraph_from(graph_condensation), output_dir, base_filename_condensation)
     links.append(('Condensation', base_filename_condensation))
 
     for (component_index, component) in enumerate(strongly_connected_components):
@@ -253,15 +253,15 @@ def visualize():
             graph_component = graph_absolute_edges.subgraph(nbunch=component).copy()
             #macrogenesis.insert_minimal_edges_from_absolute_datings(graph_component)
             # , edge_labels=True)
-            write_agraph_layout(agraph_from(graph_component), output_dir,
-                                component_filename_pattern % (component_index))
+            _write_agraph_layout(_agraph_from(graph_component), output_dir,
+                                 component_filename_pattern % (component_index))
 
     # transitive closure, don't draw
     logging.info("Generating transitive closure graph.")
     transitive_closure = networkx.transitive_closure(graph_absolute_edges)
     logging.info("{0} nodes, {1} edges in transtive closure.".format(transitive_closure.number_of_nodes(),
                                                                      transitive_closure.number_of_edges()))
-    agraph_transitive_closure = agraph_from(transitive_closure)
+    agraph_transitive_closure = _agraph_from(transitive_closure)
 
     # draw transitive reduction
     logging.info("Generating transitive reduction graph.")
@@ -269,14 +269,14 @@ def visualize():
     logging.info("{0} nodes, {1} edges in transtive reduction.".format(agraph_transitive_reduction.number_of_nodes(),
                                                                       agraph_transitive_reduction.number_of_edges()))
     base_filename_transitive_reduction = '30_transitive_reduction'
-    write_agraph_layout(agraph_transitive_reduction, output_dir, base_filename_transitive_reduction)
+    _write_agraph_layout(agraph_transitive_reduction, output_dir, base_filename_transitive_reduction)
     links.append(('Transitive reduction', base_filename_transitive_reduction))
 
     # generate index.html
     logging.info("Generating index.html")
     html_links = ['<a href="{1}.html">{0}</a>'.format(*link) for link in links]
     with open(os.path.join(output_dir, 'index.html'), mode='w') as html_file:
-        html_file.write(html_template('<h1>macrogenesis graphs</h1>' + ('<br/> '.join(html_links))))
+        html_file.write(_html_template('<h1>macrogenesis graphs</h1>' + ('<br/> '.join(html_links))))
 
 
 if __name__ == '__main__':
