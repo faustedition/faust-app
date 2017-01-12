@@ -6,16 +6,16 @@ import logging
 
 import networkx
 
-import macrogenesis
+import graph
 
 def analyse_graph(graph):
     """Print statistics about the macrogenenesis graph"""
     print "graph"
     print "{0} nodes, {1} edges in macrogenetic graph.".format(graph.number_of_nodes(),
                                                                      graph.number_of_edges())
-    absolutely_dated_notes_sorted = macrogenesis.absolutely_dated_nodes_sorted(graph)
+    absolutely_dated_notes_sorted = graph.absolutely_dated_nodes_sorted(graph)
     print "{0} nodes with absolute datings.".format(len(absolutely_dated_notes_sorted))
-    num_equal_absolute_datings = macrogenesis.insert_minimal_edges_from_absolute_datings(graph)
+    num_equal_absolute_datings = graph.insert_minimal_edges_from_absolute_datings(graph)
     print "{0} equal absolute datings.".format(num_equal_absolute_datings)
 
     print "{0} strongly connected components (conflicts).".format(networkx.number_strongly_connected_components(graph))
@@ -41,8 +41,8 @@ def order_inscriptions(graph):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    graph = macrogenesis.import_graph()
-    macrogenesis.insert_minimal_edges_from_absolute_datings(graph)
+    graph = graph.import_graph()
+    graph.insert_minimal_edges_from_absolute_datings(graph)
 
     analyse_graph(graph)
     #order_inscriptions(graph)
