@@ -5,12 +5,15 @@ process whenever they change.
 import argparse
 import logging
 import multiprocessing
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
-import watchdog
 import os
 import time
+
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
+
 import faust
+import graph
+import inscription_order
 import visualize
 
 logging.basicConfig(level=logging.INFO)
@@ -20,8 +23,23 @@ parser.add_argument("--watch", action="store_true",
 args = parser.parse_args()
 
 
+def _write_index_html(links):
+    output_dir = faust.config.get("macrogenesis", "output-dir")
+    # generate index.html
+    logging.info("Generating index.html")
+    html_links = ['<a href="{1}">{0}</a>'.format(*link) for link in links]
+    with open(os.path.join(output_dir, 'index.html'), mode='w') as html_file:
+        html_file.write(visualize.html_template('<h1>macrogenesis graphs</h1>' + ('<br/> '.join(html_links))))
+
+
 def process_data():
-    visualize.visualize()
+    """Run all processing (analysis, graph generation) on macrogenetic data"""
+    raw_graph = graph.import_graph()
+    links_analysis = inscription_order.analyse_graph()
+
+
+    links_graphs = visualize.visualize()
+    _write_index_html(links_graphs + links_analysis)
 
 
 if args.watch:

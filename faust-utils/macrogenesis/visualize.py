@@ -152,7 +152,7 @@ def _visualize_absolute_datings(agraph):
                                 color=STYLE_ABSOLUTE_DATING_CLUSTER_COLOR)
             cluster_index += 1
 
-def _html_template(content):
+def html_template(content):
     return '<html><head><script src="js/svg-pan-zoom.min.js" type="text/javascript"></script></head>'\
     '<body>%s</body>'\
     '</html>' % content
@@ -166,7 +166,7 @@ def _write_agraph_layout (agraph, dir, basename):
     agraph.draw(os.path.join(dir, svg_filename))
     html_filename = os.path.join(dir, '%s.%s' % (basename, 'html'))
     with open(html_filename, mode='w') as html_file:
-        html_file.write(_html_template('<object id="genesis_graph" data="%s" type="image/svg+xml" style="width: 100%%;\
+        html_file.write(html_template('<object id="genesis_graph" data="%s" type="image/svg+xml" style="width: 100%%;\
         height: 100%%; border:1px solid black; "></object> <script type="text/javascript">window.onload = function()\
          {svgPanZoom("#genesis_graph", {zoomEnabled: true, controlIconsEnabled: true});};</script>' % svg_filename))
 
@@ -176,6 +176,10 @@ def _highlighted_base_filename (highlighted_node_url):
     return '20_highlighted_%s' % base64.urlsafe_b64encode(highlighted_node_url)
 
 def visualize():
+    """
+    Lay out, style and write to disk the macrogenesis graphs.
+    :return: list of pairs ``(link_text, relative_path)`` to the generated html pages
+    """
     output_dir = faust.config.get("macrogenesis", "output-dir")
     # copy resources
     try:
@@ -220,7 +224,7 @@ def visualize():
     del graph_imported
     base_filename_absolute_edges = '10_absolute_edges'
     _write_agraph_layout(_agraph_from(graph_absolute_edges), output_dir, base_filename_absolute_edges)
-    links.append(('Raw datings (relative and absolute)', base_filename_absolute_edges))
+    links.append(('Raw datings (relative and absolute)', '%s.html' % base_filename_absolute_edges))
     # again with edge labels
     # TODO this breaks graphviz
     # agraph_absolute_edges_edge_labels = agraph_from(graph_absolute_edges, edge_labels=True)
@@ -245,7 +249,7 @@ def visualize():
 
     base_filename_condensation = '15_condensation'
     _write_agraph_layout(_agraph_from(graph_condensation), output_dir, base_filename_condensation)
-    links.append(('Condensation', base_filename_condensation))
+    links.append(('Condensation', '%s.html' % base_filename_condensation))
 
     for (component_index, component) in enumerate(strongly_connected_components):
         # don't generate subgraphs consisting of a single node
@@ -270,13 +274,8 @@ def visualize():
                                                                       agraph_transitive_reduction.number_of_edges()))
     base_filename_transitive_reduction = '30_transitive_reduction'
     _write_agraph_layout(agraph_transitive_reduction, output_dir, base_filename_transitive_reduction)
-    links.append(('Transitive reduction', base_filename_transitive_reduction))
-
-    # generate index.html
-    logging.info("Generating index.html")
-    html_links = ['<a href="{1}.html">{0}</a>'.format(*link) for link in links]
-    with open(os.path.join(output_dir, 'index.html'), mode='w') as html_file:
-        html_file.write(_html_template('<h1>macrogenesis graphs</h1>' + ('<br/> '.join(html_links))))
+    links.append(('Transitive reduction', '%s.html' % base_filename_transitive_reduction))
+    return links
 
 
 if __name__ == '__main__':
