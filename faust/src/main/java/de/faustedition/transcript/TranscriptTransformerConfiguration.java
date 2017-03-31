@@ -1,6 +1,7 @@
 package de.faustedition.transcript;
 
 import de.faustedition.transcript.input.GXMLTransformerModule;
+import de.faustedition.transcript.input.GapTransformerModule;
 import eu.interedition.text.Name;
 import eu.interedition.text.xml.XMLTransformerConfigurationBase;
 import eu.interedition.text.xml.XMLTransformerModule;
@@ -56,6 +57,7 @@ public class TranscriptTransformerConfiguration {
 		modules.add(new DefaultAnnotationXMLTransformerModule<JsonNode>());
 		modules.add(new CLIXAnnotationXMLTransformerModule<JsonNode>());
 		modules.add(new GXMLTransformerModule());
+		modules.add(new GapTransformerModule());
 
 	}
 }
