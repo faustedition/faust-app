@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<grammar xmlns="http://relaxng.org/ns/structure/1.0"
-         xmlns:xlink="http://www.w3.org/1999/xlink"
-         datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
-         ns="http://www.tei-c.org/ns/1.0"><!--
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:xlink="http://www.w3.org/1999/xlink"
+   datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" ns="http://www.tei-c.org/ns/1.0">
+   <!--
 Schema generated from ODD source 2013-11-20T17:24:32Z. 
 Edition: 1.9.0. Last updated on February 25th 2011.
 Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
   
---><!----><div ns="http://www.w3.org/2000/svg"
-        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+-->
+   <!---->
+   <div ns="http://www.w3.org/2000/svg" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
       <define name="Boolean.datatype">
          <choice>
             <value>false</value>
@@ -1299,8 +1299,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="XLINK.xmlns.attrib"/>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:type"
-                       a:defaultValue="simple">
+               name="xlink:type" a:defaultValue="simple">
                <value>simple</value>
             </attribute>
          </optional>
@@ -1324,8 +1323,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:show"
-                       a:defaultValue="other">
+               name="xlink:show" a:defaultValue="other">
                <choice>
                   <value>other</value>
                </choice>
@@ -1333,8 +1331,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:actuate"
-                       a:defaultValue="onLoad">
+               name="xlink:actuate" a:defaultValue="onLoad">
                <value>onLoad</value>
             </attribute>
          </optional>
@@ -1347,8 +1344,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="XLINK.xmlns.attrib"/>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:type"
-                       a:defaultValue="simple">
+               name="xlink:type" a:defaultValue="simple">
                <value>simple</value>
             </attribute>
          </optional>
@@ -1370,8 +1366,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:show"
-                       a:defaultValue="other">
+               name="xlink:show" a:defaultValue="other">
                <choice>
                   <value>other</value>
                </choice>
@@ -1379,8 +1374,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:actuate"
-                       a:defaultValue="onLoad">
+               name="xlink:actuate" a:defaultValue="onLoad">
                <value>onLoad</value>
             </attribute>
          </optional>
@@ -1393,8 +1387,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="XLINK.xmlns.attrib"/>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:type"
-                       a:defaultValue="simple">
+               name="xlink:type" a:defaultValue="simple">
                <value>simple</value>
             </attribute>
          </optional>
@@ -1416,8 +1409,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:show"
-                       a:defaultValue="embed">
+               name="xlink:show" a:defaultValue="embed">
                <choice>
                   <value>embed</value>
                </choice>
@@ -1425,8 +1417,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:actuate"
-                       a:defaultValue="onLoad">
+               name="xlink:actuate" a:defaultValue="onLoad">
                <value>onLoad</value>
             </attribute>
          </optional>
@@ -1439,8 +1430,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="XLINK.xmlns.attrib"/>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:type"
-                       a:defaultValue="simple">
+               name="xlink:type" a:defaultValue="simple">
                <value>simple</value>
             </attribute>
          </optional>
@@ -1462,8 +1452,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:show"
-                       a:defaultValue="replace">
+               name="xlink:show" a:defaultValue="replace">
                <choice>
                   <value>new</value>
                   <value>replace</value>
@@ -1472,8 +1461,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xlink:actuate"
-                       a:defaultValue="onRequest">
+               name="xlink:actuate" a:defaultValue="onRequest">
                <value>onRequest</value>
             </attribute>
          </optional>
@@ -1603,15 +1591,13 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="preserveAspectRatio"
-                       a:defaultValue="xMidYMid meet">
+               name="preserveAspectRatio" a:defaultValue="xMidYMid meet">
                <ref name="PreserveAspectRatioSpec.datatype"/>
             </attribute>
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="zoomAndPan"
-                       a:defaultValue="magnify">
+               name="zoomAndPan" a:defaultValue="magnify">
                <choice>
                   <value>disable</value>
                   <value>magnify</value>
@@ -1619,9 +1605,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
             </attribute>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="version"
-                       a:defaultValue="1.1">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="version"
+               a:defaultValue="1.1">
                <value type="string" datatypeLibrary="">1.1</value>
             </attribute>
          </optional>
@@ -1632,15 +1617,13 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="contentScriptType"
-                       a:defaultValue="text/ecmascript">
+               name="contentScriptType" a:defaultValue="text/ecmascript">
                <ref name="ContentType.datatype"/>
             </attribute>
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="contentStyleType"
-                       a:defaultValue="text/css">
+               name="contentStyleType" a:defaultValue="text/css">
                <ref name="ContentType.datatype"/>
             </attribute>
          </optional>
@@ -1854,8 +1837,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="preserveAspectRatio"
-                       a:defaultValue="xMidYMid meet">
+               name="preserveAspectRatio" a:defaultValue="xMidYMid meet">
                <ref name="PreserveAspectRatioSpec.datatype"/>
             </attribute>
          </optional>
@@ -2010,8 +1992,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </attribute>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="preserveAspectRatio"
-                       a:defaultValue="xMidYMid meet">
+               name="preserveAspectRatio" a:defaultValue="xMidYMid meet">
                <ref name="PreserveAspectRatioSpec.datatype"/>
             </attribute>
          </optional>
@@ -2044,8 +2025,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
       <define name="attlist.style" combine="interleave">
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xml:space"
-                       a:defaultValue="preserve">
+               name="xml:space" a:defaultValue="preserve">
                <value>preserve</value>
             </attribute>
          </optional>
@@ -2989,8 +2969,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="preserveAspectRatio"
-                       a:defaultValue="xMidYMid meet">
+               name="preserveAspectRatio" a:defaultValue="xMidYMid meet">
                <ref name="PreserveAspectRatioSpec.datatype"/>
             </attribute>
          </optional>
@@ -3021,8 +3000,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <attribute name="name"/>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="rendering-intent"
-                       a:defaultValue="auto">
+               name="rendering-intent" a:defaultValue="auto">
                <choice>
                   <value>auto</value>
                   <value>perceptual</value>
@@ -3303,8 +3281,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="preserveAspectRatio"
-                       a:defaultValue="xMidYMid meet">
+               name="preserveAspectRatio" a:defaultValue="xMidYMid meet">
                <ref name="PreserveAspectRatioSpec.datatype"/>
             </attribute>
          </optional>
@@ -3574,9 +3551,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="SVG.FilterPrimitiveWithIn.attrib"/>
          <attribute name="in2"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="mode"
-                       a:defaultValue="normal">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="mode"
+               a:defaultValue="normal">
                <choice>
                   <value>normal</value>
                   <value>multiply</value>
@@ -3610,9 +3586,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="SVG.FilterColor.attrib"/>
          <ref name="SVG.FilterPrimitiveWithIn.attrib"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="matrix">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="matrix">
                <choice>
                   <value>matrix</value>
                   <value>saturate</value>
@@ -3678,9 +3653,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="SVG.FilterPrimitiveWithIn.attrib"/>
          <attribute name="in2"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="operator"
-                       a:defaultValue="over">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="operator"
+               a:defaultValue="over">
                <choice>
                   <value>over</value>
                   <value>in</value>
@@ -3759,9 +3733,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
             </attribute>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="edgeMode"
-                       a:defaultValue="duplicate">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="edgeMode"
+               a:defaultValue="duplicate">
                <choice>
                   <value>duplicate</value>
                   <value>wrap</value>
@@ -3861,8 +3834,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="xChannelSelector"
-                       a:defaultValue="A">
+               name="xChannelSelector" a:defaultValue="A">
                <choice>
                   <value>R</value>
                   <value>G</value>
@@ -3873,8 +3845,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="yChannelSelector"
-                       a:defaultValue="A">
+               name="yChannelSelector" a:defaultValue="A">
                <choice>
                   <value>R</value>
                   <value>G</value>
@@ -3976,8 +3947,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="SVG.External.attrib"/>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="preserveAspectRatio"
-                       a:defaultValue="xMidYMid meet">
+               name="preserveAspectRatio" a:defaultValue="xMidYMid meet">
                <ref name="PreserveAspectRatioSpec.datatype"/>
             </attribute>
          </optional>
@@ -4051,9 +4021,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="SVG.FilterColor.attrib"/>
          <ref name="SVG.FilterPrimitiveWithIn.attrib"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="operator"
-                       a:defaultValue="erode">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="operator"
+               a:defaultValue="erode">
                <choice>
                   <value>erode</value>
                   <value>dilate</value>
@@ -4217,8 +4186,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="stitchTiles"
-                       a:defaultValue="noStitch">
+               name="stitchTiles" a:defaultValue="noStitch">
                <choice>
                   <value>stitch</value>
                   <value>noStitch</value>
@@ -4226,9 +4194,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
             </attribute>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="turbulence">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="turbulence">
                <choice>
                   <value>fractalNoise</value>
                   <value>turbulence</value>
@@ -4715,15 +4682,13 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="preserveAspectRatio"
-                       a:defaultValue="xMidYMid meet">
+               name="preserveAspectRatio" a:defaultValue="xMidYMid meet">
                <ref name="PreserveAspectRatioSpec.datatype"/>
             </attribute>
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="zoomAndPan"
-                       a:defaultValue="magnify">
+               name="zoomAndPan" a:defaultValue="magnify">
                <choice>
                   <value>disable</value>
                   <value>magnify</value>
@@ -4796,9 +4761,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
             <attribute name="max"/>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="restart"
-                       a:defaultValue="always">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="restart"
+               a:defaultValue="always">
                <choice>
                   <value>always</value>
                   <value>never</value>
@@ -4813,9 +4777,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
             <attribute name="repeatDur"/>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="fill"
-                       a:defaultValue="remove">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="fill"
+               a:defaultValue="remove">
                <choice>
                   <value>remove</value>
                   <value>freeze</value>
@@ -4829,9 +4792,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
       </define>
       <define name="SVG.AnimationValue.attrib">
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="calcMode"
-                       a:defaultValue="linear">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="calcMode"
+               a:defaultValue="linear">
                <choice>
                   <value>discrete</value>
                   <value>linear</value>
@@ -4865,9 +4827,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
       </define>
       <define name="SVG.AnimationAddtion.attrib">
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="additive"
-                       a:defaultValue="replace">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="additive"
+               a:defaultValue="replace">
                <choice>
                   <value>replace</value>
                   <value>sum</value>
@@ -4876,8 +4837,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          </optional>
          <optional>
             <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="accumulate"
-                       a:defaultValue="none">
+               name="accumulate" a:defaultValue="none">
                <choice>
                   <value>none</value>
                   <value>sum</value>
@@ -4970,9 +4930,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="SVG.AnimationTiming.attrib"/>
          <ref name="SVG.AnimationAddtion.attrib"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="calcMode"
-                       a:defaultValue="paced">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="calcMode"
+               a:defaultValue="paced">
                <choice>
                   <value>discrete</value>
                   <value>linear</value>
@@ -5068,9 +5027,8 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
          <ref name="SVG.AnimationValue.attrib"/>
          <ref name="SVG.AnimationAddtion.attrib"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="translate">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="translate">
                <choice>
                   <value>translate</value>
                   <value>scale</value>
@@ -5877,7 +5835,7 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
       <optional>
          <attribute name="unit">
             <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] cm; 2] mm; 3] in; 4] lines; 5] chars</a:documentation>
+               Suggested values include: 1] cm; 2] mm; 3] in; 4] lines; 5] chars</a:documentation>
             <choice>
                <value>cm</value>
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -5925,8 +5883,8 @@ Suggested values include: 1] cm; 2] mm; 3] in; 4] lines; 5] chars</a:documentati
    <define name="_teiatt.dimensions.attribute.scope">
       <optional>
          <attribute name="scope">
-            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] all; 2] most; 3] range</a:documentation>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"> Sample
+               values include: 1] all; 2] most; 3] range</a:documentation>
             <ref name="_teidata.enumerated"/>
          </attribute>
       </optional>
@@ -5949,8 +5907,8 @@ Sample values include: 1] all; 2] most; 3] range</a:documentation>
    <define name="_teiatt.damaged.attribute.agent">
       <optional>
          <attribute name="agent">
-            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"> Sample
+               values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
             <ref name="_teidata.enumerated"/>
          </attribute>
       </optional>
@@ -6050,9 +6008,8 @@ Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
    </define>
    <define name="_teiatt.declarable.attribute.default">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="default"
-                    a:defaultValue="false">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="default"
+            a:defaultValue="false">
             <a:documentation/>
             <choice>
                <value>true</value>
@@ -6086,9 +6043,8 @@ Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
    </define>
    <define name="_teiatt.divLike.attribute.org">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="org"
-                    a:defaultValue="uniform">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="org"
+            a:defaultValue="uniform">
             <a:documentation/>
             <choice>
                <value>composite</value>
@@ -6101,9 +6057,8 @@ Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
    </define>
    <define name="_teiatt.divLike.attribute.sample">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="sample"
-                    a:defaultValue="complete">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="sample"
+            a:defaultValue="complete">
             <a:documentation/>
             <choice>
                <value>initial</value>
@@ -6122,9 +6077,8 @@ Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
    </define>
    <define name="_teiatt.divLike.attribute.part">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="part"
-                    a:defaultValue="N">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="part"
+            a:defaultValue="N">
             <a:documentation/>
             <choice>
                <value>Y</value>
@@ -6146,11 +6100,12 @@ Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
    </define>
    <define name="_teiatt.docStatus.attribute.status">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="status"
-                    a:defaultValue="draft">
-            <a:documentation>
-Sample values include: 1] approved; 2] candidate; 3] cleared; 4] deprecated; 5] draft; 6] embargoed; 7] expired; 8] frozen; 9] galley; 10] proposed; 11] published; 12] recommendation; 13] submitted; 14] unfinished; 15] withdrawn</a:documentation>
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="status"
+            a:defaultValue="draft">
+            <a:documentation> Sample values include: 1] approved; 2] candidate; 3] cleared; 4]
+               deprecated; 5] draft; 6] embargoed; 7] expired; 8] frozen; 9] galley; 10] proposed;
+               11] published; 12] recommendation; 13] submitted; 14] unfinished; 15]
+               withdrawn</a:documentation>
             <ref name="_teidata.enumerated"/>
          </attribute>
       </optional>
@@ -6196,9 +6151,8 @@ Sample values include: 1] approved; 2] candidate; 3] cleared; 4] deprecated; 5] 
    </define>
    <define name="_teiatt.editLike.attribute.instant">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="instant"
-                    a:defaultValue="false">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="instant"
+            a:defaultValue="false">
             <a:documentation/>
             <ref name="_teidata.xTruthValue"/>
          </attribute>
@@ -6208,7 +6162,7 @@ Sample values include: 1] approved; 2] candidate; 3] cleared; 4] deprecated; 5] 
       <optional>
          <attribute name="evidence">
             <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] internal; 2] external; 3] conjecture</a:documentation>
+               Suggested values include: 1] internal; 2] external; 3] conjecture</a:documentation>
             <list>
                <oneOrMore>
                   <choice>
@@ -6288,7 +6242,10 @@ Suggested values include: 1] internal; 2] external; 3] conjecture</a:documentati
       <optional>
          <attribute name="rend">
             <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] left; 2] right; 3] centered; 4] inline; 5] underline; 6] underdots; 7] double; 8] multiple; 9] vertical; 10] erase; 11] sub; 12] sup; 13] font-big; 14] font-small; 15] indent-10; 16] indent-20; 17] indent-30; 18] indent-40; 19] indent-50; 20] indent-60; 21] indent-70</a:documentation>
+               Suggested values include: 1] left; 2] right; 3] centered; 4] inline; 5] underline; 6]
+               underdots; 7] double; 8] multiple; 9] vertical; 10] erase; 11] sub; 12] sup; 13]
+               font-big; 14] font-small; 15] indent-10; 16] indent-20; 17] indent-30; 18] indent-40;
+               19] indent-50; 20] indent-60; 21] indent-70</a:documentation>
             <list>
                <oneOrMore>
                   <choice>
@@ -6468,8 +6425,8 @@ Suggested values include: 1] left; 2] right; 3] centered; 4] inline; 5] underlin
    <define name="_teiatt.interpLike.attribute.type">
       <optional>
          <attribute name="type">
-            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] image; 2] character; 3] theme; 4] allusion</a:documentation>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"> Sample
+               values include: 1] image; 2] character; 3] theme; 4] allusion</a:documentation>
             <ref name="_teidata.enumerated"/>
          </attribute>
       </optional>
@@ -6495,7 +6452,9 @@ Sample values include: 1] image; 2] character; 3] theme; 4] allusion</a:document
       <optional>
          <attribute name="unit">
             <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] m; 2] kg; 3] s; 4] Hz; 5] Pa; 6] Ω; 7] L; 8] t; 9] ha; 10] Å; 11] mL; 12] cm; 13] dB; 14] kbit; 15] Kibit; 16] kB; 17] KiB; 18] MB; 19] MiB</a:documentation>
+               Suggested values include: 1] m; 2] kg; 3] s; 4] Hz; 5] Pa; 6] Ω; 7] L; 8] t; 9] ha;
+               10] Å; 11] mL; 12] cm; 13] dB; 14] kbit; 15] Kibit; 16] kB; 17] KiB; 18] MB; 19]
+               MiB</a:documentation>
             <choice>
                <value>m</value>
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -6592,7 +6551,8 @@ Suggested values include: 1] m; 2] kg; 3] s; 4] Hz; 5] Pa; 6] Ω; 7] L; 8] t; 9
       <optional>
          <attribute name="place">
             <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] below; 2] bottom; 3] margin; 4] top; 5] opposite; 6] overleaf; 7] above; 8] end; 9] inline; 10] inspace</a:documentation>
+               Suggested values include: 1] below; 2] bottom; 3] margin; 4] top; 5] opposite; 6]
+               overleaf; 7] above; 8] end; 9] inline; 10] inspace</a:documentation>
             <list>
                <oneOrMore>
                   <choice>
@@ -6756,9 +6716,8 @@ Suggested values include: 1] below; 2] bottom; 3] margin; 4] top; 5] opposite; 6
    </define>
    <define name="_teiatt.segLike.attribute.part">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="part"
-                    a:defaultValue="N">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="part"
+            a:defaultValue="N">
             <a:documentation/>
             <choice>
                <value>Y</value>
@@ -6808,11 +6767,9 @@ Suggested values include: 1] below; 2] bottom; 3] margin; 4] top; 5] opposite; 6
    </define>
    <define name="_teiatt.tableDecoration.attribute.role">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="role"
-                    a:defaultValue="data">
-            <a:documentation>
-Suggested values include: 1] label; 2] data</a:documentation>
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="role"
+            a:defaultValue="data">
+            <a:documentation> Suggested values include: 1] label; 2] data</a:documentation>
             <choice>
                <value>label</value>
                <a:documentation/>
@@ -6825,9 +6782,8 @@ Suggested values include: 1] label; 2] data</a:documentation>
    </define>
    <define name="_teiatt.tableDecoration.attribute.rows">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="rows"
-                    a:defaultValue="1">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="rows"
+            a:defaultValue="1">
             <a:documentation/>
             <ref name="_teidata.count"/>
          </attribute>
@@ -6835,9 +6791,8 @@ Suggested values include: 1] label; 2] data</a:documentation>
    </define>
    <define name="_teiatt.tableDecoration.attribute.cols">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="cols"
-                    a:defaultValue="1">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="cols"
+            a:defaultValue="1">
             <a:documentation/>
             <ref name="_teidata.count"/>
          </attribute>
@@ -6859,11 +6814,11 @@ Suggested values include: 1] label; 2] data</a:documentation>
    </define>
    <define name="_teiatt.transcriptional.attribute.status">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="status"
-                    a:defaultValue="unremarkable">
-            <a:documentation>
-Sample values include: 1] duplicate; 2] duplicate-partial; 3] excessStart; 4] excessEnd; 5] shortStart; 6] shortEnd; 7] partial; 8] unremarkable</a:documentation>
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="status"
+            a:defaultValue="unremarkable">
+            <a:documentation> Sample values include: 1] duplicate; 2] duplicate-partial; 3]
+               excessStart; 4] excessEnd; 5] shortStart; 6] shortEnd; 7] partial; 8]
+               unremarkable</a:documentation>
             <ref name="_teidata.enumerated"/>
          </attribute>
       </optional>
@@ -9147,9 +9102,8 @@ Sample values include: 1] duplicate; 2] duplicate-partial; 3] excessStart; 4] ex
    </define>
    <define name="_teiatt.personal.attribute.full">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="full"
-                    a:defaultValue="yes">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="full"
+            a:defaultValue="yes">
             <a:documentation/>
             <choice>
                <value>yes</value>
@@ -9295,17 +9249,15 @@ Sample values include: 1] duplicate; 2] duplicate-partial; 3] excessStart; 4] ex
          <ref name="_teiatt.global.attributes"/>
          <ref name="_teiatt.ascribed.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="aloud"
-                       a:defaultValue="unknown">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="aloud"
+               a:defaultValue="unknown">
                <a:documentation/>
                <ref name="_teidata.xTruthValue"/>
             </attribute>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="direct"
-                       a:defaultValue="true">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="direct"
+               a:defaultValue="true">
                <a:documentation/>
                <ref name="_teidata.xTruthValue"/>
             </attribute>
@@ -9350,7 +9302,8 @@ Sample values include: 1] duplicate; 2] duplicate-partial; 3] excessStart; 4] ex
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] spoken; 2] thought; 3] written; 4] soCalled; 5] foreign; 6] distinct; 7] term; 8] emph; 9] mentioned</a:documentation>
+                  Suggested values include: 1] spoken; 2] thought; 3] written; 4] soCalled; 5]
+                  foreign; 6] distinct; 7] term; 8] emph; 9] mentioned</a:documentation>
                <choice>
                   <value>spoken</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -9606,7 +9559,7 @@ Suggested values include: 1] spoken; 2] thought; 3] written; 4] soCalled; 5] for
          <optional>
             <attribute name="agent">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
+                  Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -9686,7 +9639,7 @@ Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
          <optional>
             <attribute name="agent">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
+                  Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -9829,7 +9782,8 @@ Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] cardinal; 2] ordinal; 3] fraction; 4] percentage</a:documentation>
+                  Suggested values include: 1] cardinal; 2] ordinal; 3] fraction; 4]
+                  percentage</a:documentation>
                <choice>
                   <value>cardinal</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -9908,7 +9862,8 @@ Suggested values include: 1] cardinal; 2] ordinal; 3] fraction; 4] percentage</a
          <optional>
             <attribute name="calendar">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] Gregorian; 2] Julian; 3] Islamic; 4] Hebrew; 5] Revolutionary; 6] Iranian; 7] Coptic; 8] Chinese</a:documentation>
+                  Suggested values include: 1] Gregorian; 2] Julian; 3] Islamic; 4] Hebrew; 5]
+                  Revolutionary; 6] Iranian; 7] Coptic; 8] Chinese</a:documentation>
                <choice>
                   <value>Gregorian</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -9967,7 +9922,9 @@ Suggested values include: 1] Gregorian; 2] Julian; 3] Islamic; 4] Hebrew; 5] Rev
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] suspension; 2] contraction; 3] brevigraph; 4] superscription; 5] acronym; 6] title; 7] organization; 8] geographic</a:documentation>
+                  Sample values include: 1] suspension; 2] contraction; 3] brevigraph; 4]
+                  superscription; 5] acronym; 6] title; 7] organization; 8]
+                  geographic</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -9997,11 +9954,10 @@ Sample values include: 1] suspension; 2] contraction; 3] brevigraph; 4] superscr
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="ptr-constraint-ptrAtts">
             <rule context="tei:ptr">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@target and @cRef">Only one of the
-	attributes 'target' and 'cRef' may be supplied.</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@target and @cRef">Only one of the attributes 'target' and 'cRef' may be
+                  supplied.</report>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -10036,11 +9992,10 @@ Sample values include: 1] suspension; 2] contraction; 3] brevigraph; 4] superscr
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="ref-constraint-refAtts">
             <rule context="tei:ref">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@target and @cRef">Only one of the
-	attributes 'target' and 'cRef' may be supplied.</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@target and @cRef">Only one of the attributes 'target' and 'cRef' may be
+                  supplied.</report>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -10113,11 +10068,10 @@ Sample values include: 1] suspension; 2] contraction; 3] brevigraph; 4] superscr
          </group>
          <ref name="_teiatt.global.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="simple">
-               <a:documentation>
-Suggested values include: 1] ordered; 2] bulleted; 3] simple; 4] gloss</a:documentation>
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="simple">
+               <a:documentation> Suggested values include: 1] ordered; 2] bulleted; 3] simple; 4]
+                  gloss</a:documentation>
                <choice>
                   <value>ordered</value>
                   <a:documentation/>
@@ -10232,9 +10186,8 @@ Suggested values include: 1] ordered; 2] bulleted; 3] simple; 4] gloss</a:docume
          <ref name="_teiatt.responsibility.attributes"/>
          <ref name="_teiatt.typed.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="anchored"
-                       a:defaultValue="true">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="anchored"
+               a:defaultValue="true">
                <a:documentation/>
                <ref name="_teidata.truthValue"/>
             </attribute>
@@ -10357,7 +10310,9 @@ Suggested values include: 1] ordered; 2] bulleted; 3] simple; 4] gloss</a:docume
          <ref name="_teiatt.breaking.attributes"/>
          <attribute name="unit">
             <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] page; 2] column; 3] line; 4] book; 5] poem; 6] canto; 7] speaker; 8] stanza; 9] act; 10] scene; 11] section; 12] absent; 13] unnumbered</a:documentation>
+               Suggested values include: 1] page; 2] column; 3] line; 4] book; 5] poem; 6] canto; 7]
+               speaker; 8] stanza; 9] act; 10] scene; 11] section; 12] absent; 13]
+               unnumbered</a:documentation>
             <choice>
                <value>page</value>
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -10646,7 +10601,8 @@ Suggested values include: 1] page; 2] column; 3] line; 4] book; 5] poem; 6] cant
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] main; 2] sub; 3] alt; 4] short; 5] desc</a:documentation>
+                  Sample values include: 1] main; 2] sub; 3] alt; 4] short; 5]
+                  desc</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -10717,7 +10673,8 @@ Sample values include: 1] main; 2] sub; 3] alt; 4] short; 5] desc</a:documentati
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] vol; 2] issue; 3] pp; 4] ll; 5] chap; 6] part</a:documentation>
+                  Suggested values include: 1] vol; 2] issue; 3] pp; 4] ll; 5] chap; 6]
+                  part</a:documentation>
                <choice>
                   <value>vol</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -10846,29 +10803,28 @@ Suggested values include: 1] vol; 2] issue; 3] pp; 4] ll; 5] chap; 6] part</a:do
             </choice>
          </optional>
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="relatedItem-constraint-targetorcontent11">
+            id="relatedItem-constraint-targetorcontent11">
             <rule context="tei:relatedItem">
                <sch:report xmlns:sch="http://purl.oclc.org/dsdl/schematron"
-                           xmlns="http://www.tei-c.org/ns/1.0"
-                           xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                           xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                           xmlns:svg="http://www.w3.org/2000/svg"
-                           xmlns:f="http://www.faustedition.net/ns"
-                           test="@target and count( child::* ) &gt; 0">If the 'target' attribute is used, the
-        relatedItem element must be empty</sch:report>
+                  xmlns="http://www.tei-c.org/ns/1.0"
+                  xmlns:rng="http://relaxng.org/ns/structure/1.0"
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@target and count( child::* ) &gt; 0">If the 'target' attribute is used, the
+                  relatedItem element must be empty</sch:report>
             </rule>
-         </pattern> 
+         </pattern>
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="relatedItem-constraint-targetorcontent11">
+            id="relatedItem-constraint-targetorcontent11">
             <rule context="tei:relatedItem">
                <sch:assert xmlns:sch="http://purl.oclc.org/dsdl/schematron"
-                           xmlns="http://www.tei-c.org/ns/1.0"
-                           xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                           xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                           xmlns:svg="http://www.w3.org/2000/svg"
-                           xmlns:f="http://www.faustedition.net/ns"
-                           test="@target or child::*">A relatedItem element should have either a 'target' attribute
-        or a child element to indicate the related bibliographic item</sch:assert>
+                  xmlns="http://www.tei-c.org/ns/1.0"
+                  xmlns:rng="http://relaxng.org/ns/structure/1.0"
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@target or child::*">A relatedItem element should have either a 'target'
+                  attribute or a child element to indicate the related bibliographic
+                  item</sch:assert>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -10898,9 +10854,8 @@ Suggested values include: 1] vol; 2] issue; 3] pp; 4] ll; 5] chap; 6] part</a:do
          <ref name="_teiatt.metrical.attributes"/>
          <ref name="_teiatt.enjamb.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="part"
-                       a:defaultValue="N">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="part"
+               a:defaultValue="N">
                <a:documentation/>
                <choice>
                   <value>Y</value>
@@ -11019,7 +10974,8 @@ Suggested values include: 1] vol; 2] issue; 3] pp; 4] ll; 5] chap; 6] part</a:do
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] setting; 2] entrance; 3] exit; 4] business; 5] novelistic; 6] delivery; 7] modifier; 8] location; 9] mixed</a:documentation>
+                  Suggested values include: 1] setting; 2] entrance; 3] exit; 4] business; 5]
+                  novelistic; 6] delivery; 7] modifier; 8] location; 9] mixed</a:documentation>
                <choice>
                   <value>setting</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -11060,9 +11016,8 @@ Suggested values include: 1] setting; 2] entrance; 3] exit; 4] business; 5] nove
          </group>
          <ref name="_teiatt.global.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="version"
-                       a:defaultValue="5.0">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="version"
+               a:defaultValue="5.0">
                <a:documentation/>
                <ref name="_teidata.version"/>
             </attribute>
@@ -11080,7 +11035,7 @@ Suggested values include: 1] setting; 2] entrance; 3] exit; 4] business; 5] nove
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] index; 2] toc; 3] figlist; 4] tablist</a:documentation>
+                  Sample values include: 1] index; 2] toc; 3] figlist; 4] tablist</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -11101,11 +11056,9 @@ Sample values include: 1] index; 2] toc; 3] figlist; 4] tablist</a:documentation
          </group>
          <ref name="_teiatt.global.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="text">
-               <a:documentation>
-Sample values include: 1] text; 2] corpus</a:documentation>
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="text">
+               <a:documentation> Sample values include: 1] text; 2] corpus</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -11317,9 +11270,8 @@ Sample values include: 1] text; 2] corpus</a:documentation>
          <ref name="_teiatt.global.attributes"/>
          <ref name="_teiatt.declarable.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="status"
-                       a:defaultValue="unknown">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="status"
+               a:defaultValue="unknown">
                <a:documentation/>
                <choice>
                   <value>free</value>
@@ -11476,9 +11428,8 @@ Sample values include: 1] text; 2] corpus</a:documentation>
          <ref name="_teiatt.global.attributes"/>
          <ref name="_teiatt.declarable.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="status"
-                       a:defaultValue="unknown">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="status"
+               a:defaultValue="unknown">
                <a:documentation/>
                <choice>
                   <value>high</value>
@@ -11493,9 +11444,8 @@ Sample values include: 1] text; 2] corpus</a:documentation>
             </attribute>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="method"
-                       a:defaultValue="silent">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="method"
+               a:defaultValue="silent">
                <a:documentation/>
                <choice>
                   <value>silent</value>
@@ -11523,9 +11473,8 @@ Sample values include: 1] text; 2] corpus</a:documentation>
             </attribute>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="method"
-                       a:defaultValue="silent">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="method"
+               a:defaultValue="silent">
                <a:documentation/>
                <choice>
                   <value>silent</value>
@@ -11547,9 +11496,8 @@ Sample values include: 1] text; 2] corpus</a:documentation>
          <ref name="_teiatt.global.attributes"/>
          <ref name="_teiatt.declarable.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="marks"
-                       a:defaultValue="all">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="marks"
+               a:defaultValue="all">
                <a:documentation/>
                <choice>
                   <value>none</value>
@@ -11562,9 +11510,8 @@ Sample values include: 1] text; 2] corpus</a:documentation>
             </attribute>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="form"
-                       a:defaultValue="unknown">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="form"
+               a:defaultValue="unknown">
                <a:documentation/>
                <text/>
             </attribute>
@@ -11581,9 +11528,8 @@ Sample values include: 1] text; 2] corpus</a:documentation>
          <ref name="_teiatt.global.attributes"/>
          <ref name="_teiatt.declarable.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="eol"
-                       a:defaultValue="some">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="eol"
+               a:defaultValue="some">
                <a:documentation/>
                <choice>
                   <value>all</value>
@@ -11778,7 +11724,8 @@ Sample values include: 1] text; 2] corpus</a:documentation>
          <ref name="_teiatt.sourced.attributes"/>
          <attribute name="unit">
             <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] page; 2] column; 3] line; 4] book; 5] poem; 6] canto; 7] stanza; 8] act; 9] scene; 10] section; 11] absent</a:documentation>
+               Suggested values include: 1] page; 2] column; 3] line; 4] book; 5] poem; 6] canto; 7]
+               stanza; 8] act; 9] scene; 10] section; 11] absent</a:documentation>
             <choice>
                <value>page</value>
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -12160,11 +12107,10 @@ Suggested values include: 1] page; 2] column; 3] line; 4] book; 5] poem; 6] cant
          <ref name="_teiatt.global.attributes"/>
          <ref name="_teiatt.declarable.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="datum"
-                       a:defaultValue="WGS84">
-               <a:documentation>
-Suggested values include: 1] WGS84; 2] MGRS; 3] OSGB36; 4] ED50</a:documentation>
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="datum"
+               a:defaultValue="WGS84">
+               <a:documentation> Suggested values include: 1] WGS84; 2] MGRS; 3] OSGB36; 4]
+                  ED50</a:documentation>
                <choice>
                   <value>WGS84</value>
                   <a:documentation/>
@@ -12198,12 +12144,10 @@ Suggested values include: 1] WGS84; 2] MGRS; 3] OSGB36; 4] ED50</a:documentation
                <ref name="_teitext"/>
             </choice>
          </group>
-         <ns xmlns="http://purl.oclc.org/dsdl/schematron"
-             prefix="tei"
-             uri="http://www.tei-c.org/ns/1.0"/>
-         <ns xmlns="http://purl.oclc.org/dsdl/schematron"
-             prefix="rng"
-             uri="http://relaxng.org/ns/structure/1.0"/>
+         <ns xmlns="http://purl.oclc.org/dsdl/schematron" prefix="tei"
+            uri="http://www.tei-c.org/ns/1.0"/>
+         <ns xmlns="http://purl.oclc.org/dsdl/schematron" prefix="rng"
+            uri="http://relaxng.org/ns/structure/1.0"/>
          <ref name="_teiatt.global.attributes"/>
          <optional>
             <attribute name="version">
@@ -13103,11 +13047,10 @@ Suggested values include: 1] WGS84; 2] MGRS; 3] OSGB36; 4] ED50</a:documentation
          </zeroOrMore>
          <ref name="_teiatt.global.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="main">
-               <a:documentation>
-Suggested values include: 1] main; 2] sub; 3] alt; 4] short; 5] desc</a:documentation>
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="main">
+               <a:documentation> Suggested values include: 1] main; 2] sub; 3] alt; 4] short; 5]
+                  desc</a:documentation>
                <choice>
                   <value>main</value>
                   <a:documentation/>
@@ -13430,7 +13373,8 @@ Suggested values include: 1] main; 2] sub; 3] alt; 4] short; 5] desc</a:document
                      <value>location</value>
                      <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
                      <value>value</value>
-                     <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
+                     <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+                     />
                   </choice>
                </oneOrMore>
             </list>
@@ -13456,11 +13400,10 @@ Suggested values include: 1] main; 2] sub; 3] alt; 4] short; 5] desc</a:document
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="s-constraint-noNestedS">
             <rule context="tei:s">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="tei:s">You may not nest one s element within
-      another: use seg instead</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="tei:s">You may not nest one s element within another: use seg
+                  instead</report>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -13889,9 +13832,8 @@ Suggested values include: 1] main; 2] sub; 3] alt; 4] short; 5] desc</a:document
          </zeroOrMore>
          <ref name="_teiatt.global.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="role">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="role">
                <a:documentation/>
                <choice>
                   <value>role</value>
@@ -13958,7 +13900,7 @@ Suggested values include: 1] main; 2] sub; 3] alt; 4] short; 5] desc</a:document
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] entrance; 2] exit; 3] onStage</a:documentation>
+                  Suggested values include: 1] entrance; 2] exit; 3] onStage</a:documentation>
                <choice>
                   <value>entrance</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -13973,7 +13915,7 @@ Suggested values include: 1] entrance; 2] exit; 3] onStage</a:documentation>
          <optional>
             <attribute name="where">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] L; 2] R; 3] C</a:documentation>
+                  Sample values include: 1] L; 2] R; 3] C</a:documentation>
                <list>
                   <oneOrMore>
                      <ref name="_teidata.enumerated"/>
@@ -14048,9 +13990,8 @@ Sample values include: 1] L; 2] R; 3] C</a:documentation>
             </attribute>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="discrete"
-                       a:defaultValue="unknown">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="discrete"
+               a:defaultValue="unknown">
                <a:documentation/>
                <ref name="_teidata.xTruthValue"/>
             </attribute>
@@ -14204,9 +14145,8 @@ Sample values include: 1] L; 2] R; 3] C</a:documentation>
             <ref name="_teidata.name"/>
          </attribute>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="optional"
-                       a:defaultValue="true">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="optional"
+               a:defaultValue="true">
                <a:documentation/>
                <data type="boolean"/>
             </attribute>
@@ -14369,26 +14309,22 @@ Sample values include: 1] L; 2] R; 3] C</a:documentation>
                <ref name="_teimodel.featureVal"/>
             </choice>
          </zeroOrMore>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="f-constraint-fValConstraints">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="f-constraint-fValConstraints">
             <rule xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                  xmlns:svg="http://www.w3.org/2000/svg"
-                  xmlns:f="http://www.faustedition.net/ns"
-                  context="tei:fVal">
-               <assert test="not(tei:* and text)"> A feature value cannot
-    contain both text and element content</assert>
+               xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+               xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+               context="tei:fVal">
+               <assert test="not(tei:* and text)"> A feature value cannot contain both text and
+                  element content</assert>
             </rule>
-         </pattern> 
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="f-constraint-fValConstraints">
+         </pattern>
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="f-constraint-fValConstraints">
             <rule xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                  xmlns:svg="http://www.w3.org/2000/svg"
-                  xmlns:f="http://www.faustedition.net/ns"
-                  context="tei:fVal">
-               <report test="count(tei:*)&gt;1"> A feature value can contain
-    only one child element</report>
+               xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+               xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+               context="tei:fVal">
+               <report test="count(tei:*)&gt;1"> A feature value can contain only one child
+                  element</report>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -14588,43 +14524,37 @@ Sample values include: 1] L; 2] R; 3] C</a:documentation>
       <element name="link">
          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
          <empty/>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="link-constraint-linkTargets1">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="link-constraint-linkTargets1">
             <rule context="tei:link">
                <sch:report xmlns:sch="http://purl.oclc.org/dsdl/schematron"
-                           xmlns="http://www.tei-c.org/ns/1.0"
-                           xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                           xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                           xmlns:svg="http://www.w3.org/2000/svg"
-                           xmlns:f="http://www.faustedition.net/ns"
-                           test="@target and @targets">You may not supply both 
-	@target and @targets</sch:report>
+                  xmlns="http://www.tei-c.org/ns/1.0"
+                  xmlns:rng="http://relaxng.org/ns/structure/1.0"
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@target and @targets">You may not supply both @target and
+                  @targets</sch:report>
             </rule>
          </pattern>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="link-constraint-linkTargets2">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="link-constraint-linkTargets2">
             <rule context="tei:link">
                <sch:report xmlns:sch="http://purl.oclc.org/dsdl/schematron"
-                           xmlns="http://www.tei-c.org/ns/1.0"
-                           xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                           xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                           xmlns:svg="http://www.w3.org/2000/svg"
-                           xmlns:f="http://www.faustedition.net/ns"
-                           test="not(@target) and not(@targets)">You must
-	supply either @target or @targets</sch:report>
+                  xmlns="http://www.tei-c.org/ns/1.0"
+                  xmlns:rng="http://relaxng.org/ns/structure/1.0"
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="not(@target) and not(@targets)">You must supply either @target or
+                  @targets</sch:report>
             </rule>
          </pattern>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="link-constraint-linkTargets3">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="link-constraint-linkTargets3">
             <rule context="tei:link">
                <sch:assert xmlns:sch="http://purl.oclc.org/dsdl/schematron"
-                           xmlns="http://www.tei-c.org/ns/1.0"
-                           xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                           xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                           xmlns:svg="http://www.w3.org/2000/svg"
-                           xmlns:f="http://www.faustedition.net/ns"
-                           test="contains(@target,' ')">You must supply at least two
-values for @target</sch:assert>
+                  xmlns="http://www.tei-c.org/ns/1.0"
+                  xmlns:rng="http://relaxng.org/ns/structure/1.0"
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="contains(@target,' ')">You must supply at least two values for
+                  @target</sch:assert>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -14675,9 +14605,8 @@ values for @target</sch:assert>
          <ref name="_teiatt.typed.attributes"/>
          <ref name="_teiatt.declaring.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="part"
-                       a:defaultValue="N">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="part"
+               a:defaultValue="N">
                <a:documentation/>
                <choice>
                   <value>Y</value>
@@ -14738,7 +14667,7 @@ values for @target</sch:assert>
          <optional>
             <attribute name="unit">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] d; 2] h; 3] min; 4] s; 5] ms</a:documentation>
+                  Suggested values include: 1] d; 2] h; 3] min; 4] s; 5] ms</a:documentation>
                <choice>
                   <value>d</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -14790,7 +14719,7 @@ Suggested values include: 1] d; 2] h; 3] min; 4] s; 5] ms</a:documentation>
          <optional>
             <attribute name="unit">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] d; 2] h; 3] min; 4] s; 5] ms</a:documentation>
+                  Suggested values include: 1] d; 2] h; 3] min; 4] s; 5] ms</a:documentation>
                <choice>
                   <value>d</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -14827,37 +14756,30 @@ Suggested values include: 1] d; 2] h; 3] min; 4] s; 5] ms</a:documentation>
          <zeroOrMore>
             <ref name="_teimodel.glossLike"/>
          </zeroOrMore>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="join-constraint-joinTargets1">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="join-constraint-joinTargets1">
             <rule context="tei:join">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@target and @targets">You may not supply both 
-	@target and @targets</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@target and @targets">You may not supply both @target and @targets</report>
             </rule>
          </pattern>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="join-constraint-joinTargets2">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="join-constraint-joinTargets2">
             <rule context="tei:join">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="not(@target) and not(@targets)">You must
-	supply either @target or @targets</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="not(@target) and not(@targets)">You must supply either @target or
+                  @targets</report>
             </rule>
          </pattern>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="join-constraint-joinTargets3">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="join-constraint-joinTargets3">
             <rule context="tei:join">
                <assert xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="contains(@target,' ')">You must supply at least two
-values for @target</assert>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="contains(@target,' ')">You must supply at least two values for
+                  @target</assert>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -14882,9 +14804,8 @@ values for @target</assert>
             </attribute>
          </optional>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="scope"
-                       a:defaultValue="root">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="scope"
+               a:defaultValue="root">
                <a:documentation/>
                <choice>
                   <value>root</value>
@@ -14926,37 +14847,30 @@ values for @target</assert>
       <element name="alt">
          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
          <empty/>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="alt-constraint-altTargets1">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="alt-constraint-altTargets1">
             <rule context="tei:alt">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@target and @targets">You may not supply both 
-	@target and @targets</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@target and @targets">You may not supply both @target and @targets</report>
             </rule>
          </pattern>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="alt-constraint-altTargets2">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="alt-constraint-altTargets2">
             <rule context="tei:alt">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="not(@target) and not(@targets)">You must
-	supply either @target or @targets</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="not(@target) and not(@targets)">You must supply either @target or
+                  @targets</report>
             </rule>
          </pattern>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="alt-constraint-altTargets3">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="alt-constraint-altTargets3">
             <rule context="tei:alt">
                <assert xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="contains(@target,' ')">You must supply at least two
-values for @target</assert>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="contains(@target,' ')">You must supply at least two values for
+                  @target</assert>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -15012,9 +14926,8 @@ values for @target</assert>
          <ref name="_teiatt.global.attributes"/>
          <ref name="_teiatt.pointing.group.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="mode"
-                       a:defaultValue="excl">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="mode"
+               a:defaultValue="excl">
                <a:documentation/>
                <choice>
                   <value>excl</value>
@@ -15179,39 +15092,30 @@ values for @target</assert>
             </zeroOrMore>
          </group>
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="dimensions-constraint-duplicateDim1">
+            id="dimensions-constraint-duplicateDim1">
             <rule context="tei:dimensions">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="count(tei:width)&gt; 1">
-	Width element may appear once only
-      </report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="count(tei:width)&gt; 1"> Width element may appear once only </report>
             </rule>
-         </pattern> 
+         </pattern>
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="dimensions-constraint-duplicateDim2">
+            id="dimensions-constraint-duplicateDim2">
             <rule context="tei:dimensions">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="count(tei:height)&gt; 1">
-	Height element may appear once only
-      </report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="count(tei:height)&gt; 1"> Height element may appear once only </report>
             </rule>
-         </pattern> 
+         </pattern>
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="dimensions-constraint-duplicateDim3">
+            id="dimensions-constraint-duplicateDim3">
             <rule context="tei:dimensions">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="count(tei:depth)&gt; 1">
-	Depth element may appear once only
-      </report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="count(tei:depth)&gt; 1"> Depth element may appear once only </report>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -15219,7 +15123,8 @@ values for @target</assert>
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] leaves; 2] ruled; 3] pricked; 4] written; 5] miniatures; 6] binding; 7] box</a:documentation>
+                  Sample values include: 1] leaves; 2] ruled; 3] pricked; 4] written; 5] miniatures;
+                  6] binding; 7] box</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -15503,15 +15408,13 @@ Sample values include: 1] leaves; 2] ruled; 3] pricked; 4] written; 5] miniature
             </zeroOrMore>
          </group>
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="msIdentifier-constraint-msId_minimal">
+            id="msIdentifier-constraint-msId_minimal">
             <rule context="tei:msIdentifier">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="local-name(*[1])='idno' or                              local-name(*[1])='altIdentifier' or        .='' ">
-	    You must supply either a locator of some type or a
-	    name</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="local-name(*[1])='idno' or                              local-name(*[1])='altIdentifier' or        .='' "
+                  > You must supply either a locator of some type or a name</report>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -15890,9 +15793,8 @@ Sample values include: 1] leaves; 2] ruled; 3] pricked; 4] written; 5] miniature
    </define>
    <define name="_teiatt.msExcerpt.attribute.defective">
       <optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="defective"
-                    a:defaultValue="false">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="defective"
+            a:defaultValue="false">
             <a:documentation/>
             <ref name="_teidata.xTruthValue"/>
          </attribute>
@@ -15968,7 +15870,7 @@ Sample values include: 1] leaves; 2] ruled; 3] pricked; 4] written; 5] miniature
          <optional>
             <attribute name="material">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] paper; 2] parch; 3] mixed</a:documentation>
+                  Suggested values include: 1] paper; 2] parch; 3] mixed</a:documentation>
                <choice>
                   <value>paper</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -16643,7 +16545,8 @@ Suggested values include: 1] paper; 2] parch; 3] mixed</a:documentation>
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] undirected; 2] directed; 3] transitionNetwork; 4] transducer</a:documentation>
+                  Suggested values include: 1] undirected; 2] directed; 3] transitionNetwork; 4]
+                  transducer</a:documentation>
                <choice>
                   <value>undirected</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -16691,7 +16594,7 @@ Suggested values include: 1] undirected; 2] directed; 3] transitionNetwork; 4] t
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] initial; 2] final</a:documentation>
+                  Suggested values include: 1] initial; 2] final</a:documentation>
                <choice>
                   <value>initial</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -16809,9 +16712,8 @@ Suggested values include: 1] initial; 2] final</a:documentation>
                <ref name="_teidata.count"/>
             </attribute>
          </optional>
-         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                    name="ord"
-                    a:defaultValue="true">
+         <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="ord"
+            a:defaultValue="true">
             <a:documentation/>
             <choice>
                <value>true</value>
@@ -17109,14 +17011,13 @@ Suggested values include: 1] initial; 2] final</a:documentation>
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="app-constraint-only1lem">
             <rule context="tei:app">
                <sch:assert xmlns:sch="http://purl.oclc.org/dsdl/schematron"
-                           xmlns="http://www.tei-c.org/ns/1.0"
-                           xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                           xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                           xmlns:svg="http://www.w3.org/2000/svg"
-                           xmlns:f="http://www.faustedition.net/ns"
-                           test="count( descendant::tei:lem[ generate-id(       current() ) = generate-id( ancestor::tei:app[1] ) ]) &lt;       2">Only one &lt;lem&gt; element may appear within a single
-      apparatus entry, whether it appears outside a &lt;rdgGrp&gt;
-      element or within it.</sch:assert>
+                  xmlns="http://www.tei-c.org/ns/1.0"
+                  xmlns:rng="http://relaxng.org/ns/structure/1.0"
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="count( descendant::tei:lem[ generate-id(       current() ) = generate-id( ancestor::tei:app[1] ) ]) &lt;       2"
+                  >Only one &lt;lem&gt; element may appear within a single apparatus entry, whether
+                  it appears outside a &lt;rdgGrp&gt; element or within it.</sch:assert>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -17416,8 +17317,8 @@ Suggested values include: 1] initial; 2] final</a:documentation>
    <define name="_teiatt.textCritical.attribute.type">
       <optional>
          <attribute name="type">
-            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] substantive; 2] orthographic</a:documentation>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"> Sample
+               values include: 1] substantive; 2] orthographic</a:documentation>
             <ref name="_teidata.enumerated"/>
          </attribute>
       </optional>
@@ -17425,8 +17326,9 @@ Sample values include: 1] substantive; 2] orthographic</a:documentation>
    <define name="_teiatt.textCritical.attribute.cause">
       <optional>
          <attribute name="cause">
-            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] homeoteleuton; 2] homeoarchy; 3] paleographicConfusion; 4] haplography; 5] dittography; 6] falseEmendation</a:documentation>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"> Sample
+               values include: 1] homeoteleuton; 2] homeoarchy; 3] paleographicConfusion; 4]
+               haplography; 5] dittography; 6] falseEmendation</a:documentation>
             <ref name="_teidata.enumerated"/>
          </attribute>
       </optional>
@@ -17565,9 +17467,8 @@ Sample values include: 1] homeoteleuton; 2] homeoarchy; 3] paleographicConfusion
          <ref name="_teiatt.typed.attributes"/>
          <ref name="_teiatt.global.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="rotate"
-                       a:defaultValue="0">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="rotate"
+               a:defaultValue="0">
                <a:documentation/>
                <ref name="_teidata.count"/>
             </attribute>
@@ -17582,26 +17483,23 @@ Sample values include: 1] homeoteleuton; 2] homeoarchy; 3] paleographicConfusion
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="addSpan-constraint-spanTo">
             <rule context="tei:addSpan">
                <sch:assert xmlns:s="http://www.ascc.net/xml/schematron"
-                           xmlns:sch="http://purl.oclc.org/dsdl/schematron"
-                           xmlns="http://www.tei-c.org/ns/1.0"
-                           xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                           xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                           xmlns:svg="http://www.w3.org/2000/svg"
-                           xmlns:f="http://www.faustedition.net/ns"
-                           test="@spanTo">The spanTo= attribute of <sch:name/> is required.</sch:assert>
+                  xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+                  xmlns="http://www.tei-c.org/ns/1.0"
+                  xmlns:rng="http://relaxng.org/ns/structure/1.0"
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@spanTo">The spanTo= attribute of <sch:name/> is required.</sch:assert>
             </rule>
          </pattern>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="addSpan-constraint-spanTo_fr">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="addSpan-constraint-spanTo_fr">
             <rule context="tei:addSpan">
                <sch:assert xmlns:s="http://www.ascc.net/xml/schematron"
-                           xmlns:sch="http://purl.oclc.org/dsdl/schematron"
-                           xmlns="http://www.tei-c.org/ns/1.0"
-                           xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                           xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                           xmlns:svg="http://www.w3.org/2000/svg"
-                           xmlns:f="http://www.faustedition.net/ns"
-                           test="@spanTo">L'attribut spanTo est requis.</sch:assert>
+                  xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+                  xmlns="http://www.tei-c.org/ns/1.0"
+                  xmlns:rng="http://relaxng.org/ns/structure/1.0"
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@spanTo">L'attribut spanTo est requis.</sch:assert>
             </rule>
          </pattern>
          <ref name="_teiatt.changeRelated.attributes"/>
@@ -17635,25 +17533,20 @@ Sample values include: 1] homeoteleuton; 2] homeoarchy; 3] paleographicConfusion
       <element name="damageSpan">
          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
          <empty/>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="damageSpan-constraint-spanTo">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="damageSpan-constraint-spanTo">
             <rule context="tei:damageSpan">
                <assert xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@spanTo">The spanTo= attribute of
-	<name/> is required.</assert>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@spanTo">The spanTo= attribute of <name/> is required.</assert>
             </rule>
          </pattern>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="damageSpan-constraint-spanTo_fr">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="damageSpan-constraint-spanTo_fr">
             <rule context="tei:damageSpan">
                <assert xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@spanTo">L'attribut spanTo est requis.</assert>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@spanTo">L'attribut spanTo est requis.</assert>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -17670,21 +17563,17 @@ Sample values include: 1] homeoteleuton; 2] homeoarchy; 3] paleographicConfusion
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="delSpan-constraint-spanTo">
             <rule context="tei:delSpan">
                <assert xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@spanTo">The spanTo= attribute of <name/>
-      is required.</assert>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@spanTo">The spanTo= attribute of <name/> is required.</assert>
             </rule>
          </pattern>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="delSpan-constraint-spanTo_fr">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="delSpan-constraint-spanTo_fr">
             <rule context="tei:delSpan">
                <assert xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@spanTo">L'attribut spanTo est requis.</assert>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@spanTo">L'attribut spanTo est requis.</assert>
             </rule>
          </pattern>
          <ref name="_teiatt.changeRelated.attributes"/>
@@ -17725,7 +17614,8 @@ Sample values include: 1] homeoteleuton; 2] homeoarchy; 3] paleographicConfusion
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] header; 2] footer; 3] pageNum; 4] lineNum; 5] sig; 6] catch</a:documentation>
+                  Sample values include: 1] header; 2] footer; 3] pageNum; 4] lineNum; 5] sig; 6]
+                  catch</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -17921,9 +17811,8 @@ Sample values include: 1] header; 2] footer; 3] pageNum; 4] lineNum; 5] sig; 6] 
          <ref name="_teiatt.global.attributes"/>
          <ref name="_teiatt.declarable.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="met real">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="met real">
                <a:documentation/>
                <list>
                   <choice>
@@ -17986,9 +17875,8 @@ Sample values include: 1] header; 2] footer; 3] pageNum; 4] lineNum; 5] sig; 6] 
             </list>
          </attribute>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="terminal"
-                       a:defaultValue="true">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="terminal"
+               a:defaultValue="true">
                <a:documentation/>
                <ref name="_teidata.truthValue"/>
             </attribute>
@@ -18031,8 +17919,8 @@ Sample values include: 1] header; 2] footer; 3] pageNum; 4] lineNum; 5] sig; 6] 
    <define name="_teiatt.enjamb.attribute.enjamb">
       <optional>
          <attribute name="enjamb">
-            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] no; 2] yes; 3] weak; 4] strong</a:documentation>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"> Sample
+               values include: 1] no; 2] yes; 3] weak; 4] strong</a:documentation>
             <ref name="_teidata.enumerated"/>
          </attribute>
       </optional>
@@ -19305,27 +19193,23 @@ Sample values include: 1] no; 2] yes; 3] weak; 4] strong</a:documentation>
          <optional>
             <ref name="_teidesc"/>
          </optional>
-         <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="relation-constraint-activemutual">
+         <pattern xmlns="http://purl.oclc.org/dsdl/schematron" id="relation-constraint-activemutual">
             <rule context="tei:relation">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@active and @mutual">Only one of the attributes
-	'active' and 'mutual' may be supplied</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@active and @mutual">Only one of the attributes 'active' and 'mutual' may be
+                  supplied</report>
             </rule>
          </pattern>
          <pattern xmlns="http://purl.oclc.org/dsdl/schematron"
-                  id="relation-constraint-activepassive">
+            id="relation-constraint-activepassive">
             <rule context="tei:relation">
                <report xmlns:rng="http://relaxng.org/ns/structure/1.0"
-                       xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
-                       xmlns:svg="http://www.w3.org/2000/svg"
-                       xmlns:f="http://www.faustedition.net/ns"
-                       test="@passive and not(@active)">the attribute 'passive'
-	may be supplied only if the attribute 'active' is
-	supplied</report>
+                  xmlns:ge="http://www.tei-c.org/ns/geneticEditions"
+                  xmlns:svg="http://www.w3.org/2000/svg" xmlns:f="http://www.faustedition.net/ns"
+                  test="@passive and not(@active)">the attribute 'passive' may be supplied only if
+                  the attribute 'active' is supplied</report>
             </rule>
          </pattern>
          <ref name="_teiatt.global.attributes"/>
@@ -19333,11 +19217,10 @@ Sample values include: 1] no; 2] yes; 3] weak; 4] strong</a:documentation>
          <ref name="_teiatt.editLike.attributes"/>
          <ref name="_teiatt.naming.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="personal">
-               <a:documentation>
-Suggested values include: 1] social; 2] personal; 3] other</a:documentation>
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="personal">
+               <a:documentation> Suggested values include: 1] social; 2] personal; 3]
+                  other</a:documentation>
                <choice>
                   <value>social</value>
                   <a:documentation/>
@@ -20156,9 +20039,8 @@ Suggested values include: 1] social; 2] personal; 3] other</a:documentation>
          </zeroOrMore>
          <ref name="_teiatt.global.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="mode"
-                       a:defaultValue="x">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="mode"
+               a:defaultValue="x">
                <a:documentation/>
                <choice>
                   <value>s</value>
@@ -20191,9 +20073,8 @@ Suggested values include: 1] social; 2] personal; 3] other</a:documentation>
          </zeroOrMore>
          <ref name="_teiatt.global.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="type"
-                       a:defaultValue="single">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="type"
+               a:defaultValue="single">
                <a:documentation/>
                <choice>
                   <value>single</value>
@@ -20224,7 +20105,8 @@ Suggested values include: 1] social; 2] personal; 3] other</a:documentation>
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] original; 2] revision; 3] translation; 4] abridgment; 5] plagiarism; 6] traditional</a:documentation>
+                  Sample values include: 1] original; 2] revision; 3] translation; 4] abridgment; 5]
+                  plagiarism; 6] traditional</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -20245,7 +20127,8 @@ Sample values include: 1] original; 2] revision; 3] translation; 4] abridgment; 
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] art; 2] domestic; 3] religious; 4] business; 5] education; 6] govt; 7] public</a:documentation>
+                  Sample values include: 1] art; 2] domestic; 3] religious; 4] business; 5]
+                  education; 6] govt; 7] public</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -20310,7 +20193,8 @@ Sample values include: 1] art; 2] domestic; 3] religious; 4] business; 5] educat
          <optional>
             <attribute name="active">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] singular; 2] plural; 3] corporate; 4] unknown</a:documentation>
+                  Suggested values include: 1] singular; 2] plural; 3] corporate; 4]
+                  unknown</a:documentation>
                <choice>
                   <value>singular</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -20327,7 +20211,8 @@ Suggested values include: 1] singular; 2] plural; 3] corporate; 4] unknown</a:do
          <optional>
             <attribute name="passive">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] self; 2] single; 3] many; 4] group; 5] world</a:documentation>
+                  Suggested values include: 1] self; 2] single; 3] many; 4] group; 5]
+                  world</a:documentation>
                <choice>
                   <value>self</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -20360,7 +20245,8 @@ Suggested values include: 1] self; 2] single; 3] many; 4] group; 5] world</a:doc
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] none; 2] scripted; 3] formulaic; 4] revised</a:documentation>
+                  Sample values include: 1] none; 2] scripted; 3] formulaic; 4]
+                  revised</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -20381,7 +20267,8 @@ Sample values include: 1] none; 2] scripted; 3] formulaic; 4] revised</a:documen
          <optional>
             <attribute name="type">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Suggested values include: 1] persuade; 2] express; 3] inform; 4] entertain</a:documentation>
+                  Suggested values include: 1] persuade; 2] express; 3] inform; 4]
+                  entertain</a:documentation>
                <choice>
                   <value>persuade</value>
                   <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
@@ -20896,7 +20783,7 @@ Suggested values include: 1] persuade; 2] express; 3] inform; 4] entertain</a:do
          <optional>
             <attribute name="binder">
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">
-Sample values include: 1] glue; 2] pin; 3] sewn</a:documentation>
+                  Sample values include: 1] glue; 2] pin; 3] sewn</a:documentation>
                <ref name="_teidata.enumerated"/>
             </attribute>
          </optional>
@@ -20950,9 +20837,8 @@ Sample values include: 1] glue; 2] pin; 3] sewn</a:documentation>
          <ref name="_teiatt.global.attributes"/>
          <ref name="_teiatt.typed.attributes"/>
          <optional>
-            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-                       name="ordered"
-                       a:defaultValue="true">
+            <attribute xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" name="ordered"
+               a:defaultValue="true">
                <a:documentation/>
                <ref name="_teidata.truthValue"/>
             </attribute>
