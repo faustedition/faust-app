@@ -10340,9 +10340,15 @@ Edition Location: http://www.tei-c.org/Vault/P5/1.9.0/
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
                <value>unnumbered</value>
                <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
+               <value>paralipomenon</value>
+               <value>refline</value>
+               <value>testimony</value>
                <data type="Name"/>
             </choice>
          </attribute>
+         <optional>
+            <attribute name="relatedLines" ns="http://www.faustedition.net/ns"/>
+         </optional>
          <empty/>
       </element>
    </define>
