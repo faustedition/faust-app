@@ -35,20 +35,24 @@
 		</extensions>
 	</build>
 	<repositories>
-		<repository>
-			<id>faustedition-releases</id>
-			<url>http://faustedition.uni-wuerzburg.de/nexus/content/repositories/releases</url>
-		</repository>
+                <repository>
+                  <id>internal</id>
+                  <url>http://dev.digital-humanities.de/nexus/content/repositories/releases/</url>
+                </repository>
+                <repository>
+                  <id>snapshots</id>
+                  <url>http://dev.digital-humanities.de/nexus/content/repositories/snapshots/</url>
+                </repository>
 	</repositories>
 	<distributionManagement>
-		<repository>
-			<id>faustedition-releases</id>
-			<url>http://faustedition.uni-wuerzburg.de/nexus/content/repositories/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>faustedition-snapshots</id>
-			<url>http://faustedition.uni-wuerzburg.de/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
+                <repository>
+                  <id>internal</id>
+                  <url>http://dev.digital-humanities.de/nexus/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                  <id>snapshots</id>
+                  <url>http://dev.digital-humanities.de/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
 		<site>
 			<id>faustedition-schema</id>
 			<url>scp://faustedition.uni-wuerzburg.de/mnt/data/htdocs/schema/${project.version}</url>
