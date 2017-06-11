@@ -7,24 +7,97 @@
 	<version>1.4-SNAPSHOT</version>
 	<name>Digitale Faust-Edition :: Faust TEI P5 schema</name>
 	<packaging>jar</packaging>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<teiStylesheetUrl>http://www.tei-c.org/release/xml/tei/stylesheet/</teiStylesheetUrl>	
+	    <p5subsetUrl>http://www.tei-c.org/Vault/P5/1.9.1/xml/tei/odd/p5subset.xml</p5subsetUrl>
+	    <upload.url>faustedition.uni-wuerzburg.de:/mnt/data/htdocs/schema/${project.version}</upload.url>
+	</properties>
+	
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.tei</groupId>
-				<artifactId>tei-odd-plugin</artifactId>
-				<version>1.2-SNAPSHOT</version>
-				<configuration>
-				  <p5subsetUrl>http://www.tei-c.org/Vault/P5/1.9.1/xml/tei/odd/p5subset.xml</p5subsetUrl>
-				</configuration>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xml-maven-plugin</artifactId>
+				<version>1.0.1</version>
 				<executions>
 					<execution>
-						<goals>
-							<goal>schema</goal>
-							<goal>deploy</goal>
-						</goals>
+						<id>transform-odd</id>
+						<goals><goal>transform</goal></goals>
+						<phase>compile</phase>
+						<configuration>
+							<transformationSets>
+								<transformationSet>
+									<stylesheet>${teiStylesheetUrl}/odds/odd2relax.xsl</stylesheet>
+									<dir>src/main/odd</dir>
+									<parameters>
+										<parameter><name>verbose</name><value>false</value></parameter>
+										<parameter><name>TEIC</name><value>true</value></parameter>
+										<parameter><name>lang</name><value>en</value></parameter>
+										<parameter><name>doclang</name><value>en</value></parameter>
+										<parameter><name>parameterize</name><value>false</value></parameter>
+										<parameter><name>patternPrefix</name><value>_tei</value></parameter>					
+									</parameters>
+								    <fileMappers>
+										<fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+										  <targetExtension>.rng</targetExtension>
+										</fileMapper>
+									</fileMappers>
+								</transformationSet>
+								<transformationSet>
+									<stylesheet>${teiStylesheetUrl}/odds/odd2odd.xsl</stylesheet>
+									<dir>src/main/odd</dir>
+									<parameters>
+										<parameter><name>selectedSchema</name><value>faust-tei</value></parameter>
+										<parameter><name>verbose</name><value>false</value></parameter>
+										<parameter><name>TEIC</name><value>true</value></parameter>
+										<parameter><name>lang</name><value>en</value></parameter>
+										<parameter><name>doclang</name><value>en</value></parameter>
+										<parameter><name>stripped</name><value>true</value></parameter>
+										<parameter><name>defaultSource</name><value>${p5subsetUrl}</value></parameter>
+										<parameter><name>useVersionFromTEI</name><value>true</value></parameter>
+									</parameters>
+								</transformationSet>
+							</transformationSets>
+						</configuration>						
+					</execution>			
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>net.sf.saxon</groupId>
+						<artifactId>Saxon-HE</artifactId>
+						<version>9.7.0-18</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				
+				<executions>
+					<execution>
+						<id>deploy-rsync</id>
+						<phase>deploy</phase>
+						<goals><goal>exec</goal></goals>
+						<configuration>
+							<executable>rsync</executable>
+							<arguments>
+								<argument>-a</argument>
+								<argument>-u</argument>
+								<argument>--chmod=ug+rwX,o+rX,Dg+s</argument>
+								<argument>--omit-dir-times</argument>
+								<argument>${project.build.directory}/generated-resources/xml/xslt/</argument>
+								<argument>${upload.url}</argument>
+							</arguments>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+			
+			
 		</plugins>
 		<extensions>
 			<extension>
