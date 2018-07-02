@@ -43,7 +43,7 @@ def order_inscriptions(graph):
         transitive_closure = networkx.transitive_closure(graph)
         logging.info("{0} nodes, {1} edges in transtive closure.".format(transitive_closure.number_of_nodes(),
                                                                          transitive_closure.number_of_edges()))
-        num_predecessors_nodes = [(len(transitive_closure.predecessors(node)), node) for node in transitive_closure]
+        num_predecessors_nodes = [(len(list(transitive_closure.predecessors(node))), node) for node in transitive_closure]
         for n in sorted(num_predecessors_nodes, key=lambda tup: tup[0]):
             order_file.write('%i %s\n' % (n[0], n[1]))
             # print '%i %s' % (n[0], n[1])

@@ -43,8 +43,15 @@ def _label_from_uri(uri):
     """Returns a readable label from a uri of a document, inscription, bibliographical source, etc."""
     # label = uri[len('faust://'):]
 
+    wit = graph.Witness.get(uri)
+    if hasattr(wit, 'sigil'):
+        return wit.sigil
+    if (uri.startswith('faust://document/faustedition/')):
+        return uri[len('faust://document/faustedition/'):]
     if (uri.startswith('faust://document/wa/')):
         return uri[len('faust://document/wa/'):]
+    if (uri.startswith('faust://inscription/faustedition/')):
+        return uri[len('faust://inscription/faustedition/'):]
     if (uri.startswith('faust://inscription/wa')):
         return uri[len('faust://inscription/wa/'):]
     if (uri.startswith('faust://document/')):
@@ -201,7 +208,7 @@ def visualize():
     for highlighted_node in graph_imported:
         highlighted_bunch = list(networkx.all_neighbors(graph_imported, highlighted_node))
         highlighted_bunch.append(highlighted_node)
-        graph_highlighted_subgraph = graph_imported.subgraph(nbunch=highlighted_bunch).copy()
+        graph_highlighted_subgraph = graph_imported.subgraph(highlighted_bunch).copy()
         graph_highlighted_subgraph.node[highlighted_node][KEY_HIGHLIGHT]= VALUE_TRUE
         graph.insert_minimal_edges_from_absolute_datings(graph_highlighted_subgraph)
 
@@ -254,7 +261,7 @@ def visualize():
     for (component_index, component) in enumerate(strongly_connected_components):
         # don't generate subgraphs consisting of a single node
         if len(component) > 1:
-            graph_component = graph_absolute_edges.subgraph(nbunch=component).copy()
+            graph_component = graph_absolute_edges.subgraph(component).copy()
             #macrogenesis.insert_minimal_edges_from_absolute_datings(graph_component)
             # , edge_labels=True)
             _write_agraph_layout(_agraph_from(graph_component), output_dir,

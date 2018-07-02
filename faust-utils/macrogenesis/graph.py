@@ -1,7 +1,13 @@
 """
 Parse macrogenetic XML files into a networkx graph
 """
+import json
 import pickle
+import re
+import sys
+import urllib2
+from collections import Mapping
+
 import networkx
 import lxml.etree as etree
 import logging
@@ -25,8 +31,85 @@ GENETIC_RELATION_MAP = {'temp-pre': 'temp-pre',
                         'temp-syn': 'temp-syn'}
 
 
+class Inscription:
+
+    def __init__(self, witness, inscription):
+        self.witness = witness
+        self.inscription = inscription
+
+    @property
+    def uri(self):
+        return "/".join([self.witness.uri.replace('faust://document/', 'faust://inscription/'), self.inscription])
+
+    def __str__(self):
+        return self.uri
+
+
+class UnknownRef:
+
+    def __init__(self, uri):
+        self.uri = uri
+
+    def __str__(self):
+        return self.uri
+
+
+
+class Witness:
+    database = {}
+
+    def __init__(self, doc_record):
+        if isinstance(doc_record, Mapping):
+            self.__dict__.update(doc_record)
+        else:
+            raise TypeError('doc_record must be a mapping, not a ' + str(type(doc_record)))
+
+    def uris(self):
+        yield self.uri
+        if hasattr(self, 'other_sigils'):
+            for uri in self.other_sigils:
+                yield uri
+                if u'/wa_faust/' in uri:
+                    yield uri.replace('/wa_faust/', '/wa/')
+
+    @classmethod
+    def _load_database(cls, url='http://dev.digital-humanities.de/ci/job/faust-gen-fast/lastSuccessfulBuild/artifact/target/uris.json'):
+        sigil_json = urllib2.urlopen(url)
+        sigil_data = json.load(sigil_json)
+        sigil_json.close()
+        for doc in sigil_data:
+            wit = cls(doc)
+            for uri in wit.uris():
+                cls.database[uri] = wit
+
+        for ref, uri in sorted(cls.database.items()):
+            print ref, uri
+
+    @classmethod
+    def get(cls, uri):
+        if not cls.database:
+            cls._load_database()
+
+        if uri in cls.database:
+            return cls.database[uri]
+
+        if uri.startswith('faust://inscription'):
+            system, sigil, inscription = re.match('^faust://inscription/(.*)/(.*)/(.*)', uri).groups()
+            base = "/".join(['faust://document', system, inscription])
+            if base in cls.database:
+                wit = cls.database[base]
+                return Inscription(wit, inscription)
+
+        logging.warning('Unknown reference: %s', uri)
+        return UnknownRef(uri)
+
+    def __str__(self):
+        return self.uri
+
+
 class AbsoluteDating:
     """Represent an absolute dating"""
+
     # None can be passed for missing values
     def __init__(self, when, from_, to, not_before, not_after, bibliographic_source=None, source_file=None):
         self.when = when
@@ -111,6 +194,7 @@ def _average_absolute_date(node_attr):
     # TODO average of all dates, not just first one
     return node_attr[KEY_ABSOLUTE_DATINGS][0].average
 
+
 def insert_minimal_edges_from_absolute_datings(graph):
     """
     Append a networkx graph with information that is in the absolute datings.
@@ -129,7 +213,8 @@ def insert_minimal_edges_from_absolute_datings(graph):
             else:
                 last_differently_dated_node_id = previous_dated_node_id
             if last_differently_dated_node_id is not None:
-                graph.add_edge(last_differently_dated_node_id, node[0], attr_dict={KEY_RELATION_NAME: VALUE_IMPLICIT_FROM_ABSOLUTE})
+                graph.add_edge(last_differently_dated_node_id, node[0],
+                               attr_dict={KEY_RELATION_NAME: VALUE_IMPLICIT_FROM_ABSOLUTE})
         previous_dated_node_id = node[0]
         previous_date = _average_absolute_date(node[1])
     return same_dates_count
@@ -156,12 +241,12 @@ def _parse_dates(macrogenetic_document, graph):
             source_uri = date.find('f:source', namespaces=faust.namespaces).attrib['uri']
 
             absolute_dating = AbsoluteDating(
-                _parse_datestr(date.attrib["when"] if date.attrib.has_key("when") else None),
-                _parse_datestr(date.attrib["from"] if date.attrib.has_key("from") else None),
-                _parse_datestr(date.attrib["to"] if date.attrib.has_key("to") else None),
-                _parse_datestr(date.attrib["notBefore"] if date.attrib.has_key("notBefore") else None),
-                _parse_datestr(date.attrib["notAfter"] if date.attrib.has_key("notAfter") else None),
-                bibliographic_source=source_uri, source_file=macrogenetic_document.docinfo.URL)
+                    _parse_datestr(date.attrib["when"] if date.attrib.has_key("when") else None),
+                    _parse_datestr(date.attrib["from"] if date.attrib.has_key("from") else None),
+                    _parse_datestr(date.attrib["to"] if date.attrib.has_key("to") else None),
+                    _parse_datestr(date.attrib["notBefore"] if date.attrib.has_key("notBefore") else None),
+                    _parse_datestr(date.attrib["notAfter"] if date.attrib.has_key("notAfter") else None),
+                    bibliographic_source=source_uri, source_file=macrogenetic_document.docinfo.URL)
 
             date_id = 'date_{0}'.format(date_index)
             date_label = str(absolute_dating)
@@ -198,7 +283,7 @@ def _parse_relationships(macrogenetic_document, graph):
             previous_item = None
             previous_item_uri = None
             for item in items:
-                item_uri = item.attrib["uri"]
+                item_uri = Witness.get(item.attrib["uri"]).uri
                 # TODO create label in visualization component
                 _add_item_node(graph, item_uri)
                 if previous_item is None:
@@ -220,7 +305,7 @@ def _parse_relationships(macrogenetic_document, graph):
                                                   edges_from_previous_to_this if
                                                   edge[2].has_key(KEY_BIBLIOGRAPHIC_SOURCE)]
                     if not source_uri in used_bibliographic_sources:
-                        #if not relation_name == 'temp-syn':
+                        # if not relation_name == 'temp-syn':
                         graph.add_edge(previous_item_uri, item_uri, attr_dict=edge_attr_dict)
                         # make edges two directional for synchronous relation?
                         # if relation_name == 'temp-syn':
@@ -241,7 +326,11 @@ def _parse_relationships(macrogenetic_document, graph):
 
 
 def _add_item_node(graph, item_uri):
-    graph.add_node(item_uri, attr_dict={KEY_NODE_TYPE: VALUE_ITEM_NODE})
+    wit = Witness.get(item_uri)
+    attrs = {KEY_NODE_TYPE: VALUE_ITEM_NODE}
+    if hasattr(wit, 'sigil'):
+        attrs['label'] = wit.sigil
+    graph.add_node(wit.uri, attr_dict=attrs)
 
 
 def import_graph():
@@ -250,7 +339,7 @@ def import_graph():
         _parse(macrogenetic_file, imported_graph)
 
     logging.info(
-        "{0} nodes, {1} edges read.".format(imported_graph.number_of_nodes(), imported_graph.number_of_edges()))
+            "{0} nodes, {1} edges read.".format(imported_graph.number_of_nodes(), imported_graph.number_of_edges()))
     return imported_graph
 
 
