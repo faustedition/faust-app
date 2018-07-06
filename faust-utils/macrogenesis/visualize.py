@@ -15,6 +15,8 @@ import faust
 import graph
 
 # styles and defaults
+import macrogenesis.uris
+
 KEY_HIGHLIGHT = 'highlight'
 VALUE_TRUE = 'true'
 
@@ -43,8 +45,8 @@ def _label_from_uri(uri):
     """Returns a readable label from a uri of a document, inscription, bibliographical source, etc."""
     # label = uri[len('faust://'):]
 
-    wit = graph.Witness.get(uri)
-    if hasattr(wit, 'sigil'):
+    wit = macrogenesis.uris.Witness.get(uri)
+    if hasattr(wit, u'sigil'):
         return wit.sigil
     if (uri.startswith('faust://document/faustedition/')):
         return uri[len('faust://document/faustedition/'):]
@@ -102,7 +104,7 @@ def _apply_agraph_styles(agraph, edge_labels=False):
         if graph.KEY_NODE_TYPE in node.attr.keys() and node.attr[graph.KEY_NODE_TYPE] == graph.VALUE_ITEM_NODE:
             # link to subgraph for single node neighborhood
             _set_node_url(node.attr, _highlighted_base_filename(node))
-            node.attr['label'] = _label_from_uri(node)
+            node.attr['label'] = str(_label_from_uri(node))
             node.attr['tooltip'] = '%s &#013;&#013; %s ' \
                                    % (_label_from_uri(node), node)
 
