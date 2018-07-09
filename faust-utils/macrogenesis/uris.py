@@ -5,9 +5,11 @@ import json
 import logging
 import re
 import urllib2
-from collections import defaultdict
+from collections import defaultdict, Counter
+from operator import itemgetter
 
 from lxml import etree
+
 import faust
 
 
@@ -20,7 +22,7 @@ class Inscription(object):
         if self.known_witness:
             self.known_inscription = inscription in getattr(witness, 'inscriptions', {})
             if self.known_inscription:
-                self.status = 'ok'
+                self.status = '(ok)'
             else:
                 self.status = 'unknown-inscription'
         else:
@@ -93,7 +95,7 @@ class Witness(object):
     def __init__(self, doc_record):
         if isinstance(doc_record, dict):
             self.__dict__.update(doc_record)
-            self.status = "ok"
+            self.status = '(ok)'
         else:
             raise TypeError('doc_record must be a mapping, not a ' + str(type(doc_record)))
 
@@ -174,28 +176,35 @@ def _collect_wits():
         tree = etree.parse(macrogenetic_file)  # type: etree._ElementTree
         for element in tree.xpath('//f:item', namespaces=faust.namespaces):  # type: etree._Element
             uri = element.get('uri')
-            wit = Witness.get(uri)
+            wit = Witness.get(uri, allow_duplicate=True)
             items[wit].append((macrogenetic_file.split('macrogenesis/')[-1], element.sourceline))
     return items
+
+
+def _assemble_report(wits):
+    referenced = [(str(wit), wit.status, ", ".join([file + ":" + str(line) for file, line in wits[wit]]))
+                  for wit in sorted(wits, key=str)]
+
+    unused = [(str(wit), "no macrogenesis data", "")
+              for wit in sorted(set(Witness.database.values()), key=str)
+              if wit not in wits and isinstance(wit, Witness)]
+
+    return [row for row in sorted(referenced, key=lambda r: (r[1], r[0])) if row[1] != '(ok)'] \
+           + [row for row in sorted(referenced, key=itemgetter(0)) if row[1] == '(ok)'] \
+           + unused
 
 
 def _report_wits(wits, output_csv='witness-usage.csv'):
     with codecs.open(output_csv, "wt", encoding='utf-8') as reportfile:
         table = csv.writer(reportfile)
-        table.writerow(['URI', 'Status', 'Vorkommen'])
-        for wit in sorted(wits, key=str):
-            table.writerow([
-                str(wit),
-                wit.status,
-                ", ".join([file + ":" + str(line) for file, line in wits[wit]])
-            ])
-        for wit in sorted(set(Witness.database.values()), key=str):
-            if wit not in wits:
-                table.writerow([
-                    str(wit),
-                    "no-data",
-                    ""
-                ])
+        rows = _assemble_report(wits)
+        table.writerow(('Zeuge / Referenz', 'Status', 'Vorkommen'))
+        for row in rows:
+            table.writerow(row)
+        stats = Counter([row[1].split(':')[0] for row in rows])
+        report = "\n".join('%5d: %s' % (count, status) for status, count in stats.most_common())
+        logging.warning('Analyzed references in data:\n%s', report)
+
 
 
 if __name__ == '__main__':

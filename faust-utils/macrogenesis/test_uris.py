@@ -48,7 +48,7 @@ def test_known_wit(fake_db):
     h = Witness.get('faust://document/faustedition/2_H')
     assert isinstance(h, Witness)
     assert h.uri == 'faust://document/faustedition/2_H'
-    assert h.status == 'ok'
+    assert h.status == '(ok)'
 
 
 def test_other_uri(fake_db):
@@ -56,7 +56,7 @@ def test_other_uri(fake_db):
     h = Witness.get('faust://document/wa/2_H')
     assert isinstance(h, Witness)
     assert h.uri == 'faust://document/faustedition/2_H'
-    assert h.status == 'ok'
+    assert h.status == '(ok)'
 
 
 def test_missing_stuff(fake_db):
@@ -69,7 +69,7 @@ def test_ex_inscription(fake_db):
     Witness.database = fake_db
     i = Witness.get('faust://inscription/wa/2_H/i_uebrige')
     assert isinstance(i, Inscription)
-    assert i.status == 'ok'
+    assert i.status == '(ok)'
 
 
 def test_missing_inscription(fake_db):
