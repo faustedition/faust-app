@@ -10,7 +10,7 @@ import faust
 import datetime
 import base64
 
-from macrogenesis.uris import Witness
+from uris import Witness
 
 KEY_RELATION_NAME = 'relation_name'
 KEY_ABSOLUTE_DATINGS = 'absolute_datings'

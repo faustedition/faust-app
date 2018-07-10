@@ -11,11 +11,11 @@ import textwrap
 
 import networkx
 
+import uris
 import faust
 import graph
 
 # styles and defaults
-import macrogenesis.uris
 
 KEY_HIGHLIGHT = 'highlight'
 VALUE_TRUE = 'true'
@@ -45,7 +45,7 @@ def _label_from_uri(uri):
     """Returns a readable label from a uri of a document, inscription, bibliographical source, etc."""
     # label = uri[len('faust://'):]
 
-    wit = macrogenesis.uris.Witness.get(uri)
+    wit = uris.Witness.get(uri)
     if hasattr(wit, u'sigil'):
         return wit.sigil
     if (uri.startswith('faust://document/faustedition/')):
