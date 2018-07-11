@@ -4,13 +4,42 @@ import csv
 import json
 import logging
 import re
+from functools import wraps
 from urllib2 import urlopen
 from collections import defaultdict, Counter
 from operator import itemgetter
 
+import pandas as pd
 from lxml import etree
 
 import faust
+
+
+def call_recorder(function=None, argument_picker=None):
+    """
+    Decorator that records call / result counts.
+
+    Args:
+        argument_picker(Function): function that picks the interesting arguments
+    """
+
+    def decorator(fun):
+        recorder = Counter()
+
+        @wraps(fun)
+        def wrapper(*args, **kwargs):
+            relevant_args = args if argument_picker is None else argument_picker(args)
+            result = fun(*args, **kwargs)
+            recorder.update([(relevant_args, result)])
+            return result
+
+        wrapper.recorder = recorder
+        return wrapper
+
+    if callable(function) and argument_picker is None:
+        return decorator(function)
+    else:
+        return decorator
 
 
 class Inscription(object):
@@ -128,10 +157,9 @@ class Witness(object):
             json_str = '[' + ''.join(para_file.readlines()[1:])
             para_file.close()
             orig_para = json.loads(json_str, encoding='utf-8')
-            cls.paralipomena = { p['n'].strip(): p for p in orig_para }
+            cls.paralipomena = {p['n'].strip(): p for p in orig_para}
 
         return cls.paralipomena
-
 
     @classmethod
     def build_database(cls, sigil_data):
@@ -151,11 +179,13 @@ class Witness(object):
         return database
 
     @classmethod
+    @call_recorder(argument_picker=itemgetter(1))
     def get(cls, uri, allow_duplicate=False):
         if not cls.database:
             cls._load_database()
             cls._load_paralipomena()
 
+        orig_uri = uri
         uri = uri.replace('-', '_')
 
         if uri in cls.database:
@@ -165,7 +195,7 @@ class Witness(object):
             else:
                 return result
 
-        wa_pseudo_inscr = re.match('faust://(inscription|document)/wa/(\S+)alpha', uri)
+        wa_pseudo_inscr = re.match('faust://(inscription|document)/wa/(\S+?)\.?alpha$', uri)
         if wa_pseudo_inscr is not None:
             docuri = 'faust://document/wa_faust/' + wa_pseudo_inscr.group(2)
             wit = cls.get(docuri)
@@ -176,14 +206,17 @@ class Witness(object):
 
         space_inscr = re.match('faust://(inscription|document)/(.*?)/(.*?)\s+(.*?)', uri)
         if space_inscr is not None:
-            uri = 'faust://inscription/' + space_inscr.group(2) + '/' + space_inscr.group(3) + '/' + space_inscr.group(4)
+            uri = 'faust://inscription/' + space_inscr.group(2) + '/' + space_inscr.group(3) + '/' + space_inscr.group(
+                    4)
 
         wa_para = re.match(r'faust://(inscription|document)/wa/P(.+?)(/(.+?))$', uri)
         if wa_para and wa_para.group(2) in cls.paralipomena:
             sigil = cls.paralipomena[wa_para.group(2)]['sigil']
             para_n = wa_para.group(2)
             inscription = wa_para.group(4) if wa_para.group(4) else ('P' + para_n)
-            witness = [witness for witness in cls.database.values() if isinstance(witness, Witness) and witness.sigil == sigil][0]
+            witness = \
+                [witness for witness in cls.database.values() if
+                 isinstance(witness, Witness) and witness.sigil == sigil][0]
             result = Inscription(witness, inscription)
             logging.info('Recognized WA paralipomenon: %s -> %s', uri, result)
             return result
@@ -195,7 +228,6 @@ class Witness(object):
                 base = "/".join(['faust://document', system, sigil])
                 wit = cls.get(base)
                 return Inscription(wit, inscription)
-
 
         logging.warning('Unknown reference: %s', uri)
         return UnknownRef(uri)
@@ -248,8 +280,36 @@ def _report_wits(wits, output_csv='witness-usage.csv'):
         logging.warning('Analyzed references in data:\n%s', report)
 
 
-
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     wits = _collect_wits()
+
+    resolutions = defaultdict(set)
+    for uri, result in Witness.get.recorder.keys():
+        resolutions[result].add(uri)
+
+    with codecs.open("reference-normalizations.csv", "wt", encoding="utf-8") as resfile:
+        table = csv.writer(resfile)
+        table.writerow(('in macrogenesis', 'normalisiert'))
+
+        for uri in sorted(resolutions):
+            for ref in sorted(resolutions[uri]):
+                if str(uri) != str(ref):
+                    table.writerow((ref, uri))
+
+
     _report_wits(wits)
+
+    wit_sigils = dict()
+    for w in [w for w in Witness.database.values() if isinstance(w, Witness)]:
+        sigils = dict()
+        for uri, sigil in w.other_sigils.items():
+            parts = uri.split('/')
+            type_, ascii = parts[3:5]
+            sigils[type_] = sigil
+            sigils[type_ + ' (norm.)'] = ascii
+        wit_sigils[w] = sigils
+
+    wit_report = pd.DataFrame(wit_sigils).T
+    wit_report.to_excel('witness-sigils.xlsx')
+
