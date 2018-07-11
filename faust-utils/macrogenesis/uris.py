@@ -103,6 +103,7 @@ class Witness(object):
         result = [self.uri]
         if hasattr(self, 'other_sigils'):
             for uri in self.other_sigils:
+                uri = uri.replace('-', '_')
                 result.append(uri)
                 if u'/wa_faust/' in uri:
                     result.append(uri.replace('/wa_faust/', '/wa/'))
@@ -140,12 +141,27 @@ class Witness(object):
         if not cls.database:
             cls._load_database()
 
+        uri = uri.replace('-', '_')
+
         if uri in cls.database:
             result = cls.database[uri]
             if isinstance(result, AmbiguousRef):
                 return result if allow_duplicate else result.first()
             else:
                 return result
+
+        wa_pseudo_inscr = re.match('faust://(inscription|document)/wa/(\S+)alpha', uri)
+        if wa_pseudo_inscr is not None:
+            docuri = 'faust://document/wa_faust/' + wa_pseudo_inscr.group(2)
+            wit = cls.get(docuri)
+            if isinstance(wit, Witness):
+                return Inscription(wit, 'alpha')
+            else:
+                logging.warning('Could not fix WA pseudo inscription candidate %s (%s)', uri, wit)
+
+        space_inscr = re.match('faust://(inscription|document)/(.*?)/(.*?)\s+(.*?)', uri)
+        if space_inscr is not None:
+            uri = 'faust://inscription/' + space_inscr.group(2) + '/' + space_inscr.group(3) + '/' + space_inscr.group(4)
 
         if uri.startswith('faust://inscription'):
             match = re.match('faust://inscription/(.*)/(.*)/(.*)', uri)
