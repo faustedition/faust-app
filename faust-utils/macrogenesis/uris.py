@@ -4,7 +4,7 @@ import csv
 import json
 import logging
 import re
-import urllib2
+from urllib2 import urlopen
 from collections import defaultdict, Counter
 from operator import itemgetter
 
@@ -91,6 +91,7 @@ class AmbiguousRef(object):
 
 class Witness(object):
     database = {}
+    paralipomena = None
 
     def __init__(self, doc_record):
         if isinstance(doc_record, dict):
@@ -114,10 +115,23 @@ class Witness(object):
     @classmethod
     def _load_database(cls,
                        url='http://dev.digital-humanities.de/ci/job/faust-gen-fast/lastSuccessfulBuild/artifact/target/uris.json'):
-        sigil_json = urllib2.urlopen(url)
+        sigil_json = urlopen(url)
         sigil_data = json.load(sigil_json)
         sigil_json.close()
         cls.database = cls.build_database(sigil_data)
+
+    @classmethod
+    def _load_paralipomena(cls,
+                           url='http://dev.digital-humanities.de/ci/job/faust-gen-fast/lastSuccessfulBuild/artifact/target/www/data/paralipomena.js'):
+        if cls.paralipomena is None:
+            para_file = urlopen(url)
+            json_str = '[' + ''.join(para_file.readlines()[1:])
+            para_file.close()
+            orig_para = json.loads(json_str, encoding='utf-8')
+            cls.paralipomena = { p['n'].strip(): p for p in orig_para }
+
+        return cls.paralipomena
+
 
     @classmethod
     def build_database(cls, sigil_data):
@@ -140,6 +154,7 @@ class Witness(object):
     def get(cls, uri, allow_duplicate=False):
         if not cls.database:
             cls._load_database()
+            cls._load_paralipomena()
 
         uri = uri.replace('-', '_')
 
@@ -163,6 +178,16 @@ class Witness(object):
         if space_inscr is not None:
             uri = 'faust://inscription/' + space_inscr.group(2) + '/' + space_inscr.group(3) + '/' + space_inscr.group(4)
 
+        wa_para = re.match(r'faust://(inscription|document)/wa/P(.+?)(/(.+?))$', uri)
+        if wa_para and wa_para.group(2) in cls.paralipomena:
+            sigil = cls.paralipomena[wa_para.group(2)]['sigil']
+            para_n = wa_para.group(2)
+            inscription = wa_para.group(4) if wa_para.group(4) else ('P' + para_n)
+            witness = [witness for witness in cls.database.values() if isinstance(witness, Witness) and witness.sigil == sigil][0]
+            result = Inscription(witness, inscription)
+            logging.info('Recognized WA paralipomenon: %s -> %s', uri, result)
+            return result
+
         if uri.startswith('faust://inscription'):
             match = re.match('faust://inscription/(.*)/(.*)/(.*)', uri)
             if match is not None:
@@ -170,6 +195,7 @@ class Witness(object):
                 base = "/".join(['faust://document', system, sigil])
                 wit = cls.get(base)
                 return Inscription(wit, inscription)
+
 
         logging.warning('Unknown reference: %s', uri)
         return UnknownRef(uri)
@@ -224,5 +250,6 @@ def _report_wits(wits, output_csv='witness-usage.csv'):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     wits = _collect_wits()
     _report_wits(wits)
