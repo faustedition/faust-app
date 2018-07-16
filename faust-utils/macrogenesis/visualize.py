@@ -11,10 +11,12 @@ import textwrap
 
 import networkx
 
+import uris
 import faust
 import graph
 
 # styles and defaults
+
 KEY_HIGHLIGHT = 'highlight'
 VALUE_TRUE = 'true'
 
@@ -43,8 +45,15 @@ def _label_from_uri(uri):
     """Returns a readable label from a uri of a document, inscription, bibliographical source, etc."""
     # label = uri[len('faust://'):]
 
+    wit = uris.Witness.get(uri)
+    if hasattr(wit, u'sigil'):
+        return wit.sigil
+    if (uri.startswith('faust://document/faustedition/')):
+        return uri[len('faust://document/faustedition/'):]
     if (uri.startswith('faust://document/wa/')):
         return uri[len('faust://document/wa/'):]
+    if (uri.startswith('faust://inscription/faustedition/')):
+        return uri[len('faust://inscription/faustedition/'):]
     if (uri.startswith('faust://inscription/wa')):
         return uri[len('faust://inscription/wa/'):]
     if (uri.startswith('faust://document/')):
@@ -95,7 +104,7 @@ def _apply_agraph_styles(agraph, edge_labels=False):
         if graph.KEY_NODE_TYPE in node.attr.keys() and node.attr[graph.KEY_NODE_TYPE] == graph.VALUE_ITEM_NODE:
             # link to subgraph for single node neighborhood
             _set_node_url(node.attr, _highlighted_base_filename(node))
-            node.attr['label'] = _label_from_uri(node)
+            node.attr['label'] = str(_label_from_uri(node))
             node.attr['tooltip'] = '%s &#013;&#013; %s ' \
                                    % (_label_from_uri(node), node)
 
