@@ -33,11 +33,11 @@ class AbsoluteDating:
 
     # None can be passed for missing values
     def __init__(self, when, from_, to, not_before, not_after, bibliographic_source=None, source_file=None):
-        self.when = when
-        self.from_ = from_
-        self.to = to
-        self.not_before = not_before
-        self.not_after = not_after
+        self.when = _parse_datestr(when)
+        self.from_ = _parse_datestr(from_)
+        self.to = _parse_datestr(to)
+        self.not_before = _parse_datestr(not_before)
+        self.not_after = _parse_datestr(not_after)
         self.bibliographic_source = bibliographic_source
         self.source_file = source_file
 
@@ -97,7 +97,12 @@ def _parse(macrogenetic_file, graph):
 
 def _parse_datestr(datestr):
     """Parse a datestring and return a datetime object"""
-    return None if datestr is None else datetime.datetime.strptime(datestr, '%Y-%m-%d')
+    if datestr is None:
+        return None
+    elif datestr is datetime:
+        return datestr
+    else:
+        return datetime.datetime.strptime(datestr, '%Y-%m-%d')
 
 
 def serialize_for_graphviz(obj):
