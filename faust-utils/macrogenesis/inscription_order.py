@@ -1,7 +1,7 @@
 """
 Calculate a heuristic absolute temporal ordering of all inscriptions
 """
-
+import csv
 import logging
 import os
 
@@ -34,6 +34,26 @@ def graph_statistics(macrogenetic_graph):
     return [("Graph statistics", statistics_file_name)]
 
 
+def analyse_conflicts(macrogenetic_graph):
+    output_dir = faust.config.get("macrogenesis", "output-dir")
+    conflicts_file_name = 'conflicts.txt'
+    with open(os.path.join(output_dir, conflicts_file_name), "wt") as conflicts_file:
+        writer = csv.writer(conflicts_file, delimiter='\t')
+        writer.writerow(['Size', 'Edges', 'Sources', 'Types', 'Cycle'])
+        for nodes in sorted(networkx.strongly_connected_components(macrogenetic_graph), key=len, reverse=True):
+            size = len(nodes)
+            if size > 1:
+                subgraph = networkx.subgraph(macrogenetic_graph, nodes)  # type: networkx.DiGraph
+                edge_count = len(subgraph.edges)
+                sources = {attr['attr_dict'].get(graph.KEY_BIBLIOGRAPHIC_SOURCE, '') for u, v, attr in subgraph.edges.data()}
+                node_types = {attr['attr_dict'].get(graph.KEY_NODE_TYPE, '') for u, v, attr in subgraph.edges.data()}
+                writer.writerow([size, edge_count, ", ".join(sources), ", ".join(node_types), " -> ".join(map(str, nodes))])
+    return [('List of conflicts', conflicts_file_name)]
+
+
+
+
+
 def order_inscriptions(graph):
     """Print a list of inscriptions heuristically ordered by their date of writing"""
 
@@ -56,7 +76,7 @@ def analyse_graph():
     graph.insert_minimal_edges_from_absolute_datings(macrogenetic_graph)
 
     links = graph_statistics(macrogenetic_graph)
-    links = links +  order_inscriptions(macrogenetic_graph)
+    links = links +  order_inscriptions(macrogenetic_graph) + analyse_conflicts(macrogenetic_graph)
     return links
 
 if __name__ == '__main__':
