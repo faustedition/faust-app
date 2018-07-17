@@ -240,8 +240,11 @@ class Witness(object):
             return self.uri == other.uri
         return str(self) == str(other)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.sigil_t
+
+    def __str__(self):
+        return codecs.encode(self.__unicode__(), 'ascii', 'xmlcharrefreplace')
 
 
 def _collect_wits():
